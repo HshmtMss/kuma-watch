@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap from "@/components/KumaMap";
+import RiskPanel from "@/components/RiskPanel";
 import {
   RISK_LEVEL_COLOR,
   RISK_LEVEL_LABEL,
@@ -93,6 +94,12 @@ export default function KumaClient() {
 
       <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
         <KumaMap records={filtered} showHeatmap={showHeatmap} />
+
+        <div className="pointer-events-none absolute left-3 top-3 z-[1000] w-[min(340px,calc(100vw-1.5rem))]">
+          <div className="pointer-events-auto">
+            <RiskPanel />
+          </div>
+        </div>
 
         {loading && (
           <div className="absolute inset-0 z-[999] flex items-center justify-center bg-white/70 backdrop-blur-sm">
