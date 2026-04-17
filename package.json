@@ -1,17 +1,24 @@
 {
-  "name": "kuma-map",
-  "version": "0.1.0",
+  "name": "kumawatch",
+  "version": "1.0.0-beta.1",
   "private": true,
+  "description": "KumaWatch（クマウォッチ）— 全国クマ出没予報・危険度マップ",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:mesh": "node scripts/build-mesh-data.mjs"
   },
   "dependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/papaparse": "^5.5.2",
+    "leaflet": "^1.9.4",
     "next": "16.2.0",
+    "papaparse": "^5.5.3",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
