@@ -1,44 +1,152 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type {
+  Map as LeafletMap,
+  Marker,
+  LayerGroup,
+  Rectangle,
+} from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
+import { computeScore, RISK_LEVEL_COLOR } from "@/lib/score";
+
+type MeshEntry = {
+  m: string;
+  s: number;
+  x: number;
+  l: number;
+  ls: number;
+  lat: number;
+  lon: number;
+};
+
+type MeshJsonPayload = {
+  generatedAt: string;
+  count: number;
+  meshes: MeshEntry[];
+};
+
+const MESH_LAT_HALF = 2.5 / 60 / 2;
+const MESH_LON_HALF = 3.75 / 60 / 2;
+const MIN_HEAT_ZOOM = 6;
+const MAX_HEAT_RECTS = 4000;
 
 type Props = {
   records: KumaRecord[];
   center?: [number, number];
   zoom?: number;
+  showHeatmap?: boolean;
 };
 
 export default function KumaMap({
   records,
   center = [36.5, 137.5],
   zoom = 6,
+  showHeatmap = true,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<any[]>([]);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const markersRef = useRef<Marker[]>([]);
+  const meshLayerRef = useRef<LayerGroup | null>(null);
+  const meshDataRef = useRef<MeshEntry[] | null>(null);
+  const showHeatmapRef = useRef(showHeatmap);
 
-  // 地図を一度だけ初期化
+  useEffect(() => {
+    showHeatmapRef.current = showHeatmap;
+    const map = mapRef.current;
+    const layer = meshLayerRef.current;
+    if (!map || !layer) return;
+    if (showHeatmap) {
+      if (!map.hasLayer(layer)) layer.addTo(map);
+      renderMeshLayerNow();
+    } else if (map.hasLayer(layer)) {
+      map.removeLayer(layer);
+    }
+  }, [showHeatmap]);
+
+  const renderMeshLayerNow = () => {
+    const map = mapRef.current;
+    const layer = meshLayerRef.current;
+    const meshes = meshDataRef.current;
+    if (!map || !layer || !meshes) return;
+    if (!showHeatmapRef.current) return;
+
+    import("leaflet").then((L) => {
+      layer.clearLayers();
+      if (map.getZoom() < MIN_HEAT_ZOOM) return;
+
+      const bounds = map.getBounds();
+      const padLat = MESH_LAT_HALF;
+      const padLon = MESH_LON_HALF;
+      const south = bounds.getSouth() - padLat;
+      const north = bounds.getNorth() + padLat;
+      const west = bounds.getWest() - padLon;
+      const east = bounds.getEast() + padLon;
+
+      const now = new Date();
+      const visible: MeshEntry[] = [];
+      for (const m of meshes) {
+        if (m.lat < south || m.lat > north) continue;
+        if (m.lon < west || m.lon > east) continue;
+        visible.push(m);
+        if (visible.length >= MAX_HEAT_RECTS) break;
+      }
+
+      for (const m of visible) {
+        const { score, level } = computeScore(
+          {
+            second: m.s,
+            sixth: m.x,
+            latest: m.l,
+            latestSingle: m.ls,
+          },
+          now,
+          null,
+        );
+        if (level === "safe") continue;
+
+        const color = RISK_LEVEL_COLOR[level];
+        const opacity = Math.min(0.55, 0.15 + score / 200);
+        const rect: Rectangle = L.rectangle(
+          [
+            [m.lat - MESH_LAT_HALF, m.lon - MESH_LON_HALF],
+            [m.lat + MESH_LAT_HALF, m.lon + MESH_LON_HALF],
+          ],
+          {
+            stroke: false,
+            fillColor: color,
+            fillOpacity: opacity,
+            interactive: false,
+            renderer: L.canvas({ padding: 0.1 }),
+          },
+        );
+        rect.addTo(layer);
+      }
+    });
+  };
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el || mapRef.current) return;
-
     let cancelled = false;
 
     import("leaflet").then((L) => {
       if (cancelled || !el || mapRef.current) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      const IconDefault = L.Icon.Default as unknown as {
+        prototype: { _getIconUrl?: unknown };
+      };
+      delete IconDefault.prototype._getIconUrl;
       L.Icon.Default.mergeOptions({
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+        iconRetinaUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+        iconUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+        shadowUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
       });
 
-      const map = L.map(el, { center, zoom });
+      const map = L.map(el, { center, zoom, preferCanvas: true });
       mapRef.current = map;
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -47,6 +155,23 @@ export default function KumaMap({
           '<a href="https://public.sharp9110.com/view/allposts/bear">Sharp9110</a> CC BY 4.0',
         maxZoom: 18,
       }).addTo(map);
+
+      const meshLayer = L.layerGroup();
+      meshLayerRef.current = meshLayer;
+      if (showHeatmapRef.current) meshLayer.addTo(map);
+
+      map.on("moveend zoomend", renderMeshLayerNow);
+
+      fetch("/data/mesh.json", { cache: "force-cache" })
+        .then((r) => r.json())
+        .then((data: MeshJsonPayload) => {
+          if (cancelled) return;
+          meshDataRef.current = data.meshes;
+          renderMeshLayerNow();
+        })
+        .catch(() => {
+          // mesh data load failed — silently continue without heatmap
+        });
     });
 
     return () => {
@@ -55,17 +180,17 @@ export default function KumaMap({
         mapRef.current.remove();
         mapRef.current = null;
       }
+      meshLayerRef.current = null;
+      markersRef.current = [];
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // records が変わるたびにピンだけ更新
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     import("leaflet").then((L) => {
-      // 既存ピンを削除
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
 
@@ -84,7 +209,7 @@ export default function KumaMap({
         });
 
       records.forEach((r) => {
-        const m = L.marker([r.lat, r.lon], {
+        const marker = L.marker([r.lat, r.lon], {
           icon: makeIcon(r.headCount > 1 ? "#ef4444" : "#6b7280"),
         })
           .addTo(map)
@@ -97,15 +222,10 @@ export default function KumaMap({
             </div>`,
             { maxWidth: 260 },
           );
-        markersRef.current.push(m);
+        markersRef.current.push(marker);
       });
     });
   }, [records]);
 
-  return (
-    <div
-      ref={containerRef}
-      style={{ position: "absolute", inset: 0 }}
-    />
-  );
+  return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
 }
