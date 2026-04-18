@@ -3,9 +3,10 @@
 import { useEffect, useRef } from "react";
 import type {
   Map as LeafletMap,
-  Marker,
   LayerGroup,
   Rectangle,
+  CircleMarker,
+  Popup,
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import { computeScore, RISK_LEVEL_COLOR } from "@/lib/score";
@@ -29,7 +30,15 @@ type MeshJsonPayload = {
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
 const MIN_HEAT_ZOOM = 6;
-const MAX_HEAT_RECTS = 4000;
+const REDRAW_DEBOUNCE_MS = 180;
+
+function mobileCaps() {
+  if (typeof window === "undefined") return { maxRects: 4000, maxPins: 1200 };
+  const narrow = window.innerWidth < 768;
+  return narrow
+    ? { maxRects: 1500, maxPins: 500 }
+    : { maxRects: 4000, maxPins: 1500 };
+}
 
 type Props = {
   records: KumaRecord[];
@@ -46,60 +55,54 @@ export default function KumaMap({
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
-  const markersRef = useRef<Marker[]>([]);
   const meshLayerRef = useRef<LayerGroup | null>(null);
+  const pinLayerRef = useRef<LayerGroup | null>(null);
+  const popupRef = useRef<Popup | null>(null);
   const meshDataRef = useRef<MeshEntry[] | null>(null);
+  const recordsRef = useRef<KumaRecord[]>(records);
   const showHeatmapRef = useRef(showHeatmap);
+  const redrawTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    showHeatmapRef.current = showHeatmap;
-    const map = mapRef.current;
-    const layer = meshLayerRef.current;
-    if (!map || !layer) return;
-    if (showHeatmap) {
-      if (!map.hasLayer(layer)) layer.addTo(map);
-      renderMeshLayerNow();
-    } else if (map.hasLayer(layer)) {
-      map.removeLayer(layer);
+  const scheduleRedraw = () => {
+    if (redrawTimerRef.current != null) {
+      window.clearTimeout(redrawTimerRef.current);
     }
-  }, [showHeatmap]);
+    redrawTimerRef.current = window.setTimeout(() => {
+      redrawTimerRef.current = null;
+      renderMeshLayer();
+      renderPinLayer();
+    }, REDRAW_DEBOUNCE_MS);
+  };
 
-  const renderMeshLayerNow = () => {
+  const renderMeshLayer = () => {
     const map = mapRef.current;
     const layer = meshLayerRef.current;
     const meshes = meshDataRef.current;
     if (!map || !layer || !meshes) return;
-    if (!showHeatmapRef.current) return;
+    if (!showHeatmapRef.current) {
+      layer.clearLayers();
+      return;
+    }
 
     import("leaflet").then((L) => {
       layer.clearLayers();
       if (map.getZoom() < MIN_HEAT_ZOOM) return;
 
+      const { maxRects } = mobileCaps();
       const bounds = map.getBounds();
-      const padLat = MESH_LAT_HALF;
-      const padLon = MESH_LON_HALF;
-      const south = bounds.getSouth() - padLat;
-      const north = bounds.getNorth() + padLat;
-      const west = bounds.getWest() - padLon;
-      const east = bounds.getEast() + padLon;
+      const south = bounds.getSouth() - MESH_LAT_HALF;
+      const north = bounds.getNorth() + MESH_LAT_HALF;
+      const west = bounds.getWest() - MESH_LON_HALF;
+      const east = bounds.getEast() + MESH_LON_HALF;
 
       const now = new Date();
-      const visible: MeshEntry[] = [];
+      const canvas = L.canvas({ padding: 0.1 });
+      let drawn = 0;
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
         if (m.lon < west || m.lon > east) continue;
-        visible.push(m);
-        if (visible.length >= MAX_HEAT_RECTS) break;
-      }
-
-      for (const m of visible) {
         const { score, level } = computeScore(
-          {
-            second: m.s,
-            sixth: m.x,
-            latest: m.l,
-            latestSingle: m.ls,
-          },
+          { second: m.s, sixth: m.x, latest: m.l, latestSingle: m.ls },
           now,
           null,
         );
@@ -117,13 +120,89 @@ export default function KumaMap({
             fillColor: color,
             fillOpacity: opacity,
             interactive: false,
-            renderer: L.canvas({ padding: 0.1 }),
+            renderer: canvas,
           },
         );
         rect.addTo(layer);
+        drawn++;
+        if (drawn >= maxRects) break;
       }
     });
   };
+
+  const renderPinLayer = () => {
+    const map = mapRef.current;
+    const layer = pinLayerRef.current;
+    const recs = recordsRef.current;
+    if (!map || !layer) return;
+
+    import("leaflet").then((L) => {
+      layer.clearLayers();
+      const { maxPins } = mobileCaps();
+      const bounds = map.getBounds();
+      const south = bounds.getSouth();
+      const north = bounds.getNorth();
+      const west = bounds.getWest();
+      const east = bounds.getEast();
+
+      const canvas = L.canvas({ padding: 0.1 });
+      let drawn = 0;
+      for (const r of recs) {
+        if (r.lat < south || r.lat > north) continue;
+        if (r.lon < west || r.lon > east) continue;
+        const color = r.headCount > 1 ? "#ef4444" : "#6b7280";
+        const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
+          radius: r.headCount > 1 ? 6 : 5,
+          color: "#ffffff",
+          weight: 1.2,
+          fillColor: color,
+          fillOpacity: 0.9,
+          renderer: canvas,
+        });
+        marker.on("click", () => showRecordPopup(L, r));
+        marker.addTo(layer);
+        drawn++;
+        if (drawn >= maxPins) break;
+      }
+    });
+  };
+
+  const showRecordPopup = (
+    L: typeof import("leaflet"),
+    r: KumaRecord,
+  ) => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!popupRef.current) {
+      popupRef.current = L.popup({ maxWidth: 280, autoPan: true });
+    }
+    const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
+      <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>
+      ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
+      <div>📅 ${escapeHtml(r.date)}</div><div>🔢 ${r.headCount}頭</div>
+      ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
+    </div>`;
+    popupRef.current.setLatLng([r.lat, r.lon]).setContent(html).openOn(map);
+  };
+
+  useEffect(() => {
+    recordsRef.current = records;
+    renderPinLayer();
+  }, [records]);
+
+  useEffect(() => {
+    showHeatmapRef.current = showHeatmap;
+    const map = mapRef.current;
+    const layer = meshLayerRef.current;
+    if (!map || !layer) return;
+    if (showHeatmap) {
+      if (!map.hasLayer(layer)) layer.addTo(map);
+      renderMeshLayer();
+    } else {
+      layer.clearLayers();
+      if (map.hasLayer(layer)) map.removeLayer(layer);
+    }
+  }, [showHeatmap]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -133,21 +212,15 @@ export default function KumaMap({
     import("leaflet").then((L) => {
       if (cancelled || !el || mapRef.current) return;
 
-      const IconDefault = L.Icon.Default as unknown as {
-        prototype: { _getIconUrl?: unknown };
-      };
-      delete IconDefault.prototype._getIconUrl;
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-        iconUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-        shadowUrl:
-          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+      const map = L.map(el, {
+        center,
+        zoom,
+        preferCanvas: true,
+        zoomControl: false,
       });
-
-      const map = L.map(el, { center, zoom, preferCanvas: true });
       mapRef.current = map;
+
+      L.control.zoom({ position: "topright" }).addTo(map);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
@@ -160,72 +233,50 @@ export default function KumaMap({
       meshLayerRef.current = meshLayer;
       if (showHeatmapRef.current) meshLayer.addTo(map);
 
-      map.on("moveend zoomend", renderMeshLayerNow);
+      const pinLayer = L.layerGroup();
+      pinLayerRef.current = pinLayer;
+      pinLayer.addTo(map);
+
+      map.on("moveend", scheduleRedraw);
+      map.on("zoomend", scheduleRedraw);
 
       fetch("/data/mesh.json", { cache: "force-cache" })
         .then((r) => r.json())
         .then((data: MeshJsonPayload) => {
           if (cancelled) return;
           meshDataRef.current = data.meshes;
-          renderMeshLayerNow();
+          renderMeshLayer();
         })
-        .catch(() => {
-          // mesh data load failed — silently continue without heatmap
-        });
+        .catch(() => {});
+
+      renderPinLayer();
     });
 
     return () => {
       cancelled = true;
+      if (redrawTimerRef.current != null) {
+        window.clearTimeout(redrawTimerRef.current);
+        redrawTimerRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
       meshLayerRef.current = null;
-      markersRef.current = [];
+      pinLayerRef.current = null;
+      popupRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    import("leaflet").then((L) => {
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
-
-      const makeIcon = (color: string) =>
-        L.divIcon({
-          html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 28" width="20" height="28">
-            <ellipse cx="10" cy="26.5" rx="4" ry="1.5" fill="rgba(0,0,0,0.18)"/>
-            <path d="M10 0C6.13 0 3 3.13 3 7c0 5.25 7 17 7 17s7-11.75 7-17c0-3.87-3.13-7-7-7z"
-              fill="${color}" stroke="white" stroke-width="1.2"/>
-            <circle cx="10" cy="7" r="2.8" fill="white" opacity="0.8"/>
-          </svg>`,
-          className: "",
-          iconSize: [20, 28],
-          iconAnchor: [10, 28],
-          popupAnchor: [0, -30],
-        });
-
-      records.forEach((r) => {
-        const marker = L.marker([r.lat, r.lon], {
-          icon: makeIcon(r.headCount > 1 ? "#ef4444" : "#6b7280"),
-        })
-          .addTo(map)
-          .bindPopup(
-            `<div style="min-width:180px;font-size:13px;line-height:1.8">
-              <b>🐻 ${r.prefectureName} ${r.cityName}</b>
-              ${r.sectionName ? `<div style="color:#555;font-size:12px">${r.sectionName}</div>` : ""}
-              <div>📅 ${r.date}</div><div>🔢 ${r.headCount}頭</div>
-              ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${r.comment}</div>` : ""}
-            </div>`,
-            { maxWidth: 260 },
-          );
-        markersRef.current.push(marker);
-      });
-    });
-  }, [records]);
-
   return <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

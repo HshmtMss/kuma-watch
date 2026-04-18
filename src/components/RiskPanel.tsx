@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type {
   MeshData,
   ScoreBreakdown,
@@ -12,7 +12,7 @@ import {
   computeScore,
   lunarPhase,
 } from "@/lib/score";
-import { latLonToMeshCode, meshCodeToCenter } from "@/lib/mesh";
+import { latLonToMeshCode } from "@/lib/mesh";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
 
 type MeshEntry = {
@@ -82,6 +82,13 @@ function getPosition(): Promise<GeolocationPosition> {
 
 export default function RiskPanel() {
   const [state, setState] = useState<State>({ kind: "idle" });
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (state.kind === "ready" || state.kind === "error") {
+      setExpanded(true);
+    }
+  }, [state.kind]);
 
   const evaluate = useCallback(async (lat: number, lon: number) => {
     try {
@@ -95,8 +102,11 @@ export default function RiskPanel() {
         return;
       }
 
-      setState({ kind: "loading", stage: "メッシュデータを取得中" });
-      const meshes = await loadMeshes();
+      setState({ kind: "loading", stage: "データを取得中" });
+      const [meshes, weather] = await Promise.all([
+        loadMeshes(),
+        fetchWeather(lat, lon),
+      ]);
       const entry = meshes.find((m) => m.m === meshCode);
       const mesh: MeshData | null = entry
         ? {
@@ -108,13 +118,9 @@ export default function RiskPanel() {
           }
         : null;
 
-      setState({ kind: "loading", stage: "気象データを取得中" });
-      const weather = await fetchWeather(lat, lon);
-
-      const now = new Date();
       const breakdown = computeScore(
         mesh ?? { second: 0, sixth: 0, latest: 0, latestSingle: 0 },
-        now,
+        new Date(),
         weather,
       );
 
@@ -153,95 +159,139 @@ export default function RiskPanel() {
     }
   }, [evaluate]);
 
+  const badge =
+    state.kind === "ready" ? (
+      <span
+        className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
+        style={{ background: RISK_LEVEL_COLOR[state.breakdown.level] }}
+      >
+        {RISK_LEVEL_LABEL[state.breakdown.level]} {state.breakdown.score}
+      </span>
+    ) : null;
+
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-black/8 bg-white/95 shadow backdrop-blur">
-      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
-        <div className="text-sm font-semibold text-gray-800">現在地の危険度</div>
+    <>
+      {expanded && (
         <button
-          onClick={onUseGps}
-          disabled={state.kind === "loading"}
-          className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white hover:bg-amber-700 disabled:opacity-50"
-        >
-          📍 現在地を取得
-        </button>
+          aria-label="パネルを閉じる"
+          onClick={() => setExpanded(false)}
+          className="pointer-events-auto absolute inset-0 z-[1050] bg-black/20"
+        />
+      )}
+
+      <div
+        className={`pointer-events-auto absolute inset-x-0 bottom-0 z-[1100] transition-transform duration-200 ease-out ${
+          expanded ? "translate-y-0" : ""
+        } sm:left-3 sm:right-auto sm:top-3 sm:bottom-auto sm:w-[360px]`}
+      >
+        <div className="mx-auto w-full max-w-[640px] rounded-t-2xl border border-black/8 bg-white shadow-xl sm:rounded-2xl">
+          <button
+            onClick={() => {
+              if (state.kind === "idle") {
+                void onUseGps();
+              } else {
+                setExpanded((v) => !v);
+              }
+            }}
+            className="flex w-full items-center gap-3 px-4 py-3 text-left"
+            aria-expanded={expanded}
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
+              📍
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-gray-900">
+                現在地の危険度
+              </div>
+              <div className="truncate text-xs text-gray-500">
+                {state.kind === "idle" && "タップして GPS で評価"}
+                {state.kind === "loading" && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                    {state.stage}...
+                  </span>
+                )}
+                {state.kind === "error" && (
+                  <span className="text-red-600">⚠️ {state.message}</span>
+                )}
+                {state.kind === "ready" &&
+                  (state.mesh
+                    ? `スコア ${state.breakdown.score} / 100`
+                    : "この地点には出没実績データがありません")}
+              </div>
+            </div>
+            {badge}
+            {(state.kind === "ready" || state.kind === "error") && (
+              <span
+                className={`shrink-0 text-gray-400 transition-transform ${
+                  expanded ? "rotate-180" : ""
+                }`}
+                aria-hidden
+              >
+                ▾
+              </span>
+            )}
+          </button>
+
+          {expanded && state.kind === "ready" && (
+            <RiskDetails state={state} onReload={onUseGps} />
+          )}
+          {expanded && state.kind === "error" && (
+            <div className="border-t border-gray-100 px-4 py-3">
+              <button
+                onClick={onUseGps}
+                className="rounded-full bg-amber-600 px-4 py-2 text-xs font-medium text-white hover:bg-amber-700"
+              >
+                再試行
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-
-      <div className="p-4 text-sm">
-        {state.kind === "idle" && (
-          <p className="text-gray-500">
-            「現在地を取得」ボタンを押すと、現在地の 5km メッシュを特定し、
-            過去実績・季節・気象・時間帯を踏まえた危険度スコアを計算します。
-          </p>
-        )}
-
-        {state.kind === "loading" && (
-          <div className="flex items-center gap-2 text-gray-600">
-            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-amber-600" />
-            {state.stage}...
-          </div>
-        )}
-
-        {state.kind === "error" && (
-          <p className="text-red-600">⚠️ {state.message}</p>
-        )}
-
-        {state.kind === "ready" && (
-          <RiskReadout state={state} />
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
-function RiskReadout({ state }: { state: Extract<State, { kind: "ready" }> }) {
+function RiskDetails({
+  state,
+  onReload,
+}: {
+  state: Extract<State, { kind: "ready" }>;
+  onReload: () => void;
+}) {
   const { breakdown, weather, lat, lon, meshCode, mesh } = state;
   const now = new Date();
   const { name: lunarName } = lunarPhase(now);
   const hour = now.getHours();
-  const levelColor = RISK_LEVEL_COLOR[breakdown.level];
-  const levelLabel = RISK_LEVEL_LABEL[breakdown.level];
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-3">
-        <span
-          className="rounded-full px-3 py-1 text-sm font-bold text-white"
-          style={{ background: levelColor }}
-        >
-          {levelLabel}
-        </span>
-        <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold text-gray-900">
-            {breakdown.score}
-          </span>
-          <span className="text-xs text-gray-500">/ 100</span>
-        </div>
-      </div>
-
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+    <div className="max-h-[60vh] space-y-3 overflow-y-auto border-t border-gray-100 px-4 py-3 text-sm sm:max-h-[70vh]">
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
         <div>
           <dt className="text-gray-500">メッシュ</dt>
           <dd className="font-mono text-gray-800">{meshCode}</dd>
         </div>
         <div>
-          <dt className="text-gray-500">現在地</dt>
+          <dt className="text-gray-500">座標</dt>
           <dd className="text-gray-800">
             {lat.toFixed(4)}, {lon.toFixed(4)}
           </dd>
         </div>
-        <div>
+        <div className="col-span-2">
           <dt className="text-gray-500">気象</dt>
           <dd className="text-gray-800">
             {weather
-              ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C / 降水 ${weather.precipMm}mm (${weatherCodeLabel(weather.weatherCode)})`
+              ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C / 降水 ${weather.precipMm}mm（${weatherCodeLabel(weather.weatherCode)}）`
               : "取得できませんでした"}
           </dd>
         </div>
         <div>
-          <dt className="text-gray-500">日時・月相</dt>
-          <dd className="text-gray-800">
-            {hour}時 / {lunarName}
-          </dd>
+          <dt className="text-gray-500">時刻</dt>
+          <dd className="text-gray-800">{hour}時</dd>
+        </div>
+        <div>
+          <dt className="text-gray-500">月相</dt>
+          <dd className="text-gray-800">{lunarName}</dd>
         </div>
       </dl>
 
@@ -262,9 +312,18 @@ function RiskReadout({ state }: { state: Extract<State, { kind: "ready" }> }) {
       {!mesh && (
         <p className="rounded-md bg-amber-50 p-2 text-xs text-amber-800">
           ※ このメッシュには過去の出没実績データがありません。
-          表示スコアは季節・気象・時間帯のみから算出されています。
+          表示スコアは季節・気象・時間帯から算出された参考値です。
         </p>
       )}
+
+      <div className="flex items-center gap-2 pt-1">
+        <button
+          onClick={onReload}
+          className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+        >
+          🔄 再計算
+        </button>
+      </div>
 
       <p className="text-[10px] leading-relaxed text-gray-500">
         スコアは統計的な参考値です。実際のクマの行動は個体差・環境により大きく変わります。

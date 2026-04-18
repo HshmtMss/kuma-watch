@@ -4,10 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap from "@/components/KumaMap";
 import RiskPanel from "@/components/RiskPanel";
-import {
-  RISK_LEVEL_COLOR,
-  RISK_LEVEL_LABEL,
-} from "@/lib/score";
+import { RISK_LEVEL_COLOR, RISK_LEVEL_LABEL } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 
 const RISK_LEGEND_ORDER: RiskLevel[] = ["low", "moderate", "elevated", "high"];
@@ -18,6 +15,9 @@ export default function KumaClient() {
   const [selectedPref, setSelectedPref] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
   const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showPins, setShowPins] = useState(true);
+  const [showLegend, setShowLegend] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetch("/api/kuma")
@@ -39,125 +39,198 @@ export default function KumaClient() {
     return Array.from(set).sort().reverse();
   }, [records]);
 
-  const filtered = useMemo(
-    () =>
-      records.filter((r) => {
-        const prefOk =
-          selectedPref === "all" || r.prefectureName === selectedPref;
-        const yearOk =
-          selectedYear === "all" || r.date.startsWith(selectedYear);
-        return prefOk && yearOk;
-      }),
-    [records, selectedPref, selectedYear],
-  );
+  const filtered = useMemo(() => {
+    if (!showPins) return [];
+    return records.filter((r) => {
+      const prefOk =
+        selectedPref === "all" || r.prefectureName === selectedPref;
+      const yearOk =
+        selectedYear === "all" || r.date.startsWith(selectedYear);
+      return prefOk && yearOk;
+    });
+  }, [records, selectedPref, selectedYear, showPins]);
+
+  const activeFilterCount =
+    (selectedPref !== "all" ? 1 : 0) + (selectedYear !== "all" ? 1 : 0);
 
   return (
-    <div className="flex flex-col" style={{ flex: 1, minHeight: 0 }}>
-      <div className="flex flex-wrap items-center gap-2 border-b border-black/8 bg-white px-4 py-2 shrink-0">
-        <select
-          value={selectedPref}
-          onChange={(e) => setSelectedPref(e.target.value)}
-          disabled={loading}
-          className="rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 outline-none disabled:opacity-50"
-        >
-          <option value="all">都道府県: すべて</option>
-          {prefectures.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
-        </select>
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          disabled={loading}
-          className="rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 outline-none disabled:opacity-50"
-        >
-          <option value="all">年: すべて</option>
-          {years.map((y) => (
-            <option key={y} value={y}>{y}年</option>
-          ))}
-        </select>
-        <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-          <input
-            type="checkbox"
-            checked={showHeatmap}
-            onChange={(e) => setShowHeatmap(e.target.checked)}
-            className="h-3 w-3 accent-amber-600"
-          />
-          危険度ヒートマップ
-        </label>
-        <span className="ml-auto rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
-          {loading
-            ? "読み込み中..."
-            : `${filtered.length.toLocaleString()} 件 / 全 ${records.length.toLocaleString()} 件`}
-        </span>
-      </div>
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden">
+      <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
+        <a href="/" className="flex items-center gap-2 min-w-0">
+          <span className="text-xl" aria-hidden="true">🐻</span>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-bold text-gray-900">
+              KumaWatch
+            </div>
+            <div className="hidden text-[10px] leading-tight text-gray-500 sm:block">
+              全国クマ出没予報
+            </div>
+          </div>
+        </a>
 
-      <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
-        <KumaMap records={filtered} showHeatmap={showHeatmap} />
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={`flex h-9 items-center gap-1 rounded-full border border-gray-200 px-3 text-xs font-medium transition ${
+              showFilters || activeFilterCount > 0
+                ? "bg-amber-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+            aria-expanded={showFilters}
+            aria-label="フィルタ"
+          >
+            <span aria-hidden>⚙</span>
+            <span>絞り込み</span>
+            {activeFilterCount > 0 && (
+              <span className="ml-0.5 rounded-full bg-white/25 px-1.5 text-[10px]">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+          <details className="relative">
+            <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-gray-200 bg-white text-sm text-gray-700">
+              ⋮
+              <span className="sr-only">メニュー</span>
+            </summary>
+            <div className="absolute right-0 top-11 z-10 w-44 rounded-lg border border-gray-200 bg-white py-1 text-xs shadow-lg">
+              <a href="/about" className="block px-3 py-2 hover:bg-gray-50">
+                このサイトについて
+              </a>
+              <a href="/sources" className="block px-3 py-2 hover:bg-gray-50">
+                データ出典
+              </a>
+              <a href="/for-gov" className="block px-3 py-2 hover:bg-gray-50">
+                自治体の方へ
+              </a>
+              <a
+                href="/disclaimer"
+                className="block px-3 py-2 hover:bg-gray-50"
+              >
+                免責事項
+              </a>
+              <a href="/privacy" className="block px-3 py-2 hover:bg-gray-50">
+                プライバシー
+              </a>
+            </div>
+          </details>
+        </div>
+      </header>
 
-        <div className="pointer-events-none absolute left-3 top-3 z-[1000] w-[min(340px,calc(100vw-1.5rem))]">
-          <div className="pointer-events-auto">
-            <RiskPanel />
+      {showFilters && (
+        <div className="relative z-[1050] shrink-0 border-b border-black/8 bg-white px-3 py-2">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <label className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5">
+              <input
+                type="checkbox"
+                checked={showHeatmap}
+                onChange={(e) => setShowHeatmap(e.target.checked)}
+                className="h-3 w-3 accent-amber-600"
+              />
+              ヒートマップ
+            </label>
+            <label className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5">
+              <input
+                type="checkbox"
+                checked={showPins}
+                onChange={(e) => setShowPins(e.target.checked)}
+                className="h-3 w-3 accent-amber-600"
+              />
+              出没ピン
+            </label>
+            <select
+              value={selectedPref}
+              onChange={(e) => setSelectedPref(e.target.value)}
+              disabled={loading}
+              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700 disabled:opacity-50"
+            >
+              <option value="all">都道府県: すべて</option>
+              {prefectures.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              disabled={loading}
+              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700 disabled:opacity-50"
+            >
+              <option value="all">年: すべて</option>
+              {years.map((y) => (
+                <option key={y} value={y}>
+                  {y}年
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setShowLegend((v) => !v)}
+              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700"
+            >
+              凡例 {showLegend ? "を隠す" : "を見る"}
+            </button>
           </div>
         </div>
+      )}
+
+      <div className="relative flex-1 min-h-0">
+        <KumaMap records={filtered} showHeatmap={showHeatmap} />
 
         {loading && (
-          <div className="absolute inset-0 z-[999] flex items-center justify-center bg-white/70 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-gray-600" />
-              <p className="text-sm text-gray-600">全国データを取得中...</p>
-            </div>
+          <div className="pointer-events-none absolute left-1/2 top-3 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
+            <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+            出没データ取得中...
           </div>
         )}
 
-        <div className="absolute bottom-6 right-3 z-[1000] space-y-2 rounded-xl border border-black/8 bg-white/95 p-3 text-xs text-gray-700 shadow backdrop-blur">
-          <div>
-            <p className="mb-1.5 font-semibold text-gray-800">ピン（出没情報）</p>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上
-            </div>
+        {!loading && (
+          <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium text-gray-600 shadow backdrop-blur">
+            {filtered.length.toLocaleString()}件表示 / 全
+            {records.length.toLocaleString()}件
           </div>
-          {showHeatmap && (
-            <div className="border-t border-gray-200 pt-2">
-              <p className="mb-1.5 font-semibold text-gray-800">危険度（5km メッシュ）</p>
+        )}
+
+        {showLegend && (
+          <div className="pointer-events-auto absolute bottom-[calc(var(--sheet-height,6rem)+0.75rem)] right-3 z-[900] w-40 rounded-xl border border-black/8 bg-white/95 p-2.5 text-[11px] text-gray-700 shadow backdrop-blur">
+            <div className="mb-1 flex items-center justify-between">
+              <div className="font-semibold text-gray-800">凡例</div>
+              <button
+                onClick={() => setShowLegend(false)}
+                className="text-gray-400 hover:text-gray-900"
+                aria-label="凡例を閉じる"
+              >
+                ×
+              </button>
+            </div>
+            <div className="mb-1.5">
+              <div className="mb-0.5 text-[10px] text-gray-500">ピン</div>
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-gray-500" />1頭
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block h-2 w-2 rounded-full bg-red-500" />2頭以上
+              </div>
+            </div>
+            <div>
+              <div className="mb-0.5 text-[10px] text-gray-500">危険度</div>
               {RISK_LEGEND_ORDER.map((level) => (
-                <div key={level} className="flex items-center gap-2">
+                <div key={level} className="flex items-center gap-1.5">
                   <span
-                    className="inline-block h-2.5 w-2.5 rounded-sm"
-                    style={{ background: RISK_LEVEL_COLOR[level], opacity: 0.7 }}
+                    className="inline-block h-2 w-2 rounded-sm"
+                    style={{
+                      background: RISK_LEVEL_COLOR[level],
+                      opacity: 0.7,
+                    }}
                   />
                   {RISK_LEVEL_LABEL[level]}
                 </div>
               ))}
-              <p className="mt-1 text-[10px] text-gray-500">ズーム 6 以上で表示</p>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        )}
 
-      <footer className="shrink-0 border-t border-black/8 bg-white px-4 py-2 text-xs text-gray-400">
-        データ出典:{" "}
-        <a
-          href="https://public.sharp9110.com/view/allposts/bear"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-gray-600"
-        >
-          Sharp9110 クマ出没マップ（CC BY 4.0）
-        </a>
-        ・メッシュ危険度は過去実績ベースの参考値です。詳細は{" "}
-        <a href="/sources" className="underline hover:text-gray-600">
-          データ出典
-        </a>
-        ／
-        <a href="/disclaimer" className="underline hover:text-gray-600">
-          免責事項
-        </a>
-        をご確認ください。
-      </footer>
+        <RiskPanel />
+      </div>
     </div>
   );
 }
