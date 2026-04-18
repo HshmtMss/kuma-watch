@@ -300,11 +300,11 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
                   )}
                   {state.kind === "ready" && (
                     <>
-                      {state.breakdown.level === "unknown"
-                        ? "データ不足（評価困難）"
-                        : state.mesh
-                          ? `スコア ${state.breakdown.score} / 100`
-                          : `緩衝域 / 近隣 ${state.nearbyRadiusKm}km に目撃 ${state.nearbySightings} 件`}
+                      {state.mesh
+                        ? `スコア ${state.breakdown.score} / 100`
+                        : state.nearbySightings > 0
+                          ? `緩衝域（近隣 ${state.nearbyRadiusKm}km に ${state.nearbySightings} 件）`
+                          : `スコア ${state.breakdown.score} / 100 ・ データ不足`}
                     </>
                   )}
                 </div>
@@ -365,8 +365,8 @@ function RiskDetails({
       ? "ツキノワグマ"
       : undefined;
 
-  const isUnknown = breakdown.level === "unknown";
-  const isBuffer = !mesh && breakdown.level !== "unknown";
+  const isInsufficient = !mesh && (nearbySightings ?? 0) === 0;
+  const isBuffer = !mesh && (nearbySightings ?? 0) > 0;
 
   const askContext = {
     place: placeName,
@@ -395,40 +395,29 @@ function RiskDetails({
         </span>
       </div>
 
-      {isUnknown ? (
-        <div className="rounded-xl bg-gray-50 p-3 text-sm text-gray-800 ring-1 ring-gray-200">
-          <div className="mb-1 font-semibold text-gray-900">⚠️ データ不足</div>
-          <p className="text-xs leading-relaxed text-gray-700">
-            環境省の生息域調査に記録がなく、近隣 {nearbyRadiusKm}km 以内でも
-            直近の目撃情報を確認できませんでした。
-            <strong className="mx-1 text-gray-900">
-              「安全」とは評価していません。
-            </strong>
-            山間部・里山では基本対策（熊鈴・単独行動回避）を推奨します。
-          </p>
+      {isInsufficient && (
+        <div className="rounded-xl bg-gray-50 p-3 text-xs leading-relaxed text-gray-700 ring-1 ring-gray-200">
+          <span className="font-semibold text-gray-900">ℹ️ データ不足:</span>{" "}
+          環境省の生息域調査に記録がなく、近隣 {nearbyRadiusKm}km 以内でも直近の目撃情報を確認できていません。
+          <strong className="mx-1 text-gray-900">「安全」ではなく 5 段階のうち「低い」として暫定表示</strong>
+          しています。山間部では基本対策を推奨します。
         </div>
-      ) : (
-        <>
-          {isBuffer && (
-            <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
-              <div className="mb-1 font-semibold">🟠 緩衝域として評価</div>
-              <p className="text-xs leading-relaxed">
-                このメッシュは環境省の生息域調査には含まれていませんが、
-                近隣 {nearbyRadiusKm}km 以内で {nearbySightings} 件の直近目撃情報があり、
-                クマが行動域を広げている可能性があります。
-              </p>
-            </div>
-          )}
-          <RiskCharts
-            mesh={mesh}
-            weather={weather}
-            baseDate={now}
-            nearbyWeightedCount={nearbyWeightedCount}
-            nearbySightings={nearbySightings}
-            nearbyRadiusKm={nearbyRadiusKm}
-          />
-        </>
       )}
+      {isBuffer && (
+        <div className="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-900 ring-1 ring-amber-200">
+          <span className="font-semibold">🟠 緩衝域:</span>{" "}
+          このメッシュは環境省の生息域調査には含まれていませんが、
+          近隣 {nearbyRadiusKm}km 以内で {nearbySightings} 件の直近目撃情報があります。
+        </div>
+      )}
+      <RiskCharts
+        mesh={mesh}
+        weather={weather}
+        baseDate={now}
+        nearbyWeightedCount={nearbyWeightedCount}
+        nearbySightings={nearbySightings}
+        nearbyRadiusKm={nearbyRadiusKm}
+      />
 
       <div className="border-t border-gray-100 pt-4">
         <MunicipalCard entry={state.municipality} />

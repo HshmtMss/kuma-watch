@@ -229,11 +229,11 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
             <div className="mt-0.5 text-[11px] text-gray-500">
               {loading
                 ? "計算中..."
-                : breakdown?.level === "unknown"
-                  ? "生息記録・目撃情報なし"
-                  : mesh
-                    ? "生息域内"
-                    : "生息域外（近隣目撃あり）"}
+                : mesh
+                  ? "生息域内"
+                  : nearby.length > 0
+                    ? "生息域外（近隣目撃あり）"
+                    : "生息域外（観測データ不足）"}
             </div>
           </div>
         </div>

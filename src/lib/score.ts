@@ -117,13 +117,27 @@ export function computeScore(
   };
 
   if (historyScore <= 0) {
+    // Out-of-habitat + no nearby sightings: return the lowest of 5 levels ("低い")
+    // with explicit data-insufficiency note. Never returns "安全".
+    const lowDefaultScore = Math.round(
+      Math.min(
+        30,
+        Math.max(
+          15,
+          factors.seasonal * 0.15 +
+            factors.weather * 0.1 +
+            factors.lunar * 0.05,
+        ),
+      ),
+    );
     return {
-      score: 0,
-      level: "unknown",
+      score: lowDefaultScore,
+      level: "low",
       factors,
       explanation: [
         "この地域は環境省の生息域調査に記録がなく、近隣にも直近の目撃情報が確認できていません。",
-        "ただし「データが無い」ことは「安全」を意味しません。山間部・里山では基本対策を推奨します。",
+        "データ不足のため、5 段階のうち「低い」を暫定的に表示しています。",
+        "「安全」を意味するものではありません。山間部・里山では基本対策を推奨します。",
       ],
     };
   }
