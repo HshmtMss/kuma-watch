@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PlaceSearch from "@/components/PlaceSearch";
 import GpsButton from "@/components/GpsButton";
+import HomeMapPreview from "@/components/HomeMapPreview";
 
 const POPULAR_DESTINATIONS: Array<{ name: string; lat: number; lon: number; hint: string }> = [
   { name: "上高地", lat: 36.2508, lon: 137.6341, hint: "長野県松本市・北アルプス" },
@@ -27,13 +28,17 @@ export default function HomePage() {
         </nav>
       </header>
 
-      <section className="mx-auto w-full max-w-xl px-5 pt-6 sm:pt-14">
+      <section className="mx-auto w-full max-w-xl px-5 pt-4 sm:pt-8">
         <h1 className="mb-2 text-center text-xl font-bold leading-snug text-gray-900 sm:text-2xl">
           行き先のクマ情報、1 画面で。
         </h1>
-        <p className="mb-6 text-center text-sm text-gray-600">
-          地名を入れるか、現在地を押すだけで、予測と対策をまとめて表示します。
+        <p className="mb-5 text-center text-sm text-gray-600">
+          全国のクマ生息域と出没予測を、地名か現在地ですぐ確認できます。
         </p>
+
+        <div className="mb-5">
+          <HomeMapPreview />
+        </div>
 
         <div className="mb-3">
           <PlaceSearch autofocus={false} />
