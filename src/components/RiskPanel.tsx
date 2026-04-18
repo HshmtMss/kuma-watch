@@ -22,6 +22,8 @@ import {
 } from "@/data/municipalities";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 import MunicipalCard from "@/components/MunicipalCard";
+import RiskCharts from "@/components/RiskCharts";
+import AskBox from "@/components/AskBox";
 
 export type LocationSource = "gps" | "tap";
 export type SelectedLocation = {
@@ -309,78 +311,89 @@ function RiskDetails({
   state: Extract<State, { kind: "ready" }>;
   onReload: () => void;
 }) {
-  const { breakdown, weather, lat, lon, meshCode, mesh, source } = state;
+  const { breakdown, weather, mesh, placeName } = state;
   const now = new Date();
-  const { name: lunarName } = lunarPhase(now);
   const hour = now.getHours();
+  const month = now.getMonth() + 1;
+  const weatherLabel = weather
+    ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C`
+    : "気象情報なし";
+
+  const bearSpecies = state.municipality?.bearSpecies.includes("higuma")
+    ? "ヒグマ"
+    : state.municipality
+      ? "ツキノワグマ"
+      : undefined;
+
+  const askContext = {
+    place: placeName,
+    prefecture: state.municipality?.prefNameJa,
+    score: breakdown.score,
+    level: breakdown.level,
+    hour,
+    month,
+    weather: weather
+      ? {
+          tempC: weather.tempC,
+          precipMm: weather.precipMm,
+          label: weatherCodeLabel(weather.weatherCode),
+        }
+      : undefined,
+    bearSpecies,
+    habitatInside: !!mesh,
+  };
 
   return (
-    <div className="max-h-[60vh] space-y-3 overflow-y-auto border-t border-gray-100 px-4 py-3 text-sm sm:max-h-[70vh]">
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
-        <div>
-          <dt className="text-gray-500">メッシュ</dt>
-          <dd className="font-mono text-gray-800">{meshCode}</dd>
-        </div>
-        <div>
-          <dt className="text-gray-500">座標 ({source === "gps" ? "GPS" : "タップ"})</dt>
-          <dd className="text-gray-800">
-            {lat.toFixed(4)}, {lon.toFixed(4)}
-          </dd>
-        </div>
-        <div className="col-span-2">
-          <dt className="text-gray-500">気象</dt>
-          <dd className="text-gray-800">
-            {weather
-              ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C / 降水 ${weather.precipMm}mm（${weatherCodeLabel(weather.weatherCode)}）`
-              : "取得できませんでした"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-gray-500">時刻</dt>
-          <dd className="text-gray-800">{hour}時</dd>
-        </div>
-        <div>
-          <dt className="text-gray-500">月相</dt>
-          <dd className="text-gray-800">{lunarName}</dd>
-        </div>
-      </dl>
+    <div className="max-h-[70vh] space-y-4 overflow-y-auto border-t border-gray-100 px-4 py-3 text-sm">
+      <div className="flex items-center justify-between text-[11px] text-gray-500">
+        <span>{weatherLabel}</span>
+        <span>
+          {hour}時 / {month}月
+        </span>
+      </div>
 
-      <div className="border-t border-gray-100 pt-3">
-        <div className="mb-1.5 text-xs font-semibold text-gray-700">
-          スコア内訳
+      {!mesh ? (
+        <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900">
+          🌿 この場所は環境省の生息域調査でクマの生息記録がない地域です。
+          基本対策で十分に安全に過ごせます。
         </div>
-        <ul className="space-y-1 text-xs text-gray-700">
+      ) : (
+        <RiskCharts mesh={mesh} weather={weather} baseDate={now} />
+      )}
+
+      <div className="border-t border-gray-100 pt-4">
+        <MunicipalCard entry={state.municipality} />
+      </div>
+
+      <div className="border-t border-gray-100 pt-4">
+        <AskBox context={askContext} />
+      </div>
+
+      <details className="rounded-xl bg-gray-50 px-3 py-2 text-xs text-gray-700">
+        <summary className="cursor-pointer font-semibold text-gray-800">
+          スコアの根拠を詳しく見る
+        </summary>
+        <ul className="mt-2 space-y-1">
           {breakdown.explanation.map((line, idx) => (
             <li key={idx} className="flex items-start gap-2">
-              <span className="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" />
+              <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-gray-400" />
               <span>{line}</span>
             </li>
           ))}
         </ul>
-      </div>
+      </details>
 
-      {!mesh && (
-        <p className="rounded-md bg-emerald-50 p-2 text-xs text-emerald-900">
-          ※ このメッシュは環境省の生息域調査でクマの生息記録がない地域です。
-          そのため危険度は「安全」と評価されます。
-        </p>
-      )}
-
-      <div className="border-t border-gray-100 pt-3">
-        <MunicipalCard entry={state.municipality} />
-      </div>
-
-      <div className="flex items-center gap-2 pt-1">
+      <div className="flex items-center gap-2">
         <button
           onClick={onReload}
-          className="rounded-full bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
+          className="rounded-full bg-gray-100 px-3 py-1.5 text-[11px] font-medium text-gray-700 hover:bg-gray-200"
         >
           📍 現在地で再計算
         </button>
       </div>
 
-      <p className="text-[10px] leading-relaxed text-gray-500">
-        スコアは統計的な参考値です。実際のクマの行動は個体差・環境により大きく変わります。
+      <p className="text-[10px] leading-relaxed text-gray-400">
+        スコアは参考値です。実際のクマの行動は個体差・環境で変わります。
         必ず自治体の公式情報と合わせてご確認ください。
       </p>
     </div>
