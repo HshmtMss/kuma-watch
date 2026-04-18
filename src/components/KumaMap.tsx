@@ -11,22 +11,7 @@ import type {
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import { computeScore, RISK_LEVEL_COLOR } from "@/lib/score";
-
-type MeshEntry = {
-  m: string;
-  s: number;
-  x: number;
-  l: number;
-  ls: number;
-  lat: number;
-  lon: number;
-};
-
-type MeshJsonPayload = {
-  generatedAt: string;
-  count: number;
-  meshes: MeshEntry[];
-};
+import { loadMeshes, type MeshEntry } from "@/lib/mesh-data";
 
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
@@ -307,11 +292,10 @@ export default function KumaMap({
         if (cb) cb(e.latlng.lat, e.latlng.lng);
       });
 
-      fetch("/data/mesh.json", { cache: "force-cache" })
-        .then((r) => r.json())
-        .then((data: MeshJsonPayload) => {
+      loadMeshes()
+        .then((meshes) => {
           if (cancelled) return;
-          meshDataRef.current = data.meshes;
+          meshDataRef.current = meshes;
           renderMeshLayer();
         })
         .catch(() => {});

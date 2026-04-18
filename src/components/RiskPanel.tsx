@@ -13,19 +13,8 @@ import {
   lunarPhase,
 } from "@/lib/score";
 import { latLonToMeshCode } from "@/lib/mesh";
+import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
-
-type MeshEntry = {
-  m: string;
-  s: number;
-  x: number;
-  l: number;
-  ls: number;
-  lat: number;
-  lon: number;
-};
-
-type MeshJsonPayload = { meshes: MeshEntry[] };
 
 export type LocationSource = "gps" | "tap";
 export type SelectedLocation = {
@@ -48,16 +37,6 @@ type State =
       weather: WeatherSnapshot | null;
       breakdown: ScoreBreakdown;
     };
-
-let meshCache: Promise<MeshEntry[]> | null = null;
-function loadMeshes(): Promise<MeshEntry[]> {
-  if (!meshCache) {
-    meshCache = fetch("/data/mesh.json", { cache: "force-cache" })
-      .then((r) => r.json() as Promise<MeshJsonPayload>)
-      .then((d) => d.meshes);
-  }
-  return meshCache;
-}
 
 async function fetchWeather(
   lat: number,
@@ -115,7 +94,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         loadMeshes(),
         fetchWeather(loc.lat, loc.lon),
       ]);
-      const entry = meshes.find((m) => m.m === meshCode);
+      const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
         ? {
             meshCode: entry.m,

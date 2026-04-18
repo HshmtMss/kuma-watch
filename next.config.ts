@@ -41,7 +41,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/data/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=3600, s-maxage=86400" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400",
+          },
+        ],
       },
     ];
   },
