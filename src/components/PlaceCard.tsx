@@ -147,6 +147,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         nearbyWeightedCount: nearbyWeighted,
         nearbySightings: nearbyCountWithin10,
         nearbyRadiusKm: 10,
+        prefCode: rev?.prefCode,
       });
       setBreakdown(score);
       setNearby(near);

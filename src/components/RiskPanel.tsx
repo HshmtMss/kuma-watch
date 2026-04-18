@@ -169,6 +169,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
+        prefCode: rev?.prefCode,
       });
 
       const municipality =
@@ -417,6 +418,7 @@ function RiskDetails({
         nearbyWeightedCount={nearbyWeightedCount}
         nearbySightings={nearbySightings}
         nearbyRadiusKm={nearbyRadiusKm}
+        prefCode={state.municipality?.prefCode}
       />
 
       <div className="border-t border-gray-100 pt-4">

@@ -5,6 +5,12 @@ import type {
   ScoreFactors,
   WeatherSnapshot,
 } from "./types";
+import {
+  findNutCropEntry,
+  NUT_CROP_LABEL,
+  NUT_CROP_MULTIPLIER,
+  type NutCropEntry,
+} from "@/data/nut-crop";
 
 const SEASONAL_COEFF: Record<number, number> = {
   1: 15,
@@ -84,7 +90,26 @@ export type ScoreOptions = {
   nearbyWeightedCount?: number;
   nearbySightings?: number;
   nearbyRadiusKm?: number;
+  prefCode?: string;
 };
+
+function nutCropMultiplier(
+  prefCode: string | undefined,
+  month: number,
+  now: Date,
+): { multiplier: number; entry?: NutCropEntry; appliesNow: boolean } {
+  // Only apply boost in late summer ~ early winter (Aug-Dec).
+  const appliesNow = month >= 8 && month <= 12;
+  if (!prefCode) return { multiplier: 1.0, appliesNow };
+  const entry = findNutCropEntry(prefCode, now);
+  if (!entry) return { multiplier: 1.0, appliesNow };
+  if (!appliesNow) return { multiplier: 1.0, entry, appliesNow };
+  return {
+    multiplier: NUT_CROP_MULTIPLIER[entry.level],
+    entry,
+    appliesNow,
+  };
+}
 
 export function bufferHistoryFromNearby(weightedCount: number): number {
   if (weightedCount <= 0) return 0;
@@ -108,9 +133,13 @@ export function computeScore(
   const isInsideHabitat = directHistory > 0;
   const isBufferZone = !isInsideHabitat && bufferHistory > 0;
 
+  const baseSeasonal = calcSeasonalScore(month);
+  const nutCrop = nutCropMultiplier(opts.prefCode, month, now);
+  const boostedSeasonal = Math.min(100, baseSeasonal * nutCrop.multiplier);
+
   const factors: ScoreFactors = {
     history: historyScore,
-    seasonal: calcSeasonalScore(month),
+    seasonal: boostedSeasonal,
     weather: calcWeatherScore(weather),
     lunar: calcLunarScore(phase),
     timeOfDayBonus: calcTimeBonus(hour),
@@ -156,9 +185,15 @@ export function computeScore(
     ? `履歴（生息域）: ${factors.history.toFixed(0)} pts（最新調査 ${mesh?.latest ?? 0} / 第6回 ${mesh?.sixth ?? 0} / 第2回 ${mesh?.second ?? 0}）`
     : `履歴（緩衝域）: ${factors.history.toFixed(0)} pts（近隣 ${radius}km 以内の直近目撃 ${opts.nearbySightings ?? 0} 件から推計）`;
 
+  const seasonalLabel = nutCrop.entry && nutCrop.appliesNow && nutCrop.multiplier !== 1
+    ? `季節: ${factors.seasonal.toFixed(0)} pts（${month}月 × 堅果類 ${NUT_CROP_LABEL[nutCrop.entry.level]} ×${nutCrop.multiplier.toFixed(2)}）`
+    : nutCrop.entry && nutCrop.appliesNow
+      ? `季節: ${factors.seasonal.toFixed(0)} pts（${month}月 / 堅果類 ${NUT_CROP_LABEL[nutCrop.entry.level]}・補正なし）`
+      : `季節: ${factors.seasonal.toFixed(0)} pts（${month}月の月別係数）`;
+
   const explanation = [
     historyLabel,
-    `季節: ${factors.seasonal} pts（${month}月の月別係数）`,
+    seasonalLabel,
     weather
       ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm}mm）`
       : `気象: ${factors.weather} pts（取得なし・中央値）`,
