@@ -4,7 +4,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SRC = process.argv[2] ?? "/Users/hashimoto/kumamori-map/assets/bear_combined.csv";
+const DEFAULT_SRC = join(
+  __dirname,
+  "..",
+  "data-sources",
+  "env-ministry",
+  "bear_combined.csv",
+);
+const SRC = process.argv[2] ?? DEFAULT_SRC;
 const OUT = join(__dirname, "..", "public", "data", "mesh.json");
 
 const SECOND_LAT_STEP_MIN = 5;
