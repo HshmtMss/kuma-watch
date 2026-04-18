@@ -97,6 +97,18 @@ export function computeScore(
     timeOfDayBonus: calcTimeBonus(hour),
   };
 
+  if (factors.history <= 0) {
+    return {
+      score: 0,
+      level: "safe",
+      factors,
+      explanation: [
+        "環境省の生息域調査でこの 5km メッシュにクマの生息記録がないため、危険度は非常に低いと評価しています。",
+        "（季節・気象・時間帯の係数は生息域内でのみ加味されます）",
+      ],
+    };
+  }
+
   const weighted =
     factors.history * 0.4 +
     factors.seasonal * 0.3 +
@@ -108,7 +120,7 @@ export function computeScore(
   const level = toRiskLevel(score);
 
   const explanation = [
-    `履歴: ${factors.history.toFixed(0)} pts（最新 ${mesh.latest} / 半年内 ${mesh.sixth} / 二年内 ${mesh.second}）`,
+    `履歴（生息域）: ${factors.history.toFixed(0)} pts（最新調査 ${mesh.latest} / 第6回 ${mesh.sixth} / 第2回 ${mesh.second}）`,
     `季節: ${factors.seasonal} pts（${month}月の月別係数）`,
     weather
       ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm}mm）`

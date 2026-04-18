@@ -227,7 +227,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
                   {state.kind === "ready" &&
                     (state.mesh
                       ? `スコア ${state.breakdown.score} / 100`
-                      : "この地点には出没実績データがありません")}
+                      : "生息域外（環境省調査で生息記録なし）")}
                 </div>
               </div>
               {badge}
@@ -323,9 +323,9 @@ function RiskDetails({
       </div>
 
       {!mesh && (
-        <p className="rounded-md bg-amber-50 p-2 text-xs text-amber-800">
-          ※ このメッシュには過去の出没実績データがありません。
-          表示スコアは季節・気象・時間帯から算出された参考値です。
+        <p className="rounded-md bg-emerald-50 p-2 text-xs text-emerald-900">
+          ※ このメッシュは環境省の生息域調査でクマの生息記録がない地域です。
+          そのため危険度は「安全」と評価されます。
         </p>
       )}
 

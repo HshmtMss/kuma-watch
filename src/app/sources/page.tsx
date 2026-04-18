@@ -29,13 +29,13 @@ const SIGHTING_SOURCES: SourceEntry[] = [
     usage: "個別出没点の地図表示、最近 30〜90 日のスコア補正",
   },
   {
-    name: "5km メッシュ出没集計（環境省公開情報ベース）",
-    provider: "環境省 生物多様性センター 他",
+    name: "自然環境保全基礎調査（哺乳類分布調査）",
+    provider: "環境省 生物多様性センター",
     license: "環境省利用規約",
-    licenseUrl: "https://www.env.go.jp/",
-    url: "https://www.env.go.jp/",
+    licenseUrl: "https://www.biodic.go.jp/index.html",
+    url: "https://www.biodic.go.jp/kiso/fnd_list_h.html",
     coverage: "全国 5km メッシュ",
-    usage: "ヒートマップ表示、履歴スコア（過去 2 年間の出没実績）",
+    usage: "ヒートマップ表示の基盤。第2回〜最新回の生息域確認結果をもとに履歴スコアを算出",
   },
 ];
 
