@@ -12,9 +12,10 @@ import {
   computeScore,
   lunarPhase,
 } from "@/lib/score";
-import { latLonToMeshCode } from "@/lib/mesh";
+import { latLonToMeshCode, haversineKm } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
+import type { KumaRecord } from "@/app/api/kuma/route";
 import {
   findMunicipalityByPrefCode,
   findMunicipalityByPrefName,
@@ -47,7 +48,37 @@ type State =
       breakdown: ScoreBreakdown;
       municipality?: MunicipalEntry;
       placeName?: string;
+      nearbyWeightedCount: number;
+      nearbySightings: number;
+      nearbyRadiusKm: number;
     };
+
+const NEARBY_RADIUS_KM = 10;
+const NEARBY_DECAY_KM = 5;
+
+async function fetchNearbyWeighted(
+  lat: number,
+  lon: number,
+  radiusKm: number = NEARBY_RADIUS_KM,
+): Promise<{ count: number; weighted: number }> {
+  try {
+    const r = await fetch("/api/kuma");
+    if (!r.ok) return { count: 0, weighted: 0 };
+    const data = (await r.json()) as { records?: KumaRecord[] };
+    const recs = data.records ?? [];
+    let count = 0;
+    let weighted = 0;
+    for (const s of recs) {
+      const d = haversineKm(lat, lon, s.lat, s.lon);
+      if (d > radiusKm) continue;
+      count += 1;
+      weighted += Math.exp(-d / NEARBY_DECAY_KM);
+    }
+    return { count, weighted };
+  } catch {
+    return { count: 0, weighted: 0 };
+  }
+}
 
 async function reverseGeocode(
   lat: number,
@@ -117,10 +148,11 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
       }
 
       setState({ kind: "loading", stage: "データを取得中" });
-      const [meshes, weather, rev] = await Promise.all([
+      const [meshes, weather, rev, nearby] = await Promise.all([
         loadMeshes(),
         fetchWeather(loc.lat, loc.lon),
         reverseGeocode(loc.lat, loc.lon),
+        fetchNearbyWeighted(loc.lat, loc.lon),
       ]);
       const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
@@ -133,11 +165,11 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
           }
         : null;
 
-      const breakdown = computeScore(
-        mesh ?? { second: 0, sixth: 0, latest: 0, latestSingle: 0 },
-        new Date(),
-        weather,
-      );
+      const breakdown = computeScore(mesh, new Date(), weather, {
+        nearbyWeightedCount: nearby.weighted,
+        nearbySightings: nearby.count,
+        nearbyRadiusKm: NEARBY_RADIUS_KM,
+      });
 
       const municipality =
         findMunicipalityByPrefCode(rev?.prefCode) ??
@@ -157,6 +189,9 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         breakdown,
         municipality,
         placeName,
+        nearbyWeightedCount: nearby.weighted,
+        nearbySightings: nearby.count,
+        nearbyRadiusKm: NEARBY_RADIUS_KM,
       });
     } catch (err) {
       setState({
@@ -263,10 +298,15 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
                   {state.kind === "error" && (
                     <span className="text-red-600">⚠️ {state.message}</span>
                   )}
-                  {state.kind === "ready" &&
-                    (state.mesh
-                      ? `スコア ${state.breakdown.score} / 100`
-                      : "生息域外（環境省調査で生息記録なし）")}
+                  {state.kind === "ready" && (
+                    <>
+                      {state.breakdown.level === "unknown"
+                        ? "データ不足（評価困難）"
+                        : state.mesh
+                          ? `スコア ${state.breakdown.score} / 100`
+                          : `緩衝域 / 近隣 ${state.nearbyRadiusKm}km に目撃 ${state.nearbySightings} 件`}
+                    </>
+                  )}
                 </div>
               </div>
               {badge}
@@ -311,7 +351,7 @@ function RiskDetails({
   state: Extract<State, { kind: "ready" }>;
   onReload: () => void;
 }) {
-  const { breakdown, weather, mesh, placeName } = state;
+  const { breakdown, weather, mesh, placeName, nearbySightings, nearbyRadiusKm, nearbyWeightedCount } = state;
   const now = new Date();
   const hour = now.getHours();
   const month = now.getMonth() + 1;
@@ -324,6 +364,9 @@ function RiskDetails({
     : state.municipality
       ? "ツキノワグマ"
       : undefined;
+
+  const isUnknown = breakdown.level === "unknown";
+  const isBuffer = !mesh && breakdown.level !== "unknown";
 
   const askContext = {
     place: placeName,
@@ -352,13 +395,39 @@ function RiskDetails({
         </span>
       </div>
 
-      {!mesh ? (
-        <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900">
-          🌿 この場所は環境省の生息域調査でクマの生息記録がない地域です。
-          基本対策で十分に安全に過ごせます。
+      {isUnknown ? (
+        <div className="rounded-xl bg-gray-50 p-3 text-sm text-gray-800 ring-1 ring-gray-200">
+          <div className="mb-1 font-semibold text-gray-900">⚠️ データ不足</div>
+          <p className="text-xs leading-relaxed text-gray-700">
+            環境省の生息域調査に記録がなく、近隣 {nearbyRadiusKm}km 以内でも
+            直近の目撃情報を確認できませんでした。
+            <strong className="mx-1 text-gray-900">
+              「安全」とは評価していません。
+            </strong>
+            山間部・里山では基本対策（熊鈴・単独行動回避）を推奨します。
+          </p>
         </div>
       ) : (
-        <RiskCharts mesh={mesh} weather={weather} baseDate={now} />
+        <>
+          {isBuffer && (
+            <div className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
+              <div className="mb-1 font-semibold">🟠 緩衝域として評価</div>
+              <p className="text-xs leading-relaxed">
+                このメッシュは環境省の生息域調査には含まれていませんが、
+                近隣 {nearbyRadiusKm}km 以内で {nearbySightings} 件の直近目撃情報があり、
+                クマが行動域を広げている可能性があります。
+              </p>
+            </div>
+          )}
+          <RiskCharts
+            mesh={mesh}
+            weather={weather}
+            baseDate={now}
+            nearbyWeightedCount={nearbyWeightedCount}
+            nearbySightings={nearbySightings}
+            nearbyRadiusKm={nearbyRadiusKm}
+          />
+        </>
       )}
 
       <div className="border-t border-gray-100 pt-4">

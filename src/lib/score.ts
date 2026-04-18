@@ -80,31 +80,50 @@ function calcTimeBonus(hour: number): number {
   return isBearActiveHour(hour) ? 10 : 0;
 }
 
+export type ScoreOptions = {
+  nearbyWeightedCount?: number;
+  nearbySightings?: number;
+  nearbyRadiusKm?: number;
+};
+
+export function bufferHistoryFromNearby(weightedCount: number): number {
+  if (weightedCount <= 0) return 0;
+  return Math.min(70, Math.round(weightedCount * 18));
+}
+
 export function computeScore(
-  mesh: Pick<MeshData, "second" | "sixth" | "latest" | "latestSingle">,
+  mesh: Pick<MeshData, "second" | "sixth" | "latest" | "latestSingle"> | null,
   now: Date,
   weather: WeatherSnapshot | null,
+  opts: ScoreOptions = {},
 ): ScoreBreakdown {
   const month = now.getMonth() + 1;
   const hour = now.getHours();
   const { phase, name: phaseName } = lunarPhase(now);
+  const radius = opts.nearbyRadiusKm ?? 10;
+
+  const directHistory = mesh ? calcHistoryScore(mesh) : 0;
+  const bufferHistory = bufferHistoryFromNearby(opts.nearbyWeightedCount ?? 0);
+  const historyScore = Math.max(directHistory, bufferHistory);
+  const isInsideHabitat = directHistory > 0;
+  const isBufferZone = !isInsideHabitat && bufferHistory > 0;
 
   const factors: ScoreFactors = {
-    history: calcHistoryScore(mesh),
+    history: historyScore,
     seasonal: calcSeasonalScore(month),
     weather: calcWeatherScore(weather),
     lunar: calcLunarScore(phase),
     timeOfDayBonus: calcTimeBonus(hour),
   };
 
-  if (factors.history <= 0) {
+  if (historyScore <= 0) {
     return {
       score: 0,
-      level: "safe",
+      level: "unknown",
       factors,
       explanation: [
-        "環境省の生息域調査でこの 5km メッシュにクマの生息記録がないため、危険度は非常に低いと評価しています。",
-        "（季節・気象・時間帯の係数は生息域内でのみ加味されます）",
+        "この地域は環境省の生息域調査に記録がなく、近隣にも直近の目撃情報が確認できていません。",
+        "ただし「データが無い」ことは「安全」を意味しません。山間部・里山では基本対策を推奨します。",
       ],
     };
   }
@@ -119,8 +138,12 @@ export function computeScore(
   const score = Math.round(Math.min(100, Math.max(0, weighted)));
   const level = toRiskLevel(score);
 
+  const historyLabel = isInsideHabitat
+    ? `履歴（生息域）: ${factors.history.toFixed(0)} pts（最新調査 ${mesh?.latest ?? 0} / 第6回 ${mesh?.sixth ?? 0} / 第2回 ${mesh?.second ?? 0}）`
+    : `履歴（緩衝域）: ${factors.history.toFixed(0)} pts（近隣 ${radius}km 以内の直近目撃 ${opts.nearbySightings ?? 0} 件から推計）`;
+
   const explanation = [
-    `履歴（生息域）: ${factors.history.toFixed(0)} pts（最新調査 ${mesh.latest} / 第6回 ${mesh.sixth} / 第2回 ${mesh.second}）`,
+    historyLabel,
     `季節: ${factors.seasonal} pts（${month}月の月別係数）`,
     weather
       ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm}mm）`
@@ -130,6 +153,12 @@ export function computeScore(
       ? `時間帯補正: +${factors.timeOfDayBonus}（${hour}時はクマの活動時間帯）`
       : `時間帯補正: 0（${hour}時は活動時間外）`,
   ];
+
+  if (isBufferZone) {
+    explanation.unshift(
+      "環境省の生息域調査には記録がありませんが、近隣で直近の目撃があり緩衝域として評価しています。",
+    );
+  }
 
   return { score, level, factors, explanation };
 }
@@ -148,6 +177,7 @@ export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   moderate: "中程度",
   elevated: "やや高い",
   high: "高い",
+  unknown: "データ不足",
 };
 
 export const RISK_LEVEL_COLOR: Record<RiskLevel, string> = {
@@ -156,4 +186,5 @@ export const RISK_LEVEL_COLOR: Record<RiskLevel, string> = {
   moderate: "#f59e0b",
   elevated: "#f97316",
   high: "#dc2626",
+  unknown: "#6b7280",
 };

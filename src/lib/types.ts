@@ -55,7 +55,7 @@ export type MeshScored = MeshData & {
   centerLon: number;
 };
 
-export type RiskLevel = "safe" | "low" | "moderate" | "elevated" | "high";
+export type RiskLevel = "safe" | "low" | "moderate" | "elevated" | "high" | "unknown";
 
 export type WeatherSnapshot = {
   tempC: number;

@@ -12,40 +12,52 @@ type Props = {
   mesh: MeshData | null;
   weather: WeatherSnapshot | null;
   baseDate: Date;
+  nearbyWeightedCount?: number;
+  nearbySightings?: number;
+  nearbyRadiusKm?: number;
 };
 
 const MONTH_LABEL = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
 
-export default function RiskCharts({ mesh, weather, baseDate }: Props) {
+export default function RiskCharts({
+  mesh,
+  weather,
+  baseDate,
+  nearbyWeightedCount,
+  nearbySightings,
+  nearbyRadiusKm,
+}: Props) {
   const currentHour = baseDate.getHours();
   const currentMonth = baseDate.getMonth();
+  const scoreOpts = {
+    nearbyWeightedCount,
+    nearbySightings,
+    nearbyRadiusKm,
+  };
 
   const hourly = useMemo(() => {
-    const meshOrEmpty = mesh ?? { second: 0, sixth: 0, latest: 0, latestSingle: 0 };
     return Array.from({ length: 24 }, (_, h) => {
       const d = new Date(baseDate);
       d.setHours(h, 0, 0, 0);
-      const b = computeScore(meshOrEmpty, d, weather);
+      const b = computeScore(mesh, d, weather, scoreOpts);
       return { hour: h, score: b.score, level: b.level };
     });
-  }, [mesh, weather, baseDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mesh, weather, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm]);
 
   const monthly = useMemo(() => {
-    const meshOrEmpty = mesh ?? { second: 0, sixth: 0, latest: 0, latestSingle: 0 };
     return Array.from({ length: 12 }, (_, m) => {
       const d = new Date(baseDate);
       d.setMonth(m);
-      const b = computeScore(meshOrEmpty, d, null);
+      const b = computeScore(mesh, d, null, scoreOpts);
       return { month: m, score: b.score, level: b.level };
     });
-  }, [mesh, baseDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mesh, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm]);
 
-  if (!mesh) {
-    return (
-      <div className="rounded-xl bg-emerald-50 p-3 text-xs text-emerald-800">
-        この場所は生息域外のため、時間帯や月による変動はありません。
-      </div>
-    );
+  const hasAnyScore = hourly.some((h) => h.score > 0) || monthly.some((m) => m.score > 0);
+  if (!hasAnyScore) {
+    return null;
   }
 
   return (

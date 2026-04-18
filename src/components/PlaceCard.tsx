@@ -136,11 +136,18 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
       setMesh(mData);
       setWeather(w);
 
-      const score = computeScore(
-        mData ?? { second: 0, sixth: 0, latest: 0, latestSingle: 0 },
-        new Date(),
-        w,
-      );
+      let nearbyWeighted = 0;
+      for (const r of near) {
+        if (r.distanceKm <= 10) {
+          nearbyWeighted += Math.exp(-r.distanceKm / 5);
+        }
+      }
+      const nearbyCountWithin10 = near.filter((r) => r.distanceKm <= 10).length;
+      const score = computeScore(mData, new Date(), w, {
+        nearbyWeightedCount: nearbyWeighted,
+        nearbySightings: nearbyCountWithin10,
+        nearbyRadiusKm: 10,
+      });
       setBreakdown(score);
       setNearby(near);
 
@@ -220,7 +227,13 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
               {levelLabel}
             </div>
             <div className="mt-0.5 text-[11px] text-gray-500">
-              {loading ? "計算中..." : mesh ? "生息域内" : "生息域外（安全）"}
+              {loading
+                ? "計算中..."
+                : breakdown?.level === "unknown"
+                  ? "生息記録・目撃情報なし"
+                  : mesh
+                    ? "生息域内"
+                    : "生息域外（近隣目撃あり）"}
             </div>
           </div>
         </div>
