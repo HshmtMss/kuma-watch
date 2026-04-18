@@ -91,7 +91,28 @@ export type ScoreOptions = {
   nearbySightings?: number;
   nearbyRadiusKm?: number;
   prefCode?: string;
+  elevationM?: number | null;
 };
+
+export function calcTerrainScore(elevationM: number | null | undefined): number {
+  if (elevationM == null) return 50;
+  if (elevationM < 50) return 10;
+  if (elevationM < 200) return 25;
+  if (elevationM < 500) return 50;
+  if (elevationM < 1000) return 72;
+  if (elevationM < 1500) return 85;
+  return 92;
+}
+
+export function terrainLabel(elevationM: number | null | undefined): string {
+  if (elevationM == null) return "標高不明";
+  if (elevationM < 50) return "沿岸・低地";
+  if (elevationM < 200) return "平野・丘陵";
+  if (elevationM < 500) return "里山・低山";
+  if (elevationM < 1000) return "中山地";
+  if (elevationM < 1500) return "山地";
+  return "高山・亜高山";
+}
 
 function nutCropMultiplier(
   prefCode: string | undefined,
@@ -136,26 +157,31 @@ export function computeScore(
   const baseSeasonal = calcSeasonalScore(month);
   const nutCrop = nutCropMultiplier(opts.prefCode, month, now);
   const boostedSeasonal = Math.min(100, baseSeasonal * nutCrop.multiplier);
+  const terrain = calcTerrainScore(opts.elevationM);
 
   const factors: ScoreFactors = {
     history: historyScore,
     seasonal: boostedSeasonal,
     weather: calcWeatherScore(weather),
     lunar: calcLunarScore(phase),
+    terrain,
     timeOfDayBonus: calcTimeBonus(hour),
   };
 
   if (historyScore <= 0) {
     // Out-of-habitat + no nearby sightings: return the lowest of 5 levels ("低い")
     // with explicit data-insufficiency note. Never returns "安全".
+    // Terrain (elevation) still factored in so mountainous areas aren't treated
+    // like coastal cities.
     const lowDefaultScore = Math.round(
       Math.min(
         30,
         Math.max(
           15,
-          factors.seasonal * 0.15 +
-            factors.weather * 0.1 +
-            factors.lunar * 0.05,
+          factors.seasonal * 0.12 +
+            factors.weather * 0.08 +
+            factors.lunar * 0.04 +
+            factors.terrain * 0.15,
         ),
       ),
     );
@@ -165,6 +191,7 @@ export function computeScore(
       factors,
       explanation: [
         "この地域は環境省の生息域調査に記録がなく、近隣にも直近の目撃情報が確認できていません。",
+        `地形: ${factors.terrain} pts（${terrainLabel(opts.elevationM)}${opts.elevationM != null ? ` / 標高 ${Math.round(opts.elevationM)}m` : ""}）`,
         "データ不足のため、5 段階のうち「低い」を暫定的に表示しています。",
         "「安全」を意味するものではありません。山間部・里山では基本対策を推奨します。",
       ],
@@ -172,10 +199,11 @@ export function computeScore(
   }
 
   const weighted =
-    factors.history * 0.4 +
-    factors.seasonal * 0.3 +
-    factors.weather * 0.2 +
-    factors.lunar * 0.1 +
+    factors.history * 0.35 +
+    factors.seasonal * 0.25 +
+    factors.weather * 0.15 +
+    factors.lunar * 0.08 +
+    factors.terrain * 0.17 +
     factors.timeOfDayBonus;
 
   const score = Math.round(Math.min(100, Math.max(0, weighted)));
@@ -191,12 +219,15 @@ export function computeScore(
       ? `季節: ${factors.seasonal.toFixed(0)} pts（${month}月 / 堅果類 ${NUT_CROP_LABEL[nutCrop.entry.level]}・補正なし）`
       : `季節: ${factors.seasonal.toFixed(0)} pts（${month}月の月別係数）`;
 
+  const terrainLine = `地形: ${factors.terrain} pts（${terrainLabel(opts.elevationM)}${opts.elevationM != null ? ` / 標高 ${Math.round(opts.elevationM)}m` : ""}）`;
+
   const explanation = [
     historyLabel,
     seasonalLabel,
     weather
       ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm}mm）`
       : `気象: ${factors.weather} pts（取得なし・中央値）`,
+    terrainLine,
     `月相: ${factors.lunar} pts（${phaseName}）`,
     factors.timeOfDayBonus > 0
       ? `時間帯補正: +${factors.timeOfDayBonus}（${hour}時はクマの活動時間帯）`

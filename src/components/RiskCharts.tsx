@@ -16,6 +16,7 @@ type Props = {
   nearbySightings?: number;
   nearbyRadiusKm?: number;
   prefCode?: string;
+  elevationM?: number | null;
 };
 
 const MONTH_LABEL = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
@@ -28,6 +29,7 @@ export default function RiskCharts({
   nearbySightings,
   nearbyRadiusKm,
   prefCode,
+  elevationM,
 }: Props) {
   const currentHour = baseDate.getHours();
   const currentMonth = baseDate.getMonth();
@@ -36,6 +38,7 @@ export default function RiskCharts({
     nearbySightings,
     nearbyRadiusKm,
     prefCode,
+    elevationM,
   };
 
   const hourly = useMemo(() => {
@@ -46,7 +49,7 @@ export default function RiskCharts({
       return { hour: h, score: b.score, level: b.level };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mesh, weather, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode]);
+  }, [mesh, weather, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode, elevationM]);
 
   const monthly = useMemo(() => {
     return Array.from({ length: 12 }, (_, m) => {
@@ -56,7 +59,7 @@ export default function RiskCharts({
       return { month: m, score: b.score, level: b.level };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mesh, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode]);
+  }, [mesh, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode, elevationM]);
 
   const hasAnyScore = hourly.some((h) => h.score > 0) || monthly.some((m) => m.score > 0);
   if (!hasAnyScore) {

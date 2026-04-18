@@ -35,6 +35,19 @@ type Props = {
 
 type NearbySighting = KumaRecord & { distanceKm: number };
 
+async function fetchElevation(lat: number, lon: number): Promise<number | null> {
+  try {
+    const r = await fetch(
+      `/api/elevation?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+    );
+    if (!r.ok) return null;
+    const data = (await r.json()) as { elevationM?: number | null };
+    return typeof data.elevationM === "number" ? data.elevationM : null;
+  } catch {
+    return null;
+  }
+}
+
 async function fetchWeather(
   lat: number,
   lon: number,
@@ -102,11 +115,12 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
 
       const meshCode = latLonToMeshCode(lat, lon);
 
-      const [rev, meshes, w, near] = await Promise.all([
+      const [rev, meshes, w, near, elevationM] = await Promise.all([
         reverseGeocode(lat, lon),
         loadMeshes(),
         fetchWeather(lat, lon),
         fetchNearbySightings(lat, lon, 20),
+        fetchElevation(lat, lon),
       ]);
 
       if (cancelled) return;
@@ -148,6 +162,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         nearbySightings: nearbyCountWithin10,
         nearbyRadiusKm: 10,
         prefCode: rev?.prefCode,
+        elevationM,
       });
       setBreakdown(score);
       setNearby(near);

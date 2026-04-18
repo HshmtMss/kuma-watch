@@ -51,10 +51,27 @@ type State =
       nearbyWeightedCount: number;
       nearbySightings: number;
       nearbyRadiusKm: number;
+      elevationM: number | null;
     };
 
 const NEARBY_RADIUS_KM = 10;
 const NEARBY_DECAY_KM = 5;
+
+async function fetchElevation(
+  lat: number,
+  lon: number,
+): Promise<number | null> {
+  try {
+    const r = await fetch(
+      `/api/elevation?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+    );
+    if (!r.ok) return null;
+    const data = (await r.json()) as { elevationM?: number | null };
+    return typeof data.elevationM === "number" ? data.elevationM : null;
+  } catch {
+    return null;
+  }
+}
 
 async function fetchNearbyWeighted(
   lat: number,
@@ -148,11 +165,12 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
       }
 
       setState({ kind: "loading", stage: "データを取得中" });
-      const [meshes, weather, rev, nearby] = await Promise.all([
+      const [meshes, weather, rev, nearby, elevationM] = await Promise.all([
         loadMeshes(),
         fetchWeather(loc.lat, loc.lon),
         reverseGeocode(loc.lat, loc.lon),
         fetchNearbyWeighted(loc.lat, loc.lon),
+        fetchElevation(loc.lat, loc.lon),
       ]);
       const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
@@ -170,6 +188,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
         prefCode: rev?.prefCode,
+        elevationM,
       });
 
       const municipality =
@@ -193,6 +212,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
+        elevationM,
       });
     } catch (err) {
       setState({
@@ -419,6 +439,7 @@ function RiskDetails({
         nearbySightings={nearbySightings}
         nearbyRadiusKm={nearbyRadiusKm}
         prefCode={state.municipality?.prefCode}
+        elevationM={state.elevationM}
       />
 
       <div className="border-t border-gray-100 pt-4">

@@ -71,6 +71,7 @@ export type ScoreFactors = {
   seasonal: number;
   weather: number;
   lunar: number;
+  terrain: number;
   timeOfDayBonus: number;
 };
 
