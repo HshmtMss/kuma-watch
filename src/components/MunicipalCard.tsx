@@ -1,0 +1,89 @@
+"use client";
+
+import type { MunicipalEntry } from "@/data/municipalities";
+
+type Props = {
+  entry: MunicipalEntry | undefined;
+  summary?: string | null;
+  loadingSummary?: boolean;
+};
+
+const KIND_LABEL: Record<string, string> = {
+  official_info: "公式情報",
+  official_map: "公式マップ",
+  official_app: "公式アプリ",
+  open_data: "オープンデータ",
+  social: "SNS",
+  contact: "問い合わせ",
+};
+
+export default function MunicipalCard({ entry, summary, loadingSummary }: Props) {
+  if (!entry) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+        この地域の自治体マスタ情報はまだ未登録です。今後追加予定です。
+      </div>
+    );
+  }
+
+  const speciesLabel = entry.bearSpecies
+    .map((s) => (s === "higuma" ? "ヒグマ" : "ツキノワグマ"))
+    .join("・");
+
+  return (
+    <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="text-sm font-semibold text-blue-900">
+          {entry.prefNameJa} のクマ情報
+        </div>
+        <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-blue-200">
+          {speciesLabel}
+        </span>
+      </div>
+
+      {loadingSummary ? (
+        <div className="mb-3 flex items-center gap-2 text-xs text-gray-500">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+          自治体情報を要約中...
+        </div>
+      ) : summary ? (
+        <div className="mb-3 rounded-lg border-l-4 border-blue-400 bg-white p-3 text-sm leading-relaxed text-gray-800">
+          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-blue-600">
+            自治体発信の要約
+          </div>
+          {summary}
+        </div>
+      ) : (
+        <p className="mb-3 text-sm text-gray-700">{entry.summary}</p>
+      )}
+
+      <div className="space-y-1.5">
+        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-blue-700">
+          公式リソース
+        </div>
+        {entry.links.map((link) => (
+          <a
+            key={link.url}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2 rounded-md bg-white px-3 py-2 text-sm text-blue-800 ring-1 ring-blue-100 transition hover:ring-blue-300"
+          >
+            <span aria-hidden>🔗</span>
+            <span className="flex-1 min-w-0">
+              <span className="block font-medium">{link.label}</span>
+              <span className="block truncate text-[10px] text-blue-500">
+                {KIND_LABEL[link.kind] ?? link.kind}
+                {link.note ? ` ・ ${link.note}` : ""}
+              </span>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <p className="mt-3 text-[10px] text-gray-500">
+        最終確認: {entry.verifiedAt}
+      </p>
+    </div>
+  );
+}
