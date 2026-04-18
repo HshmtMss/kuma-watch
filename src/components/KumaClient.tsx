@@ -49,6 +49,29 @@ export default function KumaClient() {
       .catch(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!navigator.geolocation) return;
+    let cancelled = false;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (cancelled) return;
+        setSelectedLocation({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          source: "gps",
+        });
+      },
+      () => {
+        // permission denied or timeout — silent fallback (user can tap/search)
+      },
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const prefectures = useMemo(() => {
     const set = new Set(records.map((r) => r.prefectureName).filter(Boolean));
     return Array.from(set).sort((a, b) => a.localeCompare(b, "ja"));
