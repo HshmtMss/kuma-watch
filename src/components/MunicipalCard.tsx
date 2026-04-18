@@ -1,11 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { MunicipalEntry } from "@/data/municipalities";
+import type { SummaryResponse } from "@/app/api/summary/route";
 
 type Props = {
   entry: MunicipalEntry | undefined;
-  summary?: string | null;
-  loadingSummary?: boolean;
 };
 
 const KIND_LABEL: Record<string, string> = {
@@ -17,7 +17,28 @@ const KIND_LABEL: Record<string, string> = {
   contact: "問い合わせ",
 };
 
-export default function MunicipalCard({ entry, summary, loadingSummary }: Props) {
+export default function MunicipalCard({ entry }: Props) {
+  const [summary, setSummary] = useState<SummaryResponse | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
+  useEffect(() => {
+    if (!entry) return;
+    let cancelled = false;
+    setLoadingSummary(true);
+    fetch(`/api/summary?prefCode=${entry.prefCode}`)
+      .then((r) => (r.ok ? (r.json() as Promise<SummaryResponse>) : null))
+      .then((data) => {
+        if (!cancelled && data) setSummary(data);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoadingSummary(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [entry]);
+
   if (!entry) {
     return (
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
@@ -46,12 +67,20 @@ export default function MunicipalCard({ entry, summary, loadingSummary }: Props)
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />
           自治体情報を要約中...
         </div>
-      ) : summary ? (
+      ) : summary?.summary ? (
         <div className="mb-3 rounded-lg border-l-4 border-blue-400 bg-white p-3 text-sm leading-relaxed text-gray-800">
-          <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-blue-600">
+          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-blue-600">
             自治体発信の要約
+            {summary.mode === "demo" && (
+              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 lowercase">
+                demo
+              </span>
+            )}
           </div>
-          {summary}
+          {summary.summary}
+          {summary.note && (
+            <div className="mt-2 text-[10px] text-gray-400">{summary.note}</div>
+          )}
         </div>
       ) : (
         <p className="mb-3 text-sm text-gray-700">{entry.summary}</p>
