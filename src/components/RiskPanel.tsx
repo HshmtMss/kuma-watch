@@ -15,6 +15,13 @@ import {
 import { latLonToMeshCode } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
+import {
+  findMunicipalityByPrefCode,
+  findMunicipalityByPrefName,
+  type MunicipalEntry,
+} from "@/data/municipalities";
+import type { GeocodeHit } from "@/app/api/geocode/route";
+import MunicipalCard from "@/components/MunicipalCard";
 
 export type LocationSource = "gps" | "tap";
 export type SelectedLocation = {
@@ -36,7 +43,25 @@ type State =
       mesh: MeshData | null;
       weather: WeatherSnapshot | null;
       breakdown: ScoreBreakdown;
+      municipality?: MunicipalEntry;
+      placeName?: string;
     };
+
+async function reverseGeocode(
+  lat: number,
+  lon: number,
+): Promise<GeocodeHit | null> {
+  try {
+    const r = await fetch(
+      `/api/geocode?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}&v=2`,
+    );
+    if (!r.ok) return null;
+    const data = (await r.json()) as { result?: GeocodeHit };
+    return data.result ?? null;
+  } catch {
+    return null;
+  }
+}
 
 async function fetchWeather(
   lat: number,
@@ -90,9 +115,10 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
       }
 
       setState({ kind: "loading", stage: "データを取得中" });
-      const [meshes, weather] = await Promise.all([
+      const [meshes, weather, rev] = await Promise.all([
         loadMeshes(),
         fetchWeather(loc.lat, loc.lon),
+        reverseGeocode(loc.lat, loc.lon),
       ]);
       const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
@@ -111,6 +137,13 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         weather,
       );
 
+      const municipality =
+        findMunicipalityByPrefCode(rev?.prefCode) ??
+        findMunicipalityByPrefName(rev?.prefecture);
+      const placeName = rev
+        ? [rev.prefecture, rev.city].filter(Boolean).join(" ")
+        : undefined;
+
       setState({
         kind: "ready",
         lat: loc.lat,
@@ -120,6 +153,8 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         mesh,
         weather,
         breakdown,
+        municipality,
+        placeName,
       });
     } catch (err) {
       setState({
@@ -207,10 +242,12 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
                 📍
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-gray-900">
-                  {state.kind === "ready" && state.source === "tap"
-                    ? "選択地点の危険度"
-                    : "現在地の危険度"}
+                <div className="truncate text-sm font-semibold text-gray-900">
+                  {state.kind === "ready" && state.placeName
+                    ? state.placeName
+                    : state.kind === "ready" && state.source === "tap"
+                      ? "選択地点の危険度"
+                      : "現在地の危険度"}
                 </div>
                 <div className="truncate text-xs text-gray-500">
                   {state.kind === "idle" &&
@@ -328,6 +365,10 @@ function RiskDetails({
           そのため危険度は「安全」と評価されます。
         </p>
       )}
+
+      <div className="border-t border-gray-100 pt-3">
+        <MunicipalCard entry={state.municipality} />
+      </div>
 
       <div className="flex items-center gap-2 pt-1">
         <button

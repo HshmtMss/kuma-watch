@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap from "@/components/KumaMap";
+import PlaceSearch from "@/components/PlaceSearch";
 import RiskPanel, { type SelectedLocation } from "@/components/RiskPanel";
 import { RISK_LEVEL_COLOR, RISK_LEVEL_LABEL } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
+import type { GeocodeHit } from "@/app/api/geocode/route";
 
 const RISK_LEGEND_ORDER: RiskLevel[] = ["low", "moderate", "elevated", "high"];
 
@@ -31,6 +33,10 @@ export default function KumaClient() {
 
   const handleClear = useCallback(() => {
     setSelectedLocation(null);
+  }, []);
+
+  const handleSearchPick = useCallback((hit: GeocodeHit) => {
+    setSelectedLocation({ lat: hit.lat, lon: hit.lon, source: "tap" });
   }, []);
 
   useEffect(() => {
@@ -70,33 +76,32 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        <a href="/" className="flex items-center gap-2 min-w-0">
+        <a href="/" className="flex shrink-0 items-center gap-1.5">
           <span className="text-xl" aria-hidden="true">🐻</span>
-          <div className="min-w-0">
-            <div className="truncate text-sm font-bold text-gray-900">
-              KumaWatch
-            </div>
-            <div className="hidden text-[10px] leading-tight text-gray-500 sm:block">
-              全国クマ出没予報
-            </div>
-          </div>
+          <span className="hidden text-sm font-bold text-gray-900 sm:inline">
+            KumaWatch
+          </span>
         </a>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="min-w-0 flex-1">
+          <PlaceSearch compact onPick={handleSearchPick} />
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1">
           <button
             onClick={() => setShowFilters((v) => !v)}
-            className={`flex h-9 items-center gap-1 rounded-full border border-gray-200 px-3 text-xs font-medium transition ${
+            className={`flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-sm font-medium transition ${
               showFilters || activeFilterCount > 0
                 ? "bg-amber-600 text-white"
                 : "bg-white text-gray-700"
             }`}
             aria-expanded={showFilters}
-            aria-label="フィルタ"
+            aria-label="絞り込み"
+            title="絞り込み"
           >
             <span aria-hidden>⚙</span>
-            <span>絞り込み</span>
             {activeFilterCount > 0 && (
-              <span className="ml-0.5 rounded-full bg-white/25 px-1.5 text-[10px]">
+              <span className="absolute ml-6 -mt-4 rounded-full bg-red-500 px-1 text-[9px] text-white">
                 {activeFilterCount}
               </span>
             )}

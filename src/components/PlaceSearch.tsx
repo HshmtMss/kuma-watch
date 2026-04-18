@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
-export default function PlaceSearch({ autofocus = false }: { autofocus?: boolean }) {
+type Props = {
+  autofocus?: boolean;
+  onPick?: (hit: GeocodeHit) => void;
+  compact?: boolean;
+};
+
+export default function PlaceSearch({ autofocus = false, onPick, compact = false }: Props) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<GeocodeHit[]>([]);
@@ -45,6 +51,11 @@ export default function PlaceSearch({ autofocus = false }: { autofocus?: boolean
 
   const handlePick = (hit: GeocodeHit) => {
     setOpen(false);
+    setQ("");
+    if (onPick) {
+      onPick(hit);
+      return;
+    }
     const params = new URLSearchParams({
       lat: String(hit.lat),
       lon: String(hit.lon),
@@ -57,7 +68,7 @@ export default function PlaceSearch({ autofocus = false }: { autofocus?: boolean
     <div className="relative w-full">
       <div className="relative">
         <span
-          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-lg text-gray-400"
+          className={`pointer-events-none absolute ${compact ? "left-2.5 text-sm" : "left-3.5 text-lg"} top-1/2 -translate-y-1/2 text-gray-400`}
           aria-hidden
         >
           🔍
@@ -71,8 +82,12 @@ export default function PlaceSearch({ autofocus = false }: { autofocus?: boolean
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => hits.length > 0 && setOpen(true)}
           onBlur={() => window.setTimeout(() => setOpen(false), 150)}
-          placeholder="行き先を入力（例: 上高地 / 奥多摩 / 蔵王）"
-          className="h-12 w-full rounded-full border border-gray-200 bg-white py-2 pl-11 pr-4 text-base text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+          placeholder={compact ? "地名を入力" : "行き先を入力（例: 上高地 / 奥多摩 / 蔵王）"}
+          className={
+            compact
+              ? "h-9 w-full rounded-full border border-gray-200 bg-white py-1 pl-9 pr-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+              : "h-12 w-full rounded-full border border-gray-200 bg-white py-2 pl-11 pr-4 text-base text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+          }
         />
       </div>
 

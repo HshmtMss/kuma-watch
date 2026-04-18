@@ -18,11 +18,14 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    return SEO_REDIRECT_SLUGS.map((slug) => ({
-      source: `/${slug}`,
-      destination: "/",
-      permanent: true,
-    }));
+    return [
+      ...SEO_REDIRECT_SLUGS.map((slug) => ({
+        source: `/${slug}`,
+        destination: "/",
+        permanent: true,
+      })),
+      { source: "/map", destination: "/", permanent: true },
+    ];
   },
   async headers() {
     return [
