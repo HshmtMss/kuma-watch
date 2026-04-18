@@ -13,6 +13,7 @@ const RISK_LEGEND_ORDER: RiskLevel[] = ["low", "moderate", "elevated", "high"];
 
 export default function KumaClient() {
   const [records, setRecords] = useState<KumaRecord[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedPref, setSelectedPref] = useState("all");
   const [selectedYear, setSelectedYear] = useState("all");
@@ -42,8 +43,9 @@ export default function KumaClient() {
   useEffect(() => {
     fetch("/api/kuma")
       .then((r) => r.json())
-      .then((data: { records?: KumaRecord[] }) => {
+      .then((data: { records?: KumaRecord[]; total?: number }) => {
         setRecords(Array.isArray(data.records) ? data.records : []);
+        setTotal(typeof data.total === "number" ? data.total : 0);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -232,8 +234,7 @@ export default function KumaClient() {
 
         {!loading && (
           <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium text-gray-600 shadow backdrop-blur sm:left-auto sm:right-16">
-            {filtered.length.toLocaleString()}件表示 / 全
-            {records.length.toLocaleString()}件
+            {filtered.length.toLocaleString()}件表示 / 取得 {records.length.toLocaleString()}件 / 全{total.toLocaleString()}件
           </div>
         )}
 

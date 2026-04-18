@@ -27,20 +27,27 @@ type Sharp9110Record = {
   HeadCount?: number;
 };
 
-// プロセスメモリにキャッシュ（再起動するまで有効）
 let cache: { records: KumaRecord[]; fetchedAt: number } | null = null;
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1時間
+const CACHE_TTL_MS = 60 * 60 * 1000;
+const DEFAULT_LIMIT = 8000;
+const MAX_LIMIT = 25000;
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const pref = searchParams.get("pref");
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const limitParam = searchParams.get("limit");
+  const limit = limitParam
+    ? Math.min(MAX_LIMIT, Math.max(1, Number(limitParam) || DEFAULT_LIMIT))
+    : DEFAULT_LIMIT;
 
   try {
     const now = Date.now();
 
     if (!cache || now - cache.fetchedAt > CACHE_TTL_MS) {
       const res = await fetch(NATIONAL_JSON_URL, {
-        headers: { "User-Agent": "kuma-map-prototype/1.0" },
+        headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
         cache: "no-store",
       });
 
@@ -80,15 +87,27 @@ export async function GET(req: Request) {
     if (pref) {
       records = records.filter((r) => r.prefectureName === pref);
     }
+    if (from) {
+      records = records.filter((r) => r.date >= from);
+    }
+    if (to) {
+      records = records.filter((r) => r.date <= to);
+    }
 
-    // 件数が多すぎるとブラウザが重くなるため、新しい順に最大2000件に制限
-    const limited = records.slice(-2000).reverse();
+    // 日付降順、最新から limit 件
+    const sorted = [...records].sort((a, b) => (a.date > b.date ? -1 : 1));
+    const limited = sorted.slice(0, limit);
 
     return NextResponse.json(
-      { records: limited, total: cache.records.length, shown: limited.length },
+      {
+        records: limited,
+        total: cache.records.length,
+        matched: records.length,
+        shown: limited.length,
+      },
       {
         headers: {
-          "Cache-Control": "public, max-age=3600",
+          "Cache-Control": "public, max-age=3600, s-maxage=3600",
         },
       },
     );
