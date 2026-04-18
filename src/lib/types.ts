@@ -61,6 +61,9 @@ export type WeatherSnapshot = {
   tempC: number;
   precipMm: number;
   weatherCode: number;
+  pressureHPa?: number | null;
+  tempChange24h?: number | null;
+  pressureChange24h?: number | null;
   fetchedAt: string;
   lat: number;
   lon: number;

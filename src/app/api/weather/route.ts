@@ -9,7 +9,13 @@ type OpenMeteoResponse = {
     temperature_2m?: number;
     precipitation?: number;
     weather_code?: number;
+    surface_pressure?: number;
     time?: string;
+  };
+  hourly?: {
+    time?: string[];
+    temperature_2m?: number[];
+    surface_pressure?: number[];
   };
 };
 
@@ -22,6 +28,33 @@ function parseFloatParam(value: string | null, min: number, max: number): number
 
 function roundForCache(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+function findValue24hAgo(
+  times: string[] | undefined,
+  values: number[] | undefined,
+  currentTimeIso: string | undefined,
+): number | null {
+  if (!times || !values || !currentTimeIso) return null;
+  const now = new Date(currentTimeIso).getTime();
+  if (!Number.isFinite(now)) return null;
+  const target = now - 24 * 3600 * 1000;
+  let bestIdx = -1;
+  let bestDelta = Infinity;
+  for (let i = 0; i < times.length; i++) {
+    const t = new Date(times[i]).getTime();
+    if (!Number.isFinite(t)) continue;
+    const delta = Math.abs(t - target);
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      bestIdx = i;
+    }
+  }
+  if (bestIdx < 0) return null;
+  // Only accept within 2 hours of target
+  if (bestDelta > 2 * 3600 * 1000) return null;
+  const v = values[bestIdx];
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
 export async function GET(req: Request) {
@@ -42,7 +75,13 @@ export async function GET(req: Request) {
   const url = new URL(UPSTREAM);
   url.searchParams.set("latitude", String(roundedLat));
   url.searchParams.set("longitude", String(roundedLon));
-  url.searchParams.set("current", "temperature_2m,precipitation,weather_code");
+  url.searchParams.set(
+    "current",
+    "temperature_2m,precipitation,weather_code,surface_pressure",
+  );
+  url.searchParams.set("hourly", "temperature_2m,surface_pressure");
+  url.searchParams.set("past_days", "1");
+  url.searchParams.set("forecast_days", "1");
   url.searchParams.set("timezone", "Asia/Tokyo");
 
   try {
@@ -73,10 +112,33 @@ export async function GET(req: Request) {
       );
     }
 
+    const currentPressure =
+      typeof current.surface_pressure === "number" ? current.surface_pressure : null;
+    const temp24hAgo = findValue24hAgo(
+      data.hourly?.time,
+      data.hourly?.temperature_2m,
+      current.time,
+    );
+    const pressure24hAgo = findValue24hAgo(
+      data.hourly?.time,
+      data.hourly?.surface_pressure,
+      current.time,
+    );
+
+    const tempChange24h =
+      temp24hAgo != null ? Math.round((current.temperature_2m - temp24hAgo) * 10) / 10 : null;
+    const pressureChange24h =
+      currentPressure != null && pressure24hAgo != null
+        ? Math.round((currentPressure - pressure24hAgo) * 10) / 10
+        : null;
+
     const snapshot: WeatherSnapshot = {
       tempC: current.temperature_2m,
       precipMm: current.precipitation,
       weatherCode: current.weather_code,
+      pressureHPa: currentPressure,
+      tempChange24h,
+      pressureChange24h,
       fetchedAt: current.time ?? new Date().toISOString(),
       lat: roundedLat,
       lon: roundedLon,
