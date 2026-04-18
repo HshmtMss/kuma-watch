@@ -7,6 +7,7 @@ import type {
   Rectangle,
   CircleMarker,
   Popup,
+  LeafletMouseEvent,
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import { computeScore, RISK_LEVEL_COLOR } from "@/lib/score";
@@ -45,6 +46,8 @@ type Props = {
   center?: [number, number];
   zoom?: number;
   showHeatmap?: boolean;
+  selectedLocation?: { lat: number; lon: number; source: "gps" | "tap" } | null;
+  onMapClick?: (lat: number, lon: number) => void;
 };
 
 export default function KumaMap({
@@ -52,16 +55,24 @@ export default function KumaMap({
   center = [36.5, 137.5],
   zoom = 6,
   showHeatmap = true,
+  selectedLocation = null,
+  onMapClick,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const meshLayerRef = useRef<LayerGroup | null>(null);
   const pinLayerRef = useRef<LayerGroup | null>(null);
+  const selectionLayerRef = useRef<LayerGroup | null>(null);
   const popupRef = useRef<Popup | null>(null);
   const meshDataRef = useRef<MeshEntry[] | null>(null);
   const recordsRef = useRef<KumaRecord[]>(records);
   const showHeatmapRef = useRef(showHeatmap);
+  const onMapClickRef = useRef(onMapClick);
   const redrawTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    onMapClickRef.current = onMapClick;
+  }, [onMapClick]);
 
   const scheduleRedraw = () => {
     if (redrawTimerRef.current != null) {
@@ -159,7 +170,13 @@ export default function KumaMap({
           fillOpacity: 0.9,
           renderer: canvas,
         });
-        marker.on("click", () => showRecordPopup(L, r));
+        marker.on("click", (e) => {
+          // stop propagation so the map click handler doesn't also fire
+          if ((e as unknown as LeafletMouseEvent).originalEvent) {
+            (e as unknown as LeafletMouseEvent).originalEvent.stopPropagation?.();
+          }
+          showRecordPopup(L, r);
+        });
         marker.addTo(layer);
         drawn++;
         if (drawn >= maxPins) break;
@@ -185,6 +202,38 @@ export default function KumaMap({
     popupRef.current.setLatLng([r.lat, r.lon]).setContent(html).openOn(map);
   };
 
+  const renderSelectionLayer = () => {
+    const map = mapRef.current;
+    const layer = selectionLayerRef.current;
+    if (!map || !layer) return;
+
+    import("leaflet").then((L) => {
+      layer.clearLayers();
+      if (!selectedLocation) return;
+
+      const { lat, lon, source } = selectedLocation;
+      const color = source === "gps" ? "#2563eb" : "#d97706";
+
+      L.circle([lat, lon], {
+        radius: 180,
+        color,
+        weight: 1,
+        fillColor: color,
+        fillOpacity: 0.12,
+        interactive: false,
+      }).addTo(layer);
+
+      L.circleMarker([lat, lon], {
+        radius: 8,
+        color: "#ffffff",
+        weight: 2.5,
+        fillColor: color,
+        fillOpacity: 1,
+        interactive: false,
+      }).addTo(layer);
+    });
+  };
+
   useEffect(() => {
     recordsRef.current = records;
     renderPinLayer();
@@ -203,6 +252,16 @@ export default function KumaMap({
       if (map.hasLayer(layer)) map.removeLayer(layer);
     }
   }, [showHeatmap]);
+
+  useEffect(() => {
+    renderSelectionLayer();
+    const map = mapRef.current;
+    if (!map || !selectedLocation) return;
+    const { lat, lon } = selectedLocation;
+    const targetZoom = Math.max(map.getZoom(), 10);
+    map.flyTo([lat, lon], targetZoom, { duration: 0.8 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocation?.lat, selectedLocation?.lon, selectedLocation?.source]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -237,8 +296,16 @@ export default function KumaMap({
       pinLayerRef.current = pinLayer;
       pinLayer.addTo(map);
 
+      const selectionLayer = L.layerGroup();
+      selectionLayerRef.current = selectionLayer;
+      selectionLayer.addTo(map);
+
       map.on("moveend", scheduleRedraw);
       map.on("zoomend", scheduleRedraw);
+      map.on("click", (e: LeafletMouseEvent) => {
+        const cb = onMapClickRef.current;
+        if (cb) cb(e.latlng.lat, e.latlng.lng);
+      });
 
       fetch("/data/mesh.json", { cache: "force-cache" })
         .then((r) => r.json())
@@ -250,6 +317,7 @@ export default function KumaMap({
         .catch(() => {});
 
       renderPinLayer();
+      renderSelectionLayer();
     });
 
     return () => {
@@ -264,6 +332,7 @@ export default function KumaMap({
       }
       meshLayerRef.current = null;
       pinLayerRef.current = null;
+      selectionLayerRef.current = null;
       popupRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

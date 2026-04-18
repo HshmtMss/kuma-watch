@@ -27,6 +27,13 @@ type MeshEntry = {
 
 type MeshJsonPayload = { meshes: MeshEntry[] };
 
+export type LocationSource = "gps" | "tap";
+export type SelectedLocation = {
+  lat: number;
+  lon: number;
+  source: LocationSource;
+};
+
 type State =
   | { kind: "idle" }
   | { kind: "loading"; stage: string }
@@ -35,6 +42,7 @@ type State =
       kind: "ready";
       lat: number;
       lon: number;
+      source: LocationSource;
       meshCode: string;
       mesh: MeshData | null;
       weather: WeatherSnapshot | null;
@@ -80,20 +88,20 @@ function getPosition(): Promise<GeolocationPosition> {
   });
 }
 
-export default function RiskPanel() {
+type Props = {
+  location: SelectedLocation | null;
+  onPickGps: (loc: SelectedLocation) => void;
+  onClear: () => void;
+};
+
+export default function RiskPanel({ location, onPickGps, onClear }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => {
-    if (state.kind === "ready" || state.kind === "error") {
-      setExpanded(true);
-    }
-  }, [state.kind]);
-
-  const evaluate = useCallback(async (lat: number, lon: number) => {
+  const evaluate = useCallback(async (loc: SelectedLocation) => {
     try {
       setState({ kind: "loading", stage: "メッシュを特定中" });
-      const meshCode = latLonToMeshCode(lat, lon);
+      const meshCode = latLonToMeshCode(loc.lat, loc.lon);
       if (!meshCode) {
         setState({
           kind: "error",
@@ -105,7 +113,7 @@ export default function RiskPanel() {
       setState({ kind: "loading", stage: "データを取得中" });
       const [meshes, weather] = await Promise.all([
         loadMeshes(),
-        fetchWeather(lat, lon),
+        fetchWeather(loc.lat, loc.lon),
       ]);
       const entry = meshes.find((m) => m.m === meshCode);
       const mesh: MeshData | null = entry
@@ -126,8 +134,9 @@ export default function RiskPanel() {
 
       setState({
         kind: "ready",
-        lat,
-        lon,
+        lat: loc.lat,
+        lon: loc.lon,
+        source: loc.source,
         meshCode,
         mesh,
         weather,
@@ -141,11 +150,29 @@ export default function RiskPanel() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!location) {
+      setState({ kind: "idle" });
+      return;
+    }
+    void evaluate(location);
+  }, [location, evaluate]);
+
+  useEffect(() => {
+    if (state.kind === "ready" || state.kind === "error") {
+      setExpanded(true);
+    }
+  }, [state.kind]);
+
   const onUseGps = useCallback(async () => {
     setState({ kind: "loading", stage: "位置情報を取得中" });
     try {
       const pos = await getPosition();
-      await evaluate(pos.coords.latitude, pos.coords.longitude);
+      onPickGps({
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        source: "gps",
+      });
     } catch (err) {
       const msg =
         err instanceof GeolocationPositionError
@@ -157,7 +184,7 @@ export default function RiskPanel() {
             : "位置情報を取得できませんでした";
       setState({ kind: "error", message: msg });
     }
-  }, [evaluate]);
+  }, [onPickGps]);
 
   const badge =
     state.kind === "ready" ? (
@@ -168,6 +195,14 @@ export default function RiskPanel() {
         {RISK_LEVEL_LABEL[state.breakdown.level]} {state.breakdown.score}
       </span>
     ) : null;
+
+  const handleHeaderClick = () => {
+    if (state.kind === "idle") {
+      void onUseGps();
+    } else {
+      setExpanded((v) => !v);
+    }
+  };
 
   return (
     <>
@@ -180,58 +215,57 @@ export default function RiskPanel() {
       )}
 
       <div
-        className={`pointer-events-auto absolute inset-x-0 bottom-0 z-[1100] transition-transform duration-200 ease-out ${
-          expanded ? "translate-y-0" : ""
-        } sm:left-3 sm:right-auto sm:top-3 sm:bottom-auto sm:w-[360px]`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-0 z-[1100] transition-transform duration-200 ease-out sm:left-3 sm:right-auto sm:top-3 sm:bottom-auto sm:w-[360px]`}
       >
         <div className="mx-auto w-full max-w-[640px] rounded-t-2xl border border-black/8 bg-white shadow-xl sm:rounded-2xl">
-          <button
-            onClick={() => {
-              if (state.kind === "idle") {
-                void onUseGps();
-              } else {
-                setExpanded((v) => !v);
-              }
-            }}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left"
-            aria-expanded={expanded}
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
-              📍
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-gray-900">
-                現在地の危険度
+          <div className="flex items-center gap-2 px-3 py-2.5">
+            <button
+              onClick={handleHeaderClick}
+              className="flex min-w-0 flex-1 items-center gap-3 text-left"
+              aria-expanded={expanded}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
+                📍
               </div>
-              <div className="truncate text-xs text-gray-500">
-                {state.kind === "idle" && "タップして GPS で評価"}
-                {state.kind === "loading" && (
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
-                    {state.stage}...
-                  </span>
-                )}
-                {state.kind === "error" && (
-                  <span className="text-red-600">⚠️ {state.message}</span>
-                )}
-                {state.kind === "ready" &&
-                  (state.mesh
-                    ? `スコア ${state.breakdown.score} / 100`
-                    : "この地点には出没実績データがありません")}
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-gray-900">
+                  {state.kind === "ready" && state.source === "tap"
+                    ? "選択地点の危険度"
+                    : "現在地の危険度"}
+                </div>
+                <div className="truncate text-xs text-gray-500">
+                  {state.kind === "idle" &&
+                    "タップして GPS で評価／地図タップでも評価できます"}
+                  {state.kind === "loading" && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                      {state.stage}...
+                    </span>
+                  )}
+                  {state.kind === "error" && (
+                    <span className="text-red-600">⚠️ {state.message}</span>
+                  )}
+                  {state.kind === "ready" &&
+                    (state.mesh
+                      ? `スコア ${state.breakdown.score} / 100`
+                      : "この地点には出没実績データがありません")}
+                </div>
               </div>
-            </div>
-            {badge}
+              {badge}
+            </button>
             {(state.kind === "ready" || state.kind === "error") && (
-              <span
-                className={`shrink-0 text-gray-400 transition-transform ${
-                  expanded ? "rotate-180" : ""
-                }`}
-                aria-hidden
+              <button
+                onClick={() => {
+                  setExpanded(false);
+                  onClear();
+                }}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                aria-label="クリア"
               >
-                ▾
-              </span>
+                ×
+              </button>
             )}
-          </button>
+          </div>
 
           {expanded && state.kind === "ready" && (
             <RiskDetails state={state} onReload={onUseGps} />
@@ -242,7 +276,7 @@ export default function RiskPanel() {
                 onClick={onUseGps}
                 className="rounded-full bg-amber-600 px-4 py-2 text-xs font-medium text-white hover:bg-amber-700"
               >
-                再試行
+                再試行（GPS）
               </button>
             </div>
           )}
@@ -259,7 +293,7 @@ function RiskDetails({
   state: Extract<State, { kind: "ready" }>;
   onReload: () => void;
 }) {
-  const { breakdown, weather, lat, lon, meshCode, mesh } = state;
+  const { breakdown, weather, lat, lon, meshCode, mesh, source } = state;
   const now = new Date();
   const { name: lunarName } = lunarPhase(now);
   const hour = now.getHours();
@@ -272,7 +306,7 @@ function RiskDetails({
           <dd className="font-mono text-gray-800">{meshCode}</dd>
         </div>
         <div>
-          <dt className="text-gray-500">座標</dt>
+          <dt className="text-gray-500">座標 ({source === "gps" ? "GPS" : "タップ"})</dt>
           <dd className="text-gray-800">
             {lat.toFixed(4)}, {lon.toFixed(4)}
           </dd>
@@ -319,9 +353,9 @@ function RiskDetails({
       <div className="flex items-center gap-2 pt-1">
         <button
           onClick={onReload}
-          className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+          className="rounded-full bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700"
         >
-          🔄 再計算
+          📍 現在地で再計算
         </button>
       </div>
 

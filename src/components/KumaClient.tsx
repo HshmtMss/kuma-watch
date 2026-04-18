@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap from "@/components/KumaMap";
-import RiskPanel from "@/components/RiskPanel";
+import RiskPanel, { type SelectedLocation } from "@/components/RiskPanel";
 import { RISK_LEVEL_COLOR, RISK_LEVEL_LABEL } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 
@@ -18,6 +18,20 @@ export default function KumaClient() {
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedLocation, setSelectedLocation] =
+    useState<SelectedLocation | null>(null);
+
+  const handleMapClick = useCallback((lat: number, lon: number) => {
+    setSelectedLocation({ lat, lon, source: "tap" });
+  }, []);
+
+  const handleGpsPick = useCallback((loc: SelectedLocation) => {
+    setSelectedLocation(loc);
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setSelectedLocation(null);
+  }, []);
 
   useEffect(() => {
     fetch("/api/kuma")
@@ -174,7 +188,12 @@ export default function KumaClient() {
       )}
 
       <div className="relative flex-1 min-h-0">
-        <KumaMap records={filtered} showHeatmap={showHeatmap} />
+        <KumaMap
+          records={filtered}
+          showHeatmap={showHeatmap}
+          selectedLocation={selectedLocation}
+          onMapClick={handleMapClick}
+        />
 
         {loading && (
           <div className="pointer-events-none absolute left-1/2 top-3 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
@@ -184,7 +203,7 @@ export default function KumaClient() {
         )}
 
         {!loading && (
-          <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium text-gray-600 shadow backdrop-blur">
+          <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium text-gray-600 shadow backdrop-blur sm:left-auto sm:right-16">
             {filtered.length.toLocaleString()}件表示 / 全
             {records.length.toLocaleString()}件
           </div>
@@ -229,7 +248,11 @@ export default function KumaClient() {
           </div>
         )}
 
-        <RiskPanel />
+        <RiskPanel
+          location={selectedLocation}
+          onPickGps={handleGpsPick}
+          onClear={handleClear}
+        />
       </div>
     </div>
   );
