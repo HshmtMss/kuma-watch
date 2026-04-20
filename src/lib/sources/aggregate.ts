@@ -1,6 +1,7 @@
 import { DATA_SOURCES } from "@/data/data-sources";
 import { fetchArcGisSightings } from "./arcgis";
 import { fetchCsvSightings } from "./csv";
+import { fetchHigumapSightings } from "./higumap";
 import { fetchKmlSightings } from "./kml";
 import type { UnifiedSighting } from "./types";
 
@@ -8,11 +9,13 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   const arcgis = DATA_SOURCES.filter((s) => s.arcgis);
   const csv = DATA_SOURCES.filter((s) => s.csv);
   const kml = DATA_SOURCES.filter((s) => s.kml);
+  const higumap = DATA_SOURCES.filter((s) => s.extractor === "higumap-api");
 
   const results = await Promise.all([
     ...arcgis.map((s) => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
     ...csv.map((s) => fetchCsvSightings(s).catch(() => [] as UnifiedSighting[])),
     ...kml.map((s) => fetchKmlSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...higumap.map((s) => fetchHigumapSightings(s).catch(() => [] as UnifiedSighting[])),
   ]);
 
   const merged: UnifiedSighting[] = [];

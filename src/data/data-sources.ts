@@ -8,6 +8,7 @@ export type ExtractorType =
   | "direct-api"
   | "direct-kml"
   | "arcgis-dashboard"
+  | "higumap-api"
   | "custom-webmap";
 export type UrlRole =
   | "list"
@@ -63,8 +64,9 @@ export type CsvSource = {
 export type KmlNameFormat =
   | "city-section-wareki" // "平内町、堀替地区、H29.1.25" (青森)
   | "city-section-iso"    // "青森市、地区、2025/4/1"
-  | "date-only"           // "令和7年4月5日" / "8月27日" (岩手・宮城)
-  | "extended-data";      // name は通し番号、情報は ExtendedData (福島)
+  | "date-only"           // "令和7年4月5日" / "8月27日" / "2025/01/16" (岩手・宮城・栃木)
+  | "extended-data"       // name は通し番号、情報は ExtendedData (福島)
+  | "section-in-name";    // name = 地名、日付は description 内 (奈良・鳥取・島根)
 
 export type KmlDateFormat =
   | "wareki-or-md" // 和暦優先、次に M月D日 (要 fiscalYear)
@@ -82,6 +84,13 @@ export type KmlSource = {
   commentField?: string;
   headCountField?: string;
   fiscalYear?: number;    // "M月D日" 補完用。4-12月→fiscalYear, 1-3月→fiscalYear+1
+  // 1 つの KML が複数県をカバーするとき座標で prefName を切替える
+  coordPrefectureSplit?: {
+    axis: "lon" | "lat";
+    threshold: number;
+    lowerPrefName: string;  // 値 < threshold の場合
+    upperPrefName: string;  // 値 >= threshold の場合
+  };
 };
 
 export type DataSourceEntry = {
@@ -126,8 +135,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://higumap.info/", role: "map", hint: "ひぐまっぷ トップ" },
       { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/higuma-top.html", role: "list", hint: "道庁ヒグマトップページ" },
     ],
-    extractor: "custom-webmap",
-    notes: "ひぐまっぷは専用 WebMap。道内多くの市町村が利用。データ取得は個別調査が必要",
+    extractor: "higumap-api",
+    notes: "ひぐまっぷ (https://higumap.info) の公開 JSON API `/map/reportsJson?cityId=X&fiscalYear=Y` を 65 市町村 × 複数年度で取得。道内多くの市町村が採用するヒグマ出没情報プラットフォーム",
     verifiedAt: "2026-04-20",
   },
   {
@@ -273,13 +282,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "tochigi",
     kind: "prefecture",
     prefCode: "09",
-    regionLabel: "栃木県 クマ出没（目撃）状況",
+    regionLabel: "栃木県 とちぎのクマ目撃情報2025（Google My Map）",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.tochigi.lg.jp/d04/choujyuu/r4_kuma_shutubotu.html", role: "list", hint: "令和7年度クマ出没（目撃）状況" },
+      { url: "https://www.pref.tochigi.lg.jp/d04/choujyuu/r4_kuma_shutubotu.html", role: "list", hint: "令和7年度クマ出没（目撃）状況（県公式）" },
+      { url: "https://www.google.com/maps/d/viewer?mid=10qIEI8EW5IVAY82zXyoF8DbWto0aUyc", role: "map", hint: "とちぎのクマ目撃情報2025" },
+      { url: "https://map.police.tochigi.dsvc.jp/", role: "map", hint: "栃木県警公開マップ" },
     ],
-    extractor: "llm-html",
-    notes: "栃木県警公開マップも別途存在",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=10qIEI8EW5IVAY82zXyoF8DbWto0aUyc&forcekml=1",
+      nameFormat: "date-only",
+    },
+    notes: "Google My Map 258 件。name=日付 (2025/01/16 形式)、description=ソース URL（新聞記事等）",
     verifiedAt: "2026-04-20",
   },
   {
@@ -594,13 +609,18 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "nara",
     kind: "prefecture",
     prefCode: "29",
-    regionLabel: "奈良県 クマ情報",
+    regionLabel: "奈良県 奈良市・木津川市・山添村クマ目撃マップ",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.nara.jp/dd.aspx?menuid=12237", role: "list" },
+      { url: "https://www.pref.nara.jp/dd.aspx?menuid=12237", role: "list", hint: "奈良県公式" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1ij-CG5R6Kc1fFnd_eFvI3gbeWOQvvFs", role: "map", hint: "奈良市・木津川市・山添村クマ目撃マップ" },
     ],
-    extractor: "llm-html",
-    requiresResearch: true,
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1ij-CG5R6Kc1fFnd_eFvI3gbeWOQvvFs&forcekml=1",
+      nameFormat: "section-in-name",
+    },
+    notes: "Google My Map 110 件。県全域ではなく奈良市・木津川市・山添村限定。name=地名、description=日付+時刻",
     verifiedAt: "2026-04-20",
   },
   {
@@ -633,13 +653,25 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "shimane",
     kind: "prefecture",
     prefCode: "32",
-    regionLabel: "島根県 クマ情報",
+    regionLabel: "島根県 山陰中央新報クマ目撃マップ（島根県・鳥取県）",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.shimane.lg.jp/nature/yasei/kuma.html", role: "list" },
+      { url: "https://www.pref.shimane.lg.jp/nature/yasei/kuma.html", role: "list", hint: "県公式" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1g5S_PUzzPjzY5UFp8IBBamT0vOhOGvg", role: "map", hint: "山陰中央新報 島根県・鳥取県クマ目撃マップ" },
+      { url: "https://www.sanin-chuo.co.jp/articles/-/587216", role: "list", hint: "山陰中央新報の元記事" },
     ],
-    extractor: "llm-html",
-    requiresResearch: true,
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1g5S_PUzzPjzY5UFp8IBBamT0vOhOGvg&forcekml=1",
+      nameFormat: "section-in-name",
+      coordPrefectureSplit: {
+        axis: "lon",
+        threshold: 133.3,
+        lowerPrefName: "島根県",
+        upperPrefName: "鳥取県",
+      },
+    },
+    notes: "山陰中央新報（報道機関）作成。499 件。鳥取県の一部も含むため経度 133.3 で県を切替。県公式は PDF のみ",
     verifiedAt: "2026-04-20",
   },
   {

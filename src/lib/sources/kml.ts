@@ -197,6 +197,7 @@ function buildSighting(
     const candidates: string[] = [];
     if (cfg.dateField && pm.extended[cfg.dateField]) candidates.push(pm.extended[cfg.dateField]);
     if (pm.name) candidates.push(pm.name);
+    if (pm.description) candidates.push(stripHtml(pm.description));
     for (const c of candidates) {
       date = parseDateCandidate(c, cfg.dateFormat, cfg.fiscalYear);
       if (date) break;
@@ -205,6 +206,15 @@ function buildSighting(
 
     if (cfg.cityField && pm.extended[cfg.cityField]) city = pm.extended[cfg.cityField];
     if (cfg.sectionField && pm.extended[cfg.sectionField]) section = pm.extended[cfg.sectionField];
+
+    if (cfg.nameFormat === "section-in-name" && pm.name) {
+      // Strip leading "1 " / "1." / "1、" index, then treat rest as section
+      const cleaned = normalizeFullWidth(pm.name)
+        .trim()
+        .replace(/^\s*[\d,]+[\s.,、]+/u, "")
+        .trim();
+      if (cleaned && !section) section = cleaned;
+    }
   }
 
   let comment = "";
@@ -239,12 +249,18 @@ export async function fetchKmlSightings(
     const prefName = entry.regionLabel.split(" ")[0] ?? entry.regionLabel;
 
     const maxFutureYear = new Date().getFullYear() + 1;
+    const split = entry.kml.coordPrefectureSplit;
     const sightings: UnifiedSighting[] = [];
     for (let i = 0; i < points.length; i++) {
       const built = buildSighting(points[i], entry.kml);
       if (!built) continue;
       const y = Number(built.date.slice(0, 4));
       if (!Number.isFinite(y) || y < 1970 || y > maxFutureYear) continue;
+      let recordPref = prefName;
+      if (split) {
+        const v = split.axis === "lon" ? points[i].lon : points[i].lat;
+        recordPref = v < split.threshold ? split.lowerPrefName : split.upperPrefName;
+      }
       sightings.push({
         id: `${entry.id}-${i}`,
         source: entry.id,
@@ -252,7 +268,7 @@ export async function fetchKmlSightings(
         lat: points[i].lat,
         lon: points[i].lon,
         date: built.date,
-        prefectureName: prefName,
+        prefectureName: recordPref,
         cityName: built.city,
         sectionName: built.section,
         comment: built.comment,
