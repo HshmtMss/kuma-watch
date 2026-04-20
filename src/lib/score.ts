@@ -91,6 +91,7 @@ export type ScoreOptions = {
   nearbySightings?: number;
   nearbyRadiusKm?: number;
   prefCode?: string;
+  bearStatus?: "present" | "rare" | "extinct" | "absent" | null;
   elevationM?: number | null;
   slopeDeg?: number | null;
   isForest?: boolean | null;
@@ -236,6 +237,21 @@ export function computeScore(
   };
 
   if (historyScore <= 0) {
+    // Bear-absent prefectures (沖縄・千葉・九州 7 県など) は 'safe' を明示返却
+    if (opts.bearStatus === "absent" || opts.bearStatus === "extinct") {
+      return {
+        score: 0,
+        level: "safe",
+        factors,
+        explanation: [
+          opts.bearStatus === "extinct"
+            ? "この地域は環境省により絶滅宣言されており、クマの生息記録はありません。"
+            : "この地域にはクマが元々生息していません。",
+          "基本対策は不要ですが、目撃情報等があれば念のため確認してください。",
+        ],
+      };
+    }
+    // 四国など rare 地域は "低い" 固定・注釈付き
     // Out-of-habitat + no nearby sightings: return the lowest of 5 levels ("低い")
     // with explicit data-insufficiency note. Never returns "安全".
     // Terrain (elevation/slope/forest) still factored in so mountainous/forested

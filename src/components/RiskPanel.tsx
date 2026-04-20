@@ -21,6 +21,7 @@ import {
   findMunicipalityByPrefName,
   type MunicipalEntry,
 } from "@/data/municipalities";
+import { findSourceByPrefCode } from "@/data/data-sources";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 import MunicipalCard from "@/components/MunicipalCard";
 import RiskCharts from "@/components/RiskCharts";
@@ -213,11 +214,13 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
           }
         : null;
 
+      const dataSource = findSourceByPrefCode(rev?.prefCode ?? "");
       const breakdown = computeScore(mesh, new Date(), weather, {
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
         prefCode: rev?.prefCode,
+        bearStatus: dataSource?.bearStatus ?? null,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
         isForest: forest?.isForest ?? null,

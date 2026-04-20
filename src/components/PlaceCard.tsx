@@ -24,6 +24,7 @@ import {
   findMunicipalityByPrefCode,
   type MunicipalEntry,
 } from "@/data/municipalities";
+import { findSourceByPrefCode } from "@/data/data-sources";
 import MunicipalCard from "@/components/MunicipalCard";
 
 type Props = {
@@ -187,11 +188,13 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         }
       }
       const nearbyCountWithin10 = near.filter((r) => r.distanceKm <= 10).length;
+      const dataSource = findSourceByPrefCode(rev?.prefCode ?? "");
       const score = computeScore(mData, new Date(), w, {
         nearbyWeightedCount: nearbyWeighted,
         nearbySightings: nearbyCountWithin10,
         nearbyRadiusKm: 10,
         prefCode: rev?.prefCode,
+        bearStatus: dataSource?.bearStatus ?? null,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
         isForest: forest?.isForest ?? null,
