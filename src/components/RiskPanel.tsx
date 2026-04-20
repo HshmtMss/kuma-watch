@@ -429,6 +429,8 @@ function RiskDetails({
   const isBuffer = !mesh && (nearbySightings ?? 0) > 0;
 
   const askContext = {
+    lat: state.lat,
+    lon: state.lon,
     place: placeName,
     prefecture: state.municipality?.prefNameJa,
     score: breakdown.score,

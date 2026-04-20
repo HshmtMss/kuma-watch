@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -6,6 +7,8 @@ const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models
 type AskPayload = {
   question: string;
   context?: {
+    lat?: number;
+    lon?: number;
     place?: string;
     prefecture?: string;
     score?: number;
@@ -31,7 +34,7 @@ async function callGemini(
       },
       contents: [{ role: "user", parts: [{ text: userText }] }],
       generationConfig: {
-        temperature: 0.4,
+        temperature: 0.3,
         maxOutputTokens: 1024,
         thinkingConfig: { thinkingBudget: 0 },
       },
@@ -59,7 +62,10 @@ function buildContextText(ctx: AskPayload["context"]): string {
   if (ctx.bearSpecies) parts.push(`対象クマ: ${ctx.bearSpecies}`);
   if (ctx.habitatInside !== undefined)
     parts.push(`生息域: ${ctx.habitatInside ? "内" : "外"}`);
-  if (ctx.level) parts.push(`現在の危険度: ${ctx.level}${ctx.score != null ? `（${ctx.score}/100）` : ""}`);
+  if (ctx.level)
+    parts.push(
+      `現在の危険度: ${ctx.level}${ctx.score != null ? `（${ctx.score}/100）` : ""}`,
+    );
   if (ctx.hour != null) parts.push(`時刻: ${ctx.hour}時`);
   if (ctx.month != null) parts.push(`月: ${ctx.month}月`);
   if (ctx.weather) {
@@ -69,6 +75,18 @@ function buildContextText(ctx: AskPayload["context"]): string {
     );
   }
   return parts.join(" / ");
+}
+
+function formatSightings(records: NearbySighting[]): string {
+  if (records.length === 0) {
+    return "【周辺5km以内・直近12ヶ月の公式出没記録】\n該当する記録は公式データに存在しません。";
+  }
+  const lines = records.map((r) => {
+    const loc = [r.cityName, r.sectionName].filter(Boolean).join(" ");
+    const comment = r.comment ? ` / ${r.comment.slice(0, 80)}` : "";
+    return `- ${r.date} ${loc || "(地名不明)"} / ${r.distanceKm.toFixed(1)}km / ソース:${r.source}${comment}`;
+  });
+  return `【周辺5km以内・直近12ヶ月の公式出没記録 ${records.length}件】\n${lines.join("\n")}`;
 }
 
 function demoAnswer(question: string, ctx?: AskPayload["context"]): string {
@@ -89,11 +107,19 @@ export async function POST(req: Request) {
   const q = typeof body?.question === "string" ? body.question.trim().slice(0, 300) : "";
   if (!q) return NextResponse.json({ error: "質問を入力してください" }, { status: 400 });
 
+  const lat = body.context?.lat;
+  const lon = body.context?.lon;
+  const nearby: NearbySighting[] =
+    typeof lat === "number" && typeof lon === "number" && Number.isFinite(lat) && Number.isFinite(lon)
+      ? await findNearbySightings(lat, lon, { radiusKm: 5, withinDays: 365, limit: 15 }).catch(() => [])
+      : [];
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({
       answer: demoAnswer(q, body.context),
       mode: "demo" as const,
+      nearbyCount: nearby.length,
       note: "GEMINI_API_KEY 未設定のためデモ応答を返しています",
     });
   }
@@ -102,18 +128,23 @@ export async function POST(req: Request) {
     "あなたは KumaWatch のクマ出没対策ガイドです。",
     "日本語で、2〜4 文以内の簡潔な回答を返します。",
     "過度に恐怖を煽らず、実用的な対策を 1〜2 つ含めます。",
-    "提供されたコンテキスト（場所・気象・危険度）を必ず踏まえてください。",
-    "憶測や根拠のない情報は避け、わからない場合は "
-      + "「一次情報は自治体公式サイトをご確認ください」と明示してください。",
-    "箇条書きより自然な文章を優先します。",
+    "",
+    "【重要な事実参照ルール】",
+    "1. 「周辺の公式出没記録」セクションに提示された記録のみを『過去の実例』として参照してください。",
+    "2. リストにない出没情報・日付・場所は存在しないものとして扱い、推測しないこと。",
+    "3. 記録が0件の場合は「この周辺5km以内・直近12ヶ月の公式記録はありません」と明示すること。",
+    "4. ユーザーの質問が『最近の目撃』『具体的な事例』を問う場合、リストの日付・市町村名を引用してください。",
+    "5. スコア・気象等のコンテキストは現状把握のためのもので、記録ではありません。",
   ].join("\n");
 
-  const userText = `コンテキスト: ${buildContextText(body.context)}\n質問: ${q}`;
+  const nearbyBlock = formatSightings(nearby);
+  const userText = `コンテキスト: ${buildContextText(body.context)}\n\n${nearbyBlock}\n\n質問: ${q}`;
   const llm = await callGemini(apiKey, systemInstruction, userText);
   const answer = llm ?? demoAnswer(q, body.context);
   return NextResponse.json({
     answer,
     mode: llm ? ("llm" as const) : ("demo" as const),
+    nearbyCount: nearby.length,
     note: llm ? undefined : "LLM 応答に失敗したためデモ応答を返しています",
   });
 }

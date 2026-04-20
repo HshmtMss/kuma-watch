@@ -3,6 +3,8 @@
 import { useState } from "react";
 
 type AskContext = {
+  lat?: number;
+  lon?: number;
   place?: string;
   prefecture?: string;
   score?: number;
