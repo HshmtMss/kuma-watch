@@ -153,7 +153,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://kumadas.net/", role: "map", hint: "クマダス 秋田県・大館市協力の投稿マップ（Sharp9110 ベース）" },
     ],
     extractor: "arcgis-dashboard",
-    notes: "Sharp9110 と重複。ArcGIS Hub で公式の構造化データ提供あり",
+    notes: "秋田県の公式システムはクマダス (kumadas.net、技術基盤 Sharp9110)。ArcGIS Hub は legacy page で構造化データ API は未提供。Sharp9110 経由の 18,859 件を公式データとして利用",
     verifiedAt: "2026-04-20",
   },
   {
@@ -431,7 +431,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://gis-gifu.jp/gifu/Portal", role: "gis", hint: "県域統合型 GIS ぎふ トップ（クママップあり）" },
     ],
     extractor: "llm-html",
-    notes: "県域統合型 GIS で公開。ArcGIS REST 取得の可能性あり",
+    notes: "県域統合型 GIS で公開されるが、legacy SSL（ASP ベース）で API 化困難。LLM 抽出経由で対応",
     verifiedAt: "2026-04-20",
   },
   {
@@ -498,7 +498,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://g-kyoto.gis.pref.kyoto.lg.jp/g-kyoto/top/select.asp?dtp=676", role: "gis", hint: "京都府・市町村共同 GIS（出没地点）" },
     ],
     extractor: "llm-html",
-    notes: "位置座標付き Excel 公開の情報あり（要追跡）",
+    notes: "Excel 直接公開は未確認。GIS は legacy SSL（ASP ベース）で API 化困難、LLM 抽出経由で対応",
     verifiedAt: "2026-04-20",
   },
   {
