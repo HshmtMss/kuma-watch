@@ -40,6 +40,25 @@ export type ArcGisSource = {
   mappings: ArcGisFieldMappings;
 };
 
+export type CsvFieldMappings = {
+  date: string;
+  lat: string;
+  lon: string;
+  city?: string;
+  section?: string;
+  situation?: string;
+  headCount?: string;
+  timeOfDay?: string;
+};
+
+export type CsvSource = {
+  csvUrl: string;
+  encoding?: "utf-8" | "sjis";
+  delimiter?: "," | "\t";
+  dateFormat?: "iso" | "ja-slash" | "epoch-ms";
+  mappings: CsvFieldMappings;
+};
+
 export type DataSourceEntry = {
   id: string;
   kind: SourceKind;
@@ -49,6 +68,7 @@ export type DataSourceEntry = {
   urls: DataSourceUrl[];
   extractor: ExtractorType;
   arcgis?: ArcGisSource;
+  csv?: CsvSource;
   license?: string;
   notes?: string;
   requiresResearch?: boolean;
@@ -147,7 +167,23 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.yamagata.jp/050011/kurashi/shizen/seibutsu/about_kuma/kuma_yamagata_top.html", role: "list", hint: "山形県 クマ情報トップ" },
     ],
     extractor: "direct-csv",
-    notes: "位置座標付き CSV を定期公開（2026-04-14 時点で 16KB）。最優先 direct-csv 化候補",
+    csv: {
+      csvUrl: "https://www.pref.yamagata.jp/documents/2414/20260414_kemonote-cleaned.csv",
+      encoding: "utf-8",
+      delimiter: ",",
+      dateFormat: "ja-slash",
+      mappings: {
+        date: "目撃した日付",
+        lat: "緯度",
+        lon: "経度",
+        city: "ユーザ名",
+        section: "地名等",
+        situation: "この場所の周辺環境",
+        headCount: "目撃頭数",
+        timeOfDay: "目撃した時間帯（0:00～24:00）",
+      },
+    },
+    notes: "位置座標付き CSV（2026-04-14 時点で 69 件、16KB）",
     verifiedAt: "2026-04-20",
   },
   {
@@ -227,7 +263,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.saitama.lg.jp/dx-portal/info/kumashutsubotsu.html", role: "list", hint: "DX ポータル クマ出没マップ案内" },
     ],
     extractor: "arcgis-dashboard",
-    notes: "ArcGIS REST API 経由で目撃一覧・ヒートマップ取得可能",
+    arcgis: {
+      featureServerUrl:
+        "https://services9.arcgis.com/n65w8AXGaYPTqFYI/arcgis/rest/services/survey123_3123e5ed452d4e89845e4ba6129c1e2d_results/FeatureServer/0",
+      mappings: {
+        date: "field_1",
+        city: "field_4",
+        section: "field_6",
+        situation: "field_9",
+        headCount: "field_10",
+        timeOfDay: "field_2",
+      },
+    },
+    notes: "ArcGIS Survey123 ベース。2026-04 時点で 282 件。危険度ラベル field_17 も活用可能",
     verifiedAt: "2026-04-20",
   },
   {
@@ -252,8 +300,21 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.kankyo.metro.tokyo.lg.jp/nature/animals_plants/bear/witness", role: "list", hint: "TOKYOくまっぷ 目撃情報リスト" },
     ],
     extractor: "direct-csv",
+    csv: {
+      csvUrl:
+        "https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/tukinowaguma_source20260302",
+      encoding: "utf-8",
+      delimiter: ",",
+      dateFormat: "ja-slash",
+      mappings: {
+        date: "date",
+        lat: "lat",
+        lon: "lon",
+        situation: "sightings, traces, etc.",
+      },
+    },
     license: "東京都 利用規約",
-    notes: "CSV と GPX の両形式で公開。direct-csv 化の最優先候補",
+    notes: "CSV 公開（2026-03-02 時点で 955 件）。CSV の URL はファイル更新のたびに変わる可能性あり",
     verifiedAt: "2026-04-20",
   },
   {
@@ -311,13 +372,15 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "ishikawa",
     kind: "prefecture",
     prefCode: "17",
-    regionLabel: "石川県 ツキノワグマ出没情報",
+    regionLabel: "石川県 ツキノワグマ出没情報（Google My Map）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.ishikawa.lg.jp/sizen/kuma/navi01.html", role: "map", hint: "石川県ツキノワグマ出没情報地図" },
+      { url: "https://www.google.com/maps/d/kml?mid=17x-ZQxVWesZ3iJdObP0BXeS_R7e0vxw&forcekml=1", role: "map", hint: "Google My Maps KML エクスポート（令和8年）" },
     ],
     extractor: "llm-html",
-    notes: "GIS ベースのマップあり",
+    notes:
+      "Google My Maps ベース。KML 取得可能だが 2026-04 時点で Point は 6 件のみ（残りは市町境界ポリゴン）。優先度は低い。Sharp9110 の 187 件のほうが量は多い",
     verifiedAt: "2026-04-20",
   },
   {
