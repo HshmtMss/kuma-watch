@@ -61,13 +61,27 @@ export type CsvSource = {
 };
 
 export type KmlNameFormat =
-  | "city-section-wareki" // "平内町、堀替地区、H29.1.25"
-  | "city-section-iso"; // "青森市、地区、2025/4/1"
+  | "city-section-wareki" // "平内町、堀替地区、H29.1.25" (青森)
+  | "city-section-iso"    // "青森市、地区、2025/4/1"
+  | "date-only"           // "令和7年4月5日" / "8月27日" (岩手・宮城)
+  | "extended-data";      // name は通し番号、情報は ExtendedData (福島)
+
+export type KmlDateFormat =
+  | "wareki-or-md" // 和暦優先、次に M月D日 (要 fiscalYear)
+  | "us-slash"     // M/D/YYYY
+  | "ja-slash";    // YYYY/M/D
 
 export type KmlSource = {
   kmlUrl: string;
   nameFormat: KmlNameFormat;
-  nameSeparator?: string; // default "、"
+  nameSeparator?: string; // city-section-* で使用、default "、"
+  dateField?: string;     // ExtendedData に日付が入っているときのキー
+  dateFormat?: KmlDateFormat;
+  cityField?: string;
+  sectionField?: string;
+  commentField?: string;
+  headCountField?: string;
+  fiscalYear?: number;    // "M月D日" 補完用。4-12月→fiscalYear, 1-3月→fiscalYear+1
 };
 
 export type DataSourceEntry = {
@@ -139,25 +153,38 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "iwate",
     kind: "prefecture",
     prefCode: "03",
-    regionLabel: "岩手県 ツキノワグマ出没状況",
+    regionLabel: "岩手県 ツキノワグマ出没状況（Google My Map）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.iwate.jp/kurashikankyou/shizen/yasei/1049881/1056087.html", role: "list", hint: "人身被害状況・出没状況、Google マップ埋込あり" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1Rzj7qui6pXmL02XzmsH_Zqf8Feg", role: "map", hint: "岩手県 Google My Map（県公式）" },
     ],
-    extractor: "llm-html",
-    notes: "ページ内に Google My Map を埋込。Bears アプリ（Golden Field 社）も県採用",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1Rzj7qui6pXmL02XzmsH_Zqf8Feg&forcekml=1",
+      nameFormat: "date-only",
+    },
+    notes: "Google My Map の name 欄に和暦日付、description に状況。市町村情報は name に無し",
     verifiedAt: "2026-04-20",
   },
   {
     id: "miyagi",
     kind: "prefecture",
     prefCode: "04",
-    regionLabel: "宮城県 ツキノワグマ",
+    regionLabel: "宮城県 ツキノワグマ（令和7年度 Google My Map）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.miyagi.jp/soshiki/sizenhogo/tukinowaguma.html", role: "list", hint: "宮城県の公式ページ" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1aZCXqs7vrAPEBhE4HkT3CwmlMdunP2Y", role: "map", hint: "宮城県 Google My Map（令和7年度）" },
     ],
-    extractor: "llm-html",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1aZCXqs7vrAPEBhE4HkT3CwmlMdunP2Y&forcekml=1",
+      nameFormat: "date-only",
+      dateField: "年月日",
+      fiscalYear: 2025,
+    },
+    notes: "3,535 件。name には和暦日付 or 種別（目撃/痕跡/人身被害）。ExtendedData 年月日 に US 形式 or M月D日",
     verifiedAt: "2026-04-20",
   },
   {
@@ -208,13 +235,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "fukushima",
     kind: "prefecture",
     prefCode: "07",
-    regionLabel: "福島県 ツキノワグマ目撃情報",
+    regionLabel: "福島県 ツキノワグマ目撃情報（Google My Map）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.fukushima.lg.jp/sec/16035b/tukinowaguma-mokugeki.html", role: "map", hint: "県ツキノワグマ目撃情報マップ（県警データ）" },
+      { url: "https://www.google.com/maps/d/viewer?mid=10gR9gJgiEA_Tso2E0jM-Q2sI41A3n_w", role: "map", hint: "福島県 Google My Map（県警データ）" },
     ],
-    extractor: "llm-html",
-    notes: "県警から提供された目撃情報を基にマップ作成",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=10gR9gJgiEA_Tso2E0jM-Q2sI41A3n_w&forcekml=1",
+      nameFormat: "extended-data",
+      dateField: "日付",
+      dateFormat: "us-slash",
+      cityField: "市町村",
+      sectionField: "住所",
+      commentField: "状況",
+      headCountField: "頭数",
+    },
+    notes: "県警から提供された目撃情報。ExtendedData に市町村・住所・日付・頭数・状況が全て構造化されている 2,046 件",
     verifiedAt: "2026-04-20",
   },
   {
