@@ -10,6 +10,7 @@ export type ExtractorType =
   | "direct-shapefile-zip"
   | "arcgis-dashboard"
   | "higumap-api"
+  | "kemonote-api"
   | "custom-webmap";
 export type UrlRole =
   | "list"
@@ -213,6 +214,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     extractor: "arcgis-dashboard",
     notes: "秋田県の公式システムはクマダス (kumadas.net、技術基盤 Sharp9110)。ArcGIS Hub は legacy page で構造化データ API は未提供。Sharp9110 経由の 18,859 件を公式データとして利用",
     verifiedAt: "2026-04-20",
+  },
+  {
+    id: "yamagata-kemonote",
+    kind: "prefecture",
+    prefCode: "06",
+    regionLabel: "山形県 けものノート（県公式投稿マップ）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://v2.kemonote.com/#/login", role: "map", hint: "けものノート v2（山形県アカウント kuma/kuma で閲覧可）" },
+    ],
+    extractor: "kemonote-api",
+    notes: "けものノート API 経由で山形県の投稿を取得。JWT auth で /web/api/map_points を呼ぶ。qa_content 内の『目撃した日付』『クマを目撃した日付』を date として採用、無ければ posted_at を JST 変換してフォールバック",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "yamagata",
