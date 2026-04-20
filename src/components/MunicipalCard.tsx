@@ -6,6 +6,8 @@ import type { SummaryResponse } from "@/app/api/summary/route";
 
 type Props = {
   entry: MunicipalEntry | undefined;
+  lat?: number;
+  lon?: number;
 };
 
 const KIND_LABEL: Record<string, string> = {
@@ -17,7 +19,7 @@ const KIND_LABEL: Record<string, string> = {
   contact: "問い合わせ",
 };
 
-export default function MunicipalCard({ entry }: Props) {
+export default function MunicipalCard({ entry, lat, lon }: Props) {
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
@@ -25,7 +27,10 @@ export default function MunicipalCard({ entry }: Props) {
     if (!entry) return;
     let cancelled = false;
     setLoadingSummary(true);
-    fetch(`/api/summary?prefCode=${entry.prefCode}`)
+    const params = new URLSearchParams({ prefCode: entry.prefCode });
+    if (typeof lat === "number" && Number.isFinite(lat)) params.set("lat", lat.toFixed(5));
+    if (typeof lon === "number" && Number.isFinite(lon)) params.set("lon", lon.toFixed(5));
+    fetch(`/api/summary?${params.toString()}`)
       .then((r) => (r.ok ? (r.json() as Promise<SummaryResponse>) : null))
       .then((data) => {
         if (!cancelled && data) setSummary(data);
@@ -37,7 +42,7 @@ export default function MunicipalCard({ entry }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [entry]);
+  }, [entry, lat, lon]);
 
   if (!entry) {
     return (
@@ -78,6 +83,12 @@ export default function MunicipalCard({ entry }: Props) {
             )}
           </div>
           {summary.summary}
+          {typeof summary.nearbyCount === "number" && (
+            <div className="mt-2 text-[10px] text-blue-700">
+              周辺 5km / 直近 12 ヶ月の公式記録: {summary.nearbyCount} 件
+              {summary.nearbyLatestDate ? `（最新 ${summary.nearbyLatestDate}）` : ""}
+            </div>
+          )}
           {summary.note && (
             <div className="mt-2 text-[10px] text-gray-400">{summary.note}</div>
           )}

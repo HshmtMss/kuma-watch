@@ -3,6 +3,7 @@ import {
   findMunicipalityByPrefCode,
   type MunicipalEntry,
 } from "@/data/municipalities";
+import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -15,6 +16,8 @@ export type SummaryResponse = {
   sourceUrls: string[];
   fetchedAt: string;
   mode: "llm" | "demo";
+  nearbyCount: number;
+  nearbyLatestDate?: string;
   note?: string;
 };
 
@@ -53,11 +56,15 @@ async function fetchMunicipalPage(url: string): Promise<string | null> {
   }
 }
 
-function buildDemoSummary(entry: MunicipalEntry): string {
+function buildDemoSummary(entry: MunicipalEntry, nearby: NearbySighting[]): string {
   const species = entry.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
-  const season = ["春先", "秋口"];
-  const s = season[new Date().getMonth() % 2];
-  return `${entry.prefNameJa}では${species}の出没情報を ${entry.links[0]?.label ?? "公式サイト"} で随時更新しています。${s}は特に活動が活発な時期にあたるため、早朝・夕方の単独行動を控え、熊鈴を携帯するなどの基本対策を徹底してください。詳細な目撃情報や注意喚起は下記の公式リソースをご確認ください。`;
+  const base = `${entry.prefNameJa}では${species}の出没情報を ${entry.links[0]?.label ?? "公式サイト"} で随時更新しています。`;
+  if (nearby.length === 0) {
+    return `${base}この周辺 5km 以内の公式出没記録は直近 12 ヶ月で確認されていません。ただし例年の活動期（春先と秋口）は注意が必要です。詳細は下記の公式リソースをご確認ください。`;
+  }
+  const latest = nearby[0];
+  const loc = [latest.cityName, latest.sectionName].filter(Boolean).join(" ") || "この周辺";
+  return `${base}この周辺 5km 以内・直近 12 ヶ月の公式出没記録は ${nearby.length} 件。最新は ${latest.date} の ${loc} です。早朝・夕方の単独行動を控え、熊鈴を携帯してください。`;
 }
 
 async function callGemini(
@@ -94,22 +101,45 @@ async function callGemini(
   }
 }
 
-function buildPrompt(entry: MunicipalEntry, pageText: string): string {
+function formatSightings(nearby: NearbySighting[]): string {
+  if (nearby.length === 0) {
+    return "【この周辺 5km 以内・直近 12 ヶ月の公式出没記録】\n該当する記録は公式データに存在しません。";
+  }
+  const lines = nearby.slice(0, 10).map((r) => {
+    const loc = [r.cityName, r.sectionName].filter(Boolean).join(" ");
+    return `- ${r.date} ${loc || "(地名不明)"} / ${r.distanceKm.toFixed(1)}km / ソース:${r.source}`;
+  });
+  return `【この周辺 5km 以内・直近 12 ヶ月の公式出没記録 ${nearby.length} 件（最新 10 件）】\n${lines.join("\n")}`;
+}
+
+function buildPrompt(
+  entry: MunicipalEntry,
+  pageText: string,
+  nearby: NearbySighting[],
+): string {
   const species = entry.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
+  const sightingsBlock = formatSightings(nearby);
   return `あなたは地域安全のコミュニケーション専門家です。
-以下の自治体公式サイトの原文を、観光客・登山者・住民向けに要約してください。
+以下の「自治体公式サイトの原文」と「周辺の公式出没記録」を踏まえて、
+観光客・登山者・住民向けに要約してください。
+
+【重要な事実参照ルール】
+1. 出没の具体件数・日付・場所を述べるときは、提示された公式出没記録のみを引用すること。
+2. 記録に存在しない日付・場所・件数は絶対に書かないこと。推測禁止。
+3. 記録が 0 件の場合は「この周辺 5km 以内の直近記録は確認されていない」と明示すること。
 
 制約:
 - 3 文以内、日本語
 - 過度に恐怖を煽らず冷静で実用的な表現
 - 具体的な対策を 1 つ含めること
-- 原文にない事実は加えないこと
 - 最後に "（${entry.prefNameJa}公式サイトより KumaWatch が要約）" を付けること
 
 対象地域: ${entry.prefNameJa}
 対象クマ種: ${species}
 
-原文（抜粋）:
+${sightingsBlock}
+
+自治体公式サイト原文（抜粋）:
 ${pageText}
 
 要約:`;
@@ -118,6 +148,8 @@ ${pageText}
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const prefCode = searchParams.get("prefCode");
+  const latStr = searchParams.get("lat");
+  const lonStr = searchParams.get("lon");
 
   if (!prefCode) {
     return NextResponse.json({ error: "prefCode が必要です" }, { status: 400 });
@@ -135,16 +167,25 @@ export async function GET(req: Request) {
     .filter((l) => l.kind === "official_info" || l.kind === "official_map")
     .map((l) => l.url);
 
+  const lat = latStr ? Number(latStr) : NaN;
+  const lon = lonStr ? Number(lonStr) : NaN;
+  const nearby: NearbySighting[] =
+    Number.isFinite(lat) && Number.isFinite(lon)
+      ? await findNearbySightings(lat, lon, { radiusKm: 5, withinDays: 365, limit: 30 }).catch(() => [])
+      : [];
+
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     const res: SummaryResponse = {
       prefCode,
       prefName: entry.prefNameJa,
-      summary: buildDemoSummary(entry),
+      summary: buildDemoSummary(entry, nearby),
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
+      nearbyCount: nearby.length,
+      nearbyLatestDate: nearby[0]?.date,
       note: "GEMINI_API_KEY 未設定のためデモ要約を返しています",
     };
     return NextResponse.json(res, {
@@ -159,10 +200,12 @@ export async function GET(req: Request) {
     const res: SummaryResponse = {
       prefCode,
       prefName: entry.prefNameJa,
-      summary: buildDemoSummary(entry),
+      summary: buildDemoSummary(entry, nearby),
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
+      nearbyCount: nearby.length,
+      nearbyLatestDate: nearby[0]?.date,
       note: "公式ページを取得できなかったためデモ要約を返しています",
     };
     return NextResponse.json(res, {
@@ -170,10 +213,10 @@ export async function GET(req: Request) {
     });
   }
 
-  const prompt = buildPrompt(entry, pageText);
+  const prompt = buildPrompt(entry, pageText, nearby);
   const llmText = await callGemini(apiKey, prompt);
 
-  const summary = llmText ?? buildDemoSummary(entry);
+  const summary = llmText ?? buildDemoSummary(entry, nearby);
   const res: SummaryResponse = {
     prefCode,
     prefName: entry.prefNameJa,
@@ -181,6 +224,8 @@ export async function GET(req: Request) {
     sourceUrls,
     fetchedAt: new Date().toISOString(),
     mode: llmText ? "llm" : "demo",
+    nearbyCount: nearby.length,
+    nearbyLatestDate: nearby[0]?.date,
     note: llmText ? undefined : "LLM 応答取得に失敗したためデモ要約を返しています",
   };
 

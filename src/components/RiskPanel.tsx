@@ -487,7 +487,7 @@ function RiskDetails({
       />
 
       <div className="border-t border-gray-100 pt-4">
-        <MunicipalCard entry={state.municipality} />
+        <MunicipalCard entry={state.municipality} lat={state.lat} lon={state.lon} />
       </div>
 
       <div className="border-t border-gray-100 pt-4">
