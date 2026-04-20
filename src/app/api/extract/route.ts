@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { findSourceById, type DataSourceEntry } from "@/data/data-sources";
 
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const CACHE_SECONDS = 60 * 60 * 12;
 const FETCH_TIMEOUT_MS = 10_000;
@@ -135,9 +135,10 @@ ${pageTexts.join("\n\n---\n\n").slice(0, 30_000)}
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.1,
-          maxOutputTokens: 4096,
+          maxOutputTokens: 8192,
           responseMimeType: "application/json",
           responseSchema: EXTRACTION_SCHEMA,
+          thinkingConfig: { thinkingBudget: 0 },
         },
       }),
     });

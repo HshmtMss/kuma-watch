@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 type AskPayload = {
@@ -30,7 +30,11 @@ async function callGemini(
         parts: [{ text: systemInstruction }],
       },
       contents: [{ role: "user", parts: [{ text: userText }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 500 },
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 1024,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     };
     const r = await fetch(url, {
       method: "POST",

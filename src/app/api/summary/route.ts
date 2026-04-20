@@ -4,7 +4,7 @@ import {
   type MunicipalEntry,
 } from "@/data/municipalities";
 
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const SUMMARY_CACHE_SECONDS = 21600;
 
@@ -68,21 +68,28 @@ async function callGemini(
     const url = `${GEMINI_ENDPOINT}?key=${apiKey}`;
     const body = {
       contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 300 },
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 1024,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     };
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      next: { revalidate: SUMMARY_CACHE_SECONDS },
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error("[summary] gemini failed", r.status, await r.text());
+      return null;
+    }
     const data = (await r.json()) as {
       candidates?: { content?: { parts?: { text?: string }[] } }[];
     };
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     return text || null;
-  } catch {
+  } catch (e) {
+    console.error("[summary] gemini error", e);
     return null;
   }
 }
