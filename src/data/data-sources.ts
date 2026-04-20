@@ -26,6 +26,20 @@ export type DataSourceUrl = {
   hint?: string;
 };
 
+export type ArcGisFieldMappings = {
+  date?: string;
+  city?: string;
+  section?: string;
+  situation?: string;
+  headCount?: string;
+  timeOfDay?: string;
+};
+
+export type ArcGisSource = {
+  featureServerUrl: string;
+  mappings: ArcGisFieldMappings;
+};
+
 export type DataSourceEntry = {
   id: string;
   kind: SourceKind;
@@ -34,6 +48,7 @@ export type DataSourceEntry = {
   bearStatus: BearStatus;
   urls: DataSourceUrl[];
   extractor: ExtractorType;
+  arcgis?: ArcGisSource;
   license?: string;
   notes?: string;
   requiresResearch?: boolean;
@@ -186,7 +201,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.gunma.jp/site/houdou/650808.html", role: "list", hint: "県公式説明ページ" },
     ],
     extractor: "arcgis-dashboard",
-    notes: "市町村職員が直接入力。月別・時間帯別の集計あり。ArcGIS REST API 経由で取得可能",
+    arcgis: {
+      featureServerUrl:
+        "https://services7.arcgis.com/DkC6f6v0YUQX0rke/arcgis/rest/services/survey123_a77f33a9b9f649cfada5c7983c67874b_results/FeatureServer/0",
+      mappings: {
+        date: "field_18",
+        city: "field_11",
+        section: "field_11",
+        situation: "field10",
+        headCount: "field_8",
+        timeOfDay: "field_19",
+      },
+    },
+    notes: "ArcGIS Survey123 ベース。2026-04 時点で 1,293 件",
     verifiedAt: "2026-04-20",
   },
   {
@@ -252,7 +279,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.niigata.lg.jp/site/tyoujyutaisakusienn/241009kumamap.html", role: "list", hint: "県公式案内ページ" },
     ],
     extractor: "arcgis-dashboard",
-    notes: "2024-10 にリニューアル、年/月/市町村別集計機能あり",
+    arcgis: {
+      featureServerUrl:
+        "https://services6.arcgis.com/SKz58fvdFlaEB35q/arcgis/rest/services/survey123_08d14b98657b47309b868f49602375c8_results/FeatureServer/0",
+      mappings: {
+        date: "field_20",
+        city: "field_7",
+        section: "field_17",
+        situation: "field_9",
+        headCount: "field_26",
+        timeOfDay: "field_21",
+      },
+    },
+    notes: "ArcGIS Survey123 ベース。2024-10 リニューアル。2026-04 時点で 3,558 件",
     verifiedAt: "2026-04-20",
   },
   {
