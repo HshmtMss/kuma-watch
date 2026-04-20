@@ -7,6 +7,7 @@ export type ExtractorType =
   | "direct-json"
   | "direct-api"
   | "direct-kml"
+  | "direct-shapefile-zip"
   | "arcgis-dashboard"
   | "higumap-api"
   | "custom-webmap";
@@ -503,14 +504,15 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "gifu",
     kind: "prefecture",
     prefCode: "21",
-    regionLabel: "岐阜県 ツキノワグマ情報マップ（県域統合 GIS）",
+    regionLabel: "岐阜県 ツキノワグマ情報マップ（CKAN オープンデータ）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.gifu.lg.jp/page/4964.html", role: "list", hint: "県公式 ツキノワグマについて" },
-      { url: "https://gis-gifu.jp/gifu/Portal", role: "gis", hint: "県域統合型 GIS ぎふ トップ（クママップあり）" },
+      { url: "https://gifu-opendata.pref.gifu.lg.jp/dataset/c11265-010", role: "csv", hint: "岐阜県オープンデータ（年度別 Shapefile/CSV）" },
+      { url: "https://gis-gifu.jp/gifu/Portal", role: "gis", hint: "県域統合型 GIS（legacy SSL で API 化不能）" },
     ],
-    extractor: "llm-html",
-    notes: "県域統合型 GIS で公開されるが、legacy SSL（ASP ベース）で API 化困難。LLM 抽出経由で対応",
+    extractor: "direct-shapefile-zip",
+    notes: "CKAN で R2(2020)〜R7(2025)の年度別 Shapefile ZIP を公開。JGD2011 平面直角 7 系→WGS84 変換後マージ。2019 以前は別 CSV",
     verifiedAt: "2026-04-20",
   },
   {
