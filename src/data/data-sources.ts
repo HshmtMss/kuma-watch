@@ -6,6 +6,7 @@ export type ExtractorType =
   | "direct-excel"
   | "direct-json"
   | "direct-api"
+  | "direct-kml"
   | "arcgis-dashboard"
   | "custom-webmap";
 export type UrlRole =
@@ -59,6 +60,16 @@ export type CsvSource = {
   mappings: CsvFieldMappings;
 };
 
+export type KmlNameFormat =
+  | "city-section-wareki" // "平内町、堀替地区、H29.1.25"
+  | "city-section-iso"; // "青森市、地区、2025/4/1"
+
+export type KmlSource = {
+  kmlUrl: string;
+  nameFormat: KmlNameFormat;
+  nameSeparator?: string; // default "、"
+};
+
 export type DataSourceEntry = {
   id: string;
   kind: SourceKind;
@@ -69,6 +80,7 @@ export type DataSourceEntry = {
   extractor: ExtractorType;
   arcgis?: ArcGisSource;
   csv?: CsvSource;
+  kml?: KmlSource;
   license?: string;
   notes?: string;
   requiresResearch?: boolean;
@@ -108,13 +120,19 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "aomori",
     kind: "prefecture",
     prefCode: "02",
-    regionLabel: "青森県 クマに注意してください",
+    regionLabel: "青森県 ツキノワグマ出没状況（Google My Map）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html", role: "list", hint: "青森県の公式注意ページ" },
+      { url: "https://www.google.com/maps/d/viewer?mid=13Nbo8EFxhx50lQsl4SptQctrnNU", role: "map", hint: "青森県 Google My Map（県公式）" },
     ],
-    extractor: "llm-html",
-    notes: "2026-04 より『くまログあおもり』運用開始（詳細 URL 要追跡）",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=13Nbo8EFxhx50lQsl4SptQctrnNU&forcekml=1",
+      nameFormat: "city-section-wareki",
+      nameSeparator: "、",
+    },
+    notes: "Google My Map の name 欄に『市町村、地区名、和暦日付』形式で 7,624 件。2026-04 時点で県内最大規模",
     verifiedAt: "2026-04-20",
   },
   {
@@ -376,11 +394,16 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.ishikawa.lg.jp/sizen/kuma/navi01.html", role: "map", hint: "石川県ツキノワグマ出没情報地図" },
-      { url: "https://www.google.com/maps/d/kml?mid=17x-ZQxVWesZ3iJdObP0BXeS_R7e0vxw&forcekml=1", role: "map", hint: "Google My Maps KML エクスポート（令和8年）" },
+      { url: "https://www.google.com/maps/d/kml?mid=17x-ZQxVWesZ3iJdObP0BXeS_R7e0vxw&forcekml=1", role: "map", hint: "Google My Maps KML（令和8年）" },
     ],
-    extractor: "llm-html",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=17x-ZQxVWesZ3iJdObP0BXeS_R7e0vxw&forcekml=1",
+      nameFormat: "city-section-wareki",
+      nameSeparator: "、",
+    },
     notes:
-      "Google My Maps ベース。KML 取得可能だが 2026-04 時点で Point は 6 件のみ（残りは市町境界ポリゴン）。優先度は低い。Sharp9110 の 187 件のほうが量は多い",
+      "Google My Maps ベース。2026-04 時点で Point は 6 件のみ（残りは市町境界ポリゴン）。Sharp9110 の 187 件を併用",
     verifiedAt: "2026-04-20",
   },
   {
