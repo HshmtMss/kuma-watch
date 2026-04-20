@@ -1,4 +1,5 @@
 import type { DataSourceEntry } from "@/data/data-sources";
+import { epochToIsoDate, parseIsoLike, parseWarekiDate } from "./date-utils";
 import { inJapanBounds, type UnifiedSighting } from "./types";
 
 const PAGE_SIZE = 2000;
@@ -18,11 +19,16 @@ type ArcGisQueryResponse = {
 
 const memo = new Map<string, { at: number; data: UnifiedSighting[] }>();
 
-function epochToIso(v: unknown): string {
-  if (typeof v !== "number" || !Number.isFinite(v)) return "";
-  const d = new Date(v);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toISOString().split("T")[0];
+function parseDateValue(v: unknown, format: "epoch-ms" | "wareki" | "iso" | undefined): string {
+  if (format === "wareki") {
+    if (typeof v !== "string") return "";
+    return parseWarekiDate(v) ?? parseIsoLike(v) ?? "";
+  }
+  if (format === "iso") {
+    if (typeof v !== "string") return "";
+    return parseIsoLike(v) ?? "";
+  }
+  return epochToIsoDate(v);
 }
 
 function cleanString(v: unknown): string {
@@ -72,7 +78,7 @@ export async function fetchArcGisSightings(
   const cached = memo.get(entry.id);
   if (cached && now - cached.at < CACHE_TTL_MS) return cached.data;
 
-  const { featureServerUrl, mappings } = entry.arcgis;
+  const { featureServerUrl, mappings, dateFormat } = entry.arcgis;
   const sightings: UnifiedSighting[] = [];
   let offset = 0;
 
@@ -94,7 +100,7 @@ export async function fetchArcGisSightings(
         continue;
       }
       const dateVal = mappings.date ? attrs[mappings.date] : undefined;
-      const date = epochToIso(dateVal);
+      const date = parseDateValue(dateVal, dateFormat);
       if (!date) continue;
 
       const objectId = attrs.objectid ?? attrs.OBJECTID ?? attrs.ObjectId;

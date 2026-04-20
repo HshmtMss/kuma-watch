@@ -37,9 +37,12 @@ export type ArcGisFieldMappings = {
   timeOfDay?: string;
 };
 
+export type ArcGisDateFormat = "epoch-ms" | "wareki" | "iso";
+
 export type ArcGisSource = {
   featureServerUrl: string;
   mappings: ArcGisFieldMappings;
+  dateFormat?: ArcGisDateFormat; // default "epoch-ms"
 };
 
 export type CsvFieldMappings = {
@@ -540,14 +543,25 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "mie",
     kind: "prefecture",
     prefCode: "24",
-    regionLabel: "三重県 ツキノワグマ出没情報",
+    regionLabel: "三重県 ツキノワグマ出没情報（ArcGIS）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.mie.lg.jp/JTAISAKU/HP/m0114900048.htm", role: "list", hint: "三重県の公式ページ" },
       { url: "https://www.pref.mie.lg.jp/MIDORI/HP/m0118500310.htm", role: "list", hint: "三重県クマ出没情報アプリ案内" },
+      { url: "https://map-pref-mie.maps.arcgis.com/apps/webappviewer/index.html?id=67a611717c1a4cc487540b2be4264c45", role: "arcgis", hint: "三重県 Click Maps (ArcGIS WebAppViewer)" },
     ],
-    extractor: "llm-html",
-    notes: "県公式『けものおと』アプリあり",
+    extractor: "arcgis-dashboard",
+    arcgis: {
+      featureServerUrl:
+        "https://services5.arcgis.com/tkvkIlp1M2KOKx34/arcgis/rest/services/%EF%BC%88R6%E7%A2%BA%E5%AE%9A%E7%89%88%EF%BC%89%E3%82%AF%E3%83%9E%E7%9B%AE%E6%92%83%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%EF%BC%88%E6%8F%90%E4%BE%9B%E7%94%A8%EF%BC%89/FeatureServer/0",
+      dateFormat: "wareki",
+      mappings: {
+        date: "目撃日",
+        section: "場所",
+        situation: "発見形態",
+      },
+    },
+    notes: "R6確定版クマ目撃位置情報（提供用）FeatureServer、99 件。日付は R7.4.15 形式 (和暦)",
     verifiedAt: "2026-04-20",
   },
   {
