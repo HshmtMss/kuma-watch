@@ -1134,6 +1134,49 @@ export const DATA_SOURCES: DataSourceEntry[] = [
   },
 ];
 
+// 札幌市 ヒグマ出没情報 CKAN (年度別 2017-2025)。
+// ひぐまっぷ API に札幌市のデータが含まれないため、CKAN の年度別 CSV を直接取得。
+const SAPPORO_CKAN_YEARS: Array<{ year: number; resource: string }> = [
+  { year: 2017, resource: "6d2ebe8d-d683-41b6-83b5-0395a3e795ae" },
+  { year: 2018, resource: "e33993cc-4ef1-4916-9cad-1e9d585f9427" },
+  { year: 2019, resource: "6a9c917a-1fe1-4217-876b-e1ffa5138144" },
+  { year: 2020, resource: "9647f46b-6e07-4209-8b3e-45c8b329e579" },
+  { year: 2021, resource: "a9255555-4afa-4450-8c00-8bac4b24d088" },
+  { year: 2022, resource: "37fd8fe6-b1c1-4c0a-b3a8-85cc3958603d" },
+  { year: 2023, resource: "3d6c0e28-7247-4503-b248-258e59192b99" },
+  { year: 2024, resource: "b289a37b-9149-4e34-981f-6743488d5779" },
+  { year: 2025, resource: "76c539c8-cd17-4449-a972-6ddc8c3d5306" },
+];
+for (const { year, resource } of SAPPORO_CKAN_YEARS) {
+  DATA_SOURCES.push({
+    id: `sapporo-${year}`,
+    kind: "municipal",
+    prefCode: "01",
+    regionLabel: `北海道 札幌市ヒグマ出没情報 ${year}年`,
+    bearStatus: "present",
+    urls: [
+      { url: `https://ckan.pf-sapporo.jp/dataset/sapporo_bear_appearance`, role: "csv", hint: "札幌市 CKAN" },
+    ],
+    extractor: "direct-csv",
+    csv: {
+      csvUrl: `https://ckan.pf-sapporo.jp/dataset/0d3197ef-c473-48ac-86bd-0fc34084b0ee/resource/${resource}/download/${year}sapporobearappearance.csv`,
+      encoding: "utf-8",
+      delimiter: ",",
+      dateFormat: "ja-slash",
+      mappings: {
+        date: "日付",
+        lat: "緯度",
+        lon: "経度",
+        city: "区",
+        section: "出没場所",
+        situation: "状況",
+      },
+    },
+    notes: `${year}年札幌市ヒグマ出没情報。ひぐまっぷに札幌市データが無いため CKAN から直接取得`,
+    verifiedAt: "2026-04-21",
+  });
+}
+
 export function findSourceById(id: string): DataSourceEntry | undefined {
   return DATA_SOURCES.find((s) => s.id === id);
 }
