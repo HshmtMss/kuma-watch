@@ -164,8 +164,180 @@ function buildIwateAggregate(): PrefectureAggregate {
   };
 }
 
+// ---------------------------------------------------------------------------
+// 福井県 seed
+// 出典: https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2_d/fil/R4-8.pdf
+//       (2026-04-19 時点、県全域・地域別月別集計)
+// ---------------------------------------------------------------------------
+const FUKUI_ANNUAL: Record<number, { sighting: number; capture: number }> = {
+  2025: { sighting: 950, capture: 166 }, // R7 (2026-04-19 時点)
+  2024: { sighting: 897, capture: 169 }, // R6
+  2023: { sighting: 766, capture: 140 }, // R5
+  2022: { sighting: 314, capture: 80 }, // R4
+};
+
+// R7 県全域 月別 (出没件数)
+const FUKUI_R7_MONTHLY: Record<number, number> = {
+  4: 35, 5: 90, 6: 115, 7: 102, 8: 40, 9: 62,
+  10: 204, 11: 216, 12: 53, 1: 19, 2: 10, 3: 4,
+};
+
+function buildFukuiAggregate(): PrefectureAggregate {
+  const prefCode = "18";
+  const prefName = "福井県";
+  const annual: MunicipalAggregate[] = [];
+  const monthly: MunicipalAggregate[] = [];
+
+  for (const [fyStr, counts] of Object.entries(FUKUI_ANNUAL)) {
+    const fy = Number(fyStr);
+    annual.push({
+      id: `fukui-pref-${fy}`,
+      prefCode,
+      prefName,
+      period: { fiscalYear: fy },
+      counts: { sighting: counts.sighting, capture: counts.capture },
+    });
+  }
+  for (const [mStr, n] of Object.entries(FUKUI_R7_MONTHLY)) {
+    monthly.push({
+      id: `fukui-pref-2025-${mStr}`,
+      prefCode,
+      prefName,
+      period: { fiscalYear: 2025, month: Number(mStr) },
+      counts: { sighting: n },
+    });
+  }
+
+  return {
+    prefCode,
+    prefName,
+    annual,
+    monthly,
+    sources: [
+      {
+        url: "https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2_d/fil/R4-8.pdf",
+        label: "福井県内のツキノワグマの出没状況（R4〜R8 月別・地域別）",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "県が点座標を公開しておらず、公式 GIS も API 未公開のため PDF 集計のみ。数値は 2026-04-19 時点速報",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 広島県 seed (R7 市町別・月別)
+// 出典: https://www.pref.hiroshima.lg.jp/uploaded/attachment/659604.pdf (2026-02 時点)
+// ---------------------------------------------------------------------------
+const HIROSHIMA_R7_MUNI: Array<[string, number]> = [
+  ["広島市", 176], ["呉市", 0], ["大竹市", 2], ["東広島市", 21], ["廿日市市", 29],
+  ["安芸高田市", 76], ["府中町", 3], ["安芸太田町", 68], ["北広島町", 57],
+  ["尾道市", 0], ["福山市", 6], ["府中市", 1], ["三原市", 26], ["世羅町", 5], ["神石高原町", 4],
+  ["三次市", 54], ["庄原市", 57],
+];
+const HIROSHIMA_R7_MONTHLY: Record<number, number> = {
+  4: 21, 5: 44, 6: 76, 7: 64, 8: 42, 9: 46, 10: 107, 11: 125, 12: 47, 1: 10, 2: 3, 3: 0,
+};
+
+function buildHiroshimaAggregate(): PrefectureAggregate {
+  const prefCode = "34";
+  const prefName = "広島県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: `hiroshima-pref-2025`,
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 585 },
+    },
+  ];
+  const monthly: MunicipalAggregate[] = [];
+  for (const [muni, n] of HIROSHIMA_R7_MUNI) {
+    annual.push({
+      id: `hiroshima-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  for (const [mStr, n] of Object.entries(HIROSHIMA_R7_MONTHLY)) {
+    monthly.push({
+      id: `hiroshima-pref-2025-${mStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: 2025, month: Number(mStr) },
+      counts: { sighting: n },
+    });
+  }
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [{
+      url: "https://www.pref.hiroshima.lg.jp/uploaded/attachment/659604.pdf",
+      label: "令和7年度ツキノワグマ目撃件数（市町・月別）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "ツキノワグマと疑われる目撃例や痕跡等を含む。西中国地域個体群、絶滅危惧",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 和歌山県 seed (R7 市町別・月別)
+// 出典: https://www.pref.wakayama.lg.jp/prefg/032600/yasei/kuma_d/fil/kumamap202601-202603.pdf
+// ---------------------------------------------------------------------------
+const WAKAYAMA_R7_MUNI: Array<[string, number]> = [
+  ["和歌山市", 0], ["海南市", 0], ["紀美野町", 2], ["岩出市", 0], ["紀の川市", 1], ["橋本市", 1],
+  ["かつらぎ町", 7], ["九度山町", 2], ["高野町", 17], ["有田市", 0], ["湯浅町", 1], ["広川町", 4],
+  ["有田川町", 25], ["御坊市", 0], ["美浜町", 0], ["日高町", 2], ["由良町", 0], ["印南町", 0],
+  ["みなべ町", 1], ["日高川町", 8], ["田辺市", 20], ["白浜町", 0], ["上富田町", 1], ["すさみ町", 3],
+  ["新宮市", 3], ["那智勝浦町", 0], ["太地町", 0], ["古座川町", 0], ["北山村", 1], ["串本町", 0],
+];
+const WAKAYAMA_R7_MONTHLY: Record<number, number> = {
+  4: 5, 5: 5, 6: 9, 7: 10, 8: 18, 9: 10, 10: 8, 11: 15, 12: 9, 1: 3, 2: 6, 3: 1,
+};
+
+function buildWakayamaAggregate(): PrefectureAggregate {
+  const prefCode = "30";
+  const prefName = "和歌山県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: `wakayama-pref-2025`,
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 99, capture: 10 },
+    },
+  ];
+  const monthly: MunicipalAggregate[] = [];
+  for (const [muni, n] of WAKAYAMA_R7_MUNI) {
+    if (n === 0) continue; // 0 件は省略
+    annual.push({
+      id: `wakayama-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  for (const [mStr, n] of Object.entries(WAKAYAMA_R7_MONTHLY)) {
+    monthly.push({
+      id: `wakayama-pref-2025-${mStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: 2025, month: Number(mStr) },
+      counts: { sighting: n },
+    });
+  }
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [{
+      url: "https://www.pref.wakayama.lg.jp/prefg/032600/yasei/kuma_d/fil/kumamap202601-202603.pdf",
+      label: "和歌山県ツキノワグマ目撃マップ（R7 市町別月別速報）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "紀伊半島個体群、県全体で年数十件規模。直近 3 ヶ月マップも公開されるが点座標は PDF 上の図のみ",
+  };
+}
+
+// ---------------------------------------------------------------------------
 export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildIwateAggregate(),
+  buildFukuiAggregate(),
+  buildHiroshimaAggregate(),
+  buildWakayamaAggregate(),
 ];
 
 export function findPrefectureAggregate(prefCode: string): PrefectureAggregate | undefined {

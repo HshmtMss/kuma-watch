@@ -68,9 +68,27 @@ async function fetchMunicipalPage(url: string): Promise<string | null> {
   }
 }
 
-function buildDemoSummary(entry: MunicipalEntry, nearby: NearbySighting[]): string {
-  const species = entry.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
-  const base = `${entry.prefNameJa}では${species}の出没情報を ${entry.links[0]?.label ?? "公式サイト"} で随時更新しています。`;
+function buildDemoSummary(
+  entry: MunicipalEntry | undefined,
+  nearby: NearbySighting[],
+  aggregate: AggregateContext | null,
+  prefName: string,
+): string {
+  const species = entry?.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
+  const base = `${prefName}では${species}の出没情報を ${entry?.links[0]?.label ?? "公式サイト"} で随時更新しています。`;
+
+  // 集計データがあれば優先
+  if (aggregate && aggregate.prefAnnualRecent.length > 0) {
+    const latest = aggregate.prefAnnualRecent[0];
+    const muniPart = aggregate.muniBand
+      ? `（${aggregate.muniName ?? "市町村単位"}: ${aggregate.muniBand}）`
+      : "";
+    const nearbyPart = nearby.length > 0
+      ? `周辺 5km 以内の直近記録は ${nearby.length} 件、最新 ${nearby[0].date}。`
+      : "点座標付き記録は周辺 5km 以内で確認されていません。";
+    return `${base}令和${latest.fiscalYear - 2018}年度は県全体で ${latest.sighting.toLocaleString()} 件${muniPart}。${nearbyPart}早朝・夕方の単独行動を控え、熊鈴を携帯してください。`;
+  }
+
   if (nearby.length === 0) {
     return `${base}この周辺 5km 以内の公式出没記録は直近 12 ヶ月で確認されていません。ただし例年の活動期（春先と秋口）は注意が必要です。詳細は下記の公式リソースをご確認ください。`;
   }
@@ -124,6 +142,39 @@ function formatSightings(nearby: NearbySighting[]): string {
   return `【この周辺 5km 以内・直近 12 ヶ月の公式出没記録 ${nearby.length} 件（最新 10 件）】\n${lines.join("\n")}`;
 }
 
+function buildPromptFromAggregate(
+  prefName: string,
+  pageText: string,
+  nearby: NearbySighting[],
+  aggregate: AggregateContext | null,
+): string {
+  const sightingsBlock = formatSightings(nearby);
+  const aggregateBlock = aggregate ? formatAggregateForPrompt(aggregate) : "";
+  return `あなたは地域安全のコミュニケーション専門家です。
+以下の「公式サイト原文」「周辺の公式出没記録」「公式集計」を踏まえて、
+観光客・登山者・住民向けに要約してください。
+
+【重要な事実参照ルール】
+1. 出没件数・日付・場所は、提示された公式出没記録／公式集計のみ引用すること。
+2. リストにない値は書かない。推測禁止。
+3. 点記録が0件でも集計があれば積極的に引用する。
+4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
+
+制約: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。
+最後に "（${prefName}公式資料より KumaWatch が要約）" を付けること。
+
+対象地域: ${prefName}
+
+${sightingsBlock}
+
+${aggregateBlock}
+
+公式サイト原文（抜粋）:
+${pageText}
+
+要約:`;
+}
+
 function buildPrompt(
   entry: MunicipalEntry,
   pageText: string,
@@ -174,16 +225,21 @@ export async function GET(req: Request) {
   }
 
   const entry = findMunicipalityByPrefCode(prefCode);
-  if (!entry) {
+  const aggregate = buildAggregateContext(prefCode, muniName);
+
+  // 自治体マスタが未登録でも、集計データがあれば応答を返す
+  if (!entry && !aggregate) {
     return NextResponse.json(
       { error: "対象の自治体マスタが未登録です" },
       { status: 404 },
     );
   }
 
-  const sourceUrls = entry.links
-    .filter((l) => l.kind === "official_info" || l.kind === "official_map")
-    .map((l) => l.url);
+  const sourceUrls = entry
+    ? entry.links
+        .filter((l) => l.kind === "official_info" || l.kind === "official_map")
+        .map((l) => l.url)
+    : (aggregate?.sources.map((s) => s.url) ?? []);
 
   const lat = latStr ? Number(latStr) : NaN;
   const lon = lonStr ? Number(lonStr) : NaN;
@@ -192,7 +248,6 @@ export async function GET(req: Request) {
       ? await findNearbySightings(lat, lon, { radiusKm: 5, withinDays: 365, limit: 30 }).catch(() => [])
       : [];
 
-  const aggregate = buildAggregateContext(prefCode, muniName);
   const aggregateMeta = aggregate
     ? {
         hasAggregate: true,
@@ -202,14 +257,15 @@ export async function GET(req: Request) {
         muniTier: aggregate.muniTier,
       }
     : undefined;
+  const prefName = entry?.prefNameJa ?? aggregate?.prefName ?? "";
 
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     const res: SummaryResponse = {
       prefCode,
-      prefName: entry.prefNameJa,
-      summary: buildDemoSummary(entry, nearby),
+      prefName,
+      summary: buildDemoSummary(entry, nearby, aggregate, prefName),
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
@@ -229,8 +285,8 @@ export async function GET(req: Request) {
   if (!pageText) {
     const res: SummaryResponse = {
       prefCode,
-      prefName: entry.prefNameJa,
-      summary: buildDemoSummary(entry, nearby),
+      prefName,
+      summary: buildDemoSummary(entry, nearby, aggregate, prefName),
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
@@ -244,13 +300,15 @@ export async function GET(req: Request) {
     });
   }
 
-  const prompt = buildPrompt(entry, pageText, nearby, aggregate);
+  const prompt = entry
+    ? buildPrompt(entry, pageText, nearby, aggregate)
+    : buildPromptFromAggregate(prefName, pageText, nearby, aggregate);
   const llmText = await callGemini(apiKey, prompt);
 
-  const summary = llmText ?? buildDemoSummary(entry, nearby);
+  const summary = llmText ?? buildDemoSummary(entry, nearby, aggregate, prefName);
   const res: SummaryResponse = {
     prefCode,
-    prefName: entry.prefNameJa,
+    prefName,
     summary,
     sourceUrls,
     fetchedAt: new Date().toISOString(),
