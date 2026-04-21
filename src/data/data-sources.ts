@@ -506,14 +506,27 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "toyama",
     kind: "prefecture",
     prefCode: "16",
-    regionLabel: "富山県 クマっぷ",
+    regionLabel: "富山県 クマっぷ（ArcGIS FeatureServer）",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html", role: "map", hint: "富山県 ツキノワグマ出没情報地図『クマっぷ』" },
+      { url: "https://pref-toyama-1709.maps.arcgis.com/apps/dashboards/daffbc92f82342339aa6bf3c83ab4742", role: "arcgis", hint: "県公式 ArcGIS Dashboard" },
     ],
-    extractor: "custom-webmap",
-    notes: "2026-04-06 に全面リニューアル。GIS ベース",
-    verifiedAt: "2026-04-20",
+    extractor: "arcgis-dashboard",
+    arcgis: {
+      featureServerUrl:
+        "https://services7.arcgis.com/pUdPpUsq83Kw8pWi/arcgis/rest/services/survey123_3f07f1f9864d43368d48b5f373d6cd68_results/FeatureServer/0",
+      dateFormat: "epoch-ms",
+      mappings: {
+        date: "HasseiDateTime",
+        city: "HasseiCity",
+        section: "HasseiArea",
+        situation: "TsuhoInfo",
+        headCount: "BearAdult",
+      },
+    },
+    notes: "2026-04-06 リニューアル後の Survey123 ベース ArcGIS。4,357 件。目撃/痕跡/人身被害が HoukokuType で区別される",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "ishikawa",
@@ -528,12 +541,11 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     extractor: "direct-kml",
     kml: {
       kmlUrl: "https://www.google.com/maps/d/kml?mid=17x-ZQxVWesZ3iJdObP0BXeS_R7e0vxw&forcekml=1",
-      nameFormat: "city-section-wareki",
-      nameSeparator: "、",
+      nameFormat: "section-in-name",
     },
     notes:
-      "Google My Maps ベース。2026-04 時点で Point は 6 件のみ（残りは市町境界ポリゴン）。Sharp9110 の 187 件を併用",
-    verifiedAt: "2026-04-20",
+      "Google My Maps R8（令和8年度）。Point 6 件のみ（残りは市町境界ポリゴン）。description に『出没日: R8.2.23』等の和暦/ISO 日付あり。Sharp9110 の 187 件を併用",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "fukui",
@@ -542,10 +554,13 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "福井県 福井クマ情報",
     bearStatus: "present",
     urls: [
-      { url: "https://tsukinowaguma.pref.fukui.lg.jp/", role: "map", hint: "福井クマ情報 専用ドメイン" },
+      { url: "https://tsukinowaguma.pref.fukui.lg.jp/", role: "map", hint: "福井クマ情報 専用ドメイン（OpenLayers 独自 GIS）" },
+      { url: "https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2.html", role: "list", hint: "県自然環境課 トップページ（PDF リンク）" },
+      { url: "https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2_d/fil/R4-8.pdf", role: "pdf", hint: "出没状況（R4〜R8）月別・地域別集計 PDF" },
     ],
     extractor: "custom-webmap",
-    verifiedAt: "2026-04-20",
+    notes: "県公式は独自 OpenLayers GIS で API 未公開。PDF は月別/地域別の集計のみで座標データなし。R7 年計 950 件。Sharp9110 経由のデータなし",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "yamanashi",
