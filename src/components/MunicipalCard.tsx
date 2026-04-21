@@ -8,6 +8,7 @@ type Props = {
   entry: MunicipalEntry | undefined;
   lat?: number;
   lon?: number;
+  muniName?: string;
 };
 
 const KIND_LABEL: Record<string, string> = {
@@ -19,7 +20,7 @@ const KIND_LABEL: Record<string, string> = {
   contact: "問い合わせ",
 };
 
-export default function MunicipalCard({ entry, lat, lon }: Props) {
+export default function MunicipalCard({ entry, lat, lon, muniName }: Props) {
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
@@ -30,6 +31,7 @@ export default function MunicipalCard({ entry, lat, lon }: Props) {
     const params = new URLSearchParams({ prefCode: entry.prefCode });
     if (typeof lat === "number" && Number.isFinite(lat)) params.set("lat", lat.toFixed(5));
     if (typeof lon === "number" && Number.isFinite(lon)) params.set("lon", lon.toFixed(5));
+    if (muniName) params.set("muniName", muniName);
     fetch(`/api/summary?${params.toString()}`)
       .then((r) => (r.ok ? (r.json() as Promise<SummaryResponse>) : null))
       .then((data) => {
@@ -42,7 +44,7 @@ export default function MunicipalCard({ entry, lat, lon }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [entry, lat, lon]);
+  }, [entry, lat, lon, muniName]);
 
   if (!entry) {
     return (
@@ -87,6 +89,19 @@ export default function MunicipalCard({ entry, lat, lon }: Props) {
             <div className="mt-2 text-[10px] text-blue-700">
               周辺 5km / 直近 12 ヶ月の公式記録: {summary.nearbyCount} 件
               {summary.nearbyLatestDate ? `（最新 ${summary.nearbyLatestDate}）` : ""}
+            </div>
+          )}
+          {summary.aggregate?.hasAggregate && (
+            <div className="mt-1 text-[10px] text-emerald-700">
+              {summary.aggregate.prefAnnualLatestFiscalYear &&
+              summary.aggregate.prefAnnualLatestSighting
+                ? `${summary.prefName} 令和${
+                    summary.aggregate.prefAnnualLatestFiscalYear - 2018
+                  }年度 県全体 ${summary.aggregate.prefAnnualLatestSighting.toLocaleString()} 件`
+                : null}
+              {summary.aggregate.muniBand
+                ? ` / ${muniName ?? "この市町村"}: ${summary.aggregate.muniBand}`
+                : null}
             </div>
           )}
           {summary.note && (

@@ -3,6 +3,11 @@ import {
   findMunicipalityByPrefCode,
   type MunicipalEntry,
 } from "@/data/municipalities";
+import {
+  buildAggregateContext,
+  formatAggregateForPrompt,
+  type AggregateContext,
+} from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
@@ -18,6 +23,13 @@ export type SummaryResponse = {
   mode: "llm" | "demo";
   nearbyCount: number;
   nearbyLatestDate?: string;
+  aggregate?: {
+    hasAggregate: boolean;
+    prefAnnualLatestSighting?: number;
+    prefAnnualLatestFiscalYear?: number;
+    muniBand?: string;
+    muniTier?: string;
+  };
   note?: string;
 };
 
@@ -116,17 +128,20 @@ function buildPrompt(
   entry: MunicipalEntry,
   pageText: string,
   nearby: NearbySighting[],
+  aggregate: AggregateContext | null,
 ): string {
   const species = entry.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
   const sightingsBlock = formatSightings(nearby);
+  const aggregateBlock = aggregate ? formatAggregateForPrompt(aggregate) : "";
   return `あなたは地域安全のコミュニケーション専門家です。
-以下の「自治体公式サイトの原文」と「周辺の公式出没記録」を踏まえて、
+以下の「自治体公式サイトの原文」「周辺の公式出没記録」「公式集計」を踏まえて、
 観光客・登山者・住民向けに要約してください。
 
 【重要な事実参照ルール】
-1. 出没の具体件数・日付・場所を述べるときは、提示された公式出没記録のみを引用すること。
-2. 記録に存在しない日付・場所・件数は絶対に書かないこと。推測禁止。
-3. 記録が 0 件の場合は「この周辺 5km 以内の直近記録は確認されていない」と明示すること。
+1. 出没の具体件数・日付・場所を述べるときは、提示された公式出没記録／公式集計のみを引用すること。
+2. 記録にも集計にもない日付・場所・件数は絶対に書かないこと。推測禁止。
+3. 点記録が0件でも、公式集計（県・市町村単位の件数）があれば積極的に引用する。
+4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
 
 制約:
 - 3 文以内、日本語
@@ -139,6 +154,8 @@ function buildPrompt(
 
 ${sightingsBlock}
 
+${aggregateBlock}
+
 自治体公式サイト原文（抜粋）:
 ${pageText}
 
@@ -150,6 +167,7 @@ export async function GET(req: Request) {
   const prefCode = searchParams.get("prefCode");
   const latStr = searchParams.get("lat");
   const lonStr = searchParams.get("lon");
+  const muniName = searchParams.get("muniName") ?? undefined;
 
   if (!prefCode) {
     return NextResponse.json({ error: "prefCode が必要です" }, { status: 400 });
@@ -174,6 +192,17 @@ export async function GET(req: Request) {
       ? await findNearbySightings(lat, lon, { radiusKm: 5, withinDays: 365, limit: 30 }).catch(() => [])
       : [];
 
+  const aggregate = buildAggregateContext(prefCode, muniName);
+  const aggregateMeta = aggregate
+    ? {
+        hasAggregate: true,
+        prefAnnualLatestSighting: aggregate.prefAnnualRecent[0]?.sighting,
+        prefAnnualLatestFiscalYear: aggregate.prefAnnualRecent[0]?.fiscalYear,
+        muniBand: aggregate.muniBand,
+        muniTier: aggregate.muniTier,
+      }
+    : undefined;
+
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -186,6 +215,7 @@ export async function GET(req: Request) {
       mode: "demo",
       nearbyCount: nearby.length,
       nearbyLatestDate: nearby[0]?.date,
+      aggregate: aggregateMeta,
       note: "GEMINI_API_KEY 未設定のためデモ要約を返しています",
     };
     return NextResponse.json(res, {
@@ -206,6 +236,7 @@ export async function GET(req: Request) {
       mode: "demo",
       nearbyCount: nearby.length,
       nearbyLatestDate: nearby[0]?.date,
+      aggregate: aggregateMeta,
       note: "公式ページを取得できなかったためデモ要約を返しています",
     };
     return NextResponse.json(res, {
@@ -213,7 +244,7 @@ export async function GET(req: Request) {
     });
   }
 
-  const prompt = buildPrompt(entry, pageText, nearby);
+  const prompt = buildPrompt(entry, pageText, nearby, aggregate);
   const llmText = await callGemini(apiKey, prompt);
 
   const summary = llmText ?? buildDemoSummary(entry, nearby);
@@ -226,6 +257,7 @@ export async function GET(req: Request) {
     mode: llmText ? "llm" : "demo",
     nearbyCount: nearby.length,
     nearbyLatestDate: nearby[0]?.date,
+    aggregate: aggregateMeta,
     note: llmText ? undefined : "LLM 応答取得に失敗したためデモ要約を返しています",
   };
 

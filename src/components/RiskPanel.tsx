@@ -49,6 +49,7 @@ type State =
       breakdown: ScoreBreakdown;
       municipality?: MunicipalEntry;
       placeName?: string;
+      muniName?: string;
       nearbyWeightedCount: number;
       nearbySightings: number;
       nearbyRadiusKm: number;
@@ -245,6 +246,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         breakdown,
         municipality,
         placeName,
+        muniName: rev?.city,
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
@@ -433,6 +435,8 @@ function RiskDetails({
     lon: state.lon,
     place: placeName,
     prefecture: state.municipality?.prefNameJa,
+    prefCode: state.municipality?.prefCode,
+    muniName: state.muniName,
     score: breakdown.score,
     level: breakdown.level,
     hour,
@@ -487,7 +491,7 @@ function RiskDetails({
       />
 
       <div className="border-t border-gray-100 pt-4">
-        <MunicipalCard entry={state.municipality} lat={state.lat} lon={state.lon} />
+        <MunicipalCard entry={state.municipality} lat={state.lat} lon={state.lon} muniName={state.muniName} />
       </div>
 
       <div className="border-t border-gray-100 pt-4">

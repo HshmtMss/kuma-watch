@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildAggregateContext, formatAggregateForPrompt } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
@@ -11,6 +12,8 @@ type AskPayload = {
     lon?: number;
     place?: string;
     prefecture?: string;
+    prefCode?: string;
+    muniName?: string;
     score?: number;
     level?: string;
     hour?: number;
@@ -114,6 +117,10 @@ export async function POST(req: Request) {
       ? await findNearbySightings(lat, lon, { radiusKm: 5, withinDays: 365, limit: 15 }).catch(() => [])
       : [];
 
+  const aggregate = body.context?.prefCode
+    ? buildAggregateContext(body.context.prefCode, body.context.muniName)
+    : null;
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({
@@ -130,21 +137,30 @@ export async function POST(req: Request) {
     "過度に恐怖を煽らず、実用的な対策を 1〜2 つ含めます。",
     "",
     "【重要な事実参照ルール】",
-    "1. 「周辺の公式出没記録」セクションに提示された記録のみを『過去の実例』として参照してください。",
-    "2. リストにない出没情報・日付・場所は存在しないものとして扱い、推測しないこと。",
-    "3. 記録が0件の場合は「この周辺5km以内・直近12ヶ月の公式記録はありません」と明示すること。",
-    "4. ユーザーの質問が『最近の目撃』『具体的な事例』を問う場合、リストの日付・市町村名を引用してください。",
+    "1. 「周辺の公式出没記録」と「公式集計」セクションに提示された記録のみを『事実』として参照してください。",
+    "2. リストにない出没情報・日付・場所・件数は存在しないものとして扱い、推測しないこと。",
+    "3. 点座標付き記録が0件でも、公式集計（県・市町村単位の件数）があれば積極的に引用してください。例:『岩手県令和7年度は全体で9,739件、市町村単位では XX 市が 300 件以上の集計帯にあります』。",
+    "4. 記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示すること。",
     "5. スコア・気象等のコンテキストは現状把握のためのもので、記録ではありません。",
   ].join("\n");
 
   const nearbyBlock = formatSightings(nearby);
-  const userText = `コンテキスト: ${buildContextText(body.context)}\n\n${nearbyBlock}\n\n質問: ${q}`;
+  const aggregateBlock = aggregate ? formatAggregateForPrompt(aggregate) : "";
+  const userText = [
+    `コンテキスト: ${buildContextText(body.context)}`,
+    nearbyBlock,
+    aggregateBlock,
+    `質問: ${q}`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
   const llm = await callGemini(apiKey, systemInstruction, userText);
   const answer = llm ?? demoAnswer(q, body.context);
   return NextResponse.json({
     answer,
     mode: llm ? ("llm" as const) : ("demo" as const),
     nearbyCount: nearby.length,
+    hasAggregate: !!aggregate,
     note: llm ? undefined : "LLM 応答に失敗したためデモ応答を返しています",
   });
 }

@@ -7,6 +7,8 @@ type AskContext = {
   lon?: number;
   place?: string;
   prefecture?: string;
+  prefCode?: string;
+  muniName?: string;
   score?: number;
   level?: string;
   hour?: number;
