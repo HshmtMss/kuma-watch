@@ -463,6 +463,85 @@ function buildNaganoAggregate(): PrefectureAggregate {
 }
 
 // ---------------------------------------------------------------------------
+// 兵庫県 seed (R6 年計 + R7 4-8月 + 地域別)
+// 出典: https://web.pref.hyogo.lg.jp/nk20/documents/shiryo2_mokugekikonseki.pdf
+// ---------------------------------------------------------------------------
+const HYOGO_R6_MONTHLY: Record<number, number> = {
+  4: 18, 5: 72, 6: 141, 7: 107, 8: 138, 9: 167, 10: 285, 11: 148, 12: 42, 1: 4, 2: 1, 3: 5,
+};
+const HYOGO_R7_MONTHLY_PARTIAL: Record<number, number> = {
+  4: 37, 5: 119, 6: 53, 7: 72, 8: 45,
+};
+// 地域 (R7 4-8月速報) → muniName マッピング近似
+const HYOGO_R7_REGION: Array<[string, number, number]> = [
+  // [region, R7件数, 過去5年平均]
+  ["但馬北部", 160, 146],
+  ["但馬南部", 34, 51],
+  ["西播磨", 62, 36],
+  ["丹波", 23, 15],
+  ["中播磨", 19, 25],
+  ["北播磨", 19, 4],
+  ["阪神", 9, 6],
+  ["東播磨", 0, 0],
+  ["神戸", 0, 1],
+];
+
+function buildHyogoAggregate(): PrefectureAggregate {
+  const prefCode = "28";
+  const prefName = "兵庫県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "hyogo-pref-2024",
+      prefCode, prefName,
+      period: { fiscalYear: 2024 },
+      counts: { sighting: 1128 },
+    },
+    {
+      id: "hyogo-pref-2025-partial",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 326 }, // 4-8月のみ速報
+    },
+  ];
+  // 地域別 R7 (市町村ではなく地域カテゴリ)
+  for (const [region, n] of HYOGO_R7_REGION) {
+    if (n === 0) continue;
+    annual.push({
+      id: `hyogo-${region}-2025`,
+      prefCode, prefName, muniName: region,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = [];
+  for (const [m, n] of Object.entries(HYOGO_R6_MONTHLY)) {
+    monthly.push({
+      id: `hyogo-pref-2024-${m}`,
+      prefCode, prefName,
+      period: { fiscalYear: 2024, month: Number(m) },
+      counts: { sighting: n },
+    });
+  }
+  for (const [m, n] of Object.entries(HYOGO_R7_MONTHLY_PARTIAL)) {
+    monthly.push({
+      id: `hyogo-pref-2025-${m}`,
+      prefCode, prefName,
+      period: { fiscalYear: 2025, month: Number(m) },
+      counts: { sighting: n },
+    });
+  }
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [{
+      url: "https://web.pref.hyogo.lg.jp/nk20/documents/shiryo2_mokugekikonseki.pdf",
+      label: "ツキノワグマの目撃・痕跡件数（R7 8月末・R6 全年・過去5年平均）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "県森林動物研究センター調査。県全域を 9 地域 (但馬北部・南部/西中北播磨/丹波/阪神/東播磨/神戸) に分類。但馬北部 (豊岡・香美・新温泉・養父・朝来・香住等) が圧倒的多数",
+  };
+}
+
+// ---------------------------------------------------------------------------
 export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildIwateAggregate(),
   buildFukuiAggregate(),
@@ -471,6 +550,7 @@ export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildKanagawaAggregate(),
   buildAichiAggregate(),
   buildNaganoAggregate(),
+  buildHyogoAggregate(),
 ];
 
 export function findPrefectureAggregate(prefCode: string): PrefectureAggregate | undefined {
