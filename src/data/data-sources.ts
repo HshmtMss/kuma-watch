@@ -808,14 +808,21 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "shiga",
     kind: "prefecture",
     prefCode: "25",
-    regionLabel: "滋賀県 クマ情報",
+    regionLabel: "滋賀県 大津市ツキノワグマ出没マップ（Google My Map）",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.shiga.lg.jp/ippan/kankyoshizen/yasei/kuma.html", role: "list" },
+      { url: "https://www.pref.shiga.lg.jp/ippan/kankyoshizen/yasei/kuma.html", role: "list", hint: "県公式" },
+      { url: "https://www.city.otsu.lg.jp/soshiki/025/1605/g/t/1390705956292.html", role: "list", hint: "大津市公式" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1rE5HcSdJnm2gX3iT1FMt0aCVuQ9ArDs", role: "map", hint: "大津市 令和5-8年度 4 フォルダ統合マップ" },
     ],
-    extractor: "llm-html",
-    requiresResearch: true,
-    verifiedAt: "2026-04-20",
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1rE5HcSdJnm2gX3iT1FMt0aCVuQ9ArDs&forcekml=1",
+      nameFormat: "date-paren-location",
+      fiscalYear: 2025, // default fallback; folder 別 fiscalYear が優先されるが全 folder が検出できなかった placemark 用
+    },
+    notes: "大津市単独のマップ 109 件。4 folder (R5〜R8) に分かれており folder 名から fiscalYear 自動判定。県全域ではなく、県公式のマップは PDF のみ",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "kyoto",

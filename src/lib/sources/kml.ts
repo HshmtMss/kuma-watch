@@ -98,7 +98,8 @@ function parseDateParenLocation(
   fiscalYear: number | undefined,
 ): ParsedDateParenLocation {
   if (!name) return {};
-  const s = normalizeFullWidth(name).trim();
+  // Normalize full-width digits/letters AND full-width space (U+3000)
+  const s = normalizeFullWidth(name).replace(/\u3000/g, " ").trim();
   // Match month/day at start: "1/17", "1／17", "1月17日", "1月17"
   const md =
     s.match(/^\s*(\d{1,2})[/／](\d{1,2})/) ??
@@ -110,9 +111,21 @@ function parseDateParenLocation(
   if (fiscalYear == null) return {};
   const year = mo >= 4 ? fiscalYear : fiscalYear + 1;
   const date = `${year}-${String(mo).padStart(2, "0")}-${String(da).padStart(2, "0")}`;
-  // last parenthesis group = location
+  // Prefer last parenthesis content; fallback to last whitespace-separated non-date/time token
   const loc = [...s.matchAll(/[（(]([^（()）]+)[）)]/g)].map((m) => m[1]);
-  const section = loc[loc.length - 1]?.trim() ?? "";
+  let section = loc[loc.length - 1]?.trim() ?? "";
+  if (!section) {
+    const tokens = s.split(/\s+/).filter(Boolean);
+    for (let i = tokens.length - 1; i >= 0; i--) {
+      const tk = tokens[i];
+      if (/^\d{1,2}[/／]\d{1,2}(?:日)?$/.test(tk)) continue;
+      if (/^\d{1,2}[:：]\d{1,2}(?:頃)?$/.test(tk)) continue;
+      if (/^\d{1,2}(?:月|時)\d{0,2}(?:日|分|頃)?$/.test(tk)) continue;
+      if (/^[\d:：頃月日時分/／]+$/.test(tk)) continue;
+      section = tk;
+      break;
+    }
+  }
   return { date, section };
 }
 
@@ -159,12 +172,51 @@ type PlacemarkRaw = {
   lat: number;
   lon: number;
   extended: Record<string, string>;
+  folderFiscalYear?: number;
 };
 
+function detectFolderFiscalYear(folderName: string): number | undefined {
+  if (!folderName) return undefined;
+  const s = normalizeFullWidth(folderName);
+  // 令和N年度 / 令和元年度
+  const wa = s.match(/令和(元|\d{1,2})年度?/);
+  if (wa) {
+    const y = wa[1] === "元" ? 1 : Number(wa[1]);
+    if (Number.isFinite(y) && y >= 1 && y <= 50) return 2018 + y;
+  }
+  // 平成N年度
+  const hei = s.match(/平成(元|\d{1,2})年度?/);
+  if (hei) {
+    const y = hei[1] === "元" ? 1 : Number(hei[1]);
+    if (Number.isFinite(y) && y >= 1 && y <= 31) return 1988 + y;
+  }
+  // RN / R元
+  const rr = s.match(/R(元|\d{1,2})年?度?/);
+  if (rr) {
+    const y = rr[1] === "元" ? 1 : Number(rr[1]);
+    if (Number.isFinite(y) && y >= 1 && y <= 50) return 2018 + y;
+  }
+  return undefined;
+}
+
 function extractPointPlacemarks(kml: string): PlacemarkRaw[] {
-  const placemarks = kml.match(/<Placemark[^>]*>[\s\S]*?<\/Placemark>/g) ?? [];
+  // Locate folder spans so we can tag each placemark with its folder fiscalYear
+  type FolderSpan = { start: number; end: number; year?: number };
+  const folders: FolderSpan[] = [];
+  const folderOpenRe = /<Folder>\s*<name>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/name>/g;
+  let fm: RegExpExecArray | null;
+  while ((fm = folderOpenRe.exec(kml)) !== null) {
+    const endIdx = kml.indexOf("</Folder>", fm.index);
+    if (endIdx < 0) continue;
+    folders.push({ start: fm.index, end: endIdx, year: detectFolderFiscalYear(fm[1]) });
+  }
+
   const out: PlacemarkRaw[] = [];
-  for (const pm of placemarks) {
+  const pmRe = /<Placemark[^>]*>[\s\S]*?<\/Placemark>/g;
+  let pmMatch: RegExpExecArray | null;
+  while ((pmMatch = pmRe.exec(kml)) !== null) {
+    const pm = pmMatch[0];
+    const pos = pmMatch.index;
     if (!pm.includes("<Point>")) continue;
     const nameMatch = pm.match(/<name>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/name>/);
     const descMatch = pm.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/);
@@ -183,12 +235,23 @@ function extractPointPlacemarks(kml: string): PlacemarkRaw[] {
       extended[m[1]] = m[2].trim();
     }
 
+    // Find enclosing folder (deepest/last containing this position)
+    let folderFiscalYear: number | undefined;
+    for (let i = folders.length - 1; i >= 0; i--) {
+      const f = folders[i];
+      if (f.start <= pos && pos < f.end && f.year != null) {
+        folderFiscalYear = f.year;
+        break;
+      }
+    }
+
     out.push({
       name: (nameMatch?.[1] ?? "").trim(),
       description: (descMatch?.[1] ?? "").trim(),
       lat,
       lon,
       extended,
+      folderFiscalYear,
     });
   }
   return out;
@@ -212,6 +275,8 @@ function buildSighting(
   let section = "";
   let date: string | null = null;
 
+  const effFiscalYear = pm.folderFiscalYear ?? cfg.fiscalYear;
+
   if (cfg.nameFormat === "city-section-wareki") {
     const parsed = parseCitySectionWareki(pm.name);
     if (!parsed.date) return null;
@@ -219,7 +284,7 @@ function buildSighting(
     section = parsed.section ?? "";
     date = parsed.date;
   } else if (cfg.nameFormat === "date-paren-location") {
-    const parsed = parseDateParenLocation(pm.name, cfg.fiscalYear);
+    const parsed = parseDateParenLocation(pm.name, effFiscalYear);
     if (!parsed.date) return null;
     section = parsed.section ?? "";
     date = parsed.date;
@@ -229,7 +294,7 @@ function buildSighting(
     if (pm.name) candidates.push(pm.name);
     if (pm.description) candidates.push(stripHtml(pm.description));
     for (const c of candidates) {
-      date = parseDateCandidate(c, cfg.dateFormat, cfg.fiscalYear);
+      date = parseDateCandidate(c, cfg.dateFormat, effFiscalYear);
       if (date) break;
     }
     if (!date) return null;
