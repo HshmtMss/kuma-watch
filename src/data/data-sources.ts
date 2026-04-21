@@ -71,7 +71,8 @@ export type KmlNameFormat =
   | "city-section-iso"    // "青森市、地区、2025/4/1"
   | "date-only"           // "令和7年4月5日" / "8月27日" / "2025/01/16" (岩手・宮城・栃木)
   | "extended-data"       // name は通し番号、情報は ExtendedData (福島)
-  | "section-in-name";    // name = 地名、日付は description 内 (奈良・鳥取・島根)
+  | "section-in-name"     // name = 地名、日付は description 内 (奈良・鳥取・島根)
+  | "date-paren-location"; // "M/D(曜日)午前/午後H時M分(city section)" (山形 gmap)
 
 export type KmlDateFormat =
   | "wareki-or-md" // 和暦優先、次に M月D日 (要 fiscalYear)
@@ -214,6 +215,63 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     extractor: "arcgis-dashboard",
     notes: "秋田県の公式システムはクマダス (kumadas.net、技術基盤 Sharp9110)。ArcGIS Hub は legacy page で構造化データ API は未提供。Sharp9110 経由の 18,859 件を公式データとして利用",
     verifiedAt: "2026-04-20",
+  },
+  {
+    id: "yamagata-gmap-r7",
+    kind: "prefecture",
+    prefCode: "06",
+    regionLabel: "山形県 R7 クマ目撃マップ（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.yamagata.jp/050011/midori/2025kumap.html", role: "list", hint: "令和7年度クマ目撃マップ案内ページ" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1N9E9rixBQwxB4TKQ2XsP32GLOi6w6qQ", role: "map", hint: "R7 Google My Map" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1N9E9rixBQwxB4TKQ2XsP32GLOi6w6qQ&forcekml=1",
+      nameFormat: "date-paren-location",
+      fiscalYear: 2025,
+    },
+    notes: "R7 (令和7年度) 3,092 件。name に M/D(曜日)午前/午後H時M分(市町+地名) 形式",
+    verifiedAt: "2026-04-21",
+  },
+  {
+    id: "yamagata-gmap-r6",
+    kind: "prefecture",
+    prefCode: "06",
+    regionLabel: "山形県 R6 クマ目撃マップ（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.yamagata.jp/050011/midori/2024kumap.html", role: "list", hint: "令和6年度クマ目撃マップ案内" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1da3oBtt7Foif1w2r_UPO9-RdwuElVis", role: "map", hint: "R6 Google My Map" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1da3oBtt7Foif1w2r_UPO9-RdwuElVis&forcekml=1",
+      nameFormat: "date-paren-location",
+      fiscalYear: 2024,
+    },
+    notes: "R6 (令和6年度) 369 件",
+    verifiedAt: "2026-04-21",
+  },
+  {
+    id: "yamagata-gmap-r5",
+    kind: "prefecture",
+    prefCode: "06",
+    regionLabel: "山形県 R5 クマ目撃マップ（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.yamagata.jp/050011/midori/2023kumap.html", role: "list", hint: "令和5年度クマ目撃マップ案内" },
+      { url: "https://www.google.com/maps/d/viewer?mid=1x_6oTNnnFifUnxVYBCPg4vxpIpZigkY", role: "map", hint: "R5 Google My Map" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1x_6oTNnnFifUnxVYBCPg4vxpIpZigkY&forcekml=1",
+      nameFormat: "date-paren-location",
+      fiscalYear: 2023,
+    },
+    notes: "R5 (令和5年度) 894 件",
+    verifiedAt: "2026-04-21",
   },
   {
     id: "yamagata-kemonote",

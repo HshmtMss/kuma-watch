@@ -91,6 +91,31 @@ function parseDateCandidate(
   return null;
 }
 
+type ParsedDateParenLocation = { date?: string; section?: string };
+
+function parseDateParenLocation(
+  name: string,
+  fiscalYear: number | undefined,
+): ParsedDateParenLocation {
+  if (!name) return {};
+  const s = normalizeFullWidth(name).trim();
+  // Match month/day at start: "1/17", "1／17", "1月17日", "1月17"
+  const md =
+    s.match(/^\s*(\d{1,2})[/／](\d{1,2})/) ??
+    s.match(/^\s*(\d{1,2})月(\d{1,2})日?/);
+  if (!md) return {};
+  const mo = Number(md[1]);
+  const da = Number(md[2]);
+  if (mo < 1 || mo > 12 || da < 1 || da > 31) return {};
+  if (fiscalYear == null) return {};
+  const year = mo >= 4 ? fiscalYear : fiscalYear + 1;
+  const date = `${year}-${String(mo).padStart(2, "0")}-${String(da).padStart(2, "0")}`;
+  // last parenthesis group = location
+  const loc = [...s.matchAll(/[（(]([^（()）]+)[）)]/g)].map((m) => m[1]);
+  const section = loc[loc.length - 1]?.trim() ?? "";
+  return { date, section };
+}
+
 type ParsedCitySectionWareki = { city?: string; section?: string; date?: string };
 
 function parseCitySectionWareki(name: string): ParsedCitySectionWareki {
@@ -191,6 +216,11 @@ function buildSighting(
     const parsed = parseCitySectionWareki(pm.name);
     if (!parsed.date) return null;
     city = parsed.city ?? "";
+    section = parsed.section ?? "";
+    date = parsed.date;
+  } else if (cfg.nameFormat === "date-paren-location") {
+    const parsed = parseDateParenLocation(pm.name, cfg.fiscalYear);
+    if (!parsed.date) return null;
     section = parsed.section ?? "";
     date = parsed.date;
   } else {
