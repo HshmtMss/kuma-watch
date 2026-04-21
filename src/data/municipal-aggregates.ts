@@ -333,11 +333,144 @@ function buildWakayamaAggregate(): PrefectureAggregate {
 }
 
 // ---------------------------------------------------------------------------
+// 神奈川県 seed (R7 ナラティブリスト)
+// 出典: https://www.pref.kanagawa.jp/documents/15077/kuma_r7_0330.pdf
+// ---------------------------------------------------------------------------
+const KANAGAWA_R7_MONTHLY: Record<number, number> = {
+  4: 2, 5: 13, 6: 10, 7: 9, 8: 8, 9: 7, 10: 10, 11: 14, 12: 5, 1: 9, 2: 3, 3: 1,
+};
+const KANAGAWA_R7_MUNI: Array<[string, number]> = [
+  ["相模原市", 15], ["松田町", 15], ["山北町", 16], ["清川村", 12], ["伊勢原市", 10],
+  ["秦野市", 13], ["厚木市", 4], ["愛川町", 5],
+];
+
+function buildKanagawaAggregate(): PrefectureAggregate {
+  const prefCode = "14";
+  const prefName = "神奈川県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "kanagawa-pref-2025",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 91 },
+    },
+  ];
+  for (const [muni, n] of KANAGAWA_R7_MUNI) {
+    annual.push({
+      id: `kanagawa-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = Object.entries(KANAGAWA_R7_MONTHLY).map(([m, n]) => ({
+    id: `kanagawa-pref-2025-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2025, month: Number(m) },
+    counts: { sighting: n },
+  }));
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [{
+      url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r7_0330.pdf",
+      label: "【令和7年度】目撃等情報（令和7年4月〜令和8年3月）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "丹沢山地中心に 91 件 (目撃・痕跡 84 + 捕殺・錯誤捕獲等 7)。区分『人里』『山中』併記。全件の日付・市町村・状況が PDF に narrative で記載",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 愛知県 seed (過去5年ナラティブリスト)
+// 出典: https://www.pref.aichi.jp/uploaded/attachment/612858.pdf
+// ---------------------------------------------------------------------------
+const AICHI_ANNUAL: Record<number, number> = {
+  2025: 22, 2024: 19, 2023: 19, 2022: 20, 2021: 12,
+};
+const AICHI_R7_MUNI: Array<[string, number]> = [
+  ["豊田市", 11], ["東栄町", 6], ["豊根村", 3], ["瀬戸市", 2], ["設楽町", 1], ["新城市", 3],
+];
+
+function buildAichiAggregate(): PrefectureAggregate {
+  const prefCode = "23";
+  const prefName = "愛知県";
+  const annual: MunicipalAggregate[] = [];
+  for (const [fyStr, n] of Object.entries(AICHI_ANNUAL)) {
+    annual.push({
+      id: `aichi-pref-${fyStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: Number(fyStr) },
+      counts: { sighting: n },
+    });
+  }
+  for (const [muni, n] of AICHI_R7_MUNI) {
+    annual.push({
+      id: `aichi-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  return {
+    prefCode, prefName, annual,
+    sources: [{
+      url: "https://www.pref.aichi.jp/uploaded/attachment/612858.pdf",
+      label: "ツキノワグマ確認情報（過去5年間）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "県北東部（豊田市北部・設楽町・東栄町・豊根村・新城市・瀬戸市等）に出没限定。年間 12〜22 件。定点カメラ撮影・錯誤捕獲を含む",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 長野県 seed (R8 4月前半速報、今後 R7 月別 PDF 追加予定)
+// 出典: https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf
+// ---------------------------------------------------------------------------
+const NAGANO_R8_EARLY_MUNI: Array<[string, number]> = [
+  ["大町市", 2], ["高山村", 2], ["南木曽町", 1], ["長野市", 4], ["軽井沢町", 2],
+  ["山ノ内町", 1], ["安曇野市", 3], ["白馬村", 2], ["塩尻市", 2], ["信濃町", 4],
+  ["中野市", 1], ["木島平村", 2], ["飯綱町", 2], ["王滝村", 2],
+];
+
+function buildNaganoAggregate(): PrefectureAggregate {
+  const prefCode = "20";
+  const prefName = "長野県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "nagano-pref-2026-early",
+      prefCode, prefName,
+      period: { fiscalYear: 2026, month: 4 },
+      counts: { sighting: 30 }, // R8 4月1〜17日速報
+    },
+  ];
+  for (const [muni, n] of NAGANO_R8_EARLY_MUNI) {
+    annual.push({
+      id: `nagano-${muni}-2026-early`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2026, month: 4 },
+      counts: { sighting: n },
+    });
+  }
+  return {
+    prefCode, prefName, annual,
+    sources: [{
+      url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf",
+      label: "ツキノワグマ出没（目撃）情報（令和8年4月17日現在）",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "県公式『けものおと2』アプリ連携の月次リスト。R8 は 4/1〜4/17 の初期 30 件のみ確定。R7 全体集計は月別 PDF 12 本に分散。県全域で年数千件規模の推計",
+  };
+}
+
+// ---------------------------------------------------------------------------
 export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildIwateAggregate(),
   buildFukuiAggregate(),
   buildHiroshimaAggregate(),
   buildWakayamaAggregate(),
+  buildKanagawaAggregate(),
+  buildAichiAggregate(),
+  buildNaganoAggregate(),
 ];
 
 export function findPrefectureAggregate(prefCode: string): PrefectureAggregate | undefined {
