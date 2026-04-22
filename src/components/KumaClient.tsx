@@ -1,28 +1,125 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import Link from "next/link";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
 import RiskPanel, { type SelectedLocation } from "@/components/RiskPanel";
+import WelcomeOverlay from "@/components/WelcomeOverlay";
 import { RISK_LEVEL_COLOR, RISK_LEVEL_LABEL } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
+const WELCOME_STORAGE_KEY = "kumaWatch.welcomed.v1";
+
+function subscribeWelcome(cb: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const handler = (e: StorageEvent) => {
+    if (e.key === WELCOME_STORAGE_KEY) cb();
+  };
+  window.addEventListener("storage", handler);
+  return () => window.removeEventListener("storage", handler);
+}
+
+function getWelcomeSnapshot(): boolean {
+  try {
+    return window.localStorage.getItem(WELCOME_STORAGE_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+function getWelcomeServerSnapshot(): boolean {
+  // SSR では "welcomed" 相当として扱い、初期描画で overlay を出さない (ハイドレーション不整合回避)
+  return true;
+}
+
 const RISK_LEGEND_ORDER: RiskLevel[] = ["low", "moderate", "elevated", "high"];
+
+type PeriodOption = { label: string; days: number | null };
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { label: "1週間", days: 7 },
+  { label: "1ヶ月", days: 30 },
+  { label: "3ヶ月", days: 90 },
+  { label: "1年", days: 365 },
+  { label: "全期間", days: null },
+];
+const DEFAULT_PERIOD_DAYS: number | null = 90;
+
+function computeCutoff(days: number | null): string | null {
+  if (days === null) return null;
+  const d = new Date(Date.now() - days * 86_400_000);
+  return d.toISOString().slice(0, 10);
+}
 
 export default function KumaClient() {
   const [records, setRecords] = useState<KumaRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedPref, setSelectedPref] = useState("all");
-  const [selectedYear, setSelectedYear] = useState("all");
+  const [periodDays, setPeriodDaysRaw] = useState<number | null>(DEFAULT_PERIOD_DAYS);
+  const [periodCutoff, setPeriodCutoff] = useState<string | null>(() =>
+    typeof window === "undefined" ? null : computeCutoff(DEFAULT_PERIOD_DAYS),
+  );
+  const setPeriod = useCallback((days: number | null) => {
+    setPeriodDaysRaw(days);
+    setPeriodCutoff(computeCutoff(days));
+  }, []);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
+  const welcomedFromStore = useSyncExternalStore(
+    subscribeWelcome,
+    getWelcomeSnapshot,
+    getWelcomeServerSnapshot,
+  );
+  const [dismissed, setDismissed] = useState(false);
+  const showWelcome = !welcomedFromStore && !dismissed;
+  const [gpsLoading, setGpsLoading] = useState(false);
+
+  const dismissWelcome = useCallback(() => {
+    setDismissed(true);
+    try {
+      window.localStorage.setItem(WELCOME_STORAGE_KEY, "1");
+    } catch {
+      // storage unavailable (private mode等) — その回のみ非表示で OK
+    }
+  }, []);
+
+  const requestGpsFromWelcome = useCallback(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      dismissWelcome();
+      return;
+    }
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGpsLoading(false);
+        setSelectedLocation({
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          source: "gps",
+        });
+        dismissWelcome();
+      },
+      () => {
+        setGpsLoading(false);
+        dismissWelcome();
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 },
+    );
+  }, [dismissWelcome]);
 
   const handleMapClick = useCallback((lat: number, lon: number) => {
     setSelectedLocation({ lat, lon, source: "tap" });
@@ -51,9 +148,16 @@ export default function KumaClient() {
       .catch(() => setLoading(false));
   }, []);
 
+  // GPS 自動取得: 既に welcomed 済み (= 2 回目以降の訪問) のときだけ mount 時に走らせる。
+  // 初訪問はオーバーレイから明示的に "現在地で見る" を押させる。
+  const autoGpsRanRef = useRef(false);
   useEffect(() => {
+    if (autoGpsRanRef.current) return;
     if (typeof window === "undefined") return;
     if (!navigator.geolocation) return;
+    // 直接 snapshot を読んで "初訪問フラグが無い" = "このセッションで overlay を出した" 場合は skip
+    if (!getWelcomeSnapshot()) return;
+    autoGpsRanRef.current = true;
     let cancelled = false;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -65,7 +169,7 @@ export default function KumaClient() {
         });
       },
       () => {
-        // permission denied or timeout — silent fallback (user can tap/search)
+        // permission denied or timeout — silent fallback
       },
       { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 },
     );
@@ -79,34 +183,29 @@ export default function KumaClient() {
     return Array.from(set).sort((a, b) => a.localeCompare(b, "ja"));
   }, [records]);
 
-  const years = useMemo(() => {
-    const set = new Set(records.map((r) => r.date.slice(0, 4)).filter(Boolean));
-    return Array.from(set).sort().reverse();
-  }, [records]);
-
   const filtered = useMemo(() => {
     if (!showPins) return [];
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
-      const yearOk =
-        selectedYear === "all" || r.date.startsWith(selectedYear);
-      return prefOk && yearOk;
+      const periodOk = !periodCutoff || r.date >= periodCutoff;
+      return prefOk && periodOk;
     });
-  }, [records, selectedPref, selectedYear, showPins]);
+  }, [records, selectedPref, periodCutoff, showPins]);
 
-  const activeFilterCount =
-    (selectedPref !== "all" ? 1 : 0) + (selectedYear !== "all" ? 1 : 0);
+  const activeFilterCount = selectedPref !== "all" ? 1 : 0;
+  const periodLabel =
+    PERIOD_OPTIONS.find((p) => p.days === periodDays)?.label ?? "期間";
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        <a href="/" className="flex shrink-0 items-center gap-1.5">
+        <Link href="/" className="flex shrink-0 items-center gap-1.5">
           <span className="text-xl" aria-hidden="true">🐻</span>
           <span className="hidden text-sm font-bold text-gray-900 sm:inline">
             KumaWatch
           </span>
-        </a>
+        </Link>
 
         <div className="min-w-0 flex-1">
           <PlaceSearch compact onPick={handleSearchPick} />
@@ -160,6 +259,32 @@ export default function KumaClient() {
         </div>
       </header>
 
+      {/* 期間チップ: 常時露出、UX の主役 */}
+      <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-stone-50 px-2 py-1.5">
+        <div className="flex items-center gap-1 overflow-x-auto">
+          <span className="shrink-0 px-1.5 text-[10px] font-medium text-stone-500">
+            期間
+          </span>
+          {PERIOD_OPTIONS.map((p) => {
+            const active = periodDays === p.days;
+            return (
+              <button
+                key={p.label}
+                onClick={() => setPeriod(p.days)}
+                className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium transition ${
+                  active
+                    ? "bg-stone-900 text-white shadow-sm"
+                    : "border border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-100"
+                }`}
+                aria-pressed={active}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {showFilters && (
         <div className="relative z-[1050] shrink-0 border-b border-black/8 bg-white px-3 py-2">
           <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -194,19 +319,6 @@ export default function KumaClient() {
                 </option>
               ))}
             </select>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              disabled={loading}
-              className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700 disabled:opacity-50"
-            >
-              <option value="all">年: すべて</option>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}年
-                </option>
-              ))}
-            </select>
             <button
               onClick={() => setShowLegend((v) => !v)}
               className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700"
@@ -234,7 +346,7 @@ export default function KumaClient() {
 
         {!loading && (
           <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-medium text-gray-600 shadow backdrop-blur sm:left-auto sm:right-16">
-            {filtered.length.toLocaleString()}件表示 / 取得 {records.length.toLocaleString()}件 / 全{total.toLocaleString()}件
+            {periodLabel}: {filtered.length.toLocaleString()}件 / 全{total.toLocaleString()}件
           </div>
         )}
 
@@ -283,6 +395,14 @@ export default function KumaClient() {
           onClear={handleClear}
         />
       </div>
+
+      {showWelcome && (
+        <WelcomeOverlay
+          onGpsRequest={requestGpsFromWelcome}
+          onDismiss={dismissWelcome}
+          gpsLoading={gpsLoading}
+        />
+      )}
     </div>
   );
 }
