@@ -130,55 +130,46 @@ async function fetchForest(
   }
 }
 
-async function fetchNearbyWeighted(
+// KumaClient が既に期間スコープで fetch 済みの records から近隣集計する。
+// ヒートマップと同じ records を使うことで色・件数が一致する。
+function computeNearbyFromRecords(
+  records: KumaRecord[],
   lat: number,
   lon: number,
   periodDays: number | null,
   radiusKm: number = NEARBY_RADIUS_KM,
-): Promise<{
+): {
   count: number;
   weighted: number;
   periodCount: number;
   periodWeighted: number;
   periodRecent: NearbyRecent[];
-}> {
-  try {
-    const r = await fetch("/api/kuma");
-    if (!r.ok)
-      return {
-        count: 0,
-        weighted: 0,
-        periodCount: 0,
-        periodWeighted: 0,
-        periodRecent: [],
-      };
-    const data = (await r.json()) as { records?: KumaRecord[] };
-    const recs = data.records ?? [];
-    const cutoff = cutoffDate(periodDays);
-    let count = 0;
-    let weighted = 0;
-    let periodCount = 0;
-    let periodWeighted = 0;
-    const periodHits: NearbyRecent[] = [];
-    for (const s of recs) {
-      const d = haversineKm(lat, lon, s.lat, s.lon);
-      if (d > radiusKm) continue;
-      count += 1;
-      const w = Math.exp(-d / NEARBY_DECAY_KM);
-      weighted += w;
-      if (!cutoff || s.date >= cutoff) {
-        periodCount += 1;
-        periodWeighted += w;
-        periodHits.push({
-          id: s.id,
-          date: s.date,
-          cityName: s.cityName,
-          sectionName: s.sectionName,
-          comment: s.comment,
-          headCount: s.headCount,
-          distanceKm: d,
-        });
-      }
+} {
+  const cutoff = cutoffDate(periodDays);
+  let count = 0;
+  let weighted = 0;
+  let periodCount = 0;
+  let periodWeighted = 0;
+  const periodHits: NearbyRecent[] = [];
+  for (const s of records) {
+    const d = haversineKm(lat, lon, s.lat, s.lon);
+    if (d > radiusKm) continue;
+    count += 1;
+    const w = Math.exp(-d / NEARBY_DECAY_KM);
+    weighted += w;
+    if (!cutoff || s.date >= cutoff) {
+      periodCount += 1;
+      periodWeighted += w;
+      periodHits.push({
+        id: s.id,
+        date: s.date,
+        cityName: s.cityName,
+        sectionName: s.sectionName,
+        comment: s.comment,
+        headCount: s.headCount,
+        distanceKm: d,
+      });
+    }
     }
     periodHits.sort((a, b) => (a.date > b.date ? -1 : 1));
     return {
@@ -187,16 +178,7 @@ async function fetchNearbyWeighted(
       periodCount,
       periodWeighted,
       periodRecent: periodHits.slice(0, 5),
-    };
-  } catch {
-    return {
-      count: 0,
-      weighted: 0,
-      periodCount: 0,
-      periodWeighted: 0,
-      periodRecent: [],
-    };
-  }
+  };
 }
 
 async function reverseGeocode(
@@ -247,12 +229,15 @@ function getPosition(): Promise<GeolocationPosition> {
 type Props = {
   location: SelectedLocation | null;
   periodDays: number | null;
+  /** KumaClient が期間スコープで読み込んだ records を共有 (ヒートマップと同じ入力) */
+  records: KumaRecord[];
   onPickGps: (loc: SelectedLocation) => void;
 };
 
 export default function RiskPanel({
   location,
   periodDays,
+  records,
   onPickGps,
 }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
@@ -273,15 +258,20 @@ export default function RiskPanel({
         }
 
         setState({ kind: "loading", stage: "データを取得中" });
-        const [meshes, weather, rev, nearby, elevation, forest] =
-          await Promise.all([
-            loadMeshes(),
-            fetchWeather(loc.lat, loc.lon),
-            reverseGeocode(loc.lat, loc.lon),
-            fetchNearbyWeighted(loc.lat, loc.lon, periodDays),
-            fetchElevation(loc.lat, loc.lon),
-            fetchForest(loc.lat, loc.lon),
-          ]);
+        const [meshes, weather, rev, elevation, forest] = await Promise.all([
+          loadMeshes(),
+          fetchWeather(loc.lat, loc.lon),
+          reverseGeocode(loc.lat, loc.lon),
+          fetchElevation(loc.lat, loc.lon),
+          fetchForest(loc.lat, loc.lon),
+        ]);
+        // records はヒートマップと共有 (KumaClient が期間スコープで取得済み)
+        const nearby = computeNearbyFromRecords(
+          records,
+          loc.lat,
+          loc.lon,
+          periodDays,
+        );
       const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
         ? {
@@ -366,7 +356,7 @@ export default function RiskPanel({
         message: err instanceof Error ? err.message : "評価に失敗しました",
       });
     }
-  }, [periodDays]);
+  }, [periodDays, records]);
 
   useEffect(() => {
     if (!location) {
