@@ -23,7 +23,8 @@ import {
 } from "@/data/municipalities";
 import { findSourceByPrefCode } from "@/data/data-sources";
 import type { GeocodeHit } from "@/app/api/geocode/route";
-import MunicipalCard from "@/components/MunicipalCard";
+import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
+import MunicipalLinks from "@/components/MunicipalLinks";
 import RiskCharts from "@/components/RiskCharts";
 import AskBox from "@/components/AskBox";
 
@@ -529,9 +530,9 @@ function RiskDetails({
   };
 
   return (
-    <div className="max-h-[70vh] space-y-4 overflow-y-auto border-t border-gray-100 px-4 py-3 text-sm">
-      {/* Headline: 過去◯期間・10km 以内に N 件 */}
-      <div className="-mx-4 -mt-3 border-b border-gray-100 bg-amber-50/60 px-4 py-3">
+    <div className="max-h-[75vh] overflow-y-auto border-t border-gray-100 text-sm">
+      {/* 1. 件数 headline (常時) */}
+      <section className="bg-amber-50/70 px-4 py-3">
         <div className="text-[10px] font-medium uppercase tracking-wider text-amber-700">
           {periodDays === null
             ? `半径 ${nearbyRadiusKm}km 以内の目撃`
@@ -548,11 +549,19 @@ function RiskDetails({
             </span>
           )}
         </div>
-      </div>
+        {(isInsufficient || isBuffer) && (
+          <p className="mt-2 text-[11px] leading-relaxed text-amber-900">
+            {isInsufficient &&
+              "環境省の生息域調査に記録なし。近隣の公式目撃も未確認。山間部では基本対策を。"}
+            {isBuffer &&
+              `生息域外の緩衝域。近隣で ${nearbySightings} 件の公式目撃記録あり。`}
+          </p>
+        )}
+      </section>
 
-      {/* 直近の目撃 3 件 */}
+      {/* 2. 直近の目撃 3 件 (常時) */}
       {periodNearbyRecent.length > 0 && (
-        <section>
+        <section className="border-t border-gray-100 px-4 py-3">
           <h3 className="mb-2 text-xs font-semibold text-gray-700">
             🕓 直近の目撃
           </h3>
@@ -560,17 +569,15 @@ function RiskDetails({
             {periodNearbyRecent.slice(0, 3).map((r) => (
               <li
                 key={String(r.id)}
-                className="rounded-lg border border-gray-100 bg-white px-3 py-2 text-xs text-gray-700"
+                className="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700"
               >
                 <div className="mb-0.5 flex items-center justify-between gap-2">
-                  <span className="font-medium text-gray-900">
-                    {r.date}
-                  </span>
+                  <span className="font-medium text-gray-900">{r.date}</span>
                   <span className="shrink-0 text-[10px] text-gray-500">
                     {r.distanceKm.toFixed(1)}km / {r.cityName || "—"}
                   </span>
                 </div>
-                <div className="line-clamp-2 text-[11px] leading-relaxed text-gray-600">
+                <div className="line-clamp-2 text-xs leading-relaxed text-gray-600">
                   {r.comment?.trim() || r.sectionName || "（詳細記載なし）"}
                 </div>
               </li>
@@ -579,82 +586,89 @@ function RiskDetails({
         </section>
       )}
 
-      <div className="flex items-center justify-between text-[11px] text-gray-500">
-        <span>{weatherLabel}</span>
-        <span>
-          {hour}時 / {month}月
-        </span>
-      </div>
+      {/* 3. 自治体からのお知らせ + 要約 (常時) */}
+      <section className="border-t border-gray-100 px-4 py-3">
+        <MunicipalNoticeBox
+          entry={state.municipality}
+          prefCode={state.municipality?.prefCode}
+          lat={state.lat}
+          lon={state.lon}
+          muniName={state.muniName}
+        />
+      </section>
 
-      {isInsufficient && (
-        <div className="rounded-xl bg-gray-50 p-3 text-xs leading-relaxed text-gray-700 ring-1 ring-gray-200">
-          <span className="font-semibold text-gray-900">ℹ️ データ不足:</span>{" "}
-          環境省の生息域調査に記録がなく、近隣 {nearbyRadiusKm}km 以内でも直近の目撃情報を確認できていません。
-          <strong className="mx-1 text-gray-900">「安全」ではなく 5 段階のうち「低い」として暫定表示</strong>
-          しています。山間部では基本対策を推奨します。
-        </div>
-      )}
-      {isBuffer && (
-        <div className="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-900 ring-1 ring-amber-200">
-          <span className="font-semibold">🟠 緩衝域:</span>{" "}
-          このメッシュは環境省の生息域調査には含まれていませんが、
-          近隣 {nearbyRadiusKm}km 以内で {nearbySightings} 件の直近目撃情報があります。
-        </div>
-      )}
-      <RiskCharts
-        mesh={mesh}
-        weather={weather}
-        baseDate={now}
-        nearbyWeightedCount={nearbyWeightedCount}
-        nearbySightings={nearbySightings}
-        nearbyRadiusKm={nearbyRadiusKm}
-        prefCode={state.municipality?.prefCode}
-        elevationM={state.elevationM}
-        slopeDeg={state.slopeDeg}
-        isForest={state.isForest}
-        forestType={state.forestType}
-      />
-
-      <div className="border-t border-gray-100 pt-4">
-        <MunicipalCard entry={state.municipality} lat={state.lat} lon={state.lon} muniName={state.muniName} />
-      </div>
-
-      <div className="border-t border-gray-100 pt-4">
-        <AskBox context={askContext} />
-      </div>
-
-      <details className="rounded-xl bg-gray-50 px-3 py-2 text-xs text-gray-700">
-        <summary className="cursor-pointer font-semibold text-gray-800">
-          スコアの根拠を詳しく見る
-        </summary>
-        <ul className="mt-2 space-y-1">
-          {breakdown.explanation.map((line, idx) => (
-            <li key={idx} className="flex items-start gap-2">
-              <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-gray-400" />
-              <span>{line}</span>
-            </li>
-          ))}
-        </ul>
-      </details>
-
-      <div className="flex flex-wrap items-center gap-2">
+      {/* 4. CTA 行 (常時) */}
+      <section className="border-t border-gray-100 px-4 py-3">
         <Link
           href={`/place?${placeQuery.toString()}`}
-          className="inline-flex h-9 items-center rounded-full bg-amber-600 px-4 text-xs font-semibold text-white hover:bg-amber-700"
+          className="flex h-11 w-full items-center justify-center rounded-full bg-amber-600 text-sm font-semibold text-white hover:bg-amber-700"
         >
-          詳しく見る →
+          📖 もっと詳しく見る
         </Link>
-        <button
-          onClick={onReload}
-          className="rounded-full bg-gray-100 px-3 py-1.5 text-[11px] font-medium text-gray-700 hover:bg-gray-200"
-        >
-          📍 現在地で再計算
-        </button>
-      </div>
+      </section>
 
-      <p className="text-[10px] leading-relaxed text-gray-400">
-        スコアは参考値です。実際のクマの行動は個体差・環境で変わります。
-        必ず自治体の公式情報と合わせてご確認ください。
+      {/* 5. AI に質問 (常時) */}
+      <section className="border-t border-gray-100 px-4 py-3">
+        <AskBox context={askContext} />
+      </section>
+
+      {/* 6. 詳細データ (折り畳み) */}
+      <details className="border-t border-gray-100 group">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          <span>▾ 詳細データ（時間帯・月別・根拠）</span>
+          <span className="text-[10px] text-gray-400 group-open:hidden">
+            タップで展開
+          </span>
+        </summary>
+        <div className="space-y-4 px-4 pb-4">
+          <div className="flex items-center justify-between text-[11px] text-gray-500">
+            <span>{weatherLabel}</span>
+            <span>
+              {hour}時 / {month}月
+            </span>
+          </div>
+
+          <RiskCharts
+            mesh={mesh}
+            weather={weather}
+            baseDate={now}
+            nearbyWeightedCount={nearbyWeightedCount}
+            nearbySightings={nearbySightings}
+            nearbyRadiusKm={nearbyRadiusKm}
+            prefCode={state.municipality?.prefCode}
+            elevationM={state.elevationM}
+            slopeDeg={state.slopeDeg}
+            isForest={state.isForest}
+            forestType={state.forestType}
+          />
+
+          <MunicipalLinks entry={state.municipality} />
+
+          <details className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-700">
+            <summary className="min-h-9 cursor-pointer font-medium text-gray-800">
+              スコアの根拠
+            </summary>
+            <ul className="mt-2 space-y-1">
+              {breakdown.explanation.map((line, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-gray-400" />
+                  <span>{line}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+
+          <button
+            onClick={onReload}
+            className="min-h-9 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+          >
+            📍 現在地で再計算
+          </button>
+        </div>
+      </details>
+
+      <p className="px-4 py-3 text-[10px] leading-relaxed text-gray-400">
+        スコアは参考値です。実際のクマの行動は個体差・環境で変わります。必ず自治体の公式情報と合わせてご確認ください。
       </p>
     </div>
   );
