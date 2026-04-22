@@ -368,7 +368,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
                 他 {nearby.length - 5} 件（
                 <Link
                   className="underline"
-                  href={`/map?lat=${lat}&lon=${lon}&zoom=10`}
+                  href={`/?lat=${lat}&lon=${lon}&zoom=10`}
                 >
                   地図で見る
                 </Link>
@@ -414,7 +414,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-100 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
         <div className="mx-auto flex max-w-xl items-center gap-2">
           <Link
-            href={`/map`}
+            href={`/`}
             className="flex h-10 flex-1 items-center justify-center rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
             🗺️ 地図で見る

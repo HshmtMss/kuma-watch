@@ -1,5 +1,5 @@
-import HomeLanding from "@/components/HomeLanding";
+import KumaClient from "@/components/KumaClient";
 
 export default function HomePage() {
-  return <HomeLanding />;
+  return <KumaClient />;
 }

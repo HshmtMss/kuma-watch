@@ -1,12 +1,10 @@
 import type { NextConfig } from "next";
 
-const MAP_REDIRECT_SLUGS = [
+const SEO_REDIRECT_SLUGS = [
   "bear-map",
   "kuma-map",
   "kumamori-map",
   "kumamorimap",
-];
-const LANDING_REDIRECT_SLUGS = [
   "camping-safety",
   "hiking-safety",
   "mountain-safety",
@@ -21,16 +19,12 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      ...MAP_REDIRECT_SLUGS.map((slug) => ({
-        source: `/${slug}`,
-        destination: "/map",
-        permanent: true,
-      })),
-      ...LANDING_REDIRECT_SLUGS.map((slug) => ({
+      ...SEO_REDIRECT_SLUGS.map((slug) => ({
         source: `/${slug}`,
         destination: "/",
         permanent: true,
       })),
+      { source: "/map", destination: "/", permanent: true },
     ];
   },
   async headers() {

@@ -167,7 +167,7 @@ function SubmitContent() {
             📍 {gpsLoading ? "取得中..." : "現在地を使う"}
           </button>
           <Link
-            href="/map"
+            href="/"
             className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
             🗺️ 地図から選ぶ
