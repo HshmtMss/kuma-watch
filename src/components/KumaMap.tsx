@@ -25,8 +25,12 @@ import {
 
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
+const MESH_LAT_STEP = 2.5 / 60;
+const MESH_LON_STEP = 3.75 / 60;
 const MIN_HEAT_ZOOM = 5;
 const LOW_LEVEL_ZOOM_THRESHOLD = 8;
+const LOD_ZOOM_THRESHOLD = 8; // これ未満で LOD 集約
+const LOD_STEP = 3; // 3×3 セルを 1 ブロックに
 const REDRAW_DEBOUNCE_MS = 180;
 
 function mobileCaps() {
@@ -106,8 +110,106 @@ export default function KumaMap({
       const canvas = L.canvas({ padding: 0.1 });
       const density = sightingDensityRef.current;
       const currentZoom = map.getZoom();
+      const useLOD = currentZoom < LOD_ZOOM_THRESHOLD;
       // ズームアウト時は low (弱い色) を捨てて cap 内で重要セルを確実に描く
       const skipLowLevel = currentZoom < LOW_LEVEL_ZOOM_THRESHOLD;
+      const opacityMap: Record<string, number> = {
+        low: 0.28,
+        moderate: 0.5,
+        elevated: 0.65,
+        high: 0.8,
+      };
+      const RANK: Record<string, number> = {
+        safe: 0,
+        low: 1,
+        moderate: 2,
+        elevated: 3,
+        high: 4,
+      };
+
+      if (useLOD) {
+        // LOD: 3×3 セルを集約。max level を代表値として 1 矩形描く。
+        type LodBucket = {
+          minLat: number;
+          maxLat: number;
+          minLon: number;
+          maxLon: number;
+          maxRank: number;
+          maxLevel: "safe" | "low" | "moderate" | "elevated" | "high";
+        };
+        const buckets = new Map<string, LodBucket>();
+        const latBinSize = MESH_LAT_STEP * LOD_STEP;
+        const lonBinSize = MESH_LON_STEP * LOD_STEP;
+        for (const m of meshes) {
+          if (m.lat < south || m.lat > north) continue;
+          if (m.lon < west || m.lon > east) continue;
+          const direct = calcHistoryScore({
+            second: m.s,
+            sixth: m.x,
+            latest: m.l,
+            latestSingle: m.ls,
+          });
+          const nearby = density?.get(m.m);
+          const { level } = computeSpatialScore({
+            historyDirect: direct,
+            historyNeighbor: m.neighborHistory,
+            sightingWeighted: nearby?.weighted ?? 0,
+          });
+          if (level === "safe" || level === "unknown") continue;
+          if (skipLowLevel && level === "low") continue;
+          const rank = RANK[level];
+          const latBin = Math.floor(m.lat / latBinSize);
+          const lonBin = Math.floor(m.lon / lonBinSize);
+          const key = `${latBin}|${lonBin}`;
+          const b = buckets.get(key);
+          const cellMinLat = m.lat - MESH_LAT_HALF;
+          const cellMaxLat = m.lat + MESH_LAT_HALF;
+          const cellMinLon = m.lon - MESH_LON_HALF;
+          const cellMaxLon = m.lon + MESH_LON_HALF;
+          if (!b) {
+            buckets.set(key, {
+              minLat: cellMinLat,
+              maxLat: cellMaxLat,
+              minLon: cellMinLon,
+              maxLon: cellMaxLon,
+              maxRank: rank,
+              maxLevel: level as LodBucket["maxLevel"],
+            });
+          } else {
+            if (cellMinLat < b.minLat) b.minLat = cellMinLat;
+            if (cellMaxLat > b.maxLat) b.maxLat = cellMaxLat;
+            if (cellMinLon < b.minLon) b.minLon = cellMinLon;
+            if (cellMaxLon > b.maxLon) b.maxLon = cellMaxLon;
+            if (rank > b.maxRank) {
+              b.maxRank = rank;
+              b.maxLevel = level as LodBucket["maxLevel"];
+            }
+          }
+        }
+        let drawn = 0;
+        for (const b of buckets.values()) {
+          const color = RISK_LEVEL_COLOR[b.maxLevel];
+          const opacity = opacityMap[b.maxLevel] ?? 0.5;
+          const rect: Rectangle = L.rectangle(
+            [
+              [b.minLat, b.minLon],
+              [b.maxLat, b.maxLon],
+            ],
+            {
+              stroke: false,
+              fillColor: color,
+              fillOpacity: opacity,
+              interactive: false,
+              renderer: canvas,
+            },
+          );
+          rect.addTo(layer);
+          drawn++;
+          if (drawn >= maxRects) break;
+        }
+        return;
+      }
+
       let drawn = 0;
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
@@ -126,12 +228,6 @@ export default function KumaMap({
         });
         if (level === "safe" || level === "unknown") continue;
         if (skipLowLevel && level === "low") continue;
-        const opacityMap: Record<string, number> = {
-          low: 0.28,
-          moderate: 0.5,
-          elevated: 0.65,
-          high: 0.8,
-        };
         const opacity = opacityMap[level] ?? 0.5;
 
         const color = RISK_LEVEL_COLOR[level];

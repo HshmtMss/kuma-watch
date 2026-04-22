@@ -395,18 +395,21 @@ export function computeSpatialScore(params: {
   let baseline: number;
   let sightingBoost: number;
   if (historyDirect > 0) {
-    // 生息域の中: elevated 起点 (baseline だけでは high には到達しない。
-    // 直近の目撃が加わると high)
-    baseline = 58 + Math.min(15, historyDirect * 0.3);
+    // 生息域の中 (= 山間部/rural の近似): elevated 起点。
+    // 直近の目撃が加わると high。
+    baseline = 55 + Math.min(15, historyDirect * 0.3);
     sightingBoost = Math.min(45, sightingWeighted * 12);
   } else if (historyNeighbor > 0) {
-    // 周辺メッシュに生息記録: moderate 起点
-    baseline = 40 + Math.min(14, historyNeighbor * 0.3);
-    sightingBoost = Math.min(40, sightingWeighted * 12);
+    // 自セルに生息記録なし、周辺 10km に記録のみ
+    //  = 市街地/里山と生息域の境界ゾーン。ユーザーの原則:
+    //    「市街地は危険度が低い」「生息域が近くにあっても市街地は低い」
+    //  → low (青) レンジに留める。目撃が重なったときだけ moderate に。
+    baseline = Math.min(28, historyNeighbor * 0.5);
+    sightingBoost = Math.min(35, sightingWeighted * 10);
   } else {
-    // 生息域外: 都市/平野。目撃がある場合のみ低レベルで色をつける
+    // 生息域外: 都市/平野。目撃がある場合のみ低レベルで色をつける。
     baseline = 0;
-    sightingBoost = Math.min(25, sightingWeighted * 8);
+    sightingBoost = Math.min(20, sightingWeighted * 7);
   }
 
   const score = Math.round(Math.min(100, baseline + sightingBoost));
