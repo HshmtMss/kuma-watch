@@ -307,7 +307,7 @@ export function computeScore(
     : isBufferZone
       ? `履歴（緩衝域）: ${factors.history.toFixed(0)} pts（近隣 ${radius}km 以内の直近目撃 ${opts.nearbySightings ?? 0} 件から推計）`
       : isNeighborHabitat
-        ? `履歴（周辺メッシュ）: ${factors.history.toFixed(0)} pts（自セルは空白だが、周辺 3km 以内の環境省メッシュに生息記録あり）`
+        ? `履歴（周辺メッシュ）: ${factors.history.toFixed(0)} pts（自セルは空白だが、周辺 10km 以内の環境省メッシュに生息記録あり）`
         : `履歴: ${factors.history.toFixed(0)} pts`;
 
   const seasonalLabel = nutCrop.entry && nutCrop.appliesNow && nutCrop.multiplier !== 1
