@@ -391,6 +391,7 @@ export default function KumaClient() {
 
         <RiskPanel
           location={selectedLocation}
+          periodDays={periodDays}
           onPickGps={handleGpsPick}
           onClear={handleClear}
         />

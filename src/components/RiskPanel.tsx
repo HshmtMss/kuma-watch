@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type {
   MeshData,
@@ -10,7 +11,6 @@ import {
   RISK_LEVEL_COLOR,
   RISK_LEVEL_LABEL,
   computeScore,
-  lunarPhase,
 } from "@/lib/score";
 import { latLonToMeshCode, haversineKm } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
@@ -34,6 +34,24 @@ export type SelectedLocation = {
   source: LocationSource;
 };
 
+type NearbyRecent = Pick<
+  KumaRecord,
+  "id" | "date" | "cityName" | "sectionName" | "comment" | "headCount"
+> & { distanceKm: number };
+
+function periodLabelOf(days: number | null): string {
+  if (days === null) return "全期間";
+  if (days >= 365) return "1年";
+  if (days >= 90) return "3ヶ月";
+  if (days >= 30) return "1ヶ月";
+  return "1週間";
+}
+
+function cutoffDate(days: number | null): string | null {
+  if (days === null) return null;
+  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+}
+
 type State =
   | { kind: "idle" }
   | { kind: "loading"; stage: string }
@@ -53,6 +71,9 @@ type State =
       nearbyWeightedCount: number;
       nearbySightings: number;
       nearbyRadiusKm: number;
+      periodDays: number | null;
+      periodNearbyCount: number;
+      periodNearbyRecent: NearbyRecent[];
       elevationM: number | null;
       slopeDeg: number | null;
       isForest: boolean | null;
@@ -107,24 +128,52 @@ async function fetchForest(
 async function fetchNearbyWeighted(
   lat: number,
   lon: number,
+  periodDays: number | null,
   radiusKm: number = NEARBY_RADIUS_KM,
-): Promise<{ count: number; weighted: number }> {
+): Promise<{
+  count: number;
+  weighted: number;
+  periodCount: number;
+  periodRecent: NearbyRecent[];
+}> {
   try {
     const r = await fetch("/api/kuma");
-    if (!r.ok) return { count: 0, weighted: 0 };
+    if (!r.ok)
+      return { count: 0, weighted: 0, periodCount: 0, periodRecent: [] };
     const data = (await r.json()) as { records?: KumaRecord[] };
     const recs = data.records ?? [];
+    const cutoff = cutoffDate(periodDays);
     let count = 0;
     let weighted = 0;
+    let periodCount = 0;
+    const periodHits: NearbyRecent[] = [];
     for (const s of recs) {
       const d = haversineKm(lat, lon, s.lat, s.lon);
       if (d > radiusKm) continue;
       count += 1;
       weighted += Math.exp(-d / NEARBY_DECAY_KM);
+      if (!cutoff || s.date >= cutoff) {
+        periodCount += 1;
+        periodHits.push({
+          id: s.id,
+          date: s.date,
+          cityName: s.cityName,
+          sectionName: s.sectionName,
+          comment: s.comment,
+          headCount: s.headCount,
+          distanceKm: d,
+        });
+      }
     }
-    return { count, weighted };
+    periodHits.sort((a, b) => (a.date > b.date ? -1 : 1));
+    return {
+      count,
+      weighted,
+      periodCount,
+      periodRecent: periodHits.slice(0, 5),
+    };
   } catch {
-    return { count: 0, weighted: 0 };
+    return { count: 0, weighted: 0, periodCount: 0, periodRecent: [] };
   }
 }
 
@@ -175,35 +224,44 @@ function getPosition(): Promise<GeolocationPosition> {
 
 type Props = {
   location: SelectedLocation | null;
+  periodDays: number | null;
   onPickGps: (loc: SelectedLocation) => void;
   onClear: () => void;
 };
 
-export default function RiskPanel({ location, onPickGps, onClear }: Props) {
+export default function RiskPanel({
+  location,
+  periodDays,
+  onPickGps,
+  onClear,
+}: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const [expanded, setExpanded] = useState(false);
 
-  const evaluate = useCallback(async (loc: SelectedLocation) => {
-    try {
-      setState({ kind: "loading", stage: "メッシュを特定中" });
-      const meshCode = latLonToMeshCode(loc.lat, loc.lon);
-      if (!meshCode) {
-        setState({
-          kind: "error",
-          message: "この位置はサービス対象範囲外です（日本域外）",
-        });
-        return;
-      }
+  const evaluate = useCallback(
+    async (loc: SelectedLocation) => {
+      try {
+        setState({ kind: "loading", stage: "メッシュを特定中" });
+        const meshCode = latLonToMeshCode(loc.lat, loc.lon);
+        if (!meshCode) {
+          setExpanded(true);
+          setState({
+            kind: "error",
+            message: "この位置はサービス対象範囲外です（日本域外）",
+          });
+          return;
+        }
 
-      setState({ kind: "loading", stage: "データを取得中" });
-      const [meshes, weather, rev, nearby, elevation, forest] = await Promise.all([
-        loadMeshes(),
-        fetchWeather(loc.lat, loc.lon),
-        reverseGeocode(loc.lat, loc.lon),
-        fetchNearbyWeighted(loc.lat, loc.lon),
-        fetchElevation(loc.lat, loc.lon),
-        fetchForest(loc.lat, loc.lon),
-      ]);
+        setState({ kind: "loading", stage: "データを取得中" });
+        const [meshes, weather, rev, nearby, elevation, forest] =
+          await Promise.all([
+            loadMeshes(),
+            fetchWeather(loc.lat, loc.lon),
+            reverseGeocode(loc.lat, loc.lon),
+            fetchNearbyWeighted(loc.lat, loc.lon, periodDays),
+            fetchElevation(loc.lat, loc.lon),
+            fetchForest(loc.lat, loc.lon),
+          ]);
       const entry = findMeshByCode(meshes, meshCode);
       const mesh: MeshData | null = entry
         ? {
@@ -235,6 +293,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         ? [rev.prefecture, rev.city].filter(Boolean).join(" ")
         : undefined;
 
+      setExpanded(true);
       setState({
         kind: "ready",
         lat: loc.lat,
@@ -250,32 +309,31 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
+        periodDays,
+        periodNearbyCount: nearby.periodCount,
+        periodNearbyRecent: nearby.periodRecent,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
         isForest: forest?.isForest ?? null,
         forestType: forest?.forestType ?? null,
       });
     } catch (err) {
+      setExpanded(true);
       setState({
         kind: "error",
         message: err instanceof Error ? err.message : "評価に失敗しました",
       });
     }
-  }, []);
+  }, [periodDays]);
 
   useEffect(() => {
     if (!location) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing internal state with parent prop clear
       setState({ kind: "idle" });
       return;
     }
     void evaluate(location);
   }, [location, evaluate]);
-
-  useEffect(() => {
-    if (state.kind === "ready" || state.kind === "error") {
-      setExpanded(true);
-    }
-  }, [state.kind]);
 
   const onUseGps = useCallback(async () => {
     setState({ kind: "loading", stage: "位置情報を取得中" });
@@ -295,6 +353,7 @@ export default function RiskPanel({ location, onPickGps, onClear }: Props) {
           : err instanceof Error
             ? err.message
             : "位置情報を取得できませんでした";
+      setExpanded(true);
       setState({ kind: "error", message: msg });
     }
   }, [onPickGps]);
@@ -413,13 +472,30 @@ function RiskDetails({
   state: Extract<State, { kind: "ready" }>;
   onReload: () => void;
 }) {
-  const { breakdown, weather, mesh, placeName, nearbySightings, nearbyRadiusKm, nearbyWeightedCount } = state;
+  const {
+    breakdown,
+    weather,
+    mesh,
+    placeName,
+    nearbySightings,
+    nearbyRadiusKm,
+    nearbyWeightedCount,
+    periodDays,
+    periodNearbyCount,
+    periodNearbyRecent,
+  } = state;
   const now = new Date();
   const hour = now.getHours();
   const month = now.getMonth() + 1;
   const weatherLabel = weather
     ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C`
     : "気象情報なし";
+  const periodLabel = periodLabelOf(periodDays);
+  const placeQuery = new URLSearchParams({
+    lat: state.lat.toFixed(5),
+    lon: state.lon.toFixed(5),
+  });
+  if (placeName) placeQuery.set("name", placeName);
 
   const bearSpecies = state.municipality?.bearSpecies.includes("higuma")
     ? "ヒグマ"
@@ -454,6 +530,55 @@ function RiskDetails({
 
   return (
     <div className="max-h-[70vh] space-y-4 overflow-y-auto border-t border-gray-100 px-4 py-3 text-sm">
+      {/* Headline: 過去◯期間・10km 以内に N 件 */}
+      <div className="-mx-4 -mt-3 border-b border-gray-100 bg-amber-50/60 px-4 py-3">
+        <div className="text-[10px] font-medium uppercase tracking-wider text-amber-700">
+          {periodDays === null
+            ? `半径 ${nearbyRadiusKm}km 以内の目撃`
+            : `過去${periodLabel}・半径 ${nearbyRadiusKm}km 以内の目撃`}
+        </div>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-3xl font-bold tracking-tight text-gray-900">
+            {periodNearbyCount.toLocaleString()}
+          </span>
+          <span className="text-sm text-gray-600">件</span>
+          {periodDays !== null && nearbySightings > periodNearbyCount && (
+            <span className="ml-auto text-[10px] text-gray-500">
+              全期間では {nearbySightings.toLocaleString()} 件
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* 直近の目撃 3 件 */}
+      {periodNearbyRecent.length > 0 && (
+        <section>
+          <h3 className="mb-2 text-xs font-semibold text-gray-700">
+            🕓 直近の目撃
+          </h3>
+          <ul className="space-y-1.5">
+            {periodNearbyRecent.slice(0, 3).map((r) => (
+              <li
+                key={String(r.id)}
+                className="rounded-lg border border-gray-100 bg-white px-3 py-2 text-xs text-gray-700"
+              >
+                <div className="mb-0.5 flex items-center justify-between gap-2">
+                  <span className="font-medium text-gray-900">
+                    {r.date}
+                  </span>
+                  <span className="shrink-0 text-[10px] text-gray-500">
+                    {r.distanceKm.toFixed(1)}km / {r.cityName || "—"}
+                  </span>
+                </div>
+                <div className="line-clamp-2 text-[11px] leading-relaxed text-gray-600">
+                  {r.comment?.trim() || r.sectionName || "（詳細記載なし）"}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <div className="flex items-center justify-between text-[11px] text-gray-500">
         <span>{weatherLabel}</span>
         <span>
@@ -512,7 +637,13 @@ function RiskDetails({
         </ul>
       </details>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          href={`/place?${placeQuery.toString()}`}
+          className="inline-flex h-9 items-center rounded-full bg-amber-600 px-4 text-xs font-semibold text-white hover:bg-amber-700"
+        >
+          詳しく見る →
+        </Link>
         <button
           onClick={onReload}
           className="rounded-full bg-gray-100 px-3 py-1.5 text-[11px] font-medium text-gray-700 hover:bg-gray-200"
