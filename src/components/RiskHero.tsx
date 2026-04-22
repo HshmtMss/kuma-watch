@@ -6,7 +6,6 @@ import { RISK_LEVEL_COLOR, SOFT_LEVEL_LABEL } from "@/lib/score";
 import {
   classifyLocationType,
   LOCATION_TYPE_META,
-  locationVerdict,
 } from "@/lib/location-type";
 import type { SummaryResponse } from "@/app/api/summary/route";
 
@@ -35,10 +34,10 @@ export default function RiskHero({
 }: Props) {
   const locationType = classifyLocationType(elevationM, isForest);
   const meta = LOCATION_TYPE_META[locationType];
-  const verdict = locationVerdict(
-    locationType,
-    level === "unknown" ? "low" : level,
-  );
+  // バーと badge と同じ語彙 (SOFT_LEVEL_LABEL) を使って統一。
+  // 場所タイプ (🌲 山間部 etc.) は別行で提示。
+  const verdict =
+    level === "unknown" ? "計算中..." : SOFT_LEVEL_LABEL[level];
   const activeIdx = LEVELS.indexOf(level);
 
   // LLM 文脈補足: /api/summary の summary フィールドを引く

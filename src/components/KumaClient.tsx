@@ -14,7 +14,7 @@ import KumaMap from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
 import RiskPanel, { type SelectedLocation } from "@/components/RiskPanel";
 import WelcomeOverlay from "@/components/WelcomeOverlay";
-import { RISK_LEVEL_COLOR, RISK_LEVEL_LABEL } from "@/lib/score";
+import { RISK_LEVEL_COLOR, SOFT_LEVEL_LABEL } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
@@ -44,7 +44,13 @@ function getWelcomeServerSnapshot(): boolean {
   return true;
 }
 
-const RISK_LEGEND_ORDER: RiskLevel[] = ["low", "moderate", "elevated", "high"];
+const RISK_LEGEND_ORDER: RiskLevel[] = [
+  "safe",
+  "low",
+  "moderate",
+  "elevated",
+  "high",
+];
 
 type PeriodOption = { label: string; days: number | null };
 const PERIOD_OPTIONS: PeriodOption[] = [
@@ -378,7 +384,7 @@ export default function KumaClient() {
                 onChange={(e) => setShowHeatmap(e.target.checked)}
                 className="h-3 w-3 accent-amber-600"
               />
-              ヒートマップ
+              危険度ヒートマップ
             </label>
             <label className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5">
               <input
@@ -455,7 +461,9 @@ export default function KumaClient() {
               </div>
             </div>
             <div>
-              <div className="mb-0.5 text-[10px] text-gray-500">危険度</div>
+              <div className="mb-0.5 text-[10px] text-gray-500">
+                危険度ヒートマップ
+              </div>
               {RISK_LEGEND_ORDER.map((level) => (
                 <div key={level} className="flex items-center gap-1.5">
                   <span
@@ -465,19 +473,21 @@ export default function KumaClient() {
                       opacity: 0.7,
                     }}
                   />
-                  {RISK_LEVEL_LABEL[level]}
+                  {SOFT_LEVEL_LABEL[level]}
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <RiskPanel
-          location={selectedLocation}
-          periodDays={periodDays}
-          onPickGps={handleGpsPick}
-        />
       </div>
+
+      {/* カードは map の外に、下に押し上げ式で配置 (Google Maps 風) */}
+      <RiskPanel
+        location={selectedLocation}
+        periodDays={periodDays}
+        onPickGps={handleGpsPick}
+      />
 
       {showWelcome && (
         <WelcomeOverlay

@@ -9,8 +9,10 @@ import type {
 } from "@/lib/types";
 import {
   RISK_LEVEL_COLOR,
-  RISK_LEVEL_LABEL,
+  SOFT_LEVEL_LABEL,
   computeScore,
+  computeSpatialScore,
+  calcHistoryScore,
 } from "@/lib/score";
 import { latLonToMeshCode, haversineKm } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
@@ -137,26 +139,36 @@ async function fetchNearbyWeighted(
   count: number;
   weighted: number;
   periodCount: number;
+  periodWeighted: number;
   periodRecent: NearbyRecent[];
 }> {
   try {
     const r = await fetch("/api/kuma");
     if (!r.ok)
-      return { count: 0, weighted: 0, periodCount: 0, periodRecent: [] };
+      return {
+        count: 0,
+        weighted: 0,
+        periodCount: 0,
+        periodWeighted: 0,
+        periodRecent: [],
+      };
     const data = (await r.json()) as { records?: KumaRecord[] };
     const recs = data.records ?? [];
     const cutoff = cutoffDate(periodDays);
     let count = 0;
     let weighted = 0;
     let periodCount = 0;
+    let periodWeighted = 0;
     const periodHits: NearbyRecent[] = [];
     for (const s of recs) {
       const d = haversineKm(lat, lon, s.lat, s.lon);
       if (d > radiusKm) continue;
       count += 1;
-      weighted += Math.exp(-d / NEARBY_DECAY_KM);
+      const w = Math.exp(-d / NEARBY_DECAY_KM);
+      weighted += w;
       if (!cutoff || s.date >= cutoff) {
         periodCount += 1;
+        periodWeighted += w;
         periodHits.push({
           id: s.id,
           date: s.date,
@@ -173,10 +185,17 @@ async function fetchNearbyWeighted(
       count,
       weighted,
       periodCount,
+      periodWeighted,
       periodRecent: periodHits.slice(0, 5),
     };
   } catch {
-    return { count: 0, weighted: 0, periodCount: 0, periodRecent: [] };
+    return {
+      count: 0,
+      weighted: 0,
+      periodCount: 0,
+      periodWeighted: 0,
+      periodRecent: [],
+    };
   }
 }
 
@@ -294,6 +313,21 @@ export default function RiskPanel({
         forestType: forest?.forestType ?? null,
       });
 
+      // 表示される level / score はヒートマップと同じ空間的式で算出する。
+      // ヒートマップ側も期間フィルタ済みの目撃密度を使うため、RiskPanel も
+      // 期間フィルタ済み (periodWeighted) で揃える。
+      // (季節・時間帯・気象などの動的要素は breakdown.factors として詳細側で残す)
+      const directHistory = mesh ? calcHistoryScore(mesh) : 0;
+      const { score: spatialScore, level: spatialLevel } = computeSpatialScore(
+        {
+          historyDirect: directHistory,
+          historyNeighbor: neighborMeshScore,
+          sightingWeighted: nearby.periodWeighted,
+        },
+      );
+      breakdown.score = spatialScore;
+      breakdown.level = spatialLevel;
+
       const municipality =
         findMunicipalityByPrefCode(rev?.prefCode) ??
         findMunicipalityByPrefName(rev?.prefecture);
@@ -372,7 +406,7 @@ export default function RiskPanel({
         className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
         style={{ background: RISK_LEVEL_COLOR[state.breakdown.level] }}
       >
-        {RISK_LEVEL_LABEL[state.breakdown.level]} {state.breakdown.score}
+        {SOFT_LEVEL_LABEL[state.breakdown.level]} {state.breakdown.score}
       </span>
     ) : null;
 
@@ -384,20 +418,16 @@ export default function RiskPanel({
     }
   };
 
-  return (
-    <>
-      {expanded && (
-        <button
-          aria-label="パネルを閉じる"
-          onClick={() => setExpanded(false)}
-          className="pointer-events-auto absolute inset-0 z-[1050] bg-black/20"
-        />
-      )}
+  // 非選択時は何もレンダしない (押し上げ式でマップが全画面を使う)
+  if (state.kind === "idle") return null;
 
-      <div
-        className={`pointer-events-auto absolute inset-x-0 bottom-0 z-[1100] transition-transform duration-200 ease-out sm:left-3 sm:right-auto sm:top-3 sm:bottom-auto sm:w-[360px]`}
-      >
-        <div className="mx-auto w-full max-w-[640px] rounded-t-2xl border border-black/8 bg-white shadow-xl sm:rounded-2xl">
+  return (
+    <div
+      className="shrink-0 border-t border-black/8 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.06)]"
+      role="region"
+      aria-label="選択地点の危険度"
+    >
+      <div className="mx-auto w-full max-w-3xl">
           <div className="flex items-center gap-2 px-3 py-2.5">
             <button
               onClick={handleHeaderClick}
@@ -416,8 +446,6 @@ export default function RiskPanel({
                       : "現在地の危険度"}
                 </div>
                 <div className="truncate text-xs text-gray-500">
-                  {state.kind === "idle" &&
-                    "タップして GPS で評価／地図タップでも評価できます"}
                   {state.kind === "loading" && (
                     <span className="inline-flex items-center gap-1.5">
                       <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
@@ -465,9 +493,8 @@ export default function RiskPanel({
               </button>
             </div>
           )}
-        </div>
       </div>
-    </>
+    </div>
   );
 }
 

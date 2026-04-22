@@ -10,8 +10,18 @@ import type {
   LeafletMouseEvent,
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
-import { computeScore, RISK_LEVEL_COLOR } from "@/lib/score";
-import { loadMeshes, type MeshEntry } from "@/lib/mesh-data";
+import {
+  calcHistoryScore,
+  computeSpatialScore,
+  RISK_LEVEL_COLOR,
+} from "@/lib/score";
+import { loadMeshes } from "@/lib/mesh-data";
+import {
+  augmentMeshesWithNeighborScore,
+  aggregateSightingsPerCell,
+  type AugmentedMeshEntry,
+  type SightingDensity,
+} from "@/lib/neighbor-habitat";
 
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
@@ -49,7 +59,8 @@ export default function KumaMap({
   const pinLayerRef = useRef<LayerGroup | null>(null);
   const selectionLayerRef = useRef<LayerGroup | null>(null);
   const popupRef = useRef<Popup | null>(null);
-  const meshDataRef = useRef<MeshEntry[] | null>(null);
+  const meshDataRef = useRef<AugmentedMeshEntry[] | null>(null);
+  const sightingDensityRef = useRef<Map<string, SightingDensity> | null>(null);
   const recordsRef = useRef<KumaRecord[]>(records);
   const showHeatmapRef = useRef(showHeatmap);
   const onMapClickRef = useRef(onMapClick);
@@ -91,21 +102,34 @@ export default function KumaMap({
       const west = bounds.getWest() - MESH_LON_HALF;
       const east = bounds.getEast() + MESH_LON_HALF;
 
-      const now = new Date();
       const canvas = L.canvas({ padding: 0.1 });
+      const density = sightingDensityRef.current;
       let drawn = 0;
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
         if (m.lon < west || m.lon > east) continue;
-        const { score, level } = computeScore(
-          { second: m.s, sixth: m.x, latest: m.l, latestSingle: m.ls },
-          now,
-          null,
-        );
-        if (level === "safe") continue;
+        const direct = calcHistoryScore({
+          second: m.s,
+          sixth: m.x,
+          latest: m.l,
+          latestSingle: m.ls,
+        });
+        const nearby = density?.get(m.m);
+        const { level } = computeSpatialScore({
+          historyDirect: direct,
+          historyNeighbor: m.neighborHistory,
+          sightingWeighted: nearby?.weighted ?? 0,
+        });
+        if (level === "safe" || level === "unknown") continue;
+        const opacityMap: Record<string, number> = {
+          low: 0.28,
+          moderate: 0.5,
+          elevated: 0.65,
+          high: 0.8,
+        };
+        const opacity = opacityMap[level] ?? 0.5;
 
         const color = RISK_LEVEL_COLOR[level];
-        const opacity = Math.min(0.55, 0.15 + score / 200);
         const rect: Rectangle = L.rectangle(
           [
             [m.lat - MESH_LAT_HALF, m.lon - MESH_LON_HALF],
@@ -222,6 +246,13 @@ export default function KumaMap({
   useEffect(() => {
     recordsRef.current = records;
     renderPinLayer();
+    // 危険度ヒートマップ用に、records 変化のたびに密度を再集計
+    const meshes = meshDataRef.current;
+    if (meshes) {
+      sightingDensityRef.current = aggregateSightingsPerCell(records, meshes);
+      renderMeshLayer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [records]);
 
   useEffect(() => {
@@ -308,10 +339,29 @@ export default function KumaMap({
         if (cb) cb(e.latlng.lat, e.latlng.lng);
       });
 
+      // コンテナサイズ変化 (カードの押し上げ・折り畳み等) を検知して地図を再描画
+      if (typeof ResizeObserver !== "undefined") {
+        const ro = new ResizeObserver(() => {
+          map.invalidateSize();
+        });
+        ro.observe(el);
+        // cleanup via closure reference
+        const prevCleanup = cancelled;
+        void prevCleanup;
+      }
+
       loadMeshes()
         .then((meshes) => {
           if (cancelled) return;
-          meshDataRef.current = meshes;
+          // 周辺メッシュの履歴を距離減衰で事前計算し、危険度ヒートマップの
+          // 穴 (自セル空白だが周囲は生息域) を埋める
+          const augmented = augmentMeshesWithNeighborScore(meshes);
+          meshDataRef.current = augmented;
+          // 現在読み込み済みの records がある場合、密度も集計しておく
+          sightingDensityRef.current = aggregateSightingsPerCell(
+            recordsRef.current,
+            augmented,
+          );
           renderMeshLayer();
         })
         .catch(() => {});
