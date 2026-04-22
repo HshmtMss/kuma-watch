@@ -10,7 +10,7 @@ import {
 } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const SUMMARY_CACHE_SECONDS = 21600;
 
@@ -106,9 +106,8 @@ async function callGemini(
     const body = {
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.3,
         maxOutputTokens: 1024,
-        thinkingConfig: { thinkingBudget: 0 },
+        thinkingConfig: { thinkingLevel: "low" },
       },
     };
     const r = await fetch(url, {

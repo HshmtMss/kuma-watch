@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { buildAggregateContext, formatAggregateForPrompt } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 type AskPayload = {
@@ -37,9 +37,8 @@ async function callGemini(
       },
       contents: [{ role: "user", parts: [{ text: userText }] }],
       generationConfig: {
-        temperature: 0.3,
         maxOutputTokens: 1024,
-        thinkingConfig: { thinkingBudget: 0 },
+        thinkingConfig: { thinkingLevel: "low" },
       },
     };
     const r = await fetch(url, {
