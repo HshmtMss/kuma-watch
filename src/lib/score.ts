@@ -90,6 +90,8 @@ export type ScoreOptions = {
   nearbyWeightedCount?: number;
   nearbySightings?: number;
   nearbyRadiusKm?: number;
+  /** 周辺 (既定 3km) の環境省メッシュの生息記録を距離減衰で取り込んだ上限値 */
+  neighborMeshScore?: number;
   prefCode?: string;
   bearStatus?: "present" | "rare" | "extinct" | "absent" | null;
   elevationM?: number | null;
@@ -213,9 +215,12 @@ export function computeScore(
 
   const directHistory = mesh ? calcHistoryScore(mesh) : 0;
   const bufferHistory = bufferHistoryFromNearby(opts.nearbyWeightedCount ?? 0);
-  const historyScore = Math.max(directHistory, bufferHistory);
+  const neighborHistory = opts.neighborMeshScore ?? 0;
+  const historyScore = Math.max(directHistory, bufferHistory, neighborHistory);
   const isInsideHabitat = directHistory > 0;
   const isBufferZone = !isInsideHabitat && bufferHistory > 0;
+  const isNeighborHabitat =
+    !isInsideHabitat && !isBufferZone && neighborHistory > 0;
 
   const baseSeasonal = calcSeasonalScore(month);
   const nutCrop = nutCropMultiplier(opts.prefCode, month, now);
@@ -299,7 +304,11 @@ export function computeScore(
 
   const historyLabel = isInsideHabitat
     ? `履歴（生息域）: ${factors.history.toFixed(0)} pts（最新調査 ${mesh?.latest ?? 0} / 第6回 ${mesh?.sixth ?? 0} / 第2回 ${mesh?.second ?? 0}）`
-    : `履歴（緩衝域）: ${factors.history.toFixed(0)} pts（近隣 ${radius}km 以内の直近目撃 ${opts.nearbySightings ?? 0} 件から推計）`;
+    : isBufferZone
+      ? `履歴（緩衝域）: ${factors.history.toFixed(0)} pts（近隣 ${radius}km 以内の直近目撃 ${opts.nearbySightings ?? 0} 件から推計）`
+      : isNeighborHabitat
+        ? `履歴（周辺メッシュ）: ${factors.history.toFixed(0)} pts（自セルは空白だが、周辺 3km 以内の環境省メッシュに生息記録あり）`
+        : `履歴: ${factors.history.toFixed(0)} pts`;
 
   const seasonalLabel = nutCrop.entry && nutCrop.appliesNow && nutCrop.multiplier !== 1
     ? `季節: ${factors.seasonal.toFixed(0)} pts（${month}月 × 堅果類 ${NUT_CROP_LABEL[nutCrop.entry.level]} ×${nutCrop.multiplier.toFixed(2)}）`

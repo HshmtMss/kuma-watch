@@ -14,6 +14,7 @@ import {
 } from "@/lib/score";
 import { latLonToMeshCode, haversineKm } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
+import { computeNeighborMeshScore } from "@/lib/neighbor-habitat";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import {
@@ -273,12 +274,19 @@ export default function RiskPanel({
             latestSingle: entry.ls,
           }
         : null;
+      const neighborMeshScore = computeNeighborMeshScore(
+        meshes,
+        loc.lat,
+        loc.lon,
+        meshCode,
+      );
 
       const dataSource = findSourceByPrefCode(rev?.prefCode ?? "");
       const breakdown = computeScore(mesh, new Date(), weather, {
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
         nearbyRadiusKm: NEARBY_RADIUS_KM,
+        neighborMeshScore,
         prefCode: rev?.prefCode,
         bearStatus: dataSource?.bearStatus ?? null,
         elevationM: elevation.elevationM,

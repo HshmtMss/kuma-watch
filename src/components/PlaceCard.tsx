@@ -18,6 +18,7 @@ import {
 import { latLonToMeshCode } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { haversineKm } from "@/lib/mesh";
+import { computeNeighborMeshScore } from "@/lib/neighbor-habitat";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
 import {
   findMunicipalityByPrefName,
@@ -191,11 +192,18 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         }
       }
       const nearbyCountWithin10 = near.filter((r) => r.distanceKm <= 10).length;
+      const neighborMeshScore = computeNeighborMeshScore(
+        meshes,
+        lat,
+        lon,
+        meshCode,
+      );
       const dataSource = findSourceByPrefCode(rev?.prefCode ?? "");
       const score = computeScore(mData, new Date(), w, {
         nearbyWeightedCount: nearbyWeighted,
         nearbySightings: nearbyCountWithin10,
         nearbyRadiusKm: 10,
+        neighborMeshScore,
         prefCode: rev?.prefCode,
         bearStatus: dataSource?.bearStatus ?? null,
         elevationM: elevation.elevationM,
