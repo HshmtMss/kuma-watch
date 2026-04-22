@@ -423,9 +423,33 @@ function buildAichiAggregate(): PrefectureAggregate {
 }
 
 // ---------------------------------------------------------------------------
-// 長野県 seed (R8 4月前半速報、今後 R7 月別 PDF 追加予定)
-// 出典: https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf
+// 長野県 seed (R7 全年月別 + R7 市町村別 + R8 4月前半速報)
+// R7: 県公式 月別目撃情報 PDF 12 本から手動集計 (2,346 件 / 71 市町村)
+// R8: 417-mokugeki1.pdf (令和8年4月17日現在) 30 件
 // ---------------------------------------------------------------------------
+const NAGANO_R7_MONTHLY: Record<number, number> = {
+  // fiscalYear 2025 = 令和7年度 (2025/4 〜 2026/3)
+  4: 46, 5: 137, 6: 402, 7: 351, 8: 342, 9: 302,
+  10: 366, 11: 293, 12: 82, 1: 8, 2: 6, 3: 11,
+};
+// R7 市町村別件数（月別 PDF 12 本を集計）。0 件の市町村は省略。
+const NAGANO_R7_MUNI: Array<[string, number]> = [
+  ["大町市", 288], ["長野市", 199], ["軽井沢町", 131], ["安曇野市", 102], ["信濃町", 102],
+  ["王滝村", 96], ["塩尻市", 90], ["木曽町", 86], ["松本市", 82], ["小谷村", 70],
+  ["飯田市", 68], ["上松町", 55], ["高山村", 54], ["上田市", 51], ["飯山市", 49],
+  ["木島平村", 49], ["山ノ内町", 46], ["南木曽町", 46], ["小川村", 42], ["栄村", 41],
+  ["須坂市", 38], ["辰野町", 37], ["中野市", 37], ["大桑村", 29], ["高森町", 27],
+  ["白馬村", 25], ["中川村", 24], ["阿智村", 23], ["朝日村", 22], ["松川町", 22],
+  ["木祖村", 20], ["富士見町", 19], ["伊那市", 19], ["飯綱町", 18], ["佐久市", 16],
+  ["大鹿村", 16], ["野沢温泉村", 15], ["松川村", 15], ["千曲市", 14], ["泰阜村", 14],
+  ["喬木村", 13], ["生坂村", 12], ["小諸市", 11], ["岡谷市", 11], ["池田町", 10],
+  ["駒ヶ根市", 9], ["下條村", 8], ["坂城町", 8], ["箕輪町", 8], ["筑北村", 7],
+  ["御代田町", 6], ["天龍村", 5], ["長和町", 4], ["小布施町", 4], ["阿南町", 3],
+  ["諏訪市", 3], ["飯島町", 3], ["麻績村", 3], ["根羽村", 3], ["青木村", 3],
+  ["小海町", 2], ["宮田村", 2], ["茅野市", 2], ["南牧村", 2], ["東御市", 1],
+  ["下諏訪町", 1], ["南箕輪村", 1], ["豊丘村", 1], ["佐久穂町", 1], ["立科町", 1],
+  ["原村", 1],
+];
 const NAGANO_R8_EARLY_MUNI: Array<[string, number]> = [
   ["大町市", 2], ["高山村", 2], ["南木曽町", 1], ["長野市", 4], ["軽井沢町", 2],
   ["山ノ内町", 1], ["安曇野市", 3], ["白馬村", 2], ["塩尻市", 2], ["信濃町", 4],
@@ -437,12 +461,26 @@ function buildNaganoAggregate(): PrefectureAggregate {
   const prefName = "長野県";
   const annual: MunicipalAggregate[] = [
     {
+      id: "nagano-pref-2025",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 2346 }, // R7 年計
+    },
+    {
       id: "nagano-pref-2026-early",
       prefCode, prefName,
       period: { fiscalYear: 2026, month: 4 },
       counts: { sighting: 30 }, // R8 4月1〜17日速報
     },
   ];
+  for (const [muni, n] of NAGANO_R7_MUNI) {
+    annual.push({
+      id: `nagano-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
   for (const [muni, n] of NAGANO_R8_EARLY_MUNI) {
     annual.push({
       id: `nagano-${muni}-2026-early`,
@@ -451,14 +489,32 @@ function buildNaganoAggregate(): PrefectureAggregate {
       counts: { sighting: n },
     });
   }
+  const monthly: MunicipalAggregate[] = Object.entries(NAGANO_R7_MONTHLY).map(([m, n]) => ({
+    id: `nagano-pref-2025-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2025, month: Number(m) },
+    counts: { sighting: n },
+  }));
   return {
-    prefCode, prefName, annual,
-    sources: [{
-      url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf",
-      label: "ツキノワグマ出没（目撃）情報（令和8年4月17日現在）",
-      retrievedAt: "2026-04-21",
-    }],
-    notes: "県公式『けものおと2』アプリ連携の月次リスト。R8 は 4/1〜4/17 の初期 30 件のみ確定。R7 全体集計は月別 PDF 12 本に分散。県全域で年数千件規模の推計",
+    prefCode, prefName, annual, monthly,
+    sources: [
+      {
+        url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/kuma-map.html",
+        label: "長野県 ツキノワグマ情報マップ（PDF 一覧）",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf",
+        label: "ツキノワグマ出没（目撃）情報（令和8年4月17日現在）",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/20260331-mokugeki.pdf",
+        label: "令和7年度 月別目撃情報（4月〜3月 各月 PDF）",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "県公式『けものおと2』アプリ連携の月次リスト。R7 (2025/4〜2026/3) は月別 PDF 12 本を集計して 2,346 件・71 市町村。最多は大町市 288 件、長野市 199 件、軽井沢町 131 件。R8 は 4/1〜4/17 の初期 30 件のみ確定",
   };
 }
 
@@ -542,6 +598,396 @@ function buildHyogoAggregate(): PrefectureAggregate {
 }
 
 // ---------------------------------------------------------------------------
+// 大阪府 seed (R7 4-12月速報 + R6 年計、北摂中心)
+// 出典: https://www.pref.osaka.lg.jp/o120140/doubutu/yaseidoubutu/shutsubotsu_r7.html
+// ---------------------------------------------------------------------------
+const OSAKA_R7_MUNI: Array<[string, number]> = [
+  ["能勢町", 8], ["豊能町", 8], ["島本町", 3], ["高槻市", 2],
+  ["茨木市", 1], ["池田市", 1], ["泉南市", 1], ["泉佐野市", 1],
+];
+const OSAKA_R7_MONTHLY: Record<number, number> = {
+  4: 1, 5: 1, 6: 1, 7: 2, 8: 5, 9: 5, 10: 3, 11: 6, 12: 1,
+};
+
+function buildOsakaAggregate(): PrefectureAggregate {
+  const prefCode = "27";
+  const prefName = "大阪府";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "osaka-pref-2025",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 25 }, // R7 2026-12-11 時点速報
+    },
+    {
+      id: "osaka-pref-2024",
+      prefCode, prefName,
+      period: { fiscalYear: 2024 },
+      counts: { sighting: 19 },
+    },
+  ];
+  for (const [muni, n] of OSAKA_R7_MUNI) {
+    annual.push({
+      id: `osaka-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = Object.entries(OSAKA_R7_MONTHLY).map(([m, n]) => ({
+    id: `osaka-pref-2025-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2025, month: Number(m) },
+    counts: { sighting: n },
+  }));
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [{
+      url: "https://www.pref.osaka.lg.jp/o120140/doubutu/yaseidoubutu/shutsubotsu_r7.html",
+      label: "大阪府 令和7年度 市街地周辺における野生動物の出没情報",
+      retrievedAt: "2026-04-21",
+    }],
+    notes: "府内に恒常的な生息地なし、隣接府県（京都・兵庫・奈良）からの流入個体。能勢町・豊能町の北摂地域が出没の 7 割近くを占める",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 鳥取県 seed (R7 月別・地域別・市町別 + R1-R6 年計)
+// 出典:
+//   https://www.pref.tottori.lg.jp/item/1143816.htm
+//   https://www.pref.tottori.lg.jp/secure/1370084/monthly_bear_sightings.pdf
+//   https://www.pref.tottori.lg.jp/secure/1143816/R8.3.31kuma.pdf
+// ---------------------------------------------------------------------------
+const TOTTORI_ANNUAL: Record<number, number> = {
+  2019: 260, 2020: 234, 2021: 156, 2022: 104,
+  2023: 164, 2024: 272, 2025: 95,
+};
+const TOTTORI_R7_MONTHLY: Record<number, number> = {
+  4: 3, 5: 7, 6: 8, 7: 20, 8: 14, 9: 6, 10: 14, 11: 12, 12: 7, 1: 2, 2: 1, 3: 1,
+};
+const TOTTORI_R7_REGION: Array<[string, number]> = [
+  ["東部", 57], ["中部", 7], ["西部", 31],
+];
+// 市町村別 (R8.3.31 付の一覧 PDF 76 件を集計)
+const TOTTORI_R7_MUNI: Array<[string, number]> = [
+  ["鳥取市", 19], ["岩美町", 13], ["大山町", 10], ["伯耆町", 6], ["若桜町", 6],
+  ["日南町", 5], ["江府町", 4], ["三朝町", 4], ["南部町", 3], ["米子市", 2],
+  ["湯梨浜町", 2], ["八頭町", 1], ["智頭町", 1],
+];
+
+function buildTottoriAggregate(): PrefectureAggregate {
+  const prefCode = "31";
+  const prefName = "鳥取県";
+  const annual: MunicipalAggregate[] = [];
+  for (const [fyStr, n] of Object.entries(TOTTORI_ANNUAL)) {
+    annual.push({
+      id: `tottori-pref-${fyStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: Number(fyStr) },
+      counts: { sighting: n },
+    });
+  }
+  for (const [muni, n] of TOTTORI_R7_MUNI) {
+    annual.push({
+      id: `tottori-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  for (const [region, n] of TOTTORI_R7_REGION) {
+    annual.push({
+      id: `tottori-${region}-2025`,
+      prefCode, prefName, muniName: region,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = Object.entries(TOTTORI_R7_MONTHLY).map(([m, n]) => ({
+    id: `tottori-pref-2025-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2025, month: Number(m) },
+    counts: { sighting: n },
+  }));
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [
+      {
+        url: "https://www.pref.tottori.lg.jp/item/1143816.htm",
+        label: "鳥取県 クマ出没情報",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.tottori.lg.jp/secure/1370084/monthly_bear_sightings.pdf",
+        label: "ツキノワグマ出没件数の推移 (R1-R7 年度別・月別・地域別)",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.tottori.lg.jp/secure/1143816/R8.3.31kuma.pdf",
+        label: "令和7(2025)年度 クマ目撃・痕跡情報一覧",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "西中国地域個体群に属し絶滅危惧。地域 3 区分（東部・中部・西部）は県組織の総合事務所管轄。R6 は 272 件と増加、R7 は 95 件でやや落ち着き。市町村別は一覧 PDF 76 件からの近似",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 山口県 seed (R6 確定市町月別 + 歴史年計、R7 はまだ未確定)
+// 出典:
+//   https://www.pref.yamaguchi.lg.jp/soshiki/41/20698.html
+//   https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208249.xlsx (過去月別)
+//   https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208250.xlsx (R6 市町月別)
+// ---------------------------------------------------------------------------
+const YAMAGUCHI_ANNUAL: Record<number, { sighting: number; capture: number }> = {
+  2024: { sighting: 799, capture: 89 }, // R6
+  2023: { sighting: 444, capture: 63 }, // R5
+  2022: { sighting: 254, capture: 40 }, // R4
+  2021: { sighting: 339, capture: 60 }, // R3
+  2020: { sighting: 366, capture: 55 }, // R2
+  2019: { sighting: 231, capture: 40 }, // R1
+};
+const YAMAGUCHI_R6_MONTHLY: Record<number, number> = {
+  4: 22, 5: 71, 6: 91, 7: 65, 8: 68, 9: 130, 10: 226, 11: 93, 12: 20, 1: 5, 2: 6, 3: 2,
+};
+const YAMAGUCHI_R6_MUNI: Array<[string, number]> = [
+  ["岩国市", 252], ["周南市", 199], ["山口市", 116], ["萩市", 63],
+  ["長門市", 40], ["柳井市", 26], ["下松市", 19], ["下関市", 19],
+  ["光市", 15], ["防府市", 10], ["阿武町", 10], ["美祢市", 8],
+  ["宇部市", 7], ["田布施町", 6], ["平生町", 5], ["山陽小野田市", 2],
+  ["和木町", 2],
+];
+const YAMAGUCHI_R8_EARLY_MUNI: Array<[string, number]> = [
+  ["岩国市", 7], ["周南市", 3], ["山口市", 1], ["長門市", 1],
+];
+
+function buildYamaguchiAggregate(): PrefectureAggregate {
+  const prefCode = "35";
+  const prefName = "山口県";
+  const annual: MunicipalAggregate[] = [];
+  for (const [fyStr, counts] of Object.entries(YAMAGUCHI_ANNUAL)) {
+    annual.push({
+      id: `yamaguchi-pref-${fyStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: Number(fyStr) },
+      counts: { sighting: counts.sighting, capture: counts.capture },
+    });
+  }
+  annual.push({
+    id: "yamaguchi-pref-2026-early",
+    prefCode, prefName,
+    period: { fiscalYear: 2026, month: 4 },
+    counts: { sighting: 12 }, // R8 4月17日時点
+  });
+  for (const [muni, n] of YAMAGUCHI_R6_MUNI) {
+    annual.push({
+      id: `yamaguchi-${muni}-2024`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2024 },
+      counts: { sighting: n },
+    });
+  }
+  for (const [muni, n] of YAMAGUCHI_R8_EARLY_MUNI) {
+    annual.push({
+      id: `yamaguchi-${muni}-2026-early`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2026, month: 4 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = Object.entries(YAMAGUCHI_R6_MONTHLY).map(([m, n]) => ({
+    id: `yamaguchi-pref-2024-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2024, month: Number(m) },
+    counts: { sighting: n },
+  }));
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [
+      {
+        url: "https://www.pref.yamaguchi.lg.jp/soshiki/41/20698.html",
+        label: "山口県 ツキノワグマによる被害を防ぐために (自然保護課)",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208249.xlsx",
+        label: "過去からの月別クマ目撃情報 (H9-R6)",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208250.xlsx",
+        label: "令和6年度 市町別・月別クマ目撃情報",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.yamaguchi.lg.jp/site/police/212182.html",
+        label: "YPくまっぷ（山口県警察）",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "西中国地域個体群、絶滅危惧。岩国・周南・山口・萩を中心に県内広域分布。R6 (2024) 799 件は過去最多級。R7 (2025) は県警 YPくまっぷで公開、集計 PDF は未公表",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 徳島県 seed (四国個体群、年間数件レベル)
+// 出典: https://www.pref.tokushima.lg.jp/ippannokata/kurashi/shizen/7241461/
+// ---------------------------------------------------------------------------
+const TOKUSHIMA_ANNUAL: Record<number, number> = {
+  2025: 7, 2024: 7, 2023: 2, 2022: 2, 2021: 1,
+};
+
+function buildTokushimaAggregate(): PrefectureAggregate {
+  const prefCode = "36";
+  const prefName = "徳島県";
+  const annual: MunicipalAggregate[] = [];
+  for (const [fyStr, n] of Object.entries(TOKUSHIMA_ANNUAL)) {
+    annual.push({
+      id: `tokushima-pref-${fyStr}`,
+      prefCode, prefName,
+      period: { fiscalYear: Number(fyStr) },
+      counts: { sighting: n },
+    });
+  }
+  // 主な出没市町村 (R7 記載分): 美馬市、那賀郡那賀町、三好市
+  for (const muni of ["美馬市", "那賀町", "三好市"]) {
+    annual.push({
+      id: `tokushima-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: {},
+      band: "数件",
+    });
+  }
+  return {
+    prefCode, prefName, annual,
+    sources: [
+      {
+        url: "https://www.pref.tokushima.lg.jp/ippannokata/kurashi/shizen/7241461/",
+        label: "徳島県 【目撃情報あり】ツキノワグマについて",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.tokushima.lg.jp/file/attachment/1015220.pdf",
+        label: "令和7年度改正 徳島県ツキノワグマ対応指針",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "四国個体群（徳島・高知の剣山系中心、推定 20 数頭、絶滅危惧）。年間 1〜7 件と極少。捕獲時は学習放獣対応。美馬市木屋平・那賀町・三好市等で目撃",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 静岡県 seed (R7 県公式 PDF 200件全件リスト + R6 156件)
+// 出典:
+//   https://www.pref.shizuoka.jp/kurashikankyo/shizenkankyo/wild/1017680.html
+//   https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/r7kumamap.pdf
+// ---------------------------------------------------------------------------
+const SHIZUOKA_R7_MONTHLY: Record<number, number> = {
+  4: 7, 5: 4, 6: 13, 7: 21, 8: 16, 9: 8, 10: 38, 11: 43, 12: 30, 1: 11, 2: 4, 3: 5,
+};
+const SHIZUOKA_R7_MUNI: Array<[string, number]> = [
+  ["富士宮市", 48], ["静岡市清水区", 41], ["静岡市葵区", 36],
+  ["浜松市天竜区", 24], ["川根本町", 15], ["浜松市浜名区", 11],
+  ["裾野市", 8], ["御殿場市", 5], ["小山町", 4], ["富士市", 2],
+  ["森町", 1], ["静岡市駿河区", 1], ["掛川市", 1],
+  ["菊川市", 1], ["熱海市", 1], ["函南町", 1],
+];
+
+function buildShizuokaAggregate(): PrefectureAggregate {
+  const prefCode = "22";
+  const prefName = "静岡県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "shizuoka-pref-2025",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 200 },
+    },
+    {
+      id: "shizuoka-pref-2024",
+      prefCode, prefName,
+      period: { fiscalYear: 2024 },
+      counts: { sighting: 156 },
+    },
+  ];
+  for (const [muni, n] of SHIZUOKA_R7_MUNI) {
+    annual.push({
+      id: `shizuoka-${muni}-2025`,
+      prefCode, prefName, muniName: muni,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: n },
+    });
+  }
+  const monthly: MunicipalAggregate[] = Object.entries(SHIZUOKA_R7_MONTHLY).map(([m, n]) => ({
+    id: `shizuoka-pref-2025-${m}`,
+    prefCode, prefName,
+    period: { fiscalYear: 2025, month: Number(m) },
+    counts: { sighting: n },
+  }));
+  return {
+    prefCode, prefName, annual, monthly,
+    sources: [
+      {
+        url: "https://www.pref.shizuoka.jp/kurashikankyo/shizenkankyo/wild/1017680.html",
+        label: "静岡県のツキノワグマ（県自然保護課）",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/r7kumamap.pdf",
+        label: "令和7年度 静岡県ツキノワグマ目撃情報（全200件）",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/r6kuma.pdf",
+        label: "令和6年度 クマ出没マップ（全156件）",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "県 HP 上では R5 以降の全件リストを PDF 公開（地図＋通し番号）。R7 200 件、R6 156 件。富士宮市・静岡市（葵区・清水区）・浜松市天竜区の 4 市で全体の 3/4 を占める。10〜12 月が月次ピーク",
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 茨城県 seed (R7 単発目撃 1 件、9 年ぶり)
+// 出典: https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/tsukinowagumamokugeki.html
+// ---------------------------------------------------------------------------
+function buildIbarakiAggregate(): PrefectureAggregate {
+  const prefCode = "08";
+  const prefName = "茨城県";
+  const annual: MunicipalAggregate[] = [
+    {
+      id: "ibaraki-pref-2025",
+      prefCode, prefName,
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 1 }, // 大子町高柴 2025-06-02 1 件
+    },
+    {
+      id: "ibaraki-大子町-2025",
+      prefCode, prefName, muniName: "大子町",
+      period: { fiscalYear: 2025 },
+      counts: { sighting: 1 },
+    },
+  ];
+  return {
+    prefCode, prefName, annual,
+    sources: [
+      {
+        url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/tsukinowagumamokugeki.html",
+        label: "大子町高柴におけるツキノワグマの目撃情報について",
+        retrievedAt: "2026-04-21",
+      },
+      {
+        url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/documents/kumakanri_honbun.pdf",
+        label: "茨城県ツキノワグマ管理計画（令和7年3月）",
+        retrievedAt: "2026-04-21",
+      },
+    ],
+    notes: "県内に恒常的生息地なし。2025-06-02 大子町高柴で 2016 年以来 9 年ぶりの確定目撃（ドラレコ映像）。県は R7.3 に第二種特定鳥獣管理計画を策定し定着防止方針",
+  };
+}
+
+// ---------------------------------------------------------------------------
 export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildIwateAggregate(),
   buildFukuiAggregate(),
@@ -551,6 +997,12 @@ export const PREFECTURE_AGGREGATES: PrefectureAggregate[] = [
   buildAichiAggregate(),
   buildNaganoAggregate(),
   buildHyogoAggregate(),
+  buildOsakaAggregate(),
+  buildTottoriAggregate(),
+  buildYamaguchiAggregate(),
+  buildTokushimaAggregate(),
+  buildIbarakiAggregate(),
+  buildShizuokaAggregate(),
 ];
 
 export function findPrefectureAggregate(prefCode: string): PrefectureAggregate | undefined {
