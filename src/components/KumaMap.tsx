@@ -17,7 +17,7 @@ import {
 } from "@/lib/score";
 import { loadMeshes } from "@/lib/mesh-data";
 import {
-  augmentMeshesWithNeighborScore,
+  buildDangerGrid,
   aggregateSightingsPerCell,
   type AugmentedMeshEntry,
   type SightingDensity,
@@ -353,14 +353,14 @@ export default function KumaMap({
       loadMeshes()
         .then((meshes) => {
           if (cancelled) return;
-          // 周辺メッシュの履歴を距離減衰で事前計算し、危険度ヒートマップの
-          // 穴 (自セル空白だが周囲は生息域) を埋める
-          const augmented = augmentMeshesWithNeighborScore(meshes);
-          meshDataRef.current = augmented;
-          // 現在読み込み済みの records がある場合、密度も集計しておく
+          // 危険度グリッド: 環境省メッシュ + 穴に synthetic セルを補完、
+          // 全セルに neighborHistory を付ける (原則: 生息域が近ければ
+          // 調査データがなくても危険)
+          const grid = buildDangerGrid(meshes);
+          meshDataRef.current = grid;
           sightingDensityRef.current = aggregateSightingsPerCell(
             recordsRef.current,
-            augmented,
+            grid,
           );
           renderMeshLayer();
         })
