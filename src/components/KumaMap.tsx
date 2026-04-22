@@ -25,15 +25,16 @@ import {
 
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
-const MIN_HEAT_ZOOM = 6;
+const MIN_HEAT_ZOOM = 5;
+const LOW_LEVEL_ZOOM_THRESHOLD = 8;
 const REDRAW_DEBOUNCE_MS = 180;
 
 function mobileCaps() {
-  if (typeof window === "undefined") return { maxRects: 4000, maxPins: 1200 };
+  if (typeof window === "undefined") return { maxRects: 10000, maxPins: 1200 };
   const narrow = window.innerWidth < 768;
   return narrow
-    ? { maxRects: 1500, maxPins: 500 }
-    : { maxRects: 4000, maxPins: 1500 };
+    ? { maxRects: 4000, maxPins: 500 }
+    : { maxRects: 10000, maxPins: 1500 };
 }
 
 type Props = {
@@ -104,6 +105,9 @@ export default function KumaMap({
 
       const canvas = L.canvas({ padding: 0.1 });
       const density = sightingDensityRef.current;
+      const currentZoom = map.getZoom();
+      // ズームアウト時は low (弱い色) を捨てて cap 内で重要セルを確実に描く
+      const skipLowLevel = currentZoom < LOW_LEVEL_ZOOM_THRESHOLD;
       let drawn = 0;
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
@@ -121,6 +125,7 @@ export default function KumaMap({
           sightingWeighted: nearby?.weighted ?? 0,
         });
         if (level === "safe" || level === "unknown") continue;
+        if (skipLowLevel && level === "low") continue;
         const opacityMap: Record<string, number> = {
           low: 0.28,
           moderate: 0.5,
