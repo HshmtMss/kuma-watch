@@ -137,16 +137,40 @@ export default function KumaClient() {
     setSelectedLocation({ lat: hit.lat, lon: hit.lon, source: "tap" });
   }, []);
 
+  // 期間チップに連動して /api/kuma を再フェッチ。
+  // periodCutoff が null (= 全期間) のときは from 指定なし、上限 25,000 件まで取得。
   useEffect(() => {
-    fetch("/api/kuma")
+    let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag before external fetch
+    setLoading(true);
+    // 期間ごとに必要な件数を取る。短期間は軽く、全期間は最大まで。
+    const limit =
+      periodDays === null
+        ? 100000
+        : periodDays >= 365
+          ? 50000
+          : periodDays >= 90
+            ? 15000
+            : periodDays >= 30
+              ? 5000
+              : 2000;
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (periodCutoff) params.set("from", periodCutoff);
+    fetch(`/api/kuma?${params.toString()}`)
       .then((r) => r.json())
       .then((data: { records?: KumaRecord[]; total?: number }) => {
+        if (cancelled) return;
         setRecords(Array.isArray(data.records) ? data.records : []);
         setTotal(typeof data.total === "number" ? data.total : 0);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [periodCutoff, periodDays]);
 
   // GPS 自動取得: 既に welcomed 済み (= 2 回目以降の訪問) のときだけ mount 時に走らせる。
   // 初訪問はオーバーレイから明示的に "現在地で見る" を押させる。

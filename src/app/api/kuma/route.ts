@@ -17,7 +17,7 @@ export type KumaRecord = {
 };
 
 const DEFAULT_LIMIT = 8000;
-const MAX_LIMIT = 25000;
+const MAX_LIMIT = 100000;
 
 function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
   return {
