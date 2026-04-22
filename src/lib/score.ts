@@ -86,6 +86,16 @@ function calcTimeBonus(hour: number): number {
   return isBearActiveHour(hour) ? 10 : 0;
 }
 
+/** 怖がらせ語を避けた行動志向のレベル表記 (UI 用) */
+export const SOFT_LEVEL_LABEL: Record<RiskLevel, string> = {
+  safe: "基本対策で OK",
+  low: "少し意識して",
+  moderate: "しっかり対策を",
+  elevated: "入山は慎重に",
+  high: "極めて警戒",
+  unknown: "データ取得中",
+};
+
 export type ScoreOptions = {
   nearbyWeightedCount?: number;
   nearbySightings?: number;

@@ -9,12 +9,7 @@ import type {
   ScoreBreakdown,
   WeatherSnapshot,
 } from "@/lib/types";
-import {
-  RISK_LEVEL_COLOR,
-  RISK_LEVEL_LABEL,
-  computeScore,
-  lunarPhase,
-} from "@/lib/score";
+import { computeScore, lunarPhase } from "@/lib/score";
 import { latLonToMeshCode } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { haversineKm } from "@/lib/mesh";
@@ -30,6 +25,7 @@ import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
 import MunicipalLinks from "@/components/MunicipalLinks";
 import RiskCharts from "@/components/RiskCharts";
 import AskBox from "@/components/AskBox";
+import RiskHero from "@/components/RiskHero";
 
 type Props = {
   lat: number;
@@ -138,8 +134,10 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
   const [mesh, setMesh] = useState<MeshData | null>(null);
   const [weather, setWeather] = useState<WeatherSnapshot | null>(null);
   const [nearby, setNearby] = useState<NearbySighting[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [municipal, setMunicipal] = useState<MunicipalEntry | undefined>(undefined);
+  const [elevationM, setElevationM] = useState<number | null>(null);
+  const [isForest, setIsForest] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -184,6 +182,8 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         : null;
       setMesh(mData);
       setWeather(w);
+      setElevationM(elevation.elevationM);
+      setIsForest(forest?.isForest ?? null);
 
       let nearbyWeighted = 0;
       for (const r of near) {
@@ -222,8 +222,6 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
     };
   }, [lat, lon, initialName, name]);
 
-  const levelColor = breakdown ? RISK_LEVEL_COLOR[breakdown.level] : "#9ca3af";
-  const levelLabel = breakdown ? RISK_LEVEL_LABEL[breakdown.level] : "読み込み中";
   const now = new Date();
   const hour = now.getHours();
   const { name: lunarName } = lunarPhase(now);
@@ -296,41 +294,25 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         </div>
       </div>
 
-      {/* 2. Risk hero */}
-      <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-        <div
-          className="flex items-center gap-4 p-5"
-          style={{
-            background: `linear-gradient(135deg, ${levelColor}22 0%, #ffffff 100%)`,
-          }}
-        >
-          <div
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-white shadow-lg"
-            style={{ background: levelColor }}
-          >
-            <div className="text-center">
-              <div className="text-xl font-bold leading-none">
-                {breakdown?.score ?? "—"}
-              </div>
-              <div className="mt-0.5 text-[9px] opacity-90">/ 100</div>
-            </div>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-lg font-bold" style={{ color: levelColor }}>
-              {levelLabel}
-            </div>
-            <div className="mt-0.5 text-[11px] text-gray-500">
-              {loading
-                ? "計算中..."
-                : mesh
-                  ? "生息域内"
-                  : nearby.length > 0
-                    ? "生息域外（近隣目撃あり）"
-                    : "生息域外（観測データ不足）"}
-            </div>
-          </div>
+      {/* 2. Risk hero (場所タイプ × 柔らか判定 × LLM 補足) */}
+      {breakdown ? (
+        <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+          <RiskHero
+            level={breakdown.level}
+            score={breakdown.score}
+            elevationM={elevationM}
+            isForest={isForest}
+            prefCode={municipal?.prefCode}
+            lat={lat}
+            lon={lon}
+            muniName={city}
+          />
         </div>
-      </div>
+      ) : (
+        <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 text-sm text-gray-500">
+          計算中...
+        </div>
+      )}
 
       {/* 3. 件数 headline */}
       <section className="mb-4 rounded-2xl bg-amber-50/70 p-4">

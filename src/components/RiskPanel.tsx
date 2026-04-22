@@ -28,6 +28,7 @@ import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
 import MunicipalLinks from "@/components/MunicipalLinks";
 import RiskCharts from "@/components/RiskCharts";
 import AskBox from "@/components/AskBox";
+import RiskHero from "@/components/RiskHero";
 
 export type LocationSource = "gps" | "tap";
 export type SelectedLocation = {
@@ -539,7 +540,19 @@ function RiskDetails({
 
   return (
     <div className="max-h-[75vh] overflow-y-auto border-t border-gray-100 text-sm">
-      {/* 1. 件数 headline (常時) */}
+      {/* 1. 場所タイプ × 柔らか判定 × LLM 補足 (常時) */}
+      <RiskHero
+        level={breakdown.level}
+        score={breakdown.score}
+        elevationM={state.elevationM}
+        isForest={state.isForest}
+        prefCode={state.municipality?.prefCode}
+        lat={state.lat}
+        lon={state.lon}
+        muniName={state.muniName}
+      />
+
+      {/* 2. 件数 headline (常時) */}
       <section className="bg-amber-50/70 px-4 py-3">
         <div className="text-[10px] font-medium uppercase tracking-wider text-amber-700">
           {periodDays === null

@@ -50,10 +50,12 @@ export default function MunicipalNoticeBox({
 
   if (!code) return null;
 
+  if (!summary && !loading) return null;
+
   return (
     <div>
       {summary && summary.notices.length > 0 && (
-        <div className="mb-3">
+        <div>
           <div className="mb-1.5 text-xs font-semibold text-gray-700">
             📰 自治体からのお知らせ
           </div>
@@ -88,18 +90,7 @@ export default function MunicipalNoticeBox({
       {loading && !summary && (
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-          自治体情報を取得中...
-        </div>
-      )}
-
-      {summary?.summary && (
-        <div className="rounded-lg bg-blue-50/60 p-3 text-sm leading-relaxed text-gray-800">
-          {summary.summary}
-          {summary.mode === "demo" && (
-            <span className="ml-1 rounded bg-amber-100 px-1 py-0.5 text-[9px] font-bold text-amber-800">
-              demo
-            </span>
-          )}
+          お知らせを取得中...
         </div>
       )}
     </div>
