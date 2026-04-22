@@ -27,6 +27,7 @@ export default function MunicipalCard({ entry, lat, lon, muniName }: Props) {
   useEffect(() => {
     if (!entry) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag before external fetch
     setLoadingSummary(true);
     const params = new URLSearchParams({ prefCode: entry.prefCode });
     if (typeof lat === "number" && Number.isFinite(lat)) params.set("lat", lat.toFixed(5));
@@ -68,6 +69,39 @@ export default function MunicipalCard({ entry, lat, lon, muniName }: Props) {
           {speciesLabel}
         </span>
       </div>
+
+      {summary?.notices && summary.notices.length > 0 && (
+        <div className="mb-3 rounded-lg bg-white p-3 ring-1 ring-blue-100">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-blue-700">
+            📰 直近のお知らせ
+          </div>
+          <ul className="space-y-1.5">
+            {summary.notices.map((n, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2 text-xs text-gray-800"
+              >
+                <span className="shrink-0 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-800">
+                  {n.date}
+                </span>
+                <span className="min-w-0 flex-1 leading-relaxed">
+                  {n.headline}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {summary.sourceUrls[0] && (
+            <a
+              href={summary.sourceUrls[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-[10px] text-blue-600 hover:underline"
+            >
+              公式ページで全ての情報を見る →
+            </a>
+          )}
+        </div>
+      )}
 
       {loadingSummary ? (
         <div className="mb-3 flex items-center gap-2 text-xs text-gray-500">

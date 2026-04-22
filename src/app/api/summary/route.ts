@@ -14,10 +14,16 @@ const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const SUMMARY_CACHE_SECONDS = 21600;
 
+export type Notice = {
+  date: string; // YYYY-MM-DD or YYYY-MM もしくは原文の日付表記
+  headline: string;
+};
+
 export type SummaryResponse = {
   prefCode: string;
   prefName: string;
   summary: string;
+  notices: Notice[];
   sourceUrls: string[];
   fetchedAt: string;
   mode: "llm" | "demo";
@@ -107,6 +113,25 @@ async function callGemini(
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
         maxOutputTokens: 1024,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            notices: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  date: { type: "string" },
+                  headline: { type: "string" },
+                },
+                required: ["date", "headline"],
+              },
+            },
+            summary: { type: "string" },
+          },
+          required: ["notices", "summary"],
+        },
         thinkingConfig: { thinkingLevel: "low" },
       },
     };
@@ -159,8 +184,12 @@ function buildPromptFromAggregate(
 3. 点記録が0件でも集計があれば積極的に引用する。
 4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
 
-制約: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。
-最後に "（${prefName}公式資料より KumaWatch が要約）" を付けること。
+制約:
+- summary: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。最後に "（${prefName}公式資料より KumaWatch が要約）" を付けること。
+- notices: 公式サイト原文から**日付が明記されているお知らせのみ**抽出し、直近の 3 件を配列で返す。
+  - date は元の表記から YYYY-MM-DD（不明箇所は YYYY-MM または原文表記）に整形。
+  - headline は 40 文字以内で 1 行要約。
+  - 日付付きのお知らせが無ければ空配列を返すこと（推測で埋めない）。
 
 対象地域: ${prefName}
 
@@ -194,10 +223,11 @@ function buildPrompt(
 4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
 
 制約:
-- 3 文以内、日本語
-- 過度に恐怖を煽らず冷静で実用的な表現
-- 具体的な対策を 1 つ含めること
-- 最後に "（${entry.prefNameJa}公式サイトより KumaWatch が要約）" を付けること
+- summary: 3 文以内、日本語、過度に恐怖を煽らず冷静で実用的、具体的な対策を 1 つ含める。最後に "（${entry.prefNameJa}公式サイトより KumaWatch が要約）" を付けること。
+- notices: 公式サイト原文から**日付が明記されているお知らせのみ**抽出し、直近の 3 件を配列で返す。
+  - date は元の表記から YYYY-MM-DD（不明箇所は YYYY-MM または原文表記）に整形。
+  - headline は 40 文字以内で 1 行要約。
+  - 日付付きのお知らせが無ければ空配列を返すこと（推測で埋めない）。
 
 対象地域: ${entry.prefNameJa}
 対象クマ種: ${species}
@@ -265,6 +295,7 @@ export async function GET(req: Request) {
       prefCode,
       prefName,
       summary: buildDemoSummary(entry, nearby, aggregate, prefName),
+      notices: [],
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
@@ -286,6 +317,7 @@ export async function GET(req: Request) {
       prefCode,
       prefName,
       summary: buildDemoSummary(entry, nearby, aggregate, prefName),
+      notices: [],
       sourceUrls,
       fetchedAt: new Date().toISOString(),
       mode: "demo",
@@ -304,11 +336,14 @@ export async function GET(req: Request) {
     : buildPromptFromAggregate(prefName, pageText, nearby, aggregate);
   const llmText = await callGemini(apiKey, prompt);
 
-  const summary = llmText ?? buildDemoSummary(entry, nearby, aggregate, prefName);
+  const parsed = parseSummaryJson(llmText);
+  const summary = parsed?.summary ?? llmText ?? buildDemoSummary(entry, nearby, aggregate, prefName);
+  const notices = parsed?.notices ?? [];
   const res: SummaryResponse = {
     prefCode,
     prefName,
     summary,
+    notices,
     sourceUrls,
     fetchedAt: new Date().toISOString(),
     mode: llmText ? "llm" : "demo",
@@ -323,4 +358,32 @@ export async function GET(req: Request) {
       "Cache-Control": `public, max-age=${SUMMARY_CACHE_SECONDS}, s-maxage=${SUMMARY_CACHE_SECONDS}`,
     },
   });
+}
+
+function parseSummaryJson(
+  text: string | null,
+): { summary: string; notices: Notice[] } | null {
+  if (!text) return null;
+  try {
+    const raw = JSON.parse(text) as unknown;
+    if (typeof raw !== "object" || raw === null) return null;
+    const obj = raw as { summary?: unknown; notices?: unknown };
+    const summary = typeof obj.summary === "string" ? obj.summary : "";
+    const rawNotices = Array.isArray(obj.notices) ? obj.notices : [];
+    const notices: Notice[] = rawNotices
+      .map((n) => {
+        if (typeof n !== "object" || n === null) return null;
+        const r = n as { date?: unknown; headline?: unknown };
+        if (typeof r.date !== "string" || typeof r.headline !== "string") return null;
+        const headline = r.headline.trim();
+        const date = r.date.trim();
+        if (!headline || !date) return null;
+        return { date, headline } satisfies Notice;
+      })
+      .filter((n): n is Notice => n !== null)
+      .slice(0, 3);
+    return { summary, notices };
+  } catch {
+    return null;
+  }
 }
