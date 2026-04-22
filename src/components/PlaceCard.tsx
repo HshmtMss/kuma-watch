@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import type { GeocodeHit } from "@/app/api/geocode/route";
@@ -127,6 +128,7 @@ async function fetchNearbySightings(
 }
 
 export default function PlaceCard({ lat, lon, initialName, src }: Props) {
+  const router = useRouter();
   const [name, setName] = useState(initialName ?? "");
   const [prefecture, setPrefecture] = useState<string | undefined>(undefined);
   const [city, setCity] = useState<string | undefined>(undefined);
@@ -275,13 +277,19 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
     <div className="mx-auto w-full max-w-xl px-4 pb-24 pt-3">
       {/* 1. Header */}
       <div className="mb-4 flex items-center gap-2">
-        <Link
-          href="/"
+        <button
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push("/");
+            }
+          }}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm hover:bg-gray-50"
           aria-label="戻る"
         >
           ←
-        </Link>
+        </button>
         <div className="min-w-0 flex-1">
           <div className="truncate text-base font-bold text-gray-900">
             {src === "gps" && !name ? "現在地" : name || "地点情報"}

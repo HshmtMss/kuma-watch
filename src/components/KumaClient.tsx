@@ -19,6 +19,8 @@ import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
 const WELCOME_STORAGE_KEY = "kumaWatch.welcomed.v1";
+const LAST_LOCATION_KEY = "kumaWatch.lastLocation";
+const LAST_PERIOD_KEY = "kumaWatch.lastPeriodDays";
 
 function subscribeWelcome(cb: () => void): () => void {
   if (typeof window === "undefined") return () => {};
@@ -172,8 +174,67 @@ export default function KumaClient() {
     };
   }, [periodCutoff, periodDays]);
 
+  // sessionStorage 復元: /place などから戻ってきたときに選択地点と期間を復活させる
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    if (typeof window === "undefined") return;
+    try {
+      const rawLoc = window.sessionStorage.getItem(LAST_LOCATION_KEY);
+      if (rawLoc) {
+        const parsed = JSON.parse(rawLoc) as SelectedLocation;
+        if (
+          parsed &&
+          typeof parsed.lat === "number" &&
+          typeof parsed.lon === "number"
+        ) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect -- restoring from session
+          setSelectedLocation(parsed);
+        }
+      }
+      const rawPeriod = window.sessionStorage.getItem(LAST_PERIOD_KEY);
+      if (rawPeriod !== null) {
+        const val = rawPeriod === "null" ? null : Number(rawPeriod);
+        if (val === null || Number.isFinite(val)) setPeriod(val);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [setPeriod]);
+
+  // sessionStorage 保存: 変化を追って保存する
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (selectedLocation) {
+        window.sessionStorage.setItem(
+          LAST_LOCATION_KEY,
+          JSON.stringify(selectedLocation),
+        );
+      } else {
+        window.sessionStorage.removeItem(LAST_LOCATION_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.sessionStorage.setItem(
+        LAST_PERIOD_KEY,
+        periodDays === null ? "null" : String(periodDays),
+      );
+    } catch {
+      // ignore
+    }
+  }, [periodDays]);
+
   // GPS 自動取得: 既に welcomed 済み (= 2 回目以降の訪問) のときだけ mount 時に走らせる。
   // 初訪問はオーバーレイから明示的に "現在地で見る" を押させる。
+  // 復元された selectedLocation があれば GPS は不要なので skip。
   const autoGpsRanRef = useRef(false);
   useEffect(() => {
     if (autoGpsRanRef.current) return;
@@ -181,6 +242,8 @@ export default function KumaClient() {
     if (!navigator.geolocation) return;
     // 直接 snapshot を読んで "初訪問フラグが無い" = "このセッションで overlay を出した" 場合は skip
     if (!getWelcomeSnapshot()) return;
+    // 復元済みならそのポイントを優先、GPS は走らせない
+    if (window.sessionStorage.getItem(LAST_LOCATION_KEY)) return;
     autoGpsRanRef.current = true;
     let cancelled = false;
     navigator.geolocation.getCurrentPosition(
