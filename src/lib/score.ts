@@ -369,6 +369,50 @@ export function toRiskLevel(score: number): RiskLevel {
   return "safe";
 }
 
+/**
+ * 空間的な危険度のみのスコア (0-100)。
+ * ヒートマップのセル色と per-point RiskPanel の 5 段階表示で共通に使う。
+ * 季節・時間帯・気象などの動的要素は含めない (それらは RiskHero の補足文・
+ * 詳細 RiskCharts 側で説明)。
+ *
+ * 設計方針:
+ * - 環境省メッシュに記録がある = その地域にクマが生息している (= 山中/rural の近似)
+ *   → 目撃ゼロでも baseline を 60+ に置いて「常に注意」な見た目にする
+ * - 周辺 10km に記録のみ = 生息域の隣接 transition zone
+ *   → baseline 40+ の moderate 起点
+ * - 記録なし + 隣接もなし = 都市中心/平野部 (市街地)
+ *   → 目撃が来ない限り safe のまま
+ * - 目撃加重 (直近期間内) は上乗せ。生息域内では重視、市街地では
+ *   news event 扱いで軽めに (過度な警戒を避ける)
+ */
+export function computeSpatialScore(params: {
+  historyDirect: number;
+  historyNeighbor: number;
+  sightingWeighted: number;
+}): { score: number; level: RiskLevel } {
+  const { historyDirect, historyNeighbor, sightingWeighted } = params;
+
+  let baseline: number;
+  let sightingBoost: number;
+  if (historyDirect > 0) {
+    // 生息域の中: elevated 起点 (baseline だけでは high には到達しない。
+    // 直近の目撃が加わると high)
+    baseline = 58 + Math.min(15, historyDirect * 0.3);
+    sightingBoost = Math.min(45, sightingWeighted * 12);
+  } else if (historyNeighbor > 0) {
+    // 周辺メッシュに生息記録: moderate 起点
+    baseline = 40 + Math.min(14, historyNeighbor * 0.3);
+    sightingBoost = Math.min(40, sightingWeighted * 12);
+  } else {
+    // 生息域外: 都市/平野。目撃がある場合のみ低レベルで色をつける
+    baseline = 0;
+    sightingBoost = Math.min(25, sightingWeighted * 8);
+  }
+
+  const score = Math.round(Math.min(100, baseline + sightingBoost));
+  return { score, level: toRiskLevel(score) };
+}
+
 export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   safe: "安全",
   low: "低い",
