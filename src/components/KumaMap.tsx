@@ -244,7 +244,23 @@ export default function KumaMap({
     if (!map || !selectedLocation) return;
     const { lat, lon } = selectedLocation;
     const targetZoom = Math.max(map.getZoom(), 10);
-    map.flyTo([lat, lon], targetZoom, { duration: 0.8 });
+    // シート/サイドパネルで隠れないように地図中心をずらす:
+    //   モバイル (<640px): シートが下にあるので、ピンを画面上部に寄せる
+    //   デスクトップ: サイドパネルが左にあるので、ピンを画面右寄りに寄せる
+    const isMobile =
+      typeof window !== "undefined" ? window.innerWidth < 640 : false;
+    const offsetX = isMobile ? 0 : 180;
+    const offsetY = isMobile
+      ? -Math.round((typeof window !== "undefined" ? window.innerHeight : 800) * 0.35)
+      : 0;
+    if (offsetX !== 0 || offsetY !== 0) {
+      const pinPx = map.project([lat, lon], targetZoom);
+      const centerPx = pinPx.subtract([offsetX, offsetY]);
+      const centerLatLng = map.unproject(centerPx, targetZoom);
+      map.flyTo(centerLatLng, targetZoom, { duration: 0.8 });
+    } else {
+      map.flyTo([lat, lon], targetZoom, { duration: 0.8 });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLocation?.lat, selectedLocation?.lon, selectedLocation?.source]);
 

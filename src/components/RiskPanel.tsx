@@ -229,14 +229,12 @@ type Props = {
   location: SelectedLocation | null;
   periodDays: number | null;
   onPickGps: (loc: SelectedLocation) => void;
-  onClear: () => void;
 };
 
 export default function RiskPanel({
   location,
   periodDays,
   onPickGps,
-  onClear,
 }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const [expanded, setExpanded] = useState(false);
@@ -444,12 +442,10 @@ export default function RiskPanel({
             </button>
             {(state.kind === "ready" || state.kind === "error") && (
               <button
-                onClick={() => {
-                  setExpanded(false);
-                  onClear();
-                }}
+                onClick={() => setExpanded(false)}
                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-                aria-label="クリア"
+                aria-label="閉じる"
+                title="閉じる (ピンは残ります / 別の地点をタップすると切り替え)"
               >
                 ×
               </button>

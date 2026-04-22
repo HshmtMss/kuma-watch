@@ -131,10 +131,6 @@ export default function KumaClient() {
     setSelectedLocation(loc);
   }, []);
 
-  const handleClear = useCallback(() => {
-    setSelectedLocation(null);
-  }, []);
-
   const handleSearchPick = useCallback((hit: GeocodeHit) => {
     setSelectedLocation({ lat: hit.lat, lon: hit.lon, source: "tap" });
   }, []);
@@ -480,7 +476,6 @@ export default function KumaClient() {
           location={selectedLocation}
           periodDays={periodDays}
           onPickGps={handleGpsPick}
-          onClear={handleClear}
         />
       </div>
 
