@@ -5,6 +5,8 @@ import { fetchGifuSightings } from "./gifu";
 import { fetchHigumapSightings } from "./higumap";
 import { fetchKemonoteSightings } from "./kemonote";
 import { fetchKmlSightings } from "./kml";
+import { fetchLlmHtmlSightings } from "./llm-html";
+import { fetchPdfLlmSightings } from "./pdf-llm";
 import type { UnifiedSighting } from "./types";
 
 export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
@@ -14,6 +16,8 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   const higumap = DATA_SOURCES.filter((s) => s.extractor === "higumap-api");
   const gifu = DATA_SOURCES.filter((s) => s.extractor === "direct-shapefile-zip");
   const kemonote = DATA_SOURCES.filter((s) => s.extractor === "kemonote-api");
+  const llmHtml = DATA_SOURCES.filter((s) => s.extractor === "llm-html");
+  const llmPdf = DATA_SOURCES.filter((s) => s.extractor === "llm-pdf");
 
   const results = await Promise.all([
     ...arcgis.map((s) => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
@@ -22,6 +26,8 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
     ...higumap.map((s) => fetchHigumapSightings(s).catch(() => [] as UnifiedSighting[])),
     ...gifu.map((s) => fetchGifuSightings(s).catch(() => [] as UnifiedSighting[])),
     ...kemonote.map((s) => fetchKemonoteSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...llmHtml.map((s) => fetchLlmHtmlSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...llmPdf.map((s) => fetchPdfLlmSightings(s).catch(() => [] as UnifiedSighting[])),
   ]);
 
   const merged: UnifiedSighting[] = [];

@@ -1,4 +1,4 @@
-export type SightingSourceKind = "sharp9110" | "arcgis" | "csv";
+export type SightingSourceKind = "sharp9110" | "arcgis" | "csv" | "llm-html";
 
 export type UnifiedSighting = {
   id: string;
