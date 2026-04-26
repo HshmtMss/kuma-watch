@@ -8,10 +8,10 @@
   ],
   "functions": {
     "src/app/api/kuma/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     },
     "src/app/api/cron/refresh/route.ts": {
-      "maxDuration": 300
+      "maxDuration": 60
     }
   }
 }
