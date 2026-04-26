@@ -337,7 +337,10 @@ export async function GET(req: Request) {
   const llmText = await callGemini(apiKey, prompt);
 
   const parsed = parseSummaryJson(llmText);
-  const summary = parsed?.summary ?? llmText ?? buildDemoSummary(entry, nearby, aggregate, prefName);
+  // LLM が JSON parse に失敗した場合 (llmText が生文字列) はそのまま出すと
+  // 中カッコや notices 配列が UI に漏れる。必ず buildDemoSummary にフォールバックする。
+  const summary =
+    parsed?.summary?.trim() || buildDemoSummary(entry, nearby, aggregate, prefName);
   const notices = parsed?.notices ?? [];
   const res: SummaryResponse = {
     prefCode,

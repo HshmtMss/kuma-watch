@@ -36,7 +36,10 @@ const DEFAULT_SUGGESTIONS = [
   "クマに会ったらどうすればいい？",
 ];
 
-export default function AskBox({ context, suggestions = DEFAULT_SUGGESTIONS }: Props) {
+export default function AskBox({
+  context,
+  suggestions = DEFAULT_SUGGESTIONS,
+}: Props) {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
   const [log, setLog] = useState<QaItem[]>([]);
@@ -57,7 +60,15 @@ export default function AskBox({ context, suggestions = DEFAULT_SUGGESTIONS }: P
         setError(data.error ?? "質問の送信に失敗しました");
         return;
       }
-      setLog((prev) => [...prev, { question, answer: data.answer, mode: data.mode, note: data.note }]);
+      setLog((prev) => [
+        ...prev,
+        {
+          question,
+          answer: data.answer,
+          mode: data.mode,
+          note: data.note,
+        },
+      ]);
       setQ("");
     } catch {
       setError("ネットワークエラーが発生しました");
@@ -68,8 +79,6 @@ export default function AskBox({ context, suggestions = DEFAULT_SUGGESTIONS }: P
 
   return (
     <div className="space-y-2">
-      <div className="text-[13px] font-semibold text-gray-900">💬 この場所について聞く</div>
-
       {log.map((item, i) => (
         <div key={i} className="space-y-1.5">
           <div className="rounded-xl rounded-tr-sm bg-amber-100 px-3 py-2 text-sm text-amber-900">
@@ -85,7 +94,9 @@ export default function AskBox({ context, suggestions = DEFAULT_SUGGESTIONS }: P
               )}
             </div>
             <div className="leading-relaxed">{item.answer}</div>
-            {item.note && <div className="mt-1 text-[10px] text-gray-400">{item.note}</div>}
+            {item.note && (
+              <div className="mt-1 text-[10px] text-gray-400">{item.note}</div>
+            )}
           </div>
         </div>
       ))}
@@ -127,7 +138,7 @@ export default function AskBox({ context, suggestions = DEFAULT_SUGGESTIONS }: P
           onChange={(e) => setQ(e.target.value.slice(0, 200))}
           placeholder="自由に質問する..."
           disabled={loading}
-          className="h-10 flex-1 rounded-full border border-gray-200 bg-white px-4 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100 disabled:opacity-60"
+          className="h-10 flex-1 rounded-full border border-gray-300 bg-white px-4 text-sm text-gray-900 placeholder:text-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-100 disabled:opacity-60"
         />
         <button
           type="submit"

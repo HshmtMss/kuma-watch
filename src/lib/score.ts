@@ -86,14 +86,27 @@ function calcTimeBonus(hour: number): number {
   return isBearActiveHour(hour) ? 10 : 0;
 }
 
-/** 怖がらせ語を避けた行動志向のレベル表記 (UI 用) */
+/** 対策を一言で伝える verdict (RiskHero の大きな文字用)。
+ *  怖がらせすぎず、段階的に対策を促すトーンに統一。
+ *  safe は行動指示なし (「安全」のまま)。 */
 export const SOFT_LEVEL_LABEL: Record<RiskLevel, string> = {
-  safe: "基本対策で OK",
-  low: "少し意識して",
-  moderate: "しっかり対策を",
-  elevated: "入山は慎重に",
-  high: "極めて警戒",
+  safe: "安全",
+  low: "念のため注意",
+  moderate: "基本対策を",
+  elevated: "対策を強化",
+  high: "しっかり対策を",
   unknown: "データ取得中",
+};
+
+/** 段階別の一行説明 (Flutter くまもりマップと同じスタイルの状況説明)。
+ *  「クマ出没危険度」を説明する文章なので、それ自体が何のレベルかをすぐ把握できる。 */
+export const LEVEL_DESCRIPTION: Record<RiskLevel, string> = {
+  safe: "出没報告のない地域です",
+  low: "報告は少ない地域ですが念のため注意",
+  moderate: "定期的に出没報告がある地域です",
+  elevated: "最近の出没報告がある地域です",
+  high: "頻繁に出没報告がある地域です",
+  unknown: "情報を取得中です",
 };
 
 export type ScoreOptions = {
@@ -294,8 +307,6 @@ export function computeScore(
       explanation: [
         "この地域は環境省の生息域調査に記録がなく、近隣にも直近の目撃情報が確認できていません。",
         `地形: ${factors.terrain} pts（${terrainLabel(opts.elevationM)}${tdetails.length ? " / " + tdetails.join(" / ") : ""}）`,
-        "データ不足のため、5 段階のうち「低い」を暫定的に表示しています。",
-        "「安全」を意味するものではありません。山間部・里山では基本対策を推奨します。",
       ],
     };
   }
@@ -370,49 +381,47 @@ export function toRiskLevel(score: number): RiskLevel {
 }
 
 /**
- * 空間的な危険度のみのスコア (0-100)。
- * ヒートマップのセル色と per-point RiskPanel の 5 段階表示で共通に使う。
- * 季節・時間帯・気象などの動的要素は含めない (それらは RiskHero の補足文・
- * 詳細 RiskCharts 側で説明)。
+ * 5 段階判定のしきい値 (安全→低い→中程度→やや高い→高い の 4 境界)。
+ * 入力は calcHistoryScore の戻り値 (0-50 の範囲) に対応。
+ * 初期値は公開版 Flutter くまもりマップと同じ: [0, 20, 40, 50]
  *
- * 設計方針:
- * - 環境省メッシュに記録がある = その地域にクマが生息している (= 山中/rural の近似)
- *   → 目撃ゼロでも baseline を 60+ に置いて「常に注意」な見た目にする
- * - 周辺 10km に記録のみ = 生息域の隣接 transition zone
- *   → baseline 40+ の moderate 起点
- * - 記録なし + 隣接もなし = 都市中心/平野部 (市街地)
- *   → 目撃が来ない限り safe のまま
- * - 目撃加重 (直近期間内) は上乗せ。生息域内では重視、市街地では
- *   news event 扱いで軽めに (過度な警戒を避ける)
+ *   score < thresholds[0] → safe
+ *   score < thresholds[1] → low
+ *   score < thresholds[2] → moderate
+ *   score < thresholds[3] → elevated
+ *   else                  → high
+ */
+export type LevelThresholds = readonly [number, number, number, number];
+export const DEFAULT_LEVEL_THRESHOLDS: LevelThresholds = [0, 20, 40, 50];
+
+export function kumamoriLevel(
+  historyScore: number,
+  thresholds: LevelThresholds = DEFAULT_LEVEL_THRESHOLDS,
+): RiskLevel {
+  if (historyScore <= thresholds[0]) return "safe";
+  if (historyScore < thresholds[1]) return "low";
+  if (historyScore < thresholds[2]) return "moderate";
+  if (historyScore < thresholds[3]) return "elevated";
+  return "high";
+}
+
+/**
+ * ヒートマップ + カード 共通の 5 段階スコア。
+ * 現在は環境省生息域メッシュの calcHistoryScore をそのまま利用する
+ * (Flutter 公開版と同じ挙動)。季節・気象・隣接補間など一切しない。
  */
 export function computeSpatialScore(params: {
   historyDirect: number;
-  historyNeighbor: number;
-  sightingWeighted: number;
+  thresholds?: LevelThresholds;
 }): { score: number; level: RiskLevel } {
-  const { historyDirect, historyNeighbor, sightingWeighted } = params;
-
-  let baseline: number;
-  let sightingBoost: number;
-  if (historyDirect > 0) {
-    // 生息域の中 (= 山間部/rural の近似): elevated 起点。
-    // high (red) は "直近で複数回目撃されたホットスポット" に限定する。
-    //  - weighted=1 (1-2 件近隣) までは elevated
-    //  - weighted=2+ (3+ 件近隣) で high
-    baseline = 55 + Math.min(15, historyDirect * 0.3); // 55-70
-    sightingBoost = Math.min(20, sightingWeighted * 5); // 0-20
-  } else if (historyNeighbor > 0) {
-    // 市街地/里山と生息域の境界ゾーン → low (青) キープ
-    baseline = Math.min(28, historyNeighbor * 0.5);
-    sightingBoost = Math.min(20, sightingWeighted * 5);
-  } else {
-    // 生息域外: 都市/平野。目撃があれば低レベルで色付け。
-    baseline = 0;
-    sightingBoost = Math.min(15, sightingWeighted * 4);
-  }
-
-  const score = Math.round(Math.min(100, baseline + sightingBoost));
-  return { score, level: toRiskLevel(score) };
+  // ヒートマップ (smoothMeshes → kumamoriLevel(m.s)) は連続値のまま判定するので、
+  // ここでも round せずに同じ連続値で level を決め、ヒートマップの色とカードの
+  // バー色を必ず一致させる。score の整数表示が必要な箇所は表示直前で round する。
+  const raw = params.historyDirect;
+  return {
+    score: Math.round(raw),
+    level: kumamoriLevel(raw, params.thresholds),
+  };
 }
 
 export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
@@ -424,11 +433,23 @@ export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   unknown: "データ不足",
 };
 
+/** 5 段階の色。くまもりマップの段階表現に近く、かつ文字が読める彩度を確保:
+ *  cyan → green → amber → orange → red (黄色は読みにくいので amber に変更) */
 export const RISK_LEVEL_COLOR: Record<RiskLevel, string> = {
-  safe: "#10b981",
-  low: "#3b82f6",
-  moderate: "#f59e0b",
-  elevated: "#f97316",
-  high: "#dc2626",
+  safe: "#06b6d4", // cyan-500
+  low: "#4CAF50", // green
+  moderate: "#F59E0B", // amber-500 (薄いオレンジ、読める彩度)
+  elevated: "#F97316", // orange-500
+  high: "#EF4444", // red-500
   unknown: "#6b7280",
+};
+
+/** 非選択時の pale 表示用。5 段階バーで "選択中以外" を薄く見せるのに使う。 */
+export const RISK_LEVEL_COLOR_PALE: Record<RiskLevel, string> = {
+  safe: "#cffafe",
+  low: "#dcfce7",
+  moderate: "#fef3c7",
+  elevated: "#ffedd5",
+  high: "#fee2e2",
+  unknown: "#e5e7eb",
 };

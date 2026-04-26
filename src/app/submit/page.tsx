@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Situation = "sight" | "trace" | "damage" | "injury";
 
@@ -18,30 +18,110 @@ function toLocalInputValue(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+const SUBMIT_DRAFT_KEY = "kumaWatch.submitDraft";
+type SubmitDraft = {
+  occurredAt: string;
+  headCount: number;
+  situation: Situation;
+  comment: string;
+  contact: string;
+};
+
+function defaultHeadCount(s: Situation): number {
+  // 痕跡だけ見た場合はクマ未確認なので 0 が自然
+  return s === "trace" ? 0 : 1;
+}
+
 function SubmitContent() {
   const sp = useSearchParams();
-  const initLat = Number(sp.get("lat"));
-  const initLon = Number(sp.get("lon"));
+  const router = useRouter();
 
-  const [lat, setLat] = useState<number | null>(Number.isFinite(initLat) ? initLat : null);
-  const [lon, setLon] = useState<number | null>(Number.isFinite(initLon) ? initLon : null);
+  // URL クエリから lat/lon を読む。`Number(null) === 0` で (0,0) = アフリカ沖に
+  // 飛んでしまう既知バグを避けるため、必ず存在チェックしてから Number() に通す。
+  const latParam = sp.get("lat");
+  const lonParam = sp.get("lon");
+  const initLat =
+    latParam !== null && latParam !== "" && Number.isFinite(Number(latParam))
+      ? Number(latParam)
+      : null;
+  const initLon =
+    lonParam !== null && lonParam !== "" && Number.isFinite(Number(lonParam))
+      ? Number(lonParam)
+      : null;
+
+  const [lat, setLat] = useState<number | null>(initLat);
+  const [lon, setLon] = useState<number | null>(initLon);
   const [occurredAt, setOccurredAt] = useState(toLocalInputValue(new Date()));
   const [headCount, setHeadCount] = useState(1);
-  const [situation, setSituation] = useState<Situation>("sight");
+  const [situation, setSituationRaw] = useState<Situation>("sight");
   const [comment, setComment] = useState("");
   const [contact, setContact] = useState("");
+  const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
+  const setSituation = (s: Situation) => {
+    setSituationRaw(s);
+    // ユーザーが手で頭数を編集していなければ、状況に応じた既定値に追従
+    setHeadCount((cur) => {
+      const wasDefaultForOther = SITUATIONS.some(
+        (x) => defaultHeadCount(x.value) === cur,
+      );
+      return wasDefaultForOther ? defaultHeadCount(s) : cur;
+    });
+  };
+
   useEffect(() => {
-    if (Number.isFinite(initLat) && Number.isFinite(initLon)) {
+    if (initLat !== null && initLon !== null) {
       setLat(initLat);
       setLon(initLon);
     }
   }, [initLat, initLon]);
+
+  // /?pick=submit から戻ってきた場合、保存していた下書きを復元
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sp.get("fromPicker") !== "1") return;
+    try {
+      const raw = window.sessionStorage.getItem(SUBMIT_DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw) as SubmitDraft;
+      if (draft.occurredAt) setOccurredAt(draft.occurredAt);
+      if (typeof draft.headCount === "number") setHeadCount(draft.headCount);
+      if (draft.situation) setSituationRaw(draft.situation);
+      if (draft.comment) setComment(draft.comment);
+      if (draft.contact) setContact(draft.contact);
+      window.sessionStorage.removeItem(SUBMIT_DRAFT_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [sp]);
+
+  const goPickOnMap = () => {
+    if (typeof window === "undefined") return;
+    const draft: SubmitDraft = {
+      occurredAt,
+      headCount,
+      situation,
+      comment,
+      contact,
+    };
+    try {
+      window.sessionStorage.setItem(SUBMIT_DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      /* ignore */
+    }
+    const params = new URLSearchParams({ pick: "submit" });
+    if (lat !== null && lon !== null) {
+      params.set("lat", lat.toFixed(5));
+      params.set("lon", lon.toFixed(5));
+    }
+    router.push(`/?${params.toString()}`);
+  };
 
   const useGps = () => {
     setGpsError(null);
@@ -68,6 +148,29 @@ function SubmitContent() {
     );
   };
 
+  const onPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhotoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("画像ファイルを選んでください");
+      return;
+    }
+    // 5 MB までに制限
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError("ファイルサイズは 5MB 以下にしてください");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPhotoDataUrl(typeof reader.result === "string" ? reader.result : null);
+    };
+    reader.onerror = () => {
+      setPhotoError("画像の読み込みに失敗しました");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const submit = async () => {
     if (lat == null || lon == null) {
       setSubmitError("位置を指定してください");
@@ -87,6 +190,7 @@ function SubmitContent() {
           situation,
           comment: comment || undefined,
           contact: contact || undefined,
+          photoDataUrl: photoDataUrl || undefined,
         }),
       });
       const data = await res.json();
@@ -148,13 +252,16 @@ function SubmitContent() {
         <div className="mb-2 text-sm font-semibold text-gray-800">
           1. 場所 <span className="text-red-500">*</span>
         </div>
-        {lat != null && lon != null ? (
-          <div className="mb-2 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-800">
-            <span className="font-mono">{lat.toFixed(5)}, {lon.toFixed(5)}</span>
+        {lat !== null && lon !== null ? (
+          <div className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            <span className="font-mono">
+              {lat.toFixed(5)}, {lon.toFixed(5)}
+            </span>
+            <span className="ml-2 text-amber-700">✓ 場所が指定されています</span>
           </div>
         ) : (
-          <p className="mb-2 text-xs text-gray-500">
-            現在地を取得するか、地図から場所を選んで再度アクセスしてください。
+          <p className="mb-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+            ⚠️ 場所が未指定です。下のボタンから現在地を取得するか、地図上で選んでください。
           </p>
         )}
         <div className="flex flex-wrap gap-2">
@@ -166,12 +273,13 @@ function SubmitContent() {
           >
             📍 {gpsLoading ? "取得中..." : "現在地を使う"}
           </button>
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={goPickOnMap}
             className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
             🗺️ 地図から選ぶ
-          </Link>
+          </button>
         </div>
         {gpsError && <p className="mt-1 text-[11px] text-red-600">⚠️ {gpsError}</p>}
       </section>
@@ -223,8 +331,9 @@ function SubmitContent() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setHeadCount((v) => Math.max(1, v - 1))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-700 hover:bg-gray-200"
+            onClick={() => setHeadCount((v) => Math.max(0, v - 1))}
+            disabled={headCount <= 0}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-700 hover:bg-gray-200 disabled:opacity-40"
             aria-label="減らす"
           >
             −
@@ -236,12 +345,62 @@ function SubmitContent() {
           <button
             type="button"
             onClick={() => setHeadCount((v) => Math.min(20, v + 1))}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-700 hover:bg-gray-200"
+            disabled={headCount >= 20}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-700 hover:bg-gray-200 disabled:opacity-40"
             aria-label="増やす"
           >
             ＋
           </button>
         </div>
+        <p className="mt-2 text-[10px] text-gray-500">
+          痕跡のみで姿を確認していない場合は <strong>0</strong> でも構いません。
+        </p>
+      </section>
+
+      <section className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+        <div className="mb-2 text-sm font-semibold text-gray-800">
+          5. 写真（任意）
+        </div>
+        {photoDataUrl ? (
+          <div className="mb-2 flex flex-col items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 選択した画像のプレビュー、最適化不要 */}
+            <img
+              src={photoDataUrl}
+              alt="選択した写真のプレビュー"
+              className="max-h-64 w-full rounded-lg object-contain"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoDataUrl(null);
+                setPhotoError(null);
+              }}
+              className="text-[11px] text-gray-500 hover:underline"
+            >
+              写真を削除
+            </button>
+          </div>
+        ) : (
+          <label className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-5 text-xs text-gray-600 hover:bg-gray-100">
+            <span className="text-2xl" aria-hidden>
+              📸
+            </span>
+            <span>タップして写真を選択/撮影</span>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={onPhotoChange}
+              className="hidden"
+            />
+          </label>
+        )}
+        {photoError && (
+          <p className="mt-1 text-[11px] text-red-600">⚠️ {photoError}</p>
+        )}
+        <p className="mt-1 text-[10px] text-gray-500">
+          5MB まで。クマ本体・足跡・糞・被害物などの写真が確認に役立ちます。
+        </p>
       </section>
 
       <details className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">

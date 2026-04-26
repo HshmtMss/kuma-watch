@@ -8,37 +8,70 @@ import type {
   CircleMarker,
   Popup,
   LeafletMouseEvent,
+  TileLayer,
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import {
-  calcHistoryScore,
-  computeSpatialScore,
+  DEFAULT_LEVEL_THRESHOLDS,
+  kumamoriLevel,
   RISK_LEVEL_COLOR,
+  type LevelThresholds,
 } from "@/lib/score";
-import { loadMeshes } from "@/lib/mesh-data";
-import {
-  buildDangerGrid,
-  aggregateSightingsPerCell,
-  type AugmentedMeshEntry,
-  type SightingDensity,
-} from "@/lib/neighbor-habitat";
+import { loadLandUse, loadMeshes, type LandUseMap, type MeshEntry } from "@/lib/mesh-data";
+import { smoothMeshes, type SmoothedCell } from "@/lib/smooth";
 
 const MESH_LAT_HALF = 2.5 / 60 / 2;
 const MESH_LON_HALF = 3.75 / 60 / 2;
 const MESH_LAT_STEP = 2.5 / 60;
 const MESH_LON_STEP = 3.75 / 60;
 const MIN_HEAT_ZOOM = 5;
-const LOW_LEVEL_ZOOM_THRESHOLD = 8;
 const LOD_ZOOM_THRESHOLD = 8; // これ未満で LOD 集約
 const LOD_STEP = 3; // 3×3 セルを 1 ブロックに
 const REDRAW_DEBOUNCE_MS = 180;
 
+export type TileStyle = "standard" | "satellite" | "topo";
+
+type TileProvider = {
+  url: string;
+  attribution: string;
+  subdomains?: string[];
+  maxZoom?: number;
+};
+
+const TILE_PROVIDERS: Record<TileStyle, TileProvider> = {
+  standard: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution:
+      '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  },
+  satellite: {
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attribution: "© Esri",
+    maxZoom: 18,
+  },
+  topo: {
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution: '© <a href="https://opentopomap.org/">OpenTopoMap</a>',
+    subdomains: ["a", "b", "c"],
+    maxZoom: 17,
+  },
+};
+
+const RANK: Record<string, number> = {
+  safe: 0,
+  low: 1,
+  moderate: 2,
+  elevated: 3,
+  high: 4,
+};
+
 function mobileCaps() {
-  if (typeof window === "undefined") return { maxRects: 10000, maxPins: 1200 };
+  if (typeof window === "undefined") return { maxRects: 10000, maxPins: 5000 };
   const narrow = window.innerWidth < 768;
   return narrow
-    ? { maxRects: 4000, maxPins: 500 }
-    : { maxRects: 10000, maxPins: 1500 };
+    ? { maxRects: 4000, maxPins: 2500 }
+    : { maxRects: 10000, maxPins: 8000 };
 }
 
 type Props = {
@@ -46,8 +79,24 @@ type Props = {
   center?: [number, number];
   zoom?: number;
   showHeatmap?: boolean;
-  selectedLocation?: { lat: number; lon: number; source: "gps" | "tap" } | null;
+  heatmapOpacity?: number;
+  /** Gaussian smoothing の σ (km)。0 で無効 (Flutter 同等) */
+  smoothingSigmaKm?: number;
+  /** halo (穴埋めセル) の不透明度倍率 (0-1)。habitat セルは常に 1.0 */
+  haloOpacity?: number;
+  /** 5 段階のしきい値 (safe→low→moderate→elevated→high の 4 境界) */
+  levelThresholds?: LevelThresholds;
+  tileStyle?: TileStyle;
+  selectedLocation?: {
+    lat: number;
+    lon: number;
+    source: "gps" | "tap" | "search" | "url";
+  } | null;
+  /** GPS で測定された現在地 (青丸で常時表示) */
+  currentLocation?: { lat: number; lon: number } | null;
   onMapClick?: (lat: number, lon: number) => void;
+  /** map handle を親に引き渡すための ref 代替。Leaflet インスタンス提供時に呼ばれる。 */
+  onMapReady?: (map: LeafletMap) => void;
 };
 
 export default function KumaMap({
@@ -55,21 +104,34 @@ export default function KumaMap({
   center = [36.5, 137.5],
   zoom = 6,
   showHeatmap = true,
+  heatmapOpacity = 0.4,
+  smoothingSigmaKm = 0,
+  haloOpacity = 0.5,
+  levelThresholds = DEFAULT_LEVEL_THRESHOLDS,
+  tileStyle = "standard",
   selectedLocation = null,
+  currentLocation = null,
   onMapClick,
+  onMapReady,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
+  const tileLayerRef = useRef<TileLayer | null>(null);
   const meshLayerRef = useRef<LayerGroup | null>(null);
   const pinLayerRef = useRef<LayerGroup | null>(null);
   const selectionLayerRef = useRef<LayerGroup | null>(null);
   const popupRef = useRef<Popup | null>(null);
-  const meshDataRef = useRef<AugmentedMeshEntry[] | null>(null);
-  const sightingDensityRef = useRef<Map<string, SightingDensity> | null>(null);
+  const rawMeshesRef = useRef<MeshEntry[] | null>(null);
+  const meshDataRef = useRef<SmoothedCell[] | null>(null);
+  const landUseRef = useRef<LandUseMap | null>(null);
   const recordsRef = useRef<KumaRecord[]>(records);
   const showHeatmapRef = useRef(showHeatmap);
+  const heatmapOpacityRef = useRef(heatmapOpacity);
+  const haloOpacityRef = useRef(haloOpacity);
+  const levelThresholdsRef = useRef(levelThresholds);
   const onMapClickRef = useRef(onMapClick);
   const redrawTimerRef = useRef<number | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   useEffect(() => {
     onMapClickRef.current = onMapClick;
@@ -108,27 +170,12 @@ export default function KumaMap({
       const east = bounds.getEast() + MESH_LON_HALF;
 
       const canvas = L.canvas({ padding: 0.1 });
-      const density = sightingDensityRef.current;
       const currentZoom = map.getZoom();
       const useLOD = currentZoom < LOD_ZOOM_THRESHOLD;
-      // ズームアウト時は low (弱い色) を捨てて cap 内で重要セルを確実に描く
-      const skipLowLevel = currentZoom < LOW_LEVEL_ZOOM_THRESHOLD;
-      const opacityMap: Record<string, number> = {
-        low: 0.28,
-        moderate: 0.5,
-        elevated: 0.65,
-        high: 0.8,
-      };
-      const RANK: Record<string, number> = {
-        safe: 0,
-        low: 1,
-        moderate: 2,
-        elevated: 3,
-        high: 4,
-      };
+      const opacity = heatmapOpacityRef.current;
 
       if (useLOD) {
-        // LOD: 3×3 セルを集約。max level を代表値として 1 矩形描く。
+        // LOD: 3×3 セルを集約して代表色 (max level) で描く
         type LodBucket = {
           minLat: number;
           maxLat: number;
@@ -143,20 +190,8 @@ export default function KumaMap({
         for (const m of meshes) {
           if (m.lat < south || m.lat > north) continue;
           if (m.lon < west || m.lon > east) continue;
-          const direct = calcHistoryScore({
-            second: m.s,
-            sixth: m.x,
-            latest: m.l,
-            latestSingle: m.ls,
-          });
-          const nearby = density?.get(m.m);
-          const { level } = computeSpatialScore({
-            historyDirect: direct,
-            historyNeighbor: m.neighborHistory,
-            sightingWeighted: nearby?.weighted ?? 0,
-          });
+          const level = kumamoriLevel(m.s, levelThresholdsRef.current);
           if (level === "safe" || level === "unknown") continue;
-          if (skipLowLevel && level === "low") continue;
           const rank = RANK[level];
           const latBin = Math.floor(m.lat / latBinSize);
           const lonBin = Math.floor(m.lon / lonBinSize);
@@ -189,7 +224,6 @@ export default function KumaMap({
         let drawn = 0;
         for (const b of buckets.values()) {
           const color = RISK_LEVEL_COLOR[b.maxLevel];
-          const opacity = opacityMap[b.maxLevel] ?? 0.5;
           const rect: Rectangle = L.rectangle(
             [
               [b.minLat, b.minLon],
@@ -211,26 +245,16 @@ export default function KumaMap({
       }
 
       let drawn = 0;
+      const halo = haloOpacityRef.current;
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
         if (m.lon < west || m.lon > east) continue;
-        const direct = calcHistoryScore({
-          second: m.s,
-          sixth: m.x,
-          latest: m.l,
-          latestSingle: m.ls,
-        });
-        const nearby = density?.get(m.m);
-        const { level } = computeSpatialScore({
-          historyDirect: direct,
-          historyNeighbor: m.neighborHistory,
-          sightingWeighted: nearby?.weighted ?? 0,
-        });
+        const level = kumamoriLevel(m.s, levelThresholdsRef.current);
         if (level === "safe" || level === "unknown") continue;
-        if (skipLowLevel && level === "low") continue;
-        const opacity = opacityMap[level] ?? 0.5;
 
         const color = RISK_LEVEL_COLOR[level];
+        const cellOpacity = m.isHabitat ? opacity : opacity * halo;
+        if (cellOpacity <= 0) continue;
         const rect: Rectangle = L.rectangle(
           [
             [m.lat - MESH_LAT_HALF, m.lon - MESH_LON_HALF],
@@ -239,7 +263,7 @@ export default function KumaMap({
           {
             stroke: false,
             fillColor: color,
-            fillOpacity: opacity,
+            fillOpacity: cellOpacity,
             interactive: false,
             renderer: canvas,
           },
@@ -267,10 +291,23 @@ export default function KumaMap({
       const east = bounds.getEast();
 
       const canvas = L.canvas({ padding: 0.1 });
-      let drawn = 0;
+      // bounds 内のレコードを先に集めてから均等サンプリング。
+      // recs は日付降順ソート済み。早い者勝ち break で打ち切ると、
+      // 縮小時 (全国 in-bounds) に古めのデータを持つ県 (例: 岩手) のピンが
+      // すっぽり抜ける。bounds 内の全域から均等に間引く。
+      const inBounds: KumaRecord[] = [];
       for (const r of recs) {
         if (r.lat < south || r.lat > north) continue;
         if (r.lon < west || r.lon > east) continue;
+        inBounds.push(r);
+      }
+      const toRender =
+        inBounds.length <= maxPins
+          ? inBounds
+          : Array.from({ length: maxPins }, (_, i) =>
+              inBounds[Math.floor((i * inBounds.length) / maxPins)],
+            );
+      for (const r of toRender) {
         const color = r.headCount > 1 ? "#ef4444" : "#6b7280";
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
           radius: r.headCount > 1 ? 6 : 5,
@@ -281,23 +318,19 @@ export default function KumaMap({
           renderer: canvas,
         });
         marker.on("click", (e) => {
-          // stop propagation so the map click handler doesn't also fire
           if ((e as unknown as LeafletMouseEvent).originalEvent) {
-            (e as unknown as LeafletMouseEvent).originalEvent.stopPropagation?.();
+            (
+              e as unknown as LeafletMouseEvent
+            ).originalEvent.stopPropagation?.();
           }
           showRecordPopup(L, r);
         });
         marker.addTo(layer);
-        drawn++;
-        if (drawn >= maxPins) break;
       }
     });
   };
 
-  const showRecordPopup = (
-    L: typeof import("leaflet"),
-    r: KumaRecord,
-  ) => {
+  const showRecordPopup = (L: typeof import("leaflet"), r: KumaRecord) => {
     const map = mapRef.current;
     if (!map) return;
     if (!popupRef.current) {
@@ -319,40 +352,56 @@ export default function KumaMap({
 
     import("leaflet").then((L) => {
       layer.clearLayers();
-      if (!selectedLocation) return;
 
-      const { lat, lon, source } = selectedLocation;
-      const color = source === "gps" ? "#2563eb" : "#d97706";
+      // 現在地 (青丸 + 薄い halo) — 常時表示
+      if (currentLocation) {
+        L.circle([currentLocation.lat, currentLocation.lon], {
+          radius: 180,
+          color: "#3b82f6",
+          weight: 1,
+          fillColor: "#3b82f6",
+          fillOpacity: 0.15,
+          interactive: false,
+        }).addTo(layer);
+        L.circleMarker([currentLocation.lat, currentLocation.lon], {
+          radius: 7,
+          color: "#ffffff",
+          weight: 3,
+          fillColor: "#3b82f6",
+          fillOpacity: 1,
+          interactive: false,
+        }).addTo(layer);
+      }
 
-      L.circle([lat, lon], {
-        radius: 180,
-        color,
-        weight: 1,
-        fillColor: color,
-        fillOpacity: 0.12,
-        interactive: false,
-      }).addTo(layer);
-
-      L.circleMarker([lat, lon], {
-        radius: 8,
-        color: "#ffffff",
-        weight: 2.5,
-        fillColor: color,
-        fillOpacity: 1,
-        interactive: false,
-      }).addTo(layer);
+      // 選択地点 (teardrop の赤ピン)
+      if (selectedLocation) {
+        const isGps = selectedLocation.source === "gps";
+        // GPS と currentLocation が同じ位置なら赤ピンは省略 (二重表示を避ける)
+        const sameAsCurrent =
+          isGps &&
+          currentLocation &&
+          Math.abs(currentLocation.lat - selectedLocation.lat) < 1e-6 &&
+          Math.abs(currentLocation.lon - selectedLocation.lon) < 1e-6;
+        if (!sameAsCurrent) {
+          const pinIcon = L.divIcon({
+            className: "kuma-pin",
+            html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0z" fill="#dc2626" stroke="white" stroke-width="2"/><circle cx="14" cy="13" r="4.5" fill="white"/></svg>`,
+            iconSize: [28, 36],
+            iconAnchor: [14, 36],
+          });
+          L.marker([selectedLocation.lat, selectedLocation.lon], {
+            icon: pinIcon,
+            interactive: false,
+            keyboard: false,
+          }).addTo(layer);
+        }
+      }
     });
   };
 
   useEffect(() => {
     recordsRef.current = records;
     renderPinLayer();
-    // 危険度ヒートマップ用に、records 変化のたびに密度を再集計
-    const meshes = meshDataRef.current;
-    if (meshes) {
-      sightingDensityRef.current = aggregateSightingsPerCell(records, meshes);
-      renderMeshLayer();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [records]);
 
@@ -371,19 +420,67 @@ export default function KumaMap({
   }, [showHeatmap]);
 
   useEffect(() => {
+    heatmapOpacityRef.current = heatmapOpacity;
+    renderMeshLayer();
+  }, [heatmapOpacity]);
+
+  useEffect(() => {
+    haloOpacityRef.current = haloOpacity;
+    renderMeshLayer();
+  }, [haloOpacity]);
+
+  useEffect(() => {
+    levelThresholdsRef.current = levelThresholds;
+    renderMeshLayer();
+  }, [levelThresholds]);
+
+  useEffect(() => {
+    const raw = rawMeshesRef.current;
+    if (!raw) return; // まだ mesh.json 読み込み前
+    meshDataRef.current = smoothMeshes(
+      raw,
+      smoothingSigmaKm,
+      landUseRef.current,
+    );
+    renderMeshLayer();
+  }, [smoothingSigmaKm]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const old = tileLayerRef.current;
+    const provider = TILE_PROVIDERS[tileStyle];
+    import("leaflet").then((L) => {
+      const next = L.tileLayer(provider.url, {
+        attribution: provider.attribution,
+        maxZoom: provider.maxZoom ?? 18,
+        subdomains: provider.subdomains ?? "abc",
+      });
+      next.addTo(map);
+      if (old) {
+        // fade swap: wait a tick so tiles load, then remove old
+        window.setTimeout(() => {
+          map.removeLayer(old);
+        }, 200);
+      }
+      tileLayerRef.current = next;
+    });
+  }, [tileStyle]);
+
+  useEffect(() => {
     renderSelectionLayer();
     const map = mapRef.current;
     if (!map || !selectedLocation) return;
     const { lat, lon } = selectedLocation;
     const targetZoom = Math.max(map.getZoom(), 10);
-    // シート/サイドパネルで隠れないように地図中心をずらす:
-    //   モバイル (<640px): シートが下にあるので、ピンを画面上部に寄せる
-    //   デスクトップ: サイドパネルが左にあるので、ピンを画面右寄りに寄せる
+    // シートで隠れないように地図中心を上に寄せる (シートは下 30-70vh を占める)
     const isMobile =
       typeof window !== "undefined" ? window.innerWidth < 640 : false;
     const offsetX = isMobile ? 0 : 180;
     const offsetY = isMobile
-      ? -Math.round((typeof window !== "undefined" ? window.innerHeight : 800) * 0.35)
+      ? -Math.round(
+          (typeof window !== "undefined" ? window.innerHeight : 800) * 0.18,
+        )
       : 0;
     if (offsetX !== 0 || offsetY !== 0) {
       const pinPx = map.project([lat, lon], targetZoom);
@@ -395,6 +492,12 @@ export default function KumaMap({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLocation?.lat, selectedLocation?.lon, selectedLocation?.source]);
+
+  // 現在地 (青丸) の位置だけ変わったときはカメラは動かさず、マーカーだけ更新
+  useEffect(() => {
+    renderSelectionLayer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLocation?.lat, currentLocation?.lon]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -409,17 +512,20 @@ export default function KumaMap({
         zoom,
         preferCanvas: true,
         zoomControl: false,
+        attributionControl: true,
       });
       mapRef.current = map;
+      if (onMapReady) onMapReady(map);
 
-      L.control.zoom({ position: "topright" }).addTo(map);
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | ' +
-          '<a href="https://public.sharp9110.com/view/allposts/bear">Sharp9110</a> CC BY 4.0',
-        maxZoom: 18,
-      }).addTo(map);
+      // Initial tile layer; will be replaced by the tileStyle effect below.
+      const provider = TILE_PROVIDERS[tileStyle];
+      const tile = L.tileLayer(provider.url, {
+        attribution: provider.attribution,
+        maxZoom: provider.maxZoom ?? 18,
+        subdomains: provider.subdomains ?? "abc",
+      });
+      tile.addTo(map);
+      tileLayerRef.current = tile;
 
       const meshLayer = L.layerGroup();
       meshLayerRef.current = meshLayer;
@@ -440,28 +546,30 @@ export default function KumaMap({
         if (cb) cb(e.latlng.lat, e.latlng.lng);
       });
 
-      // コンテナサイズ変化 (カードの押し上げ・折り畳み等) を検知して地図を再描画
       if (typeof ResizeObserver !== "undefined") {
         const ro = new ResizeObserver(() => {
-          map.invalidateSize();
+          // unmount 後の callback 発火で map が破棄済みなら no-op
+          const m = mapRef.current;
+          if (!m) return;
+          try {
+            m.invalidateSize();
+          } catch {
+            /* map disposed mid-resize */
+          }
         });
         ro.observe(el);
-        // cleanup via closure reference
-        const prevCleanup = cancelled;
-        void prevCleanup;
+        resizeObserverRef.current = ro;
       }
 
-      loadMeshes()
-        .then((meshes) => {
+      Promise.all([loadMeshes(), loadLandUse().catch(() => null)])
+        .then(([meshes, landUse]) => {
           if (cancelled) return;
-          // 危険度グリッド: 環境省メッシュ + 穴に synthetic セルを補完、
-          // 全セルに neighborHistory を付ける (原則: 生息域が近ければ
-          // 調査データがなくても危険)
-          const grid = buildDangerGrid(meshes);
-          meshDataRef.current = grid;
-          sightingDensityRef.current = aggregateSightingsPerCell(
-            recordsRef.current,
-            grid,
+          rawMeshesRef.current = meshes;
+          landUseRef.current = landUse;
+          meshDataRef.current = smoothMeshes(
+            meshes,
+            smoothingSigmaKm,
+            landUse,
           );
           renderMeshLayer();
         })
@@ -477,10 +585,15 @@ export default function KumaMap({
         window.clearTimeout(redrawTimerRef.current);
         redrawTimerRef.current = null;
       }
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+        resizeObserverRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
+      tileLayerRef.current = null;
       meshLayerRef.current = null;
       pinLayerRef.current = null;
       selectionLayerRef.current = null;

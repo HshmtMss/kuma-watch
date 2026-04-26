@@ -10,9 +10,15 @@ import type {
   ScoreBreakdown,
   WeatherSnapshot,
 } from "@/lib/types";
-import { computeScore, lunarPhase } from "@/lib/score";
+import {
+  computeScore,
+  computeSpatialScore,
+  calcHistoryScore,
+  lunarPhase,
+} from "@/lib/score";
 import { latLonToMeshCode } from "@/lib/mesh";
 import { loadMeshes, findMeshByCode } from "@/lib/mesh-data";
+import { buildAdvice } from "@/lib/advice";
 import { haversineKm } from "@/lib/mesh";
 import { computeNeighborMeshScore } from "@/lib/neighbor-habitat";
 import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
@@ -138,8 +144,6 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
   const [nearby, setNearby] = useState<NearbySighting[]>([]);
   const [, setLoading] = useState(true);
   const [municipal, setMunicipal] = useState<MunicipalEntry | undefined>(undefined);
-  const [elevationM, setElevationM] = useState<number | null>(null);
-  const [isForest, setIsForest] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -184,8 +188,6 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         : null;
       setMesh(mData);
       setWeather(w);
-      setElevationM(elevation.elevationM);
-      setIsForest(forest?.isForest ?? null);
 
       let nearbyWeighted = 0;
       for (const r of near) {
@@ -213,6 +215,13 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         isForest: forest?.isForest ?? null,
         forestType: forest?.forestType ?? null,
       });
+      // 表示 level/score はヒートマップと同じ空間式で揃える
+      const directHistory = mData ? calcHistoryScore(mData) : 0;
+      const { score: spatialScore, level: spatialLevel } = computeSpatialScore(
+        { historyDirect: directHistory },
+      );
+      score.score = spatialScore;
+      score.level = spatialLevel;
       setBreakdown(score);
       setNearby(near);
 
@@ -228,7 +237,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
   const hour = now.getHours();
   const { name: lunarName } = lunarPhase(now);
 
-  const advice = buildAdvice(breakdown, hour, municipal);
+  const advice = buildAdvice({ breakdown, hour, municipal });
 
   const nearby7 = nearby.filter((r) => {
     const d = new Date(r.date);
@@ -307,9 +316,6 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
           <RiskHero
             level={breakdown.level}
-            score={breakdown.score}
-            elevationM={elevationM}
-            isForest={isForest}
             prefCode={municipal?.prefCode}
             lat={lat}
             lon={lon}
@@ -407,11 +413,11 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         />
       </section>
 
-      {/* 6. いま取るべき対策 */}
+      {/* 6. 行動メモ */}
       {advice.length > 0 && (
         <section className="mb-4">
           <h2 className="mb-2 text-sm font-semibold text-gray-900">
-            💡 いま取るべき対策
+            📝 行動メモ
           </h2>
           <ul className="space-y-1.5">
             {advice.map((a, i) => (
@@ -511,85 +517,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         </div>
       </details>
 
-      {/* 9. Fixed bottom CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-100 bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
-        <div className="mx-auto flex max-w-xl items-center gap-2">
-          <Link
-            href={`/`}
-            className="flex h-11 flex-1 items-center justify-center rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            🗺️ 地図で見る
-          </Link>
-          <Link
-            href={`/submit?lat=${lat}&lon=${lon}`}
-            className="flex h-11 flex-1 items-center justify-center rounded-full bg-amber-600 text-sm font-medium text-white hover:bg-amber-700"
-          >
-            📝 この地点を投稿
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
 
-type AdviceItem = { emoji: string; title: string; body?: string };
-
-function buildAdvice(
-  breakdown: ScoreBreakdown | null,
-  hour: number,
-  municipal?: MunicipalEntry,
-): AdviceItem[] {
-  if (!breakdown) return [];
-  const items: AdviceItem[] = [];
-  const level = breakdown.level;
-  const isHiguma = municipal?.bearSpecies.includes("higuma");
-
-  if (level === "safe") {
-    return [
-      {
-        emoji: "🌿",
-        title: "この地域は生息記録がありません",
-        body: "基本的な備えだけで安全に楽しめます。",
-      },
-    ];
-  }
-  if (level === "high" || level === "elevated") {
-    items.push({
-      emoji: "🔔",
-      title: "熊鈴は必携",
-      body: "定期的に鳴らして存在を知らせましょう。",
-    });
-    items.push({
-      emoji: "🧴",
-      title: "クマスプレーの携帯を推奨",
-      body: "使い方の確認と、安全装置を外してすぐ使える位置に。",
-    });
-  }
-  if (level === "moderate") {
-    items.push({
-      emoji: "🔔",
-      title: "熊鈴やラジオで存在を知らせる",
-      body: "静かな時間帯の単独行動は特に注意。",
-    });
-  }
-  if (hour < 8 || hour >= 16) {
-    items.push({
-      emoji: "🕐",
-      title: "クマの活動時間帯です",
-      body: "早朝と夕方は見通しの悪い場所の通行を避けましょう。",
-    });
-  }
-  items.push({
-    emoji: "🍱",
-    title: "食品・ゴミは密閉・持ち帰り",
-    body: "匂いはクマを呼びます。残置はしないでください。",
-  });
-  if (isHiguma) {
-    items.push({
-      emoji: "⚠️",
-      title: "ヒグマ生息域です",
-      body: "ヒグマは大型で木にも登れます。単独行動は絶対に避けてください。",
-    });
-  }
-  return items;
-}
