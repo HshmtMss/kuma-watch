@@ -4,7 +4,7 @@ import PageShell from "@/components/PageShell";
 export const metadata: Metadata = {
   title: "このサイトについて",
   description:
-    "KumaWatch（クマウォッチ）は、全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で危険度を予報する無料の Web アプリです。運営はリサーチコーディネート株式会社です。",
+    "KumaWatch（クマウォッチ）は、全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で危険度を予報する無料の Web アプリです。運営は獣医工学ラボ（リサーチコーディネート株式会社）です。",
   alternates: { canonical: "/about" },
 };
 
@@ -27,42 +27,107 @@ export default function AboutPage() {
         <li>5km メッシュ単位の危険度マップ（5 段階表示）</li>
         <li>現在地の危険度評価（GPS 取得）</li>
         <li>時間帯・季節・気象を踏まえた予報スコア</li>
-        <li>都道府県・期間でのフィルタ</li>
+        <li>期間でのフィルタ</li>
         <li>登録不要・完全無料</li>
       </ul>
 
+      <h2 id="data-sources">データソース・出典</h2>
+      <p>
+        KumaWatch は、国・自治体・各オープンデータプロジェクトが公開する情報を組み合わせて
+        危険度を算出しています。主な出典は以下のとおりです。
+      </p>
+
+      <h3>クマ出没・分布情報</h3>
+      <ul>
+        <li>
+          <a
+            href="https://public.sharp9110.com/view/allposts/bear"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            全国クマ出没情報（Sharp9110）
+          </a>
+          <span className="text-gray-500"> / Sharp9110 / </span>
+          <a
+            href="https://creativecommons.org/licenses/by/4.0/deed.ja"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CC BY 4.0
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.biodic.go.jp/kiso/fnd_list_h.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            自然環境保全基礎調査（哺乳類分布調査）
+          </a>
+          <span className="text-gray-500"> / 環境省 生物多様性センター</span>
+        </li>
+      </ul>
+
+      <h3>気象情報</h3>
+      <ul>
+        <li>
+          <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">
+            Open-Meteo Weather API
+          </a>
+          <span className="text-gray-500"> / Open-Meteo / </span>
+          <a
+            href="https://open-meteo.com/en/features#terms"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CC BY 4.0
+          </a>
+        </li>
+      </ul>
+
+      <h3>地図・位置情報</h3>
+      <ul>
+        <li>
+          <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer">
+            OpenStreetMap
+          </a>
+          <span className="text-gray-500"> / OpenStreetMap contributors / </span>
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ODbL 1.0
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://nominatim.openstreetmap.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Nominatim
+          </a>
+          <span className="text-gray-500"> / OpenStreetMap Foundation / ODbL 1.0</span>
+        </li>
+      </ul>
+
+
       <h2>スコアの考え方</h2>
       <p>
-        KumaWatch の危険度スコアは、<strong>環境省の生息域調査をベース</strong>に、
-        現在の条件を加味して算出します。
-      </p>
-      <ol>
-        <li>
-          <strong>前提条件: 生息域判定</strong> — 環境省の自然環境保全基礎調査（哺乳類分布調査）で、
-          その 5km メッシュにクマの生息記録があるかを確認します。
-          <strong>記録がないメッシュは「安全」</strong> として、季節・気象の補正は行いません。
-        </li>
-        <li>
-          <strong>生息域内の場合</strong> — 以下の 5 要素を重み付けして算出：
-          <ul>
-            <li>履歴スコア（40%）：生息域調査の回次別スコア（最新回 × 3.0 / 第6回 × 1.5 / 第2回 × 0.5）</li>
-            <li>季節スコア（30%）：月別の活動パターン</li>
-            <li>気象スコア（20%）：現在の気温・降水量</li>
-            <li>月相スコア（10%）：夜間の明るさが活動量に与える影響</li>
-            <li>時間帯ボーナス：クマの活動ピーク時間帯（早朝・夕方）に加点</li>
-          </ul>
-        </li>
-      </ol>
-      <p>
-        ヒートマップで表示される色分けも、この生息域調査データが基礎になっています。
-        生息記録のない地域には色が付きません。
+        危険度は <strong>5 段階（安全 / 念のため注意 / 基本対策を / 対策を強化 / しっかり対策を）</strong> で表示します。
+        基本となるのは <strong>クマの生息域</strong> で、生息記録のない地域は「安全」と扱います。
+        生息域内では、<strong>過去の出没履歴を中心に、季節・気象・時間帯などを補正要素として加味</strong>し、
+        現時点で意識しておきたいレベルを表します。
       </p>
       <p>
-        なお地図上の個別ピンは、オープンデータの直近のクマ目撃・遭遇情報（Sharp9110）で、
-        生息域データとは別のデータソースです。
+        各要素の具体的な重み付けや、内部で利用しているデータソースの粒度・更新頻度などは、
+        サービスの中核ノウハウのため公開しておりません。
+        自治体・事業者向けの詳細な仕様や連携については
+        <a href="/for-gov">自治体の方へ</a> よりお問い合わせください。
       </p>
       <p>
-        このスコアは統計的な参考情報であり、実際のクマ出没を保証するものではありません。
+        本スコアは統計的な参考情報であり、実際のクマ出没を保証するものではありません。
         現地の最新情報と合わせてご活用ください。
       </p>
 
@@ -73,6 +138,11 @@ export default function AboutPage() {
       </p>
 
       <h2>運営者情報</h2>
+      <p>
+        本サイトは <strong>獣医工学ラボ</strong> によって運営されています。
+        獣医工学ラボは <strong>リサーチコーディネート株式会社</strong> が運営する、
+        獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
+      </p>
       <div>
         <p>
           <strong>リサーチコーディネート株式会社</strong>
