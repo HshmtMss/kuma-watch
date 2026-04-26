@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+/**
+ * mesh.json を生成する。
+ *
+ * 入力: data-sources/env-ministry/bear_combined.csv
+ * 出力: public/data/mesh.json
+ *
+ * ルール (公開版 Flutter くまもりマップと同じ): habitat 情報がある
+ * (s+x+l+ls > 0) 行のみ採用し、zero 行は除外する。
+ * 穴埋めはしない。
+ */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -78,6 +88,13 @@ for (let i = 1; i < lines.length; i++) {
 }
 
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, JSON.stringify({ generatedAt: new Date().toISOString(), count: rows.length, meshes: rows }));
+writeFileSync(
+  OUT,
+  JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    count: rows.length,
+    meshes: rows,
+  }),
+);
 
 console.log(`Wrote ${rows.length} meshes (${skipped} skipped) to ${OUT}`);
