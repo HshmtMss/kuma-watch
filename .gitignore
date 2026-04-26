@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# L03-b 土地利用データの zip キャッシュ (ビルド時のみ)
+data-sources/landuse/cache/
+data-sources/landuse/tmp/
+data-sources/landuse/progress.json
+.cache/
+
+# Claude Code セッション固有の一時ファイル
+.claude/scheduled_tasks.lock

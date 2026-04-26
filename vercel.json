@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/refresh",
+      "schedule": "0 */6 * * *"
+    }
+  ],
+  "functions": {
+    "src/app/api/kuma/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/cron/refresh/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}

@@ -8,6 +8,8 @@ export type SubmitPayload = {
   situation: "sight" | "trace" | "damage" | "injury";
   comment?: string;
   contact?: string;
+  /** data URL 形式 (image/jpeg, image/png など) の写真 */
+  photoDataUrl?: string;
 };
 
 const SITUATION_VALUES = new Set(["sight", "trace", "damage", "injury"]);
@@ -33,8 +35,8 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
     return { ok: false, error: "14 日より前の情報は受け付けていません" };
 
   const headCount = Number(b.headCount);
-  if (!Number.isInteger(headCount) || headCount < 1 || headCount > 20)
-    return { ok: false, error: "頭数は 1〜20 で指定してください" };
+  if (!Number.isInteger(headCount) || headCount < 0 || headCount > 20)
+    return { ok: false, error: "頭数は 0〜20 で指定してください (痕跡のみは 0)" };
 
   const situation = b.situation;
   if (typeof situation !== "string" || !SITUATION_VALUES.has(situation))
@@ -42,6 +44,18 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
 
   const comment = typeof b.comment === "string" ? b.comment.slice(0, 300) : undefined;
   const contact = typeof b.contact === "string" ? b.contact.slice(0, 200) : undefined;
+
+  let photoDataUrl: string | undefined;
+  if (typeof b.photoDataUrl === "string" && b.photoDataUrl.length > 0) {
+    if (!b.photoDataUrl.startsWith("data:image/")) {
+      return { ok: false, error: "写真は画像形式で送信してください" };
+    }
+    // data URL は base64 含めて 7MB 以下 (生ファイル 5MB + 33% base64 膨張想定)
+    if (b.photoDataUrl.length > 7 * 1024 * 1024) {
+      return { ok: false, error: "写真のサイズが大きすぎます (5MB まで)" };
+    }
+    photoDataUrl = b.photoDataUrl;
+  }
 
   return {
     ok: true,
@@ -53,6 +67,7 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
       situation: situation as SubmitPayload["situation"],
       comment,
       contact,
+      photoDataUrl,
     },
   };
 }
@@ -71,15 +86,31 @@ export async function POST(req: Request) {
   }
 
   const id = crypto.randomUUID();
+  // 写真は base64 が長くログに出ないよう別に扱う
+  const { photoDataUrl, ...rest } = result.payload;
   const submission = {
     id,
-    ...result.payload,
+    ...rest,
+    photoSize: photoDataUrl?.length ?? 0,
     receivedAt: new Date().toISOString(),
     status: "pending" as const,
   };
 
-  // TODO: Supabase に永続化。現状は dev ログに出力するだけのプロトタイプ。
-  console.log("[submit]", JSON.stringify(submission));
+  // 永続化は Phase 3 で Supabase に接続する。それまでは console に記録のみ。
+  // 公開ローンチ初期は投稿機能を「準備中」表示にし、503 を返してフロントに案内させる。
+  console.log("[submit:queued]", JSON.stringify(submission));
+
+  if (process.env.SUBMIT_ENABLED !== "1") {
+    return NextResponse.json(
+      {
+        ok: false,
+        status: "preparing",
+        error:
+          "投稿機能は現在準備中です。公開後に順次有効化します（数日内予定）。",
+      },
+      { status: 503 },
+    );
+  }
 
   return NextResponse.json({ ok: true, id, status: "received" });
 }
