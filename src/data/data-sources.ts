@@ -1,6 +1,7 @@
 export type SourceKind = "municipal" | "police" | "aggregator" | "prefecture";
 export type ExtractorType =
   | "llm-html"
+  | "llm-pdf"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -113,6 +114,9 @@ export type DataSourceEntry = {
   license?: string;
   notes?: string;
   requiresResearch?: boolean;
+  // 市町村スコープのソースで、ページに市町村名が明示されない場合の既定値。
+  // llm-html 抽出器が cityName 不明時のジオコード補完に使用。
+  defaultCity?: string;
   verifiedAt: string;
 };
 
@@ -128,6 +132,18 @@ export type DataSourceEntry = {
  * requiresResearch=true はまだ実運用前に要確認。
  *
  * 2026-04-20 URL 実地検証: HTTP 200 を確認済みのものが verified。
+ * 2026-04-26 全 URL を curl で再検証し 13 件の 404 を修正。
+ *
+ * fastbear (https://fastbear.aisometry.com/) との差分メモ:
+ *   - fastbear は Gemini で「警察＋自治体＋報道」公開情報を AI 抽出
+ *   - X bot @fastbearbot 経由でも配信
+ *   - 我々の差分: 報道スクレイピング・X タイムライン取り込みは未実装
+ *     → 将来の追加候補: 共同通信 / 地方紙 RSS / 都道府県警 X アカウント
+ *
+ * 長野県メモ: 県公式 Web は PDF のみで点座標非公開。県公認のリアルタイム閲覧は
+ *   けものおと2 アプリ (株式会社アイエスイー、山形県のけものノートと同ベンダー)。
+ *   API は kuma/kuma が通らず、県と直接協定が必要。当面は市町村サイト
+ *   (nagano-karuizawa / -matsumoto / -saku 等) の HTML を LLM 抽出で集約する方針。
  */
 export const DATA_SOURCES: DataSourceEntry[] = [
   {
@@ -139,11 +155,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://higumap.info/recent", role: "map", hint: "ひぐまっぷ 全道直近 3 ヶ月ヒグマ出没マップ" },
       { url: "https://higumap.info/", role: "map", hint: "ひぐまっぷ トップ" },
-      { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/higuma-top.html", role: "list", hint: "道庁ヒグマトップページ" },
+      { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/kihon.html", role: "list", hint: "道庁ヒグマ基本情報" },
+      { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/joho.html", role: "list", hint: "市町村ヒグマ関連情報リンク集" },
     ],
     extractor: "higumap-api",
     notes: "ひぐまっぷ (https://higumap.info) の公開 JSON API `/map/reportsJson?cityId=X&fiscalYear=Y` を 65 市町村 × 複数年度で取得。道内多くの市町村が採用するヒグマ出没情報プラットフォーム",
-    verifiedAt: "2026-04-20",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "aomori",
@@ -348,7 +365,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     bearStatus: "rare",
     urls: [
       { url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/tsukinowagumamokugeki.html", role: "list", hint: "県公式 クマ目撃情報ページ" },
-      { url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/documents/kumakanri_honbun.pdf", role: "pdf", hint: "茨城県ツキノワグマ管理計画（令和7年3月策定）" },
+      { url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/documents/kumakanri_honbun_2603.pdf", role: "pdf", hint: "茨城県ツキノワグマ管理計画（R7.3 策定・R8.3 一部変更）" },
     ],
     extractor: "llm-html",
     notes: "恒常的生息地なし。2025-06-02 大子町高柴で 2016 年以来 9 年ぶりの確定目撃。県は第二種特定鳥獣管理計画で定着防止方針",
@@ -474,7 +491,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.kanagawa.jp/docs/t4i/cnt/f3813/index.html", role: "list", hint: "神奈川県ツキノワグマ情報" },
     ],
     extractor: "llm-html",
-    verifiedAt: "2026-04-20",
+    notes: "丹沢・道志山系に少数個体群。第二種特定鳥獣管理計画の対象",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "niigata",
@@ -732,15 +750,197 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "長野県 ツキノワグマ情報マップ / けものおと2",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/kuma-map.html", role: "list", hint: "県公式 クマ情報マップ案内ページ (月別 PDF 一覧)" },
-      { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/417-mokugeki1.pdf", role: "pdf", hint: "令和8年4月17日現在 最新目撃情報一覧" },
+      { url: "https://www.pref.nagano.lg.jp/yasei/bear.html", role: "list", hint: "県公式 ツキノワグマトップ" },
+      { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/kuma-map.html", role: "list", hint: "ツキノワグマ情報マップ案内（けものおと2 アプリ・月別 PDF 一覧）" },
+      { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/424mokugeki.pdf", role: "pdf", hint: "令和8年度 最新目撃情報一覧（R8.4.24 現在）" },
       { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/20260331-mokugeki.pdf", role: "pdf", hint: "令和7年度 月別目撃情報（最終月 R8.3）" },
       { url: "https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/08_kuma-map.pdf", role: "pdf", hint: "令和7年度ツキノワグマ出没マップ 8月版（累計視覚マップ）" },
     ],
     extractor: "llm-html",
-    notes: "県公式は PDF 月次リストのみで点座標非公開。R7 (2025) 全年集計は 12 本の月別 PDF から 2,346 件・71 市町村。『けものおと2』アプリの API は未公開",
-    verifiedAt: "2026-04-21",
+    notes: "県公式 Web は PDF 月次リストのみで点座標非公開。県公認の閲覧手段は『けものおと2』スマホアプリ (com.kemonote2b.app, 株式会社アイエスイー製、山形県のけものノートと同ベンダー)。API は kuma/kuma の guest 資格情報を受け付けず、県と直接協定しないとデータ取得不可。R7 (2025) 全年集計は 12 本の月別 PDF から 2,346 件・71 市町村。点座標を補うため市町村の独自公開ページ (nagano-* 系 source) を併用",
+    verifiedAt: "2026-04-26",
   },
+  // 長野県 月別目撃情報 PDF (R7.4 〜 R8.4) — 各 PDF を Gemini PDF native input で抽出
+  ...(
+    [
+      { ym: "R7.4 (2025-04)", file: "r070430_mokugeki.pdf" },
+      { ym: "R7.5 (2025-05)", file: "r070531_mokugeki.pdf" },
+      { ym: "R7.6 (2025-06)", file: "0706_mokugeki.pdf" },
+      { ym: "R7.7 (2025-07)", file: "r0707_mokugeki.pdf" },
+      { ym: "R7.8 (2025-08)", file: "20250903mokugeki.pdf" },
+      { ym: "R7.9 (2025-09)", file: "20250930-mokugeki.pdf" },
+      { ym: "R7.10 (2025-10)", file: "251031_mokugeki.pdf" },
+      { ym: "R7.11 (2025-11)", file: "251130-mokugeki.pdf" },
+      { ym: "R7.12 (2025-12)", file: "20251231-mokugeki.pdf" },
+      { ym: "R8.1 (2026-01)", file: "20260206-mokugeki.pdf" },
+      { ym: "R8.2 (2026-02)", file: "20260306-mokugeki.pdf" },
+      { ym: "R8.3 (2026-03)", file: "20260331-mokugeki.pdf" },
+      { ym: "R8.4 (2026-04)", file: "424mokugeki.pdf" },
+    ].map(({ ym, file }) => ({
+      id: `nagano-pdf-${file.replace(/\.pdf$/, "")}`,
+      kind: "prefecture" as SourceKind,
+      prefCode: "20",
+      regionLabel: `長野県 ツキノワグマ目撃情報 ${ym}`,
+      bearStatus: "present" as BearStatus,
+      urls: [
+        {
+          url: `https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/documents/${file}`,
+          role: "pdf" as UrlRole,
+          hint: `長野県 ${ym} 月別目撃情報一覧 PDF`,
+        },
+      ],
+      extractor: "llm-pdf" as ExtractorType,
+      notes: `長野県公式の月別目撃情報 PDF。表形式 (No / 月日 / 市町村 / 区分 / 目撃痕跡別 / 大きさ / 頭数 / 状況) を Gemini で構造化抽出`,
+      verifiedAt: "2026-04-26",
+    }))
+  ),
+  {
+    id: "nagano-karuizawa",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 軽井沢町 軽井沢さるクマ情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.thread.ne.jp/kta2/sarukuma.html", role: "map", hint: "軽井沢町・観光協会協同のクマ／サル目撃マップ（過去4週間）" },
+      { url: "https://karuizawa-kankokyokai.jp/information/88027/", role: "list", hint: "軽井沢観光協会 クマ情報案内" },
+    ],
+    extractor: "llm-html",
+    notes: "thread.ne.jp/kta2 上で動作する独自 SPA。データ API は非公開のため LLM-HTML 抽出か手動取り込み想定。長野県内市町村で独自に位置データを公開している数少ない例",
+    requiresResearch: true,
+    defaultCity: "軽井沢町",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-matsumoto",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 松本市 クマ目撃情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.matsumoto.nagano.jp/soshiki/216/180997.html", role: "list", hint: "松本市 クマの目撃情報" },
+      { url: "https://www.city.matsumoto.nagano.jp/soshiki/74/3168.html", role: "list", hint: "松本市 ツキノワグマによる人身被害防止" },
+      { url: "https://x.com/Matsumoto_city", role: "rss", hint: "松本市公式 X — 出没速報あり" },
+    ],
+    extractor: "llm-html",
+    notes: "松本市は HTML テーブルで日時・地区を公開。座標は無いので地名→ジオコード前提",
+    requiresResearch: true,
+    defaultCity: "松本市",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-saku",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 佐久市 ツキノワグマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.saku.nagano.jp/kankyo_shizen/dobutsu_pet/yaseidoubutu/syutsubotsu.html", role: "list", hint: "佐久市 出没情報" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "佐久市",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-chino",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 茅野市 クマ出没注意",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.chino.lg.jp/soshiki/nourin/kumamokugeki.html", role: "list", hint: "茅野市 農林課 クマ目撃情報" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "茅野市",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-fujimi",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 富士見町 クマの目撃情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.town.fujimi.lg.jp/page/kuma.html", role: "list", hint: "富士見町 クマの目撃情報" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "富士見町",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-miyota",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 御代田町 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.town.miyota.nagano.jp/category/tyoujuutaisaku/161067.html", role: "list", hint: "御代田町 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "御代田町",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-ogawa",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 小川村 ツキノワグマ出没（目撃）マップ",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.vill.ogawa.nagano.jp/docs/45429.html", role: "map", hint: "小川村 出没（目撃）マップ" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "小川村",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "nagano-nagano",
+    kind: "municipal",
+    prefCode: "20",
+    regionLabel: "長野県 長野市 野生獣（クマなど）の出没",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.nagano.nagano.jp/n162000/contents/p001080.html", role: "list", hint: "長野市 野生獣の出没情報" },
+    ],
+    extractor: "llm-html",
+    requiresResearch: true,
+    defaultCity: "長野市",
+    verifiedAt: "2026-04-26",
+  },
+  // 長野県 主要市町村 — 個別出没情報を公開しているページ (Plan B 追加分)
+  // 注: 大町市は kuma_tyuui.html から月別 PDF へリンクしていたが、毎月 URL が変わり
+  // 1ヶ月程度で 404 化するため、自動取り込みは断念。県の月別 PDF (nagano-pdf-*) で代替。
+  ...(
+    [
+      { id: "ueda", city: "上田市", url: "https://www.city.ueda.nagano.jp/soshiki/sinrin/67323.html", hint: "上田市 クマ目撃情報" },
+      { id: "omachi", city: "大町市", url: "https://www.city.omachi.nagano.jp/00005000/00005200/kuma_tyuui.html", hint: "大町市 ツキノワグマによる人身被害防止" },
+      { id: "shiojiri", city: "塩尻市", url: "https://www.city.shiojiri.lg.jp/soshiki/5/42952.html", hint: "塩尻市 熊の目撃情報" },
+      { id: "ina", city: "伊那市", url: "https://www.inacity.jp/sangyo_noringyo/noringyo/yugaichoju/index.html", hint: "伊那市 有害鳥獣（クマ・サル・シカ等）" },
+      { id: "komagane", city: "駒ヶ根市", url: "https://www.city.komagane.nagano.jp/soshikiichiran/norinka/kochirimmugakari/1/1/1626.html", hint: "駒ヶ根市 クマの出没にご注意ください" },
+      { id: "komoro", city: "小諸市", url: "https://www.city.komoro.lg.jp/soshikikarasagasu/sangyoushinkoubu/norinka/2/1/1/15090.html", hint: "小諸市 クマの出没・目撃情報" },
+      { id: "iiyama", city: "飯山市", url: "https://www.city.iiyama.nagano.jp/soshiki/shinrin-nouchi/chojutaisaku/57822/kuma", hint: "飯山市 クマの出没にご注意ください" },
+      { id: "iida", city: "飯田市", url: "https://www.city.iida.lg.jp/soshiki/23/kumasyutsubotsu.html", hint: "飯田市 クマの出没にご注意ください" },
+      { id: "suzaka", city: "須坂市", url: "https://www.city.suzaka.nagano.jp/soshiki/5010/4/5396.html", hint: "須坂市 2025年度ツキノワグマの目撃情報" },
+      { id: "nakano", city: "中野市", url: "https://www.city.nakano.nagano.jp/docs/2021070700049/", hint: "中野市 ツキノワグマに要注意（熊出没マップ）" },
+      { id: "yamanouchi", city: "山ノ内町", url: "https://www.town.yamanouchi.nagano.jp/soshiki/kochirinmu/gyomu/nogyo_ringyo_suisan/yasechoju/704.html", hint: "山ノ内町 ツキノワグマによる被害を防ぐ" },
+      { id: "sakaki", city: "坂城町", url: "https://www.town.sakaki.nagano.jp/www/contents/1749529882626/index.html", hint: "坂城町 イノシシ・クマの出没マップ" },
+    ].map(({ id, city, url, hint }) => ({
+      id: `nagano-${id}`,
+      kind: "municipal" as SourceKind,
+      prefCode: "20",
+      regionLabel: `長野県 ${city} クマ出没情報`,
+      bearStatus: "present" as BearStatus,
+      urls: [{ url, role: "list" as UrlRole, hint }],
+      extractor: "llm-html" as ExtractorType,
+      requiresResearch: true,
+      defaultCity: city,
+      verifiedAt: "2026-04-26",
+    }))
+  ),
   {
     id: "gifu",
     kind: "prefecture",
@@ -783,31 +983,52 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "shizuoka",
     kind: "prefecture",
     prefCode: "22",
-    regionLabel: "静岡県 ツキノワグマ出没情報（県公式 PDF 全件リスト）",
+    regionLabel: "静岡県 ツキノワグマ出没情報トップ",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.shizuoka.jp/kurashikankyo/shizenkankyo/wild/1017680.html", role: "list", hint: "県自然保護課 ツキノワグマトップ" },
-      { url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/r7kumamap.pdf", role: "pdf", hint: "令和7年度 静岡県ツキノワグマ目撃情報（200件通し番号リスト）" },
-      { url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/r6kuma.pdf", role: "pdf", hint: "令和6年度 クマ出没マップ（156件）" },
-      { url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/05kumasyutubotu.pdf", role: "pdf", hint: "令和5年度 クマ出没情報" },
-      { url: "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/zinshinreport.pdf", role: "pdf", hint: "人身事故発生報告" },
     ],
     extractor: "llm-html",
-    notes: "県自然保護課が年度毎に地図＋通し番号リスト PDF を公開。R7 200件、R6 156件、R5 以降急増中。座標は PDF 上の地図のみで点データ API 未公開（Google My Map R8 版は shizuoka-gmap で別途取得）",
-    verifiedAt: "2026-04-21",
+    notes: "県自然保護課が年度毎に地図＋通し番号リスト PDF を公開。R7 200件、R6 156件、R5 以降急増中。座標は PDF 上の地図のみで点データ API 未公開。R8 版は shizuoka-gmap、PDF データは shizuoka-pdf-* で別途取得",
+    verifiedAt: "2026-04-26",
   },
+  // 静岡県 年度別 PDF (R5/R6/R7) — 表形式 (No / 目撃日 / 市町 / 地名等 / 備考)
+  ...(
+    [
+      { fy: "R7 (2025)", file: "r7kumamap.pdf", hint: "令和7年度 (200件)" },
+      { fy: "R6 (2024)", file: "r6kuma.pdf", hint: "令和6年度 (156件)" },
+      { fy: "R5 (2023)", file: "05kumasyutubotu.pdf", hint: "令和5年度" },
+    ].map(({ fy, file, hint }) => ({
+      id: `shizuoka-pdf-${file.replace(/\.pdf$/, "")}`,
+      kind: "prefecture" as SourceKind,
+      prefCode: "22",
+      regionLabel: `静岡県 ${fy} ツキノワグマ目撃情報`,
+      bearStatus: "present" as BearStatus,
+      urls: [
+        {
+          url: `https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001/017/680/${file}`,
+          role: "pdf" as UrlRole,
+          hint,
+        },
+      ],
+      extractor: "llm-pdf" as ExtractorType,
+      notes: "静岡県公式 PDF。表形式 (目撃日 / 市町 / 地名等 / 備考)",
+      verifiedAt: "2026-04-26",
+    }))
+  ),
   {
     id: "aichi",
     kind: "prefecture",
     prefCode: "23",
-    regionLabel: "愛知県 クマ情報",
+    regionLabel: "愛知県 ツキノワグマ情報",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.aichi.jp/soshiki/shizen/kuma.html", role: "list" },
+      { url: "https://www.pref.aichi.jp/soshiki/shizen/tsukinowaguma.html", role: "list", hint: "県公式 ツキノワグマトップ" },
+      { url: "https://www.pref.aichi.jp/press-release/tsukinowaguma2025.html", role: "list", hint: "2025年度 出没予測プレスリリース" },
     ],
     extractor: "llm-html",
-    requiresResearch: true,
-    verifiedAt: "2026-04-20",
+    notes: "三河山間部に生息（レッドリストあいち2025: 絶滅危惧IA類）。県は年度ごとに出没予測と確認情報を PDF で公開",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "mie",
@@ -936,30 +1157,46 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "wakayama",
     kind: "prefecture",
     prefCode: "30",
-    regionLabel: "和歌山県 クマ情報",
+    regionLabel: "和歌山県 ツキノワグマ",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.wakayama.lg.jp/prefg/031500/kuma.html", role: "list" },
+      { url: "https://www.pref.wakayama.lg.jp/prefg/032600/yasei/kuma.html", role: "list", hint: "県公式 ツキノワグマ" },
+      { url: "https://www.pref.wakayama.lg.jp/prefg/032600/kanri_d/fil/honbun.pdf", role: "pdf", hint: "和歌山県第二種特定鳥獣（ツキノワグマ）管理計画 R7.10〜R9.3" },
     ],
     extractor: "llm-html",
-    requiresResearch: true,
-    verifiedAt: "2026-04-20",
+    notes: "紀伊半島中部個体群（三重・奈良共通）。R6 推定 467 頭で 400 頭の管理閾値を超過",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "tottori",
     kind: "prefecture",
     prefCode: "31",
-    regionLabel: "鳥取県 ツキノワグマ出没情報（県公式 PDF＋ダッシュボード）",
+    regionLabel: "鳥取県 ツキノワグマ出没情報トップ",
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.tottori.lg.jp/item/1143816.htm", role: "list", hint: "県公式 クマ出没情報トップ" },
-      { url: "https://www.pref.tottori.lg.jp/secure/1143816/R8.3.31kuma.pdf", role: "pdf", hint: "令和7年度 クマ目撃・痕跡情報一覧" },
-      { url: "https://www.pref.tottori.lg.jp/secure/1370084/monthly_bear_sightings.pdf", role: "pdf", hint: "出没件数推移（R1-R7 年度別・月別・地域別）" },
       { url: "https://dashboard.cv-dip.tottori.jp/root/asset?id=4&map=true", role: "map", hint: "出没位置図 (Web ダッシュボード、PC 表示)" },
     ],
     extractor: "llm-html",
-    notes: "西中国地域個体群、絶滅危惧。R6 272 件、R7 95 件。地域 3 区分（東部・中部・西部）で集計。市町村別は一覧 PDF 76 件から近似。県公式の位置図 API は未公開",
-    verifiedAt: "2026-04-21",
+    notes: "西中国地域個体群、絶滅危惧。R6 272 件、R7 95 件。地域 3 区分（東部・中部・西部）で集計。点データ PDF は tottori-pdf-* で別途取得",
+    verifiedAt: "2026-04-26",
+  },
+  {
+    id: "tottori-pdf-r7",
+    kind: "prefecture",
+    prefCode: "31",
+    regionLabel: "鳥取県 R7 (2025) クマ目撃・痕跡情報一覧",
+    bearStatus: "present",
+    urls: [
+      {
+        url: "https://www.pref.tottori.lg.jp/secure/1143816/R8.3.31kuma.pdf",
+        role: "pdf",
+        hint: "令和7年度 クマ目撃・痕跡情報一覧 (76件、R8.3.31 時点)",
+      },
+    ],
+    extractor: "llm-pdf",
+    notes: "鳥取県公式 PDF。表形式 (日付/時間/地域/地名/区分/要因/出没地/状況)。和暦 (R7.4.19, R8.3.3 等) → 西暦変換が必要",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "shimane",
@@ -1011,14 +1248,16 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "hiroshima",
     kind: "prefecture",
     prefCode: "34",
-    regionLabel: "広島県 クマ情報",
+    regionLabel: "広島県 ツキノワグマ（野生鳥獣保護管理ポータル）",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.hiroshima.lg.jp/soshiki/84/kuma.html", role: "list" },
+      { url: "https://www.pref.hiroshima.lg.jp/site/wildlife-management/wm-bear-main.html", role: "list", hint: "県 野生鳥獣保護管理ポータル ツキノワグマトップ" },
+      { url: "https://www.pref.hiroshima.lg.jp/site/wildlife-management/wm-bear02-attention.html", role: "list", hint: "活動期注意喚起" },
+      { url: "https://www.pref.hiroshima.lg.jp/uploaded/attachment/599189.pdf", role: "pdf", hint: "令和6年度 ツキノワグマ出没状況" },
     ],
     extractor: "llm-html",
-    requiresResearch: true,
-    verifiedAt: "2026-04-20",
+    notes: "西中国地域個体群（島根・山口と共通）、絶滅危惧。R6 (2024) 4-10月 639 件",
+    verifiedAt: "2026-04-26",
   },
   {
     id: "yamaguchi",
