@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdnjs.cloudflare.com" },
     ],
   },
+  outputFileTracingIncludes: {
+    "/api/kuma": ["public/data/sightings.json"],
+    "/api/ask": ["public/data/sightings.json"],
+    "/api/summary": ["public/data/sightings.json"],
+  },
   async redirects() {
     return [
       ...SEO_REDIRECT_SLUGS.map((slug) => ({
