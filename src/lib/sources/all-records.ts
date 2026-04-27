@@ -1,4 +1,3 @@
-import { fetchAllOfficialSightings } from "./aggregate";
 import type { UnifiedSighting } from "./types";
 
 const SHARP9110_URL = "https://public.sharp9110.com/view/opendatajson/bear";
@@ -56,10 +55,3 @@ export async function getSharp9110Sightings(): Promise<UnifiedSighting[]> {
   }
 }
 
-export async function getAllSightings(): Promise<UnifiedSighting[]> {
-  const [sharp, official] = await Promise.all([
-    getSharp9110Sightings().catch(() => [] as UnifiedSighting[]),
-    fetchAllOfficialSightings().catch(() => [] as UnifiedSighting[]),
-  ]);
-  return [...sharp, ...official];
-}

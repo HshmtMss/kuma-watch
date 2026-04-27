@@ -1,4 +1,4 @@
-import { getAllSightings } from "@/lib/sources/all-records";
+import { getCachedSightings } from "@/lib/sightings-cache";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 export type NearbyOptions = {
@@ -29,7 +29,7 @@ export async function findNearbySightings(
   const withinDays = opts.withinDays ?? 365;
   const limit = opts.limit ?? 15;
 
-  const all = await getAllSightings();
+  const all = await getCachedSightings();
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - withinDays);
   const cutoffIso = cutoff.toISOString().split("T")[0];
