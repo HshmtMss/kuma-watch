@@ -98,16 +98,77 @@ export const SOFT_LEVEL_LABEL: Record<RiskLevel, string> = {
   unknown: "データ取得中",
 };
 
-/** 段階別の一行説明 (Flutter くまもりマップと同じスタイルの状況説明)。
- *  「クマ出没危険度」を説明する文章なので、それ自体が何のレベルかをすぐ把握できる。 */
+/** 生息分布調査 (= 定着個体の長期記録) ベースの一行説明。
+ *  最近の目撃情報は別の軸なので、RiskHero 側で並列に表示する。 */
 export const LEVEL_DESCRIPTION: Record<RiskLevel, string> = {
-  safe: "出没報告のない地域です",
-  low: "報告は少ない地域ですが念のため注意",
-  moderate: "定期的に出没報告がある地域です",
-  elevated: "最近の出没報告がある地域です",
-  high: "頻繁に出没報告がある地域です",
-  unknown: "情報を取得中です",
+  safe: "定着個体の記録なし",
+  low: "古い記録のみ・最新調査では確認なし",
+  moderate: "最新調査で記録あり",
+  elevated: "継続して生息が確認されている",
+  high: "恒常的な生息域",
+  unknown: "情報を取得中",
 };
+
+/** 一般ユーザー向けの 3 段階サマリ。
+ *  5 段階の正確さは詳細バーで残し、画面トップの結論はこれで一目化する。 */
+export type ShortVerdict = "safe" | "caution" | "danger";
+
+export const SHORT_VERDICT_OF: Record<RiskLevel, ShortVerdict> = {
+  safe: "safe",
+  low: "caution",
+  moderate: "caution",
+  elevated: "danger",
+  high: "danger",
+  unknown: "safe",
+};
+
+export const SHORT_VERDICT_LABEL: Record<ShortVerdict, string> = {
+  safe: "安全",
+  caution: "注意",
+  danger: "危険",
+};
+
+export const SHORT_VERDICT_COLOR: Record<ShortVerdict, string> = {
+  safe: "#06b6d4", // cyan-500
+  caution: "#F59E0B", // amber-500
+  danger: "#EF4444", // red-500
+};
+
+export const SHORT_VERDICT_EMOJI: Record<ShortVerdict, string> = {
+  safe: "🟢",
+  caution: "🟡",
+  danger: "🔴",
+};
+
+/**
+ * 過去1年の目撃件数 (メッシュ単位) からそのセルが示す「目撃由来レベル」を返す。
+ * ヒートマップ・カード両方で同じ式を使うことで、視覚と数値が完全に一致する。
+ *
+ *   0 件     → safe   (寄与なし)
+ *   1〜2 件  → low    (流れ込み程度)
+ *   3〜9 件  → moderate
+ *   10 件〜  → elevated
+ */
+export function sightingsToLevel(count: number): RiskLevel {
+  if (count >= 10) return "elevated";
+  if (count >= 3) return "moderate";
+  if (count >= 1) return "low";
+  return "safe";
+}
+
+const LEVEL_ORDER: Record<RiskLevel, number> = {
+  unknown: -1,
+  safe: 0,
+  low: 1,
+  moderate: 2,
+  elevated: 3,
+  high: 4,
+};
+
+/** 2 つの RiskLevel のうち、より高い (危険な) 方を返す。 */
+export function maxLevel(a: RiskLevel, b: RiskLevel): RiskLevel {
+  return LEVEL_ORDER[a] >= LEVEL_ORDER[b] ? a : b;
+}
 
 export type ScoreOptions = {
   nearbyWeightedCount?: number;
@@ -392,7 +453,13 @@ export function toRiskLevel(score: number): RiskLevel {
  *   else                  → high
  */
 export type LevelThresholds = readonly [number, number, number, number];
-export const DEFAULT_LEVEL_THRESHOLDS: LevelThresholds = [0, 20, 40, 50];
+// 5 段階の境界値:
+//   safe:     score = 0
+//   low:      0  < score < 30   (古い調査記録のみで最新は途絶え)
+//   moderate: 30 ≤ score < 45   (最新調査で記録あり = ×3.0 系)
+//   elevated: 45 ≤ score < 50   (最新+第6回 = 継続中)
+//   high:     score = 50         (全3回で記録 = 恒常的生息域)
+export const DEFAULT_LEVEL_THRESHOLDS: LevelThresholds = [0, 30, 45, 50];
 
 export function kumamoriLevel(
   historyScore: number,

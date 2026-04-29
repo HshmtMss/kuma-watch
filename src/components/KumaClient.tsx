@@ -14,7 +14,10 @@ import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
-import RiskPanel, { type SelectedLocation } from "@/components/RiskPanel";
+import RiskPanel, {
+  type SelectedLocation,
+  type AskContext,
+} from "@/components/RiskPanel";
 import AskBox from "@/components/AskBox";
 import TopWeatherBadge from "@/components/TopWeatherBadge";
 import SettingsPanel from "@/components/SettingsPanel";
@@ -36,8 +39,8 @@ const SMOOTHING_SIGMA_KEY = "kumaWatch.smoothingSigmaKm";
 const HALO_OPACITY_KEY = "kumaWatch.haloOpacity";
 const LEVEL_THRESHOLDS_KEY = "kumaWatch.levelThresholds";
 const DEFAULT_TILE_STYLE: TileStyle = "standard";
-const DEFAULT_HEATMAP_OPACITY = 0.4;
-const DEFAULT_SMOOTHING_SIGMA_KM = 0; // 0 = 無効 (Flutter 同等)
+const DEFAULT_HEATMAP_OPACITY = 0.5;
+const DEFAULT_SMOOTHING_SIGMA_KM = 1; // 微 (3×3) で穴埋めをデフォルト ON
 // halo (穴埋め) セルの不透明度倍率。1.0 = habitat と同じ濃さで描画。
 // 0.5 などにすると視覚的に薄くなり、カードの危険度バーと色が違って見える原因になるので、
 // 既定は 1.0 に揃える (管理者は ?admin=1 から再調整可能)。
@@ -93,6 +96,10 @@ export default function KumaClient() {
   } | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [, setMeshGeneratedAt] = useState<string | null>(null);
+  const [sightingCountByMesh, setSightingCountByMesh] = useState<
+    Map<string, number> | undefined
+  >(undefined);
+  const [askContext, setAskContext] = useState<AskContext | null>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false);
   // 投稿フローからの「地図から選ぶ」モード (mount 時に URL クエリで判定)
@@ -439,14 +446,19 @@ export default function KumaClient() {
   // GPS 自動取得: ページを開いた時に一度だけ走らせる。
   // currentLocation (青丸) は常に更新、selectedLocation (赤ピン) は
   // sessionStorage に復元があればそちらを優先。
+  // ユーザーが GPS 解決前にマップをタップ/検索したときに「いきなり現在地に
+  // 戻る」現象を防ぐため、最新の selectedLocation を ref で参照し、
+  // 既に選択がある場合は青丸 (currentLocation) のみ更新する。
+  const selectedLocationRef = useRef<SelectedLocation | null>(null);
+  useEffect(() => {
+    selectedLocationRef.current = selectedLocation;
+  }, [selectedLocation]);
   const autoGpsRanRef = useRef(false);
   useEffect(() => {
     if (autoGpsRanRef.current) return;
     if (typeof window === "undefined") return;
     if (!navigator.geolocation) return;
     autoGpsRanRef.current = true;
-    const hasRestoredSelection =
-      !!window.sessionStorage.getItem(LAST_LOCATION_KEY);
     let cancelled = false;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -454,7 +466,9 @@ export default function KumaClient() {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         setCurrentLocation({ lat, lon });
-        if (!hasRestoredSelection) {
+        // GPS 解決時点で既にユーザーが地点を選んでいたら上書きしない。
+        // (タップ・検索・URL 復元・sessionStorage 復元のいずれも含む)
+        if (!selectedLocationRef.current) {
           setSelectedLocation({ lat, lon, source: "gps" });
         }
       },
@@ -481,6 +495,26 @@ export default function KumaClient() {
     };
   }, []);
 
+  // 過去 1 年の目撃をメッシュ別に集計したマップ。
+  // ヒートマップとカード両方で「危険度の格上げ」に使い、視覚と数値を完全一致させる。
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/sighting-cells")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { counts?: Record<string, number> } | null) => {
+        if (cancelled || !data?.counts) return;
+        const map = new Map<string, number>();
+        for (const [code, n] of Object.entries(data.counts)) {
+          if (typeof n === "number" && n > 0) map.set(code, n);
+        }
+        setSightingCountByMesh(map);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = useMemo(() => {
     if (!showPins) return [];
     return records.filter((r) => {
@@ -493,16 +527,13 @@ export default function KumaClient() {
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
-      <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
+      <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2.5 shadow-sm">
         <Link href="/" className="flex shrink-0 items-center" aria-label="KumaWatch">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="KumaWatch"
-            width={120}
-            height={36}
-            priority
-            className="h-8 w-auto"
-            style={{ width: "auto", height: "2rem" }}
+            className="block h-8 w-auto"
           />
         </Link>
 
@@ -510,33 +541,33 @@ export default function KumaClient() {
           <PlaceSearch compact onPick={handleSearchPick} />
         </div>
 
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           {/* AI に聞く: クマの顔アイコン + テキスト (コンパクト) */}
           <button
             onClick={() => setShowChat(true)}
-            className="flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+            className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 text-sm font-semibold text-amber-800 hover:bg-amber-100"
             aria-label="AI に質問"
             title="AI に質問"
           >
             <Image
               src="/bear-face.png"
               alt=""
-              width={20}
-              height={20}
+              width={24}
+              height={24}
               aria-hidden
-              style={{ width: "1.25rem", height: "auto" }}
+              style={{ width: "1.5rem", height: "auto" }}
             />
             <span className="hidden sm:inline">AI に聞く</span>
           </button>
           <details className="relative">
-            <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-gray-300 bg-white text-base font-semibold text-gray-800">
+            <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-semibold text-gray-800">
               ⋮
               <span className="sr-only">メニュー</span>
             </summary>
-            <div className="absolute right-0 top-11 z-10 w-48 rounded-lg border border-gray-200 bg-white py-1 text-sm text-gray-800 shadow-lg">
+            <div className="absolute right-0 top-12 z-10 w-56 rounded-lg border border-gray-200 bg-white py-1 text-base text-gray-800 shadow-lg">
               {/* 地図スタイル切替 */}
-              <div className="border-b border-gray-100 px-3 py-2">
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+              <div className="border-b border-gray-100 px-3 py-2.5">
+                <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
                   地図スタイル
                 </div>
                 <div className="flex gap-1">
@@ -551,7 +582,7 @@ export default function KumaClient() {
                       key={opt.v}
                       type="button"
                       onClick={() => setTileStyle(opt.v as TileStyle)}
-                      className={`flex-1 rounded-md px-2 py-1 text-xs ${
+                      className={`flex-1 rounded-md px-2 py-1.5 text-sm ${
                         tileStyle === opt.v
                           ? "bg-amber-100 font-semibold text-amber-900"
                           : "text-gray-800 hover:bg-gray-100"
@@ -562,19 +593,19 @@ export default function KumaClient() {
                   ))}
                 </div>
               </div>
-              <a href="/about" className="block px-3 py-2 text-gray-800 hover:bg-gray-100">
+              <a href="/about" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
                 このサイトについて
               </a>
-              <a href="/for-gov" className="block px-3 py-2 text-gray-800 hover:bg-gray-100">
+              <a href="/for-gov" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
                 自治体の方へ
               </a>
               <a
                 href="/disclaimer"
-                className="block px-3 py-2 text-gray-800 hover:bg-gray-100"
+                className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100"
               >
                 免責事項
               </a>
-              <a href="/privacy" className="block px-3 py-2 text-gray-800 hover:bg-gray-100">
+              <a href="/privacy" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
                 プライバシー
               </a>
             </div>
@@ -582,17 +613,17 @@ export default function KumaClient() {
         </div>
       </header>
 
-      {/* 表示設定 — 1 行に集約 */}
-      <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-white px-2 py-1.5">
-        <div className="flex items-center gap-1.5 overflow-x-auto text-[11px]">
-          {/* 出没ピン (表示 ON/OFF + 期間セレクト + 件数) */}
-          <div className="flex shrink-0 items-center overflow-hidden rounded-full border border-stone-200 bg-stone-50">
-            <label className="flex items-center gap-1 px-2 py-1 font-medium text-stone-700">
+      {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}
+      <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-white px-2 py-2">
+        <div className="flex items-stretch gap-2 text-sm sm:text-xs">
+          {/* 出没ピン (表示 ON/OFF + 期間セレクト + 件数) — 横幅を取って広がる */}
+          <div className="flex flex-1 items-center overflow-hidden rounded-full border border-stone-200 bg-stone-50">
+            <label className="flex shrink-0 items-center gap-1.5 px-2.5 py-1.5 font-medium text-stone-700">
               <input
                 type="checkbox"
                 checked={showPins}
                 onChange={(e) => setShowPins(e.target.checked)}
-                className="h-3 w-3 accent-amber-600"
+                className="h-4 w-4 accent-amber-600"
               />
               出没ピン
             </label>
@@ -602,7 +633,7 @@ export default function KumaClient() {
                 setPeriod(e.target.value === "" ? null : Number(e.target.value))
               }
               disabled={!showPins}
-              className="border-l border-stone-200 bg-white py-1 pl-1.5 pr-1 text-stone-700 disabled:opacity-40"
+              className="flex-1 border-l border-stone-200 bg-white py-1.5 pl-2 pr-1 text-stone-700 disabled:opacity-40"
               aria-label="期間"
             >
               {PERIOD_OPTIONS.map((p) => (
@@ -612,7 +643,7 @@ export default function KumaClient() {
               ))}
             </select>
             <span
-              className="border-l border-stone-200 bg-white px-2 py-1 tabular-nums text-stone-600"
+              className="shrink-0 border-l border-stone-200 bg-white px-2.5 py-1.5 tabular-nums text-stone-600"
               aria-label="該当件数"
               suppressHydrationWarning
             >
@@ -620,39 +651,21 @@ export default function KumaClient() {
             </span>
           </div>
 
-          {/* 危険度ヒートマップ (表示 ON/OFF + 濃さ) */}
-          <div className="flex shrink-0 items-center overflow-hidden rounded-full border border-gray-200 bg-gray-50">
-            <label className="flex items-center gap-1 px-2 py-1 font-medium text-gray-700">
-              <input
-                type="checkbox"
-                checked={showHeatmap}
-                onChange={(e) => setShowHeatmap(e.target.checked)}
-                className="h-3 w-3 accent-amber-600"
-              />
-              危険度
-            </label>
-            <div className="flex items-center gap-1 border-l border-gray-200 bg-white px-2 py-1">
-              <span className={showHeatmap ? "text-gray-600" : "text-gray-400"}>
-                濃さ
-              </span>
-              <input
-                type="range"
-                min={0.1}
-                max={0.9}
-                step={0.1}
-                value={heatmapOpacity}
-                onChange={(e) => setHeatmapOpacity(Number(e.target.value))}
-                disabled={!showHeatmap}
-                className="h-1 w-16 cursor-pointer accent-amber-600 disabled:opacity-40"
-                aria-label="ヒートマップ不透明度"
-              />
-            </div>
-          </div>
+          {/* 危険度ヒートマップ ON/OFF */}
+          <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">
+            <input
+              type="checkbox"
+              checked={showHeatmap}
+              onChange={(e) => setShowHeatmap(e.target.checked)}
+              className="h-4 w-4 accent-amber-600"
+            />
+            危険度
+          </label>
 
           {/* 凡例トグル */}
           <button
             onClick={() => setShowLegend((v) => !v)}
-            className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2 py-1 text-gray-700"
+            className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700"
           >
             凡例 {showLegend ? "▲" : "▼"}
           </button>
@@ -667,6 +680,7 @@ export default function KumaClient() {
           smoothingSigmaKm={smoothingSigmaKm}
           haloOpacity={haloOpacity}
           levelThresholds={levelThresholds}
+          sightingCountByMesh={sightingCountByMesh}
           tileStyle={tileStyle}
           selectedLocation={selectedLocation}
           currentLocation={currentLocation}
@@ -715,22 +729,29 @@ export default function KumaClient() {
           </div>
         )}
 
+        {/* 地図右上: 天気バッジ (現在地 or 選択地点) */}
+        <TopWeatherBadge
+          lat={selectedLocation?.lat ?? currentLocation?.lat ?? null}
+          lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
+        />
+
         {/* 右端縦スタック: 共有 / 現在地 / 地図スタイル / ズーム (カード上端に合わせて配置) */}
-        <div className="absolute right-3 bottom-[calc(33vh+0.75rem)] z-[900] flex flex-col gap-2">
+        <div className="absolute right-3 bottom-[calc(41vh+0.75rem)] z-[900] flex flex-col gap-2.5">
           <button
             type="button"
             onClick={requestCurrentLocation}
             disabled={gpsLoading}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-700 shadow-lg hover:bg-gray-50 disabled:opacity-60"
+            className="flex h-13 w-13 items-center justify-center rounded-full bg-white text-gray-700 shadow-lg hover:bg-gray-50 disabled:opacity-60"
+            style={{ height: "3.25rem", width: "3.25rem" }}
             aria-label="現在地を取得"
             title="現在地を取得"
           >
             {gpsLoading ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-amber-600" />
+              <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-amber-600" />
             ) : (
               <svg
-                width="22"
-                height="22"
+                width="26"
+                height="26"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -748,7 +769,8 @@ export default function KumaClient() {
             <button
               type="button"
               onClick={handleZoomIn}
-              className="flex h-11 w-11 items-center justify-center text-lg font-light text-gray-700 hover:bg-gray-50"
+              className="flex items-center justify-center text-2xl font-light text-gray-700 hover:bg-gray-50"
+              style={{ height: "3.25rem", width: "3.25rem" }}
               aria-label="拡大"
               title="拡大"
             >
@@ -758,7 +780,8 @@ export default function KumaClient() {
             <button
               type="button"
               onClick={handleZoomOut}
-              className="flex h-11 w-11 items-center justify-center text-lg font-light text-gray-700 hover:bg-gray-50"
+              className="flex items-center justify-center text-2xl font-light text-gray-700 hover:bg-gray-50"
+              style={{ height: "3.25rem", width: "3.25rem" }}
               aria-label="縮小"
               title="縮小"
             >
@@ -766,12 +789,6 @@ export default function KumaClient() {
             </button>
           </div>
         </div>
-
-        {/* 右上: 選択地点 / 現在地の現在気象 (mesh データ更新日は about ページに移譲) */}
-        <TopWeatherBadge
-          lat={selectedLocation?.lat ?? currentLocation?.lat ?? null}
-          lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
-        />
 
         {/* 管理者用詳細設定 (?admin=1 で有効化) */}
         {isAdmin && (
@@ -828,24 +845,33 @@ export default function KumaClient() {
                 <Image
                   src="/bear-face.png"
                   alt=""
-                  width={24}
-                  height={24}
+                  width={28}
+                  height={28}
                   aria-hidden
-                  style={{ width: "1.5rem", height: "auto" }}
+                  style={{ width: "1.75rem", height: "auto" }}
                 />
-                <span className="text-base font-semibold text-gray-900">
+                <span className="text-lg font-semibold text-gray-900">
                   AI に質問
                 </span>
-                {selectedLocation && (
-                  <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] text-amber-800">
-                    選択中: {selectedLocation.lat.toFixed(3)},{" "}
-                    {selectedLocation.lon.toFixed(3)}
+                {askContext?.place ? (
+                  <span className="truncate rounded-full bg-amber-50 px-2.5 py-1 text-sm text-amber-800">
+                    {askContext.place}
+                    {askContext.level
+                      ? ` / 危険度 ${RISK_LEVEL_LABEL[askContext.level as RiskLevel] ?? askContext.level}`
+                      : ""}
                   </span>
+                ) : (
+                  selectedLocation && (
+                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-sm text-amber-800">
+                      選択中: {selectedLocation.lat.toFixed(3)},{" "}
+                      {selectedLocation.lon.toFixed(3)}
+                    </span>
+                  )
                 )}
                 <button
                   type="button"
                   onClick={() => setShowChat(false)}
-                  className="ml-auto flex h-7 w-7 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                  className="ml-auto flex h-9 w-9 items-center justify-center rounded-full text-2xl text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                   aria-label="閉じる"
                 >
                   ×
@@ -853,12 +879,13 @@ export default function KumaClient() {
               </div>
               <AskBox
                 context={
-                  selectedLocation
+                  askContext ??
+                  (selectedLocation
                     ? {
                         lat: selectedLocation.lat,
                         lon: selectedLocation.lon,
                       }
-                    : undefined
+                    : undefined)
                 }
               />
             </div>
@@ -874,8 +901,8 @@ export default function KumaClient() {
 
 
         {showLegend && (
-          <div className="pointer-events-auto absolute bottom-[calc(33vh+0.75rem)] left-3 z-[900] w-40 rounded-xl border border-black/8 bg-white/95 p-2.5 text-[11px] text-gray-700 shadow backdrop-blur">
-            <div className="mb-1 flex items-center justify-between">
+          <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] w-48 rounded-xl border border-black/8 bg-white/95 p-3 text-sm text-gray-700 shadow backdrop-blur">
+            <div className="mb-2 flex items-center justify-between">
               <div className="font-semibold text-gray-800">凡例</div>
               <button
                 onClick={() => setShowLegend(false)}
@@ -885,23 +912,23 @@ export default function KumaClient() {
                 ×
               </button>
             </div>
-            <div className="mb-1.5">
-              <div className="mb-0.5 text-[10px] text-gray-500">ピン</div>
-              <div className="flex items-center gap-1.5">
-                <span className="inline-block h-2 w-2 rounded-full bg-gray-500" />1頭
+            <div className="mb-2">
+              <div className="mb-1 text-xs text-gray-500">ピン</div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="inline-block h-2 w-2 rounded-full bg-red-500" />2頭以上
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上
               </div>
             </div>
             <div>
-              <div className="mb-0.5 text-[10px] text-gray-500">
+              <div className="mb-1 text-xs text-gray-500">
                 危険度ヒートマップ
               </div>
               {RISK_LEGEND_ORDER.map((level) => (
-                <div key={level} className="flex items-center gap-1.5">
+                <div key={level} className="flex items-center gap-2">
                   <span
-                    className="inline-block h-2 w-2 rounded-sm"
+                    className="inline-block h-2.5 w-2.5 rounded-sm"
                     style={{
                       background: RISK_LEVEL_COLOR[level],
                       opacity: 0.7,
@@ -922,7 +949,9 @@ export default function KumaClient() {
           onPickGps={handleGpsPick}
           smoothingSigmaKm={smoothingSigmaKm}
           levelThresholds={levelThresholds}
+          sightingCountByMesh={sightingCountByMesh}
           onShare={handleShare}
+          onAskContextChange={setAskContext}
         />
       </div>
 

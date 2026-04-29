@@ -8,18 +8,18 @@ import type {
   WeatherSnapshot,
 } from "@/lib/types";
 import {
-  RISK_LEVEL_COLOR,
-  RISK_LEVEL_LABEL,
   computeScore,
   computeSpatialScore,
   calcHistoryScore,
+  maxLevel,
+  sightingsToLevel,
   type LevelThresholds,
 } from "@/lib/score";
 import { latLonToMeshCode, haversineKm } from "@/lib/mesh";
 import { loadLandUse, loadMeshes, findMeshByCode } from "@/lib/mesh-data";
 import { computeNeighborMeshScore } from "@/lib/neighbor-habitat";
 import { computeSmoothedAt } from "@/lib/smooth";
-import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
+import { weatherCodeLabel } from "@/lib/weather";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import {
   findMunicipalityByPrefCode,
@@ -48,14 +48,6 @@ type NearbyRecent = Pick<
   "id" | "date" | "cityName" | "sectionName" | "comment" | "headCount"
 > & { distanceKm: number };
 
-function periodLabelOf(days: number | null): string {
-  if (days === null) return "全期間";
-  if (days >= 365) return "1年";
-  if (days >= 90) return "3ヶ月";
-  if (days >= 30) return "1ヶ月";
-  return "1週間";
-}
-
 function cutoffDate(days: number | null): string | null {
   if (days === null) return null;
   return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
@@ -83,6 +75,16 @@ type State =
       periodDays: number | null;
       periodNearbyCount: number;
       periodNearbyRecent: NearbyRecent[];
+      /** 過去365日の目撃件数 (周辺 10km・期間フィルタ非依存) — 格上げ判定用 */
+      count365d: number;
+      /** 過去90日の目撃件数 (周辺 10km・期間フィルタ非依存) — カード表示用 */
+      count90d: number;
+      /** 過去90日の目撃レコード上位 N 件 (周辺 10km) — もっと見る用 */
+      recent90d: NearbyRecent[];
+      /** 生息域メッシュベースの素のレベル (ヒートマップと同じ) */
+      baseLevel: import("@/lib/types").RiskLevel;
+      /** 最近の目撃で格上げされたか */
+      levelEscalated: boolean;
       elevationM: number | null;
       slopeDeg: number | null;
       isForest: boolean | null;
@@ -91,6 +93,31 @@ type State =
 
 const NEARBY_RADIUS_KM = 10;
 const NEARBY_DECAY_KM = 5;
+
+async function fetchNearbyHistory(
+  lat: number,
+  lon: number,
+  radiusKm: number,
+): Promise<{ count365d: number; count90d: number; records: NearbyRecent[] }> {
+  try {
+    const r = await fetch(
+      `/api/nearby-history?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&radiusKm=${radiusKm}`,
+    );
+    if (!r.ok) return { count365d: 0, count90d: 0, records: [] };
+    const data = (await r.json()) as {
+      count365d?: number;
+      count90d?: number;
+      records?: NearbyRecent[];
+    };
+    return {
+      count365d: typeof data.count365d === "number" ? data.count365d : 0,
+      count90d: typeof data.count90d === "number" ? data.count90d : 0,
+      records: Array.isArray(data.records) ? data.records : [],
+    };
+  } catch {
+    return { count365d: 0, count90d: 0, records: [] };
+  }
+}
 
 async function fetchElevation(
   lat: number,
@@ -238,8 +265,29 @@ type Props = {
   onPickGps: (loc: SelectedLocation) => void;
   smoothingSigmaKm: number;
   levelThresholds: LevelThresholds;
+  /** 過去 1 年の目撃件数をメッシュコード別に集計したマップ。
+   *  ヒートマップと同じ式で危険度を上げるために参照する。 */
+  sightingCountByMesh?: Map<string, number>;
   /** カードヘッダー内のシェアボタンから呼ぶ。地点が選択されている時のみ表示。 */
   onShare?: () => void;
+  /** 評価が ready になった時に AI へ渡す豊富なコンテキストを KumaClient に通知する。 */
+  onAskContextChange?: (ctx: AskContext | null) => void;
+};
+
+export type AskContext = {
+  lat: number;
+  lon: number;
+  place?: string;
+  prefecture?: string;
+  prefCode?: string;
+  muniName?: string;
+  score?: number;
+  level?: string;
+  hour?: number;
+  month?: number;
+  weather?: { tempC?: number; precipMm?: number; label?: string };
+  bearSpecies?: string;
+  habitatInside?: boolean;
 };
 
 export default function RiskPanel({
@@ -249,7 +297,9 @@ export default function RiskPanel({
   onPickGps,
   smoothingSigmaKm,
   levelThresholds,
+  sightingCountByMesh,
   onShare,
+  onAskContextChange,
 }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const [expanded, setExpanded] = useState(false);
@@ -265,11 +315,15 @@ export default function RiskPanel({
   const periodDaysRef = useRef(periodDays);
   const sigmaRef = useRef(smoothingSigmaKm);
   const thresholdsRef = useRef(levelThresholds);
+  const sightingMapRef = useRef<Map<string, number> | undefined>(
+    sightingCountByMesh,
+  );
   useEffect(() => {
     recordsRef.current = records;
     periodDaysRef.current = periodDays;
     sigmaRef.current = smoothingSigmaKm;
     thresholdsRef.current = levelThresholds;
+    sightingMapRef.current = sightingCountByMesh;
   });
 
   const evaluate = useCallback(
@@ -287,7 +341,7 @@ export default function RiskPanel({
         }
 
         setState({ kind: "loading", stage: "データを取得中" });
-        const [meshes, landUse, weather, rev, elevation, forest] =
+        const [meshes, landUse, weather, rev, elevation, forest, history] =
           await Promise.all([
             loadMeshes(),
             loadLandUse().catch(() => null),
@@ -295,6 +349,7 @@ export default function RiskPanel({
             reverseGeocode(loc.lat, loc.lon),
             fetchElevation(loc.lat, loc.lon),
             fetchForest(loc.lat, loc.lon),
+            fetchNearbyHistory(loc.lat, loc.lon, NEARBY_RADIUS_KM),
           ]);
         // records / period は ref で参照 (evaluate を再生成しない)
         const curRecords = recordsRef.current;
@@ -352,11 +407,23 @@ export default function RiskPanel({
           : 0;
       const directHistory =
         curSigma > 0 ? Math.max(rawDirect, smoothedAt) : rawDirect;
-      const { score: spatialScore, level: spatialLevel } = computeSpatialScore(
+      const { score: spatialScore, level: baseLevel } = computeSpatialScore(
         { historyDirect: directHistory, thresholds: curThresholds },
       );
       breakdown.score = spatialScore;
-      breakdown.level = spatialLevel;
+
+      // /api/nearby-history: 過去365日 (格上げ判定) と 過去90日 (カード表示) を別々に保持。
+      const count365d = history.count365d;
+      const count90d = history.count90d;
+      const recent90d = history.records;
+      // ヒートマップと完全一致させるため、メッシュ単位の目撃件数で同じ式で
+      // 格上げする。sightingMapRef は KumaClient が /api/sighting-cells から
+      // 取得した「過去 1 年・メッシュ別」の集計マップ。
+      const sCellCount = sightingMapRef.current?.get(meshCode) ?? 0;
+      const sightingLevel = sightingsToLevel(sCellCount);
+      const displayedLevel = maxLevel(baseLevel, sightingLevel);
+      breakdown.level = displayedLevel;
+      const levelEscalated = displayedLevel !== baseLevel;
 
       const municipality =
         findMunicipalityByPrefCode(rev?.prefCode) ??
@@ -384,6 +451,11 @@ export default function RiskPanel({
         periodDays: curPeriodDays,
         periodNearbyCount: nearby.periodCount,
         periodNearbyRecent: nearby.periodRecent,
+        count365d,
+        count90d,
+        recent90d,
+        baseLevel,
+        levelEscalated,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
         isForest: forest?.isForest ?? null,
@@ -402,13 +474,45 @@ export default function RiskPanel({
     if (!location) {
       setState({ kind: "idle" });
       setLlmAdvice(null);
+      onAskContextChange?.(null);
       return;
     }
     setLlmAdvice(null);
     // 新しい地点はコンパクト (バーまで) で表示。ユーザーがタップで full に展開
     setFullView(false);
     void evaluate(location);
-  }, [location, evaluate]);
+  }, [location, evaluate, onAskContextChange]);
+
+  // ready になったら AI 用のリッチなコンテキストを KumaClient に通知。
+  useEffect(() => {
+    if (state.kind !== "ready") return;
+    const now = new Date();
+    onAskContextChange?.({
+      lat: state.lat,
+      lon: state.lon,
+      place: state.placeName,
+      prefCode: state.municipality?.prefCode,
+      muniName: state.muniName,
+      score: state.breakdown.score,
+      level: state.breakdown.level,
+      hour: now.getHours(),
+      month: now.getMonth() + 1,
+      weather: state.weather
+        ? {
+            tempC: state.weather.tempC,
+            precipMm: state.weather.precipMm,
+            label: weatherCodeLabel(state.weather.weatherCode),
+          }
+        : undefined,
+      bearSpecies: state.municipality?.bearSpecies.includes("higuma")
+        ? "ヒグマ"
+        : state.municipality
+          ? "ツキノワグマ"
+          : undefined,
+      habitatInside: !!state.mesh,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.kind === "ready" ? state.lat : null, state.kind === "ready" ? state.lon : null, state.kind === "ready" ? state.breakdown.level : null]);
 
   // 地点が確定したら LLM 対策を取りに行く (失敗時はルールベースを表示)
   useEffect(() => {
@@ -494,16 +598,7 @@ export default function RiskPanel({
     }
   }, [onPickGps]);
 
-  const badge =
-    state.kind === "ready" ? (
-      <span
-        className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
-        style={{ background: RISK_LEVEL_COLOR[state.breakdown.level] }}
-        title="クマ出没危険度"
-      >
-        危険度: {RISK_LEVEL_LABEL[state.breakdown.level]}
-      </span>
-    ) : null;
+  // 結論バッジは RiskHero の大きなヴァーディクトに統合したのでヘッダーには出さない。
 
   // タップ時の挙動:
   //   idle → GPS 取得
@@ -536,7 +631,7 @@ export default function RiskPanel({
         borderTopRightRadius: 18,
         // compact (危険度バーまで): ピンが見える程度の小さい高さ
         // full: 詳細含めて広く展開 (カード内スクロール)
-        maxHeight: fullView ? "75vh" : "32vh",
+        maxHeight: fullView ? "78vh" : "40vh",
         transition: "max-height 0.25s ease",
         display: "flex",
         flexDirection: "column",
@@ -553,17 +648,17 @@ export default function RiskPanel({
       </button>
 
       <div className="mx-auto w-full max-w-3xl shrink-0">
-        <div className="flex items-center gap-2 px-3 pb-2">
+        <div className="flex items-end gap-2 px-3 pb-2">
           <button
             onClick={handleHeaderClick}
-            className="flex min-w-0 flex-1 items-center gap-3 text-left"
+            className="flex min-w-0 flex-1 items-center gap-2 text-left"
             aria-expanded={expanded}
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-base text-white">
               📍
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-semibold text-gray-900">
+              <div className="truncate text-base font-semibold text-gray-900">
                 {state.kind === "idle"
                   ? "地図をタップして危険度を見る"
                   : state.kind === "ready" && state.placeName
@@ -572,8 +667,8 @@ export default function RiskPanel({
                       ? "選択地点の危険度"
                       : "現在地の危険度"}
               </div>
-              <div className="truncate text-xs text-gray-500">
-                {state.kind === "idle" && "または ⚙ で設定"}
+              <div className="truncate text-sm text-gray-500 sm:text-xs">
+                {state.kind === "idle" && "または検索バーから地点を選択"}
                 {state.kind === "loading" && (
                   <span className="inline-flex items-center gap-1.5">
                     <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
@@ -583,72 +678,62 @@ export default function RiskPanel({
                 {state.kind === "error" && (
                   <span className="text-red-600">⚠️ {state.message}</span>
                 )}
-                {state.kind === "ready" && (
-                  <>
-                    {state.nearbySightings > 0 && !state.mesh
-                      ? `近隣 ${state.nearbyRadiusKm}km に ${state.nearbySightings} 件の目撃`
-                      : state.placeName
-                        ? ""
-                        : "危険度カード"}
-                  </>
-                )}
               </div>
             </div>
-            {badge}
           </button>
           {state.kind === "ready" && onShare && (
             <button
               onClick={onShare}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-amber-50 hover:text-amber-700"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-amber-50 hover:text-amber-700 sm:h-10 sm:w-10"
               aria-label="この地点をシェア"
               title="この地点をシェア"
             >
-              {/* iOS 風 share: 上向き矢印 + 箱 */}
               <svg
-                width="18"
-                height="18"
+                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="h-5 w-5"
                 aria-hidden
               >
-                <path d="M12 3v12" />
-                <path d="m8 7 4-4 4 4" />
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+                <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
               </svg>
             </button>
           )}
           {state.kind === "ready" && (
             <Link
               href={`/submit?lat=${state.lat.toFixed(5)}&lon=${state.lon.toFixed(5)}`}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-amber-50 hover:text-amber-700"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-amber-50 hover:text-amber-700 sm:h-10 sm:w-10"
               aria-label="この地点で目撃情報を投稿"
               title="この地点で目撃情報を投稿"
             >
-              {/* compose: 紙 + ペン */}
               <svg
-                width="18"
-                height="18"
+                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="h-5 w-5"
                 aria-hidden
               >
-                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                <path d="M18.375 2.625a1.768 1.768 0 1 1 2.5 2.5L12 14l-4 1 1-4 9.375-9.375z" />
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
               </svg>
             </Link>
           )}
           {(state.kind === "ready" || state.kind === "error") && (
             <button
               onClick={() => setExpanded(false)}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 sm:h-8 sm:w-8 sm:text-base"
               aria-label="閉じる"
               title="閉じる (ピンは残ります)"
             >
@@ -707,17 +792,11 @@ function RiskDetails({
     nearbySightings,
     nearbyRadiusKm,
     nearbyWeightedCount,
-    periodDays,
-    periodNearbyCount,
-    periodNearbyRecent,
+    recent90d,
   } = state;
   const now = new Date();
   const hour = now.getHours();
   const month = now.getMonth() + 1;
-  const weatherLabel = weather
-    ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C`
-    : "気象情報なし";
-  const periodLabel = periodLabelOf(periodDays);
 
   const isInsufficient = !mesh && (nearbySightings ?? 0) === 0;
   const isBuffer = !mesh && (nearbySightings ?? 0) > 0;
@@ -725,25 +804,25 @@ function RiskDetails({
 
   return (
     <div className="border-t border-gray-100 text-sm">
-      {/* 1. 危険度 verdict + 5段階バー + LLM 補足 (常時表示・コンパクト) */}
+      {/* 1. 危険度 verdict + 並列ファクト + 5段階バー + LLM 補足 */}
       <RiskHero
         level={breakdown.level}
-        prefCode={state.municipality?.prefCode}
-        lat={state.lat}
-        lon={state.lon}
-        muniName={state.muniName}
-        latestNearbyDate={periodNearbyRecent[0]?.date ?? null}
+        baseLevel={state.baseLevel}
+        count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
       />
 
       {!fullView && (
-        <button
-          type="button"
-          onClick={onExpandFull}
-          className="mt-1 w-full border-t border-gray-100 bg-gray-50/60 py-2 text-center text-[11px] font-medium text-amber-700 hover:bg-gray-100"
-        >
-          もっと見る (行動メモ・目撃・自治体・根拠) ▼
-        </button>
+        <div className="px-4 pb-3 pt-2">
+          <button
+            type="button"
+            onClick={onExpandFull}
+            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 shadow-sm hover:bg-amber-100"
+          >
+            もっと見る
+            <span aria-hidden>▼</span>
+          </button>
+        </div>
       )}
 
       {fullView && <>
@@ -765,35 +844,35 @@ function RiskDetails({
         if (advice.length === 0 && !llmAdviceLoading) return null;
         return (
           <section className="border-t border-gray-100 px-4 py-3">
-            <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+            <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
               📝 行動メモ
               {llmAdviceLoading && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-normal text-gray-400">
+                <span className="inline-flex items-center gap-1 text-xs font-normal text-gray-400 sm:text-[10px]">
                   <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
                   AI で更新中...
                 </span>
               )}
               {isLlm && !llmAdviceLoading && (
-                <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-800">
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 sm:text-[9px]">
                   AI
                 </span>
               )}
             </h3>
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {advice.map((a, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2"
+                  className="flex items-start gap-2.5 rounded-lg bg-gray-50 px-3 py-2.5"
                 >
-                  <span className="mt-0.5" aria-hidden>
+                  <span className="mt-0.5 text-lg sm:text-base" aria-hidden>
                     {a.emoji}
                   </span>
                   <div className="min-w-0">
-                    <div className="text-xs font-medium text-gray-900">
+                    <div className="text-base font-semibold text-gray-900 sm:text-xs sm:font-medium">
                       {a.title}
                     </div>
                     {a.body && (
-                      <div className="text-[11px] leading-relaxed text-gray-600">
+                      <div className="mt-0.5 text-sm leading-relaxed text-gray-600 sm:text-[11px]">
                         {a.body}
                       </div>
                     )}
@@ -808,53 +887,38 @@ function RiskDetails({
 
       {/* 詳細セクション (fullView 時のみ) */}
 
-      {/* 2. 件数 headline */}
-      <section className="bg-amber-50/70 px-4 py-3">
-        <div className="text-[10px] font-medium uppercase tracking-wider text-amber-700">
-          {periodDays === null
-            ? `半径 ${nearbyRadiusKm}km 以内の目撃`
-            : `過去${periodLabel}・半径 ${nearbyRadiusKm}km 以内の目撃`}
-        </div>
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-3xl font-bold tracking-tight text-gray-900">
-            {periodNearbyCount.toLocaleString()}
-          </span>
-          <span className="text-sm text-gray-600">件</span>
-          {periodDays !== null && nearbySightings > periodNearbyCount && (
-            <span className="ml-auto text-[10px] text-gray-500">
-              全期間では {nearbySightings.toLocaleString()} 件
-            </span>
-          )}
-        </div>
-        {(isInsufficient || isBuffer) && (
-          <p className="mt-2 text-[11px] leading-relaxed text-amber-900">
+      {/* 件数は RiskHero で常時表示しているので重複させない。
+          fullView では補足の注意書きだけ出す (生息域なし・緩衝域 等の特殊ケース)。 */}
+      {(isInsufficient || isBuffer) && (
+        <section className="bg-amber-50/70 px-4 py-3">
+          <p className="text-sm leading-relaxed text-amber-900 sm:text-xs">
             {isInsufficient &&
-              "環境省の生息域調査に記録なし。近隣の公式目撃も未確認。山間部では基本対策を。"}
+              "生息域調査に記録なし。近隣の公式目撃も未確認。山間部では基本対策を。"}
             {isBuffer &&
               `生息域外の緩衝域。近隣で ${nearbySightings} 件の公式目撃記録あり。`}
           </p>
-        )}
-      </section>
+        </section>
+      )}
 
-      {/* 2. 直近の目撃 3 件 (常時) */}
-      {periodNearbyRecent.length > 0 && (
+      {/* 直近の目撃 リスト (過去 3 ヶ月・固定窓) */}
+      {recent90d.length > 0 && (
         <section className="border-t border-gray-100 px-4 py-3">
-          <h3 className="mb-2 text-xs font-semibold text-gray-700">
+          <h3 className="mb-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
             🕓 直近の目撃
           </h3>
-          <ul className="space-y-1.5">
-            {periodNearbyRecent.slice(0, 3).map((r) => (
+          <ul className="space-y-2">
+            {recent90d.slice(0, 3).map((r) => (
               <li
                 key={String(r.id)}
-                className="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                className="rounded-lg bg-gray-50 px-3 py-2.5 text-base text-gray-700 sm:text-sm"
               >
-                <div className="mb-0.5 flex items-center justify-between gap-2">
+                <div className="mb-1 flex items-center justify-between gap-2">
                   <span className="font-medium text-gray-900">{r.date}</span>
-                  <span className="shrink-0 text-[10px] text-gray-500">
+                  <span className="shrink-0 text-xs text-gray-500 sm:text-[10px]">
                     {r.distanceKm.toFixed(1)}km / {r.cityName || "—"}
                   </span>
                 </div>
-                <div className="line-clamp-2 text-xs leading-relaxed text-gray-600">
+                <div className="line-clamp-2 text-sm leading-relaxed text-gray-600 sm:text-xs">
                   {r.comment?.trim() || r.sectionName || "（詳細記載なし）"}
                 </div>
               </li>
@@ -876,11 +940,10 @@ function RiskDetails({
 
       {/* 4. 危険度予測 (時間帯・月別・根拠) */}
       <section className="border-t border-gray-100 px-4 py-3">
-        <h3 className="mb-2 text-xs font-semibold text-gray-700">
+        <h3 className="mb-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
           📊 危険度予測
         </h3>
-        <div className="mb-2 flex items-center justify-between text-[11px] text-gray-500">
-          <span>{weatherLabel}</span>
+        <div className="mb-2 flex items-center justify-end text-sm text-gray-500 sm:text-[11px]">
           <span>
             {hour}時 / {month}月
           </span>
@@ -903,6 +966,29 @@ function RiskDetails({
       <p className="px-4 py-3 text-[10px] leading-relaxed text-gray-400">
         スコアは参考値です。実際のクマの行動は個体差・環境で変わります。必ず自治体の公式情報と合わせてご確認ください。
       </p>
+
+      {/* 運営・お問合せ — 中央寄せ・改行表示 */}
+      <footer className="border-t border-gray-100 px-4 py-4 text-center text-[11px] leading-relaxed text-gray-400">
+        <div>運営</div>
+        <div>
+          <a
+            href="https://vet-ai-lab.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gray-600 hover:underline"
+          >
+            獣医工学ラボ
+          </a>
+        </div>
+        <div className="mt-1">
+          <a
+            href="mailto:contact@research-coordinate.co.jp"
+            className="hover:text-gray-600 hover:underline"
+          >
+            お問合せ
+          </a>
+        </div>
+      </footer>
 
       </>}
     </div>

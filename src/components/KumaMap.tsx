@@ -14,9 +14,12 @@ import type { KumaRecord } from "@/app/api/kuma/route";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
   kumamoriLevel,
+  maxLevel,
   RISK_LEVEL_COLOR,
+  sightingsToLevel,
   type LevelThresholds,
 } from "@/lib/score";
+import { meshCodeToCenter } from "@/lib/mesh";
 import { loadLandUse, loadMeshes, type LandUseMap, type MeshEntry } from "@/lib/mesh-data";
 import { smoothMeshes, type SmoothedCell } from "@/lib/smooth";
 
@@ -86,6 +89,8 @@ type Props = {
   haloOpacity?: number;
   /** 5 段階のしきい値 (safe→low→moderate→elevated→high の 4 境界) */
   levelThresholds?: LevelThresholds;
+  /** 過去 1 年の目撃件数を 4 次メッシュコード単位で集計したマップ (/api/sighting-cells) */
+  sightingCountByMesh?: Map<string, number>;
   tileStyle?: TileStyle;
   selectedLocation?: {
     lat: number;
@@ -108,6 +113,7 @@ export default function KumaMap({
   smoothingSigmaKm = 0,
   haloOpacity = 0.5,
   levelThresholds = DEFAULT_LEVEL_THRESHOLDS,
+  sightingCountByMesh,
   tileStyle = "standard",
   selectedLocation = null,
   currentLocation = null,
@@ -129,6 +135,9 @@ export default function KumaMap({
   const heatmapOpacityRef = useRef(heatmapOpacity);
   const haloOpacityRef = useRef(haloOpacity);
   const levelThresholdsRef = useRef(levelThresholds);
+  const sightingCountByMeshRef = useRef<Map<string, number> | undefined>(
+    sightingCountByMesh,
+  );
   const onMapClickRef = useRef(onMapClick);
   const redrawTimerRef = useRef<number | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -173,6 +182,34 @@ export default function KumaMap({
       const currentZoom = map.getZoom();
       const useLOD = currentZoom < LOD_ZOOM_THRESHOLD;
       const opacity = heatmapOpacityRef.current;
+      const sightingMap = sightingCountByMeshRef.current;
+
+      // ヒートマップに反映するレベルは「生息域 vs 過去1年の目撃」の高い方。
+      // sightingMap は API /api/sighting-cells から取得したもの。
+      const cellLevel = (
+        meshCode: string,
+        s: number,
+      ): "safe" | "low" | "moderate" | "elevated" | "high" | "unknown" => {
+        const habitat = kumamoriLevel(s, levelThresholdsRef.current);
+        const sCount = sightingMap?.get(meshCode) ?? 0;
+        return maxLevel(habitat, sightingsToLevel(sCount));
+      };
+
+      // smoothMeshes には含まれない「生息域なし＋目撃あり」のセルを補う。
+      // 既に出力にあるコードはスキップ。
+      const seen = new Set<string>();
+      for (const m of meshes) seen.add(m.m);
+      const sightingOnlyCells: { m: string; lat: number; lon: number }[] = [];
+      if (sightingMap) {
+        for (const code of sightingMap.keys()) {
+          if (seen.has(code)) continue;
+          const c = meshCodeToCenter(code);
+          if (!c) continue;
+          if (c.lat < south || c.lat > north) continue;
+          if (c.lon < west || c.lon > east) continue;
+          sightingOnlyCells.push({ m: code, lat: c.lat, lon: c.lon });
+        }
+      }
 
       if (useLOD) {
         // LOD: 3×3 セルを集約して代表色 (max level) で描く
@@ -187,20 +224,27 @@ export default function KumaMap({
         const buckets = new Map<string, LodBucket>();
         const latBinSize = MESH_LAT_STEP * LOD_STEP;
         const lonBinSize = MESH_LON_STEP * LOD_STEP;
-        for (const m of meshes) {
-          if (m.lat < south || m.lat > north) continue;
-          if (m.lon < west || m.lon > east) continue;
-          const level = kumamoriLevel(m.s, levelThresholdsRef.current);
-          if (level === "safe" || level === "unknown") continue;
+        const accumulate = (
+          lat: number,
+          lon: number,
+          level:
+            | "safe"
+            | "low"
+            | "moderate"
+            | "elevated"
+            | "high"
+            | "unknown",
+        ) => {
+          if (level === "safe" || level === "unknown") return;
           const rank = RANK[level];
-          const latBin = Math.floor(m.lat / latBinSize);
-          const lonBin = Math.floor(m.lon / lonBinSize);
+          const latBin = Math.floor(lat / latBinSize);
+          const lonBin = Math.floor(lon / lonBinSize);
           const key = `${latBin}|${lonBin}`;
           const b = buckets.get(key);
-          const cellMinLat = m.lat - MESH_LAT_HALF;
-          const cellMaxLat = m.lat + MESH_LAT_HALF;
-          const cellMinLon = m.lon - MESH_LON_HALF;
-          const cellMaxLon = m.lon + MESH_LON_HALF;
+          const cellMinLat = lat - MESH_LAT_HALF;
+          const cellMaxLat = lat + MESH_LAT_HALF;
+          const cellMinLon = lon - MESH_LON_HALF;
+          const cellMaxLon = lon + MESH_LON_HALF;
           if (!b) {
             buckets.set(key, {
               minLat: cellMinLat,
@@ -220,6 +264,14 @@ export default function KumaMap({
               b.maxLevel = level as LodBucket["maxLevel"];
             }
           }
+        };
+        for (const m of meshes) {
+          if (m.lat < south || m.lat > north) continue;
+          if (m.lon < west || m.lon > east) continue;
+          accumulate(m.lat, m.lon, cellLevel(m.m, m.s));
+        }
+        for (const c of sightingOnlyCells) {
+          accumulate(c.lat, c.lon, cellLevel(c.m, 0));
         }
         let drawn = 0;
         for (const b of buckets.values()) {
@@ -249,7 +301,7 @@ export default function KumaMap({
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
         if (m.lon < west || m.lon > east) continue;
-        const level = kumamoriLevel(m.s, levelThresholdsRef.current);
+        const level = cellLevel(m.m, m.s);
         if (level === "safe" || level === "unknown") continue;
 
         const color = RISK_LEVEL_COLOR[level];
@@ -272,6 +324,31 @@ export default function KumaMap({
         drawn++;
         if (drawn >= maxRects) break;
       }
+      // 生息域なし＋目撃ありのセル (smoothMeshes 出力に無いもの) を追加描画。
+      // habitat=false 扱いなので halo opacity を適用する (薄め)。
+      for (const c of sightingOnlyCells) {
+        if (drawn >= maxRects) break;
+        const level = cellLevel(c.m, 0);
+        if (level === "safe" || level === "unknown") continue;
+        const color = RISK_LEVEL_COLOR[level];
+        const cellOpacity = opacity * halo;
+        if (cellOpacity <= 0) continue;
+        const rect: Rectangle = L.rectangle(
+          [
+            [c.lat - MESH_LAT_HALF, c.lon - MESH_LON_HALF],
+            [c.lat + MESH_LAT_HALF, c.lon + MESH_LON_HALF],
+          ],
+          {
+            stroke: false,
+            fillColor: color,
+            fillOpacity: cellOpacity,
+            interactive: false,
+            renderer: canvas,
+          },
+        );
+        rect.addTo(layer);
+        drawn++;
+      }
     });
   };
 
@@ -291,6 +368,14 @@ export default function KumaMap({
       const east = bounds.getEast();
 
       const canvas = L.canvas({ padding: 0.1 });
+      // モバイルはタップ領域を確保するためピンを大きく描く (Apple HIG: 最低 44pt の指針)。
+      // canvas renderer は描画半径がそのままヒット判定に使われるので、
+      // 視覚サイズを上げることが押しやすさにも直結する。
+      const isNarrow =
+        typeof window !== "undefined" ? window.innerWidth < 768 : false;
+      const rSingle = isNarrow ? 8 : 5;
+      const rMulti = isNarrow ? 10 : 6;
+      const borderWeight = isNarrow ? 1.6 : 1.2;
       // bounds 内のレコードを先に集めてから均等サンプリング。
       // recs は日付降順ソート済み。早い者勝ち break で打ち切ると、
       // 縮小時 (全国 in-bounds) に古めのデータを持つ県 (例: 岩手) のピンが
@@ -310,9 +395,9 @@ export default function KumaMap({
       for (const r of toRender) {
         const color = r.headCount > 1 ? "#ef4444" : "#6b7280";
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
-          radius: r.headCount > 1 ? 6 : 5,
+          radius: r.headCount > 1 ? rMulti : rSingle,
           color: "#ffffff",
-          weight: 1.2,
+          weight: borderWeight,
           fillColor: color,
           fillOpacity: 0.9,
           renderer: canvas,
@@ -433,6 +518,12 @@ export default function KumaMap({
     levelThresholdsRef.current = levelThresholds;
     renderMeshLayer();
   }, [levelThresholds]);
+
+  useEffect(() => {
+    sightingCountByMeshRef.current = sightingCountByMesh;
+    renderMeshLayer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sightingCountByMesh]);
 
   useEffect(() => {
     const raw = rawMeshesRef.current;

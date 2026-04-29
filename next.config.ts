@@ -12,6 +12,9 @@ const SEO_REDIRECT_SLUGS = [
 ];
 
 const nextConfig: NextConfig = {
+  // dev サーバーに LAN (実機スマホ) からアクセスする際の許可ホスト。
+  // 本番ビルドには影響しない。
+  allowedDevOrigins: ["192.168.11.57", "192.168.11.0/24"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdnjs.cloudflare.com" },

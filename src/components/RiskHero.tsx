@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { RiskLevel } from "@/lib/types";
 import {
   LEVEL_DESCRIPTION,
@@ -8,139 +7,54 @@ import {
   RISK_LEVEL_COLOR_PALE,
   RISK_LEVEL_LABEL,
 } from "@/lib/score";
-import type { SummaryResponse } from "@/app/api/summary/route";
 
 type Props = {
+  /** 表示用の (格上げ後) レベル — 5段階バー / バッジで使う */
   level: RiskLevel;
-  prefCode?: string;
-  lat: number;
-  lon: number;
-  muniName?: string;
-  /** 周辺で観測された最新の出没日 (期間フィルタ後)。null なら該当なし。 */
-  latestNearbyDate?: string | null;
+  /** 生息域メッシュベースの素のレベル — 「定着個体」ファクトの記述に使う */
+  baseLevel?: RiskLevel;
+  /** 過去90日の目撃件数 (周辺 10km) — カード表示用 */
+  count90d?: number;
   /** 「周辺」の半径 (km) — chip / "なし" メッセージの表示に使う */
   nearbyRadiusKm?: number;
 };
 
 const LEVELS: RiskLevel[] = ["safe", "low", "moderate", "elevated", "high"];
 
-/** 過去日付の相対表記 (今日 / 昨日 / N日前 / N週間前 / Nヶ月前)。
- *  YYYY-MM-DD 形式を想定。パース失敗 / 未来日は null。 */
-function relativeDays(dateStr: string): string | null {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
-  if (!m) return null;
-  const target = new Date(
-    Number(m[1]),
-    Number(m[2]) - 1,
-    Number(m[3]),
-  ).getTime();
-  if (Number.isNaN(target)) return null;
-  const now = Date.now();
-  const diffMs = now - target;
-  if (diffMs < 0) return null;
-  const day = 24 * 60 * 60 * 1000;
-  const days = Math.floor(diffMs / day);
-  if (days <= 0) return "今日";
-  if (days === 1) return "昨日";
-  if (days < 7) return `${days}日前`;
-  if (days < 30) return `${Math.floor(days / 7)}週間前`;
-  if (days < 365) return `${Math.floor(days / 30)}ヶ月前`;
-  return `${Math.floor(days / 365)}年前`;
-}
-
-/** ISO datetime 文字列から相対表記 (5分前 / 2時間前 / 6時間前 / 1日前 ...) を返す。 */
-function relativeTime(iso: string): string | null {
-  const target = new Date(iso).getTime();
-  if (Number.isNaN(target)) return null;
-  const diffMs = Date.now() - target;
-  if (diffMs < 0) return null;
-  const min = Math.floor(diffMs / 60000);
-  if (min < 1) return "たった今";
-  if (min < 60) return `${min}分前`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}時間前`;
-  const days = Math.floor(hr / 24);
-  if (days === 1) return "昨日";
-  if (days < 7) return `${days}日前`;
-  return null; // それ以降は表示しない
-}
-
 export default function RiskHero({
   level,
-  prefCode,
-  lat,
-  lon,
-  muniName,
-  latestNearbyDate = null,
+  baseLevel,
+  count90d = 0,
   nearbyRadiusKm = 10,
 }: Props) {
-  // 危険度 badge はカードヘッダー側で表示済み。このヒーロー部では
-  // 5段階バー + 一行説明 + LLM summary だけに絞って視認性を上げる。
-  const description =
-    level === "unknown" ? "情報取得中..." : LEVEL_DESCRIPTION[level];
-
-  // LLM 文脈補足: /api/summary の summary + 公式サイト URL を引く
-  const [summary, setSummary] = useState<string | null>(null);
-  const [sourceUrl, setSourceUrl] = useState<string | null>(null);
-  const [prefName, setPrefName] = useState<string | null>(null);
-  const [fetchedAt, setFetchedAt] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!prefCode) return;
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag before external fetch
-    setLoading(true);
-    const params = new URLSearchParams({ prefCode });
-    if (Number.isFinite(lat)) params.set("lat", lat.toFixed(5));
-    if (Number.isFinite(lon)) params.set("lon", lon.toFixed(5));
-    if (muniName) params.set("muniName", muniName);
-    fetch(`/api/summary?${params.toString()}`)
-      .then((r) => (r.ok ? (r.json() as Promise<SummaryResponse>) : null))
-      .then((data) => {
-        if (cancelled || !data) return;
-        if (data.summary) setSummary(data.summary);
-        if (data.sourceUrls?.[0]) setSourceUrl(data.sourceUrls[0]);
-        if (data.prefName) setPrefName(data.prefName);
-        if (data.fetchedAt) setFetchedAt(data.fetchedAt);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [prefCode, lat, lon, muniName]);
-
-  // 最新目撃 chip は RiskPanel が渡す periodNearbyRecent (ユーザーの期間フィルタ後)
-  // から計算する。/api/summary に依存しないので、prefCode 未登録地点でも表示される。
-  const latestRel = latestNearbyDate ? relativeDays(latestNearbyDate) : null;
-  const fetchedRel = fetchedAt ? relativeTime(fetchedAt) : null;
+  // 表示レベル (= 格上げ後) と素レベル (= 生息域メッシュベース) を分けて扱う。
+  // 「定着個体の記録」ファクトは素レベルで、ヴァーディクト/バーは表示レベル。
+  const habitatLevel = baseLevel ?? level;
+  const habitatDescription =
+    habitatLevel === "unknown" ? "情報取得中..." : LEVEL_DESCRIPTION[habitatLevel];
+  const verdictLabel = RISK_LEVEL_LABEL[level];
+  const verdictColor = RISK_LEVEL_COLOR[level];
+  const hasRecent = count90d > 0;
 
   return (
-    <section className="px-4 py-3">
-      {/* バー上部: 「危険度」ラベル + 最新目撃 (相対時間 chip) */}
-      <div className="mb-1 flex items-baseline justify-between gap-2">
-        <span className="text-[10px] font-medium uppercase tracking-wide text-stone-500">
+    <section className="px-4 pt-3 pb-2">
+      {/* 1. ヴァーディクト — 横幅は 5 段階バーと一致 (=親要素の幅いっぱい) */}
+      <div className="w-full">
+        <div className="mb-1 ml-1 text-xs font-semibold text-stone-500">
           危険度
-        </span>
-        {latestRel ? (
-          <span
-            className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-900"
-            title={`周辺 ${nearbyRadiusKm}km・直近の出没記録: ${latestNearbyDate}`}
-          >
-            🕓 最新の目撃: {latestRel}
+        </div>
+        <div
+          className="flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-white shadow-sm"
+          style={{ background: verdictColor }}
+        >
+          <span className="text-xl font-bold tracking-wide">
+            {verdictLabel}
           </span>
-        ) : (
-          <span className="text-[10px] text-stone-400">
-            周辺 {nearbyRadiusKm}km・直近の記録なし
-          </span>
-        )}
+        </div>
       </div>
 
-      {/* 5 段階バー: 選択中の level だけ solid 色、他は pale 色 (Flutter 同等) */}
-      <div className="flex gap-1">
+      {/* 2. 5 段階バー — ラベルとバーは同じ flex 構造で対応セルが揃う */}
+      <div className="mt-2.5 flex gap-1">
         {LEVELS.map((lv) => (
           <div
             key={lv}
@@ -152,58 +66,56 @@ export default function RiskHero({
           />
         ))}
       </div>
-      <div className="mt-1.5 flex justify-between text-[9px] text-stone-500">
+      <div className="mt-1 flex gap-1 text-[11px] text-stone-500">
         {LEVELS.map((lv) => (
           <span
             key={lv}
-            className={
-              lv === level ? "font-semibold text-stone-900" : undefined
-            }
+            className={`flex-1 text-center ${
+              lv === level ? "font-semibold text-stone-900" : ""
+            }`}
           >
             {RISK_LEVEL_LABEL[lv]}
           </span>
         ))}
       </div>
 
-      {/* 一行説明 (定期的に出没報告がある地域です 等) — 文字色はグレー系で統一 */}
-      <p className="mt-3 text-center text-sm font-medium text-stone-700">
-        {description}
-      </p>
-
-      {/* 自治体公式情報の要約 + 公式サイトリンク */}
-      {(summary || loading) && (
-        <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 p-3">
-          <div className="mb-1.5 flex items-center justify-between gap-2">
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-blue-900">
-              <span aria-hidden>🏛</span>
-              {prefName ? `${prefName}公式情報の要約` : "自治体公式情報の要約"}
-            </span>
-            {sourceUrl && (
-              <a
-                href={sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-blue-700 shadow-sm hover:bg-blue-100"
-              >
-                公式サイト →
-              </a>
-            )}
+      {/* 3. 並列ファクト 2 行 — ラベル左寄せ・値右寄せで横幅を使い切る */}
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5">
+          <div className="shrink-0 text-xs font-semibold text-stone-500">
+            定着個体
           </div>
-          {summary ? (
-            <p className="text-xs leading-relaxed text-gray-800">{summary}</p>
-          ) : (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-              状況を要約中...
-            </div>
-          )}
-          {fetchedRel && (
-            <div className="mt-1.5 text-right text-[9px] text-blue-700/60">
-              {fetchedRel}取得
-            </div>
-          )}
+          <div className="min-w-0 flex-1 text-right text-sm font-medium text-stone-800">
+            {habitatDescription}
+          </div>
         </div>
-      )}
+        <div
+          className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 ${
+            hasRecent
+              ? "border-red-200 bg-red-50"
+              : "border-stone-200 bg-stone-50"
+          }`}
+        >
+          <div
+            className={`shrink-0 text-xs font-semibold ${
+              hasRecent ? "text-red-700" : "text-stone-500"
+            }`}
+          >
+            最近の目撃
+          </div>
+          <div
+            className={`min-w-0 flex-1 text-right text-sm font-medium ${
+              hasRecent ? "text-red-900" : "text-stone-800"
+            }`}
+          >
+            {hasRecent ? `${count90d} 件 / 周辺${nearbyRadiusKm}km` : `なし / 周辺${nearbyRadiusKm}km`}
+          </div>
+        </div>
+      </div>
+
+      {/* 格上げ注釈は撤去。バー位置で十分伝わるため。 */}
+
+      {/* 自治体公式情報は MunicipalNoticeBox で要約とお知らせを一括表示 */}
     </section>
   );
 }

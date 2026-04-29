@@ -1,9 +1,23 @@
-import { unstable_cache } from "next/cache";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fetchAllOfficialSightings } from "@/lib/sources/aggregate";
 import { getSharp9110Sightings } from "@/lib/sources/all-records";
+import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import type { UnifiedSighting } from "@/lib/sources/types";
+
+/**
+ * 元ソースのジオコーダー失敗で県名と座標が大きくズレているレコードを除外する。
+ * 例: 「徳島県 那賀町」を主張しつつ座標が神奈川県内など。
+ */
+function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
+  return records.filter((r) =>
+    typeof r.lat === "number" &&
+    typeof r.lon === "number" &&
+    Number.isFinite(r.lat) &&
+    Number.isFinite(r.lon) &&
+    latLonMatchesPrefecture(r.prefectureName, r.lat, r.lon),
+  );
+}
 
 // 出没データの単一キャッシュ。/api/kuma と /api/ask (findNearbySightings) で共有する。
 // 読み取り順:
@@ -93,14 +107,34 @@ export async function aggregateAllSightings(): Promise<UnifiedSighting[]> {
   return all;
 }
 
-export const getCachedSightings = unstable_cache(
-  async (): Promise<UnifiedSighting[]> => {
-    const disk = readDiskCache();
-    if (disk && disk.records.length > 0) return disk.records;
-    const bundled = await readBundledSnapshot();
-    if (bundled && bundled.length > 0) return bundled;
-    return aggregateAllSightings();
-  },
-  ["kuma-sightings-v3"],
-  { revalidate: REVALIDATE_SECONDS, tags: [CACHE_TAG] },
-);
+// Next.js 16 の unstable_cache は 2MB 上限が課されており、
+// 全国の出没データ (~19MB) は載らない。サーバー単位のメモリキャッシュで十分なので
+// プロセスローカルに保持する (Vercel の serverless でもインスタンス内で再利用される)。
+let memCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
+const MEM_CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
+
+export async function getCachedSightings(): Promise<UnifiedSighting[]> {
+  if (memCache && Date.now() - memCache.loadedAt < MEM_CACHE_TTL_MS) {
+    return memCache.records;
+  }
+  const disk = readDiskCache();
+  if (disk && disk.records.length > 0) {
+    const cleaned = filterMisgeocoded(disk.records);
+    memCache = { records: cleaned, loadedAt: Date.now() };
+    return cleaned;
+  }
+  const bundled = await readBundledSnapshot();
+  if (bundled && bundled.length > 0) {
+    const cleaned = filterMisgeocoded(bundled);
+    memCache = { records: cleaned, loadedAt: Date.now() };
+    return cleaned;
+  }
+  const records = filterMisgeocoded(await aggregateAllSightings());
+  memCache = { records, loadedAt: Date.now() };
+  return records;
+}
+
+/** Cron 等でキャッシュを破棄する用 */
+export function invalidateSightingsCache(): void {
+  memCache = null;
+}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { invalidateSightingsCache } from "@/lib/sightings-cache";
 
 // Vercel Cron からスケジュール実行されるエンドポイント。
 // 集約結果のキャッシュタグを invalidate し、次のリクエストで再集約させる。
@@ -21,9 +21,9 @@ export async function GET(req: Request) {
     }
   }
 
-  // Next.js 16: 2 番目の引数で stale-while-revalidate のウィンドウを指定。
-  // "max" は最長の stale 期間。次のリクエストは即時 stale を返しつつ裏で再集約。
-  revalidateTag("kuma-records", "max");
+  // 出没データはサーバー単位のメモリキャッシュで持つので、
+  // タグではなく直接キャッシュを破棄して次回再ロードさせる。
+  invalidateSightingsCache();
 
   return NextResponse.json({
     ok: true,

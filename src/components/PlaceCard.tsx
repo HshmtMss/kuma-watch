@@ -314,13 +314,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
       {/* 2. Risk hero (場所タイプ × 柔らか判定 × LLM 補足) */}
       {breakdown ? (
         <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-          <RiskHero
-            level={breakdown.level}
-            prefCode={municipal?.prefCode}
-            lat={lat}
-            lon={lon}
-            muniName={city}
-          />
+          <RiskHero level={breakdown.level} />
         </div>
       ) : (
         <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 text-sm text-gray-500">
