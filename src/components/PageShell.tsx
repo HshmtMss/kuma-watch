@@ -32,10 +32,14 @@ export default function PageShell({ title, lead, children }: Props) {
           <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>
         </nav>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8">
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">{title}</h1>
-        {lead && <p className="mb-8 text-sm text-gray-600">{lead}</p>}
-        <div className="prose prose-sm max-w-none text-gray-800">{children}</div>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8 sm:py-10">
+        <h1 className="mb-3 text-2xl font-extrabold leading-tight text-stone-900 sm:text-3xl">
+          {title}
+        </h1>
+        {lead && (
+          <p className="mb-8 text-base leading-relaxed text-stone-600">{lead}</p>
+        )}
+        <div className="article-body max-w-none">{children}</div>
       </main>
       <footer className="border-t border-black/8 bg-white px-5 py-6 text-xs text-gray-500">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
