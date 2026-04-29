@@ -104,6 +104,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "spring",
     tags: ["春", "母グマ", "子グマ", "山菜採り"],
+    heroImage: "/articles/spring.jpg",
+    heroCredit: "Photo by Elena Leya on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/PnBc3ZrJOIo",
   },
   {
     slug: "diet",
@@ -115,6 +118,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["生態", "食性", "ドングリ"],
+    heroImage: "/articles/diet.jpg",
+    heroCredit: "Photo by Martins Cardoso on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/KjBo2mpTLNQ",
   },
   {
     slug: "why-increasing",
@@ -126,6 +132,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["統計", "里山", "ブナ凶作"],
+    heroImage: "/articles/why-increasing.jpg",
+    heroCredit: "Photo by Aoi on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/cy_mPGVvhpY",
   },
   {
     slug: "cub-handling",
@@ -137,6 +146,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["子グマ", "母グマ", "対処"],
+    heroImage: "/articles/cub-handling.jpg",
+    heroCredit: "Photo by Janko Ferlič on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/SDivo1PTBDs",
   },
   {
     slug: "home-protection",
@@ -148,6 +160,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["家庭", "果樹園", "電気柵"],
+    heroImage: "/articles/home-protection.jpg",
+    heroCredit: "Photo by Jong Hyuk Lee on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/Nrl5Q-Go8Y8",
   },
   {
     slug: "weapons",
@@ -159,6 +174,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["装備", "スプレー", "撃退"],
+    heroImage: "/articles/weapons.jpg",
+    heroCredit: "Photo by Thomas Thompson on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/mTPohSE-Yiw",
   },
   {
     slug: "first-aid",
@@ -170,6 +188,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["応急処置", "通報", "感染症"],
+    heroImage: "/articles/first-aid.jpg",
+    heroCredit: "Photo by Mathurin NAPOLY on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/MaKsx8JNbiI",
   },
   {
     slug: "historic-incidents",
@@ -181,6 +202,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["事件", "歴史", "ヒグマ"],
+    heroImage: "/articles/historic-incidents.jpg",
+    heroCredit: "Photo by Kenneth Sørensen on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/o7E0s-6gm3E",
   },
 ];
 
