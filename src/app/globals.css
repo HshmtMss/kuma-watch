@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
+
+/* TOC のアンカーリンクで遷移したとき、ヘッダーに見出しが隠れないよう余白を取る */
+html {
+  scroll-padding-top: 80px;
+  scroll-behavior: smooth;
+}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import WebVitalsReporter from "@/components/WebVitalsReporter";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
@@ -268,6 +269,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
+        <WebVitalsReporter />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
