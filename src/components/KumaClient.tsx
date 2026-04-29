@@ -151,10 +151,12 @@ export default function KumaClient() {
       `${shareLink}\n` +
       `#KumaWatch #クマ警戒レベル`;
 
-    // Web Share API があれば優先 (モバイルで LINE/X/メール 等のシェアシートが開く)
+    // Web Share API があれば優先 (モバイルで LINE/X/メール 等のシェアシートが開く)。
+    // text を渡すと iMessage 等で「本文テキスト + リッチカード」が二重に出るため、
+    // OG カードだけが見えるよう title と url だけにする。
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title, text, url: shareLink });
+        await navigator.share({ title, url: shareLink });
         return;
       } catch (e) {
         // ユーザーがキャンセルした場合はそのまま終了
