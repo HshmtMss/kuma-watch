@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import PageShell from "@/components/PageShell";
@@ -71,6 +72,37 @@ export default function ArticleShell({ meta, children }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
+      {meta.heroImage && (
+        <figure className="not-prose -mx-5 mb-8 sm:mx-0">
+          <div className="relative aspect-[16/9] w-full overflow-hidden bg-stone-200 sm:rounded-2xl">
+            <Image
+              src={meta.heroImage}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 768px) 768px, 100vw"
+              className="object-cover"
+            />
+          </div>
+          {meta.heroCredit && (
+            <figcaption className="mt-2 px-5 text-[11px] text-gray-400 sm:px-0">
+              {meta.heroCreditUrl ? (
+                <a
+                  href={meta.heroCreditUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-600"
+                >
+                  {meta.heroCredit}
+                </a>
+              ) : (
+                meta.heroCredit
+              )}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
       <p className="not-prose mb-6 text-xs text-gray-500">
         公開: {formatDate(meta.publishedAt)}
         {meta.publishedAt !== meta.updatedAt && (
@@ -88,10 +120,27 @@ export default function ArticleShell({ meta, children }: Props) {
           <li key={r.slug}>
             <Link
               href={`/articles/${r.slug}`}
-              className="block rounded-xl border border-gray-200 bg-white p-4 hover:border-amber-400 hover:bg-amber-50"
+              className="flex h-full overflow-hidden rounded-xl border border-gray-200 bg-white hover:border-amber-400 hover:bg-amber-50"
             >
-              <div className="text-sm font-semibold text-gray-900">{r.title}</div>
-              <div className="mt-1 text-xs text-gray-500">{r.lead}</div>
+              {r.heroImage && (
+                <div className="relative h-auto w-24 shrink-0 sm:w-28">
+                  <Image
+                    src={r.heroImage}
+                    alt=""
+                    fill
+                    sizes="112px"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="flex-1 p-3">
+                <div className="text-sm font-semibold leading-snug text-gray-900">
+                  {r.title}
+                </div>
+                <div className="mt-1 line-clamp-2 text-xs text-gray-500">
+                  {r.lead}
+                </div>
+              </div>
             </Link>
           </li>
         ))}

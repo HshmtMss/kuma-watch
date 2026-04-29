@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import { ARTICLES } from "@/lib/articles-meta";
@@ -30,34 +31,47 @@ export default function ArticlesIndexPage() {
       title="クマ対策の記事一覧"
       lead="登山・キャンプ・山菜採り・きのこ狩り・渓流釣りなど、クマと隣り合うアウトドア活動を安全に楽しむための記事をまとめています。"
     >
-      <ul className="not-prose space-y-4">
+      <ul className="not-prose space-y-5">
         {sorted.map((a) => (
           <li
             key={a.slug}
-            className="rounded-xl border border-gray-200 bg-white p-4 hover:border-amber-400 hover:bg-amber-50"
+            className="overflow-hidden rounded-xl border border-gray-200 bg-white hover:border-amber-400 hover:bg-amber-50"
           >
-            <Link href={`/articles/${a.slug}`} className="block">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                {a.season && (
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">
-                    {SEASON_LABEL[a.season]}
-                  </span>
-                )}
-                <span>{a.publishedAt}</span>
-              </div>
-              <div className="mt-2 text-base font-semibold text-gray-900">
-                {a.title}
-              </div>
-              <div className="mt-1 text-sm text-gray-600">{a.lead}</div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {a.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600"
-                  >
-                    #{t}
-                  </span>
-                ))}
+            <Link href={`/articles/${a.slug}`} className="flex flex-col gap-0 sm:flex-row">
+              {a.heroImage && (
+                <div className="relative h-40 w-full shrink-0 sm:h-auto sm:w-48">
+                  <Image
+                    src={a.heroImage}
+                    alt=""
+                    fill
+                    sizes="(min-width: 640px) 192px, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="flex-1 p-4">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  {a.season && (
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">
+                      {SEASON_LABEL[a.season]}
+                    </span>
+                  )}
+                  <span>{a.publishedAt}</span>
+                </div>
+                <div className="mt-2 text-base font-semibold text-gray-900">
+                  {a.title}
+                </div>
+                <div className="mt-1 text-sm text-gray-600">{a.lead}</div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {a.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-600"
+                    >
+                      #{t}
+                    </span>
+                  ))}
+                </div>
               </div>
             </Link>
           </li>

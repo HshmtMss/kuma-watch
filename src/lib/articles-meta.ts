@@ -15,6 +15,12 @@ export type ArticleMeta = {
   season?: "spring" | "summer" | "autumn" | "winter" | "all";
   /** 関連カテゴリ */
   tags: string[];
+  /** ヒーロー画像 (public/articles/ 配下のパス) */
+  heroImage?: string;
+  /** ヒーロー画像のクレジット (Unsplash 等) */
+  heroCredit?: string;
+  /** ヒーロー画像のクレジットリンク */
+  heroCreditUrl?: string;
 };
 
 export const ARTICLES: ArticleMeta[] = [
@@ -28,6 +34,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["遭遇", "対処", "安全", "登山"],
+    heroImage: "/articles/encounter.jpg",
+    heroCredit: "Photo by Len Rempel on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/Mvmuqh06dr4",
   },
   {
     slug: "autumn",
@@ -39,6 +48,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "autumn",
     tags: ["秋", "ハイパーフェイジア", "登山", "きのこ狩り"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
     slug: "bear-spray",
@@ -50,6 +62,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["装備", "スプレー", "登山"],
+    heroImage: "/articles/bear-spray.jpg",
+    heroCredit: "Photo by Clay Banks on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/GEQTn-FkDq4",
   },
   {
     slug: "bear-bell",
@@ -61,6 +76,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["装備", "クマ鈴", "ホイッスル"],
+    heroImage: "/articles/bear-bell.jpg",
+    heroCredit: "Photo on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/rXLY-J6kVw0",
   },
   {
     slug: "species-difference",
@@ -72,6 +90,9 @@ export const ARTICLES: ArticleMeta[] = [
     updatedAt: "2026-04-29",
     season: "all",
     tags: ["生態", "ツキノワグマ", "ヒグマ"],
+    heroImage: "/articles/species-difference.jpg",
+    heroCredit: "Photo by Zdeněk Macháček on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/_QG2C0q6J-s",
   },
 ];
 
