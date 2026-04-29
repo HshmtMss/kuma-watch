@@ -1,0 +1,118 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+export type MiniSighting = {
+  lat: number;
+  lon: number;
+  date: string;
+  sectionName?: string;
+  comment?: string;
+};
+
+type Props = {
+  centerLat: number;
+  centerLon: number;
+  records: MiniSighting[];
+  zoom?: number;
+  height?: string;
+  recencyHighlightDays?: number;
+};
+
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILE_ATTRIB =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+
+export default function MiniSightingsMap({
+  centerLat,
+  centerLon,
+  records,
+  zoom = 11,
+  height = "360px",
+  recencyHighlightDays = 90,
+}: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<unknown>(null);
+
+  useEffect(() => {
+    let disposed = false;
+    let cleanup: (() => void) | null = null;
+
+    (async () => {
+      if (!ref.current) return;
+      const L = (await import("leaflet")).default;
+      if (disposed || !ref.current) return;
+
+      const map = L.map(ref.current, {
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: true,
+      }).setView([centerLat, centerLon], zoom);
+      mapRef.current = map;
+
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
+
+      L.circleMarker([centerLat, centerLon], {
+        radius: 9,
+        color: "#92400e",
+        weight: 2,
+        fillColor: "#fde68a",
+        fillOpacity: 0.6,
+      }).addTo(map);
+
+      const now = Date.now();
+      const recentMs = recencyHighlightDays * 86_400_000;
+      for (const r of records) {
+        const t = Date.parse(r.date);
+        const isRecent = Number.isFinite(t) && now - t <= recentMs;
+        const marker = L.circleMarker([r.lat, r.lon], {
+          radius: 6,
+          color: isRecent ? "#7f1d1d" : "#9ca3af",
+          weight: 1,
+          fillColor: isRecent ? "#dc2626" : "#d1d5db",
+          fillOpacity: isRecent ? 0.85 : 0.5,
+        });
+        const date = r.date || "(日付不明)";
+        const where = r.sectionName ? `<div>${escapeHtml(r.sectionName)}</div>` : "";
+        const note = r.comment
+          ? `<div style="margin-top:2px;color:#374151">${escapeHtml(r.comment).slice(0, 120)}</div>`
+          : "";
+        marker.bindPopup(
+          `<div style="font-size:12px;line-height:1.4">
+             <div style="font-weight:700">${escapeHtml(date)}</div>
+             ${where}
+             ${note}
+           </div>`,
+        );
+        marker.addTo(map);
+      }
+
+      cleanup = () => {
+        map.remove();
+      };
+    })();
+
+    return () => {
+      disposed = true;
+      if (cleanup) cleanup();
+    };
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays]);
+
+  return (
+    <div
+      ref={ref}
+      style={{ height, width: "100%", borderRadius: "12px", overflow: "hidden" }}
+      className="border border-stone-200 bg-stone-100"
+      aria-label="周辺のクマ目撃マップ"
+    />
+  );
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}

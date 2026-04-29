@@ -20,10 +20,19 @@ export type PrefSummary = {
   latestDate: string | null;
 };
 
+export type PlaceRecord = {
+  lat: number;
+  lon: number;
+  date: string;
+  sectionName?: string;
+  comment?: string;
+};
+
 type Index = {
   byKey: Map<string, PlaceCell>;
   byPref: Map<string, PlaceCell[]>;
   prefSummaries: Map<string, PrefSummary>;
+  recordsByKey: Map<string, PlaceRecord[]>;
   loadedAt: number;
 };
 
@@ -89,6 +98,28 @@ async function build(): Promise<Index> {
   const byKey = new Map<string, PlaceCell>();
   const byPref = new Map<string, PlaceCell[]>();
   const prefSummaries = new Map<string, PrefSummary>();
+  const recordsByKey = new Map<string, PlaceRecord[]>();
+
+  for (const r of records) {
+    if (!r.prefectureName || !r.cityName) continue;
+    if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
+    const key = `${r.prefectureName}/${r.cityName}`;
+    let arr = recordsByKey.get(key);
+    if (!arr) {
+      arr = [];
+      recordsByKey.set(key, arr);
+    }
+    arr.push({
+      lat: r.lat,
+      lon: r.lon,
+      date: r.date ?? "",
+      sectionName: r.sectionName,
+      comment: r.comment,
+    });
+  }
+  for (const arr of recordsByKey.values()) {
+    arr.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  }
 
   for (const [key, e] of acc) {
     if (e.n === 0) continue;
@@ -126,7 +157,7 @@ async function build(): Promise<Index> {
     });
   }
 
-  return { byKey, byPref, prefSummaries, loadedAt: Date.now() };
+  return { byKey, byPref, prefSummaries, recordsByKey, loadedAt: Date.now() };
 }
 
 async function getIndex(): Promise<Index> {
@@ -156,6 +187,16 @@ export async function getPrefSummary(pref: string): Promise<PrefSummary | null> 
 export async function getAllPrefSummaries(): Promise<PrefSummary[]> {
   const idx = await getIndex();
   return [...idx.prefSummaries.values()].sort((a, b) => b.totalCount - a.totalCount);
+}
+
+export async function getRecordsForPlace(
+  pref: string,
+  city: string,
+  limit = 50,
+): Promise<PlaceRecord[]> {
+  const idx = await getIndex();
+  const arr = idx.recordsByKey.get(`${pref}/${city}`) ?? [];
+  return arr.slice(0, limit);
 }
 
 /** 静的生成対象のキー一覧 (count >= minCount のもの) */

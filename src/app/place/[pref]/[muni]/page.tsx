@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
   getPlaceCell,
   getPlaceCellsByPref,
+  getRecordsForPlace,
   getStaticPlaceKeys,
 } from "@/lib/place-index";
 
@@ -80,9 +82,11 @@ export default async function MuniPage({ params }: Props) {
   const cell = await getPlaceCell(pref, muni);
   if (!cell) notFound();
 
-  const siblings = (await getPlaceCellsByPref(pref))
-    .filter((c) => c.cityName !== muni)
-    .slice(0, 12);
+  const [siblingsRaw, mapRecords] = await Promise.all([
+    getPlaceCellsByPref(pref),
+    getRecordsForPlace(pref, muni, 60),
+  ]);
+  const siblings = siblingsRaw.filter((c) => c.cityName !== muni).slice(0, 12);
 
   const mapUrl = `/?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&z=12`;
   const placeUrl = `/place?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&name=${encodeURIComponent(pref + muni)}`;
@@ -182,12 +186,25 @@ export default async function MuniPage({ params }: Props) {
         </div>
       </div>
 
+      <h2>{muni} 周辺の目撃マップ</h2>
+      <div className="not-prose mb-3">
+        <MiniSightingsMap
+          centerLat={cell.latCentroid}
+          centerLon={cell.lonCentroid}
+          records={mapRecords}
+          zoom={11}
+        />
+      </div>
+      <p className="not-prose mb-6 text-xs text-gray-500">
+        赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
+      </p>
+
       <p className="not-prose mb-6 flex flex-wrap gap-2">
         <Link
           href={mapUrl}
           className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
         >
-          地図で {muni} の危険度を見る →
+          5kmメッシュの危険度マップを開く →
         </Link>
         <Link
           href={placeUrl}
