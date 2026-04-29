@@ -23,7 +23,7 @@ export default function PageShell({ title, lead, children }: Props) {
             style={{ width: "auto", height: "2.25rem" }}
           />
           <div className="hidden sm:block">
-            <div className="text-xs text-gray-500">全国クマ出没予報・危険度マップ</div>
+            <div className="text-xs text-gray-500">全国クマ出没予報・警戒レベルマップ</div>
           </div>
         </Link>
         <nav className="flex items-center gap-3 text-xs text-gray-600">

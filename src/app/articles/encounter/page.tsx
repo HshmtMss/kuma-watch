@@ -110,7 +110,7 @@ export default function Page() {
         <li>複数人での行動・声を出しながら歩く (足音を消さない)</li>
         <li>
           出発前にエリアの直近の出没情報を確認 — KumaWatch
-          のトップ <Link href="/">5kmメッシュ危険度マップ</Link> や、
+          のトップ <Link href="/">5kmメッシュ警戒レベルマップ</Link> や、
           <Link href="/articles/autumn">秋のクマ対策</Link>
           の記事を参考にしてください
         </li>

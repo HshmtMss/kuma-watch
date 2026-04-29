@@ -66,7 +66,7 @@ function buildContextText(ctx: AskPayload["context"]): string {
     parts.push(`生息域: ${ctx.habitatInside ? "内" : "外"}`);
   if (ctx.level)
     parts.push(
-      `現在の危険度: ${ctx.level}${ctx.score != null ? `（${ctx.score}/100）` : ""}`,
+      `現在の警戒レベル: ${ctx.level}${ctx.score != null ? `（${ctx.score}/100）` : ""}`,
     );
   if (ctx.hour != null) parts.push(`時刻: ${ctx.hour}時`);
   if (ctx.month != null) parts.push(`月: ${ctx.month}月`);
@@ -94,7 +94,7 @@ function formatSightings(records: NearbySighting[]): string {
 function demoAnswer(question: string, ctx?: AskPayload["context"]): string {
   const level = ctx?.level ?? "評価不明";
   const place = ctx?.place ?? "この地域";
-  return `（demo 応答）「${question}」について、${place}の現在の危険度は「${level}」です。LLM キーが未設定のため詳細回答はできません。基本対策として、熊鈴の携帯・早朝夕方の単独行動回避・食品の放置禁止を守ってください。詳しい情報は公式リソースからご確認ください。`;
+  return `（demo 応答）「${question}」について、${place}の現在の警戒レベルは「${level}」です。LLM キーが未設定のため詳細回答はできません。基本対策として、熊鈴の携帯・早朝夕方の単独行動回避・食品の放置禁止を守ってください。詳しい情報は公式リソースからご確認ください。`;
 }
 
 export async function POST(req: Request) {

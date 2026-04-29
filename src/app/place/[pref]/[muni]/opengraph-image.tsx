@@ -45,7 +45,7 @@ export default async function OGImage({ params }: Props) {
         ? { bg: "#fef3c7", accent: "#c2410c" }
         : { bg: "#fef9c3", accent: "#a16207" };
 
-  const text = `${pref}${muni}のクマ出没情報危険度マップKumaWatchクマウォッチ全国予報総目撃過去日年月最新件1234567890.-:kumawatchjp`;
+  const text = `${pref}${muni}のクマ出没情報警戒レベルマップKumaWatchクマウォッチ全国予報総目撃過去日年月最新件1234567890.-:kumawatchjp`;
   const fontBold = await loadJaFont(text, 700);
   const fontReg = await loadJaFont(text, 400);
 
@@ -90,7 +90,7 @@ export default async function OGImage({ params }: Props) {
               KumaWatch
             </div>
             <div style={{ display: "flex", fontSize: "16px", color: "#6b7280", marginTop: "2px" }}>
-              全国クマ出没予報・危険度マップ
+              全国クマ出没予報・警戒レベルマップ
             </div>
           </div>
         </div>

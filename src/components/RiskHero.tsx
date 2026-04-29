@@ -41,7 +41,7 @@ export default function RiskHero({
       {/* 1. ヴァーディクト — 横幅は 5 段階バーと一致 (=親要素の幅いっぱい) */}
       <div className="w-full">
         <div className="mb-1 ml-1 text-xs font-semibold text-stone-500">
-          危険度
+          警戒レベル
         </div>
         <div
           className="flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-white shadow-sm"

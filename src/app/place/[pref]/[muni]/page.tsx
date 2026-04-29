@@ -49,10 +49,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
   const cell = await getPlaceCell(pref, muni);
-  const titleBase = `${pref}${muni}のクマ出没情報・危険度マップ`;
+  const titleBase = `${pref}${muni}のクマ出没情報・警戒レベルマップ`;
   const desc = cell
-    ? `${pref}${muni}のクマ出没情報。過去の目撃 ${cell.count} 件 (過去90日 ${cell.count90d} 件)、最新目撃: ${formatDate(cell.latestDate)}。5kmメッシュ単位の危険度・近隣の出没履歴を確認できます。登山・キャンプ前の安全確認に。`
-    : `${pref}${muni}のクマ出没情報・危険度を確認。5kmメッシュ単位の予報で登山・キャンプ前の安全確認に。`;
+    ? `${pref}${muni}のクマ出没情報。過去の目撃 ${cell.count} 件 (過去90日 ${cell.count90d} 件)、最新目撃: ${formatDate(cell.latestDate)}。5kmメッシュ単位の警戒レベル・近隣の出没履歴を確認できます。登山・キャンプ前の安全確認に。`
+    : `${pref}${muni}のクマ出没情報・警戒レベルを確認。5kmメッシュ単位の予報で登山・キャンプ前の安全確認に。`;
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
   return {
@@ -131,7 +131,7 @@ export default async function MuniPage({ params }: Props) {
   return (
     <PageShell
       title={`${muni} のクマ出没情報`}
-      lead={`${pref} ${muni} のクマ出没情報・危険度を確認できます。`}
+      lead={`${pref} ${muni} のクマ出没情報・警戒レベルを確認できます。`}
     >
       <script
         type="application/ld+json"
@@ -204,7 +204,7 @@ export default async function MuniPage({ params }: Props) {
           href={mapUrl}
           className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
         >
-          5kmメッシュの危険度マップを開く →
+          5kmメッシュの警戒レベルマップを開く →
         </Link>
         <Link
           href={placeUrl}
@@ -219,7 +219,7 @@ export default async function MuniPage({ params }: Props) {
         {pref}{muni} ではこれまでに <strong>{cell.count} 件</strong> のクマ目撃情報が記録されており、
         うち過去1年は {cell.count365d} 件、過去90日は {cell.count90d} 件です。
         最新の目撃は {formatDate(cell.latestDate)} です。
-        各メッシュ (5kmグリッド) ごとの危険度は、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
+        各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
       </p>
 
       <h2>{muni} で登山・キャンプを予定している方へ</h2>

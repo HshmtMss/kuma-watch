@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const summary = await getPrefSummary(pref);
   const titleBase = `${pref}のクマ出没予報・市町村別マップ`;
   const desc = summary
-    ? `${pref}のクマ出没情報を市町村別に集約。総目撃${summary.totalCount}件、過去90日${summary.count90d}件、過去1年${summary.count365d}件 (最終更新: ${summary.latestDate ?? "-"})。${summary.cityCount}市町村の危険度を5kmメッシュで確認できます。`
-    : `${pref}のクマ出没情報を市町村別に集約。5kmメッシュ単位の危険度予報で登山・キャンプ前の安全確認に。`;
+    ? `${pref}のクマ出没情報を市町村別に集約。総目撃${summary.totalCount}件、過去90日${summary.count90d}件、過去1年${summary.count365d}件 (最終更新: ${summary.latestDate ?? "-"})。${summary.cityCount}市町村の警戒レベルを5kmメッシュで確認できます。`
+    : `${pref}のクマ出没情報を市町村別に集約。5kmメッシュ単位の警戒レベル予報で登山・キャンプ前の安全確認に。`;
 
   return {
     title: titleBase,
@@ -99,7 +99,7 @@ export default async function PrefPage({ params }: Props) {
         <p>
           現時点で {pref} のクマ出没情報は登録されていません。地図で周辺地域を含めて確認するには
           <Link href="/" className="text-amber-700 underline">
-            トップの危険度マップ
+            トップの警戒レベルマップ
           </Link>
           をご利用ください。
         </p>
@@ -126,7 +126,7 @@ export default async function PrefPage({ params }: Props) {
 
       <h2>使い方</h2>
       <p>
-        各市町村のリンクから、過去の目撃件数・最新の目撃日・5kmメッシュ単位の危険度・
+        各市町村のリンクから、過去の目撃件数・最新の目撃日・5kmメッシュ単位の警戒レベル・
         最近の出没履歴を確認できます。登山・キャンプ・山菜採りなど {pref} 内でアウトドア活動を
         予定している場合は、出発前の参考にご活用ください。
       </p>

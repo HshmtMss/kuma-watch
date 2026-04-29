@@ -7,9 +7,9 @@ import WebVitalsReporter from "@/components/WebVitalsReporter";
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
 const SITE_TITLE =
-  "KumaWatch（クマウォッチ）｜全国クマ出没予報・危険度マップ｜登山・キャンプの安全確認";
+  "KumaWatch（クマウォッチ）｜全国クマ出没予報・警戒レベルマップ｜登山・キャンプの安全確認";
 const SITE_DESCRIPTION =
-  "KumaWatch（クマウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で危険度を予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の危険度確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
+  "KumaWatch（クマウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の警戒レベル確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
 const GA_ID = "G-GCT59LNNZ2";
 
 const geistSans = Geist({
@@ -47,6 +47,7 @@ export const metadata: Metadata = {
     "熊出没情報",
     "ツキノワグマ",
     "ヒグマ",
+    "クマ警戒レベル",
     "クマ危険度",
     "クマ出没リアルタイム",
     "登山 安全確認",
@@ -98,7 +99,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KumaWatch（クマウォッチ）｜全国クマ出没予報",
     description:
-      "全国のクマ出没情報をリアルタイム可視化。5kmメッシュの危険度予報で登山・キャンプの安全確認に。",
+      "全国のクマ出没情報をリアルタイム可視化。5kmメッシュの警戒レベル予報で登山・キャンプの安全確認に。",
     images: ["/icons/Icon-512.png"],
   },
   icons: {
@@ -151,7 +152,7 @@ const webAppSchema = {
   isAccessibleForFree: true,
   featureList: [
     "全国クマ出没予報",
-    "5kmメッシュ危険度マップ",
+    "5kmメッシュ警戒レベルマップ",
     "現在地リスク評価",
     "時間帯別予報",
     "気象連携",
@@ -169,7 +170,7 @@ const faqSchema = {
       name: "KumaWatch（クマウォッチ）とはどんなサービスですか？",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "KumaWatch は、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没危険度を予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
+        text: "KumaWatch は、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没警戒レベルを予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
       },
     },
     {
@@ -177,7 +178,7 @@ const faqSchema = {
       name: "旧サイト「くまもりマップ」とはどんな関係ですか？",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "「くまもりマップ」は KumaWatch の旧サービス名です。他社サービスとの名称重複を避けるためリブランドしました。機能は刷新されており、従来の 5km メッシュ危険度に加えて、気象・時間帯を踏まえた予報機能が加わっています。",
+        text: "「くまもりマップ」は KumaWatch の旧サービス名です。他社サービスとの名称重複を避けるためリブランドしました。機能は刷新されており、従来の 5km メッシュ警戒レベルに加えて、気象・時間帯を踏まえた予報機能が加わっています。",
       },
     },
     {
@@ -218,12 +219,12 @@ const breadcrumbSchema = {
 const howToSchema = {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  name: "KumaWatch でクマ出没危険度を確認する方法",
-  description: "登山・キャンプ前にクマの出没危険度を確認する手順",
+  name: "KumaWatch でクマ出没警戒レベルを確認する方法",
+  description: "登山・キャンプ前にクマの出没警戒レベルを確認する手順",
   step: [
     { "@type": "HowToStep", name: "アクセス", text: "KumaWatch（kuma-watch.jp）にアクセスします。登録不要・無料です。" },
     { "@type": "HowToStep", name: "場所を指定", text: "検索バーに目的地を入力するか、GPS で現在地を取得します。" },
-    { "@type": "HowToStep", name: "危険度を確認", text: "地図上のメッシュ色分けで 5 段階の危険度を確認します。" },
+    { "@type": "HowToStep", name: "警戒レベルを確認", text: "地図上のメッシュ色分けで 5 段階の警戒レベルを確認します。" },
     { "@type": "HowToStep", name: "詳細と予報", text: "メッシュをタップしてスコアの根拠、時間帯別予報、気象条件を確認します。" },
   ],
 };

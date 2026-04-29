@@ -176,7 +176,7 @@ export default function Page() {
         </li>
         <li>
           <strong>出発前の出没情報チェック</strong>
-          (<Link href="/">5kmメッシュ危険度マップ</Link> や 各地域ページ)
+          (<Link href="/">5kmメッシュ警戒レベルマップ</Link> や 各地域ページ)
         </li>
       </ul>
 

@@ -138,16 +138,20 @@ export default function KumaClient() {
       lon: loc.lon.toFixed(5),
     });
     if (selectedLocation?.label) params.set("label", selectedLocation.label);
-    const deepLink = `${origin}/?${params.toString()}`;
-    const title = "KumaWatch — 全国クマ出没予報・危険度マップ";
+    // /share ルート経由にすることで、SNS のクローラーには地点名入りの OG カードが見える。
+    // ユーザーがリンクを開くと /share がトップへリダイレクトする。
+    const shareLink = `${origin}/share?${params.toString()}`;
+    const title = `${labelText}のクマ警戒レベルをチェック｜KumaWatch`;
     const text =
-      `【${labelText}】の出没履歴・危険度・自治体公式情報を KumaWatch で確認:\n` +
-      `${deepLink}`;
+      `🐻 ${labelText} のクマ警戒レベルを KumaWatch でチェック。\n` +
+      `散策・登山前のひと確認に。\n` +
+      `${shareLink}\n` +
+      `#KumaWatch #クマ警戒レベル`;
 
     // Web Share API があれば優先 (モバイルで LINE/X/メール 等のシェアシートが開く)
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title, text, url: deepLink });
+        await navigator.share({ title, text, url: shareLink });
         return;
       } catch (e) {
         // ユーザーがキャンセルした場合はそのまま終了
@@ -654,7 +658,7 @@ export default function KumaClient() {
             </span>
           </div>
 
-          {/* 危険度ヒートマップ ON/OFF */}
+          {/* 警戒レベルヒートマップ ON/OFF */}
           <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">
             <input
               type="checkbox"
@@ -662,7 +666,7 @@ export default function KumaClient() {
               onChange={(e) => setShowHeatmap(e.target.checked)}
               className="h-4 w-4 accent-amber-600"
             />
-            危険度
+            警戒レベル
           </label>
 
           {/* 凡例トグル */}
@@ -860,7 +864,7 @@ export default function KumaClient() {
                   <span className="truncate rounded-full bg-amber-50 px-2.5 py-1 text-sm text-amber-800">
                     {askContext.place}
                     {askContext.level
-                      ? ` / 危険度 ${RISK_LEVEL_LABEL[askContext.level as RiskLevel] ?? askContext.level}`
+                      ? ` / 警戒レベル ${RISK_LEVEL_LABEL[askContext.level as RiskLevel] ?? askContext.level}`
                       : ""}
                   </span>
                 ) : (
@@ -926,7 +930,7 @@ export default function KumaClient() {
             </div>
             <div>
               <div className="mb-1 text-xs text-gray-500">
-                危険度ヒートマップ
+                警戒レベルヒートマップ
               </div>
               {RISK_LEGEND_ORDER.map((level) => (
                 <div key={level} className="flex items-center gap-2">

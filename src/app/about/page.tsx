@@ -4,7 +4,7 @@ import PageShell from "@/components/PageShell";
 export const metadata: Metadata = {
   title: "このサイトについて",
   description:
-    "KumaWatch（クマウォッチ）は、全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で危険度を予報する無料の Web アプリです。運営は獣医工学ラボ（リサーチコーディネート株式会社）です。",
+    "KumaWatch（クマウォッチ）は、全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。運営は獣医工学ラボ（リサーチコーディネート株式会社）です。",
   alternates: { canonical: "/about" },
 };
 
@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <PageShell
       title="このサイトについて"
-      lead="KumaWatch（クマウォッチ）は、全国のクマ出没情報を集約・可視化し、危険度を予報する無料の Web アプリです。"
+      lead="KumaWatch（クマウォッチ）は、全国のクマ出没情報を集約・可視化し、警戒レベルを予報する無料の Web アプリです。"
     >
       <h2>サービスの目的</h2>
       <p>
@@ -24,8 +24,8 @@ export default function AboutPage() {
       <h2>主な機能</h2>
       <ul>
         <li>全国のクマ出没情報を地図上にリアルタイム表示</li>
-        <li>5km メッシュ単位の危険度マップ（5 段階表示）</li>
-        <li>現在地の危険度評価（GPS 取得）</li>
+        <li>5km メッシュ単位の警戒レベルマップ（5 段階表示）</li>
+        <li>現在地の警戒レベル評価（GPS 取得）</li>
         <li>時間帯・季節・気象を踏まえた予報スコア</li>
         <li>期間でのフィルタ</li>
         <li>登録不要・完全無料</li>
@@ -34,7 +34,7 @@ export default function AboutPage() {
       <h2 id="data-sources">データソース・出典</h2>
       <p>
         KumaWatch は、国・自治体・各オープンデータプロジェクトが公開する情報を組み合わせて
-        危険度を算出しています。主な出典は以下のとおりです。
+        警戒レベルを算出しています。主な出典は以下のとおりです。
       </p>
 
       <h3>クマ出没・分布情報</h3>
@@ -115,7 +115,7 @@ export default function AboutPage() {
 
       <h2>スコアの考え方</h2>
       <p>
-        危険度は <strong>5 段階（安全 / 念のため注意 / 基本対策を / 対策を強化 / しっかり対策を）</strong> で表示します。
+        警戒レベルは <strong>5 段階（安全 / 念のため注意 / 基本対策を / 対策を強化 / しっかり対策を）</strong> で表示します。
         基本となるのは <strong>クマの生息域</strong> で、生息記録のない地域は「安全」と扱います。
         生息域内では、<strong>過去の出没履歴を中心に、季節・気象・時間帯などを補正要素として加味</strong>し、
         現時点で意識しておきたいレベルを表します。

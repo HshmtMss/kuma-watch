@@ -625,7 +625,7 @@ export default function RiskPanel({
     <div
       className="pointer-events-auto absolute inset-x-0 bottom-0 z-[1000] border-t border-black/8 bg-white shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
       role="region"
-      aria-label="危険度と設定"
+      aria-label="警戒レベルと設定"
       style={{
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
@@ -660,12 +660,12 @@ export default function RiskPanel({
             <div className="min-w-0 flex-1">
               <div className="truncate text-base font-semibold text-gray-900">
                 {state.kind === "idle"
-                  ? "地図をタップして危険度を見る"
+                  ? "地図をタップして警戒レベルを見る"
                   : state.kind === "ready" && state.placeName
                     ? state.placeName
                     : state.kind === "ready" && state.source === "tap"
-                      ? "選択地点の危険度"
-                      : "現在地の危険度"}
+                      ? "選択地点の警戒レベル"
+                      : "現在地の警戒レベル"}
               </div>
               <div className="truncate text-sm text-gray-500 sm:text-xs">
                 {state.kind === "idle" && "または検索バーから地点を選択"}
@@ -941,7 +941,7 @@ function RiskDetails({
       {/* 4. 危険度予測 (時間帯・月別・根拠) */}
       <section className="border-t border-gray-100 px-4 py-3">
         <h3 className="mb-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
-          📊 危険度予測
+          📊 警戒レベル予測
         </h3>
         <div className="mb-2 flex items-center justify-end text-sm text-gray-500 sm:text-[11px]">
           <span>
