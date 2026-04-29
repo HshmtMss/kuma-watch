@@ -9,11 +9,10 @@ export type FaqItem = {
 };
 
 type Props = {
-  title?: string;
   items: FaqItem[];
 };
 
-export default function ArticleFaq({ title = "よくある質問", items }: Props) {
+export default function ArticleFaq({ items }: Props) {
   if (items.length === 0) return null;
 
   const faqSchema = {
@@ -30,12 +29,11 @@ export default function ArticleFaq({ title = "よくある質問", items }: Prop
   };
 
   return (
-    <section className="not-prose mt-8 rounded-xl border border-stone-200 bg-stone-50 p-5">
+    <section className="not-prose mt-4 rounded-xl border border-stone-200 bg-stone-50 p-5">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <h2 className="mb-4 text-lg font-bold text-stone-900">{title}</h2>
       <dl className="space-y-4">
         {items.map((it, i) => (
           <div key={i}>

@@ -31,11 +31,11 @@ export default function ArticlesIndexPage() {
       title="クマ対策の記事一覧"
       lead="登山・キャンプ・山菜採り・きのこ狩り・渓流釣りなど、クマと隣り合うアウトドア活動を安全に楽しむための記事をまとめています。"
     >
-      <ul className="not-prose space-y-5">
+      <ul className="not-prose space-y-8">
         {sorted.map((a) => (
           <li
             key={a.slug}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white hover:border-amber-400 hover:bg-amber-50"
+            className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50"
           >
             <Link href={`/articles/${a.slug}`} className="flex flex-col gap-0 sm:flex-row">
               {a.heroImage && (
