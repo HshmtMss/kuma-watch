@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import { getArticle } from "@/lib/articles-meta";
 
@@ -119,13 +120,13 @@ export default function Page() {
       <h2>スプレー以外との組み合わせ</h2>
       <p>
         スプレーは「最後の砦」であり、そこに至らないことが最善です。
-        スプレーと併せて、<a href="/articles/bear-bell">クマ鈴・ホイッスル</a>
+        スプレーと併せて、<Link href="/articles/bear-bell">クマ鈴・ホイッスル</Link>
         などで遭遇自体を回避する装備、複数人で行動する習慣、出発前の
-        <a href="/">5kmメッシュ危険度マップ</a> での情報収集も合わせて行ってください。
+        <Link href="/">5kmメッシュ危険度マップ</Link> での情報収集も合わせて行ってください。
       </p>
 
       <p>
-        遭遇したときの距離別対処は <a href="/articles/encounter">クマに遭遇したらどうする</a> で詳しく解説しています。
+        遭遇したときの距離別対処は <Link href="/articles/encounter">クマに遭遇したらどうする</Link> で詳しく解説しています。
       </p>
     </ArticleShell>
   );

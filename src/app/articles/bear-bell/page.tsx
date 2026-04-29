@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import { getArticle } from "@/lib/articles-meta";
 
@@ -134,9 +135,9 @@ export default function Page() {
       <p>
         クマ鈴は「単体では完璧ではない、しかし携行コストが低く確実に役立つ」装備です。
         遭遇予防 (鈴・ホイッスル・ラジオ) と、遭遇後の対処 (
-        <a href="/articles/bear-spray">スプレー</a>、
-        <a href="/articles/encounter">距離別の対処</a>) を組み合わせ、
-        さらに出発前に <a href="/">出没マップ</a> で情報収集する。
+        <Link href="/articles/bear-spray">スプレー</Link>、
+        <Link href="/articles/encounter">距離別の対処</Link>) を組み合わせ、
+        さらに出発前に <Link href="/">出没マップ</Link> で情報収集する。
         この三段構えがアウトドアでクマと共存するための基本です。
       </p>
     </ArticleShell>

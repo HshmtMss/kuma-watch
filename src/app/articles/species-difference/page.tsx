@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import { getArticle } from "@/lib/articles-meta";
 
@@ -125,14 +126,14 @@ export default function Page() {
       <p>
         本州・四国を訪れるならツキノワグマを、北海道ならヒグマを想定して装備と知識を整えてください。
         どちらの種でも、出発前に目的地周辺の出没情報を確認しておくことが最善の予防です。
-        KumaWatch の <a href="/place/北海道">北海道のページ</a>、
-        <a href="/place/長野県">長野県のページ</a> など、各都道府県・市町村のページから直近の目撃を確認できます。
+        KumaWatch の <Link href="/place/北海道">北海道のページ</Link>、
+        <Link href="/place/長野県">長野県のページ</Link> など、各都道府県・市町村のページから直近の目撃を確認できます。
       </p>
 
       <p>
-        いずれの種でも、遭遇時の距離別対処は <a href="/articles/encounter">クマに遭遇したら</a>
-        を、装備の選び方は <a href="/articles/bear-spray">クマよけスプレーの使い方</a>、
-        <a href="/articles/bear-bell">クマ鈴の効果</a> を参照してください。
+        いずれの種でも、遭遇時の距離別対処は <Link href="/articles/encounter">クマに遭遇したら</Link>
+        を、装備の選び方は <Link href="/articles/bear-spray">クマよけスプレーの使い方</Link>、
+        <Link href="/articles/bear-bell">クマ鈴の効果</Link> を参照してください。
       </p>
     </ArticleShell>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import { getArticle } from "@/lib/articles-meta";
 
@@ -79,7 +80,7 @@ export default function Page() {
         </li>
         <li>
           <strong>クマよけスプレーを携行</strong>:
-          詳細は <a href="/articles/bear-spray">クマよけスプレーの使い方</a> を参照
+          詳細は <Link href="/articles/bear-spray">クマよけスプレーの使い方</Link> を参照
         </li>
         <li>
           <strong>食べ物の管理</strong>:
@@ -106,15 +107,15 @@ export default function Page() {
       <h2>もし遭遇してしまったら</h2>
       <p>
         秋は子別れ後の若グマが多く、好奇心から接近されるケースもあります。
-        遭遇時の正しい対処は <a href="/articles/encounter">クマに遭遇したら</a> の記事で詳しく解説しています。
+        遭遇時の正しい対処は <Link href="/articles/encounter">クマに遭遇したら</Link> の記事で詳しく解説しています。
         距離別に行動を覚えておくだけで、被害リスクは大きく下がります。
       </p>
 
       <h2>地域別の最新出没情報</h2>
       <p>
-        KumaWatch では <a href="/">トップページの 5kmメッシュ危険度マップ</a>
+        KumaWatch では <Link href="/">トップページの 5kmメッシュ危険度マップ</Link>
         と、各都道府県・市町村ページから直近の目撃情報を確認できます。
-        例えば <a href="/place/長野県">長野県のページ</a>
+        例えば <Link href="/place/長野県">長野県のページ</Link>
         からは県内 各市町村の傾向を一覧できます。
       </p>
     </ArticleShell>

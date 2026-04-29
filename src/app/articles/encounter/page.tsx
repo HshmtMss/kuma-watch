@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import { getArticle } from "@/lib/articles-meta";
 
@@ -81,14 +82,14 @@ export default function Page() {
       <ul>
         <li>
           クマよけスプレー: 容量 230g 以上・射程 5m 以上のものをホルスターで腰に。
-          詳しくは <a href="/articles/bear-spray">クマよけスプレーの使い方</a> を参照
+          詳しくは <Link href="/articles/bear-spray">クマよけスプレーの使い方</Link> を参照
         </li>
         <li>クマ鈴・ホイッスル: 単独行は特に必須</li>
         <li>複数人での行動・声を出しながら歩く (足音を消さない)</li>
         <li>
           出発前にエリアの直近の出没情報を確認 — KumaWatch
-          のトップ <a href="/">5kmメッシュ危険度マップ</a> や、
-          <a href="/articles/autumn">秋のクマ対策</a>
+          のトップ <Link href="/">5kmメッシュ危険度マップ</Link> や、
+          <Link href="/articles/autumn">秋のクマ対策</Link>
           の記事を参考にしてください
         </li>
       </ul>
