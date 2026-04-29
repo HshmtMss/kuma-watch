@@ -229,11 +229,61 @@ export default async function MuniPage({ params }: Props) {
         出発前に下記をご確認ください:
       </p>
       <ul>
-        <li>クマ鈴・ホイッスルなど音の出るものを携帯する</li>
+        <li>
+          クマ鈴・ホイッスルなど音の出るものを携帯する (
+          <Link href="/articles/bear-bell">クマ鈴は本当に効果がある?</Link>)
+        </li>
         <li>単独行動を避け、複数人で行動する</li>
         <li>食料・ゴミは密閉して携行・持ち帰る</li>
-        <li>クマ撃退スプレーを携行し、使い方を確認しておく</li>
+        <li>
+          クマ撃退スプレーを携行し、使い方を確認しておく (
+          <Link href="/articles/bear-spray">スプレーの選び方と使い方</Link>)
+        </li>
+        <li>
+          遭遇したときの距離別の対処を覚える (
+          <Link href="/articles/encounter">クマに遭遇したらどうする</Link>)
+        </li>
         <li>近隣の自治体公式サイトで最新の出没情報を確認する</li>
+      </ul>
+
+      <h2>あわせて読みたい</h2>
+      <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <li>
+          <Link
+            href="/articles/encounter"
+            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+          >
+            <span className="font-medium">クマに遭遇したら</span>
+            <span className="ml-1 text-gray-500">距離別の正しい対処</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/articles/autumn"
+            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+          >
+            <span className="font-medium">秋のクマ対策</span>
+            <span className="ml-1 text-gray-500">なぜ秋が最も危険なのか</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/articles/bear-spray"
+            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+          >
+            <span className="font-medium">クマよけスプレー</span>
+            <span className="ml-1 text-gray-500">使い方と選び方</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/articles/species-difference"
+            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+          >
+            <span className="font-medium">ツキノワグマとヒグマ</span>
+            <span className="ml-1 text-gray-500">行動・対処の違い</span>
+          </Link>
+        </li>
       </ul>
 
       {siblings.length > 0 && (

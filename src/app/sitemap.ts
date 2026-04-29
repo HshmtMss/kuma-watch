@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { ARTICLES } from "@/lib/articles-meta";
 import { getAllPrefSummaries, getStaticPlaceKeys } from "@/lib/place-index";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -11,9 +12,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/for-gov`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/sources`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/submit`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/disclaimer`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
+
+  const articleEntries: MetadataRoute.Sitemap = ARTICLES.map((a) => ({
+    url: `${SITE_URL}/articles/${a.slug}`,
+    lastModified: new Date(a.updatedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
   let prefEntries: MetadataRoute.Sitemap = [];
   let muniEntries: MetadataRoute.Sitemap = [];
@@ -38,5 +47,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // データ取得失敗時はメインの URL のみ返す
   }
 
-  return [...staticEntries, ...prefEntries, ...muniEntries];
+  return [...staticEntries, ...articleEntries, ...prefEntries, ...muniEntries];
 }

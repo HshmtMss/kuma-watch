@@ -27,7 +27,8 @@ export default function PageShell({ title, lead, children }: Props) {
           </div>
         </Link>
         <nav className="flex items-center gap-3 text-xs text-gray-600">
-          <Link href="/" className="hover:text-gray-900">地図に戻る</Link>
+          <Link href="/" className="hover:text-gray-900">地図</Link>
+          <Link href="/articles" className="hover:text-gray-900">記事</Link>
           <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>
         </nav>
       </header>

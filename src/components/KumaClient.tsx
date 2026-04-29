@@ -593,6 +593,9 @@ export default function KumaClient() {
                   ))}
                 </div>
               </div>
+              <a href="/articles" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
+                記事 (クマ対策)
+              </a>
               <a href="/about" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
                 このサイトについて
               </a>
