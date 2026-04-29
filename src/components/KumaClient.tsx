@@ -127,9 +127,12 @@ export default function KumaClient() {
       return;
     }
     const origin = window.location.origin;
-    // selectedLocation 以外 (currentLocation のみ) のときも deep link を作れる
+    // 表示優先順: 検索ヒットの label > リバースジオコーディング結果 (askContext.place)
+    // > GPS の場合「現在地」、それ以外は「選択地点」 (タップで placeName 未取得時)
+    const resolvedName =
+      selectedLocation?.label ?? askContext?.place ?? undefined;
     const labelText =
-      selectedLocation?.label ??
+      resolvedName ??
       (selectedLocation?.source === "gps" || !selectedLocation
         ? "現在地"
         : "選択地点");
@@ -137,7 +140,7 @@ export default function KumaClient() {
       lat: loc.lat.toFixed(5),
       lon: loc.lon.toFixed(5),
     });
-    if (selectedLocation?.label) params.set("label", selectedLocation.label);
+    if (resolvedName) params.set("label", resolvedName);
     // /share ルート経由にすることで、SNS のクローラーには地点名入りの OG カードが見える。
     // ユーザーがリンクを開くと /share がトップへリダイレクトする。
     const shareLink = `${origin}/share?${params.toString()}`;
@@ -171,7 +174,7 @@ export default function KumaClient() {
       setCopyToast("シェアに失敗しました");
     }
     window.setTimeout(() => setCopyToast(null), 2000);
-  }, [selectedLocation, currentLocation]);
+  }, [selectedLocation, currentLocation, askContext]);
   // SSR と CSR で同じ初期値を返すため default で初期化し、localStorage からの
   // 復元は mount 後 (useEffect) に行う。これでハイドレーション不整合を避ける。
   const [tileStyle, setTileStyleRaw] = useState<TileStyle>(DEFAULT_TILE_STYLE);
