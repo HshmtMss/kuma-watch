@@ -17,21 +17,31 @@ type ResearchEntry = {
   title: string;
   lead: string;
   publishedAt: string;
-  category: "incident-report" | "topic" | "policy";
+  category: "daily-report" | "weekly-report" | "monthly-report" | "topic" | "policy";
 };
 
+// publishedAt 降順で並ぶように、新しいものを上に追加していく。
 const ENTRIES: ResearchEntry[] = [
   {
     slug: "2026-04-29-bear-incidents",
     title: "2026年4月29日 国内熊出没事案の時空間分析と社会的リスク評価",
     lead: "ゴールデンウィーク初日、全国で相次いだクマ出没・人身被害事案を網羅的に集約し、アーバン・ベア化の進行と背景要因を分析した報告書。",
     publishedAt: "2026-04-30",
-    category: "incident-report",
+    category: "daily-report",
+  },
+  {
+    slug: "2026-03-monthly-report",
+    title: "2026年3月 国内熊出没動向と「熊対策ロードマップ」策定の包括的分析",
+    lead: "暖冬による早期覚醒、北海道・東北・北陸の出没急増、3月27日に政府が公表した個体数削減ロードマップ（2030年度までの地域別削減目標）までを総括した月次報告。",
+    publishedAt: "2026-04-30",
+    category: "monthly-report",
   },
 ];
 
 const CATEGORY_LABEL: Record<ResearchEntry["category"], string> = {
-  "incident-report": "事案レポート",
+  "daily-report": "日次レポート",
+  "weekly-report": "週次レポート",
+  "monthly-report": "月次レポート",
   topic: "テーマ解説",
   policy: "政策提言",
 };
