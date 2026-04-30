@@ -89,7 +89,7 @@ export default async function OGImage({ params }: Props) {
               KumaWatch
             </div>
             <div style={{ display: "flex", fontSize: "16px", color: "#6b7280", marginTop: "2px" }}>
-              全国クマ出没予報・警戒レベルマップ
+              全国クマ警戒レベルマップ
             </div>
           </div>
         </div>

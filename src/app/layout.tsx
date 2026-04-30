@@ -7,7 +7,7 @@ import WebVitalsReporter from "@/components/WebVitalsReporter";
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
 const SITE_TITLE =
-  "KumaWatch（クマウォッチ）｜全国クマ出没予報・警戒レベルマップ｜登山・キャンプの安全確認";
+  "KumaWatch（クマウォッチ）｜全国クマ警戒レベルマップ｜登山・キャンプの安全確認";
 const SITE_DESCRIPTION =
   "KumaWatch（クマウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の警戒レベル確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
 const GA_ID = "G-GCT59LNNZ2";
