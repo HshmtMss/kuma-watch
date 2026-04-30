@@ -58,6 +58,7 @@ export default function PageShell({ title, lead, children }: Props) {
           <nav className="flex flex-wrap items-center gap-3">
             <Link href="/about" className="hover:text-gray-900">このサイトについて</Link>
             <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>
+            <Link href="/research" className="hover:text-gray-900">研究・知見</Link>
             <Link href="/disclaimer" className="hover:text-gray-900">免責事項</Link>
             <Link href="/privacy" className="hover:text-gray-900">プライバシー</Link>
           </nav>
