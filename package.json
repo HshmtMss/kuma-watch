@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "build:mesh": "node scripts/build-mesh-data.mjs",
-    "build:sightings": "tsx --env-file=.env.local scripts/build-sightings.ts"
+    "build:sightings": "tsx --env-file-if-exists=.env.local scripts/build-sightings.ts"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",
