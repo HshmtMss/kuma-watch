@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:mesh": "node scripts/build-mesh-data.mjs"
+    "build:mesh": "node scripts/build-mesh-data.mjs",
+    "build:sightings": "tsx --env-file=.env.local scripts/build-sightings.ts"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",
@@ -33,6 +34,7 @@
     "iconv-lite": "^0.7.2",
     "shapefile": "^0.6.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

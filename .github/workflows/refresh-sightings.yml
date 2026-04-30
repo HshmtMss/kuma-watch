@@ -1,0 +1,50 @@
+name: Refresh sightings data
+
+# 日次で 67 自治体ソース + Sharp9110 を集約し、
+# 差分があれば public/data/sightings.json を更新コミットして
+# Vercel の自動デプロイをトリガーする。
+#
+# 手動実行は GitHub UI の "Run workflow" ボタンから可能。
+
+on:
+  schedule:
+    # UTC 18:00 = JST 03:00。深夜帯で自治体サイトへの負荷を抑える。
+    - cron: '0 18 * * *'
+  workflow_dispatch: {}
+
+# git push に必要
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Aggregate sightings
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          KEMONOTE_USERNAME: ${{ secrets.KEMONOTE_USERNAME }}
+          KEMONOTE_PASSWORD: ${{ secrets.KEMONOTE_PASSWORD }}
+        run: npm run build:sightings
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet public/data/sightings.json; then
+            echo "No changes — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/sightings.json
+          git commit -m "Refresh sightings data ($(date -u +%Y-%m-%d))"
+          git push
