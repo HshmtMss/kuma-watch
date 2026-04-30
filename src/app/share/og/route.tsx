@@ -22,16 +22,27 @@ export async function GET(req: Request) {
   const labelRaw = url.searchParams.get("label") ?? "";
   const label = labelRaw.slice(0, 24) || "選択地点";
 
-  const text = `${label}のクマ警戒レベルチェックKumaWatchクマウォッチ全国マップ散策登山前のひと確認にkumawatchjp1234567890.-:このあたりを見る`;
+  const text = `${label}のクマ警戒レベルKumaWatchクマウォッチ全国マップkumawatchjp1234567890.-`;
   const fontBold = await loadJaFont(text, 700);
   const fontReg = await loadJaFont(text, 400);
   const fonts: { name: string; data: ArrayBuffer; style: "normal"; weight: 400 | 700 }[] = [];
   if (fontBold) fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal", weight: 700 });
   if (fontReg) fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal", weight: 400 });
 
-  // 地点名の文字数で大きさを微調整
+  // 地点名サイズは文字数で段階調整。
+  // 利用可能幅 ≈ 688px (左カラム780 - 左パディング72 - 右安全余白20)。
+  // 1 行に収めるため、和文 1 文字の幅 ≈ font * 0.95 を逆算して段階設定。
   const labelFontSize =
-    label.length <= 5 ? 110 : label.length <= 8 ? 88 : label.length <= 12 ? 70 : 56;
+    label.length <= 2 ? 200
+    : label.length <= 3 ? 180
+    : label.length <= 4 ? 160
+    : label.length <= 5 ? 140
+    : label.length <= 7 ? 100
+    : label.length <= 9 ? 80
+    : label.length <= 11 ? 64
+    : label.length <= 14 ? 52
+    : label.length <= 18 ? 42
+    : 34;
 
   const bearSrc = getBearDataUrl();
 
@@ -48,13 +59,13 @@ export async function GET(req: Request) {
           position: "relative",
         }}
       >
-        {/* 左カラム: テキスト */}
+        {/* 左カラム: テキスト (情報を 3 ブロックに集約: ブランド / 地点+CTA / URL) */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            padding: "60px 0 56px 72px",
-            width: "720px",
+            padding: "56px 0 56px 72px",
+            width: "780px",
             justifyContent: "space-between",
           }}
         >
@@ -63,10 +74,11 @@ export async function GET(req: Request) {
             <div
               style={{
                 display: "flex",
-                fontSize: "44px",
+                fontSize: "60px",
                 fontWeight: 700,
                 color: "#1c1917",
                 letterSpacing: "-0.5px",
+                lineHeight: 1,
               }}
             >
               KumaWatch
@@ -74,34 +86,25 @@ export async function GET(req: Request) {
             <div
               style={{
                 display: "flex",
-                fontSize: "20px",
-                color: "#78716c",
-                marginTop: "4px",
+                fontSize: "30px",
+                color: "#3f6212",
+                marginTop: "8px",
+                fontWeight: 700,
               }}
             >
               全国クマ警戒レベルマップ
             </div>
           </div>
 
-          {/* 地点名 */}
+          {/* 地点名 + CTA — メイン訴求 */}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div
-              style={{
-                display: "flex",
-                fontSize: "26px",
-                color: "#78716c",
-                marginBottom: "10px",
-              }}
-            >
-              このあたりのクマ情報を見る
-            </div>
             <div
               style={{
                 display: "flex",
                 fontSize: labelFontSize,
                 fontWeight: 700,
                 color: "#1c1917",
-                lineHeight: 1.05,
+                lineHeight: 1.0,
                 maxWidth: "100%",
               }}
             >
@@ -110,35 +113,28 @@ export async function GET(req: Request) {
             <div
               style={{
                 display: "flex",
-                fontSize: "26px",
+                fontSize: "56px",
                 color: "#065f46",
-                marginTop: "14px",
+                marginTop: "16px",
                 fontWeight: 700,
+                lineHeight: 1.05,
               }}
             >
-              のクマ警戒レベルをチェック
+              のクマ警戒レベル
             </div>
           </div>
 
-          {/* フッター */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-              color: "#57534e",
-              fontSize: "18px",
-            }}
-          >
-            <div style={{ display: "flex" }}>散策・登山前のひと確認に</div>
+          {/* URL */}
+          <div style={{ display: "flex", alignItems: "center" }}>
             <div
               style={{
                 display: "flex",
-                padding: "8px 18px",
-                background: "rgba(255,255,255,0.85)",
+                padding: "12px 26px",
+                background: "rgba(255,255,255,0.92)",
                 borderRadius: "999px",
                 fontWeight: 700,
                 color: "#1c1917",
+                fontSize: "32px",
               }}
             >
               kuma-watch.jp
@@ -147,14 +143,14 @@ export async function GET(req: Request) {
         </div>
 
         {/* 右カラム: クマイラスト
-            シェア時のクロップで右端が切れないよう内側に寄せる (paddingRight で確保) */}
+            シェア時のクロップで右端が切れないよう内側に寄せる */}
         <div
           style={{
             display: "flex",
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
-            paddingRight: "80px",
+            paddingRight: "60px",
             position: "relative",
           }}
         >
@@ -162,8 +158,8 @@ export async function GET(req: Request) {
           <img
             src={bearSrc}
             alt=""
-            width={380}
-            height={449}
+            width={340}
+            height={402}
             style={{ objectFit: "contain" }}
           />
         </div>
