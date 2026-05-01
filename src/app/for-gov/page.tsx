@@ -78,10 +78,10 @@ export default function ForGovPage() {
         KumaWatch を運営する獣医工学ラボでは、全国のクマ出没事案の時空間分析や政策提言を継続的に発信しています。
         研究・知見ページでは、日次の事案レポートやアーバン・ベア（都市型出没）に関するテーマ解説を公開しています。
       </p>
-      <p>
+      <p className="not-prose">
         <a
           href="/research"
-          className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-emerald-800"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
         >
           研究・知見ページを見る →
         </a>
