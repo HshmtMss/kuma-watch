@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/research/2026-04-29-bear-incidents`, lastModified: new Date("2026-04-30"), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/research/2026-03-monthly-report`, lastModified: new Date("2026-04-30"), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/research/2026-04-monthly-report`, lastModified: new Date("2026-05-01"), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/research/2026-04-30-daily-report`, lastModified: new Date("2026-05-01"), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/disclaimer`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
