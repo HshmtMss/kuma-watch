@@ -1,0 +1,46 @@
+name: Import research articles
+
+# Drive の研究記事フォルダ (日次・月次) をスキャンし、未公開の Doc があれば
+# /research/<slug>/page.tsx と索引・sitemap を自動生成・コミット・push する。
+# Vercel が auto deploy するので、新記事は数分以内に本番反映される。
+#
+# 動作仕様は scripts/import-research.ts を参照。
+
+on:
+  schedule:
+    # UTC 22:00 = JST 07:00。refresh-sightings (UTC 18:00) より後に走らせる。
+    - cron: '0 22 * * *'
+  workflow_dispatch: {}
+
+# git push に必要
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Import research articles from Drive
+        run: npm run import:research
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet; then
+            echo "No changes — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/research src/app/sitemap.ts
+          git commit -m "Import new research article(s) ($(date -u +%Y-%m-%d))"
+          git push
