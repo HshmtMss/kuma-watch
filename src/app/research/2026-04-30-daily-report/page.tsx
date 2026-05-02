@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/research/${SLUG}`,
     type: "article",
-    publishedTime: "2026-05-01",
+    publishedTime: "2026-05-02",
   },
   twitter: {
     card: "summary_large_image",
@@ -31,8 +31,8 @@ const SCHEMA = {
   "@type": "Article",
   headline: TITLE,
   description: DESCRIPTION,
-  datePublished: "2026-05-01",
-  dateModified: "2026-05-01",
+  datePublished: "2026-05-02",
+  dateModified: "2026-05-02",
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -184,7 +184,7 @@ export default function ResearchPage() {
         </span>
         <span>対象期間: 2026年4月30日</span>
         <span>·</span>
-        <span>公開: 2026-05-01</span>
+        <span>公開: 2026-05-02</span>
         <span>·</span>
         <Link href="/research" className="text-emerald-700 underline">
           研究・知見トップへ
@@ -201,27 +201,24 @@ export default function ResearchPage() {
       <p>4月30日早朝より、富山県警察および富山市、そして猟友会による大規模な捜索が開始された。捜索には警察ヘリコプターやドローンが投入され、空からの熱源探知が行われた 1。午前8時45分頃、県警ヘリのサーモグラフィーが住宅街から約250メートル離れた藪の中に潜伏する動物の熱源を特定した 3。</p>
       <p>これを受け、富山市は「緊急銃猟」の実施を決定した。これは、鳥獣保護管理法に基づき、警察官の管理下で、通常は禁止されている住宅街等での発砲を自治体判断で許可する極めて例外的な措置である 5。午後1時前、猟友会員によって計12発の発砲が行われ、潜伏していた成獣のオス1頭が駆除された 3。</p>
       <p>駆除された個体の詳細情報を以下の表にまとめる。</p>
-      <p>項目</p>
-      <p>詳細内容</p>
-      <p>出典</p>
-      <p>個体種別</p>
-      <p>ツキノワグマ（成獣・オス）</p>
-      <p>6</p>
-      <h3>推定年齢</h3>
-      <p>7歳</p>
-      <p>3</p>
-      <h3>体長</h3>
-      <h3>約150センチメートル</h3>
-      <p>6</p>
-      <h3>体重</h3>
-      <h2>約110キログラム（一部報道では約85kg）</h2>
-      <p>3</p>
-      <h3>駆除地点</h3>
-      <h2>富山市森付近の藪（人身被害現場から約250m）</h2>
-      <p>5</p>
-      <h3>駆除手法</h3>
-      <h3>緊急銃猟（自治体判断による発砲許可）</h3>
-      <p>3</p>
+      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-stone-50 text-xs text-stone-700">
+            <tr>
+              <th className="px-3 py-2">項目</th>
+              <th className="px-3 py-2">詳細内容</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-gray-800">
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">個体種別</td><td className="px-3 py-2 text-xs">ツキノワグマ（成獣・オス）</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">推定年齢</td><td className="px-3 py-2 text-xs">7歳</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">体長</td><td className="px-3 py-2 text-xs">約150センチメートル</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">体重</td><td className="px-3 py-2 text-xs">約110キログラム（一部報道では約85kg）</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">駆除地点</td><td className="px-3 py-2 text-xs">富山市森付近の藪（人身被害現場から約250m）</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">駆除手法</td><td className="px-3 py-2 text-xs">緊急銃猟（自治体判断による発砲許可）</td></tr>
+          </tbody>
+        </table>
+      </div>
       <p>富山市猟友会の中川稔会長は、駆除時の状況について、クマは追い詰められたことで極めて興奮しており、人間に向かってくる危険性があったと述べている 8。この個体は、前夜の女性襲撃個体と同一であるとみられ、迅速な排除がさらなる被害の拡大を食い止めたといえる。</p>
       <h3>「河川敷ルート」の生態学的考察</h3>
       <p>専門家は、今回のクマが海に近い市街地まで到達した要因として、一級河川の河川敷を移動経路として利用した可能性を指摘している。立山カルデラ砂防博物館の白石俊明学芸員によれば、神通川や常願寺川などの河川敷には、クマが身を隠すのに十分な屋敷林、畑、そして濃い藪が連続しており、これらが「回廊（コリドー）」となって山間部と沿岸部を接続してしまったという分析である 9。</p>
@@ -230,54 +227,30 @@ export default function ResearchPage() {
       <p>2026年4月30日、東北地方においてもクマの出没は記録的な水準に達しており、特に秋田県では生活圏のあらゆる場所で目撃が相次いだ。</p>
       <h3>秋田県内における同時多発的目撃事例</h3>
       <p>秋田県では4月単月での目撃件数が300件を超えており、4月14日には「ツキノワグマ出没注意報」を「警報」へ引き上げ、厳戒態勢を継続している 10。4月30日に報告された主な目撃情報を整理すると、クマが人間に依存する行動パターン、いわゆる「アーバン・ベア」化が進行している実態が見て取れる。</p>
-      <p>確認時刻</p>
-      <p>場所</p>
-      <p>状況の概要</p>
-      <p>出典</p>
-      <p>06:00</p>
-      <h3>秋田市新屋鳥木町</h3>
-      <h3>住宅地付近での目撃</h3>
-      <p>12</p>
-      <p>09:40</p>
-      <h3>潟上市天王字下浜山</h3>
-      <h3>県道上で体長約1.5mの個体を目撃</h3>
-      <p>12</p>
-      <p>10:00</p>
-      <h3>秋田市雄和碇田</h3>
-      <h2>民家から約30mの川対岸に座り込む姿を確認</h2>
-      <p>12</p>
-      <p>12:29</p>
-      <h3>潟上市天王上出戸</h3>
-      <h2>コンビニ付近から海水浴場方向へ移動する1.5mの個体</h2>
-      <p>12</p>
-      <p>14:30</p>
-      <h3>秋田市雄和（秋田空港北側）</h3>
-      <p>空港フェンス外側で目撃。爆竹により山側へ追い払い</p>
-      <p>12</p>
-      <p>14:40</p>
-      <h3>三種町（メロンロード）</h3>
-      <p>道路を歩行中、畑の中へ逃走。かなり大型の個体</p>
-      <p>12</p>
-      <p>15:20</p>
-      <h3>秋田市飯島古道</h3>
-      <h2>建物から100mの地点で体長1mの個体</h2>
-      <p>12</p>
-      <p>15:53</p>
-      <h3>秋田市河辺（秋田道上）</h3>
-      <h3>高速道路脇に座り込んでいる姿を目撃</h3>
-      <p>12</p>
-      <p>16:22</p>
-      <h3>仙北市角館町</h3>
-      <h2>民家まで約10mの地点に体長1.2mの個体が出没</h2>
-      <p>12</p>
-      <p>17:50</p>
-      <h3>仙北市角館町雲然</h3>
-      <h3>建物まで約60mの地点で目撃</h3>
-      <p>12</p>
-      <p>19:47</p>
-      <h3>横手市駅南</h3>
-      <h3>駅周辺の市街地での目撃情報</h3>
-      <p>12</p>
+      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-stone-50 text-xs text-stone-700">
+            <tr>
+              <th className="px-3 py-2">確認時刻</th>
+              <th className="px-3 py-2">場所</th>
+              <th className="px-3 py-2">状況の概要</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-gray-800">
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">06:00</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市新屋鳥木町</td><td className="px-3 py-2 text-xs">住宅地付近での目撃</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">09:40</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">潟上市天王字下浜山</td><td className="px-3 py-2 text-xs">県道上で体長約1.5mの個体を目撃</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">10:00</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市雄和碇田</td><td className="px-3 py-2 text-xs">民家から約30mの川対岸に座り込む姿を確認</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">12:29</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">潟上市天王上出戸</td><td className="px-3 py-2 text-xs">コンビニ付近から海水浴場方向へ移動する1.5mの個体</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">14:30</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市雄和（秋田空港北側）</td><td className="px-3 py-2 text-xs">空港フェンス外側で目撃。爆竹により山側へ追い払い</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">14:40</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">三種町（メロンロード）</td><td className="px-3 py-2 text-xs">道路を歩行中、畑の中へ逃走。かなり大型の個体</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">15:20</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市飯島古道</td><td className="px-3 py-2 text-xs">建物から100mの地点で体長1mの個体</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">15:53</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市河辺（秋田道上）</td><td className="px-3 py-2 text-xs">高速道路脇に座り込んでいる姿を目撃</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">16:22</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">仙北市角館町</td><td className="px-3 py-2 text-xs">民家まで約10mの地点に体長1.2mの個体が出没</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">17:50</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">仙北市角館町雲然</td><td className="px-3 py-2 text-xs">建物まで約60mの地点で目撃</td></tr>
+            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">19:47</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">横手市駅南</td><td className="px-3 py-2 text-xs">駅周辺の市街地での目撃情報</td></tr>
+          </tbody>
+        </table>
+      </div>
       <p>これらのデータから、秋田県内では山間部との境界のみならず、空港、高速道路、駅周辺といった重要インフラ付近にまでクマが浸入していることが明白である 12。特に、昼間に座り込んでいる様子が複数報告されていることは、クマが人間や車両の存在に対して一定の「慣れ」を示している可能性を強く示唆している。</p>
       <h3>警察機動隊によるライフル銃運用の開始</h3>
       <p>秋田県および岩手県における出没の激増と、人身被害のリスク増大を受け、行政側はこれまでの猟友会頼みの体制から一歩踏み込んだ決定を下した。4月30日の報道によれば、来週木曜日より、警察の機動隊員がライフル銃を用いてクマを駆除する運用が開始される 13。</p>
@@ -366,9 +339,9 @@ export default function ResearchPage() {
           <dt className="text-stone-500">対象期間</dt>
           <dd>2026年4月30日</dd>
           <dt className="text-stone-500">公開日</dt>
-          <dd>2026-05-01</dd>
+          <dd>2026-05-02</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>2026-05-01</dd>
+          <dd>2026-05-02</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
           本記事は、公開ニュース・自治体発表・政府公表資料をもとに AI で集約・要約した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}

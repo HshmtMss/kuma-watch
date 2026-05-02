@@ -246,37 +246,48 @@ function parseDoc(raw: string): ParsedDoc {
 }
 
 function parseBlocks(lines: string[]): Block[] {
-  // 見出しヒューリスティック:
-  //  - 行末に句点 (。) が無い
-  //  - 行内に句点 (。) が無い
-  //  - 文字数 <= 40
-  //  - 数字や記号で始まる行 (1. ① 等) は段落として扱う
-  // 同じ条件で文字数が小さい (<=20) 場合は h3、それ以外 h2 候補。
-  // ただし最初の段落（リード）は見出しにしない処理が必要。
+  // 見出しヒューリスティック (改訂版):
+  // 「見出しの形」を満たすだけでは見出し化せず、「次行が本文 (long paragraph)」
+  // である場合のみ見出しとして採用する。Google Docs の表は plain text export
+  // で各セルが行に分解される (heading-shape の行が交互に並ぶ) ため、形だけで
+  // 判定すると表セルが見出しに化けてしまう。実際の本文見出しは必ず後ろに
+  // 解説段落を伴うので、その性質を利用する。
+  const isHeadingShape = (line: string): boolean =>
+    !line.includes("。") &&
+    line.length > 0 &&
+    line.length <= 40 &&
+    !/^[0-9０-９①②③④⑤⑥⑦⑧⑨]/.test(line) &&
+    !/^[・※]/.test(line) &&
+    !/^\d{1,2}:\d{2}$/.test(line); // HH:MM (時刻表記) も除外
+
+  const isProseParagraph = (line: string | undefined): boolean => {
+    if (!line) return false;
+    return line.includes("。") || line.length > 60;
+  };
+
   const blocks: Block[] = [];
   let firstParagraphSeen = false;
 
-  for (const line of lines) {
-    const isHeadingCandidate =
-      !line.includes("。") &&
-      line.length > 0 &&
-      line.length <= 40 &&
-      !/^[0-9①②③④⑤⑥⑦⑧⑨]/.test(line) &&
-      !/^[・※]/.test(line);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const next = lines[i + 1];
 
-    if (isHeadingCandidate && firstParagraphSeen) {
-      // ピリオドのない短い行 → 見出し扱い
+    // リード段落到達前は何でも段落として扱う (最初の文を見出しにしない)
+    if (!firstParagraphSeen) {
+      blocks.push({ type: "p", text: line });
+      if (line.includes("。") || line.length > 30) firstParagraphSeen = true;
+      continue;
+    }
+
+    if (isHeadingShape(line) && isProseParagraph(next)) {
       const level: 2 | 3 = line.length <= 18 ? 3 : 2;
       blocks.push({ type: level === 2 ? "h2" : "h3", text: line });
     } else {
       blocks.push({ type: "p", text: line });
-      firstParagraphSeen = true;
     }
   }
 
-  // ポストプロセス: 表 (連続する短い行) が見出しとして誤検出された場合を修復。
-  // 3 個以上連続して h2/h3 が並んでいたら、それは表のセル列の可能性が高いので
-  // すべて段落に降格する。本文の見出しは通常、間に段落を挟んで現れる。
+  // ポストプロセス: 連続する見出しがあれば降格 (二段保険)
   return demoteRunsOfHeadings(blocks);
 }
 
