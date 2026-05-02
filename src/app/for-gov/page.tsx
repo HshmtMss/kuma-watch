@@ -81,7 +81,8 @@ export default function ForGovPage() {
       <p className="not-prose">
         <a
           href="/research"
-          className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold shadow-sm hover:bg-emerald-800"
+          style={{ color: "#fff", textDecoration: "none" }}
         >
           研究・知見ページを見る →
         </a>
