@@ -10,13 +10,16 @@
  * - 各 doc のファイル名 (Content-Disposition) から slug を決定。
  *     - YYYYMMDD (8桁) → "YYYY-MM-DD-daily-report"
  *     - YYYYMM   (6桁) → "YYYY-MM-monthly-report"
- * - 既に src/app/research/<slug>/ ディレクトリがあればスキップ。
+ * - 既に src/app/research/<slug>/page.tsx があればスキップ。
  *     - 既存記事 (2026-04-29-bear-incidents 等) も「既存 slug 」として
  *       事前にエイリアスマップで吸収する。
- * - 新規 doc は export?format=txt で本文取得 → ヒューリスティックで
- *   見出し/段落/参考文献を分離 → page.tsx に変換。
+ * - 新規 doc は export?format=html で HTML 取得 → node-html-parser で
+ *   見出し / 段落 / 表 / リスト / 参考文献を構造保持のまま抽出 → page.tsx に変換。
+ *   - HTML エクスポートに切り替えたことで、Google Docs の表が
+ *     <table> として正しく描画されるようになった (txt エクスポートだと
+ *     セルが flat な行に潰れて読めない)。
  * - src/app/research/page.tsx の ENTRIES 配列、src/app/sitemap.ts に
- *   新エントリを自動追加。
+ *   新エントリを自動追加 (slug が既に存在する場合は重複を避けスキップ)。
  *
  * Drive 側の前提:
  * - フォルダおよび各 Doc が "リンクを知っている全員が閲覧可" になっていること。
@@ -24,7 +27,8 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { parse, HTMLElement } from "node-html-parser";
 
 const ROOT = process.cwd();
 
@@ -55,7 +59,10 @@ type DocMeta = {
 type Block =
   | { type: "h2"; text: string }
   | { type: "h3"; text: string }
-  | { type: "p"; text: string };
+  | { type: "p"; text: string }
+  | { type: "table"; rows: string[][] }
+  | { type: "ul"; items: string[] }
+  | { type: "ol"; items: string[] };
 
 type Reference = { title: string; url: string; site?: string };
 
@@ -78,7 +85,7 @@ async function main() {
   console.log(`[import-research] found ${allDocs.length} docs total`);
 
   const existingSlugs = listExistingSlugs();
-  console.log(`[import-research] existing /research slugs: ${existingSlugs.size}`);
+  console.log(`[import-research] existing /research slugs (with page.tsx): ${existingSlugs.size}`);
 
   const newDocs = allDocs.filter((d) => !existingSlugs.has(d.slug));
   if (newDocs.length === 0) {
@@ -93,10 +100,13 @@ async function main() {
   const generated: DocMeta[] = [];
   for (const doc of newDocs) {
     try {
-      const text = await fetchDocText(doc.id);
-      const parsed = parseDoc(text);
+      const html = await fetchDocHtml(doc.id);
+      const parsed = parseDocHtml(html);
       writePage(doc, parsed);
-      console.log(`[import-research]   wrote ${doc.slug} (${parsed.body.length} blocks, ${parsed.references.length} refs)`);
+      const tableCount = parsed.body.filter((b) => b.type === "table").length;
+      console.log(
+        `[import-research]   wrote ${doc.slug} (${parsed.body.length} blocks, ${tableCount} tables, ${parsed.references.length} refs)`,
+      );
       generated.push(doc);
     } catch (e) {
       console.error(`[import-research]   FAILED ${doc.slug}:`, e);
@@ -106,7 +116,7 @@ async function main() {
   if (generated.length > 0) {
     updateIndex(generated);
     updateSitemap(generated);
-    console.log(`[import-research] updated index and sitemap with ${generated.length} entries`);
+    console.log(`[import-research] updated index and sitemap with ${generated.length} entries (duplicates skipped)`);
   }
 
   console.log("[import-research] done.");
@@ -196,158 +206,181 @@ function formatPeriod(filename: string, category: Category): string {
 }
 
 function listExistingSlugs(): Set<string> {
+  // page.tsx が存在するディレクトリのみ「既存」とみなす。
+  // ディレクトリだけ残っている (page.tsx を消した再生成シナリオ) 場合は
+  // 「未生成」として再インポートを許可する。
   const dir = join(ROOT, "src", "app", "research");
   const set = new Set<string>();
   if (!existsSync(dir)) return set;
-  // node:fs.readdirSync が dynamic import 不可なので require 経由
   const { readdirSync, statSync } = require("node:fs") as typeof import("node:fs");
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
-    if (statSync(path).isDirectory()) set.add(name);
+    if (!statSync(path).isDirectory()) continue;
+    if (existsSync(join(path, "page.tsx"))) set.add(name);
   }
   return set;
 }
 
-async function fetchDocText(docId: string): Promise<string> {
-  const url = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+async function fetchDocHtml(docId: string): Promise<string> {
+  const url = `https://docs.google.com/document/d/${docId}/export?format=html`;
   const res = await fetch(url, { redirect: "follow" });
   if (!res.ok) throw new Error(`fetch ${docId} failed: ${res.status}`);
   return await res.text();
 }
 
-function parseDoc(raw: string): ParsedDoc {
-  // BOM 除去
-  const text = raw.replace(/^﻿/, "");
-  const lines = text
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .filter((l) => l !== "");
+function parseDocHtml(html: string): ParsedDoc {
+  const root = parse(html);
+  const body = root.querySelector("body");
+  if (!body) throw new Error("HTML has no <body>");
 
-  const title = lines[0] ?? "(無題)";
-  let bodyLines = lines.slice(1);
-
-  // 参考文献セクション分離
-  const refMarkers = ["引用文献", "参考文献"];
-  let refStart = -1;
-  for (let i = 0; i < bodyLines.length; i++) {
-    if (refMarkers.includes(bodyLines[i])) {
-      refStart = i;
-      break;
-    }
-  }
-  let references: Reference[] = [];
-  if (refStart !== -1) {
-    references = parseReferences(bodyLines.slice(refStart + 1));
-    bodyLines = bodyLines.slice(0, refStart);
-  }
-
-  const body = parseBlocks(bodyLines);
-  return { title, body, references };
-}
-
-function parseBlocks(lines: string[]): Block[] {
-  // 見出しヒューリスティック (改訂版):
-  // 「見出しの形」を満たすだけでは見出し化せず、「次行が本文 (long paragraph)」
-  // である場合のみ見出しとして採用する。Google Docs の表は plain text export
-  // で各セルが行に分解される (heading-shape の行が交互に並ぶ) ため、形だけで
-  // 判定すると表セルが見出しに化けてしまう。実際の本文見出しは必ず後ろに
-  // 解説段落を伴うので、その性質を利用する。
-  const isHeadingShape = (line: string): boolean =>
-    !line.includes("。") &&
-    line.length > 0 &&
-    line.length <= 40 &&
-    !/^[0-9０-９①②③④⑤⑥⑦⑧⑨]/.test(line) &&
-    !/^[・※]/.test(line) &&
-    !/^\d{1,2}:\d{2}$/.test(line); // HH:MM (時刻表記) も除外
-
-  const isProseParagraph = (line: string | undefined): boolean => {
-    if (!line) return false;
-    return line.includes("。") || line.length > 60;
-  };
-
+  let title = "";
   const blocks: Block[] = [];
-  let firstParagraphSeen = false;
+  let inReferences = false;
+  let referencesItems: string[] = [];
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const next = lines[i + 1];
+  for (const child of body.childNodes) {
+    if (!(child instanceof HTMLElement)) continue;
+    const tag = child.tagName;
+    if (!tag) continue;
 
-    // リード段落到達前は何でも段落として扱う (最初の文を見出しにしない)
-    if (!firstParagraphSeen) {
-      blocks.push({ type: "p", text: line });
-      if (line.includes("。") || line.length > 30) firstParagraphSeen = true;
+    const text = normalizeText(child.textContent);
+
+    // 参考文献セクションの開始を検出
+    if (!inReferences && (tag === "H2" || tag === "H3" || tag === "H4" || tag === "H5" || tag === "P") &&
+        (text === "引用文献" || text === "参考文献")) {
+      inReferences = true;
       continue;
     }
 
-    if (isHeadingShape(line) && isProseParagraph(next)) {
-      const level: 2 | 3 = line.length <= 18 ? 3 : 2;
-      blocks.push({ type: level === 2 ? "h2" : "h3", text: line });
-    } else {
-      blocks.push({ type: "p", text: line });
-    }
-  }
-
-  // ポストプロセス: 連続する見出しがあれば降格 (二段保険)
-  return demoteRunsOfHeadings(blocks);
-}
-
-function demoteRunsOfHeadings(blocks: Block[]): Block[] {
-  const result: Block[] = [];
-  let i = 0;
-  while (i < blocks.length) {
-    if (blocks[i].type === "h2" || blocks[i].type === "h3") {
-      // 連続する見出しの長さを計測
-      let j = i;
-      while (j < blocks.length && (blocks[j].type === "h2" || blocks[j].type === "h3")) j++;
-      const runLength = j - i;
-      if (runLength >= 3) {
-        for (let k = i; k < j; k++) result.push({ type: "p", text: blocks[k].text });
-      } else {
-        for (let k = i; k < j; k++) result.push(blocks[k]);
+    if (inReferences) {
+      // 参考文献は <ol><li>...</li></ol> 形式が基本だが、念のため
+      // 段落 (<p>) でも採取する。
+      if (tag === "OL" || tag === "UL") {
+        for (const li of child.querySelectorAll("li")) {
+          const t = normalizeText(li.textContent);
+          if (t) referencesItems.push(t);
+        }
+      } else if (tag === "P" && text) {
+        referencesItems.push(text);
       }
-      i = j;
-    } else {
-      result.push(blocks[i]);
-      i++;
+      continue;
     }
+
+    if (tag === "H1") {
+      if (!title) title = text;
+      continue;
+    }
+
+    if (tag === "H2" || tag === "H3") {
+      if (!text) continue;
+      blocks.push({ type: tag.toLowerCase() as "h2" | "h3", text });
+      continue;
+    }
+
+    // h4以降は h3 として扱う
+    if (tag === "H4" || tag === "H5" || tag === "H6") {
+      if (!text) continue;
+      blocks.push({ type: "h3", text });
+      continue;
+    }
+
+    if (tag === "P") {
+      if (!text) continue;
+      // タイトルが H1 から取れていない場合、最初の段落をタイトルとする。
+      if (!title && blocks.length === 0) {
+        title = text;
+        continue;
+      }
+      blocks.push({ type: "p", text });
+      continue;
+    }
+
+    if (tag === "TABLE") {
+      const rows = parseTable(child);
+      if (rows.length > 0) blocks.push({ type: "table", rows });
+      continue;
+    }
+
+    if (tag === "OL" || tag === "UL") {
+      const items: string[] = [];
+      for (const li of child.querySelectorAll("li")) {
+        const t = normalizeText(li.textContent);
+        if (t) items.push(t);
+      }
+      if (items.length > 0) {
+        blocks.push({ type: tag.toLowerCase() as "ol" | "ul", items });
+      }
+      continue;
+    }
+
+    // 想定外タグはテキストとして拾う
+    if (text) blocks.push({ type: "p", text });
   }
-  return result;
+
+  const references = parseReferences(referencesItems);
+  return { title: title || "(無題)", body: blocks, references };
 }
 
-function parseReferences(lines: string[]): Reference[] {
-  const refs: Reference[] = [];
-  for (const line of lines) {
-    // フォーマット例:
-    //   "1. タイトル - サイト名, 5月 1, 2026にアクセス、 https://..."
-    //   "1. タイトル, 5月 1, 2026にアクセス、 https://..."
-    const numMatch = line.match(/^(\d+)\.\s*(.*)$/);
-    if (!numMatch) continue;
-    const rest = numMatch[2];
-    // URL 抜き出し（最後の URL を採用）
-    const urlMatches = rest.match(/https?:\/\/[^\s,]+/g);
-    if (!urlMatches || urlMatches.length === 0) continue;
-    const url = urlMatches[urlMatches.length - 1].replace(/[、,。]+$/, "");
-    // タイトル: URL より前、",X月 Y, YYYY にアクセス" の前を採用
-    let titlePart = rest
-      .replace(url, "")
-      .replace(/[0-9]+月\s*[0-9]+,\s*[0-9]+にアクセス、?/g, "")
-      .replace(/、\s*$/, "")
-      .replace(/,\s*$/, "")
-      .trim();
-    // titlePart の最後に " - サイト" が付いている場合は site として分離
-    let site: string | undefined;
-    const dashSplit = titlePart.split(/\s*-\s*/);
-    let title: string;
-    if (dashSplit.length >= 2) {
-      title = dashSplit.slice(0, -1).join(" - ").trim();
-      site = dashSplit[dashSplit.length - 1].trim();
-    } else {
-      title = titlePart.trim();
+function normalizeText(s: string): string {
+  // 改行・タブ・連続スペースを 1 つの半角スペースに正規化。先頭末尾は trim。
+  return s.replace(/[ ]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function parseTable(table: HTMLElement): string[][] {
+  const rows: string[][] = [];
+  for (const tr of table.querySelectorAll("tr")) {
+    const cells: string[] = [];
+    for (const cell of tr.querySelectorAll("td, th")) {
+      cells.push(normalizeText(cell.textContent));
     }
-    if (!title) continue;
-    refs.push({ title, url, ...(site ? { site } : {}) });
+    // 全セルが空の行はスキップ
+    if (cells.some((c) => c.length > 0)) rows.push(cells);
+  }
+  return rows;
+}
+
+function parseReferences(rawItems: string[]): Reference[] {
+  const refs: Reference[] = [];
+  for (const raw of rawItems) {
+    // <li> の場合は連結された 1 件分だが、稀に 1 つのテキストに複数連結
+    // されているケースがあるので "、X月 Y, YYYYにアクセス、 https://..."
+    // を区切りとして分割する。
+    const segments = raw
+      .split(/(?<=https?:\/\/[^\s]+)\s*(?=\d+月)/g) // URL の後ろで分割
+      .map((s) => s.trim())
+      .filter((s) => s);
+
+    for (const seg of segments) {
+      const ref = parseSingleReference(seg);
+      if (ref) refs.push(ref);
+    }
   }
   return refs;
+}
+
+function parseSingleReference(line: string): Reference | null {
+  // 番号プレフィックス "1." を許容
+  const cleaned = line.replace(/^\s*\d+\.\s*/, "");
+  const urlMatches = cleaned.match(/https?:\/\/[^\s,、。]+/g);
+  if (!urlMatches || urlMatches.length === 0) return null;
+  const url = urlMatches[urlMatches.length - 1].replace(/[、,。]+$/, "");
+  let titlePart = cleaned
+    .replace(url, "")
+    .replace(/[0-9]+月\s*[0-9]+,\s*[0-9]+にアクセス、?/g, "")
+    .replace(/、\s*$/, "")
+    .replace(/,\s*$/, "")
+    .trim();
+  let site: string | undefined;
+  const dashSplit = titlePart.split(/\s*-\s*/);
+  let title: string;
+  if (dashSplit.length >= 2) {
+    title = dashSplit.slice(0, -1).join(" - ").trim();
+    site = dashSplit[dashSplit.length - 1].trim();
+  } else {
+    title = titlePart.trim();
+  }
+  if (!title) return null;
+  return { title, url, ...(site ? { site } : {}) };
 }
 
 function writePage(doc: DocMeta, parsed: ParsedDoc) {
@@ -365,19 +398,7 @@ function renderPageTsx(doc: DocMeta, parsed: ParsedDoc): string {
 
   const categoryBadge = doc.category === "daily-report" ? "日次レポート" : "月次レポート";
 
-  const bodyJsx = parsed.body
-    .map((b) => {
-      const escaped = escapeJsxText(b.text);
-      switch (b.type) {
-        case "h2":
-          return `      <h2>${escaped}</h2>`;
-        case "h3":
-          return `      <h3>${escaped}</h3>`;
-        case "p":
-          return `      <p>${escaped}</p>`;
-      }
-    })
-    .join("\n");
+  const bodyJsx = parsed.body.map(renderBlock).join("\n");
 
   const refsJson = JSON.stringify(parsed.references, null, 2)
     .split("\n")
@@ -506,6 +527,52 @@ ${bodyJsx}
 `;
 }
 
+function renderBlock(b: Block): string {
+  switch (b.type) {
+    case "h2":
+      return `      <h2>${escapeJsxText(b.text)}</h2>`;
+    case "h3":
+      return `      <h3>${escapeJsxText(b.text)}</h3>`;
+    case "p":
+      return `      <p>${escapeJsxText(b.text)}</p>`;
+    case "ul":
+      return `      <ul>\n${b.items.map((i) => `        <li>${escapeJsxText(i)}</li>`).join("\n")}\n      </ul>`;
+    case "ol":
+      return `      <ol>\n${b.items.map((i) => `        <li>${escapeJsxText(i)}</li>`).join("\n")}\n      </ol>`;
+    case "table":
+      return renderTable(b.rows);
+  }
+}
+
+function renderTable(rows: string[][]): string {
+  if (rows.length === 0) return "";
+  const head = rows[0];
+  const bodyRows = rows.slice(1);
+  const headJsx = head
+    .map((c) => `              <th className="px-3 py-2">${escapeJsxText(c)}</th>`)
+    .join("\n");
+  const bodyJsx = bodyRows
+    .map((row) => {
+      const cells = row
+        .map((c) => `<td className="px-3 py-2 text-xs">${escapeJsxText(c)}</td>`)
+        .join("");
+      return `            <tr>${cells}</tr>`;
+    })
+    .join("\n");
+  return `      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-stone-50 text-xs text-stone-700">
+            <tr>
+${headJsx}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-gray-800">
+${bodyJsx}
+          </tbody>
+        </table>
+      </div>`;
+}
+
 function escapeJsxText(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -522,7 +589,6 @@ function updateIndex(newDocs: DocMeta[]) {
   const today = new Date();
   const publishedAt = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  // ENTRIES 配列の開始位置を探し、その直後に新エントリを差し込む。
   const marker = "const ENTRIES: ResearchEntry[] = [";
   const idx = content.indexOf(marker);
   if (idx === -1) {
@@ -532,6 +598,7 @@ function updateIndex(newDocs: DocMeta[]) {
   const insertAt = idx + marker.length;
 
   const additions = newDocs
+    .filter((d) => !content.includes(`slug: ${JSON.stringify(d.slug)}`))
     .map((d) => {
       const indexTitle =
         d.category === "daily-report"
@@ -549,6 +616,7 @@ function updateIndex(newDocs: DocMeta[]) {
     })
     .join("");
 
+  if (additions === "") return;
   content = content.slice(0, insertAt) + additions + content.slice(insertAt);
   writeFileSync(path, content);
 }
@@ -560,31 +628,35 @@ function updateSitemap(newDocs: DocMeta[]) {
   const today = new Date();
   const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  // 既存の /research/<slug> エントリのうち、最後の出現位置を見つけて
-  // その直後に追加する。研究エントリブロックのまとまりを保つ。
-  const marker = '/research/2026-04-monthly-report';
-  let anchor = content.indexOf(marker);
-  if (anchor === -1) {
-    // フォールバック: /research の static エントリの直後
-    anchor = content.indexOf('/research');
+  // 直近 (時系列で最後) の /research/<slug> エントリの行末に追記する。
+  // 同 slug が既にあれば重複追加しない。
+  const docsToAdd = newDocs.filter((d) => !content.includes(`/research/${d.slug}`));
+  if (docsToAdd.length === 0) return;
+
+  // 一番新しい "research/YYYY-MM-..." 行を探す
+  const lines = content.split("\n");
+  let lastResearchLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes("/research/2026-")) lastResearchLine = i;
   }
-  if (anchor === -1) {
+  if (lastResearchLine === -1) {
+    // フォールバック: /research の static エントリ
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes("/research`")) lastResearchLine = i;
+    }
+  }
+  if (lastResearchLine === -1) {
     console.warn("[import-research] sitemap research anchor not found — skipping");
     return;
   }
-  // anchor を含む行の末尾（次の改行位置）を取得
-  const lineEnd = content.indexOf("\n", anchor);
-  if (lineEnd === -1) return;
 
-  const additions = newDocs
-    .map(
-      (d) =>
-        `\n    { url: \`\${SITE_URL}/research/${d.slug}\`, lastModified: new Date(${JSON.stringify(isoDate)}), changeFrequency: "monthly", priority: 0.6 },`,
-    )
-    .join("");
+  const additions = docsToAdd.map(
+    (d) =>
+      `    { url: \`\${SITE_URL}/research/${d.slug}\`, lastModified: new Date(${JSON.stringify(isoDate)}), changeFrequency: "monthly", priority: 0.6 },`,
+  );
 
-  content = content.slice(0, lineEnd) + additions + content.slice(lineEnd);
-  writeFileSync(path, content);
+  lines.splice(lastResearchLine + 1, 0, ...additions);
+  writeFileSync(path, lines.join("\n"));
 }
 
 main().catch((e) => {

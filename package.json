@@ -33,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.0",
     "iconv-lite": "^0.7.2",
+    "node-html-parser": "^7.1.0",
     "shapefile": "^0.6.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
