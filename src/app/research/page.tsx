@@ -23,6 +23,20 @@ type ResearchEntry = {
 // publishedAt 降順で並ぶように、新しいものを上に追加していく。
 const ENTRIES: ResearchEntry[] = [
   {
+    slug: "2026-05-01-daily-report",
+    title: "2026年5月1日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月1日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-05-04",
+    category: "daily-report",
+  },
+  {
+    slug: "2026-05-02-daily-report",
+    title: "2026年5月2日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月2日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-05-04",
+    category: "daily-report",
+  },
+  {
     slug: "2026-04-30-daily-report",
     title: "2026年4月30日 国内クマ出没事案の時空間分析と分析報告",
     lead: "2026年4月30日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
