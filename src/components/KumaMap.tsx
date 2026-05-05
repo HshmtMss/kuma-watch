@@ -77,6 +77,49 @@ function mobileCaps() {
     : { maxRects: 10000, maxPins: 8000 };
 }
 
+// 地図の view (中心 + ズーム) を sessionStorage に保存・復元する。
+// iOS Safari はメモリ圧でタブを強制再読み込みすることがあり、その際に
+// 拡大していたズームや中心座標が失われる現象が報告されている。
+// localStorage ではなく sessionStorage を使うのは、別タブや別セッションで
+// 開いたときに前回の閲覧位置を引きずらないようにするため。
+const MAP_VIEW_KEY = "kumaWatch.mapView";
+
+type MapView = { center: [number, number]; zoom: number };
+
+function readSavedMapView(): MapView | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(MAP_VIEW_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<MapView>;
+    if (
+      !parsed ||
+      !Array.isArray(parsed.center) ||
+      parsed.center.length !== 2 ||
+      typeof parsed.center[0] !== "number" ||
+      typeof parsed.center[1] !== "number" ||
+      !Number.isFinite(parsed.center[0]) ||
+      !Number.isFinite(parsed.center[1]) ||
+      typeof parsed.zoom !== "number" ||
+      !Number.isFinite(parsed.zoom)
+    ) {
+      return null;
+    }
+    return { center: [parsed.center[0], parsed.center[1]], zoom: parsed.zoom };
+  } catch {
+    return null;
+  }
+}
+
+function saveMapView(view: MapView): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(MAP_VIEW_KEY, JSON.stringify(view));
+  } catch {
+    // ignore quota / disabled storage
+  }
+}
+
 type Props = {
   records: KumaRecord[];
   center?: [number, number];
@@ -598,9 +641,16 @@ export default function KumaMap({
     import("leaflet").then((L) => {
       if (cancelled || !el || mapRef.current) return;
 
+      // 直前の view を sessionStorage から復元する。
+      // iOS Safari がメモリ圧でタブを再読み込みしたとき、
+      // ズーム位置や中心座標が初期値に戻るのを防ぐ。
+      const restored = readSavedMapView();
+      const initialCenter = restored ? restored.center : center;
+      const initialZoom = restored ? restored.zoom : zoom;
+
       const map = L.map(el, {
-        center,
-        zoom,
+        center: initialCenter,
+        zoom: initialZoom,
         preferCanvas: true,
         zoomControl: false,
         attributionControl: true,
@@ -632,6 +682,14 @@ export default function KumaMap({
 
       map.on("moveend", scheduleRedraw);
       map.on("zoomend", scheduleRedraw);
+      // ユーザーが地図を動かすたびに view を保存する。
+      // iOS Safari でタブが再読み込みされても、ここに書いた値で復元される。
+      const persist = () => {
+        const c = map.getCenter();
+        saveMapView({ center: [c.lat, c.lng], zoom: map.getZoom() });
+      };
+      map.on("moveend", persist);
+      map.on("zoomend", persist);
       map.on("click", (e: LeafletMouseEvent) => {
         const cb = onMapClickRef.current;
         if (cb) cb(e.latlng.lat, e.latlng.lng);
