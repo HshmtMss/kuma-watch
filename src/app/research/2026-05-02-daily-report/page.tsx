@@ -1,3 +1,7 @@
+// drive-content-hash: 1b406100c9a0434d2512eb162140edb064cbb78fb8fa0ad3e583d277d080ffbd
+// このファイルは scripts/import-research.ts によって自動生成されています。
+// Drive 側の元 Doc を更新すると、次回の import 実行時にこのファイルが再生成されます
+// (上記ハッシュが変わったかどうかで判定)。手動で本文を修正する場合はハッシュ行ごと残してください。
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/research/${SLUG}`,
     type: "article",
-    publishedTime: "2026-05-04",
+    publishedTime: "2026-05-06",
   },
   twitter: {
     card: "summary_large_image",
@@ -31,8 +35,8 @@ const SCHEMA = {
   "@type": "Article",
   headline: TITLE,
   description: DESCRIPTION,
-  datePublished: "2026-05-04",
-  dateModified: "2026-05-04",
+  datePublished: "2026-05-06",
+  dateModified: "2026-05-06",
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -208,7 +212,7 @@ export default function ResearchPage() {
         </span>
         <span>対象期間: 2026年5月2日</span>
         <span>·</span>
-        <span>公開: 2026-05-04</span>
+        <span>公開: 2026-05-06</span>
         <span>·</span>
         <Link href="/research" className="text-emerald-700 underline">
           研究・知見トップへ
@@ -347,9 +351,9 @@ export default function ResearchPage() {
           <dt className="text-stone-500">対象期間</dt>
           <dd>2026年5月2日</dd>
           <dt className="text-stone-500">公開日</dt>
-          <dd>2026-05-04</dd>
+          <dd>2026-05-06</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>2026-05-04</dd>
+          <dd>2026-05-06</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
           本記事は、公開ニュース・自治体発表・政府公表資料をもとに AI で集約・要約した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}

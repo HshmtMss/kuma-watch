@@ -1,3 +1,7 @@
+// drive-content-hash: 8f2aceb664af7a52101e8de27d8592e7e1067457db15cebda45939b9d7fb50dd
+// このファイルは scripts/import-research.ts によって自動生成されています。
+// Drive 側の元 Doc を更新すると、次回の import 実行時にこのファイルが再生成されます
+// (上記ハッシュが変わったかどうかで判定)。手動で本文を修正する場合はハッシュ行ごと残してください。
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/research/${SLUG}`,
     type: "article",
-    publishedTime: "2026-05-02",
+    publishedTime: "2026-05-06",
   },
   twitter: {
     card: "summary_large_image",
@@ -31,8 +35,8 @@ const SCHEMA = {
   "@type": "Article",
   headline: TITLE,
   description: DESCRIPTION,
-  datePublished: "2026-05-02",
-  dateModified: "2026-05-02",
+  datePublished: "2026-05-06",
+  dateModified: "2026-05-06",
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -184,7 +188,7 @@ export default function ResearchPage() {
         </span>
         <span>対象期間: 2026年4月30日</span>
         <span>·</span>
-        <span>公開: 2026-05-02</span>
+        <span>公開: 2026-05-06</span>
         <span>·</span>
         <Link href="/research" className="text-emerald-700 underline">
           研究・知見トップへ
@@ -207,15 +211,16 @@ export default function ResearchPage() {
             <tr>
               <th className="px-3 py-2">項目</th>
               <th className="px-3 py-2">詳細内容</th>
+              <th className="px-3 py-2">出典</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-800">
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">個体種別</td><td className="px-3 py-2 text-xs">ツキノワグマ（成獣・オス）</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">推定年齢</td><td className="px-3 py-2 text-xs">7歳</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">体長</td><td className="px-3 py-2 text-xs">約150センチメートル</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">体重</td><td className="px-3 py-2 text-xs">約110キログラム（一部報道では約85kg）</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">駆除地点</td><td className="px-3 py-2 text-xs">富山市森付近の藪（人身被害現場から約250m）</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">駆除手法</td><td className="px-3 py-2 text-xs">緊急銃猟（自治体判断による発砲許可）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">個体種別</td><td className="px-3 py-2 text-xs">ツキノワグマ（成獣・オス）</td><td className="px-3 py-2 text-xs">6</td></tr>
+            <tr><td className="px-3 py-2 text-xs">推定年齢</td><td className="px-3 py-2 text-xs">7歳</td><td className="px-3 py-2 text-xs">3</td></tr>
+            <tr><td className="px-3 py-2 text-xs">体長</td><td className="px-3 py-2 text-xs">約150センチメートル</td><td className="px-3 py-2 text-xs">6</td></tr>
+            <tr><td className="px-3 py-2 text-xs">体重</td><td className="px-3 py-2 text-xs">約110キログラム（一部報道では約85kg）</td><td className="px-3 py-2 text-xs">3</td></tr>
+            <tr><td className="px-3 py-2 text-xs">駆除地点</td><td className="px-3 py-2 text-xs">富山市森付近の藪（人身被害現場から約250m）</td><td className="px-3 py-2 text-xs">5</td></tr>
+            <tr><td className="px-3 py-2 text-xs">駆除手法</td><td className="px-3 py-2 text-xs">緊急銃猟（自治体判断による発砲許可）</td><td className="px-3 py-2 text-xs">3</td></tr>
           </tbody>
         </table>
       </div>
@@ -234,20 +239,21 @@ export default function ResearchPage() {
               <th className="px-3 py-2">確認時刻</th>
               <th className="px-3 py-2">場所</th>
               <th className="px-3 py-2">状況の概要</th>
+              <th className="px-3 py-2">出典</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-800">
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">06:00</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市新屋鳥木町</td><td className="px-3 py-2 text-xs">住宅地付近での目撃</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">09:40</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">潟上市天王字下浜山</td><td className="px-3 py-2 text-xs">県道上で体長約1.5mの個体を目撃</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">10:00</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市雄和碇田</td><td className="px-3 py-2 text-xs">民家から約30mの川対岸に座り込む姿を確認</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">12:29</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">潟上市天王上出戸</td><td className="px-3 py-2 text-xs">コンビニ付近から海水浴場方向へ移動する1.5mの個体</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">14:30</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市雄和（秋田空港北側）</td><td className="px-3 py-2 text-xs">空港フェンス外側で目撃。爆竹により山側へ追い払い</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">14:40</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">三種町（メロンロード）</td><td className="px-3 py-2 text-xs">道路を歩行中、畑の中へ逃走。かなり大型の個体</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">15:20</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市飯島古道</td><td className="px-3 py-2 text-xs">建物から100mの地点で体長1mの個体</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">15:53</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">秋田市河辺（秋田道上）</td><td className="px-3 py-2 text-xs">高速道路脇に座り込んでいる姿を目撃</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">16:22</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">仙北市角館町</td><td className="px-3 py-2 text-xs">民家まで約10mの地点に体長1.2mの個体が出没</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">17:50</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">仙北市角館町雲然</td><td className="px-3 py-2 text-xs">建物まで約60mの地点で目撃</td></tr>
-            <tr><td className="whitespace-nowrap px-3 py-2 font-mono text-xs text-stone-600">19:47</td><td className="whitespace-nowrap px-3 py-2 text-xs font-medium">横手市駅南</td><td className="px-3 py-2 text-xs">駅周辺の市街地での目撃情報</td></tr>
+            <tr><td className="px-3 py-2 text-xs">06:00</td><td className="px-3 py-2 text-xs">秋田市新屋鳥木町</td><td className="px-3 py-2 text-xs">住宅地付近での目撃</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">09:40</td><td className="px-3 py-2 text-xs">潟上市天王字下浜山</td><td className="px-3 py-2 text-xs">県道上で体長約1.5mの個体を目撃</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">10:00</td><td className="px-3 py-2 text-xs">秋田市雄和碇田</td><td className="px-3 py-2 text-xs">民家から約30mの川対岸に座り込む姿を確認</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">12:29</td><td className="px-3 py-2 text-xs">潟上市天王上出戸</td><td className="px-3 py-2 text-xs">コンビニ付近から海水浴場方向へ移動する1.5mの個体</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">14:30</td><td className="px-3 py-2 text-xs">秋田市雄和（秋田空港北側）</td><td className="px-3 py-2 text-xs">空港フェンス外側で目撃。爆竹により山側へ追い払い</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">14:40</td><td className="px-3 py-2 text-xs">三種町（メロンロード）</td><td className="px-3 py-2 text-xs">道路を歩行中、畑の中へ逃走。かなり大型の個体</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">15:20</td><td className="px-3 py-2 text-xs">秋田市飯島古道</td><td className="px-3 py-2 text-xs">建物から100mの地点で体長1mの個体</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">15:53</td><td className="px-3 py-2 text-xs">秋田市河辺（秋田道上）</td><td className="px-3 py-2 text-xs">高速道路脇に座り込んでいる姿を目撃</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">16:22</td><td className="px-3 py-2 text-xs">仙北市角館町</td><td className="px-3 py-2 text-xs">民家まで約10mの地点に体長1.2mの個体が出没</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">17:50</td><td className="px-3 py-2 text-xs">仙北市角館町雲然</td><td className="px-3 py-2 text-xs">建物まで約60mの地点で目撃</td><td className="px-3 py-2 text-xs">12</td></tr>
+            <tr><td className="px-3 py-2 text-xs">19:47</td><td className="px-3 py-2 text-xs">横手市駅南</td><td className="px-3 py-2 text-xs">駅周辺の市街地での目撃情報</td><td className="px-3 py-2 text-xs">12</td></tr>
           </tbody>
         </table>
       </div>
@@ -269,7 +275,7 @@ export default function ResearchPage() {
       <p>一方、京都市伏見区の深草宝塔寺山町で報告された「クマのような動物」の目撃談については、その後の警察の調査と再現実験により、約600〜700メートル離れた場所に立っていた人間を見間違えた可能性が高いと判断された 22。このように、社会的な不安感の高まりにより、誤認情報が増加する傾向も、現在の日本全国における「クマ旋風」の一側面である。</p>
       <h3>中国地方：島根・岡山での記録</h3>
       <p>島根県大田市三瓶町では、30日午前11時45分頃、県道上で体長約1メートルのクマが目撃された 15。また、岡山県においても津山市奥津川などでツキノワグマの確認が続いており、中国山地沿いの集落近くまで出没エリアが南下している実態が浮き彫りとなっている 23。</p>
-      <h3>北海道におけるヒグマの動向と脅威</h3>
+      <h2>北海道におけるヒグマの動向と脅威</h2>
       <p>北海道では、本州のツキノワグマとは比較にならないほどの殺傷能力を持つヒグマの活動が、春の訪れとともに本格化している。</p>
       <h3>稚内および足寄における最新目撃</h3>
       <p>4月30日午後1時35分頃、稚内市大字声問村の上声問地区において、ヒグマの目撃が公式に記録された 24。稚内市内では過去30日間で6件の報告があり、利尻・礼文を含む最北部においても緊張感が高まっている。</p>
@@ -277,22 +283,26 @@ export default function ResearchPage() {
       <h3>統計データと春の活動傾向</h3>
       <p>北海道内における2026年4月30日時点の累積出没記録は12,649件に達しており、直近30日間だけでも74件が報告されている 24。特に和寒町（7件）や札幌市（5件）での報告が多く、札幌市中央区宮の森のような閑静な住宅街の山林付近でも、民家からわずか10メートルの距離までヒグマが接近した事例が報じられている 24。</p>
       <p>北海道における2026年春の特筆すべき傾向として、別海町で撮影された「体長2メートルを超えるヒグマが、水中で小鹿を襲い、力づくで引きずる」という衝撃的な映像が挙げられる 24。これは、冬眠から目覚めたヒグマが極めて強い捕食本能を示している証左であり、ゴールデンウィーク中に山菜採りやキャンプなどで山野に入る人々にとって、死活的な脅威となっている。</p>
-      <p>2026年出没急増の生態学的および気候学的要因</p>
+      <h2>2026年出没急増の生態学的および気候学的要因</h2>
       <p>なぜ2026年の春、これほどまでに日本全国でクマの出没が激増しているのか。専門家による調査データは、昨年度の堅果類の不作と今春の温暖な気候という、二重の要因を明らかにしている。</p>
-      <p>2025年度ブナ・ミズナラ凶作の代償</p>
+      <h3>2025年度ブナ・ミズナラ凶作の代償</h3>
       <p>新潟大学農学部の箕口秀夫名誉教授の調査によると、2025年度はブナの実が8年ぶりの「大凶作」であった 26。ブナのみならず、ミズナラ（ドングリ）も深刻な不作に見舞われた。</p>
-      <p>1. 冬眠前の栄養不足: 2025年秋、クマは十分な脂肪を蓄えられないまま冬眠に入らざるを得なかった。これにより、多くの個体が空腹状態で越冬した。</p>
-      <p>2. 冬眠明けの早期化: 体内の蓄積エネルギーが限界に達した個体は、通常の時期まで冬眠を維持できず、エサを求めて例年より数週間早く目覚める傾向にある 26。</p>
-      <p>3. 子グマの生存戦略の変化: 親グマが十分な母乳を与えられない、あるいは親自身が生存のために移動を優先することで、親離れしていないはずの子グマが単独で里山へ下りてくる「早期自立」のような現象が各地で観察されている 26。</p>
-      <p>2026年春の異常高温</p>
+      <ol>
+        <li>冬眠前の栄養不足: 2025年秋、クマは十分な脂肪を蓄えられないまま冬眠に入らざるを得なかった。これにより、多くの個体が空腹状態で越冬した。</li>
+        <li>冬眠明けの早期化: 体内の蓄積エネルギーが限界に達した個体は、通常の時期まで冬眠を維持できず、エサを求めて例年より数週間早く目覚める傾向にある 26。</li>
+        <li>子グマの生存戦略の変化: 親グマが十分な母乳を与えられない、あるいは親自身が生存のために移動を優先することで、親離れしていないはずの子グマが単独で里山へ下りてくる「早期自立」のような現象が各地で観察されている 26。</li>
+      </ol>
+      <h3>2026年春の異常高温</h3>
       <p>岩手大学の山内貴義准教授は、2026年春の温暖な気候が、クマの活動時期をさらに前倒しさせたと分析している 27。3月から4月にかけて暖かい日が続いたことで、クマの生理的な目覚めが促された一方で、高標高地の深山では依然として残雪が多く、主要なエサとなる植物の芽吹きが追いついていない。この「目覚めとエサの供給」のミスマッチが、クマをエサの豊富な人里や河川敷、あるいは農地へと誘引する強力な駆動力となっている。</p>
       <h2>野生動物管理における最新テクノロジーの導入</h2>
       <p>深刻化するクマ被害に対し、2026年はテクノロジーを活用した「スマート防除」が本格的な導入期を迎えている。</p>
-      <h2>AIによる自動検知システム「ベアラート」</h2>
+      <h3>AIによる自動検知システム「ベアラート」</h3>
       <p>2026年4月30日に詳細が発表された「地域防災 EXPO」のプレリリースでは、最新のAIカメラシステム「ベアラート」が紹介されている 10。</p>
-      <p>* 検知精度: 数万パターンの学習データに基づき、従来の90%前後を大きく上回る99%という認識率を実現。</p>
-      <p>* 検知距離: 昼間最大110メートル、夜間でも80メートル先でクマを特定できる。</p>
-      <p>* 即時性: クマが100メートルを約6秒で駆け抜ける速度を考慮し、検知と同時に管理者のスマートフォンや防災無線へ警告を送る。</p>
+      <ul>
+        <li>検知精度: 数万パターンの学習データに基づき、従来の90%前後を大きく上回る99%という認識率を実現。</li>
+        <li>検知距離: 昼間最大110メートル、夜間でも80メートル先でクマを特定できる。</li>
+        <li>即時性: クマが100メートルを約6秒で駆け抜ける速度を考慮し、検知と同時に管理者のスマートフォンや防災無線へ警告を送る。</li>
+      </ul>
       <p>このようなシステムは、富山市で問題となった「河川敷ルート」の監視に極めて有効である。目視によるパトロールには限界があるが、定点監視型のAIカメラを戦略的に配置することで、クマの都市部流入を水際で食い止めることが可能となる。</p>
       <h3>指定管理鳥獣への追加と国の支援</h3>
       <p>2024年4月に環境省がクマを「指定管理鳥獣」に追加したことで、2026年度は自治体に対する財政支援が大幅に拡充されている 10。これまでは市町村レベルの予算で賄われていた罠の設置や猟友会への報酬、さらにはドローンによる空中撮影調査などが、国の戦略的な管理計画の下で実施されるようになった。4月30日の富山市でのヘリコプターを用いた迅速な特定も、こうした広域監視体制の構築がもたらした成果の一端といえる。</p>
@@ -300,15 +310,19 @@ export default function ResearchPage() {
       <p>2026年4月30日のニュースは、日本人が野生動物とどのように共存、あるいは対峙すべきかという問いを、かつてない重みで突きつけている。</p>
       <h3>現時点での主要な知見の集約</h3>
       <p>本報告書で詳述した通り、2026年のクマ出没は以下のような新たな特徴を備えている。</p>
-      <p>1. 河川敷という死角: 川沿いの豊かな緑地が、山間部から沿岸部、市街地中心部へのクマの浸入経路（コリドー）として常態化している。</p>
-      <p>2. アーバン・ベアの定着: 人間社会の音や気配に怯えない個体が増加しており、白昼の市街地や交通インフラ付近での滞留が目立っている。</p>
-      <p>3. 警察・行政の介入強化: 猟友会に依存した従来のボランティア的防除から、警察機動隊のライフル投入や自治体判断による緊急銃猟といった、公権力による直接的な排除へとシフトしている。</p>
+      <ol>
+        <li>河川敷という死角: 川沿いの豊かな緑地が、山間部から沿岸部、市街地中心部へのクマの浸入経路（コリドー）として常態化している。</li>
+        <li>アーバン・ベアの定着: 人間社会の音や気配に怯えない個体が増加しており、白昼の市街地や交通インフラ付近での滞留が目立っている。</li>
+        <li>警察・行政の介入強化: 猟友会に依存した従来のボランティア的防除から、警察機動隊のライフル投入や自治体判断による緊急銃猟といった、公権力による直接的な排除へとシフトしている。</li>
+      </ol>
       <h3>今後の展望と住民への勧告</h3>
       <p>今後、気温の上昇とともに山菜の芽吹きが山間部へ移行すれば、一時的に出没が落ち着く可能性はあるが、昨秋の凶作の影響を引きずった個体は、依然としてエネルギー効率の良い人間の食べ物（生ごみ、農作物、果樹）を狙い続けることが予想される。</p>
       <p>専門家は、住民に対して以下の「三重の防衛策」を改めて推奨している。</p>
-      <p>* 第1層：誘引物の徹底除去: 柿、栗、生ごみなどの管理を徹底し、クマに「人間の居住区にはエサがある」と学習させない 20。</p>
-      <p>* 第2層：遭遇回避行動: 早朝・夕方の行動自粛、音を出す（鈴、ラジオ）ことでの存在誇示、そしてクマの痕跡（糞、足跡）を見つけた際の即時退避の徹底 9。</p>
-      <p>* 第3層：物理的防御の準備: 万が一の遭遇に備え、クマ撃退スプレーを携行することや、襲われた際に致命傷を避けるための「防御姿勢（うつ伏せになり、首の後ろを手で保護し、地面に密着する）」の習得 9。</p>
+      <ul>
+        <li>第1層：誘引物の徹底除去: 柿、栗、生ごみなどの管理を徹底し、クマに「人間の居住区にはエサがある」と学習させない 20。</li>
+        <li>第2層：遭遇回避行動: 早朝・夕方の行動自粛、音を出す（鈴、ラジオ）ことでの存在誇示、そしてクマの痕跡（糞、足跡）を見つけた際の即時退避の徹底 9。</li>
+        <li>第3層：物理的防御の準備: 万が一の遭遇に備え、クマ撃退スプレーを携行することや、襲われた際に致命傷を避けるための「防御姿勢（うつ伏せになり、首の後ろを手で保護し、地面に密着する）」の習得 9。</li>
+      </ul>
       <p>2026年4月30日は、日本全国でクマとの「戦い」の最前線が、山から街へと完全に移行したことを歴史に刻んだ一日であった。行政の強力な介入と、住民一人一人の高い危機意識の融合こそが、これからの人獣衝突時代を生き抜くための唯一の鍵となる。</p>
 
       {REFERENCES.length > 0 && (
@@ -339,9 +353,9 @@ export default function ResearchPage() {
           <dt className="text-stone-500">対象期間</dt>
           <dd>2026年4月30日</dd>
           <dt className="text-stone-500">公開日</dt>
-          <dd>2026-05-02</dd>
+          <dd>2026-05-06</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>2026-05-02</dd>
+          <dd>2026-05-06</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
           本記事は、公開ニュース・自治体発表・政府公表資料をもとに AI で集約・要約した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}

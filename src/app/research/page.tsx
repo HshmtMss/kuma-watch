@@ -20,19 +20,20 @@ type ResearchEntry = {
   category: "daily-report" | "weekly-report" | "monthly-report" | "topic" | "policy";
 };
 
-// publishedAt 降順で並ぶように、新しいものを上に追加していく。
+// 記事本来の日付 (slug の YYYY-MM-DD or YYYY-MM 部分) 降順で並べる。
+// 配列内の登録順は問わない (rendering 時に sortKey でソートする)。
 const ENTRIES: ResearchEntry[] = [
-  {
-    slug: "2026-05-04-daily-report",
-    title: "2026年5月4日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月4日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-05",
-    category: "daily-report",
-  },
   {
     slug: "2026-05-05-daily-report",
     title: "2026年5月5日 国内クマ出没事案の時空間分析と分析報告",
     lead: "2026年5月5日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-05-05",
+    category: "daily-report",
+  },
+  {
+    slug: "2026-05-04-daily-report",
+    title: "2026年5月4日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月4日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
     publishedAt: "2026-05-05",
     category: "daily-report",
   },
@@ -44,16 +45,16 @@ const ENTRIES: ResearchEntry[] = [
     category: "daily-report",
   },
   {
-    slug: "2026-05-01-daily-report",
-    title: "2026年5月1日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月1日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    slug: "2026-05-02-daily-report",
+    title: "2026年5月2日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月2日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
     publishedAt: "2026-05-04",
     category: "daily-report",
   },
   {
-    slug: "2026-05-02-daily-report",
-    title: "2026年5月2日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月2日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    slug: "2026-05-01-daily-report",
+    title: "2026年5月1日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月1日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
     publishedAt: "2026-05-04",
     category: "daily-report",
   },
@@ -65,10 +66,10 @@ const ENTRIES: ResearchEntry[] = [
     category: "daily-report",
   },
   {
-    slug: "2026-04-30-daily-report",
-    title: "2026年4月30日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年4月30日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-01",
+    slug: "2026-04-29-bear-incidents",
+    title: "2026年4月29日 国内熊出没事案の時空間分析と社会的リスク評価",
+    lead: "ゴールデンウィーク初日、全国で相次いだクマ出没・人身被害事案を網羅的に集約し、アーバン・ベア化の進行と背景要因を分析した報告書。",
+    publishedAt: "2026-04-30",
     category: "daily-report",
   },
   {
@@ -79,13 +80,6 @@ const ENTRIES: ResearchEntry[] = [
     category: "monthly-report",
   },
   {
-    slug: "2026-04-29-bear-incidents",
-    title: "2026年4月29日 国内熊出没事案の時空間分析と社会的リスク評価",
-    lead: "ゴールデンウィーク初日、全国で相次いだクマ出没・人身被害事案を網羅的に集約し、アーバン・ベア化の進行と背景要因を分析した報告書。",
-    publishedAt: "2026-04-30",
-    category: "daily-report",
-  },
-  {
     slug: "2026-03-monthly-report",
     title: "2026年3月 国内熊出没動向と「熊対策ロードマップ」策定の包括的分析",
     lead: "暖冬による早期覚醒、北海道・東北・北陸の出没急増、3月27日に政府が公表した個体数削減ロードマップ（2030年度までの地域別削減目標）までを総括した月次報告。",
@@ -93,6 +87,20 @@ const ENTRIES: ResearchEntry[] = [
     category: "monthly-report",
   },
 ];
+
+// slug 先頭の日付 (YYYY-MM-DD or YYYY-MM) を sortable な数値に変換する。
+// 月次レポート (YYYY-MM) は同月末日として扱い、日次より後ろに配置されない。
+function entrySortKey(slug: string): string {
+  const daily = slug.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (daily) return `${daily[1]}${daily[2]}${daily[3]}`;
+  const monthly = slug.match(/^(\d{4})-(\d{2})/);
+  if (monthly) return `${monthly[1]}${monthly[2]}99`;
+  return "00000000";
+}
+
+const SORTED_ENTRIES = [...ENTRIES].sort((a, b) =>
+  entrySortKey(b.slug).localeCompare(entrySortKey(a.slug)),
+);
 
 const CATEGORY_LABEL: Record<ResearchEntry["category"], string> = {
   "daily-report": "日次レポート",
@@ -133,7 +141,7 @@ export default function ResearchIndexPage() {
 
       <h2>公開記事</h2>
       <ul className="not-prose space-y-4">
-        {ENTRIES.map((e) => (
+        {SORTED_ENTRIES.map((e) => (
           <li
             key={e.slug}
             className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-emerald-500 hover:bg-emerald-50/40"

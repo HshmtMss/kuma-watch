@@ -28,6 +28,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { parse, HTMLElement } from "node-html-parser";
 
 const ROOT = process.cwd();
@@ -72,6 +73,10 @@ type ParsedDoc = {
   references: Reference[];
 };
 
+// page.tsx 先頭にコンテンツハッシュを埋め込んで、Drive 側の更新を検出する。
+// `// drive-content-hash: <sha256>` の形で出力 / 読み取りする。
+const HASH_MARKER = "// drive-content-hash: ";
+
 async function main() {
   console.log("[import-research] scanning Drive folders...");
 
@@ -87,39 +92,72 @@ async function main() {
   const existingSlugs = listExistingSlugs();
   console.log(`[import-research] existing /research slugs (with page.tsx): ${existingSlugs.size}`);
 
-  const newDocs = allDocs.filter((d) => !existingSlugs.has(d.slug));
-  if (newDocs.length === 0) {
-    console.log("[import-research] no new docs — nothing to do");
-    return;
+  // 各 doc を「新規」「更新あり」「変化なし」に振り分ける。
+  // Drive の HTML エクスポートはバイト的に非決定的 (class 名やタイムスタンプが揺れる)
+  // ため、生 HTML ではなくパース後の構造化コンテンツ (ParsedDoc) のハッシュで判定する。
+  const toGenerate: { doc: DocMeta; parsed: ParsedDoc; hash: string; isNew: boolean }[] = [];
+  let unchangedCount = 0;
+  for (const doc of allDocs) {
+    let parsed: ParsedDoc;
+    try {
+      const html = await fetchDocHtml(doc.id);
+      parsed = parseDocHtml(html);
+    } catch (e) {
+      console.error(`[import-research]   FAILED to fetch/parse ${doc.slug}:`, e);
+      continue;
+    }
+    const hash = sha256(JSON.stringify(parsed));
+    const existingHash = existingSlugs.has(doc.slug) ? readExistingHash(doc.slug) : null;
+    if (existingHash === hash) {
+      unchangedCount++;
+      continue;
+    }
+    toGenerate.push({ doc, parsed, hash, isNew: !existingSlugs.has(doc.slug) });
   }
 
   console.log(
-    `[import-research] new docs to import: ${newDocs.map((d) => d.slug).join(", ")}`,
+    `[import-research] new: ${toGenerate.filter((g) => g.isNew).length}, updated: ${toGenerate.filter((g) => !g.isNew).length}, unchanged: ${unchangedCount}`,
   );
 
-  const generated: DocMeta[] = [];
-  for (const doc of newDocs) {
+  if (toGenerate.length === 0) {
+    console.log("[import-research] nothing to do");
+    return;
+  }
+
+  const newOnly: DocMeta[] = [];
+  for (const { doc, parsed, hash, isNew } of toGenerate) {
     try {
-      const html = await fetchDocHtml(doc.id);
-      const parsed = parseDocHtml(html);
-      writePage(doc, parsed);
+      writePage(doc, parsed, hash);
       const tableCount = parsed.body.filter((b) => b.type === "table").length;
       console.log(
-        `[import-research]   wrote ${doc.slug} (${parsed.body.length} blocks, ${tableCount} tables, ${parsed.references.length} refs)`,
+        `[import-research]   ${isNew ? "NEW    " : "UPDATED"} ${doc.slug} (${parsed.body.length} blocks, ${tableCount} tables, ${parsed.references.length} refs)`,
       );
-      generated.push(doc);
+      if (isNew) newOnly.push(doc);
     } catch (e) {
-      console.error(`[import-research]   FAILED ${doc.slug}:`, e);
+      console.error(`[import-research]   FAILED to write ${doc.slug}:`, e);
     }
   }
 
-  if (generated.length > 0) {
-    updateIndex(generated);
-    updateSitemap(generated);
-    console.log(`[import-research] updated index and sitemap with ${generated.length} entries (duplicates skipped)`);
+  // index と sitemap の更新は「新規 slug」のみ。既存記事の更新だけなら触らない。
+  if (newOnly.length > 0) {
+    updateIndex(newOnly);
+    updateSitemap(newOnly);
+    console.log(`[import-research] updated index and sitemap with ${newOnly.length} new entries (duplicates skipped)`);
   }
 
   console.log("[import-research] done.");
+}
+
+function sha256(s: string): string {
+  return createHash("sha256").update(s).digest("hex");
+}
+
+function readExistingHash(slug: string): string | null {
+  const path = join(ROOT, "src", "app", "research", slug, "page.tsx");
+  if (!existsSync(path)) return null;
+  const head = readFileSync(path, "utf8").slice(0, 500);
+  const m = head.match(/^\/\/ drive-content-hash: ([a-f0-9]{64})/m);
+  return m ? m[1] : null;
 }
 
 async function scanFolder(
@@ -383,14 +421,14 @@ function parseSingleReference(line: string): Reference | null {
   return { title, url, ...(site ? { site } : {}) };
 }
 
-function writePage(doc: DocMeta, parsed: ParsedDoc) {
+function writePage(doc: DocMeta, parsed: ParsedDoc, contentHash: string) {
   const dir = join(ROOT, "src", "app", "research", doc.slug);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  const tsx = renderPageTsx(doc, parsed);
+  const tsx = renderPageTsx(doc, parsed, contentHash);
   writeFileSync(join(dir, "page.tsx"), tsx);
 }
 
-function renderPageTsx(doc: DocMeta, parsed: ParsedDoc): string {
+function renderPageTsx(doc: DocMeta, parsed: ParsedDoc, contentHash: string): string {
   const today = new Date();
   const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
@@ -405,7 +443,11 @@ function renderPageTsx(doc: DocMeta, parsed: ParsedDoc): string {
     .map((l, i) => (i === 0 ? l : "  " + l))
     .join("\n");
 
-  return `import type { Metadata } from "next";
+  return `${HASH_MARKER}${contentHash}
+// このファイルは scripts/import-research.ts によって自動生成されています。
+// Drive 側の元 Doc を更新すると、次回の import 実行時にこのファイルが再生成されます
+// (上記ハッシュが変わったかどうかで判定)。手動で本文を修正する場合はハッシュ行ごと残してください。
+import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 
