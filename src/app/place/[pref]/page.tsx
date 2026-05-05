@@ -8,7 +8,11 @@ import {
   getPrefSummary,
 } from "@/lib/place-index";
 
-export const dynamicParams = true;
+// 47 都道府県のみを許可。それ以外のパスは Next.js が即 404 を返す。
+// dynamicParams=true だと、未対応の文字列で叩かれた際に SSR が走って
+// 19MB の sightings.json を読み込もうとし、コールドスタート時に
+// Hobby の 10s タイムアウトを超えて 5xx が返ることがあるため。
+export const dynamicParams = false;
 
 const PREF_NAMES = new Set(Object.values(PREF_CODE_TO_NAME));
 const SITE_URL = "https://kuma-watch.jp";

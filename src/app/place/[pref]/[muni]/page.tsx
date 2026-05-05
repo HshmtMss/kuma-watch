@@ -11,7 +11,13 @@ import {
   getStaticPlaceKeys,
 } from "@/lib/place-index";
 
-export const dynamicParams = true;
+// 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
+// それ以外のパスは Next.js が即 404 を返す。
+// dynamicParams=true だと、データに無い市町村で叩かれた際に SSR が走って
+// 19MB の sightings.json を読み込もうとし、コールドスタート時に
+// Hobby の 10s タイムアウトを超えて 5xx が返ることがあるため。
+// (Search Console で札幌市・盛岡市等のサーバーエラーとして検出された)
+export const dynamicParams = false;
 
 const PREF_NAMES = new Set(Object.values(PREF_CODE_TO_NAME));
 const SITE_URL = "https://kuma-watch.jp";
