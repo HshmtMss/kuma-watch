@@ -48,3 +48,7 @@ data-sources/landuse/progress.json
 
 # Claude Code セッション固有の一時ファイル
 .claude/scheduled_tasks.lock
+
+# 公開しない下書き素材 (Wix 用画像、playwright のキャプチャ環境など)。
+# これらをコミットすると repo が肥大化するので必ず ignore する。
+drafts/
