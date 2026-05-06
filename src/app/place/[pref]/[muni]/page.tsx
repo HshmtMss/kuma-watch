@@ -323,7 +323,7 @@ export default async function MuniPage({ params }: Props) {
       <p>
         KumaWatch は Sharp9110 提供のオープンデータ (CC BY 4.0)、環境省の生息域推定データ、
         各自治体の公開データを統合しています。
-        各レコードの出典は <Link href="/about#data-sources">出典ページ</Link> で確認できます。
+        各レコードの出典は <Link href="/credits">出典・ライセンス</Link> で確認できます。
         記載内容はあくまで参考情報です。最新の出没状況は {pref}{muni} の公式発表もあわせてご確認ください。
       </p>
     </PageShell>
