@@ -42,10 +42,15 @@ export async function GET(req: Request) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
   const source = searchParams.get("source");
+  // limit パース: "abc" や "0" や "-5" のような不正値は DEFAULT_LIMIT に倒す。
+  // 旧コード `Number(v) || DEFAULT_LIMIT` だと "0" のときに 0 ではなく DEFAULT を
+  // 返したいのに、後段の Math.max(1, ...) で 1 になってしまう不整合があった。
   const limitParam = searchParams.get("limit");
-  const limit = limitParam
-    ? Math.min(MAX_LIMIT, Math.max(1, Number(limitParam) || DEFAULT_LIMIT))
-    : DEFAULT_LIMIT;
+  const limitNum = limitParam !== null ? Number(limitParam) : NaN;
+  const limit =
+    Number.isFinite(limitNum) && limitNum >= 1
+      ? Math.min(MAX_LIMIT, Math.floor(limitNum))
+      : DEFAULT_LIMIT;
   const force = searchParams.get("refresh") === "1";
 
   try {

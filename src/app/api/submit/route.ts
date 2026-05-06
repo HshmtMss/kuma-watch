@@ -98,7 +98,13 @@ export async function POST(req: Request) {
 
   // 永続化は Phase 3 で Supabase に接続する。それまでは console に記録のみ。
   // 公開ローンチ初期は投稿機能を「準備中」表示にし、503 を返してフロントに案内させる。
-  console.log("[submit:queued]", JSON.stringify(submission));
+  // 個人情報 (連絡先メール・コメント本文) は Vercel ログに残さない。長さだけ記録する。
+  const { contact, comment, ...safeSubmission } = submission;
+  console.log("[submit:queued]", JSON.stringify({
+    ...safeSubmission,
+    contactLen: contact?.length ?? 0,
+    commentLen: comment?.length ?? 0,
+  }));
 
   if (process.env.SUBMIT_ENABLED !== "1") {
     return NextResponse.json(

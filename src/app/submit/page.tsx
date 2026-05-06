@@ -193,9 +193,20 @@ function SubmitContent() {
           photoDataUrl: photoDataUrl || undefined,
         }),
       });
-      const data = await res.json();
+      // 200 系で JSON が壊れている場合 / 5xx で HTML エラーページが返る場合に
+      // 同じ catch に流れるが、メッセージを分けて UX 上の混乱を避ける。
+      let data: { id?: string; error?: string } | null = null;
+      try {
+        data = (await res.json()) as { id?: string; error?: string };
+      } catch {
+        data = null;
+      }
       if (!res.ok) {
-        setSubmitError(data?.error ?? "送信に失敗しました");
+        setSubmitError(data?.error ?? "サーバーエラーが発生しました");
+        return;
+      }
+      if (!data?.id) {
+        setSubmitError("予期しないレスポンスを受信しました");
         return;
       }
       setSubmittedId(data.id);
@@ -396,7 +407,13 @@ function SubmitContent() {
           </label>
         )}
         {photoError && (
-          <p className="mt-1 text-[11px] text-red-600">⚠️ {photoError}</p>
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="mt-1 text-[11px] text-red-600"
+          >
+            ⚠️ {photoError}
+          </p>
         )}
         <p className="mt-1 text-[10px] text-gray-500">
           5MB まで。クマ本体・足跡・糞・被害物などの写真が確認に役立ちます。
@@ -444,7 +461,11 @@ function SubmitContent() {
       </p>
 
       {submitError && (
-        <div className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700"
+        >
           ⚠️ {submitError}
         </div>
       )}

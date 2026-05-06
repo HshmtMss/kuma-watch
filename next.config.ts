@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
         permanent: true,
       })),
       { source: "/map", destination: "/", permanent: true },
+      // /sources は /about#data-sources に統合済み。Search Console の
+      // 「代替ページ」検出を抑えるため permanent (308) で渡す。
+      // 旧バックリンクからのアクセスを正規 URL (/about) に集約する。
+      { source: "/sources", destination: "/about#data-sources", permanent: true },
     ];
   },
   async headers() {

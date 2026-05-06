@@ -94,16 +94,42 @@ type State =
 const NEARBY_RADIUS_KM = 10;
 const NEARBY_DECAY_KM = 5;
 
+// 周辺 API は1つでもハングすると Promise.all 全体が止まり「情報取得中」のまま固まる。
+// 各 fetch にクライアント側タイムアウトを掛け、超過したら fallback 値を返す。
+const FETCH_TIMEOUT_MS = 8000;
+
+async function fetchWithTimeout(
+  url: string,
+  ms: number = FETCH_TIMEOUT_MS,
+): Promise<Response | null> {
+  if (typeof AbortController === "undefined") {
+    try {
+      return await fetch(url);
+    } catch {
+      return null;
+    }
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { signal: ctrl.signal });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchNearbyHistory(
   lat: number,
   lon: number,
   radiusKm: number,
 ): Promise<{ count365d: number; count90d: number; records: NearbyRecent[] }> {
+  const r = await fetchWithTimeout(
+    `/api/nearby-history?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&radiusKm=${radiusKm}`,
+  );
+  if (!r || !r.ok) return { count365d: 0, count90d: 0, records: [] };
   try {
-    const r = await fetch(
-      `/api/nearby-history?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&radiusKm=${radiusKm}`,
-    );
-    if (!r.ok) return { count365d: 0, count90d: 0, records: [] };
     const data = (await r.json()) as {
       count365d?: number;
       count90d?: number;
@@ -123,11 +149,11 @@ async function fetchElevation(
   lat: number,
   lon: number,
 ): Promise<{ elevationM: number | null; slopeDeg: number | null }> {
+  const r = await fetchWithTimeout(
+    `/api/elevation?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+  );
+  if (!r || !r.ok) return { elevationM: null, slopeDeg: null };
   try {
-    const r = await fetch(
-      `/api/elevation?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
-    );
-    if (!r.ok) return { elevationM: null, slopeDeg: null };
     const data = (await r.json()) as {
       elevationM?: number | null;
       slopeDeg?: number | null;
@@ -150,11 +176,11 @@ async function fetchForest(
   lat: number,
   lon: number,
 ): Promise<ForestApiResult | null> {
+  const r = await fetchWithTimeout(
+    `/api/forest?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+  );
+  if (!r || !r.ok) return null;
   try {
-    const r = await fetch(
-      `/api/forest?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
-    );
-    if (!r.ok) return null;
     return (await r.json()) as ForestApiResult;
   } catch {
     return null;
@@ -216,11 +242,11 @@ async function reverseGeocode(
   lat: number,
   lon: number,
 ): Promise<GeocodeHit | null> {
+  const r = await fetchWithTimeout(
+    `/api/geocode?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}&v=2`,
+  );
+  if (!r || !r.ok) return null;
   try {
-    const r = await fetch(
-      `/api/geocode?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}&v=2`,
-    );
-    if (!r.ok) return null;
     const data = (await r.json()) as { result?: GeocodeHit };
     return data.result ?? null;
   } catch {
@@ -232,12 +258,12 @@ async function fetchWeather(
   lat: number,
   lon: number,
 ): Promise<WeatherSnapshot | null> {
+  const r = await fetchWithTimeout(
+    `/api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`,
+  );
+  if (!r || !r.ok) return null;
   try {
-    const res = await fetch(
-      `/api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`,
-    );
-    if (!res.ok) return null;
-    return (await res.json()) as WeatherSnapshot;
+    return (await r.json()) as WeatherSnapshot;
   } catch {
     return null;
   }

@@ -141,7 +141,8 @@ async function callGemini(
       body: JSON.stringify(body),
     });
     if (!r.ok) {
-      console.error("[summary] gemini failed", r.status, await r.text());
+      // レスポンス本文に API key fragment やプロンプトが含まれ得るので status のみ。
+      console.error("[summary] gemini failed", r.status);
       return null;
     }
     const data = (await r.json()) as {
@@ -149,8 +150,9 @@ async function callGemini(
     };
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     return text || null;
-  } catch (e) {
-    console.error("[summary] gemini error", e);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : "unknown";
+    console.error("[summary] gemini error", msg);
     return null;
   }
 }

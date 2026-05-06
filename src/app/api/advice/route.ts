@@ -83,7 +83,9 @@ function callGemini(
   })
     .then(async (r) => {
       if (!r.ok) {
-        console.error("[advice] gemini failed", r.status, await r.text());
+        // レスポンス本文は API key fragment やプロンプト内容を含み得るので
+        // status code のみログに残す。
+        console.error("[advice] gemini failed", r.status);
         return null;
       }
       const data = (await r.json()) as {
@@ -99,8 +101,10 @@ function callGemini(
         return null;
       }
     })
-    .catch((e) => {
-      console.error("[advice] gemini error", e);
+    .catch((e: unknown) => {
+      // メッセージのみ。スタックや response object はログに残さない。
+      const msg = e instanceof Error ? e.message : "unknown";
+      console.error("[advice] gemini error", msg);
       return null;
     });
 }

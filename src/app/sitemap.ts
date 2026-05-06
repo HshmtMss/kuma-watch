@@ -10,7 +10,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1.0 },
     { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/for-gov`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/sources`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/submit`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/research`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
@@ -44,13 +43,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prefEntries = summaries.map((s) => ({
       url: `${SITE_URL}/place/${encodeURIComponent(s.prefectureName)}`,
       lastModified: now,
-      changeFrequency: "weekly" as const,
+      changeFrequency: "daily" as const,
       priority: 0.7,
     }));
     muniEntries = keys.map((k) => ({
       url: `${SITE_URL}/place/${encodeURIComponent(k.pref)}/${encodeURIComponent(k.city)}`,
       lastModified: now,
-      changeFrequency: "weekly" as const,
+      changeFrequency: "daily" as const,
       priority: 0.6,
     }));
   } catch {

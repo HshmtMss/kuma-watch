@@ -43,7 +43,7 @@ export default function DisclaimerPage() {
       <h2>5. 著作権・ライセンス</h2>
       <p>
         当サービスが利用しているデータの著作権・ライセンスは各提供元に帰属します。
-        詳細は<a href="/sources">データ出典</a>をご覧ください。
+        詳細は<a href="/about#data-sources">データ出典</a>をご覧ください。
         当サービスのロゴ・UI デザインの著作権はリサーチコーディネート株式会社に帰属します。
       </p>
 
