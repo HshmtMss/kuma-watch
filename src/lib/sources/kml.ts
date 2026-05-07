@@ -364,7 +364,9 @@ export async function fetchKmlSightings(
         lon: points[i].lon,
         date: built.date,
         prefectureName: recordPref,
-        cityName: built.city,
+        // KML から city が拾えない単一市町スコープのソース (例: 盛岡市
+        // のみ収録された MyMap) は entry.defaultCity を使う。
+        cityName: built.city || entry.defaultCity || "",
         sectionName: built.section,
         comment: built.comment,
         headCount: built.headCount,

@@ -200,6 +200,30 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     verifiedAt: "2026-04-20",
   },
   {
+    // 盛岡市公式 MyMap。県全体マップ (1Rzj...) に補完して市内 700+ 件を取り込む。
+    // ExtendedData が豊富 (発生地域・頭数・説明)、name は「令和X年Y月Z日」のみ。
+    id: "iwate-morioka-mymap",
+    kind: "prefecture",
+    prefCode: "03",
+    regionLabel: "岩手県 盛岡市内ツキノワグマ出没情報（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.google.com/maps/d/viewer?mid=1QnVCL8lSy4tc9bPEhAXTBsK6SQ0ztwc", role: "map", hint: "盛岡市内ツキノワグマ出没情報マップ（市公式）" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1QnVCL8lSy4tc9bPEhAXTBsK6SQ0ztwc&forcekml=1",
+      nameFormat: "extended-data",
+      sectionField: "発生地域",
+      headCountField: "頭数",
+      commentField: "説明",
+      // name 欄に「令和X年Y月Z日」形式で日付。dateField は使わず name から拾う。
+    },
+    defaultCity: "盛岡市",
+    notes: "盛岡市公式 My Map 782 件 (2026-05 時点)。市単位の詳細データを上乗せ",
+    verifiedAt: "2026-05-07",
+  },
+  {
     id: "miyagi",
     kind: "prefecture",
     prefCode: "04",
@@ -391,6 +415,25 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     verifiedAt: "2026-04-20",
   },
   {
+    // 2026 年版マップ (10qIE... の 2025 版を補完)。「とちぎのクマ目撃情報2026」。
+    // 件数は少ないが当該年度の最新ピンを取り込めるのが価値。
+    id: "tochigi-2026-mymap",
+    kind: "prefecture",
+    prefCode: "09",
+    regionLabel: "栃木県 とちぎのクマ目撃情報2026（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.google.com/maps/d/viewer?mid=1FiDKp98cxzU1GQu04o5rnmbtT1mgmZs", role: "map", hint: "とちぎのクマ目撃情報2026" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1FiDKp98cxzU1GQu04o5rnmbtT1mgmZs&forcekml=1",
+      nameFormat: "date-only",
+    },
+    notes: "2026 年版 (R8 年度) Google My Map 48 件 (2026-05 時点)。description にソース URL",
+    verifiedAt: "2026-05-07",
+  },
+  {
     id: "gunma",
     kind: "prefecture",
     prefCode: "10",
@@ -564,6 +607,29 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     notes:
       "Google My Maps R8（令和8年度）。Point 6 件のみ（残りは市町境界ポリゴン）。description に『出没日: R8.2.23』等の和暦/ISO 日付あり。Sharp9110 の 187 件を併用",
     verifiedAt: "2026-04-21",
+  },
+  {
+    // R7 (令和7年度=2025年度) ツキノワグマ目撃・痕跡情報。県公式の年度マップで
+    // 432 件。R8 は別 mid。市町・場所・出没日は ExtendedData に揃っている。
+    id: "ishikawa-r7-mymap",
+    kind: "prefecture",
+    prefCode: "17",
+    regionLabel: "石川県 R7 ツキノワグマ目撃・痕跡情報（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.google.com/maps/d/viewer?mid=1yzG7cN9fx5lPUMyE_Xp5k7r_EXjSz_0", role: "map", hint: "令和7年度 ツキノワグマ目撃・痕跡情報" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1yzG7cN9fx5lPUMyE_Xp5k7r_EXjSz_0&forcekml=1",
+      nameFormat: "extended-data",
+      cityField: "市町名",
+      sectionField: "場所",
+      commentField: "備考",
+      dateField: "出没日",
+    },
+    notes: "R7 (2025) 年度版 432 件 (2026-05 時点)。R8 マップ (17x-ZQ...) を補完",
+    verifiedAt: "2026-05-07",
   },
   {
     id: "fukui",
@@ -978,6 +1044,31 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     },
     notes: "令和8年度 (2026-04〜) 5 件 (2026-04-21 時点)。富士宮市・静岡市葵区等が中心",
     verifiedAt: "2026-04-21",
+  },
+  {
+    // R7 (令和7年度) 200 件。R8 (1o_iX...) と並行で過年度の蓄積を取り込む。
+    // ExtendedData が同じスキーマ (市町・地名・日付・目撃頭数) なので設定共有可能。
+    id: "shizuoka-r7-gmap",
+    kind: "prefecture",
+    prefCode: "22",
+    regionLabel: "静岡県 R7 ツキノワグマ目撃情報（Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.google.com/maps/d/viewer?mid=1hwFI-xmiB1uYeEpfNetfP15CS9uxo08", role: "map", hint: "令和7年度静岡県ツキノワグマ目撃情報" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=1hwFI-xmiB1uYeEpfNetfP15CS9uxo08&forcekml=1",
+      nameFormat: "extended-data",
+      dateField: "日付",
+      dateFormat: "ja-slash",
+      cityField: "市町",
+      sectionField: "地名",
+      commentField: "備考",
+      headCountField: "目撃頭数",
+    },
+    notes: "R7 (2025) 年度版 200 件 (2026-05 時点)。R8 マップ (1o_iX...) を補完",
+    verifiedAt: "2026-05-07",
   },
   {
     id: "shizuoka",
