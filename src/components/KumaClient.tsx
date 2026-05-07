@@ -544,42 +544,47 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ブランドユニット: クマアイコン + 「くまウォッチ / by 獣医工学ラボ」。
-            英字ロゴだけだと監修者が伝わりづらいので、和名 + 監修者を 2 段で
-            読みやすく組む。タップで /about へ。 */}
+        {/* ブランドユニット: 既存ロゴ画像 + 「by 獣医工学ラボ」を 1 行で。
+            獣医師監修・獣医工学ラボ運営のシグナルを常時提示する。タップで /about へ。 */}
         <Link
           href="/about"
-          className="flex shrink-0 items-center gap-2"
-          aria-label="くまウォッチ by 獣医工学ラボ"
+          className="flex shrink-0 items-end gap-1.5 leading-none"
+          aria-label="KumaWatch by 獣医工学ラボ"
         >
-          <Image
-            src="/bear-face.png"
-            alt=""
-            width={40}
-            height={40}
-            priority
-            aria-hidden
-            className="block shrink-0"
-            style={{ width: "2.25rem", height: "2.25rem" }}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="KumaWatch"
+            className="block h-7 w-auto sm:h-8"
           />
-          <span className="flex flex-col leading-tight">
-            <span className="text-[15px] font-bold tracking-tight text-stone-900 sm:text-base">
-              くまウォッチ
-            </span>
-            <span className="text-[11px] text-stone-500 sm:text-xs">
-              by{" "}
-              <span className="font-semibold text-stone-700">獣医工学ラボ</span>
-            </span>
+          <span className="pb-0.5 text-[11px] tracking-tight text-stone-500 sm:text-xs">
+            by{" "}
+            <span className="font-semibold text-stone-700">獣医工学ラボ</span>
           </span>
         </Link>
 
         <div className="min-w-0 flex-1" aria-hidden />
 
+        {/* データ更新日: 「最新の事案がいつ起きたか」を控えめなチップで右側に常時表示。
+            ヘッダー右の余白を埋めつつ、モバイルでも判読できるサイズ感に。 */}
+        {latestDate && (
+          <span
+            className="flex shrink-0 items-baseline gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-1 text-[11px] text-stone-600 sm:px-2.5 sm:text-xs"
+            title={`最新事案: ${latestDate}`}
+          >
+            <span className="text-stone-400">更新</span>
+            <span className="tabular-nums font-semibold text-stone-800">
+              {formatLatestDate(latestDate)}
+            </span>
+          </span>
+        )}
+
         <div className="flex shrink-0 items-center gap-1.5">
-          {/* AI に聞く: クマの顔アイコン + テキスト (コンパクト) */}
+          {/* AI に聞く: クマの顔アイコン + テキスト。
+              スマホでもテキストを常時表示し、機能を見つけやすくする。 */}
           <button
             onClick={() => setShowChat(true)}
-            className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 text-sm font-semibold text-amber-800 hover:bg-amber-100"
+            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 sm:h-11 sm:px-3 sm:text-sm"
             aria-label="AI に質問"
             title="AI に質問"
           >
@@ -589,12 +594,12 @@ export default function KumaClient() {
               width={24}
               height={24}
               aria-hidden
-              style={{ width: "1.5rem", height: "auto" }}
+              style={{ width: "1.25rem", height: "auto" }}
             />
-            <span className="hidden sm:inline">AI に聞く</span>
+            <span>AI に聞く</span>
           </button>
           <details className="relative">
-            <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-semibold text-gray-800">
+            <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-semibold text-gray-800 sm:h-11 sm:w-11">
               ⋮
               <span className="sr-only">メニュー</span>
             </summary>
@@ -680,24 +685,11 @@ export default function KumaClient() {
               ))}
             </select>
             <span
-              className="flex shrink-0 items-baseline gap-1.5 border-l border-stone-200 bg-white px-2.5 py-1.5 text-stone-600"
+              className="shrink-0 border-l border-stone-200 bg-white px-2.5 py-1.5 tabular-nums text-stone-600"
               aria-label="該当件数"
               suppressHydrationWarning
             >
-              <span className="tabular-nums">
-                {filtered.length.toLocaleString()}件
-              </span>
-              {latestDate && (
-                <>
-                  <span className="text-stone-300">·</span>
-                  <span
-                    className="text-[11px] tabular-nums text-stone-500"
-                    title={`最新事案: ${latestDate}`}
-                  >
-                    {formatLatestDate(latestDate)}更新
-                  </span>
-                </>
-              )}
+              {filtered.length.toLocaleString()}件
             </span>
           </div>
 
