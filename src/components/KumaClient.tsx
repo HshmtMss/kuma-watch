@@ -544,27 +544,41 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ロゴ + 「by 獣医工学ラボ」を一体のブランドユニットとして表示。
-            検索バーは地図上にフロート配置したことで、ここでブランディングに
-            十分なスペースが取れる。タップで /about へ遷移。 */}
+        {/* ロゴ + 「by 獣医工学ラボ」を 1 行で並べたブランドユニット。
+            獣医師監修・獣医工学ラボ運営のシグナルを常時提示する。
+            タップで /about へ。 */}
         <Link
           href="/about"
-          className="flex shrink-0 flex-col items-start leading-none"
+          className="flex shrink-0 items-end gap-1.5 leading-none"
           aria-label="KumaWatch by 獣医工学ラボ"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.png"
             alt="KumaWatch"
-            className="block h-9 w-auto sm:h-10"
+            className="block h-7 w-auto sm:h-8"
           />
-          <span className="mt-1 text-[10px] text-gray-500 sm:text-xs">
+          <span className="pb-0.5 text-[10px] tracking-tight text-gray-500 sm:text-[11px]">
             by{" "}
             <span className="font-semibold text-stone-700">獣医工学ラボ</span>
           </span>
         </Link>
 
         <div className="min-w-0 flex-1" aria-hidden />
+
+        {/* データ更新日: 「最新の事案がいつ起きたか」を控えめなチップで右側に常時表示。
+            モバイル幅でも常時見えるよう sm: 制御は外してある。 */}
+        {latestDate && (
+          <span
+            className="flex shrink-0 items-baseline gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-1 text-[10px] text-stone-600 sm:px-2.5 sm:text-[11px]"
+            title={`最新事案: ${latestDate}`}
+          >
+            <span className="text-stone-400">更新</span>
+            <span className="tabular-nums font-semibold text-stone-800">
+              {formatLatestDate(latestDate)}
+            </span>
+          </span>
+        )}
 
         <div className="flex shrink-0 items-center gap-1.5">
           {/* AI に聞く: クマの顔アイコン + テキスト (コンパクト) */}
@@ -676,11 +690,6 @@ export default function KumaClient() {
               suppressHydrationWarning
             >
               {filtered.length.toLocaleString()}件
-              {latestDate && (
-                <span className="ml-1 text-[11px] text-stone-400">
-                  / {formatLatestDate(latestDate)}更新
-                </span>
-              )}
             </span>
           </div>
 
