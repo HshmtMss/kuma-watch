@@ -417,9 +417,7 @@ export default function AboutPage() {
       <h2 id="operator">運営体制・監修者</h2>
       <p>
         本サイトは <strong>獣医工学ラボ</strong>{" "}
-        によって運営されています。獣医工学ラボは{" "}
-        <strong>リサーチコーディネート株式会社</strong>{" "}
-        が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトで、
+        が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
         <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
       </p>
       <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
@@ -434,27 +432,13 @@ export default function AboutPage() {
           単純な目撃マップではなく、<strong>獣医療の視点で「行動を変えるための情報」</strong>を提供することを目的としています。
         </p>
       </div>
-      <div>
-        <p>
-          <strong>リサーチコーディネート株式会社</strong>
-          <br />
-          〒160-0023 東京都新宿区西新宿1-20-3 西新宿高木ビル8F
-          <br />
-          Web:{" "}
-          <a
-            href="https://www.research-coordinate.co.jp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            research-coordinate.co.jp
-          </a>
-          <br />
-          Email:{" "}
-          <a href="mailto:contact@research-coordinate.co.jp">
-            contact@research-coordinate.co.jp
-          </a>
-        </p>
-      </div>
+
+      <h3 className="mt-6 text-base font-semibold text-stone-900">お問い合わせ・運営法人</h3>
+      <p className="text-sm leading-relaxed">
+        獣医工学ラボは <a href="https://www.research-coordinate.co.jp" target="_blank" rel="noopener noreferrer">リサーチコーディネート株式会社</a> が運営する技術プロジェクトです。お問い合わせは{" "}
+        <a href="mailto:contact@research-coordinate.co.jp">contact@research-coordinate.co.jp</a> まで。
+        住所: 〒160-0023 東京都新宿区西新宿1-20-3 西新宿高木ビル8F。
+      </p>
 
       {/* Final CTA */}
       <div className="not-prose mt-10 flex flex-wrap gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5">

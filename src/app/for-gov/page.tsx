@@ -344,13 +344,13 @@ export default function ForGovPage() {
           className="block rounded-xl border border-stone-200 bg-white p-4 hover:border-blue-400 hover:bg-blue-50/30"
         >
           <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-            運営会社
+            運営者
           </div>
           <div className="mt-1 text-sm font-semibold text-stone-900">
-            リサーチコーディネート株式会社
+            獣医工学ラボ
           </div>
           <div className="mt-1 text-xs text-stone-600">
-            獣医療・野生動物・公衆衛生領域の研究支援を行う技術企業。本サービスは社会実装の一環として運営。
+            獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。リサーチコーディネート株式会社が運営。
           </div>
         </a>
       </div>
