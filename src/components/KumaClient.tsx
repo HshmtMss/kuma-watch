@@ -926,21 +926,21 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 最新事案バッジ: 「いつ・どこの最新事案か」+「直近1週間の件数」を
-            常時提示。loading 中とピッカーモード中はバナー干渉を避けて非表示。 */}
+        {/* 更新日バッジ: 最新事案の発生日 (= データの新しさ) と直近1週間の件数を提示。
+            地点名は地図のピンで見える/タップで遷移できる、というほど明確な動線が
+            無いため、地点名はバッジから外し、件数のサマリだけに絞る。
+            loading 中とピッカーモード中はバナー干渉を避けて非表示。 */}
         {!loading && !pickerMode && recentSummary && (
           <div className="pointer-events-none absolute left-1/2 top-3 z-[900] flex max-w-[calc(100%-12rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
             <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
             <span className="truncate">
-              <span className="font-semibold text-gray-900">最新</span>{" "}
+              <span className="font-semibold text-gray-900">更新</span>{" "}
               <span className="tabular-nums">
                 {formatLatestDate(recentSummary.latest.date)}
-              </span>{" "}
-              {recentSummary.latest.prefectureName}
-              {recentSummary.latest.cityName}
+              </span>
               <span className="mx-1.5 text-gray-300">/</span>
               <span className="tabular-nums">
-                1週間 {recentSummary.count7.toLocaleString()}件
+                直近1週間 {recentSummary.count7.toLocaleString()}件
               </span>
             </span>
           </div>
