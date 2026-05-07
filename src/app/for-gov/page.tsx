@@ -307,7 +307,7 @@ export default function ForGovPage() {
             ["利用料金", "個人・自治体ともに完全無料"],
             ["広告", "なし"],
             ["運営", "獣医工学ラボ（リサーチコーディネート株式会社）"],
-            ["公開開始", "2026 年 4 月（前身「くまもりマップ」を含むと 2024 年〜）"],
+            ["公開開始", "2026 年 4 月"],
           ].map(([k, v]) => (
             <div key={k} className="grid grid-cols-[8rem_1fr] gap-2 px-4 py-2.5">
               <dt className="text-xs font-medium text-stone-500">{k}</dt>

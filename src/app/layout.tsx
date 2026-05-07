@@ -59,7 +59,8 @@ export const metadata: Metadata = {
     "全国 クマ マップ",
     "5kmメッシュ",
     "環境省 クマ データ",
-    "くまもりマップ",
+    "獣医師監修 クマ",
+    "獣医工学ラボ",
   ],
   robots: {
     index: true,
@@ -124,7 +125,6 @@ const webAppSchema = {
   name: SITE_NAME,
   alternateName: [
     "クマウォッチ",
-    "くまもりマップ",
     "クマ出没マップ",
     "全国クマ出没予報",
     "Bear Alert Map",
@@ -171,14 +171,6 @@ const faqSchema = {
       acceptedAnswer: {
         "@type": "Answer",
         text: "KumaWatch は、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没警戒レベルを予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "旧サイト「くまもりマップ」とはどんな関係ですか？",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "「くまもりマップ」は KumaWatch の旧サービス名です。他社サービスとの名称重複を避けるためリブランドしました。機能は刷新されており、従来の 5km メッシュ警戒レベルに加えて、気象・時間帯を踏まえた予報機能が加わっています。",
       },
     },
     {
