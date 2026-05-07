@@ -414,10 +414,16 @@ export default function KumaMap({
       // モバイルはタップ領域を確保するためピンを大きく描く (Apple HIG: 最低 44pt の指針)。
       // canvas renderer は描画半径がそのままヒット判定に使われるので、
       // 視覚サイズを上げることが押しやすさにも直結する。
+      // さらに、ズームインしたときは混雑が減るので半径を 1.5〜2.0 倍にして
+      // 親指でも確実に拾えるサイズへ。低ズームは大量描画を避けるため等倍。
       const isNarrow =
         typeof window !== "undefined" ? window.innerWidth < 768 : false;
-      const rSingle = isNarrow ? 8 : 5;
-      const rMulti = isNarrow ? 10 : 6;
+      const z = map.getZoom();
+      const zoomBoost = z >= 13 ? 2.0 : z >= 11 ? 1.5 : 1.0;
+      const baseSingle = isNarrow ? 8 : 5;
+      const baseMulti = isNarrow ? 10 : 6;
+      const rSingle = Math.round(baseSingle * zoomBoost);
+      const rMulti = Math.round(baseMulti * zoomBoost);
       const borderWeight = isNarrow ? 1.6 : 1.2;
       // bounds 内のレコードを先に集めてから均等サンプリング。
       // recs は日付降順ソート済み。早い者勝ち break で打ち切ると、
@@ -691,6 +697,38 @@ export default function KumaMap({
       map.on("moveend", persist);
       map.on("zoomend", persist);
       map.on("click", (e: LeafletMouseEvent) => {
+        // 周辺 30px 以内に出没ピンがあれば、そのピンの popup を開く。
+        // canvas renderer のヒット領域は描画半径そのままで小さく拾いづらいため、
+        // 視覚は維持したままタップ判定だけ広げる「スナップ」を入れる。
+        const recs = recordsRef.current;
+        if (recs.length > 0) {
+          const SNAP_PX = 30;
+          const clickPx = map.latLngToContainerPoint(e.latlng);
+          const bounds = map.getBounds();
+          const south = bounds.getSouth();
+          const north = bounds.getNorth();
+          const west = bounds.getWest();
+          const east = bounds.getEast();
+          let bestRec: KumaRecord | null = null;
+          let bestDistSq = SNAP_PX * SNAP_PX;
+          for (const r of recs) {
+            if (r.lat < south || r.lat > north) continue;
+            if (r.lon < west || r.lon > east) continue;
+            const px = map.latLngToContainerPoint([r.lat, r.lon]);
+            const dx = px.x - clickPx.x;
+            const dy = px.y - clickPx.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq <= bestDistSq) {
+              bestRec = r;
+              bestDistSq = distSq;
+            }
+          }
+          if (bestRec) {
+            const matched = bestRec;
+            import("leaflet").then((LL) => showRecordPopup(LL, matched));
+            return;
+          }
+        }
         const cb = onMapClickRef.current;
         if (cb) cb(e.latlng.lat, e.latlng.lng);
       });

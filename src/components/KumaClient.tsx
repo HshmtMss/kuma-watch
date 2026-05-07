@@ -21,7 +21,6 @@ import RiskPanel, {
 import AskBox from "@/components/AskBox";
 import TopWeatherBadge from "@/components/TopWeatherBadge";
 import SettingsPanel from "@/components/SettingsPanel";
-import { loadMeshPayload } from "@/lib/mesh-data";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
   RISK_LEVEL_COLOR,
@@ -38,6 +37,9 @@ const HEATMAP_OPACITY_KEY = "kumaWatch.heatmapOpacity";
 const SMOOTHING_SIGMA_KEY = "kumaWatch.smoothingSigmaKm";
 const HALO_OPACITY_KEY = "kumaWatch.haloOpacity";
 const LEVEL_THRESHOLDS_KEY = "kumaWatch.levelThresholds";
+// 初訪問のみ凡例を自動展開するためのフラグ。一度開いたら以降は記憶し、
+// ヒートマップの色の意味を初見ユーザーに即座に伝える。
+const LEGEND_SEEN_KEY = "kumaWatch.legendSeen";
 const DEFAULT_TILE_STYLE: TileStyle = "standard";
 const DEFAULT_HEATMAP_OPACITY = 0.5;
 const DEFAULT_SMOOTHING_SIGMA_KM = 1; // 微 (3×3) で穴埋めをデフォルト ON
@@ -71,6 +73,13 @@ function computeCutoff(days: number | null): string | null {
   return d.toISOString().slice(0, 10);
 }
 
+// "2026-05-05" → "5/5"。年は省略してバッジを短く。
+function formatLatestDate(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return iso;
+  return `${Number(m[2])}/${Number(m[3])}`;
+}
+
 export default function KumaClient() {
   const [records, setRecords] = useState<KumaRecord[]>([]);
   const [, setTotal] = useState(0);
@@ -95,7 +104,6 @@ export default function KumaClient() {
     lon: number;
   } | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [, setMeshGeneratedAt] = useState<string | null>(null);
   const [sightingCountByMesh, setSightingCountByMesh] = useState<
     Map<string, number> | undefined
   >(undefined);
@@ -283,6 +291,22 @@ export default function KumaClient() {
     if (params.get("admin") === "1") {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL flag check
       setIsAdmin(true);
+    }
+  }, []);
+
+  // 初訪問のみ凡例を自動オープン: ヒートマップの色が何を意味するのか
+  // 初見ユーザーにすぐ伝えるため。一度でも見たら以降はユーザー判断に委ねる。
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const seen = window.localStorage.getItem(LEGEND_SEEN_KEY);
+      if (!seen) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- first-visit only
+        setShowLegend(true);
+        window.localStorage.setItem(LEGEND_SEEN_KEY, "1");
+      }
+    } catch {
+      /* ignore */
     }
   }, []);
   const handleMapClick = useCallback((lat: number, lon: number) => {
@@ -491,19 +515,6 @@ export default function KumaClient() {
     };
   }, []);
 
-  // mesh.json の generatedAt を取得して 更新日 バナー用に保持
-  useEffect(() => {
-    let cancelled = false;
-    loadMeshPayload()
-      .then((p) => {
-        if (!cancelled) setMeshGeneratedAt(p.generatedAt ?? null);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   // 過去 1 年の目撃をメッシュ別に集計したマップ。
   // ヒートマップとカード両方で「危険度の格上げ」に使い、視覚と数値を完全一致させる。
   useEffect(() => {
@@ -533,6 +544,23 @@ export default function KumaClient() {
       return prefOk && periodOk;
     });
   }, [records, selectedPref, periodCutoff, showPins]);
+
+  // 直近の事案サマリ: 「最新の事案がいつ・どこか」+「直近1週間の件数」を
+  // 地図トップに表示するため。期間フィルタの影響を受けないよう records から計算
+  // する (3ヶ月期間でも「いま現在のクマ動向」が伝わるように)。
+  const recentSummary = useMemo(() => {
+    if (!records.length) return null;
+    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    let count7 = 0;
+    for (const r of records) {
+      if (r.date >= weekAgoIso) count7++;
+    }
+    // records は /api/kuma で日付降順ソート済み
+    const latest = records[0];
+    return { count7, latest };
+  }, [records]);
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
@@ -908,6 +936,26 @@ export default function KumaClient() {
           <div className="pointer-events-none absolute left-1/2 top-3 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
             <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
             出没データ取得中...
+          </div>
+        )}
+
+        {/* 最新事案バッジ: 「いつ・どこの最新事案か」+「直近1週間の件数」を
+            常時提示。loading 中とピッカーモード中はバナー干渉を避けて非表示。 */}
+        {!loading && !pickerMode && recentSummary && (
+          <div className="pointer-events-none absolute left-1/2 top-3 z-[900] flex max-w-[calc(100%-12rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
+            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+            <span className="truncate">
+              <span className="font-semibold text-gray-900">最新</span>{" "}
+              <span className="tabular-nums">
+                {formatLatestDate(recentSummary.latest.date)}
+              </span>{" "}
+              {recentSummary.latest.prefectureName}
+              {recentSummary.latest.cityName}
+              <span className="mx-1.5 text-gray-300">/</span>
+              <span className="tabular-nums">
+                1週間 {recentSummary.count7.toLocaleString()}件
+              </span>
+            </span>
           </div>
         )}
 
