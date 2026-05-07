@@ -99,7 +99,7 @@ const APP_SCHEMA = {
     priceCurrency: "JPY",
   },
   description:
-    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを予報する無料の Web サービス。",
+    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを予報する獣医師監修の無料 Web サービス。",
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -117,6 +117,15 @@ const APP_SCHEMA = {
         addressCountry: "JP",
       },
     },
+  },
+  // 信頼性シグナル: 獣医師監修であることを構造化データでも明示。
+  // Google の品質評価 (E-E-A-T) における Expertise / Trust に寄与する。
+  reviewedBy: {
+    "@type": "Organization",
+    name: "獣医工学ラボ",
+    description:
+      "リサーチコーディネート株式会社が運営する、獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト",
+    url: "https://www.research-coordinate.co.jp",
   },
 };
 
@@ -409,13 +418,26 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <h2>運営者情報</h2>
+      <h2 id="operator">運営体制・監修者</h2>
       <p>
         本サイトは <strong>獣医工学ラボ</strong>{" "}
         によって運営されています。獣医工学ラボは{" "}
         <strong>リサーチコーディネート株式会社</strong>{" "}
-        が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
+        が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトで、
+        <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
       </p>
+      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        <p className="mb-2 flex items-center gap-2 text-base font-semibold">
+          <span aria-hidden>🩺</span>
+          <span>獣医師監修プロジェクト</span>
+        </p>
+        <p className="leading-relaxed">
+          クマの生態・人獣共通感染症・公衆衛生のリスク評価は、本来「獣医学」の領域です。
+          本サイトでは、データの取り込みから警戒レベル算出、記事の編集に至るまで
+          <strong>獣医師の知見をもって監修</strong>しています。
+          単純な目撃マップではなく、<strong>獣医療の視点で「行動を変えるための情報」</strong>を提供することを目的としています。
+        </p>
+      </div>
       <div>
         <p>
           <strong>リサーチコーディネート株式会社</strong>

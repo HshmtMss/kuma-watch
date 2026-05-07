@@ -1,15 +1,19 @@
 name: Refresh sightings data
 
-# 日次で 67 自治体ソース + Sharp9110 を集約し、
-# 差分があれば public/data/sightings.json を更新コミットして
-# Vercel の自動デプロイをトリガーする。
+# 1日 2 回 67 自治体ソース + Sharp9110 を集約し、差分があれば
+# public/data/sightings.json を更新コミットして Vercel の自動デプロイをトリガーする。
 #
 # 手動実行は GitHub UI の "Run workflow" ボタンから可能。
 
 on:
   schedule:
-    # UTC 18:00 = JST 03:00。深夜帯で自治体サイトへの負荷を抑える。
-    - cron: '0 18 * * *'
+    # 1日 2 回。朝の登山・通学前と夕方の翌日プラン時にデータ反映を間に合わせる。
+    # UTC 18:00 = JST 03:00 (早朝バッチ・深夜帯で自治体側負荷を最小化)
+    # UTC 06:00 = JST 15:00 (午後バッチ・当日の昼前掲載分を取り込む)
+    # 1 run ≒ 20 min × 2 回/日 ≒ 1,200 min/月、private repo の Actions
+    # 無料枠 (2,000 min) の範囲内。さらに高頻度化したい場合は repo を
+    # public にすれば Actions 分数は実質無制限。
+    - cron: '0 6,18 * * *'
   workflow_dispatch: {}
 
 # git push に必要

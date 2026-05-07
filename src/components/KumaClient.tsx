@@ -553,6 +553,18 @@ export default function KumaClient() {
           />
         </Link>
 
+        {/* 獣医師監修バッジ: 獣医工学ラボ運営の信頼性を控えめに提示する。
+            タップで /about (運営体制セクション) へ。 */}
+        <Link
+          href="/about#operator"
+          className="hidden h-7 shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 text-[11px] font-semibold text-emerald-800 hover:bg-emerald-100 sm:inline-flex"
+          aria-label="獣医師監修 (運営: 獣医工学ラボ)"
+          title="獣医師監修 (運営: 獣医工学ラボ)"
+        >
+          <span aria-hidden>🩺</span>
+          <span>獣医師監修</span>
+        </Link>
+
         <div className="min-w-0 flex-1">
           <PlaceSearch compact onPick={handleSearchPick} />
         </div>
@@ -609,6 +621,18 @@ export default function KumaClient() {
                   ))}
                 </div>
               </div>
+              {/* モバイルでも「獣医師監修」が見える動線。sm 以上ではヘッダー
+                  右側の chip と冗長になるので、small チップで運営者を示す */}
+              <a
+                href="/about#operator"
+                className="flex items-center justify-between border-b border-gray-100 px-3 py-2.5 text-gray-800 hover:bg-gray-100 sm:hidden"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span aria-hidden>🩺</span>
+                  <span className="text-sm">獣医師監修</span>
+                </span>
+                <span className="text-xs text-gray-500">獣医工学ラボ</span>
+              </a>
               <a href="/articles" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
                 記事 (クマ対策)
               </a>
