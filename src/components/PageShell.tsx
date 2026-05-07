@@ -11,25 +11,38 @@ type Props = {
 export default function PageShell({ title, lead, children }: Props) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="flex items-center justify-between border-b border-black/8 bg-white px-5 py-3 shadow-sm">
-        <Link href="/" className="flex items-center gap-3" aria-label="KumaWatch">
+      <header className="flex items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm sm:px-5 sm:py-3">
+        {/* ブランドロックアップ: トップページ (KumaClient) と同じ和名 + 監修者の
+            2 段組。ブランドの「獣医師監修」シグナルを全ページで一貫させるため、
+            タップ先は `/`(地図トップ) に統一。 */}
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2"
+          aria-label="くまウォッチ by 獣医工学ラボ"
+        >
           <Image
             src="/logo.png"
             alt="KumaWatch"
             width={120}
             height={36}
             priority
-            className="h-9 w-auto"
-            style={{ width: "auto", height: "2.25rem" }}
+            className="h-7 w-auto sm:h-8"
+            style={{ width: "auto", height: "auto" }}
           />
-          <div className="hidden sm:block">
-            <div className="text-xs text-gray-500">全国クマ警戒レベルマップ</div>
-          </div>
+          <span className="flex flex-col leading-tight">
+            <span className="text-[13px] font-bold tracking-tight text-stone-900 sm:text-sm">
+              くまウォッチ
+            </span>
+            <span className="text-[11px] text-stone-500 sm:text-xs">
+              by{" "}
+              <span className="font-semibold text-stone-700">獣医工学ラボ</span>
+            </span>
+          </span>
         </Link>
-        <nav className="flex items-center gap-3 text-xs text-gray-600">
+        <nav className="flex shrink-0 items-center gap-3 text-xs text-gray-600">
           <Link href="/" className="hover:text-gray-900">地図</Link>
           <Link href="/articles" className="hover:text-gray-900">記事</Link>
-          <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>
+          <Link href="/for-gov" className="hidden hover:text-gray-900 sm:inline">自治体の方へ</Link>
         </nav>
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8 sm:py-10">
