@@ -630,12 +630,12 @@ export default function KumaClient() {
             className="block h-7 w-auto sm:h-8"
           />
           <span className="flex flex-col leading-tight">
-            <span className="text-[13px] font-bold tracking-tight text-stone-900 sm:text-sm">
+            <span className="text-[13px] font-semibold tracking-tight text-stone-900 sm:text-sm">
               くまウォッチ
             </span>
             <span className="text-[11px] text-stone-500 sm:text-xs">
               by{" "}
-              <span className="font-semibold text-stone-700">獣医工学ラボ</span>
+              <span className="font-medium text-stone-700">獣医工学ラボ</span>
             </span>
           </span>
         </Link>

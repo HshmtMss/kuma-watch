@@ -6,7 +6,7 @@ import PageShell from "@/components/PageShell";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "KumaWatch（クマウォッチ）— 全国クマ出没予報・警戒レベルマップ",
+  title: "KumaWatch（くまウォッチ）— 全国クマ出没予報・警戒レベルマップ",
   description:
     "全国 47 都道府県のクマ出没情報を 70 以上の公式ソースから自動集約し、5km メッシュ単位の警戒レベルマップで予報する無料 Web サービス。登山・キャンプ・通勤前の安全確認に。登録不要・スマホ対応。",
   keywords: [
@@ -72,7 +72,7 @@ const APP_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "KumaWatch",
-  alternateName: ["クマウォッチ", "kuma-watch.jp"],
+  alternateName: ["くまウォッチ", "kuma-watch.jp"],
   url: SITE_URL,
   applicationCategory: ["UtilitiesApplication", "MapApplication"],
   operatingSystem: "Any",
@@ -116,7 +116,7 @@ const APP_SCHEMA = {
 export default function AboutPage() {
   return (
     <PageShell
-      title="KumaWatch（クマウォッチ）について"
+      title="KumaWatch（くまウォッチ）について"
       lead="全国のクマ出没情報を 1 つの地図に。登山・キャンプ・通勤前の「行く前 30 秒チェック」を支える無料の予報サービスです。"
     >
       <script

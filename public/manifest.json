@@ -1,5 +1,5 @@
 {
-  "name": "KumaWatch（クマウォッチ）- 全国クマ出没予報",
+  "name": "KumaWatch（くまウォッチ）- 全国クマ出没予報",
   "short_name": "KumaWatch",
   "description": "全国のクマ出没情報を可視化し、5kmメッシュ単位で危険度を予報する無料の Web アプリ。現在地や旅先の安全確認にご利用ください。",
   "start_url": "/",

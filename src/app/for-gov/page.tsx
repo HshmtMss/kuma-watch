@@ -250,7 +250,7 @@ export default function ForGovPage() {
       <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
         <dl className="divide-y divide-stone-200 text-sm">
           {[
-            ["サービス名", "KumaWatch（クマウォッチ）"],
+            ["サービス名", "KumaWatch（くまウォッチ）"],
             ["URL", "https://kuma-watch.jp"],
             ["提供形態", "Web サービス（PC・スマホ対応／インストール不要）"],
             ["カバー範囲", "全国 47 都道府県／毎日自動更新"],

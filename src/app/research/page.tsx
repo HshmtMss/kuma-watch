@@ -127,7 +127,7 @@ export default function ResearchIndexPage() {
               className="text-blue-700 underline"
             >リサーチコーディネート株式会社</a>
             が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
-            KumaWatch（クマウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し
+            KumaWatch（くまウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し
             可視化することで、人と野生動物の境界における事故リスクの低減に取り組んでいます。
           </p>
           <p className="mt-2">

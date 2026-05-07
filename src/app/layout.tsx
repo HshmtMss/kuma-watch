@@ -7,9 +7,9 @@ import WebVitalsReporter from "@/components/WebVitalsReporter";
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
 const SITE_TITLE =
-  "KumaWatch（クマウォッチ）｜全国クマ警戒レベルマップ｜登山・キャンプの安全確認";
+  "KumaWatch（くまウォッチ）｜全国クマ警戒レベルマップ｜登山・キャンプの安全確認";
 const SITE_DESCRIPTION =
-  "KumaWatch（クマウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の警戒レベル確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
+  "KumaWatch（くまウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の警戒レベル確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
 const GA_ID = "G-GCT59LNNZ2";
 
 const geistSans = Geist({
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   generator: "Next.js",
   keywords: [
     "KumaWatch",
-    "クマウォッチ",
+    "くまウォッチ",
     "クマ出没予報",
     "クマ出没マップ",
     "熊出没情報",
@@ -92,13 +92,13 @@ export const metadata: Metadata = {
         url: "/icons/Icon-512.png",
         width: 512,
         height: 512,
-        alt: "KumaWatch（クマウォッチ）",
+        alt: "KumaWatch（くまウォッチ）",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "KumaWatch（クマウォッチ）｜全国クマ出没予報",
+    title: "KumaWatch（くまウォッチ）｜全国クマ出没予報",
     description:
       "全国のクマ出没情報をリアルタイム可視化。5kmメッシュの警戒レベル予報で登山・キャンプの安全確認に。",
     images: ["/icons/Icon-512.png"],
@@ -124,7 +124,7 @@ const webAppSchema = {
   "@type": "WebApplication",
   name: SITE_NAME,
   alternateName: [
-    "クマウォッチ",
+    "くまウォッチ",
     "クマ出没マップ",
     "全国クマ出没予報",
     "Bear Alert Map",
@@ -167,7 +167,7 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "KumaWatch（クマウォッチ）とはどんなサービスですか？",
+      name: "KumaWatch（くまウォッチ）とはどんなサービスですか？",
       acceptedAnswer: {
         "@type": "Answer",
         text: "KumaWatch は、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没警戒レベルを予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
