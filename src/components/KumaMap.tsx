@@ -442,7 +442,14 @@ export default function KumaMap({
               inBounds[Math.floor((i * inBounds.length) / maxPins)],
             );
       for (const r of toRender) {
-        const color = r.headCount > 1 ? "#ef4444" : "#6b7280";
+        // 報道由来 (isOfficial=false) はオレンジ系で「未確認」を示唆。
+        // 公式は従来通り 1 頭=灰 / 2 頭以上=赤の頭数強調。
+        const isNews = r.isOfficial === false;
+        const color = isNews
+          ? "#f59e0b"
+          : r.headCount > 1
+            ? "#ef4444"
+            : "#6b7280";
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
           radius: r.headCount > 1 ? rMulti : rSingle,
           color: "#ffffff",
@@ -470,11 +477,22 @@ export default function KumaMap({
     if (!popupRef.current) {
       popupRef.current = L.popup({ maxWidth: 280, autoPan: true });
     }
+    // 信頼性バッジ: isOfficial が明示的に false のものだけ「報道」と表示し、
+    // それ以外 (true・undefined) は公式情報として扱う。undefined は旧
+    // スナップショットの後方互換 (公式由来のみだった頃のデータ) のため。
+    const isNews = r.isOfficial === false;
+    const sourceBadge = isNews
+      ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
+      : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
+    const sourceLink = r.sourceUrl
+      ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`
+      : "";
     const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
-      <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>
+      <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
       <div>📅 ${escapeHtml(r.date)}</div><div>🔢 ${r.headCount}頭</div>
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
+      ${sourceLink}
     </div>`;
     popupRef.current.setLatLng([r.lat, r.lon]).setContent(html).openOn(map);
   };

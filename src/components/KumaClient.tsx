@@ -967,10 +967,13 @@ export default function KumaClient() {
             <div className="mb-2">
               <div className="mb-1 text-xs text-gray-500">ピン</div>
               <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭（公式）
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上（公式）
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
               </div>
             </div>
             <div>

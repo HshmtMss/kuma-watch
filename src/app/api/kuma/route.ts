@@ -16,6 +16,11 @@ export type KumaRecord = {
   comment: string;
   headCount: number;
   source?: string;
+  // 公式情報源 (自治体・警察) なら true、ニュース報道など二次情報源は false。
+  // 未指定 (旧スナップショット由来) は UI 側で「公式扱い」にフォールバック。
+  isOfficial?: boolean;
+  // ニュース取り込み等で元記事 URL を保持する。Popup の「詳細」リンク用。
+  sourceUrl?: string;
 };
 
 const DEFAULT_LIMIT = 8000;
@@ -33,6 +38,8 @@ function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     comment: s.comment,
     headCount: s.headCount,
     source: s.source,
+    isOfficial: s.isOfficial,
+    sourceUrl: s.sourceUrl,
   };
 }
 

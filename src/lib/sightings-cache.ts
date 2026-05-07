@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fetchAllOfficialSightings } from "@/lib/sources/aggregate";
 import { getSharp9110Sightings } from "@/lib/sources/all-records";
+import { fetchNewsSightings } from "@/lib/sources/news";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
@@ -95,13 +96,21 @@ function writeDiskCache(records: UnifiedSighting[]): void {
 }
 
 export async function aggregateAllSightings(): Promise<UnifiedSighting[]> {
-  const [sharp, official] = await Promise.all([
+  // 公式系 (sharp9110 + 自治体) と報道系 (Google News) を並列で集約。
+  // 報道系は失敗しても全体を倒さないよう catch で空配列にフォールバック。
+  // isOfficial は news.ts で false を明示。それ以外 (sharp9110 / 自治体) は
+  // undefined のまま流し、UI 側で「未指定 = 公式扱い」のデフォルトに任せる。
+  // 全レコードに isOfficial: true を埋めると sightings.json が 1MB 近く
+  // 肥大化するため、付与は news 由来 (false) のみに限定する。
+  const [sharp, official, news] = await Promise.all([
     getSharp9110Sightings().catch(() => [] as UnifiedSighting[]),
     fetchAllOfficialSightings().catch(() => [] as UnifiedSighting[]),
+    fetchNewsSightings().catch(() => [] as UnifiedSighting[]),
   ]);
   const all: UnifiedSighting[] = [
     ...sharp.map((s) => ({ ...s, source: "sharp9110" })),
     ...official,
+    ...news,
   ];
   writeDiskCache(all);
   return all;
