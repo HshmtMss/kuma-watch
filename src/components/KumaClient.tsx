@@ -544,12 +544,12 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ブランドユニット: 既存ロゴ画像 + 「by 獣医工学ラボ」を 1 行で。
-            獣医師監修・獣医工学ラボ運営のシグナルを常時提示する。タップで /about へ。 */}
+        {/* ブランドロックアップ: ロゴ画像 + 「くまウォッチ / by 獣医工学ラボ」の
+            2 段組。和名で監修者が一目で読み取れるサイズ感に整え、タップで /about へ。 */}
         <Link
           href="/about"
-          className="flex shrink-0 items-end gap-1.5 leading-none"
-          aria-label="KumaWatch by 獣医工学ラボ"
+          className="flex shrink-0 items-center gap-2"
+          aria-label="くまウォッチ by 獣医工学ラボ"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -557,34 +557,25 @@ export default function KumaClient() {
             alt="KumaWatch"
             className="block h-7 w-auto sm:h-8"
           />
-          <span className="pb-0.5 text-[11px] tracking-tight text-stone-500 sm:text-xs">
-            by{" "}
-            <span className="font-semibold text-stone-700">獣医工学ラボ</span>
+          <span className="flex flex-col leading-tight">
+            <span className="text-[13px] font-bold tracking-tight text-stone-900 sm:text-sm">
+              くまウォッチ
+            </span>
+            <span className="text-[11px] text-stone-500 sm:text-xs">
+              by{" "}
+              <span className="font-semibold text-stone-700">獣医工学ラボ</span>
+            </span>
           </span>
         </Link>
 
         <div className="min-w-0 flex-1" aria-hidden />
 
-        {/* データ更新日: 「最新の事案がいつ起きたか」を控えめなチップで右側に常時表示。
-            ヘッダー右の余白を埋めつつ、モバイルでも判読できるサイズ感に。 */}
-        {latestDate && (
-          <span
-            className="flex shrink-0 items-baseline gap-1 rounded-full border border-stone-200 bg-stone-50 px-2 py-1 text-[11px] text-stone-600 sm:px-2.5 sm:text-xs"
-            title={`最新事案: ${latestDate}`}
-          >
-            <span className="text-stone-400">更新</span>
-            <span className="tabular-nums font-semibold text-stone-800">
-              {formatLatestDate(latestDate)}
-            </span>
-          </span>
-        )}
-
         <div className="flex shrink-0 items-center gap-1.5">
-          {/* AI に聞く: クマの顔アイコン + テキスト。
-              スマホでもテキストを常時表示し、機能を見つけやすくする。 */}
+          {/* AI に聞く: クマの顔アイコン + テキスト。スマホでも常時テキスト表示。
+              ヘッダー余白を活かし、横幅と pad を広めに取って押しやすく。 */}
           <button
             onClick={() => setShowChat(true)}
-            className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 sm:h-11 sm:px-3 sm:text-sm"
+            className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3.5 text-[13px] font-semibold text-amber-800 hover:bg-amber-100 sm:h-11 sm:px-5 sm:text-sm"
             aria-label="AI に質問"
             title="AI に質問"
           >
@@ -594,7 +585,7 @@ export default function KumaClient() {
               width={24}
               height={24}
               aria-hidden
-              style={{ width: "1.25rem", height: "auto" }}
+              style={{ width: "1.5rem", height: "auto" }}
             />
             <span>AI に聞く</span>
           </button>
@@ -715,15 +706,26 @@ export default function KumaClient() {
       </div>
 
       <div className="relative flex-1 min-h-0">
-        {/* 検索バーを地図上にフロート配置。ヘッダーから移したことで、
-            ロゴ + by 獣医工学ラボ が常時しっかり見える。
-            top-3 で天気バッジの右横と並ぶことを避けるため右側に余白を確保。
-            ピッカーモード中はバナーと干渉するので非表示。 */}
+        {/* 検索バーを地図上にフロート配置。ピッカーモード中はバナーと干渉するので非表示。 */}
         {!pickerMode && (
           <div className="pointer-events-none absolute inset-x-3 top-3 z-[950] flex">
             <div className="pointer-events-auto w-full max-w-2xl rounded-full bg-white shadow-md ring-1 ring-black/5">
               <PlaceSearch compact onPick={handleSearchPick} />
             </div>
+          </div>
+        )}
+
+        {/* データ更新日: 検索バーの真下、地図左上に控えめな chip で常時表示。
+            「いつ更新されたか」のシグナルを地図のコンテキスト内に置く。 */}
+        {!loading && !pickerMode && latestDate && (
+          <div
+            className="pointer-events-none absolute left-3 top-16 z-[900] flex items-baseline gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] text-stone-600 shadow-sm backdrop-blur sm:text-xs"
+            title={`最新事案: ${latestDate}`}
+          >
+            <span className="text-stone-400">更新</span>
+            <span className="tabular-nums font-semibold text-stone-800">
+              {formatLatestDate(latestDate)}
+            </span>
           </div>
         )}
 
