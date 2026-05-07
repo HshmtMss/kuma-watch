@@ -545,8 +545,8 @@ export default function KumaClient() {
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
         {/* ロゴ + 「by 獣医工学ラボ」を一体のブランドユニットとして表示。
-            獣医師監修・獣医工学ラボ運営という強みを、別ページへの遷移なしに
-            常時提示するための一体型レイアウト。タップで /about へ遷移。 */}
+            検索バーは地図上にフロート配置したことで、ここでブランディングに
+            十分なスペースが取れる。タップで /about へ遷移。 */}
         <Link
           href="/about"
           className="flex shrink-0 flex-col items-start leading-none"
@@ -556,17 +556,15 @@ export default function KumaClient() {
           <img
             src="/logo.png"
             alt="KumaWatch"
-            className="block h-7 w-auto sm:h-8"
+            className="block h-9 w-auto sm:h-10"
           />
-          <span className="mt-0.5 text-[8.5px] text-gray-500 sm:text-[9px]">
+          <span className="mt-1 text-[10px] text-gray-500 sm:text-xs">
             by{" "}
             <span className="font-semibold text-stone-700">獣医工学ラボ</span>
           </span>
         </Link>
 
-        <div className="min-w-0 flex-1">
-          <PlaceSearch compact onPick={handleSearchPick} />
-        </div>
+        <div className="min-w-0 flex-1" aria-hidden />
 
         <div className="flex shrink-0 items-center gap-1.5">
           {/* AI に聞く: クマの顔アイコン + テキスト (コンパクト) */}
@@ -678,6 +676,11 @@ export default function KumaClient() {
               suppressHydrationWarning
             >
               {filtered.length.toLocaleString()}件
+              {latestDate && (
+                <span className="ml-1 text-[11px] text-stone-400">
+                  / {formatLatestDate(latestDate)}更新
+                </span>
+              )}
             </span>
           </div>
 
@@ -703,6 +706,18 @@ export default function KumaClient() {
       </div>
 
       <div className="relative flex-1 min-h-0">
+        {/* 検索バーを地図上にフロート配置。ヘッダーから移したことで、
+            ロゴ + by 獣医工学ラボ が常時しっかり見える。
+            top-3 で天気バッジの右横と並ぶことを避けるため右側に余白を確保。
+            ピッカーモード中はバナーと干渉するので非表示。 */}
+        {!pickerMode && (
+          <div className="pointer-events-none absolute inset-x-3 top-3 z-[950] flex">
+            <div className="pointer-events-auto w-full max-w-2xl rounded-full bg-white shadow-md ring-1 ring-black/5">
+              <PlaceSearch compact onPick={handleSearchPick} />
+            </div>
+          </div>
+        )}
+
         <KumaMap
           records={filtered}
           showHeatmap={showHeatmap}
@@ -923,20 +938,12 @@ export default function KumaClient() {
         )}
 
         {loading && (
-          <div className="pointer-events-none absolute left-1/2 top-3 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
+          <div className="pointer-events-none absolute left-1/2 top-16 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
             <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
             出没データ取得中...
           </div>
         )}
 
-        {/* 更新日バッジ: データの新しさを左上に控えめに常時表示。
-            件数や地点名は出さず、「いつ更新されたか」だけを伝える。
-            loading 中とピッカーモード中はバナー干渉を避けて非表示。 */}
-        {!loading && !pickerMode && latestDate && (
-          <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2 py-0.5 text-[10px] tabular-nums text-gray-600 shadow-sm backdrop-blur">
-            更新 {formatLatestDate(latestDate)}
-          </div>
-        )}
 
 
         {showLegend && (

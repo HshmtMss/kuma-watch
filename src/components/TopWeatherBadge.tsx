@@ -38,7 +38,7 @@ export default function TopWeatherBadge({ lat, lon }: Props) {
 
   return (
     <div
-      className="pointer-events-none absolute right-3 top-3 z-[940] flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1.5 text-sm font-medium text-gray-700 shadow backdrop-blur sm:text-xs"
+      className="pointer-events-none absolute right-3 top-16 z-[940] flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1.5 text-sm font-medium text-gray-700 shadow backdrop-blur sm:text-xs"
       title={
         weather
           ? `${weatherCodeLabel(weather.weatherCode)} / 気温 ${weather.tempC.toFixed(1)}℃ / 降水 ${weather.precipMm}mm`
