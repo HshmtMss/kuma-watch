@@ -497,6 +497,78 @@ export default function KumaClient() {
     };
   }, []);
 
+  // C1: 5 分間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
+  // タブ非表示中はポーリングを停止し、再表示時に即時 1 回チェック。
+  // 期間フィルタ (periodCutoff) と filtered の母集団に揃えるため、from を渡す。
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const POLL_MS = 5 * 60 * 1000;
+    let timer: number | null = null;
+
+    async function checkForNew() {
+      // 既存 records と同じ条件で取得
+      const limit =
+        periodDays === null
+          ? 100000
+          : periodDays >= 365
+            ? 50000
+            : periodDays >= 90
+              ? 15000
+              : periodDays >= 30
+                ? 5000
+                : 2000;
+      const params = new URLSearchParams({ limit: String(limit) });
+      if (periodCutoff) params.set("from", periodCutoff);
+      try {
+        const r = await fetch(`/api/kuma?${params.toString()}`);
+        if (!r.ok) return;
+        const data = (await r.json()) as { records?: KumaRecord[] };
+        const next = Array.isArray(data.records) ? data.records : [];
+        // 既存にない id を新着として抽出
+        const known = new Set(records.map((rec) => rec.id));
+        const fresh = next.filter((rec) => !known.has(rec.id));
+        if (fresh.length > 0) {
+          setRecords(next);
+          setCopyToast(`新着 ${fresh.length} 件`);
+          window.setTimeout(() => setCopyToast(null), 3000);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+
+    function start() {
+      stop();
+      timer = window.setInterval(() => {
+        if (document.visibilityState === "visible") checkForNew();
+      }, POLL_MS);
+    }
+    function stop() {
+      if (timer != null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    }
+    function onVis() {
+      if (document.visibilityState === "visible") {
+        // 復帰時は即座に 1 回チェックしてからポーリング再開
+        checkForNew();
+        start();
+      } else {
+        stop();
+      }
+    }
+
+    start();
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+    // records の中身ごとに再購読すると無限ループになるので、長さだけを依存に。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodCutoff, periodDays, records.length]);
+
   // 過去 1 年の目撃をメッシュ別に集計したマップ。
   // ヒートマップとカード両方で「危険度の格上げ」に使い、視覚と数値を完全一致させる。
   useEffect(() => {

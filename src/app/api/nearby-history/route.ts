@@ -48,6 +48,8 @@ export async function GET(req: Request) {
     comment: string;
     headCount: number;
     distanceKm: number;
+    isOfficial?: boolean;
+    sourceUrl?: string;
   };
 
   let count365 = 0;
@@ -72,6 +74,8 @@ export async function GET(req: Request) {
         comment: s.comment ?? "",
         headCount: s.headCount ?? 1,
         distanceKm: d,
+        isOfficial: s.isOfficial,
+        sourceUrl: s.sourceUrl,
       });
     }
   }

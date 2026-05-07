@@ -45,7 +45,14 @@ export type SelectedLocation = {
 
 type NearbyRecent = Pick<
   KumaRecord,
-  "id" | "date" | "cityName" | "sectionName" | "comment" | "headCount"
+  | "id"
+  | "date"
+  | "cityName"
+  | "sectionName"
+  | "comment"
+  | "headCount"
+  | "isOfficial"
+  | "sourceUrl"
 > & { distanceKm: number };
 
 function cutoffDate(days: number | null): string | null {
@@ -224,6 +231,8 @@ function computeNearbyFromRecords(
         sectionName: s.sectionName,
         comment: s.comment,
         headCount: s.headCount,
+        isOfficial: s.isOfficial,
+        sourceUrl: s.sourceUrl,
         distanceKm: d,
       });
     }
@@ -933,22 +942,47 @@ function RiskDetails({
             🕓 直近の目撃
           </h3>
           <ul className="space-y-2">
-            {recent90d.slice(0, 3).map((r) => (
-              <li
-                key={String(r.id)}
-                className="rounded-lg bg-gray-50 px-3 py-2.5 text-base text-gray-700 sm:text-sm"
-              >
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="font-medium text-gray-900">{r.date}</span>
-                  <span className="shrink-0 text-xs text-gray-500 sm:text-[10px]">
-                    {r.distanceKm.toFixed(1)}km / {r.cityName || "—"}
-                  </span>
-                </div>
-                <div className="line-clamp-2 text-sm leading-relaxed text-gray-600 sm:text-xs">
-                  {r.comment?.trim() || r.sectionName || "（詳細記載なし）"}
-                </div>
-              </li>
-            ))}
+            {recent90d.slice(0, 3).map((r) => {
+              const isNews = r.isOfficial === false;
+              return (
+                <li
+                  key={String(r.id)}
+                  className="rounded-lg bg-gray-50 px-3 py-2.5 text-base text-gray-700 sm:text-sm"
+                >
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium text-gray-900">{r.date}</span>
+                      <span
+                        className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-semibold ${
+                          isNews
+                            ? "border border-amber-300 bg-amber-50 text-amber-800"
+                            : "border border-emerald-200 bg-emerald-50 text-emerald-800"
+                        }`}
+                        title={isNews ? "ニュース報道由来 (未確認)" : "公式情報源"}
+                      >
+                        {isNews ? "📰 報道" : "🛡 公式"}
+                      </span>
+                    </div>
+                    <span className="shrink-0 text-xs text-gray-500 sm:text-[10px]">
+                      {r.distanceKm.toFixed(1)}km / {r.cityName || "—"}
+                    </span>
+                  </div>
+                  <div className="line-clamp-2 text-sm leading-relaxed text-gray-600 sm:text-xs">
+                    {r.comment?.trim() || r.sectionName || "（詳細記載なし）"}
+                  </div>
+                  {isNews && r.sourceUrl && (
+                    <a
+                      href={r.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-[11px] text-blue-600 underline"
+                    >
+                      元記事を開く ↗
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
