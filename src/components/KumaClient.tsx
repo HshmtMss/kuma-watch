@@ -37,9 +37,6 @@ const HEATMAP_OPACITY_KEY = "kumaWatch.heatmapOpacity";
 const SMOOTHING_SIGMA_KEY = "kumaWatch.smoothingSigmaKm";
 const HALO_OPACITY_KEY = "kumaWatch.haloOpacity";
 const LEVEL_THRESHOLDS_KEY = "kumaWatch.levelThresholds";
-// 初訪問のみ凡例を自動展開するためのフラグ。一度開いたら以降は記憶し、
-// ヒートマップの色の意味を初見ユーザーに即座に伝える。
-const LEGEND_SEEN_KEY = "kumaWatch.legendSeen";
 const DEFAULT_TILE_STYLE: TileStyle = "standard";
 const DEFAULT_HEATMAP_OPACITY = 0.5;
 const DEFAULT_SMOOTHING_SIGMA_KM = 1; // 微 (3×3) で穴埋めをデフォルト ON
@@ -294,21 +291,6 @@ export default function KumaClient() {
     }
   }, []);
 
-  // 初訪問のみ凡例を自動オープン: ヒートマップの色が何を意味するのか
-  // 初見ユーザーにすぐ伝えるため。一度でも見たら以降はユーザー判断に委ねる。
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const seen = window.localStorage.getItem(LEGEND_SEEN_KEY);
-      if (!seen) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- first-visit only
-        setShowLegend(true);
-        window.localStorage.setItem(LEGEND_SEEN_KEY, "1");
-      }
-    } catch {
-      /* ignore */
-    }
-  }, []);
   const handleMapClick = useCallback((lat: number, lon: number) => {
     setSelectedLocation({ lat, lon, source: "tap" });
   }, []);
@@ -550,15 +532,20 @@ export default function KumaClient() {
   // する (3ヶ月期間でも「いま現在のクマ動向」が伝わるように)。
   const recentSummary = useMemo(() => {
     if (!records.length) return null;
+    const todayIso = new Date().toISOString().slice(0, 10);
     const weekAgoIso = new Date(Date.now() - 7 * 86_400_000)
       .toISOString()
       .slice(0, 10);
     let count7 = 0;
+    let latest: KumaRecord | null = null;
     for (const r of records) {
+      // 未来日付の上流バグレコードは「最新」「直近1週間」の両方から除外。
+      // /api/kuma 側でも弾いているが、二重防衛で UI バッジを安定させる。
+      if (r.date > todayIso) continue;
       if (r.date >= weekAgoIso) count7++;
+      if (!latest || r.date > latest.date) latest = r;
     }
-    // records は /api/kuma で日付降順ソート済み
-    const latest = records[0];
+    if (!latest) return null;
     return { count7, latest };
   }, [records]);
 
