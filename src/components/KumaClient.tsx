@@ -527,26 +527,18 @@ export default function KumaClient() {
     });
   }, [records, selectedPref, periodCutoff, showPins]);
 
-  // 直近の事案サマリ: 「最新の事案がいつ・どこか」+「直近1週間の件数」を
-  // 地図トップに表示するため。期間フィルタの影響を受けないよう records から計算
-  // する (3ヶ月期間でも「いま現在のクマ動向」が伝わるように)。
-  const recentSummary = useMemo(() => {
+  // データ更新日: 最新の事案発生日を「データの新しさ」の指標として算出する。
+  // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
+  const latestDate = useMemo(() => {
     if (!records.length) return null;
     const todayIso = new Date().toISOString().slice(0, 10);
-    const weekAgoIso = new Date(Date.now() - 7 * 86_400_000)
-      .toISOString()
-      .slice(0, 10);
-    let count7 = 0;
-    let latest: KumaRecord | null = null;
+    let latest: string | null = null;
     for (const r of records) {
-      // 未来日付の上流バグレコードは「最新」「直近1週間」の両方から除外。
-      // /api/kuma 側でも弾いているが、二重防衛で UI バッジを安定させる。
+      // 未来日付の上流バグレコードは除外。/api/kuma 側でも弾いているが二重防衛。
       if (r.date > todayIso) continue;
-      if (r.date >= weekAgoIso) count7++;
-      if (!latest || r.date > latest.date) latest = r;
+      if (!latest || r.date > latest) latest = r.date;
     }
-    if (!latest) return null;
-    return { count7, latest };
+    return latest;
   }, [records]);
 
   return (
@@ -926,23 +918,12 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 更新日バッジ: 最新事案の発生日 (= データの新しさ) と直近1週間の件数を提示。
-            地点名は地図のピンで見える/タップで遷移できる、というほど明確な動線が
-            無いため、地点名はバッジから外し、件数のサマリだけに絞る。
+        {/* 更新日バッジ: データの新しさを左上に控えめに常時表示。
+            件数や地点名は出さず、「いつ更新されたか」だけを伝える。
             loading 中とピッカーモード中はバナー干渉を避けて非表示。 */}
-        {!loading && !pickerMode && recentSummary && (
-          <div className="pointer-events-none absolute left-1/2 top-3 z-[900] flex max-w-[calc(100%-12rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
-            <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-            <span className="truncate">
-              <span className="font-semibold text-gray-900">更新</span>{" "}
-              <span className="tabular-nums">
-                {formatLatestDate(recentSummary.latest.date)}
-              </span>
-              <span className="mx-1.5 text-gray-300">/</span>
-              <span className="tabular-nums">
-                直近1週間 {recentSummary.count7.toLocaleString()}件
-              </span>
-            </span>
+        {!loading && !pickerMode && latestDate && (
+          <div className="pointer-events-none absolute left-3 top-3 z-[900] rounded-full bg-white/90 px-2 py-0.5 text-[10px] tabular-nums text-gray-600 shadow-sm backdrop-blur">
+            更新 {formatLatestDate(latestDate)}
           </div>
         )}
 
