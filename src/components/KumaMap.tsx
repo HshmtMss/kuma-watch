@@ -105,7 +105,14 @@ function readSavedMapView(): MapView | null {
     ) {
       return null;
     }
-    return { center: [parsed.center[0], parsed.center[1]], zoom: parsed.zoom };
+    const lat = parsed.center[0];
+    const lon = parsed.center[1];
+    // 日本の地理範囲外（誤タップで世界中の点になっていた等）は破棄して
+    // 日本中心のデフォルトに戻す。緯度 20-50 / 経度 120-150 が日本 BBox。
+    if (lat < 20 || lat > 50 || lon < 120 || lon > 150) return null;
+    // ズームも 5〜18 にクランプ。世界ビュー (zoom 1-3) の保存はリセット扱い。
+    const zoom = Math.min(18, Math.max(5, parsed.zoom));
+    return { center: [lat, lon], zoom };
   } catch {
     return null;
   }
@@ -675,6 +682,9 @@ export default function KumaMap({
       const map = L.map(el, {
         center: initialCenter,
         zoom: initialZoom,
+        // 日本中心のサービスなので、ピンチアウトで世界ビューまで出せると
+        // 操作不能 (Kazakhstan の謎ピン等) が起きるため、minZoom=5 で抑える。
+        minZoom: 5,
         preferCanvas: true,
         zoomControl: false,
         attributionControl: true,

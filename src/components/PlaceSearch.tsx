@@ -52,6 +52,7 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
   const handlePick = (hit: GeocodeHit) => {
     setOpen(false);
     setQ("");
+    inputRef.current?.blur();
     if (onPick) {
       onPick(hit);
       return;
@@ -64,8 +65,35 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
     router.push(`/place?${params.toString()}`);
   };
 
+  // iOS Safari の「検索」キー / Enter 送信時のハンドラ。
+  // - 候補があれば先頭を採用（ユーザーは候補を再タップする必要がない）
+  // - 候補が無い場合は同期で /api/geocode を再呼び出して最上位を採用
+  // - いずれにせよ blur してキーボードを閉じる
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const query = q.trim();
+    if (!query) return;
+    inputRef.current?.blur();
+    if (hits.length > 0) {
+      handlePick(hits[0]);
+      return;
+    }
+    // debounce 中で hits が空のときは即座に同期取得
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
+      const data = (await res.json()) as { hits: GeocodeHit[] };
+      const top = data.hits?.[0];
+      if (top) handlePick(top);
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="relative w-full">
+    <form onSubmit={handleSubmit} className="relative w-full" role="search">
       <div className="relative">
         <span
           className={`pointer-events-none absolute ${compact ? "left-2.5 text-sm" : "left-3.5 text-lg"} top-1/2 -translate-y-1/2 text-gray-400`}
@@ -77,6 +105,7 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
           ref={inputRef}
           type="search"
           inputMode="search"
+          enterKeyHint="search"
           autoComplete="off"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -85,7 +114,9 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
           placeholder={compact ? "地名を入力" : "行き先を入力（例: 上高地 / 奥多摩 / 蔵王）"}
           className={
             compact
-              ? "h-9 w-full rounded-full border border-gray-200 bg-white py-1 pl-9 pr-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+              ? // text-base = 16px。iOS Safari は input の font-size が 16px 未満
+                // だとフォーカス時に自動拡大し、戻らない。compact でも 16px を死守する。
+                "h-10 w-full rounded-full border border-gray-200 bg-white py-1 pl-9 pr-3 text-base text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
               : "h-12 w-full rounded-full border border-gray-200 bg-white py-2 pl-11 pr-4 text-base text-gray-900 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
           }
         />
@@ -126,6 +157,6 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
             ))}
         </ul>
       )}
-    </div>
+    </form>
   );
 }
