@@ -329,14 +329,14 @@ export default function ForGovPage() {
               メールで相談する →
             </a>
             <Link
-              href="/research"
+              href="/for-gov/spec"
               className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
-              研究・知見を見る
+              庁内稟議用 資料を見る
             </Link>
           </div>
           <p className="mt-3 text-[11px] text-stone-500">
-            庁内稟議用の仕様書 PDF が必要な場合は、メール本文にその旨をお書き添えください。
+            「庁内稟議用 資料」は印刷／PDF 保存に対応した A4 仕様の資料ページです。本ページのリンクをそのまま庁内回覧にもご利用いただけます。
           </p>
         </div>
       </div>
