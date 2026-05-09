@@ -21,10 +21,10 @@ on:
 permissions:
   contents: write
 
-# 同時実行されると公衆衛生 sightings.json への push が衝突するため
-# 直前ジョブが終わるまで待つ。
+# sightings.json への書き込みを refresh-sightings / sharp9110-flash と
+# 直列化することで push 衝突を防ぐ。同じ group "sightings-write" に統一。
 concurrency:
-  group: news-flash
+  group: sightings-write
   cancel-in-progress: false
 
 jobs:

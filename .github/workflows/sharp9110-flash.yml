@@ -16,8 +16,10 @@ on:
 permissions:
   contents: write
 
+# sightings.json への書き込みを refresh-sightings / news-flash と
+# 直列化することで push 衝突を防ぐ。同じ group "sightings-write" に統一。
 concurrency:
-  group: sharp9110-flash
+  group: sightings-write
   cancel-in-progress: false
 
 jobs:

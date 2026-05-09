@@ -19,6 +19,13 @@ on:
 permissions:
   contents: write
 
+# sightings.json への書き込みを直列化。news-flash / sharp9110-flash と
+# 同じグループ "sightings-write" にすることで、refresh-sightings の 20 分
+# 実行中に他ジョブが新規コミットを入れて push 衝突 → 失敗する事故を防ぐ。
+concurrency:
+  group: sightings-write
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -53,4 +60,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/sightings.json
           git commit -m "Refresh sightings data ($(date -u +%Y-%m-%d))"
+          # 防御的 rebase。concurrency group で直列化はされているが、
+          # 万一の race を耐えるため push 前に最新を取り込む。
+          # 我々の commit が「全件再生成」なので衝突したら ours で上書き。
+          git pull --rebase -X ours origin main
           git push
