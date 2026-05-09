@@ -170,7 +170,7 @@ export default function Page() {
         <li>
           <strong>餌付け禁止の徹底</strong>:
           イエローストーンの 1980 年代方針転換は、日本の里山・観光地にもそのまま応用できる教訓。
-          家庭の柿・栗・生ゴミ管理は同じ理屈
+          家庭の柿・栗・生ゴミ管理も同じ理屈で対策できます
           (<Link href="/articles/home-protection">家庭でのクマ対策</Link>)。
         </li>
         <li>

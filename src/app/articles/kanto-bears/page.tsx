@@ -167,7 +167,7 @@ export default function Page() {
         </li>
         <li>
           <strong>クマよけスプレーの携行</strong>:
-          関東でも例外ではなく必携。腰のホルスター
+          関東でも例外ではなく必携。腰のホルスターに装着して秒で抜ける位置に
           (<Link href="/articles/bear-spray">使い方</Link>)。
         </li>
         <li>
