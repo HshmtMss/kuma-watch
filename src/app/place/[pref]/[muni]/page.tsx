@@ -92,7 +92,95 @@ export default async function MuniPage({ params }: Props) {
     getPlaceCellsByPref(pref),
     getRecordsForPlace(pref, muni, 60),
   ]);
-  const siblings = siblingsRaw.filter((c) => c.cityName !== muni).slice(0, 12);
+
+  // 距離ベースで近い 4 市町村を「近隣比較」用に抽出。
+  // 残りは下部の「県内の他の市町村」リストに従来通り表示する。
+  const haversineKm = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ) => {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+  };
+  const nearestNeighbors = siblingsRaw
+    .filter((c) => c.cityName !== muni)
+    .map((c) => ({
+      ...c,
+      distanceKm: haversineKm(
+        cell.latCentroid,
+        cell.lonCentroid,
+        c.latCentroid,
+        c.lonCentroid,
+      ),
+    }))
+    .sort((a, b) => a.distanceKm - b.distanceKm)
+    .slice(0, 4);
+  const nearestNeighborSet = new Set(nearestNeighbors.map((n) => n.cityName));
+  const siblings = siblingsRaw
+    .filter((c) => c.cityName !== muni && !nearestNeighborSet.has(c.cityName))
+    .slice(0, 12);
+
+  // 危険度バッジ — count90d を主軸に 4 段階で評価。
+  const risk =
+    cell.count90d >= 6
+      ? {
+          level: "high",
+          label: "警戒",
+          tone: "red",
+          headline: `直近 90 日で ${cell.count90d} 件の出没`,
+          note: "頻繁に出没しています。出発前に必ず周辺の最新情報を確認してください。",
+        }
+      : cell.count90d >= 1
+        ? {
+            level: "med",
+            label: "注意",
+            tone: "amber",
+            headline: `直近 90 日に ${cell.count90d} 件の出没`,
+            note: "直近で出没事案があります。早朝・夕方の単独行動は避けてください。",
+          }
+        : cell.count365d >= 1
+          ? {
+              level: "low",
+              label: "観察",
+              tone: "yellow",
+              headline: `直近 1 年で ${cell.count365d} 件の出没履歴`,
+              note: "90 日以内の事案はありませんが、生息域なので油断せずご準備を。",
+            }
+          : {
+              level: "calm",
+              label: "静穏",
+              tone: "emerald",
+              headline: "直近の出没情報なし",
+              note: "目撃情報がない期間ですが、季節や天候で状況は変わります。",
+            };
+  const riskBg: Record<string, string> = {
+    red: "border-red-300 bg-red-50",
+    amber: "border-amber-300 bg-amber-50",
+    yellow: "border-yellow-300 bg-yellow-50",
+    emerald: "border-emerald-300 bg-emerald-50",
+  };
+  const riskText: Record<string, string> = {
+    red: "text-red-900",
+    amber: "text-amber-900",
+    yellow: "text-yellow-900",
+    emerald: "text-emerald-900",
+  };
+  const riskBadge: Record<string, string> = {
+    red: "bg-red-600 text-white",
+    amber: "bg-amber-500 text-white",
+    yellow: "bg-yellow-500 text-yellow-950",
+    emerald: "bg-emerald-600 text-white",
+  };
 
   const mapUrl = `/?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&z=12`;
   const placeUrl = `/place?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&name=${encodeURIComponent(pref + muni)}`;
@@ -204,10 +292,18 @@ export default async function MuniPage({ params }: Props) {
                 "冬期は通常クマは冬眠していますが、暖冬や食料不足の年は冬眠せず徘徊する個体（穴持たず）が報告されます。雪上の足跡・痕跡には注意。",
             };
 
+  // ダイナミック lead — 数値を必ず織り込み、SERP スニペットの具体性も上げる。
+  const dynamicLead =
+    cell.count90d > 0 && cell.latestDate
+      ? `過去 90 日で ${cell.count90d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の警戒レベルを 5km メッシュで確認できます。`
+      : cell.count365d > 0 && cell.latestDate
+        ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の警戒レベルを 5km メッシュで確認できます。`
+        : `${pref} ${muni} のクマ出没情報・警戒レベルを 5km メッシュで確認できます。`;
+
   return (
     <PageShell
       title={`${muni} のクマ出没情報`}
-      lead={`${pref} ${muni} のクマ出没情報・警戒レベルを確認できます。`}
+      lead={dynamicLead}
     >
       <script
         type="application/ld+json"
@@ -237,6 +333,54 @@ export default async function MuniPage({ params }: Props) {
         <span>›</span>
         <span className="font-semibold text-stone-700">{muni}</span>
       </nav>
+
+      {/* 危険度ヒーローカード — 検索流入したユーザーに「今、危険か？」を 1 秒で答える。
+          count90d を主軸に 4 段階で色分けし、最新事案日と一言コメントを併記。 */}
+      <div
+        className={`not-prose mb-6 rounded-2xl border-2 p-5 ${riskBg[risk.tone]}`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${riskBadge[risk.tone]}`}
+              >
+                {risk.label}
+              </span>
+              <span className={`text-xs font-medium ${riskText[risk.tone]}`}>
+                {muni} 直近の状況
+              </span>
+            </div>
+            <div className={`mt-2 text-lg font-bold ${riskText[risk.tone]}`}>
+              {risk.headline}
+            </div>
+            {cell.latestDate && (
+              <div className={`mt-0.5 text-xs ${riskText[risk.tone]}/80`}>
+                最新の目撃: {formatDate(cell.latestDate)}
+              </div>
+            )}
+            <p className={`mt-2 text-xs leading-relaxed ${riskText[risk.tone]}`}>
+              {risk.note}
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href={mapUrl}
+            className="inline-flex items-center gap-1 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+          >
+            🗺️ 地図で詳細を見る →
+          </Link>
+          <a
+            href={`https://www.google.com/search?q=${encodeURIComponent(`${pref} ${muni} クマ 出没 site:lg.jp`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
+          >
+            {muni} 公式情報を検索 ↗
+          </a>
+        </div>
+      </div>
 
       <div className="not-prose mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
@@ -499,6 +643,49 @@ export default async function MuniPage({ params }: Props) {
         </li>
       </ul>
 
+      {/* 近隣 4 市町村の比較 — 距離ベースで近い順。登山・通勤など
+          「複数地域を見て判断したい」ユーザーニーズに対応。 */}
+      {nearestNeighbors.length > 0 && (
+        <>
+          <h2>{muni} の近隣で出没している市町村</h2>
+          <div className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {nearestNeighbors.map((n) => {
+              const isHot = n.count90d > 0;
+              return (
+                <Link
+                  key={n.cityName}
+                  href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(n.cityName)}`}
+                  className={`flex flex-col rounded-xl border p-3 transition ${
+                    isHot
+                      ? "border-amber-300 bg-amber-50 hover:border-amber-500"
+                      : "border-stone-200 bg-white hover:border-stone-400"
+                  }`}
+                >
+                  <div className="text-[10px] text-stone-500">
+                    距離 {n.distanceKm.toFixed(1)} km
+                  </div>
+                  <div className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+                    {n.cityName}
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-1.5">
+                    <span
+                      className={`text-base font-bold ${
+                        isHot ? "text-amber-700" : "text-stone-700"
+                      }`}
+                    >
+                      {n.count90d}
+                    </span>
+                    <span className="text-[10px] text-stone-500">
+                      件 / 過去90日
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </>
+      )}
+
       {siblings.length > 0 && (
         <>
           <h2>{pref} 内の他の市町村</h2>
@@ -526,6 +713,14 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
+      {/* モバイル限定の sticky CTA。スクロールしても常に「地図を開く」が
+          指の届く位置に出る。md 以上ではヒーローカード内のボタンで十分。 */}
+      <Link
+        href={mapUrl}
+        className="not-prose fixed inset-x-3 bottom-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-sm font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
+      >
+        🗺️ {muni} の警戒レベルマップを開く →
+      </Link>
     </PageShell>
   );
 }
