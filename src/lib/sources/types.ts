@@ -23,6 +23,9 @@ export type UnifiedSighting = {
   isOfficial?: boolean;
   // 元記事 / 元情報のリンク (news 等で記事 URL を保持)
   sourceUrl?: string;
+  // 当社が初めて取り込んだ epoch ms。news-flash の高頻度取り込みで
+  // 「新着 ○分前」の表示や「直近24h」フィルタに利用。
+  ingestedAt?: number;
 };
 
 export function inJapanBounds(lat: number, lon: number): boolean {

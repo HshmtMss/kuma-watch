@@ -1,0 +1,60 @@
+name: News flash ingest
+
+# Google News RSS から最新クマ関連ニュースを 1 時間ごとに取り込む高頻度ジョブ。
+# 67 自治体ソースを集約する refresh-sightings (1 日 2 回・1 回 20 分) と分離し、
+# こちらは数分で終わる軽量フローに保つことで、報道速報レベルの鮮度
+# (発生 → 反映が概ね 1 時間以内) を実現する。
+#
+# private repo の Actions 無料枠 (2,000 min/月) 内に収めるため、
+# 1 回 1〜2 分・1 時間ごと = 月 1,500 min 弱を上限とする。
+# refresh-sightings.yml (月 1,200 min) と合わせると合計 ~2,700 min。
+# 超過リスクが出てきたら repo を public 化するか、頻度を 2h に落とす。
+
+on:
+  schedule:
+    # 毎時 15 分。refresh-sightings (毎日 03:00 / 15:00 JST) のピークと
+    # ぶつからないよう 15 分オフセット。
+    - cron: '15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# 同時実行されると公衆衛生 sightings.json への push が衝突するため
+# 直前ジョブが終わるまで待つ。
+concurrency:
+  group: news-flash
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Ingest news
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run ingest:news
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet public/data/sightings.json; then
+            echo "No new news records — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/sightings.json
+          git commit -m "News flash: ingest fresh news ($(date -u +%Y-%m-%dT%H:%M))"
+          # rebase 衝突回避のため最新を取り直してから push
+          git pull --rebase origin main
+          git push

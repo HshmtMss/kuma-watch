@@ -21,6 +21,8 @@ export type KumaRecord = {
   isOfficial?: boolean;
   // ニュース取り込み等で元記事 URL を保持する。Popup の「詳細」リンク用。
   sourceUrl?: string;
+  // 当社が初めて取り込んだ epoch ms。「新着 ○分前」表示用。
+  ingestedAt?: number;
 };
 
 const DEFAULT_LIMIT = 8000;
@@ -40,6 +42,7 @@ function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     source: s.source,
     isOfficial: s.isOfficial,
     sourceUrl: s.sourceUrl,
+    ingestedAt: s.ingestedAt,
   };
 }
 

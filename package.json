@@ -10,6 +10,7 @@
     "lint": "eslint",
     "build:mesh": "node scripts/build-mesh-data.mjs",
     "build:sightings": "tsx --env-file-if-exists=.env.local scripts/build-sightings.ts",
+    "ingest:news": "tsx --env-file-if-exists=.env.local scripts/ingest-news-only.ts",
     "import:research": "tsx scripts/import-research.ts"
   },
   "dependencies": {

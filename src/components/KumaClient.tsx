@@ -93,6 +93,9 @@ export default function KumaClient() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
+  // 「直近24h」フィルタ: 取り込みから 24h 以内のレコードだけ残す。
+  // ON にすると最新の出没事案だけを地図に表示する速報モード。
+  const [freshOnly, setFreshOnly] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
@@ -497,12 +500,13 @@ export default function KumaClient() {
     };
   }, []);
 
-  // C1: 5 分間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
+  // C1: 1 分間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
   // タブ非表示中はポーリングを停止し、再表示時に即時 1 回チェック。
-  // 期間フィルタ (periodCutoff) と filtered の母集団に揃えるため、from を渡す。
+  // news-flash workflow が 1 時間ごとに新規 news を投入するため、ユーザーが
+  // 開きっぱなしでも 1 分以内に最新事案が反映される。
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const POLL_MS = 5 * 60 * 1000;
+    const POLL_MS = 60 * 1000;
     let timer: number | null = null;
 
     async function checkForNew() {
@@ -591,13 +595,18 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
+    const FRESH_MS = 24 * 60 * 60 * 1000;
+    const cutoffMs = Date.now() - FRESH_MS;
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
       const periodOk = !periodCutoff || r.date >= periodCutoff;
-      return prefOk && periodOk;
+      const freshOk =
+        !freshOnly ||
+        (typeof r.ingestedAt === "number" && r.ingestedAt >= cutoffMs);
+      return prefOk && periodOk && freshOk;
     });
-  }, [records, selectedPref, periodCutoff, showPins]);
+  }, [records, selectedPref, periodCutoff, showPins, freshOnly]);
 
   // データ更新日: 最新の事案発生日を「データの新しさ」の指標として算出する。
   // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
@@ -755,6 +764,25 @@ export default function KumaClient() {
               {filtered.length.toLocaleString()}件
             </span>
           </div>
+
+          {/* 直近24h フィルタ — 速報モード。ON にすると当社が直近 24h 内に
+              取り込んだ事案のみを地図に表示し、ピンも青で強調される。 */}
+          <label
+            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 font-medium ${
+              freshOnly
+                ? "border-blue-300 bg-blue-50 text-blue-800"
+                : "border-gray-200 bg-gray-50 text-gray-700"
+            }`}
+            title="当社が直近 24 時間以内に取り込んだ事案のみ表示"
+          >
+            <input
+              type="checkbox"
+              checked={freshOnly}
+              onChange={(e) => setFreshOnly(e.target.checked)}
+              className="h-4 w-4 accent-blue-600"
+            />
+            🆕 24h
+          </label>
 
           {/* 警戒レベルヒートマップ ON/OFF */}
           <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">
@@ -1051,6 +1079,9 @@ export default function KumaClient() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-3 w-3 rounded-full bg-blue-500 ring-2 ring-blue-700" />🆕 24h以内
               </div>
             </div>
             <div>

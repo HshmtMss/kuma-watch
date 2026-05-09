@@ -307,6 +307,7 @@ export async function fetchNewsSightings(): Promise<UnifiedSighting[]> {
       headCount: Number.isInteger(s.headCount) && s.headCount! > 0 ? s.headCount! : 1,
       isOfficial: false,
       sourceUrl: article.link,
+      ingestedAt: now,
     });
   }
 
