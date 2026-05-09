@@ -1,6 +1,104 @@
 // 記事の中央レジストリ。各 page.tsx がそれぞれ実際の本文を持つが、
 // sitemap / 一覧ページ / クロスリンクは ここから引く。
 
+export type CategoryId =
+  | "encounter"
+  | "gear"
+  | "season"
+  | "ecology"
+  | "scene"
+  | "region"
+  | "background";
+
+export type CategoryMeta = {
+  id: CategoryId;
+  /** カテゴリの URL slug。/articles/category/[slug] で使う */
+  slug: string;
+  /** 表示名 (短) */
+  name: string;
+  /** 記事一覧ページなどでの 1 行リード */
+  lead: string;
+  /** カテゴリページの SEO 用 description (140〜160 字程度) */
+  description: string;
+  /** 表示順。小さい順に並ぶ */
+  order: number;
+  /** カテゴリチップなどに使う絵文字 (任意) */
+  emoji?: string;
+};
+
+export const CATEGORIES: CategoryMeta[] = [
+  {
+    id: "encounter",
+    slug: "encounter",
+    name: "遭遇・対処",
+    lead: "クマと出会ってしまったとき、何をすれば生き残れるか。距離別の対応・襲われた後の応急処置まで。",
+    description:
+      "クマに遭遇したときの対処法、子グマを見たときの判断、襲われた直後の応急処置と通報など、命に関わる場面で迷わないための実践的な記事をまとめています。",
+    order: 1,
+    emoji: "🐻",
+  },
+  {
+    id: "gear",
+    slug: "gear",
+    name: "装備",
+    lead: "クマよけスプレー・クマ鈴・撃退道具など、登山・キャンプ・山仕事で使える装備の選び方と使い方。",
+    description:
+      "クマよけスプレーの正しい使い方、クマ鈴の効果検証、ホーン・ナイフ・銃器など撃退装備の現実的な選択肢を、日本の法的制約を踏まえて解説します。",
+    order: 2,
+    emoji: "🎒",
+  },
+  {
+    id: "season",
+    slug: "season",
+    name: "季節別",
+    lead: "春の母グマ、秋のハイパーフェイジア、冬の穴持たず — 季節ごとに変わるクマのリスクと対策。",
+    description:
+      "クマの行動は季節で大きく変わります。春・夏・秋・冬それぞれの出没パターンと、登山・キャンプ・山菜採り・きのこ狩りで気をつけるべきポイントをまとめます。",
+    order: 3,
+    emoji: "🍂",
+  },
+  {
+    id: "ecology",
+    slug: "ecology",
+    name: "生態",
+    lead: "クマの食性・感覚・痕跡・種別の違い。生態を知ると、出会わないための判断材料が増える。",
+    description:
+      "ツキノワグマとヒグマの違い、季節別の食性、嗅覚・聴覚・視覚の鋭さ、足跡や糞などのフィールドサインの見分け方など、クマの生態を理解するための記事をまとめています。",
+    order: 4,
+    emoji: "🌲",
+  },
+  {
+    id: "scene",
+    slug: "scene",
+    name: "シーン別",
+    lead: "山菜採り・きのこ狩り・キャンプ・渓流釣り・通学路 — 場面ごとの実践クマ対策。",
+    description:
+      "山菜採り・きのこ狩り・キャンプ・渓流釣り・通学路・自宅果樹園など、活動シーンごとに必要なクマ対策をまとめています。それぞれのシーンに固有のリスクと回避策を解説。",
+    order: 5,
+    emoji: "🏕️",
+  },
+  {
+    id: "region",
+    slug: "region",
+    name: "地域別",
+    lead: "北海道のヒグマ、東北のツキノワグマ — 地域ごとに違う出没事情と備え方。",
+    description:
+      "北海道のヒグマ、東北のツキノワグマ、関東甲信・中部山岳・西日本のクマ事情など、地域ごとの個体数・分布・市街地出没の状況をまとめます。観光・登山・通勤の備えに。",
+    order: 6,
+    emoji: "🗾",
+  },
+  {
+    id: "background",
+    slug: "background",
+    name: "背景・データ",
+    lead: "クマ出没はなぜ増えているのか。統計・歴史的事故・関連法律から全体像を整理する。",
+    description:
+      "近年のクマ出没急増の背景、過去の重大事故から学べる教訓、鳥獣保護法・狩猟法・銃刀法などクマと関わる法律を、データと史実に基づいて整理します。",
+    order: 7,
+    emoji: "📊",
+  },
+];
+
 export type ArticleMeta = {
   slug: string;
   title: string;
@@ -13,6 +111,8 @@ export type ArticleMeta = {
   updatedAt: string;
   /** 該当するシーズンタグ — 一覧並び順や関連記事に使う */
   season?: "spring" | "summer" | "autumn" | "winter" | "all";
+  /** 主カテゴリ — 1 記事 1 カテゴリ。横断的なつながりは tags で表現する */
+  category: CategoryId;
   /** 関連カテゴリ */
   tags: string[];
   /** ヒーロー画像 (public/articles/ 配下のパス) */
@@ -33,6 +133,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "encounter",
     tags: ["遭遇", "対処", "安全", "登山"],
     heroImage: "/articles/encounter.jpg",
     heroCredit: "Photo by Len Rempel on Unsplash",
@@ -47,6 +148,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "autumn",
+    category: "season",
     tags: ["秋", "ハイパーフェイジア", "登山", "きのこ狩り"],
     heroImage: "/articles/autumn.jpg",
     heroCredit: "Photo by Weiqi Xiong on Unsplash",
@@ -61,6 +163,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "gear",
     tags: ["装備", "スプレー", "登山"],
     heroImage: "/articles/bear-spray.jpg",
     heroCredit: "Photo by Clay Banks on Unsplash",
@@ -75,6 +178,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "gear",
     tags: ["装備", "クマ鈴", "ホイッスル"],
     heroImage: "/articles/bear-bell.jpg",
     heroCredit: "Photo on Unsplash",
@@ -89,6 +193,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "ecology",
     tags: ["生態", "ツキノワグマ", "ヒグマ"],
     heroImage: "/articles/species-difference.jpg",
     heroCredit: "Photo by Zdeněk Macháček on Unsplash",
@@ -103,6 +208,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "spring",
+    category: "season",
     tags: ["春", "母グマ", "子グマ", "山菜採り"],
     heroImage: "/articles/spring.jpg",
     heroCredit: "Photo by Elena Leya on Unsplash",
@@ -117,6 +223,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "ecology",
     tags: ["生態", "食性", "ドングリ"],
     heroImage: "/articles/diet.jpg",
     heroCredit: "Photo by Martins Cardoso on Unsplash",
@@ -131,6 +238,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "background",
     tags: ["統計", "里山", "ブナ凶作"],
     heroImage: "/articles/why-increasing.jpg",
     heroCredit: "Photo by Aoi on Unsplash",
@@ -145,6 +253,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "encounter",
     tags: ["子グマ", "母グマ", "対処"],
     heroImage: "/articles/cub-handling.jpg",
     heroCredit: "Photo by Janko Ferlič on Unsplash",
@@ -159,6 +268,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "scene",
     tags: ["家庭", "果樹園", "電気柵"],
     heroImage: "/articles/home-protection.jpg",
     heroCredit: "Photo by Jong Hyuk Lee on Unsplash",
@@ -173,6 +283,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "gear",
     tags: ["装備", "スプレー", "撃退"],
     heroImage: "/articles/weapons.jpg",
     heroCredit: "Photo by Thomas Thompson on Unsplash",
@@ -187,6 +298,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "encounter",
     tags: ["応急処置", "通報", "感染症"],
     heroImage: "/articles/first-aid.jpg",
     heroCredit: "Photo by Mathurin NAPOLY on Unsplash",
@@ -201,6 +313,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "background",
     tags: ["事件", "歴史", "ヒグマ"],
     heroImage: "/articles/historic-incidents.jpg",
     heroCredit: "Photo by Kenneth Sørensen on Unsplash",
@@ -215,6 +328,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "summer",
+    category: "season",
     tags: ["夏", "川遊び", "キャンプ"],
     heroImage: "/articles/summer.jpg",
     heroCredit: "Photo by Madison Kuhn on Unsplash",
@@ -229,6 +343,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "winter",
+    category: "season",
     tags: ["冬", "穴持たず", "スキー", "冬山"],
     heroImage: "/articles/winter.jpg",
     heroCredit: "Photo by Meg Jenson on Unsplash",
@@ -243,6 +358,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "ecology",
     tags: ["痕跡", "足跡", "観察"],
     heroImage: "/articles/bear-tracks.jpg",
     heroCredit: "Photo by Mykyta Kondratov on Unsplash",
@@ -257,6 +373,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "scene",
     tags: ["キャンプ", "テント", "食料"],
     heroImage: "/articles/camping.jpg",
     heroCredit: "Photo by Rostyslav Savchyn on Unsplash",
@@ -271,6 +388,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "scene",
     tags: ["釣り", "渓流", "沢"],
     heroImage: "/articles/fishing.jpg",
     heroCredit: "Photo by Jamie Cooper on Unsplash",
@@ -285,6 +403,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "scene",
     tags: ["通学路", "子供", "学校"],
     heroImage: "/articles/school-route.jpg",
     heroCredit: "Photo by Hulki Okan Tabak on Unsplash",
@@ -299,6 +418,7 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "region",
     tags: ["北海道", "ヒグマ", "地域"],
     heroImage: "/articles/hokkaido-bears.jpg",
     heroCredit: "Photo by Cuvii on Unsplash",
@@ -313,10 +433,98 @@ export const ARTICLES: ArticleMeta[] = [
     publishedAt: "2026-04-29",
     updatedAt: "2026-04-29",
     season: "all",
+    category: "ecology",
     tags: ["生態", "嗅覚", "感覚"],
     heroImage: "/articles/bear-senses.jpg",
     heroCredit: "Photo by Bob Brewer on Unsplash",
     heroCreditUrl: "https://unsplash.com/photos/ooPXlZnUnSo",
+  },
+
+  // --- 2026-05 追加分 -------------------------------------------------
+
+  {
+    slug: "mushroom-picking",
+    title: "きのこ狩りのクマ対策 — 秋の遭遇率No.1アクティビティ",
+    description:
+      "秋のクマ人身事故で最多なのが「きのこ狩り中の遭遇」。前傾姿勢で地面を見続け、林床に分け入り、夢中になりがち — クマと条件が揃います。装備と立ち回りで遭遇率は大きく下げられます。",
+    lead: "秋の人身事故で最多のシーンが「きのこ狩り」。前傾姿勢・林床・無音 — クマと条件が揃います。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "autumn",
+    category: "scene",
+    tags: ["きのこ狩り", "秋", "山菜採り", "ハイパーフェイジア"],
+  },
+  {
+    slug: "wild-vegetables",
+    title: "山菜採りのクマ対策 — 春の人身事故ワースト原因",
+    description:
+      "春のクマ人身事故の半数以上は山菜採り中に発生しています。冬眠明けの飢えた個体・子連れの母グマと、地面に屈み込み無防備になる山菜採り人の組み合わせは最悪。回避策を時系列で解説。",
+    lead: "春の人身事故の半数以上は山菜採り中。冬眠明けの母グマと、地面に屈む人間 — 最悪の組み合わせです。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "spring",
+    category: "scene",
+    tags: ["山菜採り", "春", "母グマ", "タケノコ"],
+  },
+  {
+    slug: "playing-dead",
+    title: "クマに「死んだふり」は効くのか — 種別と状況で答えが変わる",
+    description:
+      "「死んだふり」は条件付きで有効ですが、ヒグマと捕食目的の襲撃では逆効果になり得ます。ツキノワグマ vs ヒグマ、防衛攻撃 vs 捕食攻撃、姿勢・タイミング — 正しい使い分けを整理。",
+    lead: "死んだふりは条件付きで有効。ヒグマや捕食型の攻撃では逆効果になり得ます。種別と状況で正しく使い分けを。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "encounter",
+    tags: ["死んだふり", "対処", "ツキノワグマ", "ヒグマ"],
+  },
+  {
+    slug: "bear-speed",
+    title: "クマの走力 — 時速50kmから人間が「絶対に」逃げ切れない理由",
+    description:
+      "クマの最高速度はツキノワグマで時速約 40km、ヒグマで時速約 50km。100m を 10 秒未満で走破する計算で、トレーニングを積んだ陸上選手でも逃げ切れません。物理データから「逃げない」が正解な理由を解説。",
+    lead: "クマの最高速度は時速 50km。100m を 10 秒未満。陸上選手でも逃げ切れません。背中を見せたら終わりです。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "ecology",
+    tags: ["走力", "生態", "対処", "ヒグマ"],
+  },
+  {
+    slug: "bear-laws",
+    title: "クマと法律 — 鳥獣保護法・狩猟法・銃刀法の基礎",
+    description:
+      "クマは鳥獣保護管理法で保護対象でありながら、有害駆除・狩猟も認められる対象。スプレー所持・捕獲・駆除の要請・狩猟解禁の関係を、自治体・猟友会の役割とともに整理します。",
+    lead: "クマは鳥獣保護管理法で守られつつ駆除も認められる対象。法律の枠組みを整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "background",
+    tags: ["法律", "鳥獣保護法", "狩猟", "銃刀法"],
+  },
+  {
+    slug: "electric-fence",
+    title: "電気柵の張り方 — 自宅・果樹園・畑のクマ対策",
+    description:
+      "クマ対策として最も実効性が高い物理障壁が電気柵。電圧 5,000V 以上・5 段張り・地面とのアース・草刈り — 効果を出す張り方の基本と、ホームセンターで揃う機材の選び方を解説。",
+    lead: "電気柵は正しく張れば効果絶大。電圧 5,000V・5 段張り・アース・草刈り — 押さえるべき基本を整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "scene",
+    tags: ["電気柵", "果樹園", "家庭", "畑"],
+  },
+  {
+    slug: "tohoku-bears",
+    title: "東北のツキノワグマ事情 — 秋田・岩手・青森・山形・福島・宮城",
+    description:
+      "東北 6 県は本州ツキノワグマの主要生息地。秋田は人身事故全国最多が続き、岩手・山形でも市街地出没が常態化しています。県別の個体数・最新の出没傾向・地域固有のリスクをまとめます。",
+    lead: "東北 6 県はツキノワグマの主要生息地。秋田は人身事故全国最多。県別の事情とリスクを整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "region",
+    tags: ["東北", "秋田", "岩手", "青森", "ツキノワグマ"],
   },
 ];
 
@@ -324,11 +532,28 @@ export function getArticle(slug: string): ArticleMeta | undefined {
   return ARTICLES.find((a) => a.slug === slug);
 }
 
+export function getCategory(id: CategoryId): CategoryMeta | undefined {
+  return CATEGORIES.find((c) => c.id === id);
+}
+
+export function getCategoryBySlug(slug: string): CategoryMeta | undefined {
+  return CATEGORIES.find((c) => c.slug === slug);
+}
+
+export function getArticlesByCategory(id: CategoryId): ArticleMeta[] {
+  return ARTICLES.filter((a) => a.category === id).sort((a, b) =>
+    b.updatedAt.localeCompare(a.updatedAt),
+  );
+}
+
 export function getRelatedArticles(slug: string, limit = 3): ArticleMeta[] {
   const current = getArticle(slug);
   if (!current) return ARTICLES.slice(0, limit);
   const others = ARTICLES.filter((a) => a.slug !== slug);
   others.sort((a, b) => {
+    const aSameCategory = a.category === current.category ? 1 : 0;
+    const bSameCategory = b.category === current.category ? 1 : 0;
+    if (aSameCategory !== bSameCategory) return bSameCategory - aSameCategory;
     const aShared = a.tags.filter((t) => current.tags.includes(t)).length;
     const bShared = b.tags.filter((t) => current.tags.includes(t)).length;
     if (aShared !== bShared) return bShared - aShared;

@@ -2,7 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import PageShell from "@/components/PageShell";
-import { getRelatedArticles, type ArticleMeta } from "@/lib/articles-meta";
+import {
+  getCategory,
+  getRelatedArticles,
+  type ArticleMeta,
+} from "@/lib/articles-meta";
 
 const SITE_URL = "https://kuma-watch.jp";
 
@@ -24,6 +28,7 @@ function formatDate(d: string): string {
 export default function ArticleShell({ meta, children }: Props) {
   const url = `${SITE_URL}/articles/${meta.slug}`;
   const related = getRelatedArticles(meta.slug, 3);
+  const category = getCategory(meta.category);
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -33,6 +38,7 @@ export default function ArticleShell({ meta, children }: Props) {
     datePublished: meta.publishedAt,
     dateModified: meta.updatedAt,
     inLanguage: "ja",
+    articleSection: category?.name,
     author: {
       "@type": "Organization",
       name: "獣医工学ラボ",
@@ -51,14 +57,40 @@ export default function ArticleShell({ meta, children }: Props) {
     keywords: meta.tags.join(", "),
   };
 
+  const breadcrumbItems = [
+    { "@type": "ListItem", position: 1, name: "ホーム", item: `${SITE_URL}/` },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "記事一覧",
+      item: `${SITE_URL}/articles`,
+    },
+  ];
+  if (category) {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 3,
+      name: category.name,
+      item: `${SITE_URL}/articles/category/${category.slug}`,
+    });
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 4,
+      name: meta.title,
+      item: url,
+    });
+  } else {
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      position: 3,
+      name: meta.title,
+      item: url,
+    });
+  }
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "ホーム", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "記事一覧", item: `${SITE_URL}/articles` },
-      { "@type": "ListItem", position: 3, name: meta.title, item: url },
-    ],
+    itemListElement: breadcrumbItems,
   };
 
   return (
@@ -102,6 +134,30 @@ export default function ArticleShell({ meta, children }: Props) {
           )}
         </figure>
       )}
+
+      <nav
+        aria-label="パンくず"
+        className="not-prose mb-2 text-xs text-stone-500"
+      >
+        <Link href="/" className="hover:text-stone-900 hover:underline">
+          ホーム
+        </Link>
+        <span className="mx-1">/</span>
+        <Link href="/articles" className="hover:text-stone-900 hover:underline">
+          記事一覧
+        </Link>
+        {category && (
+          <>
+            <span className="mx-1">/</span>
+            <Link
+              href={`/articles/category/${category.slug}`}
+              className="hover:text-stone-900 hover:underline"
+            >
+              {category.name}
+            </Link>
+          </>
+        )}
+      </nav>
 
       <p className="not-prose mb-6 text-xs text-gray-500">
         公開: {formatDate(meta.publishedAt)}
