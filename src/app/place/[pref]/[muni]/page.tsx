@@ -9,8 +9,10 @@ import {
   getPlaceCellsByPref,
   getRecordsForPlace,
   getStaticPlaceKeys,
+  type PlaceCell,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -26,8 +28,24 @@ const SITE_URL = "https://kuma-watch.jp";
 type Props = { params: Promise<{ pref: string; muni: string }> };
 
 export async function generateStaticParams() {
-  const keys = await getStaticPlaceKeys(3);
-  return keys.map((k) => ({ pref: k.pref, muni: k.city }));
+  // 全 1,894 市区町村 (geolonia マスター) ＋ 出没データに含まれる市町村名
+  // (cityName 表記が master と異なるエッジケースも拾えるように) を Union して
+  // 重複排除。 0 件の市町村でも「該当なし」状態のページを生成し、検索流入の
+  // 機会損失を解消する。
+  const fromIndex = await getStaticPlaceKeys(1);
+  const fromMaster = JAPAN_MUNICIPALITIES.map((m) => ({
+    pref: m.prefName,
+    city: m.cityName,
+  }));
+  const seen = new Set<string>();
+  const merged: { pref: string; city: string }[] = [];
+  for (const k of [...fromMaster, ...fromIndex]) {
+    const key = `${k.pref}/${k.city}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(k);
+  }
+  return merged.map((k) => ({ pref: k.pref, muni: k.city }));
 }
 
 function decode(v: string): string {
@@ -55,10 +73,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const muni = decode(rawMuni);
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
-  const cell = await getPlaceCell(pref, muni);
-  // SEO 強化: 件数 + 最新日 + 獣医師監修 + ブランド名で
-  // 「具体性 × 鮮度 × 信頼性」を検索結果に表示する。
-  const { title, description } = buildMuniSeo(pref, muni, cell);
+  const cellFromIndex = await getPlaceCell(pref, muni);
+  // 出没データが無い市町村でも、buildMuniSeo の null パスでフォールバック
+  // タイトル ("○○のクマ出没情報・警戒レベル｜獣医師監修") を返す。
+  const { title, description } = buildMuniSeo(pref, muni, cellFromIndex);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
   return {
@@ -85,8 +103,23 @@ export default async function MuniPage({ params }: Props) {
   const muni = decode(rawMuni);
   if (!PREF_NAMES.has(pref)) notFound();
 
-  const cell = await getPlaceCell(pref, muni);
-  if (!cell) notFound();
+  const cellFromIndex = await getPlaceCell(pref, muni);
+  // 出没データが無くてもマスターにあれば 0 件カードとして生成。
+  const masterEntry = JAPAN_MUNICIPALITIES.find(
+    (m) => m.prefName === pref && m.cityName === muni,
+  );
+  if (!cellFromIndex && !masterEntry) notFound();
+  const cell: PlaceCell =
+    cellFromIndex ?? {
+      prefectureName: pref,
+      cityName: muni,
+      count: 0,
+      count90d: 0,
+      count365d: 0,
+      latestDate: null,
+      latCentroid: masterEntry!.lat,
+      lonCentroid: masterEntry!.lon,
+    };
 
   const [siblingsRaw, mapRecords] = await Promise.all([
     getPlaceCellsByPref(pref),
