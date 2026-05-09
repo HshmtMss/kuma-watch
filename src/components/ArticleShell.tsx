@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import ArticlePrevNext from "@/components/ArticlePrevNext";
+import ArticleProgressBar from "@/components/ArticleProgressBar";
+import ArticleShare from "@/components/ArticleShare";
 import PageShell from "@/components/PageShell";
 import {
   getCategory,
+  getReadingTime,
   getRelatedArticles,
   tagToSlug,
   type ArticleMeta,
@@ -30,6 +34,7 @@ export default function ArticleShell({ meta, children }: Props) {
   const url = `${SITE_URL}/articles/${meta.slug}`;
   const related = getRelatedArticles(meta.slug, 3);
   const category = getCategory(meta.category);
+  const readingMinutes = getReadingTime(meta.slug);
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -56,6 +61,7 @@ export default function ArticleShell({ meta, children }: Props) {
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     keywords: meta.tags.join(", "),
+    timeRequired: `PT${readingMinutes}M`,
   };
 
   const breadcrumbItems = [
@@ -96,6 +102,9 @@ export default function ArticleShell({ meta, children }: Props) {
 
   return (
     <PageShell title={meta.title} lead={meta.lead}>
+      <ArticleProgressBar />
+      <ArticleShare title={meta.title} url={url} />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -160,14 +169,23 @@ export default function ArticleShell({ meta, children }: Props) {
         )}
       </nav>
 
-      <p className="not-prose mb-6 text-xs text-gray-500">
-        公開: {formatDate(meta.publishedAt)}
+      <p className="not-prose mb-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+        <span>公開: {formatDate(meta.publishedAt)}</span>
         {meta.publishedAt !== meta.updatedAt && (
-          <> ・ 更新: {formatDate(meta.updatedAt)}</>
+          <span>更新: {formatDate(meta.updatedAt)}</span>
         )}
+        <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2 py-0.5 text-stone-700">
+          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <circle cx="12" cy="12" r="9" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" />
+          </svg>
+          約 {readingMinutes} 分
+        </span>
       </p>
 
       {children}
+
+      <ArticlePrevNext current={meta} />
 
       <hr className="my-8" />
 

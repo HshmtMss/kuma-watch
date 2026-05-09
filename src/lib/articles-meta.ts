@@ -822,6 +822,75 @@ export function getArticlesByTag(tag: string): ArticleMeta[] {
   );
 }
 
+/** 各記事の所要時間 (分)。`scripts/...` で page.tsx の日本語字数を 600字/分で割って算出。
+ *  記事を追加したら手動でここにも 1 行追加する。未登録は 5 分にフォールバック。 */
+const READING_TIMES: Record<string, number> = {
+  autumn: 4,
+  "bear-app": 3,
+  "bear-bell": 4,
+  "bear-canister": 4,
+  "bear-hibernation": 4,
+  "bear-laws": 5,
+  "bear-myths": 4,
+  "bear-senses": 4,
+  "bear-speed": 3,
+  "bear-spray": 4,
+  "bear-tracks": 4,
+  "bluff-charge": 3,
+  camping: 4,
+  "chubu-bears": 3,
+  "cub-handling": 4,
+  "culling-debate": 4,
+  diet: 3,
+  "electric-fence": 4,
+  encounter: 4,
+  "first-aid": 4,
+  fishing: 4,
+  "forest-work": 4,
+  "historic-incidents": 4,
+  "hokkaido-bears": 4,
+  "home-protection": 4,
+  "kanto-bears": 4,
+  "mushroom-picking": 4,
+  "night-encounter": 4,
+  "night-gear": 3,
+  "playing-dead": 4,
+  "school-route": 4,
+  "species-difference": 4,
+  spring: 4,
+  summer: 3,
+  "tohoku-bears": 4,
+  "trail-running": 3,
+  "urban-encounter": 4,
+  weapons: 4,
+  "western-bears": 4,
+  "why-increasing": 4,
+  "wild-vegetables": 4,
+  winter: 3,
+  "world-bears": 4,
+};
+
+export function getReadingTime(slug: string): number {
+  return READING_TIMES[slug] ?? 5;
+}
+
+/** 同カテゴリ内で公開日順の前後 1 本を返す。記事末尾の prev/next ナビ用。 */
+export function getPrevNextInCategory(slug: string): {
+  prev: ArticleMeta | null;
+  next: ArticleMeta | null;
+} {
+  const current = getArticle(slug);
+  if (!current) return { prev: null, next: null };
+  const sorted = ARTICLES.filter((a) => a.category === current.category).sort(
+    (a, b) => a.publishedAt.localeCompare(b.publishedAt) || a.slug.localeCompare(b.slug),
+  );
+  const idx = sorted.findIndex((a) => a.slug === slug);
+  return {
+    prev: idx > 0 ? sorted[idx - 1] : null,
+    next: idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null,
+  };
+}
+
 export function getRelatedArticles(slug: string, limit = 3): ArticleMeta[] {
   const current = getArticle(slug);
   if (!current) return ARTICLES.slice(0, limit);
