@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES } from "@/lib/articles-meta";
 import { getAllPrefSummaries, getStaticPlaceKeys } from "@/lib/place-index";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
 
@@ -40,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const [summaries, keys] = await Promise.all([
       getAllPrefSummaries(),
-      getStaticPlaceKeys(3),
+      getStaticPlaceKeys(1),
     ]);
     prefEntries = summaries.map((s) => ({
       url: `${SITE_URL}/place/${encodeURIComponent(s.prefectureName)}`,
@@ -48,7 +50,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.7,
     }));
-    muniEntries = keys.map((k) => ({
+    // sightings 由来 + マスター由来の市町村 URL を全件出力。
+    // 0 件の市町村ページも検索対象にしておく。
+    const muniSeen = new Set<string>();
+    const muniArr: { pref: string; city: string }[] = [];
+    for (const k of keys) {
+      const key = `${k.pref}/${k.city}`;
+      if (!muniSeen.has(key)) {
+        muniSeen.add(key);
+        muniArr.push(k);
+      }
+    }
+    for (const m of JAPAN_MUNICIPALITIES) {
+      const key = `${m.prefName}/${m.cityName}`;
+      if (!muniSeen.has(key)) {
+        muniSeen.add(key);
+        muniArr.push({ pref: m.prefName, city: m.cityName });
+      }
+    }
+    muniEntries = muniArr.map((k) => ({
       url: `${SITE_URL}/place/${encodeURIComponent(k.pref)}/${encodeURIComponent(k.city)}`,
       lastModified: now,
       changeFrequency: "daily" as const,
@@ -58,5 +78,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // データ取得失敗時はメインの URL のみ返す
   }
 
-  return [...staticEntries, ...articleEntries, ...prefEntries, ...muniEntries];
+  // ランドマーク (高尾山・上高地・知床 等) の /spot ページ
+  const spotEntries: MetadataRoute.Sitemap = JAPAN_LANDMARKS.map((l) => ({
+    url: `${SITE_URL}/spot/${encodeURIComponent(l.slug)}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  return [
+    ...staticEntries,
+    ...articleEntries,
+    ...prefEntries,
+    ...muniEntries,
+    ...spotEntries,
+  ];
 }
