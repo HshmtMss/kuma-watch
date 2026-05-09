@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { ARTICLES, CATEGORIES } from "@/lib/articles-meta";
+import { ARTICLES, CATEGORIES, getAllTags, tagToSlug } from "@/lib/articles-meta";
 import { getAllPrefSummaries, getStaticPlaceKeys } from "@/lib/place-index";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -42,6 +42,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.6,
+  }));
+
+  const tagEntries: MetadataRoute.Sitemap = getAllTags().map((t) => ({
+    url: `${SITE_URL}/articles/tag/${encodeURIComponent(tagToSlug(t.tag))}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
   }));
 
   let prefEntries: MetadataRoute.Sitemap = [];
@@ -97,6 +104,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticEntries,
     ...articleEntries,
     ...categoryEntries,
+    ...tagEntries,
     ...prefEntries,
     ...muniEntries,
     ...spotEntries,
