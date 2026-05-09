@@ -127,7 +127,12 @@ export default function ResearchIndexPage() {
         <div className="text-sm leading-relaxed text-stone-700">
           <p className="mb-2 font-semibold text-stone-900">獣医工学ラボについて</p>
           <p>
-            獣医工学ラボは、<a
+            <a
+              href="https://www.research-coordinate.co.jp/labs/vet/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 underline"
+            >獣医工学ラボ</a>は、<a
               href="https://www.research-coordinate.co.jp"
               target="_blank"
               rel="noopener noreferrer"

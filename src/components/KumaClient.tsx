@@ -625,29 +625,36 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ブランドロックアップ: ロゴ画像 + 「くまウォッチ / by 獣医工学ラボ」の
-            2 段組。和名で監修者が一目で読み取れるサイズ感に整え、タップで /about へ。 */}
-        <Link
-          href="/about"
-          className="flex shrink-0 items-center gap-2"
-          aria-label="くまウォッチ by 獣医工学ラボ"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt="KumaWatch"
-            className="block h-7 w-auto sm:h-8"
-          />
-          <span className="flex flex-col leading-tight">
+        {/* ブランドロックアップ: ロゴ + くまウォッチ → /about (サービス紹介)、
+            by 獣医工学ラボ → 獣医工学ラボ公式ページ (外部) の 2 リンク構造。
+            獣医工学ラボに直接アクセスできる導線を確実に提供する。 */}
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/about"
+            className="flex items-center gap-2"
+            aria-label="くまウォッチについて"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="KumaWatch"
+              className="block h-7 w-auto sm:h-8"
+            />
             <span className="text-[13px] font-semibold tracking-tight text-stone-900 sm:text-sm">
               くまウォッチ
             </span>
-            <span className="text-[11px] text-stone-500 sm:text-xs">
-              by{" "}
-              <span className="font-medium text-stone-700">獣医工学ラボ</span>
-            </span>
-          </span>
-        </Link>
+          </Link>
+          <a
+            href="https://www.research-coordinate.co.jp/labs/vet/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
+            aria-label="獣医工学ラボ (新しいタブで開く)"
+          >
+            by{" "}
+            <span className="font-medium text-stone-700">獣医工学ラボ</span>
+          </a>
+        </div>
 
         <div className="min-w-0 flex-1" aria-hidden />
 

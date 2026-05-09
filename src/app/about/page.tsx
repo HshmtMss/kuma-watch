@@ -87,7 +87,7 @@ const APP_SCHEMA = {
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
-    url: "https://www.research-coordinate.co.jp",
+    url: "https://www.research-coordinate.co.jp/labs/vet/",
     parentOrganization: {
       "@type": "Organization",
       name: "リサーチコーディネート株式会社",
@@ -109,7 +109,7 @@ const APP_SCHEMA = {
     name: "獣医工学ラボ",
     description:
       "リサーチコーディネート株式会社が運営する、獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト",
-    url: "https://www.research-coordinate.co.jp",
+    url: "https://www.research-coordinate.co.jp/labs/vet/",
   },
 };
 
@@ -368,7 +368,16 @@ export default function AboutPage() {
 
       <h2 id="operator">運営体制・監修者</h2>
       <p>
-        本サイトは <strong>獣医工学ラボ</strong>{" "}
+        本サイトは{" "}
+        <strong>
+          <a
+            href="https://www.research-coordinate.co.jp/labs/vet/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            獣医工学ラボ
+          </a>
+        </strong>{" "}
         が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
         <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
       </p>

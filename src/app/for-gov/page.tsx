@@ -288,7 +288,7 @@ export default function ForGovPage() {
           </div>
         </Link>
         <a
-          href="https://www.research-coordinate.co.jp"
+          href="https://www.research-coordinate.co.jp/labs/vet/"
           target="_blank"
           rel="noopener noreferrer"
           className="block rounded-xl border border-stone-200 bg-white p-4 hover:border-blue-400 hover:bg-blue-50/30"
