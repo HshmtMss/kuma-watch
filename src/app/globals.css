@@ -34,7 +34,14 @@ html {
 /* ----------------------------------------------------------------
  * 記事本文 (.article-body) の読みやすさ調整
  * Tailwind v4 + 標準 CSS で記述。@tailwindcss/typography に依存しない。
+ *
+ * @layer components で囲うことで、Tailwind の @layer utilities
+ * (text-white / bg-amber-600 等) が常に勝つようにする。これをしないと
+ * implicit layer 扱いとなり、.article-body a の color 指定が
+ * Tailwind の text-white を必ず上書きしてしまう (CTA ボタンが
+ * 白文字にならず橙文字 + 下線で判読不能になる現象の根因)。
  * ---------------------------------------------------------------- */
+@layer components {
 .article-body {
   font-size: 1rem;
   line-height: 1.9;
@@ -178,3 +185,4 @@ html {
 .article-body .not-prose ol {
   list-style: none;
 }
+} /* end @layer components */
