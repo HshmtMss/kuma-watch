@@ -10,6 +10,7 @@ import {
   getRecordsForPlace,
   getStaticPlaceKeys,
 } from "@/lib/place-index";
+import { buildMuniSeo } from "@/lib/place-seo";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -55,26 +56,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
   const cell = await getPlaceCell(pref, muni);
-  const titleBase = `${pref}${muni}のクマ出没情報・警戒レベルマップ`;
-  const desc = cell
-    ? `${pref}${muni}のクマ出没情報。過去の目撃 ${cell.count} 件 (過去90日 ${cell.count90d} 件)、最新目撃: ${formatDate(cell.latestDate)}。5kmメッシュ単位の警戒レベル・近隣の出没履歴を確認できます。登山・キャンプ前の安全確認に。`
-    : `${pref}${muni}のクマ出没情報・警戒レベルを確認。5kmメッシュ単位の予報で登山・キャンプ前の安全確認に。`;
+  // SEO 強化: 件数 + 最新日 + 獣医師監修 + ブランド名で
+  // 「具体性 × 鮮度 × 信頼性」を検索結果に表示する。
+  const { title, description } = buildMuniSeo(pref, muni, cell);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
   return {
-    title: titleBase,
-    description: desc,
+    title,
+    description,
     alternates: { canonical: `${SITE_URL}${path}` },
     openGraph: {
-      title: `${titleBase}｜KumaWatch`,
-      description: desc,
+      title,
+      description,
       url: `${SITE_URL}${path}`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: titleBase,
-      description: desc,
+      title,
+      description,
     },
   };
 }
@@ -134,6 +134,28 @@ export default async function MuniPage({ params }: Props) {
     },
   };
 
+  // 最近の出没事案 — mapRecords は date desc 済み。
+  // 過去 365 日 + sectionName あり、を優先して 8 件まで。
+  const today = Date.now();
+  const recentIncidents = mapRecords
+    .filter((r) => {
+      const t = Date.parse(r.date);
+      return Number.isFinite(t) && today - t <= 365 * 86_400_000;
+    })
+    .slice(0, 8);
+
+  // 地区別件数 — sectionName で集約して件数の多い順に top 5。
+  // 「○○市 ○○町 クマ」のような長尾検索の受け皿になる。
+  const sectionCounts = new Map<string, number>();
+  for (const r of mapRecords) {
+    const s = (r.sectionName ?? "").trim();
+    if (!s) continue;
+    sectionCounts.set(s, (sectionCounts.get(s) ?? 0) + 1);
+  }
+  const topSections = [...sectionCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
   return (
     <PageShell
       title={`${muni} のクマ出没情報`}
@@ -147,6 +169,26 @@ export default async function MuniPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }}
       />
+
+      {/* 視認できるパンくずリスト。SEO 上の breadcrumb は既に JSON-LD にあるが、
+          ユーザーが「県トップへ戻る」「ホームへ戻る」を直感操作できるよう本文にも置く */}
+      <nav
+        aria-label="パンくずリスト"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-xs text-stone-500"
+      >
+        <Link href="/" className="hover:text-stone-900">
+          ホーム
+        </Link>
+        <span>›</span>
+        <Link
+          href={`/place/${encodeURIComponent(pref)}`}
+          className="hover:text-stone-900"
+        >
+          {pref}
+        </Link>
+        <span>›</span>
+        <span className="font-semibold text-stone-700">{muni}</span>
+      </nav>
 
       <div className="not-prose mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
@@ -227,6 +269,72 @@ export default async function MuniPage({ params }: Props) {
         最新の目撃は {formatDate(cell.latestDate)} です。
         各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
       </p>
+
+      {/* 最近の出没事案 — 具体的な日付・地区の文字列が長尾 SEO に効く。
+          コメントが空なら sectionName を表示、それも無ければ省略。 */}
+      {recentIncidents.length > 0 && (
+        <>
+          <h2>{muni} の最近の出没事案</h2>
+          <ul className="not-prose space-y-2">
+            {recentIncidents.map((r, i) => (
+              <li
+                key={`${r.date}-${i}`}
+                className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm"
+              >
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-semibold text-stone-900">
+                    {formatDate(r.date)}
+                  </span>
+                  {r.sectionName && (
+                    <span className="text-xs text-stone-500">
+                      {r.sectionName}
+                    </span>
+                  )}
+                </div>
+                {r.comment && (
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">
+                    {r.comment}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="not-prose mt-2 text-xs text-stone-500">
+            最新の事案は{" "}
+            <Link href="/research" className="underline hover:text-stone-900">
+              日次レポート
+            </Link>
+            でも詳細を解説しています。
+          </p>
+        </>
+      )}
+
+      {/* 地区別件数 — 「○○市 ○○町 クマ」のような長尾検索の受け皿。
+          全件 0 件の地区は出さない。 */}
+      {topSections.length > 0 && (
+        <>
+          <h2>{muni} の地区別 出没件数</h2>
+          <p className="text-sm">
+            出没件数の多い地区を上位から {topSections.length} 件表示しています。
+            出発前にお住まい・目的地周辺の地区名と照らし合わせてください。
+          </p>
+          <div className="not-prose my-3 overflow-hidden rounded-xl border border-stone-200 bg-white">
+            <ul className="divide-y divide-stone-200">
+              {topSections.map(([section, n]) => (
+                <li
+                  key={section}
+                  className="flex items-baseline justify-between gap-3 px-3 py-2.5 text-sm"
+                >
+                  <span className="text-stone-800">{section}</span>
+                  <span className="shrink-0 tabular-nums text-stone-500">
+                    {n} 件
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
 
       <h2>{muni} で登山・キャンプを予定している方へ</h2>
       <p>

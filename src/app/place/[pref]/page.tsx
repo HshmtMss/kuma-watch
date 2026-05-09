@@ -7,6 +7,7 @@ import {
   getPlaceCellsByPref,
   getPrefSummary,
 } from "@/lib/place-index";
+import { buildPrefSeo } from "@/lib/place-seo";
 
 // 47 都道府県のみを許可。それ以外のパスは Next.js が即 404 を返す。
 // dynamicParams=true だと、未対応の文字列で叩かれた際に SSR が走って
@@ -37,25 +38,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
   const summary = await getPrefSummary(pref);
-  const titleBase = `${pref}のクマ出没予報・市町村別マップ`;
-  const desc = summary
-    ? `${pref}のクマ出没情報を市町村別に集約。総目撃${summary.totalCount}件、過去90日${summary.count90d}件、過去1年${summary.count365d}件 (最終更新: ${summary.latestDate ?? "-"})。${summary.cityCount}市町村の警戒レベルを5kmメッシュで確認できます。`
-    : `${pref}のクマ出没情報を市町村別に集約。5kmメッシュ単位の警戒レベル予報で登山・キャンプ前の安全確認に。`;
+  // SEO 強化: /place/[pref]/[muni] と同じテンプレで件数 + 最新日 + 獣医師監修。
+  const { title, description } = buildPrefSeo(
+    pref,
+    summary
+      ? {
+          count: summary.totalCount,
+          count90d: summary.count90d,
+          latestDate: summary.latestDate,
+          muniCount: summary.cityCount,
+        }
+      : undefined,
+  );
 
   return {
-    title: titleBase,
-    description: desc,
+    title,
+    description,
     alternates: { canonical: `${SITE_URL}/place/${encodeURIComponent(pref)}` },
     openGraph: {
-      title: `${titleBase}｜KumaWatch`,
-      description: desc,
+      title,
+      description,
       url: `${SITE_URL}/place/${encodeURIComponent(pref)}`,
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: titleBase,
-      description: desc,
+      title,
+      description,
     },
   };
 }
@@ -97,6 +106,23 @@ export default async function PrefPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+
+      {/* 視認できるパンくずリスト。SEO 上の breadcrumb は JSON-LD にあるが、
+          ユーザーが「ホームへ戻る」を直感操作できるよう本文にも置く */}
+      <nav
+        aria-label="パンくずリスト"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-xs text-stone-500"
+      >
+        <Link href="/" className="hover:text-stone-900">
+          ホーム
+        </Link>
+        <span>›</span>
+        <Link href="/place" className="hover:text-stone-900">
+          都道府県別
+        </Link>
+        <span>›</span>
+        <span className="font-semibold text-stone-700">{pref}</span>
+      </nav>
 
       <h2>{pref}内の市町村別 出没情報</h2>
       {cells.length === 0 ? (
