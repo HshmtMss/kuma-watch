@@ -162,9 +162,8 @@ export default async function PrefPage({ params }: Props) {
       </p>
       <h2>注意事項</h2>
       <p>
-        KumaWatch のデータは Sharp9110 提供のオープンデータ (CC BY 4.0)、
-        環境省の生息域推定、各自治体のオープンデータを統合したものです。あくまで参考情報であり、
-        最新かつ正確な情報は各自治体の公式発表をご確認ください。
+        KumaWatch のデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
+        あくまで参考情報であり、最新かつ正確な情報は各自治体の公式発表をご確認ください。
       </p>
       <p className="not-prose mt-6">
         <Link
