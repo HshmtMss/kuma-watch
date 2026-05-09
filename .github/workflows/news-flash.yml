@@ -12,9 +12,11 @@ name: News flash ingest
 
 on:
   schedule:
-    # 毎時 15 分。refresh-sightings (毎日 03:00 / 15:00 JST) のピークと
-    # ぶつからないよう 15 分オフセット。
-    - cron: '15 * * * *'
+    # 30 分間隔。URL 重複キャッシュ (ingest-news-only.ts → fetchNewsSightings
+    # に excludeUrls 引数で既処理 URL を渡す) により、ほとんどのランは
+    # Gemini API を呼ばずに即終了するので Actions 分数を消費しない。
+    # 新着ニュースが入ったときだけ Gemini が動く。
+    - cron: '5,35 * * * *'
   workflow_dispatch: {}
 
 permissions:

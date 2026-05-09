@@ -11,6 +11,7 @@
     "build:mesh": "node scripts/build-mesh-data.mjs",
     "build:sightings": "tsx --env-file-if-exists=.env.local scripts/build-sightings.ts",
     "ingest:news": "tsx --env-file-if-exists=.env.local scripts/ingest-news-only.ts",
+    "ingest:sharp9110": "tsx --env-file-if-exists=.env.local scripts/ingest-sharp9110-only.ts",
     "import:research": "tsx scripts/import-research.ts"
   },
   "dependencies": {

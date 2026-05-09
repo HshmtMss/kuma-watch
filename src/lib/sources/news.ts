@@ -26,7 +26,22 @@ const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models
 const MAX_ARTICLES_PER_BATCH = 50;
 const SOURCE_CACHE_TTL_MS = 60 * 60 * 1000;
 
-const FEEDS: { url: string; label: string }[] = [
+// クマ系キーワードを含む title/description だけを残すフィルタ。
+// NHK / Yahoo のような汎用ニュース feed では、これで非関連記事を弾いて
+// Gemini に渡す batch を効率化する。
+const BEAR_KEYWORD_RE = /(クマ|熊|ヒグマ|ツキノワ)/;
+const isBearItem = (it: { title: string; description: string }) =>
+  BEAR_KEYWORD_RE.test(it.title) ||
+  BEAR_KEYWORD_RE.test(it.description ?? "");
+
+type Feed = {
+  url: string;
+  label: string;
+  /** 全件入れたいキーワード特化 feed は undefined。汎用 feed には title 由来の絞り込みを与える */
+  preFilter?: (item: { title: string; description: string }) => boolean;
+};
+
+const FEEDS: Feed[] = [
   {
     // 「クマ 出没」検索の RSS。Google News は 24h 以内のニュースが多い。
     url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%87%BA%E6%B2%A1&hl=ja&gl=JP&ceid=JP:ja",
@@ -66,6 +81,31 @@ const FEEDS: { url: string; label: string }[] = [
     // 本州中心の結果に偏るので別クエリで道内事案を補強。
     url: "https://news.google.com/rss/search?q=%E3%83%92%E3%82%B0%E3%83%9E+%E5%87%BA%E6%B2%A1&hl=ja&gl=JP&ceid=JP:ja",
     label: "google-news-higuma",
+  },
+  // === NHK 全国ニュース ===
+  // NHK は地域取材網が広く、クマ事案を発生数時間以内に出すことが多い。
+  // 一般 feed なので title/description にクマ系キーワードを含むものに絞り込む。
+  {
+    url: "https://www3.nhk.or.jp/rss/news/cat0.xml",
+    label: "nhk-top",
+    preFilter: isBearItem,
+  },
+  {
+    url: "https://www3.nhk.or.jp/rss/news/cat1.xml",
+    label: "nhk-domestic",
+    preFilter: isBearItem,
+  },
+  // === Yahoo!ニュース ===
+  // 地域・国内のニュースが集約されており、地方紙発の事案も取り込める。
+  {
+    url: "https://news.yahoo.co.jp/rss/topics/local.xml",
+    label: "yahoo-local",
+    preFilter: isBearItem,
+  },
+  {
+    url: "https://news.yahoo.co.jp/rss/topics/domestic.xml",
+    label: "yahoo-domestic",
+    preFilter: isBearItem,
   },
 ];
 
@@ -179,9 +219,9 @@ function parseRssItems(xml: string, source: string): RssItem[] {
   return items;
 }
 
-async function fetchFeed(url: string, label: string): Promise<RssItem[]> {
+async function fetchFeed(feed: Feed): Promise<RssItem[]> {
   try {
-    const r = await fetch(url, {
+    const r = await fetch(feed.url, {
       headers: {
         "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp; news ingest)",
         Accept: "application/rss+xml, application/xml, text/xml",
@@ -189,13 +229,16 @@ async function fetchFeed(url: string, label: string): Promise<RssItem[]> {
       cache: "no-store",
     });
     if (!r.ok) {
-      console.warn(`[news] feed ${label} HTTP ${r.status}`);
+      console.warn(`[news] feed ${feed.label} HTTP ${r.status}`);
       return [];
     }
     const xml = await r.text();
-    return parseRssItems(xml, label);
+    const items = parseRssItems(xml, feed.label);
+    // preFilter があれば適用 (汎用 feed をクマ関連キーワードで絞り込む)
+    if (feed.preFilter) return items.filter(feed.preFilter);
+    return items;
   } catch (e) {
-    console.warn(`[news] feed ${label} fetch failed`, e);
+    console.warn(`[news] feed ${feed.label} fetch failed`, e);
     return [];
   }
 }
@@ -270,9 +313,14 @@ async function callGeminiBatch(
   }
 }
 
-export async function fetchNewsSightings(): Promise<UnifiedSighting[]> {
+export async function fetchNewsSightings(
+  excludeUrls?: ReadonlySet<string>,
+): Promise<UnifiedSighting[]> {
   const now = Date.now();
-  if (memo && now - memo.at < SOURCE_CACHE_TTL_MS) return memo.data;
+  // memo を使うのは「同一プロセス内で何度も呼ばれた時の重複抑制」のためだけ。
+  // GitHub Actions の各ランは新規プロセスなので memo は影響しない。
+  if (memo && now - memo.at < SOURCE_CACHE_TTL_MS && !excludeUrls)
+    return memo.data;
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -281,18 +329,24 @@ export async function fetchNewsSightings(): Promise<UnifiedSighting[]> {
   }
 
   // 全フィードを並列取得し、URL 重複を除く
-  const feeds = await Promise.all(FEEDS.map((f) => fetchFeed(f.url, f.label)));
+  const feeds = await Promise.all(FEEDS.map((f) => fetchFeed(f)));
   const allItems = feeds.flat();
   const uniq = new Map<string, RssItem>();
   for (const it of allItems) {
     if (!uniq.has(it.link)) uniq.set(it.link, it);
   }
+  // 既に取り込み済の URL を Gemini 呼び出し前に除外。
+  // 30 分間隔の cron ではほとんどの記事が前回処理済みなので、
+  // ここで弾けば Gemini 呼び出しがゼロ or 数件になり quota を抑えられる。
   const items = [...uniq.values()]
+    .filter((it) => !excludeUrls?.has(it.link))
     .sort((a, b) => (a.pubDate < b.pubDate ? 1 : -1))
     .slice(0, MAX_ARTICLES_PER_BATCH);
 
   if (items.length === 0) {
-    console.log("[news] no items in feeds");
+    console.log(
+      `[news] no new items (excluded ${excludeUrls?.size ?? 0} known URLs from ${uniq.size} candidates)`,
+    );
     memo = { at: now, data: [] };
     return [];
   }

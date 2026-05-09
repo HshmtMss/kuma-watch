@@ -1,0 +1,53 @@
+name: Sharp9110 flash ingest
+
+# Sharp9110 (公衆衛生通報情報) を 15 分間隔で polling する高頻度ジョブ。
+# 単一 API 呼び出しで全国分が取れる軽量ソースなので、新着があれば
+# 即時 sightings.json に追加・コミットできる。
+#
+# 1 run ≒ 30 秒 (cache hit 時) × 96 回/日 × 30 = 約 1,440 min/月。
+# news-flash (約 720 min) + refresh-sightings (約 1,800 min) と合算すると
+# 約 3,960 min/月 で private repo 無料枠 (2,000) を超過するため、
+# 必要に応じて 30 min 間隔への調整 or repo の public 化を検討。
+
+on:
+  schedule:
+    # 毎時 0/15/30/45 分。news-flash (5/35) とぶつからないようオフセット。
+    - cron: '0,15,30,45 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sharp9110-flash
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Ingest Sharp9110
+        run: npm run ingest:sharp9110
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet public/data/sightings.json; then
+            echo "No new Sharp9110 records — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/sightings.json
+          git commit -m "Sharp9110 flash: ingest fresh records ($(date -u +%Y-%m-%dT%H:%M))"
+          git pull --rebase origin main
+          git push

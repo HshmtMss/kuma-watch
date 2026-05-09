@@ -44,6 +44,8 @@ async function main(): Promise<void> {
   }
 
   // 既存の news レコード URL セット (dedup の鍵)
+  // fetchNewsSightings に渡して Gemini 呼び出し前にフィルタリングする。
+  // これにより 30 分間隔 cron でも Gemini quota をほぼ消費しない。
   const existingNewsUrls = new Set<string>();
   for (const r of snapshot.records) {
     if (r.source === "news" && r.sourceUrl) existingNewsUrls.add(r.sourceUrl);
@@ -52,14 +54,8 @@ async function main(): Promise<void> {
     `[ingest-news] existing snapshot: ${snapshot.records.length} records (${existingNewsUrls.size} news with URL)`,
   );
 
-  // 最新ニュースを取得
-  const latest = await fetchNewsSightings();
-  console.log(`[ingest-news] fetched ${latest.length} candidates from feeds`);
-
-  // URL 重複していないものだけ抽出
-  const fresh = latest.filter(
-    (r) => r.sourceUrl && !existingNewsUrls.has(r.sourceUrl),
-  );
+  // 最新ニュースを取得 (既処理 URL を除外して Gemini 呼び出しコストを最小化)
+  const fresh = await fetchNewsSightings(existingNewsUrls);
 
   if (fresh.length === 0) {
     console.log("[ingest-news] no new items — skipping write");
