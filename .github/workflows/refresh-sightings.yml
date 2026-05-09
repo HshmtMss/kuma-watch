@@ -7,13 +7,12 @@ name: Refresh sightings data
 
 on:
   schedule:
-    # 1日 3 回 (8 時間間隔)。朝・昼・夜の各時間帯に自治体公式サイトの更新を取り込む。
-    # UTC 18:00 = JST 03:00 (早朝バッチ・深夜帯で自治体側負荷を最小化)
-    # UTC 02:00 = JST 11:00 (昼前バッチ・当日の朝掲載分を取り込む)
-    # UTC 10:00 = JST 19:00 (夕方バッチ・当日の昼〜夕方掲載分を取り込む)
-    # 1 run ≒ 20 min × 3 回/日 ≒ 1,800 min/月。news-flash.yml と合わせて
-    # 約 1,900 min/月 (Actions 無料枠 2,000 min 内)。
-    - cron: '0 2,10,18 * * *'
+    # 4 時間間隔 (1日 6 回)。public repo 化により Actions 無制限なので
+    # 各時間帯の自治体掲載をカバー。
+    # UTC 18:00 = JST 03:00 / UTC 22:00 = JST 07:00 / UTC 02:00 = JST 11:00 /
+    # UTC 06:00 = JST 15:00 / UTC 10:00 = JST 19:00 / UTC 14:00 = JST 23:00
+    # 自治体側サーバー負荷を考えても、6x/日は許容範囲。
+    - cron: '0 */4 * * *'
   workflow_dispatch: {}
 
 # git push に必要

@@ -500,13 +500,13 @@ export default function KumaClient() {
     };
   }, []);
 
-  // C1: 1 分間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
+  // C1: 30 秒間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
   // タブ非表示中はポーリングを停止し、再表示時に即時 1 回チェック。
-  // news-flash workflow が 1 時間ごとに新規 news を投入するため、ユーザーが
-  // 開きっぱなしでも 1 分以内に最新事案が反映される。
+  // sharp9110-flash が 1 分ごと、news-flash が 5 分ごとにデータを入れるため、
+  // クライアント側 30 秒ポーリングで「最大 30 秒前」の事案までほぼ反映される。
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const POLL_MS = 60 * 1000;
+    const POLL_MS = 30 * 1000;
     let timer: number | null = null;
 
     async function checkForNew() {

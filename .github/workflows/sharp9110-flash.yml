@@ -1,18 +1,16 @@
 name: Sharp9110 flash ingest
 
-# Sharp9110 (公衆衛生通報情報) を 15 分間隔で polling する高頻度ジョブ。
+# Sharp9110 (公衆衛生通報情報) を 1 分間隔で polling する高頻度ジョブ。
 # 単一 API 呼び出しで全国分が取れる軽量ソースなので、新着があれば
 # 即時 sightings.json に追加・コミットできる。
 #
-# 1 run ≒ 30 秒 (cache hit 時) × 96 回/日 × 30 = 約 1,440 min/月。
-# news-flash (約 720 min) + refresh-sightings (約 1,800 min) と合算すると
-# 約 3,960 min/月 で private repo 無料枠 (2,000) を超過するため、
-# 必要に応じて 30 min 間隔への調整 or repo の public 化を検討。
+# repo public 化後は GitHub Actions が無制限・無料で使えるため、
+# 限界まで詰めて 1 分間隔運用とする。
 
 on:
   schedule:
-    # 毎時 0/15/30/45 分。news-flash (5/35) とぶつからないようオフセット。
-    - cron: '0,15,30,45 * * * *'
+    # 毎分実行。GitHub Actions の cron 最小粒度。
+    - cron: '* * * * *'
   workflow_dispatch: {}
 
 permissions:
