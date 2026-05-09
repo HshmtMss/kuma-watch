@@ -93,9 +93,6 @@ export default function KumaClient() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
-  // 「直近24h」フィルタ: 取り込みから 24h 以内のレコードだけ残す。
-  // ON にすると最新の出没事案だけを地図に表示する速報モード。
-  const [freshOnly, setFreshOnly] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
@@ -595,18 +592,13 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
-    const FRESH_MS = 24 * 60 * 60 * 1000;
-    const cutoffMs = Date.now() - FRESH_MS;
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
       const periodOk = !periodCutoff || r.date >= periodCutoff;
-      const freshOk =
-        !freshOnly ||
-        (typeof r.ingestedAt === "number" && r.ingestedAt >= cutoffMs);
-      return prefOk && periodOk && freshOk;
+      return prefOk && periodOk;
     });
-  }, [records, selectedPref, periodCutoff, showPins, freshOnly]);
+  }, [records, selectedPref, periodCutoff, showPins]);
 
   // データ更新日: 最新の事案発生日を「データの新しさ」の指標として算出する。
   // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
@@ -771,25 +763,6 @@ export default function KumaClient() {
               {filtered.length.toLocaleString()}件
             </span>
           </div>
-
-          {/* 直近24h フィルタ — 速報モード。ON にすると当社が直近 24h 内に
-              取り込んだ事案のみを地図に表示し、ピンも青で強調される。 */}
-          <label
-            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 font-medium ${
-              freshOnly
-                ? "border-blue-300 bg-blue-50 text-blue-800"
-                : "border-gray-200 bg-gray-50 text-gray-700"
-            }`}
-            title="当社が直近 24 時間以内に取り込んだ事案のみ表示"
-          >
-            <input
-              type="checkbox"
-              checked={freshOnly}
-              onChange={(e) => setFreshOnly(e.target.checked)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            🆕 24h
-          </label>
 
           {/* 警戒レベルヒートマップ ON/OFF */}
           <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">

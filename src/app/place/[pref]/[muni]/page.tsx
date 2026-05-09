@@ -216,7 +216,6 @@ export default async function MuniPage({ params }: Props) {
   };
 
   const mapUrl = `/?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&z=12`;
-  const placeUrl = `/place?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&name=${encodeURIComponent(pref + muni)}`;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -470,21 +469,6 @@ export default async function MuniPage({ params }: Props) {
       </div>
       <p className="not-prose mb-6 text-xs text-gray-500">
         赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
-      </p>
-
-      <p className="not-prose mb-6 flex flex-wrap gap-2">
-        <Link
-          href={mapUrl}
-          className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
-        >
-          5kmメッシュの警戒レベルマップを開く →
-        </Link>
-        <Link
-          href={placeUrl}
-          className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
-        >
-          詳細カードを開く
-        </Link>
       </p>
 
       <h2>{muni} のクマ出没傾向</h2>
