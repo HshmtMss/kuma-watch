@@ -52,18 +52,10 @@ export default function PageShell({ title, lead, children }: Props) {
       </main>
       <footer className="border-t border-black/8 bg-white px-5 py-6 text-xs text-gray-500">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
-          <div>
-            運営: 獣医工学ラボ (
-            <a
-              href="https://www.research-coordinate.co.jp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900"
-            >
-              リサーチコーディネート株式会社
-            </a>
-            )
-          </div>
+          {/* ブランドはトップヘッダーと同じく「獣医工学ラボ」に統一。
+              法人名 (リサーチコーディネート株式会社) は /credits 等の
+              法的記載コンテキストにのみ表示する。 */}
+          <div>運営: 獣医工学ラボ</div>
           <nav className="flex flex-wrap items-center gap-3">
             <Link href="/about" className="hover:text-gray-900">このサイトについて</Link>
             <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>

@@ -319,35 +319,38 @@ export default async function MuniPage({ params }: Props) {
       </p>
 
       {/* 過去 12 ヶ月の月別件数バーチャート — 季節性を視覚的に把握。
-          SVG/library なし、純 div で簡潔に描画。 */}
+          バー行 + ラベル行 を別 flex にし、each バーに直接 height を当てる。 */}
       <h3>過去 12 ヶ月の月別件数</h3>
       <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
         <div className="flex h-32 items-end gap-1.5">
           {monthly.map((b) => {
-            const h = (b.count / monthlyMax) * 100;
+            const h = monthlyMax > 0 ? (b.count / monthlyMax) * 100 : 0;
+            // 0 件は薄い灰色で 4% 高、件あれば最低 8% 確保して視認できるように。
+            const heightPct = b.count > 0 ? Math.max(h, 8) : 4;
             return (
               <div
                 key={b.key}
-                className="flex flex-1 flex-col items-center gap-1"
                 title={`${b.key}: ${b.count}件`}
-              >
-                <div className="flex h-full w-full items-end">
-                  <div
-                    className={`w-full rounded-t-sm ${
-                      b.count > 0 ? "bg-amber-500" : "bg-stone-200"
-                    }`}
-                    style={{ height: `${Math.max(h, b.count > 0 ? 6 : 2)}%` }}
-                  />
-                </div>
-                <div className="text-[10px] text-stone-500">{b.label}</div>
-              </div>
+                className={`flex-1 rounded-t-sm ${
+                  b.count > 0 ? "bg-amber-500" : "bg-stone-100"
+                }`}
+                style={{ height: `${heightPct}%` }}
+              />
             );
           })}
         </div>
-        <div className="mt-2 flex items-baseline justify-between text-[11px] text-stone-500">
+        <div className="mt-1 flex gap-1.5 text-[10px] text-stone-500">
+          {monthly.map((b) => (
+            <div key={b.key} className="flex-1 text-center">
+              {b.label}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-baseline justify-between border-t border-stone-100 pt-2 text-[11px] text-stone-500">
           <span>過去 12 ヶ月</span>
           <span>
-            合計 <span className="font-semibold text-stone-800">
+            合計{" "}
+            <span className="font-semibold text-stone-800">
               {monthly.reduce((a, b) => a + b.count, 0)}
             </span>{" "}
             件
@@ -523,15 +526,6 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
-      <p className="not-prose mt-8 border-t border-stone-200 pt-4 text-xs text-stone-500">
-        データ出典: 自治体公式・Sharp9110・環境省 等 70+ ソースを毎日 2 回自動取り込み（
-        <Link href="/credits" className="underline hover:text-stone-900">
-          詳細
-        </Link>
-        ）。本ページはあくまで参考情報です。最新の出没状況は{" "}
-        {pref}
-        {muni} の公式発表をあわせてご確認ください。
-      </p>
     </PageShell>
   );
 }
