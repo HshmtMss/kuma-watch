@@ -5,6 +5,7 @@ import PageShell from "@/components/PageShell";
 import {
   getCategory,
   getRelatedArticles,
+  tagToSlug,
   type ArticleMeta,
 } from "@/lib/articles-meta";
 
@@ -207,6 +208,27 @@ export default function ArticleShell({ meta, children }: Props) {
           すべての記事を見る →
         </Link>
       </p>
+
+      {meta.tags.length > 0 && (
+        <>
+          <hr className="my-8" />
+          <h2 className="not-prose mb-2 text-sm font-semibold text-stone-700">
+            関連タグ
+          </h2>
+          <ul className="not-prose flex flex-wrap gap-2 text-sm">
+            {meta.tags.map((t) => (
+              <li key={t}>
+                <Link
+                  href={`/articles/tag/${encodeURIComponent(tagToSlug(t))}`}
+                  className="inline-flex items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-stone-700 hover:border-amber-400 hover:bg-amber-50"
+                >
+                  #{t}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <hr className="my-8" />
 

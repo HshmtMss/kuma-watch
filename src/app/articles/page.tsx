@@ -5,7 +5,9 @@ import PageShell from "@/components/PageShell";
 import {
   ARTICLES,
   CATEGORIES,
+  getAllTags,
   getArticlesByCategory,
+  tagToSlug,
   type ArticleMeta,
 } from "@/lib/articles-meta";
 
@@ -138,6 +140,33 @@ export default function ArticlesIndexPage() {
           </section>
         );
       })}
+
+      {/* タグクラウド: 出現頻度順 TOP30 */}
+      <section className="not-prose mt-12">
+        <div className="mb-3 flex items-baseline justify-between border-b border-stone-200 pb-2">
+          <h2 className="text-base font-bold text-stone-900">
+            タグから探す
+          </h2>
+          <span className="text-xs text-stone-500">
+            出現頻度順
+          </span>
+        </div>
+        <ul className="flex flex-wrap gap-2 text-sm">
+          {getAllTags()
+            .slice(0, 30)
+            .map(({ tag, count }) => (
+              <li key={tag}>
+                <Link
+                  href={`/articles/tag/${encodeURIComponent(tagToSlug(tag))}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-white px-3 py-1 text-stone-700 hover:border-amber-400 hover:bg-amber-50"
+                >
+                  <span>#{tag}</span>
+                  <span className="text-xs text-stone-400">{count}</span>
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
     </PageShell>
   );
 }

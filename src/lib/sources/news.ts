@@ -20,8 +20,10 @@ import { geocodePlace, jitter } from "./geocode";
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
-// 1 回のバッチで Gemini に渡す記事数の上限。多すぎると応答長で詰まる。
-const MAX_ARTICLES_PER_BATCH = 30;
+// 1 回のバッチで Gemini に渡す記事数の上限。
+// FEEDS が 6 系統に増えたためバッチも拡張。Gemini gemini-3-flash は
+// 50 記事程度なら responseSchema の JSON 上限内に収まる。
+const MAX_ARTICLES_PER_BATCH = 50;
 const SOURCE_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const FEEDS: { url: string; label: string }[] = [
@@ -34,6 +36,36 @@ const FEEDS: { url: string; label: string }[] = [
     // 「熊 目撃」検索。キーワードを変えてカバレッジを広げる。
     url: "https://news.google.com/rss/search?q=%E7%86%8A+%E7%9B%AE%E6%92%83&hl=ja&gl=JP&ceid=JP:ja",
     label: "google-news-bear-sighting",
+  },
+  // === 警察発表系 ===
+  // 警察・県警の発表は自治体公式サイトより数時間〜半日早く出ることが多く、
+  // 速報性の鍵となる。Google News の検索面を増やして間接的に取り込む。
+  {
+    // 「クマ 警察」— 警察庁・各県警発表をベースに報道される事案
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E8%AD%A6%E5%AF%9F&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-police",
+  },
+  {
+    // 「クマ 県警」— 都道府県警発表
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E7%9C%8C%E8%AD%A6&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-prefpolice",
+  },
+  // === 自治体発表 / 防災情報系 ===
+  {
+    // 「クマ 緊急情報」— 自治体の緊急速報メール・防災情報網経由の事案
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E7%B7%8A%E6%80%A5%E6%83%85%E5%A0%B1&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-emergency",
+  },
+  {
+    // 「クマ 注意喚起」— 自治体・観光協会等の注意喚起発表
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E6%B3%A8%E6%84%8F%E5%96%9A%E8%B5%B7&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-alert",
+  },
+  {
+    // 「ヒグマ 出没」— 北海道のヒグマ専用クエリ。一般「クマ」だと
+    // 本州中心の結果に偏るので別クエリで道内事案を補強。
+    url: "https://news.google.com/rss/search?q=%E3%83%92%E3%82%B0%E3%83%9E+%E5%87%BA%E6%B2%A1&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-higuma",
   },
 ];
 
@@ -179,14 +211,20 @@ function buildPrompt(items: RssItem[]): string {
   return `あなたはニュース記事の見出し・要約から、クマ (ヒグマ・ツキノワグマ) 出没事案を抽出するツールです。
 今日: ${todayIso}
 
+入力源:
+- Google News 経由の各社報道。警察・県警発表 / 自治体緊急情報 / 注意喚起 / 防災メール / 一般報道が混在します。
+- 警察発表ベースの記事 (「○○県警によると...」「警察によると○月○日...」) は具体的な地点・時刻が含まれることが多いので優先的に抽出してください。
+- 自治体の緊急情報メール由来 (「○○市は本日午前...」) も同様に優先。
+
 抽出ルール:
-- 「個別の出没・目撃・痕跡発見・人身被害」を 1 件 1 オブジェクトで返す。
+- 「個別の出没・目撃・痕跡発見・人身被害・駆除・捕獲」を 1 件 1 オブジェクトで返す。
 - 同じ記事内に複数の事案がある場合は同じ index を持つ複数オブジェクトを返してよい。
-- 注意喚起・対策方針・統計記事 (「○○県のクマ出没件数が増加」等) は対象外 → 該当 index を返さない。
-- 駆除・捕獲のニュースで「○○市で 1 頭駆除」など具体地点・日付があれば対象。
+- 注意喚起の "全般的な" 文 (具体地点が無い「○○県では出没多発、注意を」) は対象外。
+- 統計記事 (「○○県のクマ出没件数が増加」「シーズン別の捕獲頭数」等) は対象外。
 - 各フィールドは responseSchema の description を厳守。推測しないこと。
 - pubDate より未来の日付は NG。
 - 海外のニュース (アメリカ・ロシア等) は対象外。
+- 駆除・捕獲のニュースで「○○市で 1 頭駆除」など具体地点・日付があれば対象。
 
 === articles ===
 ${articles}

@@ -453,6 +453,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "autumn",
     category: "scene",
     tags: ["きのこ狩り", "秋", "山菜採り", "ハイパーフェイジア"],
+    heroImage: "/articles/mushroom-picking.jpg",
+    heroCredit: "Photo by Townsend Walton on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/REu4bAykGxA",
   },
   {
     slug: "wild-vegetables",
@@ -465,6 +468,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "spring",
     category: "scene",
     tags: ["山菜採り", "春", "母グマ", "タケノコ"],
+    heroImage: "/articles/wild-vegetables.jpg",
+    heroCredit: "Photo by Naira Babayan on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/hiozwuYUXtM",
   },
   {
     slug: "playing-dead",
@@ -477,6 +483,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "encounter",
     tags: ["死んだふり", "対処", "ツキノワグマ", "ヒグマ"],
+    heroImage: "/articles/playing-dead.jpg",
+    heroCredit: "Photo by Bill Pennell on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/o1PU3O2lIYQ",
   },
   {
     slug: "bear-speed",
@@ -489,6 +498,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["走力", "生態", "対処", "ヒグマ"],
+    heroImage: "/articles/bear-speed.jpg",
+    heroCredit: "Photo by Hans Veth on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/T5bcvBRHv_E",
   },
   {
     slug: "bear-laws",
@@ -501,6 +513,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "background",
     tags: ["法律", "鳥獣保護法", "狩猟", "銃刀法"],
+    heroImage: "/articles/bear-laws.jpg",
+    heroCredit: "Photo by Kvnga on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/7h1gRWaBiqk",
   },
   {
     slug: "electric-fence",
@@ -513,6 +528,9 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "scene",
     tags: ["電気柵", "果樹園", "家庭", "畑"],
+    heroImage: "/articles/electric-fence.jpg",
+    heroCredit: "Photo by Phillip Flores on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/pQ-TfGxHfbA",
   },
   {
     slug: "tohoku-bears",
@@ -525,6 +543,237 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "region",
     tags: ["東北", "秋田", "岩手", "青森", "ツキノワグマ"],
+    heroImage: "/articles/tohoku-bears.jpg",
+    heroCredit: "Photo by ERIC MIYAGI on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/kAKKruhxerk",
+  },
+
+  // --- 2026-05-09 第3次追加分 ----------------------------------------
+
+  {
+    slug: "bluff-charge",
+    title: "クマの威嚇突進 (ブラフチャージ) と本気の突進の見分け方",
+    description:
+      "クマが突進してきても、その多くは威嚇 (ブラフチャージ) で途中で停止します。耳の向き・後肢の構え・口の動きで本気の攻撃と区別する方法、威嚇突進された瞬間にやってよい行動を整理します。",
+    lead: "クマの突進の多くは威嚇 (ブラフチャージ)。耳・口・後肢の動きで本気との見分けがつきます。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "encounter",
+    tags: ["ブラフチャージ", "威嚇", "対処", "突進"],
+    heroImage: "/articles/bluff-charge.jpg",
+    heroCredit: "Photo by anvesh baru on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/2ZXrBR4ByAQ",
+  },
+  {
+    slug: "urban-encounter",
+    title: "市街地・住宅地でクマに出会ったら — 通報・避難・追い払いの順序",
+    description:
+      "近年急増する市街地・住宅街でのクマ目撃。子供を守る、屋内に避難する、110 番通報する、追い払いを試みない — 都市環境ならではの対処を整理します。商店街・駐車場・公園での実例も。",
+    lead: "市街地でクマを見たら、屋内に避難 → 110番 → 追い払わない、が基本。山中とは対処順序が違います。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "encounter",
+    tags: ["市街地", "住宅地", "通報", "対処"],
+    heroImage: "/articles/urban-encounter.jpg",
+    heroCredit: "Photo by Kae Ng on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/grOTReWUHhU",
+  },
+  {
+    slug: "night-encounter",
+    title: "夜・薄暮にクマと出会ったら — ヘッドライト・音・後退の使い方",
+    description:
+      "薄明薄暮 (夕方〜夜明け) はクマの活動ピーク。視界が効かない夜間にクマと出会ったときの対処、ヘッドライトの当て方、音を出すタイミング、後退の方向 — 夜間特有のリスクと行動を解説。",
+    lead: "薄明薄暮はクマの活動ピーク。夜間遭遇では光・音・後退の順序が日中と少し違います。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "encounter",
+    tags: ["夜間", "薄明薄暮", "ヘッドライト", "対処"],
+    heroImage: "/articles/night-encounter.jpg",
+    heroCredit: "Photo by Rosie Sun on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/1L71sPT5XKc",
+  },
+  {
+    slug: "bear-canister",
+    title: "フードコンテナ・フードハングの使い方 — キャンプの食料防衛",
+    description:
+      "クマを引き寄せる最大の要因は食料の匂い。バックカントリーでの食料保管はベアキャニスター (フードコンテナ) かフードハングが基本。容器選び・吊るし方・PCT 方式の手順を実用的に解説。",
+    lead: "食料の匂い管理がクマ対策の 7 割。フードコンテナとフードハングの正しい使い方を覚えましょう。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "gear",
+    tags: ["フードコンテナ", "フードハング", "キャンプ", "匂い管理"],
+    heroImage: "/articles/bear-canister.jpg",
+    heroCredit: "Photo by Myles Tan on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/IWCljYv1TJw",
+  },
+  {
+    slug: "bear-app",
+    title: "クマ出没情報アプリ・通知サービスの選び方 — 自治体・民間サービス比較",
+    description:
+      "市町村の防災メール、県の出没マップ、民間アプリ (くまウォッチ等)、SNS 速報 — クマ情報源を比較。リアルタイム性・カバー範囲・通知設定で何を組み合わせるべきかを整理します。",
+    lead: "クマ情報源は自治体・県・民間アプリ・SNS の組み合わせがベスト。それぞれの強みと使い分けを解説。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "gear",
+    tags: ["アプリ", "情報源", "防災メール", "通知"],
+    heroImage: "/articles/bear-app.jpg",
+    heroCredit: "Photo by Dmitrii Vaccinium on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/pyM7TYWutJM",
+  },
+  {
+    slug: "night-gear",
+    title: "ヘッドライト・夜間装備のクマ対策 — 早朝・夕方の山行で持つもの",
+    description:
+      "薄明薄暮の山行はクマ遭遇率が日中の数倍。ヘッドライトの明るさ・色温度・連続点灯時間、サブライト、反射材、ベルト式スプレーの位置 — 夜間装備の構成を実用的に解説。",
+    lead: "早朝・夕方は遭遇率が日中の数倍。ヘッドライト・サブライト・反射材・スプレーの位置を最適化しましょう。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "gear",
+    tags: ["ヘッドライト", "夜間装備", "薄明薄暮", "登山"],
+    heroImage: "/articles/night-gear.jpg",
+    heroCredit: "Photo by Josh Hild on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/8f_VQ3EFbTg",
+  },
+  {
+    slug: "bear-hibernation",
+    title: "クマの冬眠の科学 — いつ・どこで・なぜ眠るのか",
+    description:
+      "クマは 11 月下旬から 4 月中旬まで冬眠します。心拍数の低下・体温維持・代謝の不思議、冬眠場所の選び方、暖冬と「穴持たず」 (冬眠しない個体) の関係を、最新の生態研究をもとに解説。",
+    lead: "クマの冬眠は深い眠りではなく軽い覚醒状態。場所選び・代謝・穴持たずの謎までを整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "winter",
+    category: "ecology",
+    tags: ["冬眠", "穴持たず", "生態", "代謝"],
+    heroImage: "/articles/bear-hibernation.jpg",
+    heroCredit: "Photo by Jonathan Rautenbach on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/Q7u49RTMvVo",
+  },
+  {
+    slug: "bear-myths",
+    title: "クマよけ俗信の真偽 — 唐辛子・人間の髪・牛糞・線香は効くか",
+    description:
+      "クマよけとして昔から伝わる「唐辛子・髪の毛・牛糞・線香」「うんこの匂いを残す」など俗信を、研究結果と現場知見から検証。効くもの・効かないもの・条件付きで効くもの、を整理します。",
+    lead: "唐辛子・髪の毛・牛糞・線香 — クマよけ俗信を研究と現場知見でファクトチェックします。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "ecology",
+    tags: ["俗信", "唐辛子", "ファクトチェック", "民間療法"],
+    heroImage: "/articles/bear-myths.jpg",
+    heroCredit: "Photo by Shino Nakamura on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/pVc3RT8OyBE",
+  },
+  {
+    slug: "trail-running",
+    title: "トレイルランのクマ対策 — 高速移動と低音量がリスクを上げる",
+    description:
+      "トレラン中の遭遇事故が増えています。早朝の山道を時速 10km で走る = 鈴の音より速く、クマが避ける時間を奪う構造。トレラン特有のリスクと、装備・ルート計画・複数人走の組み立てを解説。",
+    lead: "トレランは「速さ」が遭遇リスクを上げる活動。鈴・声・スプレーの携行と早朝避けが鍵。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "scene",
+    tags: ["トレラン", "登山", "ランニング", "早朝"],
+    heroImage: "/articles/trail-running.jpg",
+    heroCredit: "Photo by Venti Views on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/jhfDFVBCoKs",
+  },
+  {
+    slug: "forest-work",
+    title: "山仕事・林業・農作業のクマ対策 — 業務でクマと隣り合う人へ",
+    description:
+      "林業従事者・農家・狩猟者は職務上クマと隣接します。チェーンソー音・伐採地・果樹園作業など業務シーン別のリスクと、現場で使えるスプレー・無線連絡・複数人作業のルールを実用的に整理。",
+    lead: "業務でクマと隣り合う林業・農家・狩猟者へ。職場でのリスク管理と装備の組み立てを整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "scene",
+    tags: ["林業", "農作業", "狩猟", "業務"],
+    heroImage: "/articles/forest-work.jpg",
+    heroCredit: "Photo by shun idota on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/3azF1amFdB8",
+  },
+  {
+    slug: "chubu-bears",
+    title: "中部山岳・北アルプスのクマ事情 — 長野・岐阜・富山・新潟",
+    description:
+      "北アルプス・南アルプス・八ヶ岳など中部山岳の登山域はツキノワグマの良好な生息地。長野・岐阜・富山・新潟の県別出没状況、登山道・山小屋でのリスクを解説。",
+    lead: "北アルプス・南アルプス・八ヶ岳の登山者へ。中部山岳のクマ出没傾向と地域別リスクを整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "region",
+    tags: ["中部", "北アルプス", "長野", "岐阜", "登山"],
+    heroImage: "/articles/chubu-bears.jpg",
+    heroCredit: "Photo by Mike Towers on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/-n9RMASREtI",
+  },
+  {
+    slug: "kanto-bears",
+    title: "関東甲信越のクマ事情 — 群馬・栃木・埼玉・東京・神奈川・山梨",
+    description:
+      "関東は奥多摩・丹沢・秩父・尾瀬・日光と山岳域が広く、ツキノワグマも生息。高尾山・奥多摩・丹沢など首都圏ハイカーが訪れる山域での目撃と対策をまとめます。",
+    lead: "高尾山・奥多摩・丹沢・秩父にもクマはいます。首都圏ハイカー向けに地域事情と対策を整理。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "region",
+    tags: ["関東", "高尾山", "奥多摩", "丹沢", "登山"],
+    heroImage: "/articles/kanto-bears.jpg",
+    heroCredit: "Photo by Griffin Quinn on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/s1A2ToEyaTY",
+  },
+  {
+    slug: "western-bears",
+    title: "西日本のツキノワグマ — 絶滅危惧個体群と保護の現状",
+    description:
+      "近畿・中国・四国・九州のツキノワグマは絶滅危惧 II 類に指定される地域個体群が多く、保護優先度が高い。紀伊半島・東中国・四国の現状と、絶滅した九州での復活可能性を整理します。",
+    lead: "西日本のツキノワグマは保護優先度が高い地域個体群。紀伊・中国・四国の現状を整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "region",
+    tags: ["西日本", "絶滅危惧", "近畿", "四国", "保護"],
+    heroImage: "/articles/western-bears.jpg",
+    heroCredit: "Photo by Tuan P. on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/QXnEEj5RAKg",
+  },
+  {
+    slug: "culling-debate",
+    title: "クマ駆除をめぐる議論 — 倫理・運用・現場の声",
+    description:
+      "クマ駆除は人身被害の抑止と命の倫理が衝突する論点。自治体・猟友会・動物保護団体・住民それぞれの立場、放獣 vs 殺処分の判断基準、近年の SNS 上の論争を整理します。",
+    lead: "「殺処分すべきか・逃がすべきか」— クマ駆除をめぐる多角的な論点を整理します。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "background",
+    tags: ["駆除", "倫理", "猟友会", "放獣"],
+    heroImage: "/articles/culling-debate.jpg",
+    heroCredit: "Photo by Matthew Maaskant on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/2JlypxCYVJI",
+  },
+  {
+    slug: "world-bears",
+    title: "世界のクマ事故事例 — 北米グリズリー・欧州ヒグマとの比較",
+    description:
+      "北米のグリズリー・ブラックベア、欧州・ロシアのヒグマ — 海外のクマ事故から学べる教訓は多くあります。アラスカ・イエローストーン・ルーマニアの実例から、日本でも応用できる知見を整理。",
+    lead: "海外のクマ事故事例には日本にも応用できる教訓がある。北米・欧州との比較で見えてくることを整理。",
+    publishedAt: "2026-05-09",
+    updatedAt: "2026-05-09",
+    season: "all",
+    category: "background",
+    tags: ["世界", "グリズリー", "アラスカ", "比較"],
+    heroImage: "/articles/world-bears.jpg",
+    heroCredit: "Photo by Paxson Woelber on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/8IuAYIIzFMI",
   },
 ];
 
@@ -543,6 +792,33 @@ export function getCategoryBySlug(slug: string): CategoryMeta | undefined {
 export function getArticlesByCategory(id: CategoryId): ArticleMeta[] {
   return ARTICLES.filter((a) => a.category === id).sort((a, b) =>
     b.updatedAt.localeCompare(a.updatedAt),
+  );
+}
+
+/** タグの URL slug 化。日本語タグはそのまま encodeURIComponent で扱える前提だが、
+ *  URL の安定性 (タグ表記ゆれを吸収) のため、タグ表記を一意化する目的で正規化する。 */
+export function tagToSlug(tag: string): string {
+  return tag.trim();
+}
+
+/** 全タグ (重複除去) を出現頻度順に返す。/articles/tag の一覧で使う想定。 */
+export function getAllTags(): { tag: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const a of ARTICLES) {
+    for (const t of a.tags) {
+      const slug = tagToSlug(t);
+      counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    }
+  }
+  return Array.from(counts.entries())
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, "ja"));
+}
+
+export function getArticlesByTag(tag: string): ArticleMeta[] {
+  const slug = tagToSlug(tag);
+  return ARTICLES.filter((a) => a.tags.some((t) => tagToSlug(t) === slug)).sort(
+    (a, b) => b.updatedAt.localeCompare(a.updatedAt),
   );
 }
 
