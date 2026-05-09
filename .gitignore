@@ -52,3 +52,8 @@ data-sources/landuse/progress.json
 # 公開しない下書き素材 (Wix 用画像、playwright のキャプチャ環境など)。
 # これらをコミットすると repo が肥大化するので必ず ignore する。
 drafts/
+
+# 公開しない営業・運用ドキュメント (自治体アウトリーチリスト等)。
+# repo public 化後も誤って戻さないように ignore で押さえる。
+# 中身は Notion or 別の private repo で管理する。
+docs/
