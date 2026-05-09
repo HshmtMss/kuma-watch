@@ -93,7 +93,11 @@ html {
   color: #b45309; /* amber-700 — 強調を視認しやすく */
 }
 
-.article-body a {
+/* :where() で詳細度を 0 に保ち、Tailwind の utility class
+   (例: text-white, bg-amber-600) が常に勝つようにする。
+   これがないと .article-body a (0,1,1) が text-white (0,1,0) を上書きして
+   白文字ボタンが橙文字 + 下線で判読不能になる。 */
+:where(.article-body) a {
   color: #b45309; /* amber-700 */
   font-weight: 600;
   text-decoration: underline;
@@ -101,8 +105,17 @@ html {
   text-underline-offset: 2px;
   text-decoration-color: rgba(180, 83, 9, 0.35);
 }
-.article-body a:hover {
+:where(.article-body) a:hover {
   text-decoration-color: #b45309;
+}
+
+/* .not-prose 内のリンク (CTA ボタン) は完全に装飾を切る。
+   こちらも :where() でユーティリティが勝つように。 */
+:where(.article-body .not-prose) a {
+  text-decoration: none;
+}
+:where(.article-body .not-prose) a:hover {
+  text-decoration: none;
 }
 
 .article-body ul,

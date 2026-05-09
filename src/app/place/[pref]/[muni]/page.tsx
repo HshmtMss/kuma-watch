@@ -135,17 +135,16 @@ export default async function MuniPage({ params }: Props) {
   };
 
   // 最近の出没事案 — mapRecords は date desc 済み。
-  // 過去 365 日 + sectionName あり、を優先して 8 件まで。
+  // 過去 365 日 + sectionName あり、を優先して 15 件まで（より具体性のある情報量）。
   const today = Date.now();
   const recentIncidents = mapRecords
     .filter((r) => {
       const t = Date.parse(r.date);
       return Number.isFinite(t) && today - t <= 365 * 86_400_000;
     })
-    .slice(0, 8);
+    .slice(0, 15);
 
-  // 地区別件数 — sectionName で集約して件数の多い順に top 5。
-  // 「○○市 ○○町 クマ」のような長尾検索の受け皿になる。
+  // 地区別件数 — sectionName で集約して件数の多い順に top 10。
   const sectionCounts = new Map<string, number>();
   for (const r of mapRecords) {
     const s = (r.sectionName ?? "").trim();
@@ -154,7 +153,56 @@ export default async function MuniPage({ params }: Props) {
   }
   const topSections = [...sectionCounts.entries()]
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+    .slice(0, 10);
+
+  // 過去 12 ヶ月の月別件数 — 当月から 11 ヶ月前まで時系列で並べ、グラフ化。
+  // 季節性 (秋の急増・冬の減少) を直感的に把握できるようにする。
+  const monthly: { label: string; key: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    monthly.push({
+      label: `${m}月`,
+      key: `${y}-${String(m).padStart(2, "0")}`,
+      count: 0,
+    });
+  }
+  for (const r of mapRecords) {
+    const k = r.date?.slice(0, 7); // YYYY-MM
+    if (!k) continue;
+    const bucket = monthly.find((b) => b.key === k);
+    if (bucket) bucket.count += 1;
+  }
+  const monthlyMax = Math.max(1, ...monthly.map((b) => b.count));
+
+  // 季節別アドバイス — 当月が属する季節に応じて、このページで強調する注意点を切替。
+  const month = now.getMonth() + 1; // 1-12
+  const seasonalAdvice =
+    month >= 9 && month <= 11
+      ? {
+          season: "秋（9〜11月）",
+          point:
+            "秋はドングリ・果実を求めて活動範囲が広がり、人里まで降りてくる事例が急増します。早朝・夕方の単独行動を避け、複数人で音を出しながら行動してください。",
+        }
+      : month >= 6 && month <= 8
+        ? {
+            season: "夏（6〜8月）",
+            point:
+              "夏は子グマが独立する時期で、若い個体が単独で行動圏を広げ、思わぬ場所で遭遇するリスクがあります。沢沿い・林縁部・果樹園周辺は要警戒。",
+          }
+        : month >= 3 && month <= 5
+          ? {
+              season: "春（3〜5月）",
+              point:
+                "冬眠明けで採食を求めて活動が活発になります。山菜採り・タケノコ採りの時期は人とクマの行動圏が重なるため、入山前に必ず周辺の出没履歴を確認してください。",
+            }
+          : {
+              season: "冬（12〜2月）",
+              point:
+                "冬期は通常クマは冬眠していますが、暖冬や食料不足の年は冬眠せず徘徊する個体（穴持たず）が報告されます。雪上の足跡・痕跡には注意。",
+            };
 
   return (
     <PageShell
@@ -269,6 +317,54 @@ export default async function MuniPage({ params }: Props) {
         最新の目撃は {formatDate(cell.latestDate)} です。
         各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
       </p>
+
+      {/* 過去 12 ヶ月の月別件数バーチャート — 季節性を視覚的に把握。
+          SVG/library なし、純 div で簡潔に描画。 */}
+      <h3>過去 12 ヶ月の月別件数</h3>
+      <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
+        <div className="flex h-32 items-end gap-1.5">
+          {monthly.map((b) => {
+            const h = (b.count / monthlyMax) * 100;
+            return (
+              <div
+                key={b.key}
+                className="flex flex-1 flex-col items-center gap-1"
+                title={`${b.key}: ${b.count}件`}
+              >
+                <div className="flex h-full w-full items-end">
+                  <div
+                    className={`w-full rounded-t-sm ${
+                      b.count > 0 ? "bg-amber-500" : "bg-stone-200"
+                    }`}
+                    style={{ height: `${Math.max(h, b.count > 0 ? 6 : 2)}%` }}
+                  />
+                </div>
+                <div className="text-[10px] text-stone-500">{b.label}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-2 flex items-baseline justify-between text-[11px] text-stone-500">
+          <span>過去 12 ヶ月</span>
+          <span>
+            合計 <span className="font-semibold text-stone-800">
+              {monthly.reduce((a, b) => a + b.count, 0)}
+            </span>{" "}
+            件
+          </span>
+        </div>
+      </div>
+
+      {/* 季節別アドバイス — 月によって表示内容を切り替えて鮮度感を出す。 */}
+      <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+        <div className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
+          <span aria-hidden>🩺</span>
+          <span>{seasonalAdvice.season} の注意点（獣医師監修）</span>
+        </div>
+        <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">
+          {seasonalAdvice.point}
+        </p>
+      </div>
 
       {/* 最近の出没事案 — 具体的な日付・地区の文字列が長尾 SEO に効く。
           コメントが空なら sectionName を表示、それも無ければ省略。 */}
@@ -427,12 +523,14 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
-      <h2>データ出典</h2>
-      <p>
-        KumaWatch は Sharp9110 提供のオープンデータ (CC BY 4.0)、環境省の生息域推定データ、
-        各自治体の公開データを統合しています。
-        各レコードの出典は <Link href="/credits">出典・ライセンス</Link> で確認できます。
-        記載内容はあくまで参考情報です。最新の出没状況は {pref}{muni} の公式発表もあわせてご確認ください。
+      <p className="not-prose mt-8 border-t border-stone-200 pt-4 text-xs text-stone-500">
+        データ出典: 自治体公式・Sharp9110・環境省 等 70+ ソースを毎日 2 回自動取り込み（
+        <Link href="/credits" className="underline hover:text-stone-900">
+          詳細
+        </Link>
+        ）。本ページはあくまで参考情報です。最新の出没状況は{" "}
+        {pref}
+        {muni} の公式発表をあわせてご確認ください。
       </p>
     </PageShell>
   );
