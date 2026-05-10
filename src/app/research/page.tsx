@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+// ISR: 5 分ごとに静的 HTML を再生成。新規記事 (import-research が
+// /research/<slug>/page.tsx を追加 → ENTRIES 配列を更新) を CDN エッジに
+// 短い遅延で反映するため。
+export const revalidate = 300;
+
 type ResearchEntry = {
   slug: string;
   title: string;

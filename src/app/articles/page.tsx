@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/articles` },
 };
 
+// ISR: 5 分ごとに記事一覧を再生成。新規記事や順序変更を CDN に短い遅延で反映する。
+export const revalidate = 300;
+
 const SEASON_LABEL: Record<string, string> = {
   spring: "春",
   summer: "夏",

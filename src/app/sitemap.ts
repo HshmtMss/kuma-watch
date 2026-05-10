@@ -6,6 +6,10 @@ import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
 
+// ISR: 5 分ごとに sitemap を再生成。新規記事を Google にすぐ通知できるよう、
+// CDN エッジに短い遅延で反映させる。
+export const revalidate = 300;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const staticEntries: MetadataRoute.Sitemap = [
