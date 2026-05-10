@@ -20,11 +20,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdnjs.cloudflare.com" },
     ],
   },
-  outputFileTracingIncludes: {
-    "/api/kuma": ["public/data/sightings.json"],
-    "/api/ask": ["public/data/sightings.json"],
-    "/api/summary": ["public/data/sightings.json"],
-  },
+  // sightings.json は public/data/ から CDN 経由で runtime fetch する設計に
+  // 切り替えたため、API 関数バンドルへの同梱は廃止。
+  // これにより
+  //   1. Vercel の関数バンドルが軽くなり cold start が短縮
+  //   2. sharp9110-flash / news-flash の高頻度 commit でも
+  //      関数を再ビルドせず最新 sightings.json を使える
+  // 動作: src/lib/sightings-cache.ts の readBundledSnapshot が
+  // ${VERCEL_URL}/data/sightings.json を fetch する。
   async redirects() {
     return [
       ...SEO_REDIRECT_SLUGS.map((slug) => ({

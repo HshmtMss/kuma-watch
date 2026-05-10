@@ -35,7 +35,10 @@ const CACHE_DIR = join(process.cwd(), ".cache");
 const CACHE_FILE = join(CACHE_DIR, "sightings-v2.json");
 const SNAPSHOT_FILE = join(process.cwd(), "public", "data", "sightings.json");
 export const CACHE_TAG = "kuma-records";
-const REVALIDATE_SECONDS = 6 * 60 * 60;
+// Vercel 関数のプロセスローカルメモリキャッシュ TTL。
+// sharp9110-flash が 1 分ごと、news-flash が 5 分ごとに sightings.json を
+// 更新するので、5 分以上 stale な snapshot を返さない設計に。
+const REVALIDATE_SECONDS = 5 * 60;
 
 type CacheBlob = { generatedAt: number; records: UnifiedSighting[] };
 
@@ -53,7 +56,10 @@ function readDiskCache(): CacheBlob | null {
 }
 
 async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
-  // 1. fs 経由で読む (Next.js が outputFileTracing で含めてくれる場合)
+  // 1. fs 経由で読む (build 時の SSG 生成では public/data/sightings.json
+  //    が参照可能なので、ビルド中はこちら)。
+  //    Vercel の serverless 関数 runtime では bundle に同梱しないため
+  //    existsSync が false になり、fetch fallback (2.) に流れる。
   try {
     if (existsSync(SNAPSHOT_FILE)) {
       const raw = readFileSync(SNAPSHOT_FILE, "utf8");
@@ -65,12 +71,14 @@ async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
   } catch {
     // 続けて HTTP フォールバック
   }
-  // 2. Vercel: 同一オリジンの静的ファイルを CDN 経由で取得
+  // 2. Vercel runtime: 同一オリジンの静的ファイルを CDN 経由で取得。
+  //    sharp9110-flash / news-flash が頻繁に sightings.json を更新するので、
+  //    revalidate: 60 (1 分 TTL) で適度に新しい snapshot を取得する。
   const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
   if (!baseUrl) return null;
   try {
     const res = await fetch(`${baseUrl}/data/sightings.json`, {
-      cache: "force-cache",
+      next: { revalidate: 60 },
     });
     if (!res.ok) return null;
     const blob = (await res.json()) as { records?: UnifiedSighting[] };
