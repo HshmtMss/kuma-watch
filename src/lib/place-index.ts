@@ -179,6 +179,13 @@ export async function getPlaceCellsByPref(pref: string): Promise<PlaceCell[]> {
   return idx.byPref.get(pref) ?? [];
 }
 
+/** 全都道府県のセル一覧。/place/[pref]/[muni] の半径サマリーで
+ *  県境を跨ぐ近隣検索に使う。 */
+export async function getAllPlaceCells(): Promise<PlaceCell[]> {
+  const idx = await getIndex();
+  return [...idx.byKey.values()];
+}
+
 export async function getPrefSummary(pref: string): Promise<PrefSummary | null> {
   const idx = await getIndex();
   return idx.prefSummaries.get(pref) ?? null;

@@ -5,14 +5,18 @@ import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
+  getAllPlaceCells,
   getPlaceCell,
   getPlaceCellsByPref,
+  getPrefSummary,
   getRecordsForPlace,
   getStaticPlaceKeys,
   type PlaceCell,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
+import { getSeasonalAdvice } from "@/lib/place-content";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -121,13 +125,13 @@ export default async function MuniPage({ params }: Props) {
       lonCentroid: masterEntry!.lon,
     };
 
-  const [siblingsRaw, mapRecords] = await Promise.all([
+  const [siblingsRaw, allCells, mapRecords, prefSummary] = await Promise.all([
     getPlaceCellsByPref(pref),
+    getAllPlaceCells(),
     getRecordsForPlace(pref, muni, 60),
+    getPrefSummary(pref),
   ]);
 
-  // 距離ベースで近い 4 市町村を「近隣比較」用に抽出。
-  // 残りは下部の「県内の他の市町村」リストに従来通り表示する。
   const haversineKm = (
     lat1: number,
     lon1: number,
@@ -145,8 +149,11 @@ export default async function MuniPage({ params }: Props) {
         Math.sin(dLon / 2) ** 2;
     return 2 * R * Math.asin(Math.sqrt(a));
   };
-  const nearestNeighbors = siblingsRaw
-    .filter((c) => c.cityName !== muni)
+
+  // 県境を跨いだ全国セルから距離を計算。半径サマリーと近隣カードに使う。
+  // self は除外（pref+city の組で同一）。
+  const cellsWithDistance = allCells
+    .filter((c) => !(c.prefectureName === pref && c.cityName === muni))
     .map((c) => ({
       ...c,
       distanceKm: haversineKm(
@@ -156,11 +163,62 @@ export default async function MuniPage({ params }: Props) {
         c.lonCentroid,
       ),
     }))
+    .sort((a, b) => a.distanceKm - b.distanceKm);
+
+  // 半径サマリー: 20km / 50km 圏内のセル集約。各ページで全市町村別の
+  // 数値が変わるため、Google から見たコンテンツ差別化に効く。
+  const within20km = cellsWithDistance.filter((c) => c.distanceKm <= 20);
+  const within50km = cellsWithDistance.filter((c) => c.distanceKm <= 50);
+  const r20Count = within20km.reduce((s, c) => s + c.count, 0);
+  const r20Count90d = within20km.reduce((s, c) => s + c.count90d, 0);
+  const r50Count = within50km.reduce((s, c) => s + c.count, 0);
+  const r50Count90d = within50km.reduce((s, c) => s + c.count90d, 0);
+  const r20HotCities = within20km.filter((c) => c.count90d > 0).length;
+  const r50HotCities = within50km.filter((c) => c.count90d > 0).length;
+  // 最も近い「直近90日に出没のあった市町村」。県跨ぎで探す。
+  const nearestHot =
+    cellsWithDistance.find((c) => c.count90d > 0) ?? null;
+
+  // 県内コンテキスト — 本市が県全体の中でどの程度を占めるかを「シェア・所属」の
+  // ファクトとして示す。順位（第N位）表現は人身被害を伴う安全情報としては
+  // 不適切なため使わない。各ページで数値が変わるためコンテンツの差別化にも効く。
+  const prefAllMuniCount = JAPAN_MUNICIPALITIES.filter(
+    (m) => m.prefName === pref,
+  ).length;
+  const prefMuniWithSightings = siblingsRaw.length;
+  const prefMuniWithoutSightings = Math.max(
+    0,
+    prefAllMuniCount - prefMuniWithSightings,
+  );
+  const sharePctOfPref =
+    prefSummary && prefSummary.totalCount > 0 && cell.count > 0
+      ? (cell.count / prefSummary.totalCount) * 100
+      : 0;
+
+  // 周辺ランドマーク (山・国立公園・温泉地など) — /spot/[slug] への内部リンクを
+  // 形成し、市町村ページ ↔ ランドマークページ間の双方向リンクを作る。
+  // 検索クエリで「○○山 クマ」「○○温泉 クマ」が拾えるよう /spot を別系統で
+  // 持っているため、距離が近い場合は誘導する。
+  const NEARBY_LANDMARK_RADIUS_KM = 30;
+  const nearbyLandmarks = JAPAN_LANDMARKS.map((l) => ({
+    ...l,
+    distanceKm: haversineKm(cell.latCentroid, cell.lonCentroid, l.lat, l.lon),
+  }))
+    .filter((l) => l.distanceKm <= NEARBY_LANDMARK_RADIUS_KM)
     .sort((a, b) => a.distanceKm - b.distanceKm)
-    .slice(0, 4);
-  const nearestNeighborSet = new Set(nearestNeighbors.map((n) => n.cityName));
+    .slice(0, 6);
+
+  // 近隣カード: 県跨ぎで距離順に 4 件。県境の市町村でも妥当な隣接を表示できる。
+  const nearestNeighbors = cellsWithDistance.slice(0, 4);
+  const nearestNeighborKeys = new Set(
+    nearestNeighbors.map((n) => `${n.prefectureName}/${n.cityName}`),
+  );
   const siblings = siblingsRaw
-    .filter((c) => c.cityName !== muni && !nearestNeighborSet.has(c.cityName))
+    .filter(
+      (c) =>
+        c.cityName !== muni &&
+        !nearestNeighborKeys.has(`${pref}/${c.cityName}`),
+    )
     .slice(0, 12);
 
   // 危険度バッジ — count90d を主軸に 4 段階で評価。
@@ -297,32 +355,12 @@ export default async function MuniPage({ params }: Props) {
   }
   const monthlyMax = Math.max(1, ...monthly.map((b) => b.count));
 
-  // 季節別アドバイス — 当月が属する季節に応じて、このページで強調する注意点を切替。
+  // 季節別アドバイス — 県（ヒグマ/ツキノワグマ/絶滅区分）と当月から、
+  // 地域×季節のマトリクスで文章を切り替える (src/lib/place-content.ts)。
+  // 全 1,894 ページで同一文だと Google から重複認定され「クロール済み・未登録」
+  // が積み上がるため、ページ本文の差別化に直接効く。
   const month = now.getMonth() + 1; // 1-12
-  const seasonalAdvice =
-    month >= 9 && month <= 11
-      ? {
-          season: "秋（9〜11月）",
-          point:
-            "秋はドングリ・果実を求めて活動範囲が広がり、人里まで降りてくる事例が急増します。早朝・夕方の単独行動を避け、複数人で音を出しながら行動してください。",
-        }
-      : month >= 6 && month <= 8
-        ? {
-            season: "夏（6〜8月）",
-            point:
-              "夏は子グマが独立する時期で、若い個体が単独で行動圏を広げ、思わぬ場所で遭遇するリスクがあります。沢沿い・林縁部・果樹園周辺は要警戒。",
-          }
-        : month >= 3 && month <= 5
-          ? {
-              season: "春（3〜5月）",
-              point:
-                "冬眠明けで採食を求めて活動が活発になります。山菜採り・タケノコ採りの時期は人とクマの行動圏が重なるため、入山前に必ず周辺の出没履歴を確認してください。",
-            }
-          : {
-              season: "冬（12〜2月）",
-              point:
-                "冬期は通常クマは冬眠していますが、暖冬や食料不足の年は冬眠せず徘徊する個体（穴持たず）が報告されます。雪上の足跡・痕跡には注意。",
-            };
+  const seasonalAdvice = getSeasonalAdvice(pref, month);
 
   // ダイナミック lead — 数値を必ず織り込み、SERP スニペットの具体性も上げる。
   const dynamicLead =
@@ -458,6 +496,85 @@ export default async function MuniPage({ params }: Props) {
         </div>
       </div>
 
+      {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
+          ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
+          0 件の市町村でも周辺の出没状況が分かるので「安心したい」ユーザーにも価値あり。 */}
+      <h2>{muni} 周辺の出没状況（半径サマリー）</h2>
+      <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+            <div className="text-[11px] font-semibold text-stone-600">
+              半径 20km 圏内
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span
+                className={`text-xl font-bold ${r20Count90d > 0 ? "text-red-700" : "text-stone-700"}`}
+              >
+                {r20Count90d}
+              </span>
+              <span className="text-[11px] text-stone-500">
+                件 / 過去90日
+              </span>
+            </div>
+            <div className="mt-0.5 text-[11px] text-stone-500">
+              累計 {r20Count.toLocaleString()} 件・{r20HotCities} 市町村で直近の出没
+            </div>
+          </div>
+          <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+            <div className="text-[11px] font-semibold text-stone-600">
+              半径 50km 圏内
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span
+                className={`text-xl font-bold ${r50Count90d > 0 ? "text-red-700" : "text-stone-700"}`}
+              >
+                {r50Count90d}
+              </span>
+              <span className="text-[11px] text-stone-500">
+                件 / 過去90日
+              </span>
+            </div>
+            <div className="mt-0.5 text-[11px] text-stone-500">
+              累計 {r50Count.toLocaleString()} 件・{r50HotCities} 市町村で直近の出没
+            </div>
+          </div>
+        </div>
+        {nearestHot ? (
+          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+            <div className="text-[11px] font-semibold text-amber-900">
+              最も近い直近の出没
+            </div>
+            <div className="mt-1 text-sm text-amber-950">
+              <Link
+                href={`/place/${encodeURIComponent(nearestHot.prefectureName)}/${encodeURIComponent(nearestHot.cityName)}`}
+                className="font-semibold underline hover:no-underline"
+              >
+                {nearestHot.prefectureName === pref
+                  ? nearestHot.cityName
+                  : `${nearestHot.prefectureName} ${nearestHot.cityName}`}
+              </Link>
+              <span className="ml-2 text-xs">
+                {nearestHot.distanceKm.toFixed(1)} km
+              </span>
+              {nearestHot.latestDate && (
+                <span className="ml-2 text-xs">
+                  / 最新 {formatDate(nearestHot.latestDate)}
+                </span>
+              )}
+            </div>
+            <div className="mt-0.5 text-[11px] text-amber-800">
+              過去90日に {nearestHot.count90d} 件の出没。{muni} からの直線距離。
+            </div>
+          </div>
+        ) : (
+          <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
+            半径 50km 圏内で過去 90 日に出没事例は記録されていません。ただし
+            季節・天候・年によって状況は変わるため、入山・遠出の前には最新情報を
+            ご確認ください。
+          </p>
+        )}
+      </div>
+
       <h2>{muni} 周辺の目撃マップ</h2>
       <div className="not-prose mb-3">
         <MiniSightingsMap
@@ -519,16 +636,62 @@ export default async function MuniPage({ params }: Props) {
         </div>
       </div>
 
-      {/* 季節別アドバイス — 月によって表示内容を切り替えて鮮度感を出す。 */}
+      {/* 季節別アドバイス — 県（ヒグマ/ツキノワグマ/絶滅区分）×当月で文章が切り替わる。
+          全市町村で同じ文章になるのを避け、Google の重複コンテンツ判定を回避する。 */}
       <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
+        <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-emerald-900">
           <span aria-hidden>🩺</span>
-          <span>{seasonalAdvice.season} の注意点（獣医師監修）</span>
+          <span>
+            {pref} の {seasonalAdvice.season} の注意点
+          </span>
+          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
+            {seasonalAdvice.speciesLabel}
+          </span>
+          <span className="text-[10px] font-normal text-emerald-700">
+            獣医師監修
+          </span>
         </div>
         <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">
           {seasonalAdvice.point}
         </p>
       </div>
+
+      {/* 県内コンテキスト — 順位ではなく「県全体に占めるシェア・所属」の事実を提示。
+          人身被害を伴う領域での順位表現は不適切なため、所属と割合のみで示す。
+          各ページで数値が異なるため、Google 視点でのコンテンツ差別化にも寄与。 */}
+      {prefSummary && (
+        <>
+          <h2>{pref} 全体での {muni} の状況</h2>
+          {cell.count > 0 ? (
+            <p>
+              {pref} では過去全期間に{" "}
+              <strong>{prefMuniWithSightings.toLocaleString()}</strong>{" "}
+              市町村で計{" "}
+              <strong>{prefSummary.totalCount.toLocaleString()}</strong>{" "}
+              件のクマ出没が記録されており、
+              {muni} はそのうち <strong>{cell.count.toLocaleString()}</strong>{" "}
+              件（県全体の <strong>{sharePctOfPref.toFixed(1)}%</strong>）が記録された、
+              {pref} で出没記録のある市町村のひとつです。
+              直近 90 日では {pref} 全体で {prefSummary.count90d.toLocaleString()} 件
+              {cell.count90d > 0 ? `、うち本市 ${cell.count90d.toLocaleString()} 件` : "、本市には記録なし"}
+              。
+            </p>
+          ) : (
+            <p>
+              {pref} では過去全期間に{" "}
+              <strong>{prefMuniWithSightings.toLocaleString()}</strong>{" "}
+              市町村で計{" "}
+              <strong>{prefSummary.totalCount.toLocaleString()}</strong>{" "}
+              件のクマ出没が記録されています。{muni} には本サイトの集計開始以降の記録はなく、
+              {pref}{prefAllMuniCount > 0 ? ` ${prefAllMuniCount.toLocaleString()} 市町村のうち` : ""}
+              出没記録のない{prefMuniWithoutSightings > 0 ? ` ${prefMuniWithoutSightings.toLocaleString()} ` : ""}
+              市町村のひとつです。
+              ただし周辺市町村の状況や季節・年による変動があるため、
+              安心の根拠とせず、上記の半径サマリーや自治体公式情報も併せてご確認ください。
+            </p>
+          )}
+        </>
+      )}
 
       {/* 最近の出没事案 — 具体的な日付・地区の文字列が長尾 SEO に効く。
           コメントが空なら sectionName を表示、それも無ければ省略。 */}
@@ -660,18 +823,20 @@ export default async function MuniPage({ params }: Props) {
         </li>
       </ul>
 
-      {/* 近隣 4 市町村の比較 — 距離ベースで近い順。登山・通勤など
-          「複数地域を見て判断したい」ユーザーニーズに対応。 */}
+      {/* 近隣 4 市町村の比較 — 距離ベースで近い順。県境を跨いで近い市町村も拾う
+          (例: 富山県滑川市から見ると新潟県糸魚川市が県内の遠い市町村より近い)。
+          登山・通勤など「複数地域を見て判断したい」ユーザーニーズに対応。 */}
       {nearestNeighbors.length > 0 && (
         <>
           <h2>{muni} の近隣で出没している市町村</h2>
           <div className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {nearestNeighbors.map((n) => {
               const isHot = n.count90d > 0;
+              const isOtherPref = n.prefectureName !== pref;
               return (
                 <Link
-                  key={n.cityName}
-                  href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(n.cityName)}`}
+                  key={`${n.prefectureName}/${n.cityName}`}
+                  href={`/place/${encodeURIComponent(n.prefectureName)}/${encodeURIComponent(n.cityName)}`}
                   className={`flex flex-col rounded-xl border p-3 transition ${
                     isHot
                       ? "border-amber-300 bg-amber-50 hover:border-amber-500"
@@ -680,6 +845,11 @@ export default async function MuniPage({ params }: Props) {
                 >
                   <div className="text-[10px] text-stone-500">
                     距離 {n.distanceKm.toFixed(1)} km
+                    {isOtherPref && (
+                      <span className="ml-1 text-stone-400">
+                        / {n.prefectureName}
+                      </span>
+                    )}
                   </div>
                   <div className="mt-0.5 truncate text-sm font-semibold text-stone-900">
                     {n.cityName}
@@ -700,6 +870,46 @@ export default async function MuniPage({ params }: Props) {
               );
             })}
           </div>
+        </>
+      )}
+
+      {/* 周辺ランドマーク — 山・国立公園・温泉地などの /spot/[slug] への内部リンク。
+          市町村ページ ↔ ランドマークページ間の双方向リンクで、検索流入も
+          「○○山 クマ」「○○温泉 クマ」のような名所ベースのクエリで拾える。
+          距離は haversine の直線距離。 */}
+      {nearbyLandmarks.length > 0 && (
+        <>
+          <h2>{muni} 周辺の登山・観光スポット</h2>
+          <p className="text-sm">
+            {muni} の代表地点から半径 {NEARBY_LANDMARK_RADIUS_KM} km 圏内にある
+            主要なランドマークです。各スポットのページで、クマ出没情報を集約した
+            周辺マップと警戒レベルをご確認いただけます。
+          </p>
+          <ul className="not-prose my-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {nearbyLandmarks.map((l) => (
+              <li key={l.slug}>
+                <Link
+                  href={`/spot/${encodeURIComponent(l.slug)}`}
+                  className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-sm font-semibold text-stone-900">
+                      {l.name}
+                    </span>
+                    <span className="shrink-0 text-[10px] text-stone-500">
+                      {l.distanceKm.toFixed(1)} km
+                    </span>
+                  </div>
+                  {l.prefName !== pref || l.muniName !== muni ? (
+                    <div className="mt-0.5 text-[10px] text-stone-500">
+                      {l.prefName}
+                      {l.muniName ? ` ${l.muniName}` : ""}
+                    </div>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </>
       )}
 
