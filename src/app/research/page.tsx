@@ -29,6 +29,20 @@ type ResearchEntry = {
 // 配列内の登録順は問わない (rendering 時に sortKey でソートする)。
 const ENTRIES: ResearchEntry[] = [
   {
+    slug: "2026-05-10-daily-report",
+    title: "2026年5月10日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月10日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-05-12",
+    category: "daily-report",
+  },
+  {
+    slug: "2026-05-11-daily-report",
+    title: "2026年5月11日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年5月11日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-05-12",
+    category: "daily-report",
+  },
+  {
     slug: "2026-05-09-daily-report",
     title: "2026年5月9日 国内クマ出没事案の時空間分析と分析報告",
     lead: "2026年5月9日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
