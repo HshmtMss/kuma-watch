@@ -105,14 +105,11 @@ export default function ResearchIndexPage() {
             >
               リサーチコーディネート株式会社
             </a>
-            が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
-            KumaWatch（くまウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し
-            可視化することで、人と野生動物の境界における事故リスクの低減に取り組んでいます。
+            が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。KumaWatch（くまウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し可視化することで、人と野生動物の境界における事故リスクの低減に取り組んでいます。
           </p>
           <p className="mt-3">
-            本ページでは、KumaWatch のデータ・運営知見をもとにした分析レポートや、
-            自治体・専門家向けのテーマ解説を公開しています。データ連携や共同研究のご相談は
-            <Link href="/for-gov" className="ml-1 text-blue-700 underline">
+            本ページでは、KumaWatch のデータ・運営知見をもとにした分析レポートや、自治体・専門家向けのテーマ解説を公開しています。データ連携や共同研究のご相談は
+            <Link href="/for-gov" className="text-blue-700 underline">
               自治体の方へ
             </Link>
             のページ、または末尾の連絡先までご連絡ください。
@@ -269,12 +266,12 @@ export default function ResearchIndexPage() {
           <div className="mt-1">
             Web:{" "}
             <a
-              href="https://www.research-coordinate.co.jp"
+              href="https://www.research-coordinate.co.jp/labs/vet/"
               target="_blank"
               rel="noopener noreferrer"
               className="underline"
             >
-              research-coordinate.co.jp
+              research-coordinate.co.jp/labs/vet/
             </a>
           </div>
         </div>
