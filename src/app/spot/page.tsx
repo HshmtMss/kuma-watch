@@ -94,6 +94,41 @@ export default function SpotIndexPage() {
         をご利用ください。
       </p>
 
+      {/* 俯瞰用: 全観光地を都道府県別にコンパクトに一覧。アンカーで該当カードに飛ぶ。 */}
+      <details className="not-prose my-5 rounded-xl border border-stone-200 bg-stone-50 open:bg-white">
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+          <span>📋 全 {JAPAN_LANDMARKS.length} 件をまとめて見る (都道府県別)</span>
+        </summary>
+        <div className="border-t border-stone-200 px-4 py-3 text-sm">
+          {(() => {
+            const byPref = new Map<string, JapanLandmark[]>();
+            for (const l of JAPAN_LANDMARKS) {
+              const arr = byPref.get(l.prefName) ?? [];
+              arr.push(l);
+              byPref.set(l.prefName, arr);
+            }
+            return [...byPref.entries()].map(([pref, items]) => (
+              <div key={pref} className="mb-2 last:mb-0">
+                <span className="mr-2 inline-block text-xs font-semibold text-stone-500">
+                  {pref}
+                </span>
+                {items.map((l, i) => (
+                  <span key={l.slug}>
+                    {i > 0 && <span className="text-stone-300">・</span>}
+                    <Link
+                      href={`/spot/${encodeURIComponent(l.slug)}`}
+                      className="text-blue-700 hover:underline"
+                    >
+                      {l.name}
+                    </Link>
+                  </span>
+                ))}
+              </div>
+            ));
+          })()}
+        </div>
+      </details>
+
       {CATEGORY_ORDER.map((cat) => {
         const items = byCategory.get(cat) ?? [];
         if (items.length === 0) return null;

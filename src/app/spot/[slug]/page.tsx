@@ -232,7 +232,9 @@ export default async function SpotPage({ params }: Props) {
           ? { season: "春（3〜5月）", point: "冬眠明けで採食を求めて活動が活発化。山菜採り・タケノコ採りの時期は要注意。入山前に必ず周辺の出没履歴を確認してください。" }
           : { season: "冬（12〜2月）", point: "冬期は通常クマは冬眠していますが、暖冬の年は冬眠せず徘徊する個体（穴持たず）が報告されます。雪上の足跡・痕跡には注意。" };
 
-  const mapUrl = `/?lat=${landmark.lat.toFixed(5)}&lon=${landmark.lon.toFixed(5)}&z=12`;
+  // 地図に飛ぶときに地点名も渡す。トップの選択カードに「富士山」など名前が出るので、
+  // どこから来たかが視覚的に保たれ「連続性」が出る。
+  const mapUrl = `/?lat=${landmark.lat.toFixed(5)}&lon=${landmark.lon.toFixed(5)}&label=${encodeURIComponent(landmark.name)}`;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -324,46 +326,35 @@ export default async function SpotPage({ params }: Props) {
             href={mapUrl}
             className="inline-flex items-center gap-1 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
           >
-            🗺️ 地図で詳細を見る →
+            🗺️ 地図で {landmark.name} を見る →
           </Link>
-          <a
-            href={`https://www.google.com/search?q=${encodeURIComponent(`${landmark.name} クマ 出没`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* 外部ニュース検索は離脱を招くので、内部の地域分析レポート (/research/region/[pref]) に変更。
+              当該都道府県のクマ動向レポート一覧へ繋ぐ。 */}
+          <Link
+            href={`/research/region/${encodeURIComponent(landmark.prefName)}`}
             className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
           >
-            {landmark.name} の最新ニュースを検索 ↗
-          </a>
+            {landmark.prefName} の分析レポート →
+          </Link>
         </div>
       </div>
 
-      {/* ランドマーク紹介 */}
+      {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
       <h2>{landmark.name}について</h2>
       <p>{landmark.blurb}</p>
-      <ul className="not-prose my-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-        <li className="rounded-lg border border-stone-200 bg-white px-3 py-2">
-          <div className="text-[11px] text-stone-500">所在</div>
-          <div className="font-semibold text-stone-900">
-            {landmark.prefName}
-            {landmark.muniName ? ` ${landmark.muniName}` : ""}
-          </div>
-        </li>
-        <li className="rounded-lg border border-stone-200 bg-white px-3 py-2">
-          <div className="text-[11px] text-stone-500">分類</div>
-          <div className="font-semibold text-stone-900">
-            {CATEGORY_LABEL[landmark.category] ?? landmark.category}
-          </div>
-        </li>
-        <li className="rounded-lg border border-stone-200 bg-white px-3 py-2">
-          <div className="text-[11px] text-stone-500">緯度経度</div>
-          <div className="font-semibold tabular-nums text-stone-900">
-            {landmark.lat.toFixed(3)}, {landmark.lon.toFixed(3)}
-          </div>
-        </li>
-      </ul>
+      <p className="not-prose my-3 text-sm text-stone-600">
+        <span className="text-stone-500">所在: </span>
+        <span className="font-semibold text-stone-900">
+          {landmark.prefName}
+          {landmark.muniName ? ` ${landmark.muniName}` : ""}
+        </span>
+      </p>
 
       {/* 周辺マップ */}
       <h2>{landmark.name} 周辺の目撃マップ</h2>
+      <p className="text-xs text-stone-500">
+        赤いピンが過去 90 日以内、グレーが 1 年以内の目撃。ピンをタップすると日付や場所が表示されます。
+      </p>
       <div className="not-prose mb-3">
         <MiniSightingsMap
           centerLat={landmark.lat}

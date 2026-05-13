@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import HeaderNav from "@/components/HeaderNav";
 import LegalLinks from "@/components/LegalLinks";
 
 type Props = {
@@ -12,10 +13,8 @@ export default function PageShell({ title, lead, children }: Props) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="flex items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm sm:px-5">
-        {/* ブランドロックアップ: ロゴ + くまウォッチ → ホーム (内部リンク)、
-            by 獣医工学ラボ → 獣医工学ラボの公式ページ (外部リンク) の 2 リンク構造。
-            獣医工学ラボの実体的なランディング先を確実に提供する。 */}
-        <div className="flex shrink-0 items-center gap-2">
+        {/* ブランドはモバイルでも「くまウォッチ by 獣医工学ラボ」を表示する (ハンバーガー導入で幅確保)。 */}
+        <div className="flex min-w-0 shrink items-center gap-2">
           <Link
             href="/"
             className="flex items-center gap-2"
@@ -27,8 +26,7 @@ export default function PageShell({ title, lead, children }: Props) {
               alt="KumaWatch"
               className="block h-7 w-auto sm:h-8"
             />
-            {/* sm 未満では「くまウォッチ」テキストを隠してナビ幅を確保 (ロゴ画像が ブランド表記を兼ねる) */}
-            <span className="hidden text-[13px] font-semibold tracking-tight text-stone-900 sm:inline sm:text-sm">
+            <span className="truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
               くまウォッチ
             </span>
           </Link>
@@ -36,21 +34,14 @@ export default function PageShell({ title, lead, children }: Props) {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-[11px] text-stone-500 hover:text-stone-700 sm:inline sm:text-xs"
+            className="hidden text-xs text-stone-500 hover:text-stone-700 sm:inline"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}
             <span className="font-medium text-stone-700">獣医工学ラボ</span>
           </a>
         </div>
-        <nav className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-stone-600 sm:gap-4 sm:text-xs">
-          <Link href="/" className="hover:text-stone-900">地図</Link>
-          <Link href="/place" className="hover:text-stone-900">都道府県</Link>
-          <Link href="/spot" className="hover:text-stone-900">観光地</Link>
-          <Link href="/articles" className="hover:text-stone-900">クマ対策</Link>
-          <Link href="/research" className="hover:text-stone-900">研究</Link>
-          <Link href="/for-gov" className="hover:text-stone-900">自治体の方へ</Link>
-        </nav>
+        <HeaderNav />
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8 sm:py-10">
         <h1 className="mb-3 text-2xl font-extrabold leading-tight text-stone-900 sm:text-3xl">
@@ -61,22 +52,24 @@ export default function PageShell({ title, lead, children }: Props) {
         )}
         <div className="article-body max-w-none">{children}</div>
       </main>
-      <footer className="border-t border-black/8 bg-white px-5 py-5 text-xs text-gray-500">
+      <footer className="border-t border-black/8 bg-white px-5 py-6 text-sm text-gray-700">
         <div className="mx-auto max-w-3xl">
-          <div className="text-xs">
-            運営:{" "}
-            <a
-              href="https://www.research-coordinate.co.jp/labs/vet/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900"
-            >
-              獣医工学ラボ
-            </a>
-            <span aria-hidden className="mx-2">·</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span>
+              運営:{" "}
+              <a
+                href="https://www.research-coordinate.co.jp/labs/vet/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block py-1 font-medium text-gray-900 hover:underline"
+              >
+                獣医工学ラボ
+              </a>
+            </span>
+            <span className="text-gray-300" aria-hidden>·</span>
             <a
               href="mailto:contact@research-coordinate.co.jp"
-              className="hover:text-gray-900"
+              className="inline-block py-1 hover:text-gray-900 hover:underline"
             >
               お問合せ
             </a>

@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
+import HeaderNav from "@/components/HeaderNav";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
 import RiskPanel, {
@@ -623,11 +624,8 @@ export default function KumaClient() {
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
-      <header className="relative z-[1100] flex shrink-0 items-center gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ブランドロックアップ: ロゴ + くまウォッチ → /about (サービス紹介)、
-            by 獣医工学ラボ → 獣医工学ラボ公式ページ (外部) の 2 リンク構造。
-            獣医工学ラボに直接アクセスできる導線を確実に提供する。 */}
-        <div className="flex shrink-0 items-center gap-2">
+      <header className="relative z-[1100] flex shrink-0 items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
+        <div className="flex min-w-0 shrink items-center gap-2">
           <Link
             href="/about"
             className="flex items-center gap-2"
@@ -639,9 +637,7 @@ export default function KumaClient() {
               alt="KumaWatch"
               className="block h-7 w-auto sm:h-8"
             />
-            {/* くまウォッチ テキストは sm 未満で非表示 (横幅をナビに譲る)。
-                ロゴ画像が "Kuma Watch / KW" のワードマークを持っているのでブランド表記は維持される。 */}
-            <span className="hidden text-[13px] font-semibold tracking-tight text-stone-900 sm:inline sm:text-sm">
+            <span className="truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
               くまウォッチ
             </span>
           </Link>
@@ -649,42 +645,14 @@ export default function KumaClient() {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-[11px] text-stone-500 hover:text-stone-700 sm:inline sm:text-xs"
+            className="hidden text-xs text-stone-500 hover:text-stone-700 sm:inline"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}
             <span className="font-medium text-stone-700">獣医工学ラボ</span>
           </a>
         </div>
-
-        <div className="min-w-0 flex-1" aria-hidden />
-
-        {/* 主要ナビゲーション (PageShell ヘッダーと文言を揃えてサイト全体で一貫させる) */}
-        <nav
-          className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-stone-600 sm:gap-4 sm:text-xs"
-          aria-label="ブラウズ"
-        >
-          <Link href="/place" className="hover:text-stone-900">
-            都道府県
-          </Link>
-          <Link href="/spot" className="hover:text-stone-900">
-            観光地
-          </Link>
-          <Link href="/articles" className="hover:text-stone-900">
-            クマ対策
-          </Link>
-          <Link href="/research" className="hover:text-stone-900">
-            研究
-          </Link>
-          <Link href="/for-gov" className="hover:text-stone-900">
-            自治体の方へ
-          </Link>
-        </nav>
-
-        {/* 主要導線 (都道府県・観光地・クマ対策・研究・自治体の方へ) はヘッダーに、
-            地図スタイル切替は地図右側の現在地ボタン上に配置済み。
-            このサイトについて等の補足リンクは各 お問合せカード内に集約。
-            よって ⋮ メニュー自体を撤去し、ヘッダーをすっきり保つ。 */}
+        <HeaderNav />
       </header>
 
       {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}

@@ -673,12 +673,25 @@ ${bodyJsx}
 }
 
 function escapeJsxText(s: string): string {
-  return s
+  return formatInlineCitations(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/\{/g, "&#123;")
     .replace(/\}/g, "&#125;");
+}
+
+/**
+ * Drive 由来の本文中に出現する「...である1。」のような bare 参照番号を
+ * 「...である（※1）。」に整形する。学術日本語慣行の ※N 形式。
+ * 日付・年号 (例: 2025年, 5月9日) は閉じ要素が "年|月|日" などになるため
+ * このパターンには合致しない。
+ */
+function formatInlineCitations(s: string): string {
+  return s.replace(
+    /([぀-ゟ゠-ヿ一-龯、。）」])(\d{1,2})([。、])/g,
+    "$1（※$2）$3",
+  );
 }
 
 function updateIndex(newDocs: { doc: DocMeta; regions: string[] }[]) {

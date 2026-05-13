@@ -11,17 +11,26 @@ export default function LegalLinks() {
   return (
     <nav
       aria-label="補足リンク"
-      className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-gray-100 pt-3 text-[11px] text-gray-400"
+      className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-gray-200 pt-3 text-sm text-gray-600"
     >
-      <Link href="/about" className="hover:text-gray-600 hover:underline">
+      <Link
+        href="/about"
+        className="inline-block py-1 hover:text-gray-900 hover:underline"
+      >
         このサイトについて
       </Link>
-      <span aria-hidden>·</span>
-      <Link href="/disclaimer" className="hover:text-gray-600 hover:underline">
+      <span className="text-gray-300" aria-hidden>·</span>
+      <Link
+        href="/disclaimer"
+        className="inline-block py-1 hover:text-gray-900 hover:underline"
+      >
         免責事項
       </Link>
-      <span aria-hidden>·</span>
-      <Link href="/privacy" className="hover:text-gray-600 hover:underline">
+      <span className="text-gray-300" aria-hidden>·</span>
+      <Link
+        href="/privacy"
+        className="inline-block py-1 hover:text-gray-900 hover:underline"
+      >
         プライバシー
       </Link>
     </nav>

@@ -53,24 +53,26 @@ export default function MiniSightingsMap({
       L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
 
       L.circleMarker([centerLat, centerLon], {
-        radius: 9,
+        radius: 11,
         color: "#92400e",
         weight: 2,
         fillColor: "#fde68a",
-        fillOpacity: 0.6,
+        fillOpacity: 0.7,
       }).addTo(map);
 
       const now = Date.now();
       const recentMs = recencyHighlightDays * 86_400_000;
+      // タッチデバイスで押しやすい大きさ。circleMarker の HitBox は radius と一致するため、
+      // 小さすぎると指でタップしてポップアップが開かない。10〜12px なら親指でも届く。
       for (const r of records) {
         const t = Date.parse(r.date);
         const isRecent = Number.isFinite(t) && now - t <= recentMs;
         const marker = L.circleMarker([r.lat, r.lon], {
-          radius: 6,
-          color: isRecent ? "#7f1d1d" : "#9ca3af",
-          weight: 1,
-          fillColor: isRecent ? "#dc2626" : "#d1d5db",
-          fillOpacity: isRecent ? 0.85 : 0.5,
+          radius: isRecent ? 10 : 8,
+          color: isRecent ? "#7f1d1d" : "#6b7280",
+          weight: isRecent ? 2 : 1.5,
+          fillColor: isRecent ? "#dc2626" : "#9ca3af",
+          fillOpacity: isRecent ? 0.9 : 0.7,
         });
         const date = r.date || "(日付不明)";
         const where = r.sectionName ? `<div>${escapeHtml(r.sectionName)}</div>` : "";
