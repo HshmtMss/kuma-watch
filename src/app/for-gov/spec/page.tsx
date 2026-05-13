@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import PrintButton from "./PrintButton";
 
@@ -81,12 +82,12 @@ export default function MunicipalSpecPage() {
               貴自治体の公式サイトに掲載されているクマ出没情報を、住民・観光客・登山者に届ける Web サービス。
             </li>
             <li>
-              <strong>自治体作業：</strong>
-              ゼロ。これまで通り公式サイトを更新いただくだけで自動取り込み。
+              <strong>自治体側のご対応：</strong>
+              新しい運用は不要。これまで通り公式サイトを運用いただくだけで自動取り込みします。公式ページが整備されていない場合は、報道・住民投稿で補完します。
             </li>
             <li>
               <strong>費用：</strong>
-              自治体・住民ともに完全無料。広告なし。
+              現時点では基本機能を無料でご提供（自治体・住民ともに連携費用は不要）。
             </li>
             <li>
               <strong>既存実績：</strong>
@@ -203,12 +204,12 @@ export default function MunicipalSpecPage() {
           </h2>
           <div className="mt-2 space-y-2.5">
             <FAQ
-              q="費用は本当に無料ですか？"
-              a="はい、自治体・住民ともに完全無料です。広告も掲載していません。基本機能は今後も無償提供を継続する方針です。"
+              q="費用はかかりますか？"
+              a="現時点では基本機能を無料でご利用いただけます。自治体さまには連携費用も発生しません。今後、より高度な機能を有料オプションとして追加する可能性はありますが、自治体さま向けの基本機能の無償提供は継続する方針です。"
             />
             <FAQ
-              q="自治体側の作業は本当にゼロですか？"
-              a="現状の公式サイトを更新いただくだけで KumaWatch 側で自動取り込みします。専用 API や CSV エクスポートのご用意も不要です。"
+              q="自治体側に追加の作業負担はありますか？"
+              a="新しい運用は不要です。現状の公式サイトをそのまま運用いただくだけで KumaWatch 側が自動取り込みします。専用 API や CSV エクスポートのご準備も不要です。公式ページがまだ無い自治体さまは、報道・住民投稿で補完しますので、その場合も貴自治体側の作業は発生しません。"
             />
             <FAQ
               q="情報の更新が遅れたり止まったりする心配はありませんか？"
@@ -235,11 +236,22 @@ export default function MunicipalSpecPage() {
             6. 運営体制
           </h2>
           <div className="mt-2 rounded-lg border border-stone-200 bg-white p-4 print:p-3">
-            <div className="text-base font-bold text-stone-900 print:text-[11pt]">
-              獣医工学ラボ
-            </div>
-            <div className="text-xs text-stone-600 print:text-[9pt]">
-              （リサーチコーディネート株式会社が運営する技術プロジェクト）
+            <div className="mb-2 flex items-center gap-3">
+              <Image
+                src="/labs/vet-eng-lab.jpeg"
+                alt="獣医工学ラボ ロゴ"
+                width={240}
+                height={134}
+                className="h-auto w-20 shrink-0 print:w-16"
+              />
+              <div>
+                <div className="text-base font-bold text-stone-900 print:text-[11pt]">
+                  獣医工学ラボ
+                </div>
+                <div className="text-xs text-stone-600 print:text-[9pt]">
+                  （リサーチコーディネート株式会社が運営する技術プロジェクト）
+                </div>
+              </div>
             </div>
             <Spec
               rows={[

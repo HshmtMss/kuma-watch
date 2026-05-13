@@ -1,218 +1,244 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import {
+  RESEARCH_CATEGORY_LABEL,
+  researchEntryMonth,
+  researchRegionsWithCount,
+  sortedResearchEntries,
+  type ResearchEntry,
+} from "@/lib/research-entries";
 
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
   title: "研究・知見｜獣医工学ラボ",
   description:
-    "獣医工学ラボによる、全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、政策提言、自治体・専門家向けの公開知見。",
+    "獣医工学ラボによる、全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、政策提言、自治体・専門家向けの公開知見。日次・月次レポートを地域別・日付別に整理して公開。",
   alternates: { canonical: `${SITE_URL}/research` },
   robots: { index: true, follow: true },
 };
 
 // ISR: 5 分ごとに静的 HTML を再生成。新規記事 (import-research が
-// /research/<slug>/page.tsx を追加 → ENTRIES 配列を更新) を CDN エッジに
+// /research/<slug>/page.tsx を追加 → RESEARCH_ENTRIES を更新) を CDN エッジに
 // 短い遅延で反映するため。
 export const revalidate = 300;
 
-type ResearchEntry = {
-  slug: string;
-  title: string;
-  lead: string;
-  publishedAt: string;
-  category: "daily-report" | "weekly-report" | "monthly-report" | "topic" | "policy";
-};
-
-// 記事本来の日付 (slug の YYYY-MM-DD or YYYY-MM 部分) 降順で並べる。
-// 配列内の登録順は問わない (rendering 時に sortKey でソートする)。
-const ENTRIES: ResearchEntry[] = [
-  {
-    slug: "2026-05-10-daily-report",
-    title: "2026年5月10日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月10日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-12",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-11-daily-report",
-    title: "2026年5月11日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月11日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-12",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-09-daily-report",
-    title: "2026年5月9日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月9日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-10",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-07-daily-report",
-    title: "2026年5月7日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月7日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-09",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-08-daily-report",
-    title: "2026年5月8日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月8日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-09",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-06-daily-report",
-    title: "2026年5月6日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月6日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-07",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-05-daily-report",
-    title: "2026年5月5日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月5日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-05",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-04-daily-report",
-    title: "2026年5月4日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月4日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-05",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-03-daily-report",
-    title: "2026年5月3日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月3日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-04",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-02-daily-report",
-    title: "2026年5月2日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月2日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-04",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-05-01-daily-report",
-    title: "2026年5月1日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年5月1日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-04",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-04-30-daily-report",
-    title: "2026年4月30日 国内クマ出没事案の時空間分析と分析報告",
-    lead: "2026年4月30日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
-    publishedAt: "2026-05-02",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-04-29-bear-incidents",
-    title: "2026年4月29日 国内熊出没事案の時空間分析と社会的リスク評価",
-    lead: "ゴールデンウィーク初日、全国で相次いだクマ出没・人身被害事案を網羅的に集約し、アーバン・ベア化の進行と背景要因を分析した報告書。",
-    publishedAt: "2026-04-30",
-    category: "daily-report",
-  },
-  {
-    slug: "2026-04-monthly-report",
-    title: "2026年4月 国内熊出没動向と人獣衝突の構造的分析",
-    lead: "アーバンベアの完全定着、北海道の冬眠明け巨大ヒグマ（島牧村ハンター襲撃・苫前町330kg個体）、富山市住宅街での人身被害、4月1日施行のクマ「指定管理鳥獣」化までを総括した月次報告。",
-    publishedAt: "2026-05-01",
-    category: "monthly-report",
-  },
-  {
-    slug: "2026-03-monthly-report",
-    title: "2026年3月 国内熊出没動向と「熊対策ロードマップ」策定の包括的分析",
-    lead: "暖冬による早期覚醒、北海道・東北・北陸の出没急増、3月27日に政府が公表した個体数削減ロードマップ（2030年度までの地域別削減目標）までを総括した月次報告。",
-    publishedAt: "2026-04-30",
-    category: "monthly-report",
-  },
-];
-
-// slug 先頭の日付 (YYYY-MM-DD or YYYY-MM) を sortable な数値に変換する。
-// 月次レポート (YYYY-MM) は同月末日として扱い、日次より後ろに配置されない。
-function entrySortKey(slug: string): string {
-  const daily = slug.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (daily) return `${daily[1]}${daily[2]}${daily[3]}`;
-  const monthly = slug.match(/^(\d{4})-(\d{2})/);
-  if (monthly) return `${monthly[1]}${monthly[2]}99`;
-  return "00000000";
+// "2026-05" → "2026年5月"。日次レポートを月別グルーピングする見出しに使う。
+function formatMonth(yyyymm: string): string {
+  const m = yyyymm.match(/^(\d{4})-(\d{2})$/);
+  if (!m) return yyyymm;
+  return `${m[1]}年${Number(m[2])}月`;
 }
 
-const SORTED_ENTRIES = [...ENTRIES].sort((a, b) =>
-  entrySortKey(b.slug).localeCompare(entrySortKey(a.slug)),
-);
-
-const CATEGORY_LABEL: Record<ResearchEntry["category"], string> = {
-  "daily-report": "日次レポート",
-  "weekly-report": "週次レポート",
-  "monthly-report": "月次レポート",
-  topic: "テーマ解説",
-  policy: "政策提言",
-};
-
 export default function ResearchIndexPage() {
+  const sorted = sortedResearchEntries();
+
+  // 月次・テーマ・政策レポートは上段でフィード形式に。日次は下段で月別に折りたたむ。
+  const monthly = sorted.filter((e) => e.category === "monthly-report");
+  const weekly = sorted.filter((e) => e.category === "weekly-report");
+  const topicPolicy = sorted.filter(
+    (e) => e.category === "topic" || e.category === "policy",
+  );
+  const daily = sorted.filter((e) => e.category === "daily-report");
+
+  // 日次を YYYY-MM でグルーピング (新しい月から)。
+  const dailyByMonth = new Map<string, ResearchEntry[]>();
+  for (const e of daily) {
+    const m = researchEntryMonth(e.slug);
+    const arr = dailyByMonth.get(m) ?? [];
+    arr.push(e);
+    dailyByMonth.set(m, arr);
+  }
+  const dailyMonths = [...dailyByMonth.keys()].sort((a, b) => b.localeCompare(a));
+
+  const regions = researchRegionsWithCount();
+
   return (
     <PageShell
       title="研究・知見"
       lead="獣医工学ラボが公開する、クマ出没事案の分析・テーマ解説・政策提言。自治体・研究機関・専門家の皆様向けの情報です。"
     >
-      <div className="not-prose mb-8 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-        <div className="text-sm leading-relaxed text-stone-700">
-          <p className="mb-2 font-semibold text-stone-900">獣医工学ラボについて</p>
-          <p>
+      <div className="not-prose mb-8 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+        {/* ブランドストリップ: 純白で JPEG ロゴの白背景とシームレスに繋ぐ */}
+        <div className="flex flex-col items-center gap-4 px-6 pb-5 pt-6 sm:flex-row sm:items-center sm:gap-7 sm:px-8 sm:py-7">
+          <Image
+            src="/labs/vet-eng-lab.jpeg"
+            alt="獣医工学ラボ ロゴ"
+            width={480}
+            height={267}
+            className="h-auto w-44 shrink-0 sm:w-52"
+            priority
+          />
+          <div className="text-center sm:border-l sm:border-stone-200 sm:pl-7 sm:text-left">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              運営
+            </div>
+            <div className="mt-1.5 text-sm leading-relaxed text-stone-700 sm:text-[15px]">
+              獣医療・野生動物・公衆衛生領域の
+              <br className="hidden sm:block" />
+              技術プロジェクト
+            </div>
+            <div className="mt-2 text-xs text-stone-500">
+              リサーチコーディネート株式会社
+            </div>
+          </div>
+        </div>
+        {/* 説明ボディ: 区切り線 + 薄トーンで本文と分離 */}
+        <div className="border-t border-stone-100 bg-stone-50 px-6 py-5 text-sm leading-relaxed text-stone-700 sm:px-8">
+          <p className="m-0">
             <a
               href="https://www.research-coordinate.co.jp/labs/vet/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-700 underline"
-            >獣医工学ラボ</a>は、<a
+            >
+              獣医工学ラボ
+            </a>
+            は、
+            <a
               href="https://www.research-coordinate.co.jp"
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-700 underline"
-            >リサーチコーディネート株式会社</a>
+            >
+              リサーチコーディネート株式会社
+            </a>
             が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
             KumaWatch（くまウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し
             可視化することで、人と野生動物の境界における事故リスクの低減に取り組んでいます。
           </p>
-          <p className="mt-2">
+          <p className="mt-3">
             本ページでは、KumaWatch のデータ・運営知見をもとにした分析レポートや、
             自治体・専門家向けのテーマ解説を公開しています。データ連携や共同研究のご相談は
-            <Link href="/for-gov" className="ml-1 text-blue-700 underline">自治体の方へ</Link>
+            <Link href="/for-gov" className="ml-1 text-blue-700 underline">
+              自治体の方へ
+            </Link>
             のページ、または末尾の連絡先までご連絡ください。
           </p>
         </div>
       </div>
 
-      <h2>公開記事</h2>
-      <ul className="not-prose space-y-4">
-        {SORTED_ENTRIES.map((e) => (
-          <li
-            key={e.slug}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-emerald-500 hover:bg-emerald-50/40"
-          >
-            <Link href={`/research/${e.slug}`} className="block p-5">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-800">
-                  {CATEGORY_LABEL[e.category]}
+      {/* 地域から探す: 各都道府県のアーカイブへの導線。
+          記事内で頻出している都道府県をチップで並べる。 */}
+      {regions.length > 0 && (
+        <>
+          <h2>地域から探す</h2>
+          <p className="text-sm text-stone-600">
+            各都道府県に関連するレポートをまとめたアーカイブページから探せます。
+          </p>
+          <div className="not-prose mt-3 flex flex-wrap gap-2">
+            {regions.map((r) => (
+              <Link
+                key={r.pref}
+                href={`/research/region/${encodeURIComponent(r.pref)}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-900"
+              >
+                <span>{r.pref}</span>
+                <span className="text-[10px] tabular-nums text-stone-400">
+                  {r.count}
                 </span>
-                <span>{e.publishedAt}</span>
-              </div>
-              <div className="mt-2 text-base font-semibold text-gray-900">
-                {e.title}
-              </div>
-              <div className="mt-1 text-sm text-gray-600">{e.lead}</div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* 月次レポート: 最新動向の総括として最上段に大きく置く。 */}
+      {monthly.length > 0 && (
+        <>
+          <h2>月次レポート</h2>
+          <ul className="not-prose space-y-4">
+            {monthly.map((e) => (
+              <ResearchCard key={e.slug} entry={e} accent="emerald" />
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* 週次レポート: 月次と日次の中間粒度。現状エントリが無い場合は非表示。 */}
+      {weekly.length > 0 && (
+        <>
+          <h2>週次レポート</h2>
+          <ul className="not-prose space-y-4">
+            {weekly.map((e) => (
+              <ResearchCard key={e.slug} entry={e} accent="emerald" />
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* テーマ解説・政策提言。エントリが無ければセクション自体を表示しない。 */}
+      {topicPolicy.length > 0 && (
+        <>
+          <h2>テーマ解説・政策提言</h2>
+          <ul className="not-prose space-y-4">
+            {topicPolicy.map((e) => (
+              <ResearchCard key={e.slug} entry={e} accent="blue" />
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* 日次レポート: 月別 details で折りたたみ。最新の月だけ open。 */}
+      {daily.length > 0 && (
+        <>
+          <h2>日次レポート</h2>
+          <p className="text-sm text-stone-600">
+            その日の全国のクマ出没事案・人身被害・行政対応をまとめた速報レポート。月別にまとめています。
+          </p>
+          {dailyMonths.map((m, idx) => {
+            const items = dailyByMonth.get(m) ?? [];
+            return (
+              <details
+                key={m}
+                className="not-prose group mt-4 overflow-hidden rounded-xl border border-stone-200 bg-white"
+                open={idx === 0}
+              >
+                <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-4 py-3 text-sm font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+                  <span>{formatMonth(m)}</span>
+                  <span className="flex items-center gap-2 text-xs font-normal text-stone-500">
+                    <span className="tabular-nums">{items.length}件</span>
+                    <span className="text-stone-400 group-open:rotate-180">
+                      ▼
+                    </span>
+                  </span>
+                </summary>
+                <ul className="divide-y divide-stone-100">
+                  {items.map((e) => (
+                    <li key={e.slug}>
+                      <Link
+                        href={`/research/${e.slug}`}
+                        className="block px-4 py-3 hover:bg-emerald-50/40"
+                      >
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
+                          <span>{e.publishedAt}</span>
+                        </div>
+                        <div className="mt-1 text-sm font-semibold text-stone-900">
+                          {e.title}
+                        </div>
+                        {e.regions.length > 0 && (
+                          <div className="mt-1.5 flex flex-wrap gap-1">
+                            {e.regions.slice(0, 5).map((r) => (
+                              <span
+                                key={r}
+                                className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
+                              >
+                                {r}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            );
+          })}
+        </>
+      )}
 
       <h2>編集方針</h2>
       <p>
@@ -254,5 +280,52 @@ export default function ResearchIndexPage() {
         </div>
       </div>
     </PageShell>
+  );
+}
+
+function ResearchCard({
+  entry,
+  accent,
+}: {
+  entry: ResearchEntry;
+  accent: "emerald" | "blue";
+}) {
+  const accentChip =
+    accent === "emerald"
+      ? "bg-emerald-100 text-emerald-800"
+      : "bg-blue-100 text-blue-800";
+  const accentHover =
+    accent === "emerald"
+      ? "hover:border-emerald-500 hover:bg-emerald-50/40"
+      : "hover:border-blue-500 hover:bg-blue-50/40";
+  return (
+    <li
+      className={`overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${accentHover}`}
+    >
+      <Link href={`/research/${entry.slug}`} className="block p-5">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span className={`rounded-full px-2 py-0.5 font-medium ${accentChip}`}>
+            {RESEARCH_CATEGORY_LABEL[entry.category]}
+          </span>
+          <span>{entry.publishedAt}</span>
+        </div>
+        <div className="mt-2 text-base font-semibold text-gray-900">
+          {entry.title}
+        </div>
+        <div className="mt-1 text-sm text-gray-600">{entry.lead}</div>
+        {entry.regions.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {entry.regions.slice(0, 5).map((r) => (
+              <span
+                key={r}
+                className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
+              >
+                {r}
+              </span>
+            ))}
+          </div>
+        )}
+      </Link>
+    </li>
   );
 }

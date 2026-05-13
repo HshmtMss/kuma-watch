@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES, CATEGORIES, getAllTags, tagToSlug } from "@/lib/articles-meta";
 import { getAllPrefSummaries, getStaticPlaceKeys } from "@/lib/place-index";
+import {
+  RESEARCH_ENTRIES,
+  researchRegionsWithCount,
+} from "@/lib/research-entries";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
@@ -19,21 +23,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/submit`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE_URL}/research`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/research/2026-04-29-bear-incidents`, lastModified: new Date("2026-04-30"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-03-monthly-report`, lastModified: new Date("2026-04-30"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-04-monthly-report`, lastModified: new Date("2026-05-01"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-03-daily-report`, lastModified: new Date("2026-05-04"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-01-daily-report`, lastModified: new Date("2026-05-04"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-02-daily-report`, lastModified: new Date("2026-05-04"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-04-30-daily-report`, lastModified: new Date("2026-05-02"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-04-daily-report`, lastModified: new Date("2026-05-05"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-05-daily-report`, lastModified: new Date("2026-05-05"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-06-daily-report`, lastModified: new Date("2026-05-07"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-07-daily-report`, lastModified: new Date("2026-05-09"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-08-daily-report`, lastModified: new Date("2026-05-09"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-09-daily-report`, lastModified: new Date("2026-05-10"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-10-daily-report`, lastModified: new Date("2026-05-12"), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/research/2026-05-11-daily-report`, lastModified: new Date("2026-05-12"), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/credits`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/disclaimer`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
@@ -45,6 +34,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
+
+  // 研究記事を RESEARCH_ENTRIES から自動収集。新規記事追加時の sitemap 更新漏れを防ぐ。
+  const researchEntries: MetadataRoute.Sitemap = RESEARCH_ENTRIES.map((e) => ({
+    url: `${SITE_URL}/research/${e.slug}`,
+    lastModified: new Date(e.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  // 地域別アーカイブ /research/region/[pref]。記事内で言及された都道府県分。
+  const researchRegionEntries: MetadataRoute.Sitemap = researchRegionsWithCount().map(
+    (r) => ({
+      url: `${SITE_URL}/research/region/${encodeURIComponent(r.pref)}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }),
+  );
 
   const categoryEntries: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
     url: `${SITE_URL}/articles/category/${c.slug}`,
@@ -112,6 +119,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticEntries,
     ...articleEntries,
+    ...researchEntries,
+    ...researchRegionEntries,
     ...categoryEntries,
     ...tagEntries,
     ...prefEntries,

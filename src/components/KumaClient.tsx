@@ -93,6 +93,8 @@ export default function KumaClient() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
+  // 直近 24h フィルタ: ingestedAt が 24 時間以内のレコードだけに絞る速報モード。
+  const [freshOnly, setFreshOnly] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
@@ -592,13 +594,18 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
+    const FRESH_MS = 24 * 60 * 60 * 1000;
+    const cutoffMs = Date.now() - FRESH_MS;
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
       const periodOk = !periodCutoff || r.date >= periodCutoff;
-      return prefOk && periodOk;
+      const freshOk =
+        !freshOnly ||
+        (typeof r.ingestedAt === "number" && r.ingestedAt >= cutoffMs);
+      return prefOk && periodOk && freshOk;
     });
-  }, [records, selectedPref, periodCutoff, showPins]);
+  }, [records, selectedPref, periodCutoff, showPins, freshOnly]);
 
   // データ更新日: 最新の事案発生日を「データの新しさ」の指標として算出する。
   // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
@@ -763,6 +770,20 @@ export default function KumaClient() {
               {filtered.length.toLocaleString()}件
             </span>
           </div>
+
+          {/* 直近 24h フィルタ — 取り込みから 24h 以内の事案だけを表示する速報モード。 */}
+          <label
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 font-medium text-stone-700"
+            title="直近 24 時間以内に取り込んだ事案のみ表示"
+          >
+            <input
+              type="checkbox"
+              checked={freshOnly}
+              onChange={(e) => setFreshOnly(e.target.checked)}
+              className="h-4 w-4 accent-amber-600"
+            />
+            直近24h
+          </label>
 
           {/* 警戒レベルヒートマップ ON/OFF */}
           <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">
@@ -1061,7 +1082,7 @@ export default function KumaClient() {
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-block h-3 w-3 rounded-full bg-blue-500 ring-2 ring-blue-700" />🆕 24h以内
+                <span className="inline-block h-3 w-3 rounded-full bg-blue-500 ring-2 ring-blue-700" />24時間以内の新着
               </div>
             </div>
             <div>

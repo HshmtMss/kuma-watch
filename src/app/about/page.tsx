@@ -46,7 +46,7 @@ const FAQ = [
   },
   {
     q: "利用料金はかかりますか？",
-    a: "完全無料・会員登録不要・広告なし。kuma-watch.jp にアクセスするだけで利用できます。",
+    a: "現時点では基本機能を無料でご利用いただけます。会員登録も不要、kuma-watch.jp にアクセスするだけで使えます。",
   },
   {
     q: "どこの情報をもとに表示していますか？",
@@ -367,20 +367,30 @@ export default function AboutPage() {
       </div>
 
       <h2 id="operator">運営体制・監修者</h2>
-      <p>
-        本サイトは{" "}
-        <strong>
-          <a
-            href="https://www.research-coordinate.co.jp/labs/vet/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            獣医工学ラボ
-          </a>
-        </strong>{" "}
-        が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
-        <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
-      </p>
+      <div className="not-prose my-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="flex flex-col items-center gap-4 px-5 pb-4 pt-5 sm:flex-row sm:gap-6 sm:px-6 sm:py-5">
+          <Image
+            src="/labs/vet-eng-lab.jpeg"
+            alt="獣医工学ラボ ロゴ"
+            width={480}
+            height={267}
+            className="h-auto w-36 shrink-0 sm:w-44"
+          />
+          <p className="m-0 text-center text-sm leading-relaxed text-stone-700 sm:border-l sm:border-stone-200 sm:pl-6 sm:text-left">
+            本サイトは{" "}
+            <a
+              href="https://www.research-coordinate.co.jp/labs/vet/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-blue-700 underline"
+            >
+              獣医工学ラボ
+            </a>{" "}
+            が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
+            <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
+          </p>
+        </div>
+      </div>
       <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
         <p className="mb-2 flex items-center gap-2 text-base font-semibold">
           <span aria-hidden>🩺</span>

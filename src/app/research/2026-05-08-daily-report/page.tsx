@@ -5,6 +5,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-08-daily-report";
@@ -376,6 +377,7 @@ export default function ResearchPage() {
           </ol>
         </>
       )}
+      <ResearchPlaceLinks slug={SLUG} />
 
       <hr className="my-10 border-stone-200" />
 

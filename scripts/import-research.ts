@@ -18,8 +18,11 @@
  *   - HTML エクスポートに切り替えたことで、Google Docs の表が
  *     <table> として正しく描画されるようになった (txt エクスポートだと
  *     セルが flat な行に潰れて読めない)。
- * - src/app/research/page.tsx の ENTRIES 配列、src/app/sitemap.ts に
- *   新エントリを自動追加 (slug が既に存在する場合は重複を避けスキップ)。
+ * - src/lib/research-entries.ts の RESEARCH_ENTRIES 配列に新エントリを
+ *   自動追加 (slug が既に存在する場合は重複を避けスキップ)。本文中の
+ *   都道府県メンションを集計して regions 配列も埋める。
+ * - sitemap は src/app/sitemap.ts が RESEARCH_ENTRIES から自動収集するので
+ *   こちらでは何も書き換えない。
  *
  * Drive 側の前提:
  * - フォルダおよび各 Doc が "リンクを知っている全員が閲覧可" になっていること。
@@ -124,7 +127,7 @@ async function main() {
     return;
   }
 
-  const newOnly: DocMeta[] = [];
+  const newOnly: { doc: DocMeta; regions: string[] }[] = [];
   for (const { doc, parsed, hash, isNew } of toGenerate) {
     try {
       writePage(doc, parsed, hash);
@@ -132,20 +135,71 @@ async function main() {
       console.log(
         `[import-research]   ${isNew ? "NEW    " : "UPDATED"} ${doc.slug} (${parsed.body.length} blocks, ${tableCount} tables, ${parsed.references.length} refs)`,
       );
-      if (isNew) newOnly.push(doc);
+      if (isNew) {
+        newOnly.push({ doc, regions: extractRegions(parsed) });
+      }
     } catch (e) {
       console.error(`[import-research]   FAILED to write ${doc.slug}:`, e);
     }
   }
 
-  // index と sitemap の更新は「新規 slug」のみ。既存記事の更新だけなら触らない。
+  // RESEARCH_ENTRIES への登録は「新規 slug」のみ。既存記事の更新だけなら触らない。
+  // sitemap は RESEARCH_ENTRIES から自動収集するため、ここでは更新しない。
   if (newOnly.length > 0) {
     updateIndex(newOnly);
-    updateSitemap(newOnly);
-    console.log(`[import-research] updated index and sitemap with ${newOnly.length} new entries (duplicates skipped)`);
+    console.log(
+      `[import-research] updated RESEARCH_ENTRIES with ${newOnly.length} new entries (duplicates skipped)`,
+    );
   }
 
   console.log("[import-research] done.");
+}
+
+// 47 都道府県名。記事本文中の出現回数を数えて regions タグを作る。
+const PREFECTURE_NAMES = [
+  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+  "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+  "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+  "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+  "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
+];
+
+/** 本文を全テキスト化して各都道府県名の出現回数を数え、上位 5 件を返す。 */
+function extractRegions(parsed: ParsedDoc): string[] {
+  const text = blocksToText(parsed.body);
+  const counts = new Map<string, number>();
+  for (const pref of PREFECTURE_NAMES) {
+    const re = new RegExp(pref.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+    const n = (text.match(re) ?? []).length;
+    if (n > 0) counts.set(pref, n);
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || PREFECTURE_NAMES.indexOf(a[0]) - PREFECTURE_NAMES.indexOf(b[0]))
+    .slice(0, 5)
+    .map(([pref]) => pref);
+}
+
+function blocksToText(blocks: Block[]): string {
+  const out: string[] = [];
+  for (const b of blocks) {
+    switch (b.type) {
+      case "h2":
+      case "h3":
+      case "p":
+        out.push(b.text);
+        break;
+      case "ul":
+      case "ol":
+        out.push(b.items.join("\n"));
+        break;
+      case "table":
+        out.push(b.rows.map((r) => r.join(" ")).join("\n"));
+        break;
+    }
+  }
+  return out.join("\n");
 }
 
 function sha256(s: string): string {
@@ -450,6 +504,7 @@ function renderPageTsx(doc: DocMeta, parsed: ParsedDoc, contentHash: string): st
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = ${JSON.stringify(doc.slug)};
@@ -535,6 +590,8 @@ ${bodyJsx}
           </ol>
         </>
       )}
+
+      <ResearchPlaceLinks slug={SLUG} />
 
       <hr className="my-10 border-stone-200" />
 
@@ -624,29 +681,33 @@ function escapeJsxText(s: string): string {
     .replace(/\}/g, "&#125;");
 }
 
-function updateIndex(newDocs: DocMeta[]) {
-  const path = join(ROOT, "src", "app", "research", "page.tsx");
+function updateIndex(newDocs: { doc: DocMeta; regions: string[] }[]) {
+  const path = join(ROOT, "src", "lib", "research-entries.ts");
   let content = readFileSync(path, "utf8");
 
   const today = new Date();
   const publishedAt = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  const marker = "const ENTRIES: ResearchEntry[] = [";
+  // RESEARCH_ENTRIES 配列の開き [ の直後に挿入する。配列冒頭が最新の記事になる。
+  const marker = "export const RESEARCH_ENTRIES: ResearchEntry[] = [";
   const idx = content.indexOf(marker);
   if (idx === -1) {
-    console.warn("[import-research] ENTRIES marker not found in research/page.tsx — skipping index update");
+    console.warn(
+      "[import-research] RESEARCH_ENTRIES marker not found in lib/research-entries.ts — skipping",
+    );
     return;
   }
   const insertAt = idx + marker.length;
 
   const additions = newDocs
-    .filter((d) => !content.includes(`slug: ${JSON.stringify(d.slug)}`))
-    .map((d) => {
+    .filter(({ doc: d }) => !content.includes(`slug: ${JSON.stringify(d.slug)}`))
+    .map(({ doc: d, regions }) => {
       const indexTitle =
         d.category === "daily-report"
           ? `${d.period} 国内クマ出没事案の時空間分析と分析報告`
           : `${d.period} 国内クマ出没動向の月次総括レポート`;
       const lead = `${d.period}の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。`;
+      const regionsJson = JSON.stringify(regions);
       return `
   {
     slug: ${JSON.stringify(d.slug)},
@@ -654,6 +715,7 @@ function updateIndex(newDocs: DocMeta[]) {
     lead: ${JSON.stringify(lead)},
     publishedAt: ${JSON.stringify(publishedAt)},
     category: ${JSON.stringify(d.category)},
+    regions: ${regionsJson},
   },`;
     })
     .join("");
@@ -661,44 +723,6 @@ function updateIndex(newDocs: DocMeta[]) {
   if (additions === "") return;
   content = content.slice(0, insertAt) + additions + content.slice(insertAt);
   writeFileSync(path, content);
-}
-
-function updateSitemap(newDocs: DocMeta[]) {
-  const path = join(ROOT, "src", "app", "sitemap.ts");
-  let content = readFileSync(path, "utf8");
-
-  const today = new Date();
-  const isoDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-
-  // 直近 (時系列で最後) の /research/<slug> エントリの行末に追記する。
-  // 同 slug が既にあれば重複追加しない。
-  const docsToAdd = newDocs.filter((d) => !content.includes(`/research/${d.slug}`));
-  if (docsToAdd.length === 0) return;
-
-  // 一番新しい "research/YYYY-MM-..." 行を探す
-  const lines = content.split("\n");
-  let lastResearchLine = -1;
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].includes("/research/2026-")) lastResearchLine = i;
-  }
-  if (lastResearchLine === -1) {
-    // フォールバック: /research の static エントリ
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].includes("/research`")) lastResearchLine = i;
-    }
-  }
-  if (lastResearchLine === -1) {
-    console.warn("[import-research] sitemap research anchor not found — skipping");
-    return;
-  }
-
-  const additions = docsToAdd.map(
-    (d) =>
-      `    { url: \`\${SITE_URL}/research/${d.slug}\`, lastModified: new Date(${JSON.stringify(isoDate)}), changeFrequency: "monthly", priority: 0.6 },`,
-  );
-
-  lines.splice(lastResearchLine + 1, 0, ...additions);
-  writeFileSync(path, lines.join("\n"));
 }
 
 main().catch((e) => {

@@ -10,12 +10,12 @@ const CONTACT_MAILTO =
 export const metadata: Metadata = {
   title: "自治体の方へ｜KumaWatch クマ出没情報の連携・配信",
   description:
-    "自治体が公開しているクマ出没情報を KumaWatch が自動で取り込み、住民・観光客・登山者に届けます。自治体側の追加作業ゼロ・連携費用無料。70 以上の自治体・47 都道府県のデータを既に統合中。",
+    "自治体が公開しているクマ出没情報を KumaWatch が自動で取り込み、住民・観光客・登山者に届けます。新しい運用や追加負担はなく、連携費用も発生しません。70 以上の自治体・47 都道府県のデータを既に統合中。",
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
     title: "自治体の方へ｜KumaWatch",
     description:
-      "自治体側の追加作業ゼロで、住民・観光客にクマ出没情報を届けます。連携費用無料。70+ 自治体のデータを既に統合中。",
+      "新しい運用や追加負担なしで、住民・観光客にクマ出没情報を届けます。連携費用は不要。70+ 自治体のデータを既に統合中。",
     url: `${SITE_URL}/for-gov`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "自治体の方へ｜KumaWatch",
     description:
-      "自治体側の追加作業ゼロで、住民・観光客にクマ出没情報を届けます。連携費用無料。",
+      "新しい運用や追加負担なしで、住民・観光客にクマ出没情報を届けます。連携費用は不要。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
@@ -37,17 +37,17 @@ const STATS = [
 ];
 
 // 3 つのコアメッセージに集約。
-// 1) 観光客・住民への到達 / 2) 自治体作業ゼロ / 3) 獣医師監修の信頼性
+// 1) 観光客・住民への到達 / 2) 追加の運用負担なし / 3) 獣医師監修の信頼性
 const VALUE_PROPS = [
   {
     icon: "🧭",
     title: "観光客・住民に届きます",
-    body: "登山者・キャンパー・観光客が出発前に確認する地点に、貴自治体の情報が掲載されます。「○○市 クマ」検索で表示される独立ページも自動生成。",
+    body: "登山者・キャンパー・観光客が出発前に確認する地点に、貴自治体の情報が掲載されます。「○○市 クマ」で検索したときに表示される独立ページも自動生成。",
   },
   {
     icon: "🏛️",
-    title: "自治体側の作業はゼロ",
-    body: "現状の公式サイトを更新していただくだけ。新システムも新運用も不要です。HTML / PDF / CSV / KML / API、どの形式でも自動で取り込みます。",
+    title: "新しい運用は不要",
+    body: "現状の公式サイトをそのまま運用していただければ、こちらで自動取り込みします。新しいシステムや専用 API・CSV エクスポートを構築する必要はありません。公式ページがまだ無い自治体さまは、報道・住民投稿で補完します。",
   },
   {
     icon: "🩺",
@@ -61,7 +61,7 @@ const PROCESS_STEPS = [
     step: "STEP 1",
     title: "メール 1 通でご連絡",
     duration: "30 分の確認 MTG",
-    body: "対象の出没情報ページ URL をご共有ください。形式・更新頻度はオンラインで簡単に確認します。",
+    body: "対象の出没情報ページ URL をご共有ください。公式ページがまだ無い自治体さまも歓迎です（報道・住民投稿で補完します）。形式・更新頻度はオンラインで簡単に確認します。",
   },
   {
     step: "STEP 2",
@@ -77,19 +77,23 @@ const PROCESS_STEPS = [
   },
 ];
 
-// FAQ は 4 件に厳選: 費用 / 作業負担 / 出典 / 停止
+// FAQ は 5 件: 費用 / 作業負担 / 公式ページ未整備 / 出典 / 停止
 const FAQ = [
   {
     q: "費用はかかりますか？",
-    a: "自治体・住民ともに完全無料。広告も掲載しません。基本機能は無償提供を継続する方針です。",
+    a: "現時点では基本機能を無料でご利用いただけます。自治体さまには連携費用も発生しません。今後、より高度な機能を追加する際に有料オプションを設けることは検討していますが、自治体さまへの基本機能の無償提供は継続する方針です。",
   },
   {
-    q: "自治体側の作業は本当にゼロですか？",
-    a: "はい。現状の公式サイトをそのまま更新いただくだけで、KumaWatch 側が自動取り込みします。専用 API や CSV エクスポートも不要、技術対応はすべて当社が担当します。",
+    q: "自治体側の追加負担はありますか？",
+    a: "新しいシステムや専用 API・CSV エクスポートを準備していただく必要はありません。現状の公式サイトをそのまま運用いただくだけで、KumaWatch 側が自動取り込みします。技術対応はすべて当社が担当します。公式ページが整備されていない場合は、報道や住民投稿で補完しますので、その場合も貴自治体側の作業は発生しません。",
+  },
+  {
+    q: "公式の出没情報ページが無い、または更新が稀でも連携できますか？",
+    a: "はい、可能です。公式ページが整備されていない場合は、KumaWatch 側で報道情報・住民投稿・隣接自治体や県の発表を統合し、貴自治体の出没情報を専用ページに整理表示します。住民・観光客に情報を届ける手段がこれまで無かった自治体ほど、効果が大きい連携になります。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。",
   },
   {
     q: "情報の出典・著作権はどうなりますか？",
-    a: "全ての情報には自治体名を明記し、公式ページへのリンクを併記します。情報の著作権は自治体に帰属したまま。住民・観光客は最終確認を必ず公式サイトに戻れる設計です。",
+    a: "全ての情報には自治体名・出典元を明記し、公式ページがある場合はリンクを併記します。情報の著作権は自治体に帰属したまま。住民・観光客は最終確認を必ず一次出典に戻れる設計です。",
   },
   {
     q: "連携を停止したい場合は？",
@@ -101,19 +105,19 @@ export default function ForGovPage() {
   return (
     <PageShell
       title="自治体の方へ"
-      lead="公式サイトの更新を続けるだけ。観光客・住民にクマ出没情報を届ける仕組みを、自治体作業ゼロで提供します。"
+      lead="既存の公式サイト運用そのままで、観光客・住民にクマ出没情報を届ける仕組みを、貴自治体に追加負担なくご提供します。"
     >
       {/* Hero — シンプルな 3 メッセージで即決訴求 */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-800">
-          自治体連携・無料・追加作業ゼロ
+          自治体連携・追加負担なし
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
           皆さまの公開情報を、住民・観光客に届けます。
         </h2>
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>自治体側の作業はゼロ</li>
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>完全無料・広告なし</li>
+          <li className="flex gap-2"><span className="text-amber-600">✓</span>既存の運用そのままで連携可</li>
+          <li className="flex gap-2"><span className="text-amber-600">✓</span>現時点では無料でご利用いただけます</li>
           <li className="flex gap-2"><span className="text-amber-600">✓</span>獣医師監修の専門サービス</li>
         </ul>
         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -149,7 +153,7 @@ export default function ForGovPage() {
       </section>
 
       {/* Value props */}
-      <h2>3 つの違い</h2>
+      <h2>KumaWatch ならではの 3 つの特長</h2>
       <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {VALUE_PROPS.map((v) => (
           <div
@@ -170,7 +174,7 @@ export default function ForGovPage() {
       {/* サンプル: 市町村ページのスクショ */}
       <h2>市町村ごとに専用ページを自動生成</h2>
       <p>
-        「○○市 クマ」検索で表示される SEO 最適化ページが、市町村単位で自動生成されます。
+        「○○市 クマ」で検索したときに表示される専用ページを、市町村単位で自動的に用意します。住民・観光客が知りたい貴自治体のクマ出没情報が、地図・期間・件数・最新の動向まで整理された形で届きます。
       </p>
       <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
         <div className="relative aspect-[7/5] w-full bg-stone-100">
@@ -197,7 +201,7 @@ export default function ForGovPage() {
       {/* Process timeline */}
       <h2 id="process">3 ステップで開始</h2>
       <p>
-        お問い合わせから本番反映まで概ね 2〜3 週間。担当者の作業はミーティング 30 分とメール数往復のみ。
+        お問い合わせから本番反映まで概ね 2〜3 週間。貴自治体側のご対応はミーティング 30 分とメール数往復のみで完了します。
       </p>
       <div className="not-prose my-5 space-y-3">
         {PROCESS_STEPS.map((p, i) => (
@@ -254,8 +258,7 @@ export default function ForGovPage() {
             ["URL", "https://kuma-watch.jp"],
             ["提供形態", "Web サービス（PC・スマホ対応／インストール不要）"],
             ["カバー範囲", "全国 47 都道府県／毎日自動更新"],
-            ["利用料金", "個人・自治体ともに完全無料"],
-            ["広告", "なし"],
+            ["利用料金", "現時点では基本機能を無料で提供（個人・自治体ともに連携費用は不要）"],
             ["運営", "獣医工学ラボ（リサーチコーディネート株式会社）"],
             ["公開開始", "2026 年 4 月"],
           ].map(([k, v]) => (
@@ -296,11 +299,17 @@ export default function ForGovPage() {
           <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
             運営者
           </div>
-          <div className="mt-1 text-sm font-semibold text-stone-900">
-            獣医工学ラボ
-          </div>
-          <div className="mt-1 text-xs text-stone-600">
-            獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。リサーチコーディネート株式会社が運営。
+          <div className="mt-2 flex items-center gap-3">
+            <Image
+              src="/labs/vet-eng-lab.jpeg"
+              alt="獣医工学ラボ ロゴ"
+              width={240}
+              height={134}
+              className="h-auto w-24 shrink-0"
+            />
+            <div className="text-xs leading-relaxed text-stone-600">
+              獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。リサーチコーディネート株式会社が運営。
+            </div>
           </div>
         </a>
       </div>
