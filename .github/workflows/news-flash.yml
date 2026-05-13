@@ -46,7 +46,9 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run ingest:news
 
-      - name: Commit if changed
+      - name: Commit and push (with rebase retry)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           if git diff --quiet public/data/sightings.json; then
             echo "No new news records — skipping commit"
@@ -54,8 +56,29 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/sightings.json
-          git commit -m "News flash: ingest fresh news ($(date -u +%Y-%m-%dT%H:%M))"
-          # rebase 衝突回避のため最新を取り直してから push
-          git pull --rebase origin main
-          git push
+
+          # concurrency group があっても、ローカルからの code push や別ワークフロー
+          # の git push と race することがある。コンフリクト時は origin/main に
+          # 戻して ingest を再実行 (dedup により Gemini コストは最小限) → push。
+          for attempt in 1 2 3; do
+            git add public/data/sightings.json
+            git commit -m "News flash: ingest fresh news ($(date -u +%Y-%m-%dT%H:%M))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[news-flash] push/rebase failed (attempt $attempt) — re-running ingest"
+            git reset --hard origin/main
+            npm run ingest:news
+            if git diff --quiet public/data/sightings.json; then
+              echo "No new records after re-ingest — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1

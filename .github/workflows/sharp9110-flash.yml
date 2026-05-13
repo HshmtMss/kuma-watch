@@ -39,7 +39,7 @@ jobs:
       - name: Ingest Sharp9110
         run: npm run ingest:sharp9110
 
-      - name: Commit if changed
+      - name: Commit and push (with rebase retry)
         run: |
           if git diff --quiet public/data/sightings.json; then
             echo "No new Sharp9110 records — skipping commit"
@@ -47,7 +47,28 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/sightings.json
-          git commit -m "Sharp9110 flash: ingest fresh records ($(date -u +%Y-%m-%dT%H:%M))"
-          git pull --rebase origin main
-          git push
+
+          # 同名 concurrency group があっても、ローカル push や別ワークフローと
+          # 短時間 race することがある。コンフリクト時は ingest を再実行して退避。
+          for attempt in 1 2 3; do
+            git add public/data/sightings.json
+            git commit -m "Sharp9110 flash: ingest fresh records ($(date -u +%Y-%m-%dT%H:%M))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[sharp9110] push/rebase failed (attempt $attempt) — re-running ingest"
+            git reset --hard origin/main
+            npm run ingest:sharp9110
+            if git diff --quiet public/data/sightings.json; then
+              echo "No new records after re-ingest — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1
