@@ -112,6 +112,9 @@ export default function KumaClient() {
   const [showChat, setShowChat] = useState(false);
   // 投稿フローからの「地図から選ぶ」モード (mount 時に URL クエリで判定)
   const [pickerMode, setPickerMode] = useState<null | "submit">(null);
+  // 観光地 / 市町村ページから ?lat=&lon=&label= 経由で来た場合のラベル。
+  // 表示中に「← {label} に戻る」ボタンを出して履歴を戻りやすくする。
+  const [returnLabel, setReturnLabel] = useState<string | null>(null);
   const router = useRouter();
   const leafletMapRef = useRef<LeafletMap | null>(null);
   const handleMapReady = useCallback((m: LeafletMap) => {
@@ -407,6 +410,8 @@ export default function KumaClient() {
           source: "url",
           label: qLabel,
         });
+        // URL に label がある = 観光地・市町村ページ等から戻れる経路。戻るボタンを出す。
+        if (qLabel) setReturnLabel(qLabel);
         return;
       }
 
@@ -729,8 +734,9 @@ export default function KumaClient() {
       </div>
 
       <div className="relative flex-1 min-h-0">
-        {/* 検索バーを地図上にフロート配置。ピッカーモード中はバナーと干渉するので非表示。 */}
-        {!pickerMode && (
+        {/* 検索バーを地図上にフロート配置。ピッカーモード中はバナーと干渉、
+            観光地・市町村から戻る経路 (returnLabel) のときは戻るボタンと干渉するので非表示。 */}
+        {!pickerMode && !returnLabel && (
           <div className="pointer-events-none absolute inset-x-3 top-3 z-[950] flex">
             <div className="pointer-events-auto w-full max-w-2xl rounded-full bg-white shadow-md ring-1 ring-black/5">
               <PlaceSearch compact onPick={handleSearchPick} />
@@ -766,6 +772,28 @@ export default function KumaClient() {
           onMapClick={handleMapClick}
           onMapReady={handleMapReady}
         />
+
+        {/* 観光地・市町村ページから来たときの「戻る」ボタン (検索バー下にフロート)。
+            ブラウザ戻るより目立つ位置に置く。 */}
+        {returnLabel && !pickerMode && (
+          <div className="pointer-events-auto absolute left-3 top-3 z-[960] sm:top-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined" && window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  router.push("/spot");
+                }
+              }}
+              className="flex h-10 items-center gap-1.5 rounded-full bg-white px-3.5 text-sm font-semibold text-stone-800 shadow-md ring-1 ring-stone-200 hover:bg-stone-50"
+              aria-label={`${returnLabel} のページに戻る`}
+            >
+              <span aria-hidden>←</span>
+              <span className="max-w-[10rem] truncate">{returnLabel}に戻る</span>
+            </button>
+          </div>
+        )}
 
         {/* 投稿ピッカーモード時のバナー (地図上部・固定) */}
         {pickerMode === "submit" && (

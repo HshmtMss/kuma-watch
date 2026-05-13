@@ -717,6 +717,36 @@ export default function KumaMap({
       mapRef.current = map;
       if (onMapReady) onMapReady(map);
 
+      // map 生成時点で既に selectedLocation がある (URL ?lat=&lon= 由来など) 場合、
+      // selectedLocation の useEffect は map 未初期化のタイミングで早期 return しているため、
+      // ここで初回 setView を明示的に発火させる。これがないと「観光地から地図を開く」が
+      // 現在地周辺に止まる現象が起きる。
+      const initSel = selectedLocation;
+      if (initSel) {
+        const isMobile =
+          typeof window !== "undefined" ? window.innerWidth < 640 : false;
+        const targetZoom = 12;
+        const offsetX = isMobile ? 0 : 180;
+        const offsetY = isMobile
+          ? -Math.round(
+              (typeof window !== "undefined" ? window.innerHeight : 800) *
+                0.18,
+            )
+          : 0;
+        try {
+          if (offsetX !== 0 || offsetY !== 0) {
+            const pinPx = map.project([initSel.lat, initSel.lon], targetZoom);
+            const centerPx = pinPx.subtract([offsetX, offsetY]);
+            const centerLatLng = map.unproject(centerPx, targetZoom);
+            map.setView(centerLatLng, targetZoom);
+          } else {
+            map.setView([initSel.lat, initSel.lon], targetZoom);
+          }
+        } catch {
+          // ignore — map ready 直後の race のみ防ぐ
+        }
+      }
+
       // Initial tile layer; will be replaced by the tileStyle effect below.
       const provider = TILE_PROVIDERS[tileStyle];
       const tile = L.tileLayer(provider.url, {

@@ -94,12 +94,18 @@ export default function SpotIndexPage() {
         をご利用ください。
       </p>
 
-      {/* 俯瞰用: 全観光地を都道府県別にコンパクトに一覧。アンカーで該当カードに飛ぶ。 */}
-      <details className="not-prose my-5 rounded-xl border border-stone-200 bg-stone-50 open:bg-white">
-        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
-          <span>📋 全 {JAPAN_LANDMARKS.length} 件をまとめて見る (都道府県別)</span>
-        </summary>
-        <div className="border-t border-stone-200 px-4 py-3 text-sm">
+      {/* 俯瞰: 全観光地を都道府県別に grid 状の chip で並べる。
+          ただの羅列ではなく、都道府県を見出しとした 2 段構造の方が読みやすい。 */}
+      <section className="not-prose my-5 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <div className="mb-3 flex items-baseline justify-between">
+          <h2 className="text-base font-bold text-stone-900 sm:text-lg">
+            都道府県別一覧
+          </h2>
+          <span className="text-xs text-stone-500">
+            全 {JAPAN_LANDMARKS.length} 件
+          </span>
+        </div>
+        <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
           {(() => {
             const byPref = new Map<string, JapanLandmark[]>();
             for (const l of JAPAN_LANDMARKS) {
@@ -108,26 +114,29 @@ export default function SpotIndexPage() {
               byPref.set(l.prefName, arr);
             }
             return [...byPref.entries()].map(([pref, items]) => (
-              <div key={pref} className="mb-2 last:mb-0">
-                <span className="mr-2 inline-block text-xs font-semibold text-stone-500">
+              <div key={pref}>
+                <div className="mb-1.5 border-b border-stone-100 pb-1 text-xs font-semibold tracking-wide text-stone-700">
                   {pref}
-                </span>
-                {items.map((l, i) => (
-                  <span key={l.slug}>
-                    {i > 0 && <span className="text-stone-300">・</span>}
+                  <span className="ml-1.5 text-[10px] font-normal text-stone-400">
+                    {items.length}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {items.map((l) => (
                     <Link
+                      key={l.slug}
                       href={`/spot/${encodeURIComponent(l.slug)}`}
-                      className="text-blue-700 hover:underline"
+                      className="inline-block rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700 hover:bg-amber-100 hover:text-amber-900"
                     >
                       {l.name}
                     </Link>
-                  </span>
-                ))}
+                  ))}
+                </div>
               </div>
             ));
           })()}
         </div>
-      </details>
+      </section>
 
       {CATEGORY_ORDER.map((cat) => {
         const items = byCategory.get(cat) ?? [];

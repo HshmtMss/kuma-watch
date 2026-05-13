@@ -321,20 +321,12 @@ export default async function SpotPage({ params }: Props) {
             最新の目撃: {formatDate(latestDate)}
           </div>
         )}
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3">
           <Link
             href={mapUrl}
             className="inline-flex items-center gap-1 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
           >
             🗺️ 地図で {landmark.name} を見る →
-          </Link>
-          {/* 外部ニュース検索は離脱を招くので、内部の地域分析レポート (/research/region/[pref]) に変更。
-              当該都道府県のクマ動向レポート一覧へ繋ぐ。 */}
-          <Link
-            href={`/research/region/${encodeURIComponent(landmark.prefName)}`}
-            className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
-          >
-            {landmark.prefName} の分析レポート →
           </Link>
         </div>
       </div>
@@ -445,7 +437,8 @@ export default async function SpotPage({ params }: Props) {
         </>
       )}
 
-      {/* スティッキー CTA */}
+      {/* スティッキー CTA — フッターと被らないように本文末尾にスペーサーを置く。 */}
+      <div className="not-prose h-20 sm:hidden" aria-hidden />
       <Link
         href={mapUrl}
         className="not-prose fixed inset-x-3 bottom-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-sm font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
