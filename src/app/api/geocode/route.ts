@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prefCodeFromMuniCd, prefNameFromMuniCd } from "@/lib/prefectures";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const UPSTREAM = "https://nominatim.openstreetmap.org/search";
 const REVERSE = "https://nominatim.openstreetmap.org/reverse";
@@ -54,10 +55,23 @@ function toHit(r: NominatimSearchResult): GeocodeHit {
   };
 }
 
+// 5 桁の総務省コード → 市町村名 (JAPAN_MUNICIPALITIES マスター)
+function cityNameFromMuniCd(muniCd: string | undefined): string | undefined {
+  if (!muniCd) return undefined;
+  // GSI は 5 桁、JAPAN_MUNICIPALITIES.cityCode も 5 桁
+  const match = JAPAN_MUNICIPALITIES.find((m) => m.cityCode === muniCd);
+  return match?.cityName;
+}
+
 async function fetchGsiReverse(
   lat: number,
   lon: number,
-): Promise<{ prefCode?: string; prefecture?: string; district?: string }> {
+): Promise<{
+  prefCode?: string;
+  prefecture?: string;
+  city?: string;
+  district?: string;
+}> {
   try {
     const url = new URL(GSI_REVERSE);
     url.searchParams.set("lat", lat.toFixed(5));
@@ -72,6 +86,7 @@ async function fetchGsiReverse(
     return {
       prefCode: prefCodeFromMuniCd(muniCd),
       prefecture: prefNameFromMuniCd(muniCd),
+      city: cityNameFromMuniCd(muniCd),
       district: data.results?.lv01Nm,
     };
   } catch {
@@ -107,27 +122,46 @@ export async function GET(req: Request) {
       url.searchParams.set("addressdetails", "1");
       url.searchParams.set("zoom", "14");
 
+      // Nominatim と GSI を並列で叩く。Nominatim 失敗時は GSI ベースで返す。
+      const upstreamPromise = fetch(url.toString(), {
+        headers: {
+          "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)",
+          "Accept-Language": "ja",
+        },
+        next: { revalidate: CACHE_SECONDS },
+      }).catch(() => null);
       const [upstream, gsi] = await Promise.all([
-        fetch(url.toString(), {
-          headers: {
-            "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)",
-            "Accept-Language": "ja",
-          },
-          next: { revalidate: CACHE_SECONDS },
-        }),
+        upstreamPromise,
         fetchGsiReverse(lat, lon),
       ]);
-      if (!upstream.ok) {
+      let hit: GeocodeHit;
+      if (upstream && upstream.ok) {
+        const data = (await upstream.json()) as NominatimSearchResult;
+        hit = toHit(data);
+      } else {
+        // Nominatim が落ちていても GSI 由来で最低限の hit を組み立てる。
+        hit = {
+          id: 0,
+          lat,
+          lon,
+          displayName: [gsi.prefecture, gsi.city, gsi.district]
+            .filter(Boolean)
+            .join(" "),
+        };
+      }
+      if (gsi.prefecture) hit.prefecture = gsi.prefecture;
+      if (gsi.prefCode) hit.prefCode = gsi.prefCode;
+      if (gsi.district) hit.district = gsi.district;
+      // Nominatim が city を取れなかった (海岸線・国境近く・rate limit 等) 場合は GSI で補完
+      if (!hit.city && gsi.city) hit.city = gsi.city;
+
+      // 両方とも失敗して住所が全く取れない場合だけ 502 を返す
+      if (!hit.prefecture && !hit.city) {
         return NextResponse.json(
           { error: "逆ジオコーディングに失敗しました" },
           { status: 502 },
         );
       }
-      const data = (await upstream.json()) as NominatimSearchResult;
-      const hit = toHit(data);
-      if (gsi.prefecture) hit.prefecture = gsi.prefecture;
-      if (gsi.prefCode) hit.prefCode = gsi.prefCode;
-      if (gsi.district) hit.district = gsi.district;
 
       return NextResponse.json(
         { result: hit },
