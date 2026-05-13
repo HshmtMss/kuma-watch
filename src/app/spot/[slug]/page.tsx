@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
@@ -264,10 +265,41 @@ export default async function SpotPage({ params }: Props) {
       >
         <Link href="/" className="hover:text-stone-900">ホーム</Link>
         <span>›</span>
+        <Link href="/spot" className="hover:text-stone-900">観光地</Link>
+        <span>›</span>
         <Link href={`/place/${encodeURIComponent(landmark.prefName)}`} className="hover:text-stone-900">{landmark.prefName}</Link>
         <span>›</span>
         <span className="font-semibold text-stone-700">{landmark.name}</span>
       </nav>
+
+      {/* ヒーロー画像 (Wikipedia REST 由来 / CC BY-SA 4.0 等) */}
+      {landmark.imageUrl && (
+        <figure className="not-prose mb-5 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+          <div className="relative aspect-[16/9] w-full">
+            <Image
+              src={landmark.imageUrl}
+              alt={`${landmark.name}の写真`}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+              priority
+              unoptimized
+            />
+          </div>
+          <figcaption className="border-t border-stone-200 bg-white px-3 py-2 text-[11px] text-stone-500">
+            出典: Wikipedia「
+            <a
+              href={`https://ja.wikipedia.org/wiki/${encodeURIComponent(landmark.imageCredit ?? landmark.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 underline"
+            >
+              {landmark.imageCredit ?? landmark.name}
+            </a>
+            」(CC BY-SA / public domain)
+          </figcaption>
+        </figure>
+      )}
 
       {/* 危険度ヒーローカード */}
       <div className={`not-prose mb-6 rounded-2xl border-2 p-5 ${riskBg[risk.tone]}`}>
@@ -306,7 +338,7 @@ export default async function SpotPage({ params }: Props) {
       </div>
 
       {/* ランドマーク紹介 */}
-      <h2>{landmark.name} とは</h2>
+      <h2>{landmark.name}について</h2>
       <p>{landmark.blurb}</p>
       <ul className="not-prose my-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
         <li className="rounded-lg border border-stone-200 bg-white px-3 py-2">

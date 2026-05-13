@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdnjs.cloudflare.com" },
+      // Wikipedia REST API 経由で取得した観光地画像のホスト。
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
   },
   // sightings.json は public/data/ から CDN 経由で runtime fetch する設計に

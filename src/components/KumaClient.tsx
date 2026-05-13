@@ -639,7 +639,9 @@ export default function KumaClient() {
               alt="KumaWatch"
               className="block h-7 w-auto sm:h-8"
             />
-            <span className="text-[13px] font-semibold tracking-tight text-stone-900 sm:text-sm">
+            {/* くまウォッチ テキストは sm 未満で非表示 (横幅をナビに譲る)。
+                ロゴ画像が "Kuma Watch / KW" のワードマークを持っているのでブランド表記は維持される。 */}
+            <span className="hidden text-[13px] font-semibold tracking-tight text-stone-900 sm:inline sm:text-sm">
               くまウォッチ
             </span>
           </Link>
@@ -647,7 +649,7 @@ export default function KumaClient() {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
+            className="hidden text-[11px] text-stone-500 hover:text-stone-700 sm:inline sm:text-xs"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}
@@ -657,80 +659,32 @@ export default function KumaClient() {
 
         <div className="min-w-0 flex-1" aria-hidden />
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          {/* AI に聞く: クマの顔アイコン + テキスト。スマホでも常時テキスト表示。
-              ヘッダー余白を活かし、横幅と pad を広めに取って押しやすく。 */}
-          <button
-            onClick={() => setShowChat(true)}
-            className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3.5 text-[13px] font-semibold text-amber-800 hover:bg-amber-100 sm:h-11 sm:px-5 sm:text-sm"
-            aria-label="AI に質問"
-            title="AI に質問"
-          >
-            <Image
-              src="/bear-face.png"
-              alt=""
-              width={24}
-              height={24}
-              aria-hidden
-              style={{ width: "1.5rem", height: "auto" }}
-            />
-            <span>AI に聞く</span>
-          </button>
-          <details className="relative">
-            <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full border border-gray-300 bg-white text-lg font-semibold text-gray-800 sm:h-11 sm:w-11">
-              ⋮
-              <span className="sr-only">メニュー</span>
-            </summary>
-            <div className="absolute right-0 top-12 z-10 w-56 rounded-lg border border-gray-200 bg-white py-1 text-base text-gray-800 shadow-lg">
-              {/* 地図スタイル切替 */}
-              <div className="border-b border-gray-100 px-3 py-2.5">
-                <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  地図スタイル
-                </div>
-                <div className="flex gap-1">
-                  {(
-                    [
-                      { v: "standard", label: "標準" },
-                      { v: "satellite", label: "衛星" },
-                      { v: "topo", label: "地形" },
-                    ] as const
-                  ).map((opt) => (
-                    <button
-                      key={opt.v}
-                      type="button"
-                      onClick={() => setTileStyle(opt.v as TileStyle)}
-                      className={`flex-1 rounded-md px-2 py-1.5 text-sm ${
-                        tileStyle === opt.v
-                          ? "bg-amber-100 font-semibold text-amber-900"
-                          : "text-gray-800 hover:bg-gray-100"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <a href="/articles" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
-                記事 (クマ対策)
-              </a>
-              <a href="/about" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
-                このサイトについて
-              </a>
-              <a href="/for-gov" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
-                自治体の方へ
-              </a>
-              <a
-                href="/disclaimer"
-                className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100"
-              >
-                免責事項
-              </a>
-              <a href="/privacy" className="block px-3 py-2.5 text-gray-800 hover:bg-gray-100">
-                プライバシー
-              </a>
-            </div>
-          </details>
-        </div>
+        {/* 主要ナビゲーション (PageShell ヘッダーと文言を揃えてサイト全体で一貫させる) */}
+        <nav
+          className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-stone-600 sm:gap-4 sm:text-xs"
+          aria-label="ブラウズ"
+        >
+          <Link href="/place" className="hover:text-stone-900">
+            都道府県
+          </Link>
+          <Link href="/spot" className="hover:text-stone-900">
+            観光地
+          </Link>
+          <Link href="/articles" className="hover:text-stone-900">
+            クマ対策
+          </Link>
+          <Link href="/research" className="hover:text-stone-900">
+            研究
+          </Link>
+          <Link href="/for-gov" className="hover:text-stone-900">
+            自治体の方へ
+          </Link>
+        </nav>
+
+        {/* 主要導線 (都道府県・観光地・クマ対策・研究・自治体の方へ) はヘッダーに、
+            地図スタイル切替は地図右側の現在地ボタン上に配置済み。
+            このサイトについて等の補足リンクは各 お問合せカード内に集約。
+            よって ⋮ メニュー自体を撤去し、ヘッダーをすっきり保つ。 */}
       </header>
 
       {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}
@@ -892,8 +846,57 @@ export default function KumaClient() {
           lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
         />
 
-        {/* 右端縦スタック: 共有 / 現在地 / 地図スタイル / ズーム (カード上端に合わせて配置) */}
+        {/* 右端縦スタック: 地図スタイル / 現在地 / ズーム (カード上端に合わせて配置) */}
         <div className="absolute right-3 bottom-[calc(41vh+0.75rem)] z-[900] flex flex-col gap-2.5">
+          {/* 地図スタイル切替: 単一ボタン (レイヤーアイコン)。クリックで 3 オプションを横展開。
+              縦スタックで 3 ボタン並べるのは縦領域を取りすぎるので popover 方式に。 */}
+          <details className="group relative">
+            <summary
+              className="flex cursor-pointer list-none items-center justify-center rounded-full bg-white text-gray-700 shadow-lg hover:bg-gray-50 [&::-webkit-details-marker]:hidden"
+              style={{ height: "3.25rem", width: "3.25rem" }}
+              aria-label="地図スタイルを切替"
+              title="地図スタイル"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+              </svg>
+            </summary>
+            <div className="absolute right-full top-0 mr-2 flex items-center gap-1 rounded-full bg-white p-1 shadow-lg">
+              {(
+                [
+                  { v: "standard", label: "標準" },
+                  { v: "satellite", label: "衛星" },
+                  { v: "topo", label: "地形" },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.v}
+                  type="button"
+                  onClick={() => setTileStyle(opt.v as TileStyle)}
+                  className={`rounded-full px-3 py-2 text-xs font-semibold ${
+                    tileStyle === opt.v
+                      ? "bg-amber-100 text-amber-900"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  aria-pressed={tileStyle === opt.v}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </details>
           <button
             type="button"
             onClick={requestCurrentLocation}
@@ -1115,6 +1118,7 @@ export default function KumaClient() {
           levelThresholds={levelThresholds}
           sightingCountByMesh={sightingCountByMesh}
           onShare={handleShare}
+          onAskAi={() => setShowChat(true)}
           onAskContextChange={setAskContext}
         />
       </div>

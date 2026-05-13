@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import LegalLinks from "@/components/LegalLinks";
 
 type Props = {
   title: string;
@@ -26,7 +27,8 @@ export default function PageShell({ title, lead, children }: Props) {
               alt="KumaWatch"
               className="block h-7 w-auto sm:h-8"
             />
-            <span className="text-[13px] font-semibold tracking-tight text-stone-900 sm:text-sm">
+            {/* sm 未満では「くまウォッチ」テキストを隠してナビ幅を確保 (ロゴ画像が ブランド表記を兼ねる) */}
+            <span className="hidden text-[13px] font-semibold tracking-tight text-stone-900 sm:inline sm:text-sm">
               くまウォッチ
             </span>
           </Link>
@@ -34,17 +36,20 @@ export default function PageShell({ title, lead, children }: Props) {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
+            className="hidden text-[11px] text-stone-500 hover:text-stone-700 sm:inline sm:text-xs"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}
             <span className="font-medium text-stone-700">獣医工学ラボ</span>
           </a>
         </div>
-        <nav className="flex shrink-0 items-center gap-4 text-xs font-medium text-stone-600">
+        <nav className="flex shrink-0 items-center gap-1.5 text-[11px] font-medium text-stone-600 sm:gap-4 sm:text-xs">
           <Link href="/" className="hover:text-stone-900">地図</Link>
-          <Link href="/articles" className="hover:text-stone-900">記事</Link>
-          <Link href="/for-gov" className="hidden hover:text-stone-900 sm:inline">自治体の方へ</Link>
+          <Link href="/place" className="hover:text-stone-900">都道府県</Link>
+          <Link href="/spot" className="hover:text-stone-900">観光地</Link>
+          <Link href="/articles" className="hover:text-stone-900">クマ対策</Link>
+          <Link href="/research" className="hover:text-stone-900">研究</Link>
+          <Link href="/for-gov" className="hover:text-stone-900">自治体の方へ</Link>
         </nav>
       </header>
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8 sm:py-10">
@@ -56,13 +61,9 @@ export default function PageShell({ title, lead, children }: Props) {
         )}
         <div className="article-body max-w-none">{children}</div>
       </main>
-      <footer className="border-t border-black/8 bg-white px-5 py-6 text-xs text-gray-500">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
-          {/* ブランドはトップヘッダーと同じく「獣医工学ラボ」に統一。
-              ラボの公式ページへ外部リンクで誘導する。
-              法人名 (リサーチコーディネート株式会社) は /credits 等の
-              法的記載コンテキストにのみ表示する。 */}
-          <div>
+      <footer className="border-t border-black/8 bg-white px-5 py-5 text-xs text-gray-500">
+        <div className="mx-auto max-w-3xl">
+          <div className="text-xs">
             運営:{" "}
             <a
               href="https://www.research-coordinate.co.jp/labs/vet/"
@@ -72,14 +73,16 @@ export default function PageShell({ title, lead, children }: Props) {
             >
               獣医工学ラボ
             </a>
+            <span aria-hidden className="mx-2">·</span>
+            <a
+              href="mailto:contact@research-coordinate.co.jp"
+              className="hover:text-gray-900"
+            >
+              お問合せ
+            </a>
           </div>
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/about" className="hover:text-gray-900">このサイトについて</Link>
-            <Link href="/for-gov" className="hover:text-gray-900">自治体の方へ</Link>
-            <Link href="/research" className="hover:text-gray-900">研究・知見</Link>
-            <Link href="/disclaimer" className="hover:text-gray-900">免責事項</Link>
-            <Link href="/privacy" className="hover:text-gray-900">プライバシー</Link>
-          </nav>
+          {/* 全ページの最下段に補足リンクを置く。法的ページへの導線をどのページからも辿れるようにする。 */}
+          <LegalLinks />
         </div>
       </footer>
     </div>

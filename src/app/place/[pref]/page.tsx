@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
-  getPlaceCellsByPref,
+  getMuniAggregatesByPref,
   getPrefSummary,
 } from "@/lib/place-index";
 import { buildPrefSeo } from "@/lib/place-seo";
@@ -37,8 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const pref = decode(rawPref);
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
-  const summary = await getPrefSummary(pref);
+  const [summary, munis] = await Promise.all([
+    getPrefSummary(pref),
+    getMuniAggregatesByPref(pref),
+  ]);
   // SEO 強化: /place/[pref]/[muni] と同じテンプレで件数 + 最新日 + 獣医師監修。
+  // muniCount はマスターベースの実市町村数を使う (summary.cityCount は字レベル集計の数)。
   const { title, description } = buildPrefSeo(
     pref,
     summary
@@ -46,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           count: summary.totalCount,
           count90d: summary.count90d,
           latestDate: summary.latestDate,
-          muniCount: summary.cityCount,
+          muniCount: munis.length,
         }
       : undefined,
   );
@@ -74,10 +78,23 @@ export default async function PrefPage({ params }: Props) {
   const pref = decode(rawPref);
   if (!PREF_NAMES.has(pref)) notFound();
 
-  const [cells, summary] = await Promise.all([
-    getPlaceCellsByPref(pref),
+  const [munis, summary] = await Promise.all([
+    getMuniAggregatesByPref(pref),
     getPrefSummary(pref),
   ]);
+  // 件数の多い順 → 同件数は名前順 (ja)。0 件市町村は最後にまとめる。
+  const sortedMunis = [...munis].sort((a, b) => {
+    if (b.count !== a.count) return b.count - a.count;
+    return a.cityName.localeCompare(b.cityName, "ja");
+  });
+  const totalMuni = sortedMunis.length;
+  const muniWithSightings = sortedMunis.filter((m) => m.count > 0).length;
+  const totalCount = sortedMunis.reduce((s, m) => s + m.count, 0);
+  const total90d = sortedMunis.reduce((s, m) => s + m.count90d, 0);
+  const latestDate = sortedMunis.reduce<string | null>(
+    (best, m) => (m.latestDate && (!best || m.latestDate > best) ? m.latestDate : best),
+    null,
+  );
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -93,14 +110,14 @@ export default async function PrefPage({ params }: Props) {
     ],
   };
 
+  // summary は字レベル集計を元にした値なのでヘッダーには使わず、
+  // muni 正規化後の値 (totalMuni / totalCount / latestDate) を採用する。
+  void summary;
+
   return (
     <PageShell
       title={`${pref}のクマ出没予報`}
-      lead={
-        summary
-          ? `${pref}内 ${summary.cityCount} 市町村のクマ出没情報を集約。総目撃 ${summary.totalCount} 件 (過去90日 ${summary.count90d} 件 / 最終更新 ${summary.latestDate ?? "-"})。`
-          : `${pref}のクマ出没情報を市町村別に確認できます。`
-      }
+      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。総目撃 ${totalCount.toLocaleString()} 件 / 過去90日 ${total90d.toLocaleString()} 件 / うち${muniWithSightings}市町村で目撃あり (最終更新 ${latestDate ?? "-"})。`}
     >
       <script
         type="application/ld+json"
@@ -125,34 +142,41 @@ export default async function PrefPage({ params }: Props) {
       </nav>
 
       <h2>{pref}内の市町村別 出没情報</h2>
-      {cells.length === 0 ? (
-        <p>
-          現時点で {pref} のクマ出没情報は登録されていません。地図で周辺地域を含めて確認するには
-          <Link href="/" className="text-amber-700 underline">
-            トップの警戒レベルマップ
-          </Link>
-          をご利用ください。
-        </p>
-      ) : (
-        <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {cells.map((c) => (
-            <li key={c.cityName}>
-              <Link
-                href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(c.cityName)}`}
-                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 hover:border-amber-400 hover:bg-amber-50"
-              >
-                <span className="font-medium">{c.cityName}</span>
-                <span className="text-xs text-gray-500">
-                  {c.count} 件
-                  {c.count90d > 0 && (
-                    <span className="ml-1 text-red-600">({c.count90d} / 90日)</span>
-                  )}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      <p className="text-sm text-stone-600">
+        全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
+      </p>
+      <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {sortedMunis.map((m) => (
+          <li key={m.cityCode}>
+            <Link
+              href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
+              className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm hover:border-amber-400 hover:bg-amber-50 ${
+                m.count > 0
+                  ? "border-gray-200 bg-white text-gray-800"
+                  : "border-gray-100 bg-gray-50 text-gray-500"
+              }`}
+            >
+              <span className={m.count > 0 ? "font-medium" : ""}>
+                {m.cityName}
+              </span>
+              <span className="text-xs text-gray-500">
+                {m.count === 0 ? (
+                  <span className="text-gray-400">0 件</span>
+                ) : (
+                  <>
+                    {m.count.toLocaleString()} 件
+                    {m.count90d > 0 && (
+                      <span className="ml-1 text-red-600">
+                        ({m.count90d} / 90日)
+                      </span>
+                    )}
+                  </>
+                )}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
 
       <h2>使い方</h2>
       <p>

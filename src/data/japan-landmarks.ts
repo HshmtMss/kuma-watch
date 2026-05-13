@@ -30,6 +30,10 @@ export type JapanLandmark = {
   lon: number;
   /** 紹介・補足。SEO の本文として 1 段落程度 */
   blurb: string;
+  /** 代表画像 URL (Wikipedia REST API 由来)。CC BY-SA 4.0 / public domain いずれか。 */
+  imageUrl?: string;
+  /** 画像の出典 (Wikipedia 記事タイトル)。クレジット表記に使う。 */
+  imageCredit?: string;
 };
 
 export const JAPAN_LANDMARKS: JapanLandmark[] = [
@@ -45,6 +49,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.7274,
     blurb:
       "標高 3,776m、日本最高峰。山梨・静岡両県にまたがり、登山者数は年 20 万人超。富士スバルライン五合目・富士宮口・須走口・御殿場口の各登山口周辺は、夏季に限らずクマの活動が報告されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Mt.Fuji_from_Mierula.jpg/3840px-Mt.Fuji_from_Mierula.jpg",
+    imageCredit: "富士山",
   },
   {
     slug: "高尾山",
@@ -57,6 +63,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.2436,
     blurb:
       "東京西部の代表的な観光・登山スポット。年間 260 万人を超えるハイカーが訪れる一方、近年は奥高尾・小仏方面でクマの目撃情報が増加。早朝・夕方の単独行動には注意が必要です。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mt.takao.jpg/1280px-Mt.takao.jpg",
+    imageCredit: "高尾山",
   },
   {
     slug: "大菩薩嶺",
@@ -69,6 +77,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.8444,
     blurb:
       "標高 2,057m。日本百名山。上日川峠からのアクセス路が人気で、春〜秋にかけて多くの登山者が訪れます。塩山駅・甲斐大和駅周辺の山林部ではクマの活動圏内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/Mt.Daibosatsurei_from_Mt.Kasatori_03.jpg",
+    imageCredit: "大菩薩嶺",
   },
   {
     slug: "八ヶ岳",
@@ -81,6 +91,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.3706,
     blurb:
       "長野・山梨にまたがる山塊。最高峰は赤岳 (2,899m)。美濃戸・観音平・桜平など主要登山口を中心に、林縁部での目撃情報が継続的に報告されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/38/Minami-Yatsugatake_from_Mt.Kitayokodake_05.jpg",
+    imageCredit: "八ヶ岳",
   },
   {
     slug: "北岳",
@@ -93,6 +105,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.2386,
     blurb:
       "標高 3,193m、日本第 2 の高峰。広河原からのアプローチが一般的。南アルプス国立公園内でツキノワグマの生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a5/Mount_Kita_from_Mount_Nakashirane_2001-10-03.JPG",
+    imageCredit: "北岳",
   },
   {
     slug: "槍ヶ岳",
@@ -105,6 +119,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.6481,
     blurb:
       "標高 3,180m。北アルプス南部の名峰。新穂高・上高地・槍沢の各ルートでアクセス。中部山岳国立公園・ツキノワグマ生息域内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Mt.Yarigatake_from_Enzansou.jpg",
+    imageCredit: "槍ヶ岳",
   },
   {
     slug: "穂高岳",
@@ -117,6 +133,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.6480,
     blurb:
       "標高 3,190m (奥穂高岳)。日本第 3 の高峰。涸沢・上高地からのルートが人気。クマの主要生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/72/Mt.Hotaka_from_Mt.Otenshodake_01.jpg",
+    imageCredit: "穂高岳",
   },
   {
     slug: "白馬岳",
@@ -129,6 +147,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.7589,
     blurb:
       "北アルプス北部、標高 2,932m。猿倉・栂池からのアクセス。白馬村全域がツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Shiroumadake_from_maruyama_26_2000_7_30.jpg",
+    imageCredit: "白馬岳",
   },
   {
     slug: "立山",
@@ -141,6 +161,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.6193,
     blurb:
       "立山連峰、最高峰は大汝山 (3,015m)。室堂平へのケーブル＋バスでアクセス。中部山岳国立公園内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Mount_Tate_viewed_from_Midorigaike.jpg/3840px-Mount_Tate_viewed_from_Midorigaike.jpg",
+    imageCredit: "立山",
   },
   {
     slug: "御嶽山",
@@ -153,6 +175,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.4813,
     blurb:
       "標高 3,067m。長野・岐阜にまたがる活火山。王滝口・黒沢口の両登山口周辺はクマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f4/Ontake-air.jpg",
+    imageCredit: "御嶽山",
   },
   {
     slug: "白山",
@@ -165,6 +189,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 136.7710,
     blurb:
       "標高 2,702m。日本三霊山の一つ。別当出合・市ノ瀬からアクセス。白山国立公園・ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Mount_Haku_from_Onanjimine_2011-07-17.jpg",
+    imageCredit: "白山",
   },
   {
     slug: "妙高山",
@@ -177,6 +203,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.1136,
     blurb:
       "標高 2,454m。妙高戸隠連山国立公園。スキー場・温泉地が密集する地域でクマの活動も活発。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Mt_Myoko_from_Northeast.JPG",
+    imageCredit: "妙高山",
   },
   {
     slug: "蔵王",
@@ -189,6 +217,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.4396,
     blurb:
       "山形・宮城にまたがる火山群。蔵王温泉・宮城蔵王スキー場周辺は冬・夏ともに観光客が多く、林縁部での目撃情報あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Mount_Za%C5%8D_and_Sakura_01.jpg/3840px-Mount_Za%C5%8D_and_Sakura_01.jpg",
+    imageCredit: "蔵王",
   },
   {
     slug: "鳥海山",
@@ -201,6 +231,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.0489,
     blurb:
       "標高 2,236m。山形・秋田の県境。鉾立・湯ノ台・象潟口からアクセス。ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/24/Mount_Ch%C5%8Dkai_%282017-05-19%29_-_Flickr.jpg",
+    imageCredit: "鳥海山",
   },
   {
     slug: "岩手山",
@@ -213,6 +245,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 141.0008,
     blurb:
       "標高 2,038m。岩手県最高峰。馬返し・松川・焼走りからのコース。ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/0/07/Mt._Iwate_and_Morioka.jpg",
+    imageCredit: "岩手山",
   },
   {
     slug: "八甲田山",
@@ -225,6 +259,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.8792,
     blurb:
       "青森県、最高峰は大岳 (1,585m)。十和田八幡平国立公園内。ツキノワグマ・ヒグマ両方の北限交錯帯。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Hakkodasan_seen_from_the_northwest.jpg",
+    imageCredit: "八甲田山",
   },
   {
     slug: "羊蹄山",
@@ -237,6 +273,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.8108,
     blurb:
       "標高 1,898m。蝦夷富士の異名。倶知安・京極・喜茂別の各登山口。ヒグマの活動圏。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Yotei-zan-from-hirafu.jpg",
+    imageCredit: "羊蹄山",
   },
   {
     slug: "大雪山",
@@ -249,6 +287,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 142.8540,
     blurb:
       "北海道中央部の山塊、最高峰は旭岳 (2,291m)。ヒグマの主要生息地。旭岳ロープウェイ・銀泉台からアクセス。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Daisetsu0001.jpg",
+    imageCredit: "大雪山",
   },
   {
     slug: "十勝岳",
@@ -261,6 +301,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 142.6881,
     blurb:
       "標高 2,077m。十勝連峰の主峰。望岳台・吹上温泉からアクセス。ヒグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/31/Mount_Tokachi_from_Mount_Biei_1998-8-9.jpg",
+    imageCredit: "十勝岳",
   },
   // === 国立公園・主要観光地 ===
   {
@@ -274,6 +316,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.6328,
     blurb:
       "中部山岳国立公園の代表的な観光地。穂高連峰・槍ヶ岳の登山口でもあり、年 100 万人以上が訪れます。河童橋周辺でもツキノワグマの目撃事例あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7a/%E7%A7%8B%E3%81%AE%E4%B8%8A%E9%AB%98%E5%9C%B0_%28Kamikochi_in_autumn%29_24_Oct%2C_2011_-_panoramio.jpg",
+    imageCredit: "上高地",
   },
   {
     slug: "尾瀬",
@@ -286,6 +330,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.2858,
     blurb:
       "群馬・福島・新潟の 3 県にまたがる尾瀬国立公園。尾瀬ヶ原・尾瀬沼を巡るハイキングが有名。鳩待峠・大清水・沼山峠から入山。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/bf/Mt.Hiuchigatake_11.jpg",
+    imageCredit: "尾瀬",
   },
   {
     slug: "知床",
@@ -298,6 +344,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 145.0431,
     blurb:
       "世界自然遺産・知床国立公園。日本有数のヒグマ高密度地域。知床五湖・カムイワッカ・羅臼岳の各エリアで定期的に出没情報があります。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/140829_Track_Near_Furepe_Falls_Shiretoko_Hokkaido_Japan00s3.jpg/1280px-140829_Track_Near_Furepe_Falls_Shiretoko_Hokkaido_Japan00s3.jpg",
+    imageCredit: "知床国立公園",
   },
   {
     slug: "日光",
@@ -310,6 +358,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.5786,
     blurb:
       "日光国立公園・世界遺産日光の社寺。中禅寺湖・戦場ヶ原・男体山などハイキングコース多数。ツキノワグマの生息域内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Nikko_Toshogu_Yomeimon_Gate_2024.jpg/3840px-Nikko_Toshogu_Yomeimon_Gate_2024.jpg",
+    imageCredit: "日光東照宮",
   },
   {
     slug: "軽井沢",
@@ -322,6 +372,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.5969,
     blurb:
       "夏季別荘地・観光地として年間 800 万人が訪れる。一方で町内全域がツキノワグマの活動圏内で、住宅街での目撃も継続的に報告されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Mikasa-Dori%2C_Karuizawa.jpg/3840px-Mikasa-Dori%2C_Karuizawa.jpg",
+    imageCredit: "軽井沢",
   },
   {
     slug: "那須高原",
@@ -334,6 +386,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.9758,
     blurb:
       "観光・別荘・スキー場が密集する高原地帯。那須岳の登山口でもあり、ツキノワグマの生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a3/20090321%E9%82%A3%E9%A0%88%E5%B2%B3.jpg",
+    imageCredit: "那須高原",
   },
   {
     slug: "白川郷",
@@ -346,6 +400,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 136.9069,
     blurb:
       "世界遺産・合掌造り集落。観光客年 200 万人。周囲は両白山地のツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Shirakawa-go_%282017-07-22%29.jpg/3840px-Shirakawa-go_%282017-07-22%29.jpg",
+    imageCredit: "白川郷",
   },
   {
     slug: "高山",
@@ -358,6 +414,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.2521,
     blurb:
       "飛騨高山。観光客年 400 万人超の人気観光地。乗鞍・上高地の玄関口。市域は広く山林部での出没多発。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/%E5%8F%A4%E3%81%84%E7%94%BA%E4%B8%A6%E3%81%BF_-_panoramio_-_%E3%81%8F%E3%82%8D%E3%81%B5%E3%81%AD_%281%29.jpg/3840px-%E5%8F%A4%E3%81%84%E7%94%BA%E4%B8%A6%E3%81%BF_-_panoramio_-_%E3%81%8F%E3%82%8D%E3%81%B5%E3%81%AD_%281%29.jpg",
+    imageCredit: "高山市",
   },
   {
     slug: "屋久島",
@@ -370,6 +428,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 130.5286,
     blurb:
       "世界自然遺産。縄文杉・宮之浦岳の登山が人気。屋久島にはクマは生息しないが、登山前の安全情報の起点として参照されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/68/Yakushima.jpg",
+    imageCredit: "屋久島",
   },
   {
     slug: "阿蘇",
@@ -382,6 +442,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 131.1042,
     blurb:
       "世界最大級のカルデラ。阿蘇くじゅう国立公園。九州にはクマは生息しませんが、登山前の動物注意情報として参照されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/20140516%E9%98%BF%E8%98%87%E5%B1%B1%E5%BA%83%E5%9F%9F.jpg/3840px-20140516%E9%98%BF%E8%98%87%E5%B1%B1%E5%BA%83%E5%9F%9F.jpg",
+    imageCredit: "阿蘇山",
   },
   {
     slug: "箱根",
@@ -394,6 +456,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.0265,
     blurb:
       "富士箱根伊豆国立公園。年 2,000 万人の観光客が訪れる温泉地。明神ヶ岳・金時山などハイキング多数。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Lake_Ashi_from_Mt.Komagatake_03-2.jpg",
+    imageCredit: "箱根",
   },
   // === ハイキング・登山口 ===
   {
@@ -407,6 +471,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.0950,
     blurb:
       "東京都西部の山間部。雲取山・御前山・大岳山などの登山口。ツキノワグマ生息域内で、近年は住宅地周辺の目撃も。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Mts.Okutama_from_Daibosatsu-Pass_01.jpg/3840px-Mts.Okutama_from_Daibosatsu-Pass_01.jpg",
+    imageCredit: "奥多摩",
   },
   {
     slug: "丹沢",
@@ -419,6 +485,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.1656,
     blurb:
       "神奈川県の山地。塔ノ岳・蛭ヶ岳など 1,500m 級の山々。ツキノワグマ生息域内、登山者数も多く、目撃情報が継続的に発表されています。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Tanzawa_Mountains_from_Mt.Bukka_01.jpg/3840px-Tanzawa_Mountains_from_Mt.Bukka_01.jpg",
+    imageCredit: "丹沢山",
   },
   {
     slug: "雲取山",
@@ -431,6 +499,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.9436,
     blurb:
       "標高 2,017m、東京都最高峰。鴨沢・三峯神社からアクセス。ツキノワグマの主要生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Kumotori-nanatsuishi.JPG",
+    imageCredit: "雲取山",
   },
   {
     slug: "瑞牆山",
@@ -443,6 +513,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.5703,
     blurb:
       "標高 2,230m。岩峰群が特徴の名峰。瑞牆山荘・みずがき山自然公園からアクセス。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/51/Mt.Mizugaki_02.jpg",
+    imageCredit: "瑞牆山",
   },
   {
     slug: "金峰山",
@@ -455,6 +527,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.6253,
     blurb:
       "標高 2,599m。秩父山地の主峰。大弛峠・瑞牆山荘からアクセス。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/68/Otenjodake05.JPG",
+    imageCredit: "金峰山",
   },
   {
     slug: "美ヶ原",
@@ -467,6 +541,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.0900,
     blurb:
       "標高約 2,000m の高原。観光バスでアクセスでき、ハイキングが人気。周辺はツキノワグマの生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/84/Ushibuseyama_observatory.jpg",
+    imageCredit: "美ヶ原",
   },
   {
     slug: "霧ヶ峰",
@@ -479,6 +555,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.2017,
     blurb:
       "標高 1,925m。車山・八島湿原など散策コースが人気。ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Kirigamine_seen_from_the_east_2018-03-04.jpg",
+    imageCredit: "霧ヶ峰",
   },
   {
     slug: "蓼科",
@@ -491,6 +569,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.2989,
     blurb:
       "蓼科高原・蓼科山 (2,531m)。別荘地・スキー場が広がる。八ヶ岳ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Tateshina_kogen_from_Mt.Kitayokodake.JPG",
+    imageCredit: "蓼科高原",
   },
   {
     slug: "清里",
@@ -503,6 +583,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.4136,
     blurb:
       "八ヶ岳南麓の高原リゾート。標高 1,000-1,400m。観光・別荘地で、周囲の山林部にツキノワグマ生息。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/150719_KEEP_Hokuto_Yamanashi_pref_Japan16n.jpg/3840px-150719_KEEP_Hokuto_Yamanashi_pref_Japan16n.jpg",
+    imageCredit: "清里高原",
   },
   // === スキーリゾート・温泉地 (クマ生息域内) ===
   {
@@ -516,6 +598,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.8086,
     blurb:
       "苗場・かぐら・GALA 等のスキー場が集積。年間 600 万人超。周辺山域はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Naeba_Ski_Resort_%288382526043%29.jpg",
+    imageCredit: "湯沢町",
   },
   {
     slug: "白馬",
@@ -528,6 +612,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 137.8625,
     blurb:
       "国際的なスキー・登山リゾート。白馬岳・八方尾根・栂池など。ツキノワグマ生息域内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Nagano_Matsukawa.jpg/3840px-Nagano_Matsukawa.jpg",
+    imageCredit: "白馬村",
   },
   {
     slug: "ニセコ",
@@ -540,6 +626,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.6878,
     blurb:
       "国際的スキーリゾート。羊蹄山・ニセコアンヌプリの裾野。冬は雪上のヒグマ足跡情報あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Mt-nisekoannupuri-summer.jpg",
+    imageCredit: "ニセコ",
   },
   {
     slug: "草津",
@@ -552,6 +640,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.5961,
     blurb:
       "日本三名泉の一つ。観光客年 300 万人。周辺の白根山・上信越国立公園はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/%E6%B9%AF%E7%95%912.jpg/3840px-%E6%B9%AF%E7%95%912.jpg",
+    imageCredit: "草津温泉",
   },
   {
     slug: "万座",
@@ -564,6 +654,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.5111,
     blurb:
       "草津白根山西麓の温泉・スキーリゾート。標高 1,800m。周囲はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Manza_Onsen_Tsumagoi_Gunma01bs4272.jpg/3840px-Manza_Onsen_Tsumagoi_Gunma01bs4272.jpg",
+    imageCredit: "万座温泉",
   },
   {
     slug: "野沢温泉",
@@ -576,6 +668,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.4453,
     blurb:
       "国際的スキーリゾートで温泉街。毛無山・スキー場周辺はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1d/Nozawa_Onsen_01.jpg",
+    imageCredit: "野沢温泉",
   },
   {
     slug: "志賀高原",
@@ -588,6 +682,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.5147,
     blurb:
       "上信越高原国立公園内。スキー場・観光地・登山が集積。ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5e/ShigaYokote.jpg",
+    imageCredit: "志賀高原",
   },
   // === 湖・自然 ===
   {
@@ -601,6 +697,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 139.4908,
     blurb:
       "標高 1,269m の堰止湖。日光国立公園内。男体山登山口・千手ヶ浜・半月山など散策コース多数。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Mount_nantai_and_lake_chuzenji.jpg",
+    imageCredit: "中禅寺湖",
   },
   {
     slug: "河口湖",
@@ -613,6 +711,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 138.7497,
     blurb:
       "富士五湖の一つ。富士山登山口の前線基地。周辺の天上山・三ツ峠登山道はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/KawaguchiKo.jpg",
+    imageCredit: "河口湖",
   },
   {
     slug: "十和田湖",
@@ -625,6 +725,8 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 140.8961,
     blurb:
       "十和田八幡平国立公園内のカルデラ湖。奥入瀬渓流など散策が人気。ツキノワグマの活動圏内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/c0/Lake_Towada_from_Ohanabe_2008.jpg",
+    imageCredit: "十和田湖",
   },
   {
     slug: "支笏湖",
@@ -637,5 +739,607 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     lon: 141.3431,
     blurb:
       "支笏洞爺国立公園内のカルデラ湖。樽前山・恵庭岳の登山口でもあり、ヒグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Lake_Shikotsu_Mt_Eniwa-dake03n4272.jpg/3840px-Lake_Shikotsu_Mt_Eniwa-dake03n4272.jpg",
+    imageCredit: "支笏湖",
+  },
+
+  // === 追加: 山岳 (北アルプス・中央アルプス・中信・南信) ===
+  {
+    slug: "剣岳",
+    name: "剣岳",
+    altNames: ["劔岳", "Tsurugidake"],
+    prefName: "富山県",
+    muniName: "上市町",
+    category: "mountain",
+    lat: 36.6238,
+    lon: 137.6172,
+    blurb:
+      "標高 2,999m。北アルプス北部の岩稜峰。剱沢・別山尾根からのアクセスが一般的で、中部山岳国立公園のツキノワグマ生息域内。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/da/Tsurugidake_20100127.jpg",
+    imageCredit: "剱岳",
+  },
+  {
+    slug: "燕岳",
+    name: "燕岳",
+    altNames: ["Tsubakurodake", "つばくろだけ"],
+    prefName: "長野県",
+    muniName: "安曇野市",
+    category: "mountain",
+    lat: 36.4061,
+    lon: 137.7081,
+    blurb:
+      "標高 2,763m。表銀座縦走の起点として人気。中房温泉登山口は北アルプス入門ルートで、樹林帯でのクマ目撃報告あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Mt.Tsubakurodake_from_Enzansou_01.jpg",
+    imageCredit: "燕岳",
+  },
+  {
+    slug: "常念岳",
+    name: "常念岳",
+    altNames: ["Jonendake"],
+    prefName: "長野県",
+    muniName: "安曇野市",
+    category: "mountain",
+    lat: 36.3258,
+    lon: 137.7269,
+    blurb:
+      "標高 2,857m。安曇野・松本平から望める北アルプス南部の名峰。一ノ沢・三股の登山口周辺はクマの活動圏。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/76/Mt-Jounen_in_Azumino-Hotaka.jpg",
+    imageCredit: "常念岳",
+  },
+  {
+    slug: "涸沢",
+    name: "涸沢",
+    altNames: ["Karasawa"],
+    prefName: "長野県",
+    muniName: "松本市",
+    category: "trailhead",
+    lat: 36.2900,
+    lon: 137.6531,
+    blurb:
+      "標高 2,300m。穂高連峰・涸沢カールの拠点。紅葉期に登山者が集中。上高地〜横尾〜涸沢のルートは中部山岳国立公園のクマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Karasawa_Cirque_%28200708%29.jpg",
+    imageCredit: "涸沢カール",
+  },
+  {
+    slug: "木曽駒ヶ岳",
+    name: "木曽駒ヶ岳",
+    altNames: ["Kisokomagatake", "中央アルプス駒ヶ岳"],
+    prefName: "長野県",
+    muniName: "宮田村",
+    category: "mountain",
+    lat: 35.7894,
+    lon: 137.8044,
+    blurb:
+      "標高 2,956m。中央アルプス最高峰。駒ヶ岳ロープウェイで千畳敷カールへアクセス可能。ロープウェイ下部の樹林帯でクマ目撃あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Mt.Kisokomagatake_from_Mt.Utsugidake_01.jpg",
+    imageCredit: "木曽駒ヶ岳",
+  },
+  {
+    slug: "浅間山",
+    name: "浅間山",
+    altNames: ["Asamayama"],
+    prefName: "長野県",
+    muniName: "御代田町",
+    category: "mountain",
+    lat: 36.4061,
+    lon: 138.5231,
+    blurb:
+      "標高 2,568m。長野・群馬県境の活火山。前掛山・黒斑山ルートが登山対象。北麓の小諸・軽井沢、南麓の嬬恋でクマ目撃が継続。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3d/AsamaYamaS.jpg",
+    imageCredit: "浅間山",
+  },
+  {
+    slug: "谷川岳",
+    name: "谷川岳",
+    altNames: ["Tanigawadake"],
+    prefName: "群馬県",
+    muniName: "みなかみ町",
+    category: "mountain",
+    lat: 36.8347,
+    lon: 138.9269,
+    blurb:
+      "標高 1,977m。上越国境の名峰。谷川岳ロープウェイで天神平へアクセスでき、ベテラン・初心者問わず人気。みなかみ町・湯沢町側ともにツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e1/Tanigawadake.jpg",
+    imageCredit: "谷川岳",
+  },
+  {
+    slug: "武尊山",
+    name: "武尊山",
+    altNames: ["Hotakasan", "ほたかさん"],
+    prefName: "群馬県",
+    muniName: "川場村",
+    category: "mountain",
+    lat: 36.7997,
+    lon: 139.1361,
+    blurb:
+      "標高 2,158m。日本百名山。川場村・水上町・片品村に跨る。武尊神社からのアプローチや川場スキー場リフトを利用するルートでクマ目撃が継続。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Mount_Joshu-Hotaka.JPG/3840px-Mount_Joshu-Hotaka.JPG",
+    imageCredit: "武尊山",
+  },
+  {
+    slug: "苗場山",
+    name: "苗場山",
+    altNames: ["Naebasan"],
+    prefName: "新潟県",
+    muniName: "湯沢町",
+    category: "mountain",
+    lat: 36.8506,
+    lon: 138.6925,
+    blurb:
+      "標高 2,145m。山頂に広大な高層湿原。秋山郷・小赤沢・祓川ルートいずれも越後三山只見国定公園のクマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Moor_of_Mt._Naeba_in_the_late_autumn_2016.jpg/3840px-Moor_of_Mt._Naeba_in_the_late_autumn_2016.jpg",
+    imageCredit: "苗場山",
+  },
+  {
+    slug: "巻機山",
+    name: "巻機山",
+    altNames: ["Makihatayama"],
+    prefName: "新潟県",
+    muniName: "南魚沼市",
+    category: "mountain",
+    lat: 36.9261,
+    lon: 138.9408,
+    blurb:
+      "標高 1,967m。日本百名山。井戸尾根・ヌクビ沢ルートが人気で、樹林帯のクマ目撃情報が継続的に寄せられる。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6f/%E5%B7%BB%E6%A9%9F%E5%B1%B1%E3%83%BB%E5%8F%A4%E5%B3%B0%E5%B1%B1.JPG",
+    imageCredit: "巻機山",
+  },
+  {
+    slug: "越後駒ヶ岳",
+    name: "越後駒ヶ岳",
+    altNames: ["Echigo-Komagatake"],
+    prefName: "新潟県",
+    muniName: "魚沼市",
+    category: "mountain",
+    lat: 37.0703,
+    lon: 139.0203,
+    blurb:
+      "標高 2,003m。越後三山の一峰。枝折峠・駒の湯からのルートで、ブナ帯のクマ生息域を通過する。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Mt.Echigo-Komagatake.jpg/3840px-Mt.Echigo-Komagatake.jpg",
+    imageCredit: "越後駒ヶ岳",
+  },
+
+  // === 追加: 東北 ===
+  {
+    slug: "磐梯山",
+    name: "磐梯山",
+    altNames: ["Bandaisan"],
+    prefName: "福島県",
+    muniName: "猪苗代町",
+    category: "mountain",
+    lat: 37.6017,
+    lon: 140.0744,
+    blurb:
+      "標高 1,816m。会津磐梯山として親しまれる活火山。八方台・翁島・裏磐梯の各登山口でツキノワグマ目撃が散発的に発生。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/62/Mt._Bandaisan_0811.JPG",
+    imageCredit: "磐梯山",
+  },
+  {
+    slug: "安達太良山",
+    name: "安達太良山",
+    altNames: ["Adatarayama"],
+    prefName: "福島県",
+    muniName: "二本松市",
+    category: "mountain",
+    lat: 37.6217,
+    lon: 140.2867,
+    blurb:
+      "標高 1,700m。日本百名山。あだたら高原スキー場からロープウェイでアクセス。広範な熊生息域にあり、登山道周辺で目撃情報が継続。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Mount_Adatara_seen_from_the_SE.jpg/3840px-Mount_Adatara_seen_from_the_SE.jpg",
+    imageCredit: "安達太良山",
+  },
+  {
+    slug: "月山",
+    name: "月山",
+    altNames: ["Gassan"],
+    prefName: "山形県",
+    muniName: "西川町",
+    category: "mountain",
+    lat: 38.5489,
+    lon: 140.0264,
+    blurb:
+      "標高 1,984m。出羽三山の主峰。湯殿山・羽黒山と合わせて修験道の聖地。月山八合目・志津・湯殿山口ともにツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/ad/Gassan_%285693125340%29.jpg",
+    imageCredit: "月山",
+  },
+  {
+    slug: "八幡平",
+    name: "八幡平",
+    altNames: ["Hachimantai"],
+    prefName: "岩手県",
+    muniName: "八幡平市",
+    category: "national_park",
+    lat: 39.9583,
+    lon: 140.8569,
+    blurb:
+      "標高 1,613m。十和田八幡平国立公園内の高層湿原・温泉群。アスピーテライン沿いでクマ目撃が継続的に報告される。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1e/%E5%85%AB%E5%B9%A1%E5%B9%B3.jpg",
+    imageCredit: "八幡平",
+  },
+  {
+    slug: "早池峰山",
+    name: "早池峰山",
+    altNames: ["Hayachinesan"],
+    prefName: "岩手県",
+    muniName: "遠野市",
+    category: "mountain",
+    lat: 39.5644,
+    lon: 141.4881,
+    blurb:
+      "標高 1,917m。北上山地最高峰。河原坊・小田越・門馬の各登山口は遠野・宮古・花巻にまたがり、いずれもツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3a/%E5%88%9D%E5%86%AC%E3%81%AE%E6%97%A9%E6%B1%A0%E5%B3%B0%E5%B1%B1.jpg",
+    imageCredit: "早池峰山",
+  },
+  {
+    slug: "焼石岳",
+    name: "焼石岳",
+    altNames: ["Yakeishidake"],
+    prefName: "岩手県",
+    muniName: "奥州市",
+    category: "mountain",
+    lat: 39.1742,
+    lon: 140.7672,
+    blurb:
+      "標高 1,548m。栗駒国定公園内。中沼・つぶ沼・夏油温泉口からの登山ルートはブナ・ダケカンバ帯のクマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/89/Yakiisidake.jpg",
+    imageCredit: "焼石岳",
+  },
+
+  // === 追加: 西日本の主要山岳 ===
+  {
+    slug: "伯耆大山",
+    name: "伯耆大山",
+    altNames: ["大山(鳥取県)", "Daisen", "ほうきだいせん"],
+    prefName: "鳥取県",
+    muniName: "大山町",
+    category: "mountain",
+    lat: 35.3717,
+    lon: 133.5400,
+    blurb:
+      "標高 1,729m。西日本最高峰。大山町・江府町から複数の登山口。ツキノワグマの主要生息域で、ブナ帯の目撃情報が継続。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Daisen_%28mountain%29_in_2012.JPG",
+    imageCredit: "大山 (鳥取県)",
+  },
+  {
+    slug: "丹沢大山",
+    name: "丹沢大山",
+    altNames: ["大山(神奈川県)", "Oyama", "おおやま"],
+    prefName: "神奈川県",
+    muniName: "伊勢原市",
+    category: "mountain",
+    lat: 35.4361,
+    lon: 139.2306,
+    blurb:
+      "標高 1,252m。丹沢山地南東の信仰の山。大山ケーブルカーで阿夫利神社下社へ。表参道・ヤビツ峠ルート周辺でクマ目撃が散発的に報告。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/19/Mt.Oyama_from_Shibusawa_Hill_Range_01.jpg",
+    imageCredit: "大山 (神奈川県)",
+  },
+  {
+    slug: "高野山",
+    name: "高野山",
+    altNames: ["Koyasan"],
+    prefName: "和歌山県",
+    muniName: "高野町",
+    category: "mountain",
+    lat: 34.2125,
+    lon: 135.5856,
+    blurb:
+      "標高 約 800m の山上盆地。世界遺産の真言宗総本山・金剛峯寺。高野龍神スカイライン・町石道など周辺の山林部はツキノワグマの生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/17/Danjogaran_Koyasan12n3200.jpg",
+    imageCredit: "高野山",
+  },
+  {
+    slug: "石鎚山",
+    name: "石鎚山",
+    altNames: ["Ishizuchisan"],
+    prefName: "愛媛県",
+    muniName: "西条市",
+    category: "mountain",
+    lat: 33.7689,
+    lon: 133.1142,
+    blurb:
+      "標高 1,982m。西日本第 2 の高峰。石鎚スカイライン・ロープウェイの 2 系統でアクセス。四国のツキノワグマは絶滅危惧個体群、目撃情報があれば貴重。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/71/Isidutisan20220226_1.jpg",
+    imageCredit: "石鎚山",
+  },
+  {
+    slug: "剣山",
+    name: "剣山",
+    altNames: ["Tsurugisan"],
+    prefName: "徳島県",
+    muniName: "三好市",
+    category: "mountain",
+    lat: 33.8536,
+    lon: 134.0944,
+    blurb:
+      "標高 1,955m。四国第 2 の高峰。見ノ越からのリフトで登山口へ。ツキノワグマは四国絶滅危惧個体群で目撃は希少。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/2/29/Mt.Tsurugisan.jpg",
+    imageCredit: "剣山",
+  },
+  {
+    slug: "雲仙岳",
+    name: "雲仙岳",
+    altNames: ["Unzendake"],
+    prefName: "長崎県",
+    muniName: "雲仙市",
+    category: "mountain",
+    lat: 32.7572,
+    lon: 130.2950,
+    blurb:
+      "標高 1,483m (平成新山)。雲仙天草国立公園の主峰。九州にツキノワグマは事実上不在のため出没情報は極めて少ない、参考情報として掲載。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Fugendake_02_Pyroplastic_flow_area.JPG",
+    imageCredit: "雲仙岳",
+  },
+  {
+    slug: "久住山",
+    name: "久住山",
+    altNames: ["Kujusan", "九重山"],
+    prefName: "大分県",
+    muniName: "竹田市",
+    category: "mountain",
+    lat: 33.0856,
+    lon: 131.2486,
+    blurb:
+      "標高 1,791m。阿蘇くじゅう国立公園内の主峰群。牧ノ戸峠・赤川登山口からアクセス。九州本土でのクマ生息は事実上ないため、出没情報は希少。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/18/Mount_Kuju.jpg",
+    imageCredit: "久住山",
+  },
+  {
+    slug: "霧島山",
+    name: "霧島山",
+    altNames: ["Kirishimayama", "韓国岳"],
+    prefName: "鹿児島県",
+    muniName: "霧島市",
+    category: "mountain",
+    lat: 31.9333,
+    lon: 130.8639,
+    blurb:
+      "韓国岳 (1,700m) を主峰とする霧島連山。霧島錦江湾国立公園。九州本土にクマは生息せず、出没情報は基本的にない。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Kirishima_volcano_20111125.jpg/3840px-Kirishima_volcano_20111125.jpg",
+    imageCredit: "霧島山",
+  },
+
+  // === 追加: 湖・湿原 ===
+  {
+    slug: "摩周湖",
+    name: "摩周湖",
+    altNames: ["Mashuko"],
+    prefName: "北海道",
+    muniName: "弟子屈町",
+    category: "lake",
+    lat: 43.5778,
+    lon: 144.5311,
+    blurb:
+      "阿寒摩周国立公園のカルデラ湖。摩周第一・第三展望台が主なアクセスポイント。周辺の阿寒摩周山系はヒグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hokkaido%2C_Japan%2C_Lake_Mash%C5%AB%2C_2008.jpg/3840px-Hokkaido%2C_Japan%2C_Lake_Mash%C5%AB%2C_2008.jpg",
+    imageCredit: "摩周湖",
+  },
+  {
+    slug: "阿寒湖",
+    name: "阿寒湖",
+    altNames: ["Akanko"],
+    prefName: "北海道",
+    muniName: "釧路市",
+    category: "lake",
+    lat: 43.4486,
+    lon: 144.0972,
+    blurb:
+      "阿寒摩周国立公園のカルデラ湖。阿寒湖温泉・雄阿寒岳・雌阿寒岳登山口を擁し、ヒグマの主要生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Akanko.JPG",
+    imageCredit: "阿寒湖",
+  },
+  {
+    slug: "田沢湖",
+    name: "田沢湖",
+    altNames: ["Tazawako"],
+    prefName: "秋田県",
+    muniName: "仙北市",
+    category: "lake",
+    lat: 39.7158,
+    lon: 140.6611,
+    blurb:
+      "日本最深 (423m) のカルデラ湖。乳頭温泉郷・秋田駒ヶ岳登山口に近接。仙北市内のツキノワグマ生息域内で、湖畔・周辺の山林部で目撃あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Lake_Tazawa_and_Kansa-g%C5%AB_20210213.jpg/3840px-Lake_Tazawa_and_Kansa-g%C5%AB_20210213.jpg",
+    imageCredit: "田沢湖",
+  },
+  {
+    slug: "山中湖",
+    name: "山中湖",
+    altNames: ["Yamanakako"],
+    prefName: "山梨県",
+    muniName: "山中湖村",
+    category: "lake",
+    lat: 35.4194,
+    lon: 138.8806,
+    blurb:
+      "富士五湖の最大の湖。富士箱根伊豆国立公園。湖畔・周辺の山林 (鉄砲木ノ頭・三国山) でツキノワグマ目撃情報あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f3/Lake-yamanaka.jpg",
+    imageCredit: "山中湖",
+  },
+  {
+    slug: "本栖湖",
+    name: "本栖湖",
+    altNames: ["Motosuko"],
+    prefName: "山梨県",
+    muniName: "富士河口湖町",
+    category: "lake",
+    lat: 35.4631,
+    lon: 138.5894,
+    blurb:
+      "富士五湖の一つで透明度が高い。竜ヶ岳・パノラマ台の登山口が湖畔にあり、ツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/54/Lake_Motosu03.jpg",
+    imageCredit: "本栖湖",
+  },
+
+  // === 追加: 滝 ===
+  {
+    slug: "華厳の滝",
+    name: "華厳の滝",
+    altNames: ["Kegon-no-taki"],
+    prefName: "栃木県",
+    muniName: "日光市",
+    category: "resort",
+    lat: 36.7367,
+    lon: 139.5083,
+    blurb:
+      "落差 97m。日光国立公園内、中禅寺湖から流れ落ちる名瀑。日光連山の山林部はツキノワグマ生息域で、駐車場周辺でも目撃事例あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Kegon_Taki.jpg/3840px-Kegon_Taki.jpg",
+    imageCredit: "華厳滝",
+  },
+  {
+    slug: "那智の滝",
+    name: "那智の滝",
+    altNames: ["Nachi-no-taki"],
+    prefName: "和歌山県",
+    muniName: "那智勝浦町",
+    category: "resort",
+    lat: 33.6708,
+    lon: 135.8908,
+    blurb:
+      "落差 133m、日本一の高さ。世界遺産・熊野那智大社の御神体。背後の那智原始林・大雲取山系はツキノワグマ紀伊半島個体群の生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/d5/Kumano_Kodo_World_heritage_Nachi-no-taki_%E7%86%8A%E9%87%8E%E5%8F%A4%E9%81%93_%E9%82%A3%E6%99%BA%E5%A4%A7%E6%BB%9D10.JPG",
+    imageCredit: "那智滝",
+  },
+  {
+    slug: "白糸の滝",
+    name: "白糸の滝",
+    altNames: ["Shiraito-no-taki"],
+    prefName: "静岡県",
+    muniName: "富士宮市",
+    category: "resort",
+    lat: 35.3194,
+    lon: 138.5872,
+    blurb:
+      "幅 200m に広がる富士山伏流水の滝。世界遺産富士山の構成資産。富士宮口登山道に近く、周辺山林部でクマ目撃の報告がある。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Shiraito_water_fall_01.jpg",
+    imageCredit: "白糸の滝",
+  },
+  {
+    slug: "袋田の滝",
+    name: "袋田の滝",
+    altNames: ["Fukuroda-no-taki"],
+    prefName: "茨城県",
+    muniName: "大子町",
+    category: "resort",
+    lat: 36.7708,
+    lon: 140.4083,
+    blurb:
+      "落差 120m、4 段に流れ落ちる「四度の滝」。大子町・八溝山地のツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/d/da/Fukuroda_Falls_38.jpg",
+    imageCredit: "袋田の滝",
+  },
+
+  // === 追加: 文化・観光・温泉 ===
+  {
+    slug: "妻籠宿",
+    name: "妻籠宿",
+    altNames: ["Tsumagojuku"],
+    prefName: "長野県",
+    muniName: "南木曽町",
+    category: "resort",
+    lat: 35.5786,
+    lon: 137.5953,
+    blurb:
+      "中山道 42 番目の宿場町。江戸期の町並みを保存。南木曽町は木曽山脈東麓のツキノワグマ生息域で、隣接山林部での目撃情報あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/78/Kisokaido42_Tsumago.jpg",
+    imageCredit: "妻籠宿",
+  },
+  {
+    slug: "馬籠宿",
+    name: "馬籠宿",
+    altNames: ["Magomejuku"],
+    prefName: "岐阜県",
+    muniName: "中津川市",
+    category: "resort",
+    lat: 35.5239,
+    lon: 137.5639,
+    blurb:
+      "中山道 43 番目の宿場町。妻籠との間の「馬籠峠越え」は人気ハイキングコース。中津川市の山林部はツキノワグマ生息域。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Kisokaido43_Magome.jpg",
+    imageCredit: "馬籠宿",
+  },
+  {
+    slug: "富良野",
+    name: "富良野",
+    altNames: ["Furano"],
+    prefName: "北海道",
+    muniName: "富良野市",
+    category: "resort",
+    lat: 43.3417,
+    lon: 142.3833,
+    blurb:
+      "ラベンダー・スキー・ファームで知られるリゾート地。十勝岳連峰の麓に位置し、富良野岳・夕張山地はヒグマ生息域。郊外農地での出没が継続。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Furano_Snow_Resort_view2.JPG",
+    imageCredit: "富良野市",
+  },
+  {
+    slug: "美瑛",
+    name: "美瑛",
+    altNames: ["Biei"],
+    prefName: "北海道",
+    muniName: "美瑛町",
+    category: "resort",
+    lat: 43.5886,
+    lon: 142.4694,
+    blurb:
+      "丘陵風景で知られる観光地。十勝岳連峰の麓に位置し、青い池・白金温泉周辺はヒグマ生息域で目撃情報が継続的に発生。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/39/%E5%9B%9B%E5%AD%A3%E5%BD%A9%E3%81%AE%E4%B8%98-01.JPG",
+    imageCredit: "美瑛町",
+  },
+  {
+    slug: "高千穂峡",
+    name: "高千穂峡",
+    altNames: ["Takachiho-kyo"],
+    prefName: "宮崎県",
+    muniName: "高千穂町",
+    category: "resort",
+    lat: 32.7044,
+    lon: 131.3056,
+    blurb:
+      "五ヶ瀬川が形成した柱状節理の渓谷。真名井の滝で有名。九州本土にクマは生息せず、出没情報は基本的にないが、観光・登山の参考情報として掲載。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Takachiho-kyo%28Gorge%29_-_River_-_%E5%B7%9D.jpg/3840px-Takachiho-kyo%28Gorge%29_-_River_-_%E5%B7%9D.jpg",
+    imageCredit: "高千穂峡",
+  },
+  {
+    slug: "蔵王温泉",
+    name: "蔵王温泉",
+    altNames: ["Zao-onsen"],
+    prefName: "山形県",
+    muniName: "山形市",
+    category: "resort",
+    lat: 38.1547,
+    lon: 140.3914,
+    blurb:
+      "蔵王連峰中腹の名湯。樹氷・スキーリゾートとしても有名。蔵王連峰はツキノワグマ生息域で、温泉街・スキー場周辺での目撃事例あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/220430_ZaoOnsen_Yamagata_Yamagata_pref_Japan24s3.jpg/3840px-220430_ZaoOnsen_Yamagata_Yamagata_pref_Japan24s3.jpg",
+    imageCredit: "蔵王温泉",
+  },
+  {
+    slug: "銀山温泉",
+    name: "銀山温泉",
+    altNames: ["Ginzan-onsen"],
+    prefName: "山形県",
+    muniName: "尾花沢市",
+    category: "resort",
+    lat: 38.5694,
+    lon: 140.5278,
+    blurb:
+      "大正ロマンの町並みが残る山形の隠れ宿場温泉。尾花沢市の山間部はツキノワグマ生息域で、周辺の散策路で目撃情報あり。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Evening_twilight_in_Ginzan_Onsen_town_January_2022_A.jpg/3840px-Evening_twilight_in_Ginzan_Onsen_town_January_2022_A.jpg",
+    imageCredit: "銀山温泉",
+  },
+  {
+    slug: "由布院",
+    name: "由布院",
+    altNames: ["Yufuin"],
+    prefName: "大分県",
+    muniName: "由布市",
+    category: "resort",
+    lat: 33.2683,
+    lon: 131.3617,
+    blurb:
+      "由布岳の麓に広がる温泉郷。湯布院とも表記。九州本土にクマは生息せず、出没情報は基本的にないため参考情報として掲載。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Yufuin_Onsen_-Mus%C5%8Den_02.jpg",
+    imageCredit: "由布院温泉",
   },
 ];

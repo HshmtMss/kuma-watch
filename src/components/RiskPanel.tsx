@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type {
@@ -305,6 +306,8 @@ type Props = {
   sightingCountByMesh?: Map<string, number>;
   /** カードヘッダー内のシェアボタンから呼ぶ。地点が選択されている時のみ表示。 */
   onShare?: () => void;
+  /** カードヘッダー内の「AIに聞く」ボタンから呼ぶ。常に表示。 */
+  onAskAi?: () => void;
   /** 評価が ready になった時に AI へ渡す豊富なコンテキストを KumaClient に通知する。 */
   onAskContextChange?: (ctx: AskContext | null) => void;
 };
@@ -334,6 +337,7 @@ export default function RiskPanel({
   levelThresholds,
   sightingCountByMesh,
   onShare,
+  onAskAi,
   onAskContextChange,
 }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
@@ -716,6 +720,23 @@ export default function RiskPanel({
               </div>
             </div>
           </button>
+          {onAskAi && (
+            <button
+              onClick={onAskAi}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800 ring-1 ring-amber-200 hover:bg-amber-200 sm:h-10 sm:w-10"
+              aria-label="AI に質問"
+              title="AI に質問"
+            >
+              <Image
+                src="/bear-face.png"
+                alt=""
+                width={22}
+                height={22}
+                aria-hidden
+                style={{ width: "1.375rem", height: "auto" }}
+              />
+            </button>
+          )}
           {state.kind === "ready" && onShare && (
             <button
               onClick={onShare}
@@ -1027,20 +1048,21 @@ function RiskDetails({
         スコアは参考値です。実際のクマの行動は個体差・環境で変わります。必ず自治体の公式情報と合わせてご確認ください。
       </p>
 
-      {/* 運営・お問合せ — 中央寄せ・改行表示 */}
-      <footer className="border-t border-gray-100 px-4 py-4 text-center text-[11px] leading-relaxed text-gray-400">
-        <div>運営</div>
-        <div>
-          <a
-            href="https://vet-ai-lab.netlify.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-gray-600 hover:underline"
-          >
-            獣医工学ラボ
-          </a>
-        </div>
-        <div className="mt-1">
+      {/* カード末尾の控えめな運営・補足リンク行。1 行目: 運営 + お問合せ、2 行目: 補足。 */}
+      <footer className="border-t border-gray-100 px-4 py-3 text-center text-[11px] leading-relaxed text-gray-400">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <span>
+            運営:{" "}
+            <a
+              href="https://www.research-coordinate.co.jp/labs/vet/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gray-600 hover:underline"
+            >
+              獣医工学ラボ
+            </a>
+          </span>
+          <span aria-hidden>·</span>
           <a
             href="mailto:contact@research-coordinate.co.jp"
             className="hover:text-gray-600 hover:underline"
@@ -1048,6 +1070,22 @@ function RiskDetails({
             お問合せ
           </a>
         </div>
+        <nav
+          aria-label="補足リンク"
+          className="mt-1 flex flex-wrap items-center justify-center gap-x-2 gap-y-1"
+        >
+          <Link href="/about" className="hover:text-gray-600 hover:underline">
+            このサイトについて
+          </Link>
+          <span aria-hidden>·</span>
+          <Link href="/disclaimer" className="hover:text-gray-600 hover:underline">
+            免責事項
+          </Link>
+          <span aria-hidden>·</span>
+          <Link href="/privacy" className="hover:text-gray-600 hover:underline">
+            プライバシー
+          </Link>
+        </nav>
       </footer>
 
       </>}

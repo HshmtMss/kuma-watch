@@ -153,7 +153,7 @@ export default function ForGovPage() {
       </section>
 
       {/* Value props */}
-      <h2>KumaWatch ならではの 3 つの特長</h2>
+      <h2>3 つの違い</h2>
       <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {VALUE_PROPS.map((v) => (
           <div
@@ -299,17 +299,11 @@ export default function ForGovPage() {
           <div className="text-xs font-semibold uppercase tracking-wide text-blue-700">
             運営者
           </div>
-          <div className="mt-2 flex items-center gap-3">
-            <Image
-              src="/labs/vet-eng-lab.jpeg"
-              alt="獣医工学ラボ ロゴ"
-              width={240}
-              height={134}
-              className="h-auto w-24 shrink-0"
-            />
-            <div className="text-xs leading-relaxed text-stone-600">
-              獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。リサーチコーディネート株式会社が運営。
-            </div>
+          <div className="mt-1 text-sm font-semibold text-stone-900">
+            獣医工学ラボ
+          </div>
+          <div className="mt-1 text-xs leading-relaxed text-stone-600">
+            獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。リサーチコーディネート株式会社が運営。
           </div>
         </a>
       </div>

@@ -1,4 +1,5 @@
 import { getCachedSightings } from "@/lib/sightings-cache";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 export type PlaceCell = {
   prefectureName: string;
@@ -222,4 +223,123 @@ export async function getStaticPlaceKeys(
 
 export async function invalidatePlaceIndex(): Promise<void> {
   cache = null;
+}
+
+// ---------------------------------------------------------------------------
+// 市町村単位の集計
+// ---------------------------------------------------------------------------
+//
+// 元データの cityName は「湯原地内」「嬬恋村大字大笹地内」のように
+// 字 (aza) / 地内レベルが混入している。/place/[pref] では、実在する
+// 市区町村 (JAPAN_MUNICIPALITIES マスター) 単位で件数を集計して並べたい。
+//
+// マッチング戦略:
+//   1. cityName が「muni 名 + …」で始まるなら、その muni に集計 (longest-prefix-wins)
+//   2. 上記で当たらない場合は、cell 中心座標から最寄りの muni 重心へ寄せる
+//
+// muni 名の差し替えだけで集計するので、リンク先は /place/[pref]/[muni] に
+// canonical な muni 名で繋ぐ。
+
+export type MuniAggregate = {
+  prefName: string;
+  cityName: string; // canonical muni 名 (JAPAN_MUNICIPALITIES と一致)
+  cityCode: string;
+  count: number;
+  count90d: number;
+  count365d: number;
+  latestDate: string | null;
+  lat: number; // master 重心
+  lon: number;
+};
+
+function distanceKm(la1: number, lo1: number, la2: number, lo2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(la2 - la1);
+  const dLon = toRad(lo2 - lo1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(la1)) * Math.cos(toRad(la2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function resolveCanonicalMuni(
+  cityNameRaw: string,
+  lat: number,
+  lon: number,
+  munis: { cityName: string; lat: number; lon: number }[],
+): string | null {
+  // 1) prefix match (longest first)
+  let bestMatch: { name: string; len: number } | null = null;
+  for (const m of munis) {
+    if (cityNameRaw.startsWith(m.cityName)) {
+      if (!bestMatch || m.cityName.length > bestMatch.len) {
+        bestMatch = { name: m.cityName, len: m.cityName.length };
+      }
+    }
+  }
+  if (bestMatch) return bestMatch.name;
+
+  // 2) nearest centroid fallback (typically within ~15 km)
+  let nearest: { name: string; d: number } | null = null;
+  for (const m of munis) {
+    const d = distanceKm(lat, lon, m.lat, m.lon);
+    if (!nearest || d < nearest.d) nearest = { name: m.cityName, d };
+  }
+  // 50km 以上離れていれば棄却 (誤集計を防ぐ)
+  if (nearest && nearest.d < 50) return nearest.name;
+  return null;
+}
+
+/** /place/[pref] のための市町村別集計。
+ *  JAPAN_MUNICIPALITIES マスターを基底とし、出没件数 0 の市町村も含めて
+ *  全件返す。並び順は呼び出し側で決める。 */
+export async function getMuniAggregatesByPref(
+  pref: string,
+): Promise<MuniAggregate[]> {
+  const idx = await getIndex();
+  const munis = JAPAN_MUNICIPALITIES.filter((m) => m.prefName === pref);
+
+  const out = new Map<string, MuniAggregate>();
+  for (const m of munis) {
+    out.set(m.cityName, {
+      prefName: pref,
+      cityName: m.cityName,
+      cityCode: m.cityCode,
+      count: 0,
+      count90d: 0,
+      count365d: 0,
+      latestDate: null,
+      lat: m.lat,
+      lon: m.lon,
+    });
+  }
+  // 都道府県内の cell をマスター muni に正規化して集計
+  const cells = idx.byPref.get(pref) ?? [];
+  const muniRefs = munis.map((m) => ({
+    cityName: m.cityName,
+    lat: m.lat,
+    lon: m.lon,
+  }));
+  for (const cell of cells) {
+    const canon = resolveCanonicalMuni(
+      cell.cityName,
+      cell.latCentroid,
+      cell.lonCentroid,
+      muniRefs,
+    );
+    if (!canon) continue;
+    const agg = out.get(canon);
+    if (!agg) continue;
+    agg.count += cell.count;
+    agg.count90d += cell.count90d;
+    agg.count365d += cell.count365d;
+    if (
+      cell.latestDate &&
+      (!agg.latestDate || cell.latestDate > agg.latestDate)
+    ) {
+      agg.latestDate = cell.latestDate;
+    }
+  }
+  return [...out.values()];
 }
