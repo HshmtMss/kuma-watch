@@ -63,6 +63,36 @@ function cityNameFromMuniCd(muniCd: string | undefined): string | undefined {
   return match?.cityName;
 }
 
+function distanceKm(la1: number, lo1: number, la2: number, lo2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(la2 - la1);
+  const dLon = toRad(lo2 - lo1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(la1)) * Math.cos(toRad(la2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// JAPAN_MUNICIPALITIES の重心から lat/lon に最も近い市町村を返す。
+// Nominatim と GSI の両方が落ちた時の最終 fallback。50km 以内に何も無ければ undefined。
+function findNearestMuni(
+  lat: number,
+  lon: number,
+): { prefName: string; cityName: string; prefCode: string } | undefined {
+  let best: { d: number; m: (typeof JAPAN_MUNICIPALITIES)[number] } | null = null;
+  for (const m of JAPAN_MUNICIPALITIES) {
+    const d = distanceKm(lat, lon, m.lat, m.lon);
+    if (!best || d < best.d) best = { d, m };
+  }
+  if (!best || best.d > 50) return undefined;
+  return {
+    prefName: best.m.prefName,
+    cityName: best.m.cityName,
+    prefCode: best.m.prefCode,
+  };
+}
+
 async function fetchGsiReverse(
   lat: number,
   lon: number,
@@ -122,14 +152,27 @@ export async function GET(req: Request) {
       url.searchParams.set("addressdetails", "1");
       url.searchParams.set("zoom", "14");
 
-      // Nominatim と GSI を並列で叩く。Nominatim 失敗時は GSI ベースで返す。
-      const upstreamPromise = fetch(url.toString(), {
-        headers: {
-          "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)",
-          "Accept-Language": "ja",
-        },
-        next: { revalidate: CACHE_SECONDS },
-      }).catch(() => null);
+      // Nominatim と GSI を並列で叩く。
+      // Nominatim はレート制限・障害で遅くなることがあるので 3 秒で abort。
+      // GSI と最寄り市町村検索でカバーする。
+      const upstreamPromise = (async () => {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 3000);
+        try {
+          return await fetch(url.toString(), {
+            headers: {
+              "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)",
+              "Accept-Language": "ja",
+            },
+            signal: ctrl.signal,
+            next: { revalidate: CACHE_SECONDS },
+          });
+        } catch {
+          return null;
+        } finally {
+          clearTimeout(timer);
+        }
+      })();
       const [upstream, gsi] = await Promise.all([
         upstreamPromise,
         fetchGsiReverse(lat, lon),
@@ -155,7 +198,19 @@ export async function GET(req: Request) {
       // Nominatim が city を取れなかった (海岸線・国境近く・rate limit 等) 場合は GSI で補完
       if (!hit.city && gsi.city) hit.city = gsi.city;
 
-      // 両方とも失敗して住所が全く取れない場合だけ 502 を返す
+      // 最終 fallback: 上記いずれも prefName/cityName を埋められなかった時、
+      // JAPAN_MUNICIPALITIES マスターの重心から最寄り市町村を検索する。
+      // 海岸線・湖上などで Nominatim と GSI が両方失敗するケースを救う。
+      if (!hit.city || !hit.prefecture) {
+        const nearest = findNearestMuni(lat, lon);
+        if (nearest) {
+          if (!hit.city) hit.city = nearest.cityName;
+          if (!hit.prefecture) hit.prefecture = nearest.prefName;
+          if (!hit.prefCode) hit.prefCode = nearest.prefCode;
+        }
+      }
+
+      // それでも何も埋まらないなら 502 (日本域外の点など)
       if (!hit.prefecture && !hit.city) {
         return NextResponse.json(
           { error: "逆ジオコーディングに失敗しました" },
