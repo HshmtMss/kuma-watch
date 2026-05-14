@@ -58,8 +58,10 @@ drafts/
 # 中身は Notion or 別の private repo で管理する。
 docs/
 
-# クマ対策製品の自動抽出 (discover:products) の作業ファイル。
+# クマ対策製品の自動抽出 (search:products / discover:products) の作業ファイル。
 # - staging.csv は人間レビュー前の下書き、揮発的なので追跡しない
 # - discovery-queue.txt は次に処理したい URL リストで個人作業領域
+# - discovery-queries.txt は検索 query の素材で個人作業領域
 data/products-staging.csv
 data/discovery-queue.txt
+data/discovery-queries.txt

@@ -15,7 +15,8 @@
     "import:research": "tsx scripts/import-research.ts",
     "build:products": "tsx scripts/build-products.ts",
     "extract:product": "tsx --env-file-if-exists=.env.local scripts/extract-product.ts",
-    "discover:products": "tsx --env-file-if-exists=.env.local scripts/discover-products.ts"
+    "discover:products": "tsx --env-file-if-exists=.env.local scripts/discover-products.ts",
+    "search:products": "tsx --env-file-if-exists=.env.local scripts/search-products.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.73",
