@@ -482,6 +482,19 @@ export default function KumaClient() {
     if (typeof window === "undefined") return;
     if (!navigator.geolocation) return;
     autoGpsRanRef.current = true;
+    // URL に lat/lon が乗っていれば、観光地ページ等から「地図で見る」遷移してきた
+    // ケース。GPS 解決のタイミングで selectedLocation を ref 経由で確認しているが、
+    // React の再レンダ前に getCurrentPosition のキャッシュ結果が返ると ref がまだ
+    // null で観光地座標が現在地に上書きされてしまう。URL 段階で抑制すれば確実。
+    // currentLocation (青丸) も用途的に観光地遷移時には不要なので一括スキップ。
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const hasLat = params.get("lat");
+      const hasLon = params.get("lon");
+      if (hasLat !== null && hasLon !== null) return;
+    } catch {
+      // URL アクセス不可は無視して既存挙動 (GPS 自動取得) に倒す
+    }
     let cancelled = false;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -712,24 +725,84 @@ export default function KumaClient() {
             直近24h
           </label>
 
-          {/* 警戒レベルヒートマップ ON/OFF */}
-          <label className="flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700">
-            <input
-              type="checkbox"
-              checked={showHeatmap}
-              onChange={(e) => setShowHeatmap(e.target.checked)}
-              className="h-4 w-4 accent-amber-600"
-            />
-            警戒レベル
-          </label>
-
-          {/* 凡例トグル */}
-          <button
-            onClick={() => setShowLegend((v) => !v)}
-            className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 font-medium text-gray-700"
-          >
-            凡例 {showLegend ? "▲" : "▼"}
-          </button>
+          {/* 表示設定メニュー: 警戒レベル / 凡例 / 地図種類 を集約。
+              スマホで個別ボタンが横にあふれて出没ピン期間設定が見切れる問題を
+              構造的に解決するため、3 つを 1 つの popover にまとめている。 */}
+          <details className="group relative shrink-0">
+            <summary
+              className="flex cursor-pointer items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 font-medium text-stone-700 marker:hidden [&::-webkit-details-marker]:hidden"
+              aria-label="表示設定を開く"
+              title="表示設定"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+              <span className="hidden sm:inline">表示</span>
+              <span aria-hidden className="text-[10px] text-stone-400 group-open:rotate-180">
+                ▼
+              </span>
+            </summary>
+            {/* popover 本体: 右端揃え、絶対配置 */}
+            <div className="absolute right-0 top-full z-[1100] mt-1.5 w-60 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
+              <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
+                <input
+                  type="checkbox"
+                  checked={showHeatmap}
+                  onChange={(e) => setShowHeatmap(e.target.checked)}
+                  className="h-4 w-4 accent-amber-600"
+                />
+                警戒レベル（ヒートマップ）
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
+                <input
+                  type="checkbox"
+                  checked={showLegend}
+                  onChange={(e) => setShowLegend(e.target.checked)}
+                  className="h-4 w-4 accent-amber-600"
+                />
+                凡例を表示
+              </label>
+              <div className="mt-2 border-t border-stone-100 pt-2">
+                <div className="mb-1.5 px-1.5 text-xs font-medium text-stone-500">
+                  地図の種類
+                </div>
+                <div className="flex gap-1">
+                  {(
+                    [
+                      { v: "standard", label: "標準" },
+                      { v: "satellite", label: "衛星" },
+                      { v: "topo", label: "地形" },
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.v}
+                      type="button"
+                      onClick={() => setTileStyle(opt.v as TileStyle)}
+                      className={`flex-1 rounded-md px-2 py-1.5 text-xs font-semibold ${
+                        tileStyle === opt.v
+                          ? "bg-amber-100 text-amber-900"
+                          : "bg-stone-50 text-stone-700 hover:bg-stone-100"
+                      }`}
+                      aria-pressed={tileStyle === opt.v}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
 
@@ -842,57 +915,9 @@ export default function KumaClient() {
           lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
         />
 
-        {/* 右端縦スタック: 地図スタイル / 現在地 / ズーム (カード上端に合わせて配置) */}
+        {/* 右端縦スタック: 現在地 / ズーム (カード上端に合わせて配置)。
+            地図スタイル切替はツールバーの「表示」メニューに集約済み。 */}
         <div className="absolute right-3 bottom-[calc(41vh+0.75rem)] z-[900] flex flex-col gap-2.5">
-          {/* 地図スタイル切替: 単一ボタン (レイヤーアイコン)。クリックで 3 オプションを横展開。
-              縦スタックで 3 ボタン並べるのは縦領域を取りすぎるので popover 方式に。 */}
-          <details className="group relative">
-            <summary
-              className="flex cursor-pointer list-none items-center justify-center rounded-full bg-white text-gray-700 shadow-lg hover:bg-gray-50 [&::-webkit-details-marker]:hidden"
-              style={{ height: "3.25rem", width: "3.25rem" }}
-              aria-label="地図スタイルを切替"
-              title="地図スタイル"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                <polyline points="2 17 12 22 22 17" />
-                <polyline points="2 12 12 17 22 12" />
-              </svg>
-            </summary>
-            <div className="absolute right-full top-0 mr-2 flex items-center gap-1 rounded-full bg-white p-1 shadow-lg">
-              {(
-                [
-                  { v: "standard", label: "標準" },
-                  { v: "satellite", label: "衛星" },
-                  { v: "topo", label: "地形" },
-                ] as const
-              ).map((opt) => (
-                <button
-                  key={opt.v}
-                  type="button"
-                  onClick={() => setTileStyle(opt.v as TileStyle)}
-                  className={`rounded-full px-3 py-2 text-xs font-semibold ${
-                    tileStyle === opt.v
-                      ? "bg-amber-100 text-amber-900"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                  aria-pressed={tileStyle === opt.v}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </details>
           <button
             type="button"
             onClick={requestCurrentLocation}

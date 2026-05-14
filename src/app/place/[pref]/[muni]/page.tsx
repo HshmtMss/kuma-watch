@@ -441,14 +441,9 @@ export default async function MuniPage({ params }: Props) {
           >
             🗺️ 地図で詳細を見る →
           </Link>
-          <a
-            href={`https://www.google.com/search?q=${encodeURIComponent(`${pref} ${muni} クマ 出没 site:lg.jp`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
-          >
-            {muni} 公式情報を検索 ↗
-          </a>
+          {/* 「{muni} 公式情報を検索」ボタンは site:lg.jp の Google 検索結果が
+              実用的なヒットに繋がらないケースが多かったので削除。今後は
+              自治体公式マップを直接リンクする方向で見直す。 */}
         </div>
       </div>
 
@@ -939,16 +934,24 @@ export default async function MuniPage({ params }: Props) {
               </li>
             ))}
           </ul>
-          <p className="not-prose mt-3 text-xs text-gray-500">
-            <Link
-              href={`/place/${encodeURIComponent(pref)}`}
-              className="underline hover:text-gray-900"
-            >
-              {pref} の市町村一覧をすべて見る →
-            </Link>
-          </p>
         </>
       )}
+
+      {/* 戻り導線 — 市町村ページの末尾で「県のページに戻る」を必ず提供。
+          パンくずより目立つピル状ボタンで一貫した「戻る」体験を担保。 */}
+      <div className="not-prose mt-8">
+        <Link
+          href={`/place/${encodeURIComponent(pref)}`}
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          {pref} のページに戻る
+        </Link>
+      </div>
+
+      {/* sticky CTA がスクロール末尾で本文を覆わないようスペーサーを置く。
+          /spot/[slug] と同じ h-20 でフッター/本文との重なりを回避。 */}
+      <div className="not-prose h-20 sm:hidden" aria-hidden />
 
       {/* モバイル限定の sticky CTA。スクロールしても常に「地図を開く」が
           指の届く位置に出る。md 以上ではヒーローカード内のボタンで十分。 */}

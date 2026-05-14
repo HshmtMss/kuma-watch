@@ -474,6 +474,18 @@ export default async function SpotPage({ params }: Props) {
         </>
       )}
 
+      {/* 戻り導線 — ユーザーが「観光地一覧に戻る」を見失わないよう、
+          目立つピル状リンクで本文末尾に明示。 */}
+      <div className="not-prose mt-8">
+        <Link
+          href="/spot"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          観光地一覧に戻る
+        </Link>
+      </div>
+
       {/* スティッキー CTA — フッターと被らないように本文末尾にスペーサーを置く。 */}
       <div className="not-prose h-20 sm:hidden" aria-hidden />
       <Link

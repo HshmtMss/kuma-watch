@@ -224,11 +224,17 @@ export default function ArticleShell({ meta, children }: Props) {
         ))}
       </ul>
 
-      <p className="not-prose mt-6 text-xs text-gray-500">
-        <Link href="/articles" className="hover:text-gray-900 underline">
-          すべての記事を見る →
+      {/* 戻り導線 — 記事末尾で「記事一覧に戻る」を見失わないよう、
+          パンくずの小文字リンクとは別に目立つピル状ボタンを置く。 */}
+      <div className="not-prose mt-6">
+        <Link
+          href="/articles"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          記事一覧に戻る
         </Link>
-      </p>
+      </div>
 
       {meta.tags.length > 0 && (
         <>
