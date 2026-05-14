@@ -10,13 +10,13 @@ const SITE_URL = "https://kuma-watch.jp";
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: "都道府県から探す｜KumaWatch 全国クマ出没マップ",
+  title: "都道府県から探す｜獣医師監修クマ出没マップ｜KumaWatch",
   description:
-    "47 都道府県のクマ出没情報を地域別に整理。北海道・東北・関東・中部・近畿・中国・四国・九州の各都道府県ページから、最新の出没件数・市町村別の警戒レベルを確認できます。",
+    "獣医師監修・獣医工学ラボ運営。全国 47 都道府県のクマ出没情報を地域別に整理。北海道・東北・関東・中部・近畿・中国・四国・九州の各都道府県ページから、最新の出没件数・市町村別の警戒レベルを確認できます。",
   alternates: { canonical: `${SITE_URL}/place` },
   openGraph: {
-    title: "都道府県から探す｜KumaWatch",
-    description: "47 都道府県のクマ出没情報を地域別に整理。",
+    title: "都道府県から探す｜獣医師監修クマ出没マップ｜KumaWatch",
+    description: "獣医師監修・獣医工学ラボ運営。47 都道府県のクマ出没情報を地域別に整理。",
     url: `${SITE_URL}/place`,
     type: "website",
   },

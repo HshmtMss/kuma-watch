@@ -6,10 +6,12 @@ import WebVitalsReporter from "@/components/WebVitalsReporter";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
+// SITE_TITLE: 検索結果で truncation されても「獣医師監修」が必ず見えるよう前段に配置。
+// Google モバイル検索のタイトル表示は ~32〜35 文字なので、ここで切れても訴求が成立する設計。
 const SITE_TITLE =
-  "KumaWatch（くまウォッチ）｜全国クマ警戒レベルマップ｜登山・キャンプの安全確認";
+  "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch（くまウォッチ）";
 const SITE_DESCRIPTION =
-  "KumaWatch（くまウォッチ）は全国のクマ出没情報をリアルタイムで可視化し、5kmメッシュ単位で警戒レベルを予報する無料の Web アプリです。ツキノワグマ・ヒグマの出没情報、気象・時間帯を踏まえた予報、現在地の警戒レベル確認を提供します。登山・キャンプ・ハイキング・山菜採り・きのこ狩り・渓流釣りの前の安全確認にご活用ください。";
+  "獣医師監修・獣医工学ラボ運営の無料 Web アプリ。全国のクマ出没情報をリアルタイム可視化し、5km メッシュ単位で警戒レベルを予報。ツキノワグマ・ヒグマ対応。登山・キャンプ・通勤・山菜採りの前の安全確認に。";
 const GA_ID = "G-GCT59LNNZ2";
 
 const geistSans = Geist({
@@ -98,9 +100,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "KumaWatch（くまウォッチ）｜全国クマ出没予報",
+    title: "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch",
     description:
-      "全国のクマ出没情報をリアルタイム可視化。5kmメッシュの警戒レベル予報で登山・キャンプの安全確認に。",
+      "獣医師監修・獣医工学ラボ運営。全国のクマ出没情報をリアルタイム可視化。5km メッシュで警戒レベル予報。登山・キャンプ・通勤前の安全確認に。",
     images: ["/icons/Icon-512.png"],
   },
   icons: {
@@ -134,19 +136,40 @@ const webAppSchema = {
   operatingSystem: "Web Browser",
   url: SITE_URL + "/",
   offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
+  // 検索結果リッチカード・ナレッジパネルで「獣医師監修・獣医工学ラボ」が
+  // 一次的に出るよう、author / creator / publisher を明示。
   author: {
     "@type": "Organization",
-    name: "リサーチコーディネート株式会社",
-    url: "https://www.research-coordinate.co.jp",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "西新宿1-20-3 西新宿高木ビル8F",
-      addressLocality: "新宿区",
-      addressRegion: "東京都",
-      postalCode: "160-0023",
-      addressCountry: "JP",
+    name: "獣医工学ラボ",
+    alternateName: "Veterinary Engineering Lab",
+    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    parentOrganization: {
+      "@type": "Organization",
+      name: "リサーチコーディネート株式会社",
+      url: "https://www.research-coordinate.co.jp",
+      foundingDate: "2018",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "西新宿1-20-3 西新宿高木ビル8F",
+        addressLocality: "新宿区",
+        addressRegion: "東京都",
+        postalCode: "160-0023",
+        addressCountry: "JP",
+      },
+      email: "contact@research-coordinate.co.jp",
     },
-    email: "contact@research-coordinate.co.jp",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "獣医工学ラボ",
+    url: "https://www.research-coordinate.co.jp/labs/vet/",
+  },
+  // 監修主体を明示。Google は creator / contributor を補助シグナルとして使う。
+  creator: {
+    "@type": "Organization",
+    name: "獣医工学ラボ",
+    description:
+      "獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト。2021 年よりクマ検知 AI の開発などクマ対策プロジェクトを推進。",
   },
   inLanguage: "ja",
   isAccessibleForFree: true,
