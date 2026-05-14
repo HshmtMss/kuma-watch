@@ -42,15 +42,35 @@ export type GeocodeHit = {
   kind?: string;
 };
 
+// 都道府県名らしい文字列か（"東京都" "大阪府" "北海道" "長野県" 等）。
+// Nominatim は 23 区外の東京都・山間部などで addr.state を返さず addr.city に
+// 都道府県名そのものを入れてくる挙動があり、その検出に使う。
+function looksLikePrefecture(s: string | undefined): boolean {
+  return Boolean(s && /[都府県道]$/.test(s));
+}
+
 function toHit(r: NominatimSearchResult): GeocodeHit {
   const addr = r.address ?? {};
+  // 1) prefecture: state/region 優先。なくても addr.city が都道府県名なら
+  //    その値を prefecture として採用する（東京都奥多摩町等の救済）。
+  let prefecture = addr.state ?? addr.region;
+  if (!prefecture && looksLikePrefecture(addr.city)) {
+    prefecture = addr.city;
+  }
+  // 2) city: city / town / village / county の中から、
+  //    prefecture と等しいもの・都道府県名と疑われるものを除外して最初に見つかった値。
+  //    これにより「東京都 東京都」のような二重表示を構造的に防止する。
+  const cityCandidates = [addr.city, addr.town, addr.village, addr.county];
+  const city = cityCandidates.find(
+    (c) => c && c !== prefecture && !looksLikePrefecture(c),
+  );
   return {
     id: r.place_id,
     lat: Number(r.lat),
     lon: Number(r.lon),
     displayName: r.display_name,
-    prefecture: addr.state ?? addr.region,
-    city: addr.city ?? addr.town ?? addr.village ?? addr.county,
+    prefecture,
+    city,
     kind: r.type ?? r.class,
   };
 }
