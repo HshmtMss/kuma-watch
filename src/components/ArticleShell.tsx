@@ -5,6 +5,7 @@ import ArticlePrevNext from "@/components/ArticlePrevNext";
 import ArticleProgressBar from "@/components/ArticleProgressBar";
 import ArticleShare from "@/components/ArticleShare";
 import PageShell from "@/components/PageShell";
+import RelatedProducts from "@/components/RelatedProducts";
 import {
   getCategory,
   getReadingTime,
@@ -184,6 +185,8 @@ export default function ArticleShell({ meta, children }: Props) {
       </p>
 
       {children}
+
+      <RelatedProducts slug={meta.slug} />
 
       <ArticlePrevNext current={meta} />
 

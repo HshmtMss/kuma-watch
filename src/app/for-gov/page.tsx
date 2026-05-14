@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import ProductCard from "@/components/ProductCard";
+import { getProductsForPath } from "@/lib/products";
 
 const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
@@ -102,6 +104,8 @@ const FAQ = [
 ];
 
 export default function ForGovPage() {
+  const govProducts = getProductsForPath("/for-gov");
+
   return (
     <PageShell
       title="自治体の方へ"
@@ -227,6 +231,32 @@ export default function ForGovPage() {
           </div>
         ))}
       </div>
+
+      {/* 自治体向け対策ソリューション (KumaWatch と組み合わせる現場側の装備) */}
+      {govProducts.length > 0 && (
+        <>
+          <h2 id="solutions">現場で使われる検知・撃退ソリューション</h2>
+          <p>
+            出没情報の配信は KumaWatch が、現場での検知・撃退は各社の専門ソリューションが担う ── という補完関係になります。自治体さまの参考になるよう、導入実績のある AI 検知・撃退装置を整理しました。
+          </p>
+          <ul className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {govProducts.map((p) => (
+              <li key={p.id} className="h-full">
+                <ProductCard product={p} />
+              </li>
+            ))}
+          </ul>
+          <p className="not-prose mt-2 text-xs text-stone-500">
+            電気柵・防護具・コンサル等の自治体さま向け製品・サービスは{" "}
+            <Link
+              href="/products?for=gov"
+              className="font-medium text-amber-700 hover:underline"
+            >
+              対策製品一覧（自治体向け）→
+            </Link>
+          </p>
+        </>
+      )}
 
       {/* FAQ */}
       <h2 id="faq">よくあるご質問</h2>
