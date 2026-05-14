@@ -53,6 +53,7 @@ type Product = {
   source: string;
   notes: string;
   audience: string;
+  affiliateUrl: string;
 };
 
 function clean(v: string | undefined): string {
@@ -132,6 +133,7 @@ for (let i = 0; i < parsed.data.length; i++) {
     source: clean(row.source),
     notes: clean(row.notes),
     audience,
+    affiliateUrl: clean(row.affiliate_url),
   });
 }
 

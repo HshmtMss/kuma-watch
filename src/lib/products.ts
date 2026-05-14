@@ -19,6 +19,9 @@ export type Product = {
   source: string;
   notes: string;
   audience: ProductAudience;
+  /** アフィリエイトトラッキング付き URL。空ならアフィリエイト未提携で url に直接遷移。
+   *  この列に値が入った時点で、ProductCard 側で PR 表記と rel="sponsored" が自動的に有効化される。 */
+  affiliateUrl: string;
 };
 
 // 表示時のカテゴリ順序。撃退・物理防御 → 住宅・装備 → 監視・捕獲・情報 の流れで、

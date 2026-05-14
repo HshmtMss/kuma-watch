@@ -8,13 +8,30 @@ function isExternal(url: string): boolean {
 
 export default function ProductCard({ product }: Props) {
   const p = product;
-  const ext = isExternal(p.url);
+  // affiliateUrl が入っていれば優先。空なら通常 URL に直接遷移し PR 表記も出さない。
+  // この分岐ロジックがあることで、契約後は CSV の affiliate_url 列を埋めるだけで
+  // PR バッジ + sponsored リンクが自動的に有効化される。
+  const isAffiliate = Boolean(p.affiliateUrl);
+  const linkHref = isAffiliate ? p.affiliateUrl : p.url;
+  const ext = isExternal(linkHref);
+
   return (
     <article className="flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <header className="mb-2">
-        <h3 className="text-sm font-bold leading-snug text-stone-900 sm:text-base">
-          {p.name}
-        </h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-sm font-bold leading-snug text-stone-900 sm:text-base">
+            {p.name}
+          </h3>
+          {isAffiliate && (
+            <span
+              className="shrink-0 rounded-sm bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-stone-600"
+              aria-label="広告（アフィリエイトリンク）"
+              title="広告（アフィリエイトリンク）"
+            >
+              PR
+            </span>
+          )}
+        </div>
         {p.vendor && (
           <p className="mt-0.5 text-xs text-stone-500">{p.vendor}</p>
         )}
@@ -45,11 +62,17 @@ export default function ProductCard({ product }: Props) {
         )}
       </dl>
 
-      {p.url && (
+      {linkHref && (
         <a
-          href={p.url}
+          href={linkHref}
           target={ext ? "_blank" : undefined}
-          rel={ext ? "noopener noreferrer" : undefined}
+          rel={
+            ext
+              ? isAffiliate
+                ? "sponsored noopener noreferrer"
+                : "noopener noreferrer"
+              : undefined
+          }
           className="mt-3 inline-flex items-center justify-center gap-1 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-100"
         >
           詳細を見る

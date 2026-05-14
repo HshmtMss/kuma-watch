@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-14T07:06:40.443Z",
+  "generatedAt": "2026-05-14T08:35:17.424Z",
   "total": 105,
   "visibleTotal": 89,
   "products": [
@@ -19,7 +19,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "モンベル取扱で認知高",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-002",
@@ -37,7 +38,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "北海道向け推奨／URL修正済",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-003",
@@ -55,7 +57,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "日本の研究者・自治体採用率トップ",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-004",
@@ -73,7 +76,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-005",
@@ -91,7 +95,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "コスパに優れる",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-006",
@@ -109,7 +114,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "国産唯一の本格スプレー／情報修正済",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-007",
@@ -127,7 +133,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "記事内で注意喚起すべき",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-008",
@@ -145,7 +152,8 @@
       "priority": "中",
       "source": "添付",
       "notes": "研修・教育コンテンツに最適／URL修正済",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-009",
@@ -163,7 +171,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "スプレーとセット販売推奨",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-010",
@@ -181,7 +190,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "消音機能つきの定番",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-011",
@@ -199,7 +209,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "大音量モデル",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-012",
@@ -217,7 +228,8 @@
       "priority": "中",
       "source": "両方",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-013",
@@ -235,7 +247,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-014",
@@ -253,7 +266,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-015",
@@ -271,7 +285,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "軽量・遭難対策兼用",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-016",
@@ -289,7 +304,8 @@
       "priority": "中",
       "source": "添付",
       "notes": "エントリーモデル",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-017",
@@ -307,7 +323,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "スプレー+ホーンのセット推奨",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-018",
@@ -325,7 +342,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-019",
@@ -343,7 +361,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-020",
@@ -361,7 +380,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "国産で実績データあり",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-021",
@@ -379,7 +399,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-022",
@@ -397,7 +418,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-023",
@@ -415,7 +437,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "長期持続型シートとして手軽",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "repel-024",
@@ -433,7 +456,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "銃刀法非該当の数少ない熊対策武器。新規カテゴリ",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-001",
@@ -451,7 +475,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "自治体提携の第一候補",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-002",
@@ -469,7 +494,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "NTT系で信頼性高",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-003",
@@ -487,7 +513,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "URL正規化済",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-004",
@@ -505,7 +532,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-005",
@@ -523,7 +551,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "中小自治体向けエントリー",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-006",
@@ -541,7 +570,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "API連携可で技術的に親和性高",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-007",
@@ -559,7 +589,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "既存カメラ流用可",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-008",
@@ -577,7 +608,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-009",
@@ -595,7 +627,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "FASTBEARとセット運用前提",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-012",
@@ -613,7 +646,8 @@
       "priority": "中",
       "source": "添付",
       "notes": "国内メーカー",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-013",
@@ -631,7 +665,8 @@
       "priority": "中",
       "source": "両方",
       "notes": "4G通信モデル",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-014",
@@ -649,7 +684,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-015",
@@ -667,7 +703,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "定番モデル",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-016",
@@ -685,7 +722,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-017",
@@ -703,7 +741,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "国産代表撃退装置、メーカー提携候補",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-018",
@@ -721,7 +760,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "個人ユーザー向け連携優先度高",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-019",
@@ -739,7 +779,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-020",
@@ -757,7 +798,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-021",
@@ -775,7 +817,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "NTT系の最先端技術。クマ対応は今後",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "monitor-022",
@@ -793,7 +836,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "東北発スタートアップ。秋田に強み",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-001",
@@ -811,7 +855,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "クマ専用設計の決定版",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-002",
@@ -829,7 +874,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "電気柵記事から直接リンク可",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-003",
@@ -847,7 +893,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-004",
@@ -865,7 +912,8 @@
       "priority": "高",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-005",
@@ -883,7 +931,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-006",
@@ -901,7 +950,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-007",
@@ -919,7 +969,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "北海道向けで権威性高",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-008",
@@ -937,7 +988,8 @@
       "priority": "中",
       "source": "添付",
       "notes": "電気柵と併用推奨",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-009",
@@ -955,7 +1007,8 @@
       "priority": "高",
       "source": "両方",
       "notes": "フードコンテナ記事から直接リンク",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-010",
@@ -973,7 +1026,8 @@
       "priority": "中",
       "source": "両方",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-011",
@@ -991,7 +1045,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-012",
@@ -1009,7 +1064,8 @@
       "priority": "中",
       "source": "両方",
       "notes": "軽量装備向け",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-013",
@@ -1027,7 +1083,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "匂い管理の基本装備",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "fence-014",
@@ -1045,7 +1102,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "自治体パートナーシップの会話起点",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "home-001",
@@ -1063,7 +1121,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "住宅周辺の基本装備",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "home-002",
@@ -1081,7 +1140,8 @@
       "priority": "中",
       "source": "添付",
       "notes": "電池式で設置容易",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "home-003",
@@ -1099,7 +1159,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "誘引物管理の必需品",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "home-004",
@@ -1117,7 +1178,8 @@
       "priority": "高",
       "source": "添付",
       "notes": "地域コミュニティ向け",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-001",
@@ -1135,7 +1197,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-002",
@@ -1153,7 +1216,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-003",
@@ -1171,7 +1235,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-004",
@@ -1189,7 +1254,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-005",
@@ -1207,7 +1273,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-006",
@@ -1225,7 +1292,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-007",
@@ -1243,7 +1311,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "法的論点として記事に反映済み",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-008",
@@ -1261,7 +1330,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "2025年9月制度改正反映",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-009",
@@ -1279,7 +1349,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "capture-010",
@@ -1297,7 +1368,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "自治体導入後押し材料",
-      "audience": "自治体"
+      "audience": "自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-001",
@@ -1315,7 +1387,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-002",
@@ -1333,7 +1406,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-003",
@@ -1351,7 +1425,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-004",
@@ -1369,7 +1444,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-005",
@@ -1387,7 +1463,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-006",
@@ -1405,7 +1482,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "単独行のリスク管理",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "gear-007",
@@ -1423,7 +1501,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人"
+      "audience": "個人",
+      "affiliateUrl": ""
     },
     {
       "id": "info-001",
@@ -1441,7 +1520,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "北海道の権威。コンテンツ協業候補",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-002",
@@ -1459,7 +1539,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "研究監修・専門家紹介の経路",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-003",
@@ -1477,7 +1558,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "駆除議論記事で言及候補",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-004",
@@ -1495,7 +1577,8 @@
       "priority": "低",
       "source": "初回調査",
       "notes": "",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-005",
@@ -1513,7 +1596,8 @@
       "priority": "中",
       "source": "両方",
       "notes": "一次データソース",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-007",
@@ -1531,7 +1615,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "監修・取材依頼候補",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-008",
@@ -1549,7 +1634,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "北海道のヒグマ研究で連携候補",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-009",
@@ -1567,7 +1653,8 @@
       "priority": "中",
       "source": "初回調査",
       "notes": "テック寄り監修・データ協業候補",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-010",
@@ -1585,7 +1672,8 @@
       "priority": "—",
       "source": "初回調査",
       "notes": "統計データソース",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     },
     {
       "id": "info-011",
@@ -1603,7 +1691,8 @@
       "priority": "—",
       "source": "初回調査",
       "notes": "事件解説記事の参考文献",
-      "audience": "個人,自治体"
+      "audience": "個人,自治体",
+      "affiliateUrl": ""
     }
   ]
 }
