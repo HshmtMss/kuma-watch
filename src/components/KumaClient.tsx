@@ -650,7 +650,7 @@ export default function KumaClient() {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden text-xs text-stone-500 hover:text-stone-700 sm:inline"
+            className="whitespace-nowrap text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}
