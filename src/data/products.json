@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-14T09:29:25.374Z",
+  "generatedAt": "2026-05-14T22:53:03.784Z",
   "total": 105,
   "visibleTotal": 90,
   "products": [
@@ -1624,7 +1624,7 @@
       "subcategory": "専門家",
       "name": "東京農業大学 山﨑晃司教授",
       "vendor": "東京農業大学",
-      "url": "https://www.nodai.ac.jp/",
+      "url": "https://researchmap.jp/7000020673",
       "price": "—",
       "purpose": "クマ研究第一人者",
       "features": "クマ研究第一人者、各種講演・監修",
@@ -1643,7 +1643,7 @@
       "subcategory": "専門家",
       "name": "酪農学園大学 佐藤喜和教授",
       "vendor": "酪農学園大学",
-      "url": "https://www.rakuno.ac.jp/",
+      "url": "https://www.rakuno.ac.jp/archives/teacher/9384.html",
       "price": "—",
       "purpose": "ヒグマ研究第一人者",
       "features": "熊一目散の共同開発、ヒグマ研究の第一人者、各種講演・監修",
@@ -1662,7 +1662,7 @@
       "subcategory": "専門家",
       "name": "上智大学 深澤佑介准教授",
       "vendor": "上智大学",
-      "url": "https://www.sophia.ac.jp/",
+      "url": "https://ds.sophia.ac.jp/faculty/yusuke-fukazawa",
       "price": "—",
       "purpose": "AIクマ遭遇予測研究",
       "features": "元NTTドコモ。クマ遭遇AI予測マップ開発者、機械学習×時空間データ解析の専門家",

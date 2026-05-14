@@ -15,12 +15,12 @@ const SITE_URL = "https://kuma-watch.jp";
 export const metadata: Metadata = {
   title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ｜KumaWatch",
   description:
-    "獣医師監修・獣医工学ラボ運営。全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、政策提言、自治体・専門家向けの公開知見。日次・月次レポートを地域別・日付別に整理して公開。",
+    "獣医師監修・獣医工学ラボ運営。全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、自治体・専門家向けの公開知見。日次・月次レポートを地域別・日付別に整理して公開。",
   alternates: { canonical: `${SITE_URL}/research` },
   openGraph: {
     title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ",
     description:
-      "全国のクマ出没事案の時空間分析・アーバン・ベア研究・政策提言を、獣医師監修で公開。",
+      "全国のクマ出没事案の時空間分析・アーバン・ベア研究を、獣医師監修で公開。",
     url: `${SITE_URL}/research`,
     type: "website",
   },
@@ -65,19 +65,29 @@ export default function ResearchIndexPage() {
   return (
     <PageShell
       title="研究・知見"
-      lead="獣医工学ラボが公開する、クマ出没事案の分析・テーマ解説・政策提言。自治体・研究機関・専門家の皆様向けの情報です。"
+      lead="獣医工学ラボが公開する、クマ出没事案の分析・テーマ解説。自治体・研究機関・専門家の皆様向けの情報です。"
     >
       <div className="not-prose mb-8 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-        {/* ブランドストリップ: 純白で JPEG ロゴの白背景とシームレスに繋ぐ */}
+        {/* ブランドストリップ: ロゴと会社名をそれぞれ外部リンク化。
+            ブランド情報がここに集約されているので、下のボディからは
+            「獣医工学ラボはリサーチコーディネート…」の重複説明文を削除している。 */}
         <div className="flex flex-col items-center gap-4 px-6 pb-5 pt-6 sm:flex-row sm:items-center sm:gap-7 sm:px-8 sm:py-7">
-          <Image
-            src="/labs/vet-eng-lab.jpeg"
-            alt="獣医工学ラボ ロゴ"
-            width={480}
-            height={267}
-            className="h-auto w-44 shrink-0 sm:w-52"
-            priority
-          />
+          <a
+            href="https://www.research-coordinate.co.jp/labs/vet/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0"
+            aria-label="獣医工学ラボ (新しいタブで開く)"
+          >
+            <Image
+              src="/labs/vet-eng-lab.jpeg"
+              alt="獣医工学ラボ ロゴ"
+              width={480}
+              height={267}
+              className="h-auto w-44 sm:w-52"
+              priority
+            />
+          </a>
           <div className="text-center sm:border-l sm:border-stone-200 sm:pl-7 sm:text-left">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
               運営
@@ -88,34 +98,21 @@ export default function ResearchIndexPage() {
               技術プロジェクト
             </div>
             <div className="mt-2 text-xs text-stone-500">
-              リサーチコーディネート株式会社
+              <a
+                href="https://www.research-coordinate.co.jp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-stone-700"
+              >
+                リサーチコーディネート株式会社
+              </a>
             </div>
           </div>
         </div>
         {/* 説明ボディ: 区切り線 + 薄トーンで本文と分離 */}
         <div className="border-t border-stone-100 bg-stone-50 px-6 py-5 text-sm leading-relaxed text-stone-700 sm:px-8">
           <p className="m-0">
-            <a
-              href="https://www.research-coordinate.co.jp/labs/vet/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-700 underline"
-            >
-              獣医工学ラボ
-            </a>
-            は、
-            <a
-              href="https://www.research-coordinate.co.jp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-700 underline"
-            >
-              リサーチコーディネート株式会社
-            </a>
-            が運営する、獣医療・野生動物・公衆衛生領域の技術プロジェクトです。
-          </p>
-          <p className="mt-3">
-            リサーチコーディネート株式会社は<strong>2017年に獣医学的研究支援事業として創業</strong>し、<strong>2018年に法人化</strong>。大学・研究機関向けの研究支援を続けてきました。<strong>2021年からはクマ検知 AI の開発をはじめとするクマ対策プロジェクト</strong>にも着手しており、そこで蓄積した検知技術・行動分析の知見を、獣医工学ラボの活動として社会実装しています。
+            リサーチコーディネート株式会社は<strong>2017年に獣医学的研究支援事業として創業</strong>し、大学・研究機関向けの研究支援を続けてきました。<strong>2021年からはクマ検知 AI の開発をはじめとするクマ対策プロジェクト</strong>にも着手しており、そこで蓄積した検知技術・行動分析の知見を、獣医工学ラボの活動として社会実装しています。
           </p>
           <p className="mt-3">
             KumaWatch（くまウォッチ）はその社会実装の一つとして、全国のクマ出没情報を集約し可視化することで、人と野生動物の境界における事故リスクの低減に取り組んでいます。本ページでは、KumaWatch のデータ・運営知見をもとにした分析レポートや、自治体・専門家向けのテーマ解説を公開しています。データ連携や共同研究のご相談は
@@ -127,13 +124,13 @@ export default function ResearchIndexPage() {
         </div>
       </div>
 
-      {/* 地域から探す: 各都道府県のアーカイブへの導線。
+      {/* 地域から探す: 各都道府県の関連レポートへの導線。
           記事内で頻出している都道府県をチップで並べる。 */}
       {regions.length > 0 && (
         <>
           <h2>地域から探す</h2>
           <p className="text-sm text-stone-600">
-            各都道府県に関連するレポートをまとめたアーカイブページから探せます。
+            都道府県を選ぶと、その地域に関連するレポートを一覧できます。
           </p>
           <div className="not-prose mt-3 flex flex-wrap gap-2">
             {regions.map((r) => (
@@ -176,10 +173,12 @@ export default function ResearchIndexPage() {
         </>
       )}
 
-      {/* テーマ解説・政策提言。エントリが無ければセクション自体を表示しない。 */}
+      {/* テーマ解説。エントリが無ければセクション自体を表示しない。
+          内部的に topic/policy の両カテゴリを束ねるが、UI 上は「政策提言」の
+          語を出さず「テーマ解説」に統合表示する（読者にとって区別が薄いため）。 */}
       {topicPolicy.length > 0 && (
         <>
-          <h2>テーマ解説・政策提言</h2>
+          <h2>テーマ解説</h2>
           <ul className="not-prose space-y-4">
             {topicPolicy.map((e) => (
               <ResearchCard key={e.slug} entry={e} accent="blue" />
@@ -219,24 +218,25 @@ export default function ResearchIndexPage() {
                         href={`/research/${e.slug}`}
                         className="block px-4 py-3 hover:bg-emerald-50/40"
                       >
-                        <div className="flex items-center gap-2 text-xs text-stone-500">
-                          <span>{e.publishedAt}</span>
+                        {/* 日次レポートはタイトルがどれも同じ定型なので省略し、
+                            日付と自治体タグだけで識別できるようにする。 */}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                          <span className="text-sm font-semibold tabular-nums text-stone-900">
+                            {e.publishedAt}
+                          </span>
+                          {e.regions.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {e.regions.slice(0, 5).map((r) => (
+                                <span
+                                  key={r}
+                                  className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
+                                >
+                                  {r}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <div className="mt-1 text-sm font-semibold text-stone-900">
-                          {e.title}
-                        </div>
-                        {e.regions.length > 0 && (
-                          <div className="mt-1.5 flex flex-wrap gap-1">
-                            {e.regions.slice(0, 5).map((r) => (
-                              <span
-                                key={r}
-                                className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
-                              >
-                                {r}
-                              </span>
-                            ))}
-                          </div>
-                        )}
                       </Link>
                     </li>
                   ))}
@@ -250,42 +250,12 @@ export default function ResearchIndexPage() {
       <h2>編集方針</h2>
       <p>
         研究記事は、公開ニュースおよび自治体発表をもとにした情報集約・要約に、
-        AI（大規模言語モデル）を活用しています。最終的な内容は獣医工学ラボの獣医師が
+        大規模言語モデル（AI）を活用しています。最終的な内容は獣医工学ラボの獣医師が
         確認・編集の上で公開しており、編集責任は獣医工学ラボに帰属します。
       </p>
       <p>
-        事実関係の誤りや、より正確な一次出典をご存じの場合は、お手数ですが下記までご連絡ください。
+        事実関係の誤りや、より正確な一次出典をご存じの場合は、お手数ですがフッターの連絡先までご連絡ください。
       </p>
-
-      <h2>お問い合わせ</h2>
-      <div className="not-prose mt-2 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="text-sm text-gray-800">
-          <div className="mb-1 font-bold text-gray-900">獣医工学ラボ</div>
-          <div className="mb-3 text-xs text-gray-500">
-            運営: リサーチコーディネート株式会社
-          </div>
-          <div>
-            Email:{" "}
-            <a
-              href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事について"
-              className="font-semibold text-blue-700 underline"
-            >
-              contact@research-coordinate.co.jp
-            </a>
-          </div>
-          <div className="mt-1">
-            Web:{" "}
-            <a
-              href="https://www.research-coordinate.co.jp/labs/vet/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              research-coordinate.co.jp/labs/vet/
-            </a>
-          </div>
-        </div>
-      </div>
     </PageShell>
   );
 }
