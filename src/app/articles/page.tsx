@@ -14,10 +14,17 @@ import {
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "クマ対策・遭遇時の対処 記事一覧",
+  title: "クマ対策・遭遇時の対処 記事一覧｜獣医師監修｜KumaWatch",
   description:
-    "クマと遭遇したらどうするか、秋のクマ対策、クマよけスプレーの使い方、山菜採り・きのこ狩りの安全、ツキノワグマとヒグマの違いなど、登山・キャンプ・山仕事・通学路の安全に役立つ記事を、遭遇・装備・季節・生態・シーン・地域・背景の 7 カテゴリに整理して掲載しています。",
+    "獣医師監修・獣医工学ラボ運営。クマと遭遇したらどうするか、秋のクマ対策、クマよけスプレーの使い方、山菜採り・きのこ狩りの安全、ツキノワグマとヒグマの違いなど、登山・キャンプ・山仕事・通学路の安全に役立つ記事を、遭遇・装備・季節・生態・シーン・地域・背景の 7 カテゴリに整理。",
   alternates: { canonical: `${SITE_URL}/articles` },
+  openGraph: {
+    title: "クマ対策・遭遇時の対処 記事一覧｜獣医師監修",
+    description:
+      "獣医師監修・獣医工学ラボ運営。クマ対策の解説記事を 7 カテゴリで整理。登山・キャンプ・山仕事・通学路の安全に。",
+    url: `${SITE_URL}/articles`,
+    type: "website",
+  },
 };
 
 // ISR: 5 分ごとに記事一覧を再生成。新規記事や順序変更を CDN に短い遅延で反映する。
@@ -42,7 +49,7 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
           <div className="relative h-40 w-full shrink-0 sm:h-auto sm:w-48">
             <Image
               src={a.heroImage}
-              alt=""
+              alt={`${a.title} — クマ対策記事のヒーロー画像`}
               fill
               sizes="(min-width: 640px) 192px, 100vw"
               className="object-cover"

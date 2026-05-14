@@ -8,9 +8,9 @@ const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87&body=%E3%81%84%E3%81%A4%E3%82%82%E3%81%8A%E4%B8%96%E8%A9%B1%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%8A%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82%0D%0A%0D%0A%E2%96%A0%E8%87%AA%E6%B2%BB%E4%BD%93%E5%90%8D%EF%BC%9A%0D%0A%E2%96%A0%E3%81%94%E6%8B%85%E5%BD%93%E9%83%A8%E7%BD%B2%EF%BC%9A%0D%0A%E2%96%A0%E3%81%8A%E5%90%8D%E5%89%8D%EF%BC%9A%0D%0A%E2%96%A0%E3%81%94%E9%80%A3%E7%B5%A1%E5%85%88%EF%BC%88%E9%9B%BB%E8%A9%B1%E5%8F%88%E3%81%AF%E3%83%A1%E3%83%BC%E3%83%AB%EF%BC%89%EF%BC%9A%0D%0A%E2%96%A0%E3%81%94%E7%9B%B8%E8%AB%87%E5%86%85%E5%AE%B9%EF%BC%9A%0D%0A";
 
 export const metadata: Metadata = {
-  title: "自治体の方へ｜KumaWatch クマ出没情報の連携・配信",
+  title: "自治体の方へ｜獣医師監修クマ出没情報の連携・配信｜KumaWatch",
   description:
-    "自治体が公開しているクマ出没情報を KumaWatch が自動で取り込み、住民・観光客・登山者に届けます。新しい運用や追加負担はなく、連携費用も発生しません。70 以上の自治体・47 都道府県のデータを既に統合中。",
+    "獣医師監修・獣医工学ラボ運営。自治体が公開しているクマ出没情報を KumaWatch が自動で取り込み、住民・観光客・登山者に届けます。新しい運用や追加負担はなく、連携費用も発生しません。70 以上の自治体・47 都道府県のデータを既に統合中。",
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
     title: "自治体の方へ｜KumaWatch",

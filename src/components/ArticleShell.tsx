@@ -119,7 +119,7 @@ export default function ArticleShell({ meta, children }: Props) {
           <div className="relative aspect-[16/9] w-full overflow-hidden bg-stone-200 sm:rounded-2xl">
             <Image
               src={meta.heroImage}
-              alt=""
+              alt={`${meta.title} — 記事ヒーロー画像`}
               fill
               priority
               sizes="(min-width: 768px) 768px, 100vw"
@@ -201,7 +201,7 @@ export default function ArticleShell({ meta, children }: Props) {
                 <div className="relative h-auto w-24 shrink-0 sm:w-28">
                   <Image
                     src={r.heroImage}
-                    alt=""
+                    alt={`${r.title} — 関連記事サムネイル`}
                     fill
                     sizes="112px"
                     className="object-cover"

@@ -246,6 +246,39 @@ export default async function SpotPage({ params }: Props) {
     ],
   };
 
+  // 観光地・登山口の構造化データ。schema.org TouristAttraction は Google が
+  // 地名 + 「クマ 出没」系クエリに対するナレッジパネル候補として読みやすい。
+  // mountain カテゴリは Mountain type にすると Google でハイク系として優遇される傾向。
+  const placeType =
+    landmark.category === "mountain"
+      ? "Mountain"
+      : landmark.category === "lake"
+        ? "BodyOfWater"
+        : "TouristAttraction";
+  const placeSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": placeType,
+    name: landmark.name,
+    alternateName: landmark.altNames ?? [],
+    description: landmark.blurb,
+    url: `${SITE_URL}/spot/${encodeURIComponent(slug)}`,
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: landmark.lat,
+      longitude: landmark.lon,
+      addressCountry: "JP",
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "JP",
+      addressRegion: landmark.prefName,
+      addressLocality: landmark.muniName,
+    },
+    isAccessibleForFree: true,
+    publicAccess: true,
+  };
+  if (landmark.imageUrl) placeSchema.image = landmark.imageUrl;
+
   const dynamicLead =
     count90 > 0 && latestDate
       ? `${landmark.name}周辺 10 km で過去 90 日に ${count90} 件の出没（最新 ${formatDate(latestDate)}）。${SUPERVISION}・無料で警戒レベルを確認できます。`
@@ -258,6 +291,10 @@ export default async function SpotPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }}
       />
 
       {/* パンくず */}

@@ -78,7 +78,7 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
           <div className="relative h-40 w-full shrink-0 sm:h-auto sm:w-48">
             <Image
               src={a.heroImage}
-              alt=""
+              alt={`${a.title} — クマ対策記事のヒーロー画像`}
               fill
               sizes="(min-width: 640px) 192px, 100vw"
               className="object-cover"

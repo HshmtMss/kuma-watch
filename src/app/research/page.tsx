@@ -13,10 +13,17 @@ import {
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "研究・知見｜獣医工学ラボ",
+  title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ｜KumaWatch",
   description:
-    "獣医工学ラボによる、全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、政策提言、自治体・専門家向けの公開知見。日次・月次レポートを地域別・日付別に整理して公開。",
+    "獣医師監修・獣医工学ラボ運営。全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、政策提言、自治体・専門家向けの公開知見。日次・月次レポートを地域別・日付別に整理して公開。",
   alternates: { canonical: `${SITE_URL}/research` },
+  openGraph: {
+    title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ",
+    description:
+      "全国のクマ出没事案の時空間分析・アーバン・ベア研究・政策提言を、獣医師監修で公開。",
+    url: `${SITE_URL}/research`,
+    type: "website",
+  },
   robots: { index: true, follow: true },
 };
 

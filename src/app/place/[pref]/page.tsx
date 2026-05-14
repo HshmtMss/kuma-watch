@@ -8,6 +8,7 @@ import {
   getPrefSummary,
 } from "@/lib/place-index";
 import { buildPrefSeo } from "@/lib/place-seo";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 
 // 47 都道府県のみを許可。それ以外のパスは Next.js が即 404 を返す。
 // dynamicParams=true だと、未対応の文字列で叩かれた際に SSR が走って
@@ -177,6 +178,38 @@ export default async function PrefPage({ params }: Props) {
           </li>
         ))}
       </ul>
+
+      {/* 当該県にある観光地・登山口へのクロスリンク。SEO 観点で内部リンク強化と
+          ユーザー観点で「次に見たい情報」を提供する 2 役。 */}
+      {(() => {
+        const prefLandmarks = JAPAN_LANDMARKS.filter((l) => l.prefName === pref);
+        if (prefLandmarks.length === 0) return null;
+        return (
+          <>
+            <h2>{pref} の主要観光地・登山口</h2>
+            <p className="text-sm text-stone-600">
+              {pref} 内でクマ出没情報が公開されている主要な登山口・観光地。各ページで周辺 10km の出没傾向と季節別の注意点を確認できます。
+            </p>
+            <ul className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {prefLandmarks.map((l) => (
+                <li key={l.slug}>
+                  <Link
+                    href={`/spot/${encodeURIComponent(l.slug)}`}
+                    className="block rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm hover:border-amber-400 hover:bg-amber-50"
+                  >
+                    <div className="font-medium text-stone-900">{l.name}</div>
+                    {l.muniName && (
+                      <div className="text-[11px] text-stone-500">
+                        {l.muniName}
+                      </div>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        );
+      })()}
 
       <h2>使い方</h2>
       <p>
