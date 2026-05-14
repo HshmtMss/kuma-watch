@@ -25,9 +25,7 @@ export default function HeaderNav() {
         <Link href="/" className="hover:text-stone-900">地図</Link>
         <Link href="/place" className="hover:text-stone-900">都道府県</Link>
         <Link href="/spot" className="hover:text-stone-900">観光地</Link>
-        <Link href="/articles" className="hover:text-stone-900">クマ対策</Link>
-        <Link href="/products" className="hover:text-stone-900">対策製品</Link>
-        <Link href="/research" className="hover:text-stone-900">研究</Link>
+        <Link href="/measures" className="hover:text-stone-900">対策</Link>
         <Link href="/for-gov" className="hover:text-stone-900">自治体の方へ</Link>
       </nav>
 
@@ -79,9 +77,7 @@ export default function HeaderNav() {
                 { href: "/", label: "地図" },
                 { href: "/place", label: "都道府県" },
                 { href: "/spot", label: "観光地" },
-                { href: "/articles", label: "クマ対策" },
-                { href: "/products", label: "対策製品" },
-                { href: "/research", label: "研究" },
+                { href: "/measures", label: "対策" },
                 { href: "/for-gov", label: "自治体の方へ" },
               ].map((item) => (
                 <Link
