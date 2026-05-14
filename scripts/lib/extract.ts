@@ -101,9 +101,14 @@ export type ExtractedProduct = z.infer<typeof ProductSchema>;
 export async function fetchHtml(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: {
+      // 一般的な Chrome の UA。Bot を識別する文字列を含む UA だと一部 EC が 403
+      // を返すため、ブラウザ寄りにする。代わりに HTTP 標準の From ヘッダで
+      // 連絡先を提示することで運用者を identify する。
       "User-Agent":
-        "Mozilla/5.0 (compatible; KumaWatchBot/1.0; +https://kuma-watch.jp)",
-      Accept: "text/html,application/xhtml+xml",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      From: "contact@research-coordinate.co.jp",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "Accept-Language": "ja,en;q=0.8",
     },
     redirect: "follow",

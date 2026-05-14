@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-14T08:35:17.424Z",
+  "generatedAt": "2026-05-14T09:29:25.374Z",
   "total": 105,
-  "visibleTotal": 89,
+  "visibleTotal": 90,
   "products": [
     {
       "id": "repel-001",
@@ -1597,6 +1597,25 @@
       "source": "両方",
       "notes": "一次データソース",
       "audience": "個人,自治体",
+      "affiliateUrl": ""
+    },
+    {
+      "id": "info-006",
+      "category": "情報教育",
+      "subcategory": "コンサルティング",
+      "name": "株式会社野生動物保護管理事務所",
+      "vendor": "野生動物保護管理事務所",
+      "url": "https://wmo.co.jp/",
+      "price": "法人向け",
+      "purpose": "自治体向けコンサルティング",
+      "features": "自治体向け野生動物管理コンサルティング",
+      "targetUse": "自治体",
+      "caveats": "",
+      "relatedArticle": "https://kuma-watch.jp/for-gov",
+      "priority": "中",
+      "source": "初回調査",
+      "notes": "自治体向け事業の競合・パートナー候補",
+      "audience": "自治体",
       "affiliateUrl": ""
     },
     {
