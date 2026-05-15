@@ -19,7 +19,7 @@ export default function ProductCard({ product }: Props) {
     <article className="flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
       <header className="mb-2">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-bold leading-snug text-stone-900 sm:text-base">
+          <h3 className="text-base font-bold leading-snug text-amber-700 sm:text-lg">
             {p.name}
           </h3>
           {isAffiliate && (

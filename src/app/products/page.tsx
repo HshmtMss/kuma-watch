@@ -47,7 +47,7 @@ export default async function ProductsPage({
   return (
     <PageShell
       title="クマ対策の製品・サービス"
-      lead="KumaWatch がまず最初のクマ出没情報をお届けしたうえで、次の行動につながる製品・サービスを整理しました。価格・出典は外部リンク先で必ずご確認ください。"
+      lead="クマ対策に関する製品・サービスを整理しました。価格・在庫・仕様は外部リンク先で必ずご確認ください。"
     >
       <nav
         aria-label="パンくずリスト"
