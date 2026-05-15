@@ -503,10 +503,22 @@ export default async function MuniPage({ params }: Props) {
           zoom={11}
         />
       </div>
-      <p className="not-prose mb-2 text-xs text-gray-500">
-        赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
-      </p>
-      <p className="not-prose mb-8">
+      {/* 凡例 — 文章ではなくアイコン凡例にして視覚的に直読できるように。 */}
+      <ul className="not-prose mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-600">
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+          直近 90 日
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
+          1 年以上前
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-amber-300 ring-1 ring-amber-500" />
+          {muni} の代表地点
+        </li>
+      </ul>
+      <p className="not-prose mb-10">
         <Link
           href={mapUrl}
           className="inline-flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
@@ -515,13 +527,9 @@ export default async function MuniPage({ params }: Props) {
         </Link>
       </p>
 
-      {/* ───── ここから「もっと詳しく」セクション ─────
-          概要（ヒーロー + 4 枚カード + 地図）の下に詳細を並べる構造。
-          見出しで明示的に分節することで、上部で十分という読者と
-          深掘りしたい読者の両方に応える。 */}
-      <h2 className="!mt-12 !border-t !border-stone-200 !pt-8">
-        <span className="text-stone-400">もっと詳しく</span>
-      </h2>
+      {/* 概要と詳細の境界。明示的な「もっと詳しく」見出しは冗長なので
+          縦の余白と区切り線のみで分節する（h2 ラベルは削除）。 */}
+      <hr className="not-prose mb-8 border-stone-200" />
 
       {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
           ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
