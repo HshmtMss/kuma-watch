@@ -142,7 +142,7 @@ export default async function PrefPage({ params }: Props) {
         <span className="font-semibold text-stone-700">{pref}</span>
       </nav>
 
-      <h2>{pref}内の市町村別 出没情報</h2>
+      <h2>市町村別の出没情報</h2>
       <p className="text-sm text-stone-600">
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
@@ -190,7 +190,7 @@ export default async function PrefPage({ params }: Props) {
         if (prefLandmarks.length === 0) return null;
         return (
           <>
-            <h2>{pref} の主要観光地・登山口</h2>
+            <h2>主要な観光地・登山口</h2>
             <p className="text-sm text-stone-600">
               {pref} 内でクマ出没情報が公開されている主要な登山口・観光地。各ページで周辺 10km の出没傾向と季節別の注意点を確認できます。
             </p>

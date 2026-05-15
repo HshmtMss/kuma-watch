@@ -369,7 +369,7 @@ export default async function SpotPage({ params }: Props) {
       </div>
 
       {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
-      <h2>{landmark.name}について</h2>
+      <h2>このスポットについて</h2>
       <p>{landmark.blurb}</p>
       <p className="not-prose my-3 text-sm text-stone-600">
         <span className="text-stone-500">所在: </span>
@@ -380,7 +380,7 @@ export default async function SpotPage({ params }: Props) {
       </p>
 
       {/* 周辺マップ */}
-      <h2>{landmark.name} 周辺の目撃マップ</h2>
+      <h2>周辺の目撃マップ</h2>
       <p className="text-xs text-stone-500">
         赤いピンが過去 90 日以内、グレーが 1 年以内の目撃。ピンをタップすると日付や場所が表示されます。
       </p>
@@ -402,7 +402,7 @@ export default async function SpotPage({ params }: Props) {
       </p>
 
       {/* 統計 */}
-      <h2>{landmark.name} 周辺の出没統計</h2>
+      <h2>出没統計</h2>
       <div className="not-prose my-3 grid grid-cols-3 gap-2 sm:grid-cols-3">
         <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-center">
           <div className="text-xs text-stone-500">過去90日</div>
@@ -432,7 +432,7 @@ export default async function SpotPage({ params }: Props) {
       {/* 最近の出没事案 */}
       {nearby.length > 0 && (
         <>
-          <h2>{landmark.name} 周辺の最近の出没事案</h2>
+          <h2>最近の出没事案</h2>
           <ul className="not-prose space-y-2">
             {nearby.slice(0, 12).map((r, i) => (
               <li
@@ -458,7 +458,7 @@ export default async function SpotPage({ params }: Props) {
       {/* 含まれる市町村 */}
       {topMunis.length > 0 && (
         <>
-          <h2>{landmark.name} 周辺で出没のあった市町村</h2>
+          <h2>周辺で出没のあった市町村</h2>
           <div className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {topMunis.map(([city, n]) => (
               <Link

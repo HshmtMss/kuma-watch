@@ -500,7 +500,7 @@ export default async function MuniPage({ params }: Props) {
       {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
           ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
           0 件の市町村でも周辺の出没状況が分かるので「安心したい」ユーザーにも価値あり。 */}
-      <h2>{muni} 周辺の出没状況（半径サマリー）</h2>
+      <h2>周辺の出没状況</h2>
       <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -576,7 +576,7 @@ export default async function MuniPage({ params }: Props) {
         )}
       </div>
 
-      <h2>{muni} 周辺の目撃マップ</h2>
+      <h2>周辺の目撃マップ</h2>
       <div className="not-prose mb-3">
         <MiniSightingsMap
           centerLat={cell.latCentroid}
@@ -589,7 +589,7 @@ export default async function MuniPage({ params }: Props) {
         赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
       </p>
 
-      <h2>{muni} のクマ出没傾向</h2>
+      <h2>クマ出没の傾向</h2>
       {cell.count > 0 ? (
         <p>
           {pref}{muni} ではこれまでに <strong>{cell.count.toLocaleString()} 件</strong> のクマ目撃情報が記録されており、
@@ -679,7 +679,7 @@ export default async function MuniPage({ params }: Props) {
           各ページで数値が異なるため、Google 視点でのコンテンツ差別化にも寄与。 */}
       {prefSummary && (
         <>
-          <h2>{pref} 全体での {muni} の状況</h2>
+          <h2>県内での位置づけ</h2>
           {cell.count > 0 ? (
             <p>
               {pref} では過去全期間に{" "}
@@ -715,7 +715,7 @@ export default async function MuniPage({ params }: Props) {
           コメントが空なら sectionName を表示、それも無ければ省略。 */}
       {recentIncidents.length > 0 && (
         <>
-          <h2>{muni} の最近の出没事案</h2>
+          <h2>最近の出没事案</h2>
           <ul className="not-prose space-y-2">
             {recentIncidents.map((r, i) => (
               <li
@@ -754,7 +754,7 @@ export default async function MuniPage({ params }: Props) {
           全件 0 件の地区は出さない。 */}
       {topSections.length > 0 && (
         <>
-          <h2>{muni} の地区別 出没件数</h2>
+          <h2>地区別の出没件数</h2>
           <p className="text-sm">
             出没件数の多い地区を上位から {topSections.length} 件表示しています。
             出発前にお住まい・目的地周辺の地区名と照らし合わせてください。
@@ -777,7 +777,7 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
-      <h2>{muni} で登山・キャンプを予定している方へ</h2>
+      <h2>登山・キャンプの注意点</h2>
       <p>
         クマは早朝・夕方・夜間に活動が活発になりやすく、雨上がりや霧の日、
         山菜・果実・木の実が多い秋口は遭遇リスクが高まります。
@@ -846,7 +846,7 @@ export default async function MuniPage({ params }: Props) {
           登山・通勤など「複数地域を見て判断したい」ユーザーニーズに対応。 */}
       {nearestNeighbors.length > 0 && (
         <>
-          <h2>{muni} の近隣で出没している市町村</h2>
+          <h2>近隣で出没している市町村</h2>
           <div className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {nearestNeighbors.map((n) => {
               const isHot = n.count90d > 0;
@@ -897,7 +897,7 @@ export default async function MuniPage({ params }: Props) {
           距離は haversine の直線距離。 */}
       {nearbyLandmarks.length > 0 && (
         <>
-          <h2>{muni} 周辺の登山・観光スポット</h2>
+          <h2>周辺の登山・観光スポット</h2>
           <p className="text-sm">
             {muni} の代表地点から半径 {NEARBY_LANDMARK_RADIUS_KM} km 圏内にある
             主要なランドマークです。各スポットのページで、クマ出没情報を集約した
@@ -933,7 +933,7 @@ export default async function MuniPage({ params }: Props) {
 
       {siblings.length > 0 && (
         <>
-          <h2>{pref} 内の他の市町村</h2>
+          <h2>{pref} の他の市町村</h2>
           <ul className="not-prose grid grid-cols-2 gap-2 sm:grid-cols-3">
             {siblings.map((s) => (
               <li key={s.cityName}>
