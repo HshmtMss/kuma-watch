@@ -434,17 +434,10 @@ export default async function MuniPage({ params }: Props) {
             </p>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link
-            href={mapUrl}
-            className="inline-flex items-center gap-1 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
-          >
-            🗺️ 地図で詳細を見る →
-          </Link>
-          {/* 「{muni} 公式情報を検索」ボタンは site:lg.jp の Google 検索結果が
-              実用的なヒットに繋がらないケースが多かったので削除。今後は
-              自治体公式マップを直接リンクする方向で見直す。 */}
-        </div>
+        {/* ヒーローカード内に旧「🗺️ 地図で詳細を見る」ボタンがあったが、
+            概要セクション内の埋め込みマップ + Sticky CTA と動線が三重になり
+            複雑だったので削除。マップへの動線は (1) 埋め込みマップ下のリンク
+            と (2) Sticky CTA の 2 箇所に集約。 */}
       </div>
 
       {/* 4 枚カード — count が全 0 の市町村では「0／0／0／-」と並ぶだけで
@@ -496,6 +489,39 @@ export default async function MuniPage({ params }: Props) {
           </div>
         </div>
       )}
+
+      {/* 周辺の目撃マップ — 旧位置（傾向セクションの下）から概要直下に昇格。
+          ユーザーが「上部でサマリーとマップが見たい」という導線改善要望に対応。
+          地図直下に「全国マップへ」リンクを設置し、埋め込み地図からも全国
+          地図へ遷移できる構造にした。 */}
+      <h2>周辺の目撃マップ</h2>
+      <div className="not-prose mb-2">
+        <MiniSightingsMap
+          centerLat={cell.latCentroid}
+          centerLon={cell.lonCentroid}
+          records={mapRecords}
+          zoom={11}
+        />
+      </div>
+      <p className="not-prose mb-2 text-xs text-gray-500">
+        赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
+      </p>
+      <p className="not-prose mb-8">
+        <Link
+          href={mapUrl}
+          className="inline-flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+        >
+          🗺️ 全国の警戒レベルマップで他地域も見る →
+        </Link>
+      </p>
+
+      {/* ───── ここから「もっと詳しく」セクション ─────
+          概要（ヒーロー + 4 枚カード + 地図）の下に詳細を並べる構造。
+          見出しで明示的に分節することで、上部で十分という読者と
+          深掘りしたい読者の両方に応える。 */}
+      <h2 className="!mt-12 !border-t !border-stone-200 !pt-8">
+        <span className="text-stone-400">もっと詳しく</span>
+      </h2>
 
       {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
           ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
@@ -575,19 +601,6 @@ export default async function MuniPage({ params }: Props) {
           </p>
         )}
       </div>
-
-      <h2>周辺の目撃マップ</h2>
-      <div className="not-prose mb-3">
-        <MiniSightingsMap
-          centerLat={cell.latCentroid}
-          centerLon={cell.lonCentroid}
-          records={mapRecords}
-          zoom={11}
-        />
-      </div>
-      <p className="not-prose mb-6 text-xs text-gray-500">
-        赤いピンが過去90日の目撃、灰色は過去1年以上前の記録です。中央の黄色いマークは {muni} の代表地点。
-      </p>
 
       <h2>クマ出没の傾向</h2>
       {cell.count > 0 ? (
