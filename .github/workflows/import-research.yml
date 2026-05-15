@@ -41,6 +41,8 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/app/research src/app/sitemap.ts
+          # import-research.ts は src/lib/research-entries.ts に新エントリを append する。
+          # この一覧が更新されないと /research インデックスに新記事が反映されないので必ず含める。
+          git add src/app/research src/app/sitemap.ts src/lib/research-entries.ts
           git commit -m "Import new research article(s) ($(date -u +%Y-%m-%d))"
           git push
