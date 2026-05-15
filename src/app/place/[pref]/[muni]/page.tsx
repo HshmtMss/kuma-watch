@@ -447,49 +447,55 @@ export default async function MuniPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="not-prose mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-          <div className="text-xs text-gray-500">総目撃数</div>
-          <div className="mt-1 text-xl font-bold text-gray-900">{cell.count}</div>
-          <div className="text-[11px] text-gray-400">件</div>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-          <div className="text-xs text-gray-500">過去1年</div>
-          <div className="mt-1 text-xl font-bold text-gray-900">{cell.count365d}</div>
-          <div className="text-[11px] text-gray-400">件</div>
-        </div>
-        <div
-          className={`rounded-xl border px-3 py-3 text-center ${
-            cell.count90d > 0 ? "border-red-200 bg-red-50" : "border-gray-200 bg-white"
-          }`}
-        >
-          <div
-            className={`text-xs ${cell.count90d > 0 ? "text-red-700" : "text-gray-500"}`}
-          >
-            過去90日
+      {/* 4 枚カード — count が全 0 の市町村では「0／0／0／-」と並ぶだけで
+          情報量が無く、ユーザーには「データが壊れているのか？」と読まれる
+          ので、その場合はカード全体を非表示にし、ヒーローカードの
+          『直近の出没情報なし』に一本化する。 */}
+      {cell.count > 0 && (
+        <div className="not-prose mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
+            <div className="text-xs text-gray-500">総目撃数</div>
+            <div className="mt-1 text-xl font-bold text-gray-900">{cell.count}</div>
+            <div className="text-[11px] text-gray-400">件</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
+            <div className="text-xs text-gray-500">過去1年</div>
+            <div className="mt-1 text-xl font-bold text-gray-900">{cell.count365d}</div>
+            <div className="text-[11px] text-gray-400">件</div>
           </div>
           <div
-            className={`mt-1 text-xl font-bold ${
-              cell.count90d > 0 ? "text-red-900" : "text-gray-900"
+            className={`rounded-xl border px-3 py-3 text-center ${
+              cell.count90d > 0 ? "border-red-200 bg-red-50" : "border-gray-200 bg-white"
             }`}
           >
-            {cell.count90d}
+            <div
+              className={`text-xs ${cell.count90d > 0 ? "text-red-700" : "text-gray-500"}`}
+            >
+              過去90日
+            </div>
+            <div
+              className={`mt-1 text-xl font-bold ${
+                cell.count90d > 0 ? "text-red-900" : "text-gray-900"
+              }`}
+            >
+              {cell.count90d}
+            </div>
+            <div
+              className={`text-[11px] ${
+                cell.count90d > 0 ? "text-red-500" : "text-gray-400"
+              }`}
+            >
+              件
+            </div>
           </div>
-          <div
-            className={`text-[11px] ${
-              cell.count90d > 0 ? "text-red-500" : "text-gray-400"
-            }`}
-          >
-            件
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
+            <div className="text-xs text-gray-500">最新目撃</div>
+            <div className="mt-1 text-sm font-semibold text-gray-900">
+              {cell.latestDate ? formatDate(cell.latestDate) : "記録なし"}
+            </div>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-          <div className="text-xs text-gray-500">最新目撃</div>
-          <div className="mt-1 text-sm font-semibold text-gray-900">
-            {formatDate(cell.latestDate)}
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
           ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
@@ -584,12 +590,19 @@ export default async function MuniPage({ params }: Props) {
       </p>
 
       <h2>{muni} のクマ出没傾向</h2>
-      <p>
-        {pref}{muni} ではこれまでに <strong>{cell.count} 件</strong> のクマ目撃情報が記録されており、
-        うち過去1年は {cell.count365d} 件、過去90日は {cell.count90d} 件です。
-        最新の目撃は {formatDate(cell.latestDate)} です。
-        各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
-      </p>
+      {cell.count > 0 ? (
+        <p>
+          {pref}{muni} ではこれまでに <strong>{cell.count.toLocaleString()} 件</strong> のクマ目撃情報が記録されており、
+          うち過去1年は {cell.count365d} 件、過去90日は {cell.count90d} 件です。
+          {cell.latestDate && <>最新の目撃は {formatDate(cell.latestDate)} です。</>}
+          {" "}各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
+        </p>
+      ) : (
+        <p>
+          {pref}{muni} には本サイトの集計開始以降、公開された出没記録がありません。
+          ただし周辺市町村の状況や、季節・年による変動でリスクは大きく変わるため、上記の半径サマリーと自治体公式情報も併せてご確認ください。
+        </p>
+      )}
 
       {/* 過去 12 ヶ月の月別件数バーチャート — 季節性を視覚的に把握。
           全月 0 件の地域は空チャートが意味のない情報になるので、

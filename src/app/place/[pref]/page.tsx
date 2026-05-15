@@ -160,15 +160,19 @@ export default async function PrefPage({ params }: Props) {
               <span className={m.count > 0 ? "font-medium" : ""}>
                 {m.cityName}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="flex items-baseline gap-1.5 text-xs text-gray-500">
                 {m.count === 0 ? (
                   <span className="text-gray-400">0 件</span>
                 ) : (
                   <>
-                    {m.count.toLocaleString()} 件
+                    {/* 「4 件 (4 / 90日)」は分数に見えて誤解されるので
+                        累計と直近を別チップに分け、ラベルも自然な日本語に。 */}
+                    <span className="tabular-nums">
+                      累計 {m.count.toLocaleString()} 件
+                    </span>
                     {m.count90d > 0 && (
-                      <span className="ml-1 text-red-600">
-                        ({m.count90d} / 90日)
+                      <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-red-700">
+                        直近90日 {m.count90d} 件
                       </span>
                     )}
                   </>

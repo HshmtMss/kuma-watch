@@ -44,8 +44,79 @@ const D_MS = 86_400_000;
 const D90 = 90 * D_MS;
 const D365 = 365 * D_MS;
 
+// 都道府県別の市町村マスター。canonical 名と重心を引くために build() で使う。
+function buildMunisByPref(): Map<
+  string,
+  { cityName: string; lat: number; lon: number }[]
+> {
+  const m = new Map<string, { cityName: string; lat: number; lon: number }[]>();
+  for (const x of JAPAN_MUNICIPALITIES) {
+    if (!m.has(x.prefName)) m.set(x.prefName, []);
+    m.get(x.prefName)!.push({ cityName: x.cityName, lat: x.lat, lon: x.lon });
+  }
+  return m;
+}
+
+function distanceKmInline(
+  la1: number,
+  lo1: number,
+  la2: number,
+  lo2: number,
+): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(la2 - la1);
+  const dLon = toRad(lo2 - lo1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(la1)) * Math.cos(toRad(la2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// 生レコードを canonical な市町村名に正規化する。
+//   1) cityName が市町村マスターと prefix-match するならそれを採用
+//      （例: "仙台市青葉区芋沢" → "仙台市青葉区"）
+//   2) prefix-match しない (例: cityName="仙台市" だが master は ward 単位)、
+//      または cityName が空欄の場合は lat/lon から最寄り重心の市町村を採用
+//   3) 30km 以内の市町村が無ければ null（誤集計回避）
+//
+// build() を介して全 record を一度 canonical 名に寄せておくことで、
+// /place/[pref] と /place/[pref]/[muni] の集計が同じキーに揃い、
+// 「県ページでは 4 件、市町村ページでは 0 件」のような矛盾を防ぐ。
+function resolveCanonicalForIndex(
+  rawCity: string,
+  lat: number,
+  lon: number,
+  pref: string,
+  munisByPref: Map<string, { cityName: string; lat: number; lon: number }[]>,
+): string | null {
+  const munis = munisByPref.get(pref);
+  if (!munis || munis.length === 0) return null;
+
+  if (rawCity) {
+    let bestMatch: { name: string; len: number } | null = null;
+    for (const m of munis) {
+      if (rawCity.startsWith(m.cityName)) {
+        if (!bestMatch || m.cityName.length > bestMatch.len) {
+          bestMatch = { name: m.cityName, len: m.cityName.length };
+        }
+      }
+    }
+    if (bestMatch) return bestMatch.name;
+  }
+
+  let nearest: { name: string; d: number } | null = null;
+  for (const m of munis) {
+    const d = distanceKmInline(lat, lon, m.lat, m.lon);
+    if (!nearest || d < nearest.d) nearest = { name: m.cityName, d };
+  }
+  if (nearest && nearest.d < 30) return nearest.name;
+  return null;
+}
+
 async function build(): Promise<Index> {
   const records = await getCachedSightings();
+  const munisByPref = buildMunisByPref();
   const acc = new Map<
     string,
     {
@@ -63,13 +134,22 @@ async function build(): Promise<Index> {
   const now = Date.now();
 
   for (const r of records) {
-    if (!r.prefectureName || !r.cityName) continue;
-    const key = `${r.prefectureName}/${r.cityName}`;
+    if (!r.prefectureName) continue;
+    if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
+    const canonical = resolveCanonicalForIndex(
+      (r.cityName ?? "").trim(),
+      r.lat,
+      r.lon,
+      r.prefectureName,
+      munisByPref,
+    );
+    if (!canonical) continue;
+    const key = `${r.prefectureName}/${canonical}`;
     let entry = acc.get(key);
     if (!entry) {
       entry = {
         prefectureName: r.prefectureName,
-        cityName: r.cityName,
+        cityName: canonical,
         count: 0,
         count90d: 0,
         count365d: 0,
@@ -81,11 +161,9 @@ async function build(): Promise<Index> {
       acc.set(key, entry);
     }
     entry.count++;
-    if (typeof r.lat === "number" && typeof r.lon === "number") {
-      entry.latSum += r.lat;
-      entry.lonSum += r.lon;
-      entry.n++;
-    }
+    entry.latSum += r.lat;
+    entry.lonSum += r.lon;
+    entry.n++;
     if (typeof r.date === "string") {
       if (!entry.latestDate || r.date > entry.latestDate) entry.latestDate = r.date;
       const t = Date.parse(r.date);
@@ -102,9 +180,19 @@ async function build(): Promise<Index> {
   const recordsByKey = new Map<string, PlaceRecord[]>();
 
   for (const r of records) {
-    if (!r.prefectureName || !r.cityName) continue;
+    if (!r.prefectureName) continue;
     if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
-    const key = `${r.prefectureName}/${r.cityName}`;
+    // 集計と同じ canonical 解決を通す。これで /place/[pref]/[muni] が直接
+    // 引く mapRecords も、cityName 欠落/不一致レコードを正しく拾える。
+    const canonical = resolveCanonicalForIndex(
+      (r.cityName ?? "").trim(),
+      r.lat,
+      r.lon,
+      r.prefectureName,
+      munisByPref,
+    );
+    if (!canonical) continue;
+    const key = `${r.prefectureName}/${canonical}`;
     let arr = recordsByKey.get(key);
     if (!arr) {
       arr = [];
