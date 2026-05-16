@@ -699,43 +699,25 @@ export default async function MuniPage({ params }: Props) {
       </ul>
 
       <h2>あわせて読みたい</h2>
-      <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <li>
-          <Link
-            href="/articles/encounter"
-            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
-          >
-            <span className="font-medium">クマに遭遇したら</span>
-            <span className="ml-1 text-gray-500">距離別の正しい対処</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/articles/autumn"
-            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
-          >
-            <span className="font-medium">秋のクマ対策</span>
-            <span className="ml-1 text-gray-500">なぜ秋が最も危険なのか</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/articles/bear-spray"
-            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
-          >
-            <span className="font-medium">クマよけスプレー</span>
-            <span className="ml-1 text-gray-500">使い方と選び方</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/articles/species-difference"
-            className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
-          >
-            <span className="font-medium">ツキノワグマとヒグマ</span>
-            <span className="ml-1 text-gray-500">行動・対処の違い</span>
-          </Link>
-        </li>
+      {/* list-none + pl-0 で prose のオレンジマーカーと左余白を排除し、
+          カードを h2 オレンジ下線と同じ幅まで広げる。 */}
+      <ul className="not-prose grid list-none grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
+        {[
+          { href: "/articles/encounter", title: "クマに遭遇したら", sub: "距離別の正しい対処" },
+          { href: "/articles/autumn", title: "秋のクマ対策", sub: "なぜ秋が最も危険なのか" },
+          { href: "/articles/bear-spray", title: "クマよけスプレー", sub: "使い方と選び方" },
+          { href: "/articles/species-difference", title: "ツキノワグマとヒグマ", sub: "行動・対処の違い" },
+        ].map((it) => (
+          <li key={it.href}>
+            <Link
+              href={it.href}
+              className="block rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+            >
+              <span className="font-medium">{it.title}</span>
+              <span className="ml-1 text-xs text-gray-500">{it.sub}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
 
       {/* 近隣 4 市町村の比較 — 距離ベースで近い順。県境を跨いで近い市町村も拾う
@@ -799,12 +781,14 @@ export default async function MuniPage({ params }: Props) {
             {muni} から半径 {NEARBY_LANDMARK_RADIUS_KM} km 圏内にある主要なランドマークです。
             各スポットのページで、クマ出没情報を集約した周辺マップと警戒レベルをご確認いただけます。
           </p>
-          <ul className="not-prose my-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {/* 周辺ランドマーク — list-none + pl-0 でマーカーと左余白を排除。
+              カードは h2 オレンジ下線と同じ幅まで広げる。 */}
+          <ul className="not-prose my-3 grid list-none grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
             {nearbyLandmarks.map((l) => (
               <li key={l.slug}>
                 <Link
                   href={`/spot/${encodeURIComponent(l.slug)}`}
-                  className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50"
+                  className="block rounded-lg border border-stone-200 bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50"
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-sm font-semibold text-stone-900">
@@ -830,14 +814,14 @@ export default async function MuniPage({ params }: Props) {
       {siblings.length > 0 && (
         <>
           <h2>{pref} の他の市町村</h2>
-          {/* 他の市町村ナビ — モバイルでは画面幅いっぱいに広げ、左右の余白を排除。
-              PC は 2 列に戻す。 */}
-          <ul className="not-prose -mx-5 grid list-none grid-cols-1 gap-0 sm:mx-0 sm:grid-cols-2 sm:gap-2">
+          {/* 他の市町村ナビ — list-none + pl-0 でマーカーと左余白を排除。
+              カードは h2 オレンジ下線と同じ幅まで広げる。 */}
+          <ul className="not-prose grid list-none grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
             {siblings.map((s) => (
               <li key={s.cityName}>
                 <Link
                   href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(s.cityName)}`}
-                  className="flex items-center justify-between gap-3 border-y border-gray-200 bg-white px-5 py-3 text-sm text-gray-800 hover:border-amber-400 hover:bg-amber-50 sm:rounded-lg sm:border sm:px-4"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:border-amber-400 hover:bg-amber-50"
                 >
                   <span className="truncate font-medium">{s.cityName}</span>
                   <span className="shrink-0 tabular-nums text-xs text-gray-400">
