@@ -157,17 +157,17 @@ export default async function PrefPage({ params }: Props) {
       <p className="text-sm text-stone-600">
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
-      {/* 市町村カード — モバイルは 1 列・フル幅、PC は 2 列。
-          1 行内で 市町村名（左） + 1年/90日 チップ（右）の両端配置。
-          2 列カードの「左側スペースが空いて見える」問題を解消。 */}
-      <ul className="not-prose grid list-none grid-cols-1 gap-2 sm:grid-cols-2">
+      {/* 市町村カード — モバイルでは主コンテナの px-5 を負マージンで打ち消して
+          画面幅いっぱいまで広げる。PC（sm+）では従来通り 2 列カードに戻す。
+          画面左右の余白に余計なスペースが残らないようにする。 */}
+      <ul className="not-prose -mx-5 grid list-none grid-cols-1 gap-0 sm:mx-0 sm:grid-cols-2 sm:gap-2">
         {sortedMunis.map((m) => {
           const isActive = m.count365d > 0 || m.count90d > 0;
           return (
             <li key={m.cityCode}>
               <Link
                 href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
-                className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 hover:border-amber-400 hover:bg-amber-50 ${
+                className={`flex items-center justify-between gap-3 border-y px-5 py-3.5 hover:border-amber-400 hover:bg-amber-50 sm:rounded-lg sm:border sm:px-4 sm:py-3 ${
                   isActive
                     ? "border-gray-200 bg-white text-gray-800"
                     : "border-gray-100 bg-gray-50 text-gray-500"
@@ -215,18 +215,22 @@ export default async function PrefPage({ params }: Props) {
             <p className="text-sm text-stone-600">
               {pref} 内でクマ出没情報が公開されている主要な登山口・観光地。各ページで周辺 10km の出没傾向と季節別の注意点を確認できます。
             </p>
-            <ul className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {/* 観光地・登山口カード — モバイルでは画面幅いっぱい、PC は 2 列。
+                list-none で prose のオレンジ丸（marker）も除去。 */}
+            <ul className="not-prose -mx-5 my-3 grid list-none grid-cols-1 gap-0 sm:mx-0 sm:grid-cols-2 sm:gap-2">
               {prefLandmarks.map((l) => (
                 <li key={l.slug}>
                   <Link
                     href={`/spot/${encodeURIComponent(l.slug)}`}
-                    className="block rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm hover:border-amber-400 hover:bg-amber-50"
+                    className="flex items-center justify-between gap-3 border-y border-stone-200 bg-white px-5 py-3 text-sm hover:border-amber-400 hover:bg-amber-50 sm:rounded-lg sm:border sm:px-4"
                   >
-                    <div className="font-medium text-stone-900">{l.name}</div>
+                    <span className="font-semibold text-stone-900">
+                      {l.name}
+                    </span>
                     {l.muniName && (
-                      <div className="text-[11px] text-stone-500">
+                      <span className="shrink-0 text-[11px] text-stone-500">
                         {l.muniName}
-                      </div>
+                      </span>
                     )}
                   </Link>
                 </li>
