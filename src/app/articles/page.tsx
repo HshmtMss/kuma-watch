@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import CategoryFilter, {
+  type CategoryFilterItem,
+} from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
 import {
   ARTICLES,
@@ -135,63 +138,26 @@ export default async function ArticlesIndexPage({
         <span className="font-semibold text-stone-700">記事一覧</span>
       </nav>
 
-      {/* カテゴリーフィルター: タブ式。クリックで ?cat= が変わり、ページ内で一覧が絞り込まれる。
-          アンカージャンプ方式と違い、画面が下に飛ばないので連続して別カテゴリを探しやすい。 */}
-      <nav
-        aria-label="カテゴリフィルター"
-        className="not-prose sticky top-0 z-30 -mx-5 mb-6 border-b border-amber-200 bg-amber-50/95 px-5 py-3 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-4"
-      >
-        <div className="mb-2 text-sm font-semibold text-amber-800">
-          カテゴリで絞り込み
-        </div>
-        <ul className="flex flex-wrap gap-2 text-base">
-          <li>
-            <Link
-              href="/articles"
-              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 font-semibold ${
-                selectedCat === "all"
-                  ? "bg-amber-600 text-white shadow-sm"
-                  : "bg-white text-amber-900 shadow-sm hover:bg-amber-100"
-              }`}
-            >
-              <span>すべて</span>
-              <span
-                className={`text-sm tabular-nums ${
-                  selectedCat === "all" ? "text-amber-100" : "text-amber-700"
-                }`}
-              >
-                ({ARTICLES.length})
-              </span>
-            </Link>
-          </li>
-          {sortedCategories.map((c) => {
-            const count = getArticlesByCategory(c.id).length;
-            const isActive = selectedCat === c.slug;
-            return (
-              <li key={c.id}>
-                <Link
-                  href={`/articles?cat=${c.slug}`}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 font-semibold ${
-                    isActive
-                      ? "bg-amber-600 text-white shadow-sm"
-                      : "bg-white text-amber-900 shadow-sm hover:bg-amber-100"
-                  }`}
-                >
-                  {c.emoji && <span aria-hidden>{c.emoji}</span>}
-                  <span>{c.name}</span>
-                  <span
-                    className={`text-sm tabular-nums ${
-                      isActive ? "text-amber-100" : "text-amber-700"
-                    }`}
-                  >
-                    ({count})
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <CategoryFilter
+        title="カテゴリで絞り込み"
+        accent="amber"
+        activeKey={selectedCat}
+        items={[
+          {
+            key: "all",
+            href: "/articles",
+            label: "すべて",
+            count: ARTICLES.length,
+          },
+          ...sortedCategories.map<CategoryFilterItem>((c) => ({
+            key: c.slug,
+            href: `/articles?cat=${c.slug}`,
+            label: c.name,
+            emoji: c.emoji,
+            count: getArticlesByCategory(c.id).length,
+          })),
+        ]}
+      />
 
       {selectedCategory && (
         <p className="mb-4 text-base leading-relaxed text-stone-700">

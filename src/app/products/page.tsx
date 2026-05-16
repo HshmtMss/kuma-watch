@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CategoryFilter, {
+  type CategoryFilterItem,
+} from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
 import ProductCard from "@/components/ProductCard";
 import {
@@ -26,12 +29,18 @@ export const metadata: Metadata = {
   },
 };
 
-type SearchParams = Promise<{ for?: string }>;
+type SearchParams = Promise<{ for?: string; cat?: string }>;
 
-const AUDIENCES = [
-  { key: "個人", path: "", label: "個人向け", desc: "登山・キャンプ・農作業・自宅周辺で備える装備" },
-  { key: "自治体", path: "?for=gov", label: "自治体向け", desc: "AI 検知・撃退装置・捕獲・コンサル等の業務用ソリューション" },
-] as const;
+// 各カテゴリの絵文字。CategoryFilter で表示。
+const CATEGORY_EMOJI: Record<string, string> = {
+  撃退忌避: "🌶️",
+  防護柵: "🚧",
+  住宅誘引物: "🏠",
+  個人装備: "🎒",
+  監視検知: "📷",
+  捕獲駆除: "🪤",
+  情報教育: "📚",
+};
 
 export default async function ProductsPage({
   searchParams,
@@ -44,6 +53,28 @@ export default async function ProductsPage({
   const products = getProductsForAudience(audience);
   const grouped = groupByCategory(products);
 
+  // カテゴリフィルタ。音声から探す導線を anchor jump → URL クエリ式に変更し、
+  // /articles と同じ操作感に統一する。
+  const validCats = new Set(grouped.map((g) => g.category));
+  const activeCat: string =
+    sp.cat && validCats.has(sp.cat) ? sp.cat : "all";
+
+  const visibleGroups =
+    activeCat === "all"
+      ? grouped
+      : grouped.filter((g) => g.category === activeCat);
+
+  const audienceBaseHref = (aud: "個人" | "自治体") =>
+    aud === "自治体" ? "/products?for=gov" : "/products";
+
+  const catHref = (cat: string) => {
+    const params = new URLSearchParams();
+    if (audience === "自治体") params.set("for", "gov");
+    if (cat !== "all") params.set("cat", cat);
+    const qs = params.toString();
+    return `/products${qs ? `?${qs}` : ""}`;
+  };
+
   return (
     <PageShell
       title="クマ対策の製品・サービス"
@@ -51,99 +82,86 @@ export default async function ProductsPage({
     >
       <nav
         aria-label="パンくずリスト"
-        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-xs text-stone-500"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-sm text-stone-500"
       >
         <Link href="/" className="hover:text-stone-900">
           ホーム
         </Link>
         <span>›</span>
+        <Link href="/measures" className="hover:text-stone-900">
+          対策
+        </Link>
+        <span>›</span>
         <span className="font-semibold text-stone-700">対策製品</span>
       </nav>
 
-      <div
-        role="tablist"
-        aria-label="対象別タブ"
-        className="not-prose mb-6 flex flex-wrap gap-2"
-      >
-        {AUDIENCES.map((a) => {
-          const active = a.key === audience;
-          return (
-            <Link
-              key={a.key}
-              href={`/products${a.path}`}
-              role="tab"
-              aria-selected={active}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                active
-                  ? "border-amber-500 bg-amber-100 text-amber-900"
-                  : "border-stone-200 bg-white text-stone-600 hover:border-amber-300 hover:bg-amber-50"
-              }`}
-            >
-              {a.label}
-            </Link>
-          );
-        })}
-      </div>
+      <CategoryFilter
+        title="対象で絞り込み"
+        accent="emerald"
+        activeKey={audience}
+        sticky={false}
+        items={[
+          {
+            key: "個人",
+            href: audienceBaseHref("個人"),
+            label: "個人向け",
+            emoji: "🧑",
+          },
+          {
+            key: "自治体",
+            href: audienceBaseHref("自治体"),
+            label: "自治体向け",
+            emoji: "🏛️",
+          },
+        ]}
+      />
 
-      <p className="not-prose mb-4 text-sm text-stone-600">
-        {AUDIENCES.find((a) => a.key === audience)?.desc}
-        <span className="ml-2 text-stone-400">（{products.length} 件）</span>
-      </p>
-
-      {grouped.length > 0 && (
-        <nav
-          aria-label="カテゴリ目次"
-          className="not-prose mb-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
-        >
-          <div className="mb-2 text-xs font-semibold text-amber-800">
-            カテゴリから探す
-          </div>
-          <ul className="flex flex-wrap gap-1.5">
-            {grouped.map((group) => {
-              const total = group.subcategories.reduce(
-                (n, s) => n + s.products.length,
-                0,
-              );
-              return (
-                <li key={group.category}>
-                  <a
-                    href={`#${CATEGORY_ID[group.category] ?? group.category}`}
-                    className="inline-flex items-baseline gap-1 rounded-full border border-amber-300 bg-white px-3 py-1 text-xs font-semibold text-amber-900 hover:bg-amber-100"
-                  >
-                    {CATEGORY_LABEL[group.category] ?? group.category}
-                    <span className="text-[10px] font-normal tabular-nums text-amber-700">
-                      {total}
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      )}
+      <CategoryFilter
+        title="カテゴリで絞り込み"
+        accent="amber"
+        activeKey={activeCat}
+        items={[
+          {
+            key: "all",
+            href: catHref("all"),
+            label: "すべて",
+            count: products.length,
+          },
+          ...grouped.map<CategoryFilterItem>((g) => ({
+            key: g.category,
+            href: catHref(g.category),
+            label: CATEGORY_LABEL[g.category] ?? g.category,
+            emoji: CATEGORY_EMOJI[g.category],
+            count: g.subcategories.reduce(
+              (n, s) => n + s.products.length,
+              0,
+            ),
+          })),
+        ]}
+      />
 
       {grouped.length === 0 && (
-        <p className="not-prose text-sm text-stone-500">該当する製品がありません。</p>
+        <p className="not-prose text-base text-stone-500">該当する製品がありません。</p>
       )}
 
-      {grouped.map((group) => (
+      {visibleGroups.map((group) => (
         <section
           key={group.category}
           id={CATEGORY_ID[group.category] ?? group.category}
           className="not-prose mt-8 scroll-mt-20"
         >
-          <h2 className="mb-1 text-lg font-bold text-stone-900 sm:text-xl">
+          <h2 className="mb-1 text-xl font-bold text-stone-900 sm:text-2xl">
             {CATEGORY_LABEL[group.category] ?? group.category}
           </h2>
           {CATEGORY_DESC[group.category] && (
-            <p className="mb-3 text-xs text-stone-500">
+            <p className="mb-3 text-sm text-stone-600">
               {CATEGORY_DESC[group.category]}
             </p>
           )}
           {group.subcategories.map((sub) => (
             <div key={sub.subcategory} className="mt-4">
               {sub.subcategory && (
-                <h3 className="mb-2 text-sm font-semibold text-stone-700">
+                <h3 className="mb-2 text-base font-semibold text-stone-700">
                   {sub.subcategory}
                 </h3>
               )}
@@ -159,7 +177,7 @@ export default async function ProductsPage({
         </section>
       ))}
 
-      <aside className="not-prose mt-10 rounded-2xl border border-stone-200 bg-white p-4 text-xs leading-relaxed text-stone-600">
+      <aside className="not-prose mt-10 rounded-2xl border border-stone-200 bg-white p-4 text-sm leading-relaxed text-stone-600">
         <p className="font-semibold text-stone-700">この一覧について</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>
@@ -190,6 +208,16 @@ export default async function ProductsPage({
           </li>
         </ul>
       </aside>
+
+      <div className="not-prose mt-10">
+        <Link
+          href="/measures"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          クマ対策トップに戻る
+        </Link>
+      </div>
     </PageShell>
   );
 }

@@ -89,8 +89,8 @@ export default async function PrefPage({ params }: Props) {
     return a.cityName.localeCompare(b.cityName, "ja");
   });
   const totalMuni = sortedMunis.length;
-  const muniWithSightings = sortedMunis.filter((m) => m.count > 0).length;
   const totalCount = sortedMunis.reduce((s, m) => s + m.count, 0);
+  const total365d = sortedMunis.reduce((s, m) => s + m.count365d, 0);
   const total90d = sortedMunis.reduce((s, m) => s + m.count90d, 0);
   const latestDate = sortedMunis.reduce<string | null>(
     (best, m) => (m.latestDate && (!best || m.latestDate > best) ? m.latestDate : best),
@@ -118,7 +118,7 @@ export default async function PrefPage({ params }: Props) {
   return (
     <PageShell
       title={`${pref}のクマ出没予報`}
-      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。総目撃 ${totalCount.toLocaleString()} 件 / 過去90日 ${total90d.toLocaleString()} 件 / うち${muniWithSightings}市町村で目撃あり (最終更新 ${latestDate ?? "-"})。`}
+      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。累計 ${totalCount.toLocaleString()} 件 / 直近1年 ${total365d.toLocaleString()} 件 / 直近90日 ${total90d.toLocaleString()} 件 (最終更新 ${latestDate ?? "-"})。`}
     >
       <script
         type="application/ld+json"
@@ -165,16 +165,29 @@ export default async function PrefPage({ params }: Props) {
                   <span className="text-gray-400">0 件</span>
                 ) : (
                   <>
-                    {/* 「4 件 (4 / 90日)」は分数に見えて誤解されるので
-                        累計と直近を別チップに分け、ラベルも自然な日本語に。 */}
+                    {/* 累計 / 直近1年 / 直近90日 の 3 段表示。
+                        値 0 の段は淡色チップで残し、スケール感の比較を担保。 */}
                     <span className="tabular-nums">
-                      累計 {m.count.toLocaleString()} 件
+                      累計 {m.count.toLocaleString()}
                     </span>
-                    {m.count90d > 0 && (
-                      <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-red-700">
-                        直近90日 {m.count90d} 件
-                      </span>
-                    )}
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                        m.count365d > 0
+                          ? "bg-amber-100 text-amber-900"
+                          : "bg-stone-100 text-stone-400"
+                      }`}
+                    >
+                      1年 {m.count365d.toLocaleString()}
+                    </span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                        m.count90d > 0
+                          ? "bg-red-100 text-red-700"
+                          : "bg-stone-100 text-stone-400"
+                      }`}
+                    >
+                      90日 {m.count90d.toLocaleString()}
+                    </span>
                   </>
                 )}
               </span>

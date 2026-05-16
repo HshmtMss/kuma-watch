@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import CategoryFilter, {
+  type CategoryFilterItem,
+} from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
 import {
   JAPAN_LANDMARKS,
@@ -30,12 +33,11 @@ export const metadata: Metadata = {
 const CATEGORY_LABEL: Record<LandmarkCategory, string> = {
   mountain: "山岳・登山口",
   national_park: "国立公園",
-  resort: "観光・リゾート地",
-  trailhead: "トレイル・登山口",
+  resort: "観光・リゾート",
+  trailhead: "トレイル",
   lake: "湖・湖畔",
 };
 
-// カード上部に出すアイコン代わりの絵文字。
 const CATEGORY_EMOJI: Record<LandmarkCategory, string> = {
   mountain: "⛰️",
   national_park: "🏞️",
@@ -44,7 +46,6 @@ const CATEGORY_EMOJI: Record<LandmarkCategory, string> = {
   lake: "🪷",
 };
 
-// カード表示順 (主要観光地の動線から)。
 const CATEGORY_ORDER: LandmarkCategory[] = [
   "mountain",
   "national_park",
@@ -53,18 +54,31 @@ const CATEGORY_ORDER: LandmarkCategory[] = [
   "trailhead",
 ];
 
-export default function SpotIndexPage() {
-  const byCategory = new Map<LandmarkCategory, JapanLandmark[]>();
-  for (const l of JAPAN_LANDMARKS) {
-    const arr = byCategory.get(l.category) ?? [];
-    arr.push(l);
-    byCategory.set(l.category, arr);
-  }
-  // 各カテゴリ内は都道府県順 (北→南)、同県内は名前順。
-  const PREF_ORDER: Record<string, number> = {};
-  // 都道府県の北→南並びは prefectures.ts の宣言順に沿わせる (簡易: 後で参照されない仮値)。
-  // ここでは JAPAN_LANDMARKS の登場順をそのまま尊重するため、ソート不要。
-  void PREF_ORDER;
+type SearchParams = Promise<{ cat?: string }>;
+
+export default async function SpotIndexPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const sp = await searchParams;
+  const validCats = new Set<string>(CATEGORY_ORDER);
+  const activeCat: string = sp.cat && validCats.has(sp.cat) ? sp.cat : "all";
+
+  // カテゴリ毎の件数 (フィルタバー用)
+  const countByCat: Record<LandmarkCategory, number> = {
+    mountain: 0,
+    national_park: 0,
+    resort: 0,
+    trailhead: 0,
+    lake: 0,
+  };
+  for (const l of JAPAN_LANDMARKS) countByCat[l.category]++;
+
+  const visible =
+    activeCat === "all"
+      ? JAPAN_LANDMARKS
+      : JAPAN_LANDMARKS.filter((l) => l.category === activeCat);
 
   return (
     <PageShell
@@ -73,146 +87,139 @@ export default function SpotIndexPage() {
     >
       <nav
         aria-label="パンくずリスト"
-        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-xs text-stone-500"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-sm text-stone-500"
       >
         <Link href="/" className="hover:text-stone-900">
           ホーム
         </Link>
         <span>›</span>
+        <Link href="/measures" className="hover:text-stone-900">
+          対策
+        </Link>
+        <span>›</span>
         <span className="font-semibold text-stone-700">観光地から探す</span>
       </nav>
 
-      <p className="text-sm text-stone-600">
-        都道府県・市町村単位で探したい場合は{" "}
-        <Link href="/place" className="text-blue-700 underline">
-          都道府県から探す
-        </Link>
-        へ。地図 UI で確認したい場合は{" "}
-        <Link href="/" className="text-blue-700 underline">
-          トップの警戒レベルマップ
-        </Link>
-        をご利用ください。
-      </p>
+      <CategoryFilter
+        title="カテゴリで絞り込み"
+        accent="amber"
+        activeKey={activeCat}
+        items={[
+          {
+            key: "all",
+            href: "/spot",
+            label: "すべて",
+            count: JAPAN_LANDMARKS.length,
+          },
+          ...CATEGORY_ORDER.map<CategoryFilterItem>((cat) => ({
+            key: cat,
+            href: `/spot?cat=${cat}`,
+            label: CATEGORY_LABEL[cat],
+            emoji: CATEGORY_EMOJI[cat],
+            count: countByCat[cat],
+          })),
+        ]}
+      />
 
-      {/* 俯瞰: 全観光地を都道府県別に grid 状の chip で並べる。
-          ただの羅列ではなく、都道府県を見出しとした 2 段構造の方が読みやすい。 */}
-      <section className="not-prose my-5 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-base font-bold text-stone-900 sm:text-lg">
-            都道府県別一覧
-          </h2>
-          <span className="text-xs text-stone-500">
-            全 {JAPAN_LANDMARKS.length} 件
-          </span>
-        </div>
-        <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
-          {(() => {
-            const byPref = new Map<string, JapanLandmark[]>();
-            for (const l of JAPAN_LANDMARKS) {
-              const arr = byPref.get(l.prefName) ?? [];
-              arr.push(l);
-              byPref.set(l.prefName, arr);
-            }
-            return [...byPref.entries()].map(([pref, items]) => (
-              <div key={pref}>
-                <div className="mb-1.5 border-b border-stone-100 pb-1 text-xs font-semibold tracking-wide text-stone-700">
-                  {pref}
-                  <span className="ml-1.5 text-[10px] font-normal text-stone-400">
-                    {items.length}
-                  </span>
+      {/* 都道府県別一覧 — 全件表示中のみ俯瞰として表示 (フィルタ中は邪魔なので隠す) */}
+      {activeCat === "all" && (
+        <section className="not-prose my-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-base font-bold text-stone-900 sm:text-lg">
+              都道府県別一覧
+            </h2>
+            <span className="text-sm text-stone-500">
+              全 {JAPAN_LANDMARKS.length} 件
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+            {(() => {
+              const byPref = new Map<string, JapanLandmark[]>();
+              for (const l of JAPAN_LANDMARKS) {
+                const arr = byPref.get(l.prefName) ?? [];
+                arr.push(l);
+                byPref.set(l.prefName, arr);
+              }
+              return [...byPref.entries()].map(([pref, items]) => (
+                <div key={pref}>
+                  <div className="mb-1.5 border-b border-stone-100 pb-1 text-sm font-semibold tracking-wide text-stone-700">
+                    {pref}
+                    <span className="ml-1.5 text-xs font-normal text-stone-400">
+                      {items.length}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {items.map((l) => (
+                      <Link
+                        key={l.slug}
+                        href={`/spot/${encodeURIComponent(l.slug)}`}
+                        className="inline-block rounded-full bg-stone-100 px-2.5 py-1 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
+                      >
+                        {l.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {items.map((l) => (
-                    <Link
-                      key={l.slug}
-                      href={`/spot/${encodeURIComponent(l.slug)}`}
-                      className="inline-block rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-700 hover:bg-amber-100 hover:text-amber-900"
-                    >
+              ));
+            })()}
+          </div>
+        </section>
+      )}
+
+      {/* カード一覧 — フィルタ選択中はそのカテゴリのみ */}
+      <section className="not-prose mt-6">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {visible.map((l) => (
+            <li key={l.slug}>
+              <Link
+                href={`/spot/${encodeURIComponent(l.slug)}`}
+                className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:border-amber-400 hover:shadow"
+              >
+                {l.imageUrl ? (
+                  <div className="relative aspect-[16/10] w-full bg-stone-100">
+                    <Image
+                      src={l.imageUrl}
+                      alt={`${l.name}の写真`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-3xl text-stone-300">
+                    {CATEGORY_EMOJI[l.category]}
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-4">
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-base font-semibold text-stone-900">
                       {l.name}
-                    </Link>
-                  ))}
+                    </div>
+                    <div className="text-xs text-stone-500">
+                      {l.prefName}
+                      {l.muniName ? `・${l.muniName}` : ""}
+                    </div>
+                  </div>
+                  <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-stone-600">
+                    {l.blurb}
+                  </p>
                 </div>
-              </div>
-            ));
-          })()}
-        </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {CATEGORY_ORDER.map((cat) => {
-        const items = byCategory.get(cat) ?? [];
-        if (items.length === 0) return null;
-        return (
-          <section key={cat} className="not-prose mt-8">
-            <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-stone-900 sm:text-lg">
-              <span aria-hidden>{CATEGORY_EMOJI[cat]}</span>
-              <span>{CATEGORY_LABEL[cat]}</span>
-              <span className="text-xs font-normal text-stone-400">
-                {items.length} 件
-              </span>
-            </h2>
-            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((l) => (
-                <li key={l.slug}>
-                  <Link
-                    href={`/spot/${encodeURIComponent(l.slug)}`}
-                    className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:border-amber-400 hover:shadow"
-                  >
-                    {l.imageUrl ? (
-                      <div className="relative aspect-[16/10] w-full bg-stone-100">
-                        <Image
-                          src={l.imageUrl}
-                          alt={`${l.name}の写真`}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          unoptimized
-                        />
-                      </div>
-                    ) : (
-                      <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-3xl text-stone-300">
-                        {CATEGORY_EMOJI[l.category]}
-                      </div>
-                    )}
-                    <div className="flex flex-1 flex-col p-4">
-                      <div className="flex items-baseline gap-2">
-                        <div className="text-base font-semibold text-stone-900">
-                          {l.name}
-                        </div>
-                        <div className="text-[11px] text-stone-500">
-                          {l.prefName}
-                          {l.muniName ? `・${l.muniName}` : ""}
-                        </div>
-                      </div>
-                      <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-stone-600">
-                        {l.blurb}
-                      </p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        );
-      })}
-
-      <h2>関連リンク</h2>
-      <ul className="not-prose space-y-2 text-sm">
-        <li>
-          <Link href="/place" className="text-blue-700 underline">
-            🗾 都道府県から探す
-          </Link>
-        </li>
-        <li>
-          <Link href="/articles" className="text-blue-700 underline">
-            📰 クマ対策の解説記事一覧
-          </Link>
-        </li>
-        <li>
-          <Link href="/research" className="text-blue-700 underline">
-            📚 研究・知見（日次・月次レポート）
-          </Link>
-        </li>
-      </ul>
+      <div className="not-prose mt-10">
+        <Link
+          href="/measures"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          クマ対策トップに戻る
+        </Link>
+      </div>
     </PageShell>
   );
 }

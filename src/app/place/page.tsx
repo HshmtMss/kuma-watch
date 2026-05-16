@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CategoryFilter, {
+  type CategoryFilterItem,
+} from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
 import PlacePointClient from "./PlacePointClient";
 import { getAllPrefSummaries } from "@/lib/place-index";
@@ -41,6 +44,7 @@ type SearchParams = Promise<{
   lon?: string;
   name?: string;
   src?: string;
+  region?: string;
 }>;
 
 function isValidLat(n: number) {
@@ -72,6 +76,11 @@ export default async function PlacePage({
   const summaries = await getAllPrefSummaries();
   const byPref = new Map(summaries.map((s) => [s.prefectureName, s]));
 
+  // 地域フィルタ。URL ?region=北海道・東北 のような形で受け取る。
+  const validRegionLabels = new Set(REGIONS.map((r) => r.label));
+  const activeRegion: string =
+    sp.region && validRegionLabels.has(sp.region) ? sp.region : "all";
+
   // 出没件数 (90日) でホットスポットを判別。上位 5 県だけ赤バッジで強調し、
   // 残りは均一なカードでクリーンに見せる。多すぎる色は逆に視認性を下げるため。
   const topCount90Set = new Set(
@@ -88,7 +97,7 @@ export default async function PlacePage({
     >
       <nav
         aria-label="パンくずリスト"
-        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-xs text-stone-500"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-sm text-stone-500"
       >
         <Link href="/" className="hover:text-stone-900">
           ホーム
@@ -97,36 +106,78 @@ export default async function PlacePage({
         <span className="font-semibold text-stone-700">都道府県から探す</span>
       </nav>
 
-      {REGIONS.map((region) => (
+      <CategoryFilter
+        title="地域で絞り込み"
+        accent="amber"
+        activeKey={activeRegion}
+        items={[
+          {
+            key: "all",
+            href: "/place",
+            label: "すべて",
+            count: 47,
+          },
+          ...REGIONS.map<CategoryFilterItem>((r) => ({
+            key: r.label,
+            href: `/place?region=${encodeURIComponent(r.label)}`,
+            label: r.label,
+            count: r.prefs.length,
+          })),
+        ]}
+      />
+
+      {/* フィルタ選択時は該当地域のみ、全件時は全 7 ブロック並べる */}
+      {(activeRegion === "all"
+        ? REGIONS
+        : REGIONS.filter((r) => r.label === activeRegion)
+      ).map((region) => (
         <section key={region.label} className="not-prose mt-6">
-          <h2 className="mb-2 text-base font-bold text-stone-900 sm:text-lg">
+          <h2 className="mb-3 text-lg font-bold text-stone-900 sm:text-xl">
             {region.label}
           </h2>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {region.prefs.map((pref) => {
               const s = byPref.get(pref);
               const count = s?.totalCount ?? 0;
+              const count365 = s?.count365d ?? 0;
               const count90 = s?.count90d ?? 0;
               const isHot = topCount90Set.has(pref) && count90 > 0;
               return (
                 <li key={pref}>
                   <Link
                     href={`/place/${encodeURIComponent(pref)}`}
-                    className={`flex items-baseline justify-between rounded-xl border bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50/40 ${
+                    className={`flex flex-col gap-1 rounded-xl border bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50/40 ${
                       isHot ? "border-red-200" : "border-stone-200"
                     }`}
                   >
-                    <span className="text-sm font-semibold text-stone-900">
-                      {pref}
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="text-base font-semibold text-stone-900">
+                        {pref}
+                      </span>
+                      <span className="text-sm tabular-nums text-stone-500">
+                        累計 {count.toLocaleString()}
+                      </span>
                     </span>
-                    <span className="flex items-baseline gap-1.5">
-                      {isHot && (
-                        <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">
-                          90日 {count90}
-                        </span>
-                      )}
-                      <span className="text-[11px] tabular-nums text-stone-500">
-                        {count.toLocaleString()}件
+                    {/* 直近1年 + 直近90日 を別行で 2 段表示。値が 0 なら淡色で
+                        「データなし」感を出さず、ある側のスケール感を保つ。 */}
+                    <span className="flex flex-wrap items-baseline gap-1.5 text-[11px]">
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
+                          count365 > 0
+                            ? "bg-amber-100 text-amber-900"
+                            : "bg-stone-100 text-stone-400"
+                        }`}
+                      >
+                        1年 {count365.toLocaleString()}
+                      </span>
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
+                          count90 > 0
+                            ? "bg-red-100 text-red-700"
+                            : "bg-stone-100 text-stone-400"
+                        }`}
+                      >
+                        90日 {count90.toLocaleString()}
                       </span>
                     </span>
                   </Link>
@@ -136,6 +187,16 @@ export default async function PlacePage({
           </ul>
         </section>
       ))}
+
+      <div className="not-prose mt-10">
+        <Link
+          href="/measures"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+        >
+          <span aria-hidden>←</span>
+          クマ対策トップに戻る
+        </Link>
+      </div>
     </PageShell>
   );
 }

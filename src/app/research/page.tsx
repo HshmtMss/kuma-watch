@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import CategoryFilter, {
+  type CategoryFilterItem,
+} from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
 import {
   RESEARCH_CATEGORY_LABEL,
@@ -39,16 +42,55 @@ function formatMonth(yyyymm: string): string {
   return `${m[1]}年${Number(m[2])}月`;
 }
 
-export default function ResearchIndexPage() {
+// type フィルタの定義。UI 上は topic/policy を「テーマ解説」に統合表示する。
+type ResearchTypeKey =
+  | "all"
+  | "monthly-report"
+  | "weekly-report"
+  | "topic-policy"
+  | "daily-report";
+
+const TYPE_LABEL: Record<Exclude<ResearchTypeKey, "all">, string> = {
+  "monthly-report": "月次レポート",
+  "weekly-report": "週次レポート",
+  "topic-policy": "テーマ解説",
+  "daily-report": "日次レポート",
+};
+
+const TYPE_EMOJI: Record<Exclude<ResearchTypeKey, "all">, string> = {
+  "monthly-report": "📅",
+  "weekly-report": "🗓️",
+  "topic-policy": "💡",
+  "daily-report": "📝",
+};
+
+type SearchParams = Promise<{ type?: string }>;
+
+export default async function ResearchIndexPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const sp = await searchParams;
   const sorted = sortedResearchEntries();
 
-  // 月次・テーマ・政策レポートは上段でフィード形式に。日次は下段で月別に折りたたむ。
   const monthly = sorted.filter((e) => e.category === "monthly-report");
   const weekly = sorted.filter((e) => e.category === "weekly-report");
   const topicPolicy = sorted.filter(
     (e) => e.category === "topic" || e.category === "policy",
   );
   const daily = sorted.filter((e) => e.category === "daily-report");
+
+  const validTypes = new Set<ResearchTypeKey>([
+    "monthly-report",
+    "weekly-report",
+    "topic-policy",
+    "daily-report",
+  ]);
+  const activeType: ResearchTypeKey =
+    sp.type && validTypes.has(sp.type as ResearchTypeKey)
+      ? (sp.type as ResearchTypeKey)
+      : "all";
 
   // 日次を YYYY-MM でグルーピング (新しい月から)。
   const dailyByMonth = new Map<string, ResearchEntry[]>();
@@ -58,9 +100,57 @@ export default function ResearchIndexPage() {
     arr.push(e);
     dailyByMonth.set(m, arr);
   }
-  const dailyMonths = [...dailyByMonth.keys()].sort((a, b) => b.localeCompare(a));
+  const dailyMonths = [...dailyByMonth.keys()].sort((a, b) =>
+    b.localeCompare(a),
+  );
 
   const regions = researchRegionsWithCount();
+
+  const showMonthly = activeType === "all" || activeType === "monthly-report";
+  const showWeekly = activeType === "all" || activeType === "weekly-report";
+  const showTopic = activeType === "all" || activeType === "topic-policy";
+  const showDaily = activeType === "all" || activeType === "daily-report";
+
+  // フィルタアイテム。エントリ 0 件のタイプは選択肢から除外する。
+  const filterItems: CategoryFilterItem[] = [
+    { key: "all", href: "/research", label: "すべて", count: sorted.length },
+  ];
+  if (monthly.length > 0) {
+    filterItems.push({
+      key: "monthly-report",
+      href: "/research?type=monthly-report",
+      label: TYPE_LABEL["monthly-report"],
+      emoji: TYPE_EMOJI["monthly-report"],
+      count: monthly.length,
+    });
+  }
+  if (weekly.length > 0) {
+    filterItems.push({
+      key: "weekly-report",
+      href: "/research?type=weekly-report",
+      label: TYPE_LABEL["weekly-report"],
+      emoji: TYPE_EMOJI["weekly-report"],
+      count: weekly.length,
+    });
+  }
+  if (topicPolicy.length > 0) {
+    filterItems.push({
+      key: "topic-policy",
+      href: "/research?type=topic-policy",
+      label: TYPE_LABEL["topic-policy"],
+      emoji: TYPE_EMOJI["topic-policy"],
+      count: topicPolicy.length,
+    });
+  }
+  if (daily.length > 0) {
+    filterItems.push({
+      key: "daily-report",
+      href: "/research?type=daily-report",
+      label: TYPE_LABEL["daily-report"],
+      emoji: TYPE_EMOJI["daily-report"],
+      count: daily.length,
+    });
+  }
 
   return (
     <PageShell
@@ -124,33 +214,15 @@ export default function ResearchIndexPage() {
         </div>
       </div>
 
-      {/* 地域から探す: 各都道府県の関連レポートへの導線。
-          記事内で頻出している都道府県をチップで並べる。 */}
-      {regions.length > 0 && (
-        <>
-          <h2>地域から探す</h2>
-          <p className="text-sm text-stone-600">
-            都道府県を選ぶと、その地域に関連するレポートを一覧できます。
-          </p>
-          <div className="not-prose mt-3 flex flex-wrap gap-2">
-            {regions.map((r) => (
-              <Link
-                key={r.pref}
-                href={`/research/region/${encodeURIComponent(r.pref)}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-900"
-              >
-                <span>{r.pref}</span>
-                <span className="text-[10px] tabular-nums text-stone-400">
-                  {r.count}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
+      <CategoryFilter
+        title="種別で絞り込み"
+        accent="emerald"
+        activeKey={activeType}
+        items={filterItems}
+      />
 
       {/* 月次レポート: 最新動向の総括として最上段に大きく置く。 */}
-      {monthly.length > 0 && (
+      {showMonthly && monthly.length > 0 && (
         <>
           <h2>月次レポート</h2>
           <ul className="not-prose space-y-4">
@@ -162,7 +234,7 @@ export default function ResearchIndexPage() {
       )}
 
       {/* 週次レポート: 月次と日次の中間粒度。現状エントリが無い場合は非表示。 */}
-      {weekly.length > 0 && (
+      {showWeekly && weekly.length > 0 && (
         <>
           <h2>週次レポート</h2>
           <ul className="not-prose space-y-4">
@@ -176,7 +248,7 @@ export default function ResearchIndexPage() {
       {/* テーマ解説。エントリが無ければセクション自体を表示しない。
           内部的に topic/policy の両カテゴリを束ねるが、UI 上は「政策提言」の
           語を出さず「テーマ解説」に統合表示する（読者にとって区別が薄いため）。 */}
-      {topicPolicy.length > 0 && (
+      {showTopic && topicPolicy.length > 0 && (
         <>
           <h2>テーマ解説</h2>
           <ul className="not-prose space-y-4">
@@ -187,11 +259,12 @@ export default function ResearchIndexPage() {
         </>
       )}
 
-      {/* 日次レポート: 月別 details で折りたたみ。最新の月だけ open。 */}
-      {daily.length > 0 && (
+      {/* 日次レポート: 月別 details で折りたたみ。最新の月だけ open。
+          日次のみフィルタ時は全て open 表示にする (絞り込みた結果を全部見たいはず)。 */}
+      {showDaily && daily.length > 0 && (
         <>
           <h2>日次レポート</h2>
-          <p className="text-sm text-stone-600">
+          <p className="text-base text-stone-700">
             その日の全国のクマ出没事案・人身被害・行政対応をまとめた速報レポート。月別にまとめています。
           </p>
           {dailyMonths.map((m, idx) => {
@@ -200,11 +273,11 @@ export default function ResearchIndexPage() {
               <details
                 key={m}
                 className="not-prose group mt-4 overflow-hidden rounded-xl border border-stone-200 bg-white"
-                open={idx === 0}
+                open={activeType === "daily-report" || idx === 0}
               >
-                <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-4 py-3 text-sm font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-4 py-3 text-base font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
                   <span>{formatMonth(m)}</span>
-                  <span className="flex items-center gap-2 text-xs font-normal text-stone-500">
+                  <span className="flex items-center gap-2 text-sm font-normal text-stone-500">
                     <span className="tabular-nums">{items.length}件</span>
                     <span className="text-stone-400 group-open:rotate-180">
                       ▼
@@ -221,7 +294,7 @@ export default function ResearchIndexPage() {
                         {/* 日次レポートはタイトルがどれも同じ定型なので省略し、
                             日付と自治体タグだけで識別できるようにする。 */}
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                          <span className="text-sm font-semibold tabular-nums text-stone-900">
+                          <span className="text-base font-semibold tabular-nums text-stone-900">
                             {e.publishedAt}
                           </span>
                           {e.regions.length > 0 && (
@@ -229,7 +302,7 @@ export default function ResearchIndexPage() {
                               {e.regions.slice(0, 5).map((r) => (
                                 <span
                                   key={r}
-                                  className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
+                                  className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-700"
                                 >
                                   {r}
                                 </span>
@@ -244,6 +317,29 @@ export default function ResearchIndexPage() {
               </details>
             );
           })}
+        </>
+      )}
+
+      {/* 地域から探す: 全件表示時のみ表示。種別フィルタ中は邪魔なので隠す。 */}
+      {activeType === "all" && regions.length > 0 && (
+        <>
+          <h2>地域から探す</h2>
+          <p className="text-base text-stone-700">
+            都道府県を選ぶと、その地域に関連するレポートを一覧できます。
+          </p>
+          <ul className="not-prose mt-3 flex flex-wrap gap-2 text-base">
+            {regions.map((r) => (
+              <li key={r.pref}>
+                <Link
+                  href={`/research/region/${encodeURIComponent(r.pref)}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-stone-700 hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-900"
+                >
+                  <span>{r.pref}</span>
+                  <span className="text-sm text-stone-400">{r.count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </>
       )}
 
@@ -280,22 +376,22 @@ function ResearchCard({
       className={`overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${accentHover}`}
     >
       <Link href={`/research/${entry.slug}`} className="block p-5">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
           <span className={`rounded-full px-2 py-0.5 font-medium ${accentChip}`}>
             {RESEARCH_CATEGORY_LABEL[entry.category]}
           </span>
           <span>{entry.publishedAt}</span>
         </div>
-        <div className="mt-2 text-base font-semibold text-gray-900">
+        <div className="mt-2 text-lg font-bold text-gray-900">
           {entry.title}
         </div>
-        <div className="mt-1 text-sm text-gray-600">{entry.lead}</div>
+        <div className="mt-1.5 text-base leading-relaxed text-gray-700">{entry.lead}</div>
         {entry.regions.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {entry.regions.slice(0, 5).map((r) => (
               <span
                 key={r}
-                className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700"
+                className="inline-block rounded-full bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-700"
               >
                 {r}
               </span>
