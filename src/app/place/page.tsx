@@ -138,7 +138,6 @@ export default async function PlacePage({
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {region.prefs.map((pref) => {
               const s = byPref.get(pref);
-              const count = s?.totalCount ?? 0;
               const count365 = s?.count365d ?? 0;
               const count90 = s?.count90d ?? 0;
               const isHot = topCount90Set.has(pref) && count90 > 0;
@@ -146,20 +145,16 @@ export default async function PlacePage({
                 <li key={pref}>
                   <Link
                     href={`/place/${encodeURIComponent(pref)}`}
-                    className={`flex flex-col gap-1 rounded-xl border bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50/40 ${
+                    className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50/40 ${
                       isHot ? "border-red-200" : "border-stone-200"
                     }`}
                   >
-                    <span className="flex items-baseline justify-between gap-2">
-                      <span className="text-base font-semibold text-stone-900">
-                        {pref}
-                      </span>
-                      <span className="text-sm tabular-nums text-stone-500">
-                        累計 {count.toLocaleString()}
-                      </span>
+                    <span className="text-base font-semibold text-stone-900">
+                      {pref}
                     </span>
-                    {/* 直近1年 + 直近90日 を別行で 2 段表示。値が 0 なら淡色で
-                        「データなし」感を出さず、ある側のスケール感を保つ。 */}
+                    {/* 直近1年 / 直近90日 の 2 段だけを並べる。累計は古い source の
+                        影響を受けやすく、現状の危険度を直感に反映しないので外す。
+                        値 0 でも淡色チップで残し、スケール比較を可能に。 */}
                     <span className="flex flex-wrap items-baseline gap-1.5 text-[11px]">
                       <span
                         className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${

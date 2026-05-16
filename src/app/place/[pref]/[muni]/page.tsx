@@ -169,9 +169,9 @@ export default async function MuniPage({ params }: Props) {
   // 数値が変わるため、Google から見たコンテンツ差別化に効く。
   const within20km = cellsWithDistance.filter((c) => c.distanceKm <= 20);
   const within50km = cellsWithDistance.filter((c) => c.distanceKm <= 50);
-  const r20Count = within20km.reduce((s, c) => s + c.count, 0);
+  const r20Count365d = within20km.reduce((s, c) => s + c.count365d, 0);
   const r20Count90d = within20km.reduce((s, c) => s + c.count90d, 0);
-  const r50Count = within50km.reduce((s, c) => s + c.count, 0);
+  const r50Count365d = within50km.reduce((s, c) => s + c.count365d, 0);
   const r50Count90d = within50km.reduce((s, c) => s + c.count90d, 0);
   const r20HotCities = within20km.filter((c) => c.count90d > 0).length;
   const r50HotCities = within50km.filter((c) => c.count90d > 0).length;
@@ -179,21 +179,11 @@ export default async function MuniPage({ params }: Props) {
   const nearestHot =
     cellsWithDistance.find((c) => c.count90d > 0) ?? null;
 
-  // 県内コンテキスト — 本市が県全体の中でどの程度を占めるかを「シェア・所属」の
-  // ファクトとして示す。順位（第N位）表現は人身被害を伴う安全情報としては
-  // 不適切なため使わない。各ページで数値が変わるためコンテンツの差別化にも効く。
-  const prefAllMuniCount = JAPAN_MUNICIPALITIES.filter(
-    (m) => m.prefName === pref,
-  ).length;
-  const prefMuniWithSightings = siblingsRaw.length;
-  const prefMuniWithoutSightings = Math.max(
-    0,
-    prefAllMuniCount - prefMuniWithSightings,
-  );
-  const sharePctOfPref =
-    prefSummary && prefSummary.totalCount > 0 && cell.count > 0
-      ? (cell.count / prefSummary.totalCount) * 100
-      : 0;
+  // 県内コンテキスト用の集計は「県内での位置づけ」ブロック内で
+  // prefSummary.count365d / count90d / cell.count365d / cell.count90d を
+  // 直接使うので、ここで派生変数を計算する必要はない。
+  // 「N 市町村で目撃あり」「県全体のシェア」表現は、累計表示を撤去した今は
+  // 意味が薄いので併せて削除済み。
 
   // 周辺ランドマーク (山・国立公園・温泉地など) — /spot/[slug] への内部リンクを
   // 形成し、市町村ページ ↔ ランドマークページ間の双方向リンクを作る。
@@ -440,17 +430,12 @@ export default async function MuniPage({ params }: Props) {
             と (2) Sticky CTA の 2 箇所に集約。 */}
       </div>
 
-      {/* 4 枚カード — count が全 0 の市町村では「0／0／0／-」と並ぶだけで
-          情報量が無く、ユーザーには「データが壊れているのか？」と読まれる
-          ので、その場合はカード全体を非表示にし、ヒーローカードの
-          『直近の出没情報なし』に一本化する。 */}
-      {cell.count > 0 && (
-        <div className="not-prose mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-            <div className="text-xs text-gray-500">総目撃数</div>
-            <div className="mt-1 text-xl font-bold text-gray-900">{cell.count}</div>
-            <div className="text-[11px] text-gray-400">件</div>
-          </div>
+      {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
+          「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。
+          1 年・90 日が両方 0 ならヒーローカードの「直近の出没情報なし」
+          で十分なので、カード列自体を非表示にする。 */}
+      {(cell.count365d > 0 || cell.count90d > 0) && (
+        <div className="not-prose mb-6 grid grid-cols-3 gap-3">
           <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
             <div className="text-xs text-gray-500">過去1年</div>
             <div className="mt-1 text-xl font-bold text-gray-900">{cell.count365d}</div>
@@ -552,7 +537,7 @@ export default async function MuniPage({ params }: Props) {
               </span>
             </div>
             <div className="mt-0.5 text-[11px] text-stone-500">
-              累計 {r20Count.toLocaleString()} 件・{r20HotCities} 市町村で直近の出没
+              直近1年 {r20Count365d.toLocaleString()} 件・{r20HotCities} 市町村で直近の出没
             </div>
           </div>
           <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
@@ -570,7 +555,7 @@ export default async function MuniPage({ params }: Props) {
               </span>
             </div>
             <div className="mt-0.5 text-[11px] text-stone-500">
-              累計 {r50Count.toLocaleString()} 件・{r50HotCities} 市町村で直近の出没
+              直近1年 {r50Count365d.toLocaleString()} 件・{r50HotCities} 市町村で直近の出没
             </div>
           </div>
         </div>
@@ -611,16 +596,16 @@ export default async function MuniPage({ params }: Props) {
       </div>
 
       <h2>クマ出没の傾向</h2>
-      {cell.count > 0 ? (
+      {cell.count365d > 0 || cell.count90d > 0 ? (
         <p>
-          {pref}{muni} ではこれまでに <strong>{cell.count.toLocaleString()} 件</strong> のクマ目撃情報が記録されており、
-          うち過去1年は {cell.count365d} 件、過去90日は {cell.count90d} 件です。
+          {pref}{muni} では過去 1 年で <strong>{cell.count365d.toLocaleString()} 件</strong>、
+          直近 90 日で <strong>{cell.count90d.toLocaleString()} 件</strong> の出没が記録されています。
           {cell.latestDate && <>最新の目撃は {formatDate(cell.latestDate)} です。</>}
           {" "}各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
         </p>
       ) : (
         <p>
-          {pref}{muni} には本サイトの集計開始以降、公開された出没記録がありません。
+          {pref}{muni} には直近 1 年の公開された出没記録がありません。
           ただし周辺市町村の状況や、季節・年による変動でリスクは大きく変わるため、上記の半径サマリーと自治体公式情報も併せてご確認ください。
         </p>
       )}
@@ -701,31 +686,19 @@ export default async function MuniPage({ params }: Props) {
       {prefSummary && (
         <>
           <h2>県内での位置づけ</h2>
-          {cell.count > 0 ? (
+          {cell.count365d > 0 || cell.count90d > 0 ? (
             <p>
-              {pref} では過去全期間に{" "}
-              <strong>{prefMuniWithSightings.toLocaleString()}</strong>{" "}
-              市町村で計{" "}
-              <strong>{prefSummary.totalCount.toLocaleString()}</strong>{" "}
-              件のクマ出没が記録されており、
-              {muni} はそのうち <strong>{cell.count.toLocaleString()}</strong>{" "}
-              件（県全体の <strong>{sharePctOfPref.toFixed(1)}%</strong>）が記録された、
-              {pref} で出没記録のある市町村のひとつです。
-              直近 90 日では {pref} 全体で {prefSummary.count90d.toLocaleString()} 件
-              {cell.count90d > 0 ? `、うち本市 ${cell.count90d.toLocaleString()} 件` : "、本市には記録なし"}
-              。
+              直近 1 年で {pref} 全体に <strong>{prefSummary.count365d.toLocaleString()}</strong>{" "}
+              件、直近 90 日で <strong>{prefSummary.count90d.toLocaleString()}</strong>{" "}
+              件の出没が記録されています。
+              うち {muni} は直近 1 年で <strong>{cell.count365d.toLocaleString()}</strong> 件、
+              直近 90 日で <strong>{cell.count90d.toLocaleString()}</strong> 件です。
             </p>
           ) : (
             <p>
-              {pref} では過去全期間に{" "}
-              <strong>{prefMuniWithSightings.toLocaleString()}</strong>{" "}
-              市町村で計{" "}
-              <strong>{prefSummary.totalCount.toLocaleString()}</strong>{" "}
-              件のクマ出没が記録されています。{muni} には本サイトの集計開始以降の記録はなく、
-              {pref}{prefAllMuniCount > 0 ? ` ${prefAllMuniCount.toLocaleString()} 市町村のうち` : ""}
-              出没記録のない{prefMuniWithoutSightings > 0 ? ` ${prefMuniWithoutSightings.toLocaleString()} ` : ""}
-              市町村のひとつです。
-              ただし周辺市町村の状況や季節・年による変動があるため、
+              直近 1 年で {pref} 全体に {prefSummary.count365d.toLocaleString()} 件、
+              直近 90 日で {prefSummary.count90d.toLocaleString()} 件の出没が記録されていますが、
+              {muni} には直近 1 年の記録がありません。ただし周辺市町村の状況や季節・年による変動があるため、
               安心の根拠とせず、上記の半径サマリーや自治体公式情報も併せてご確認ください。
             </p>
           )}

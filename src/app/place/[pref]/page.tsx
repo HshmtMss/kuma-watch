@@ -89,7 +89,6 @@ export default async function PrefPage({ params }: Props) {
     return a.cityName.localeCompare(b.cityName, "ja");
   });
   const totalMuni = sortedMunis.length;
-  const totalCount = sortedMunis.reduce((s, m) => s + m.count, 0);
   const total365d = sortedMunis.reduce((s, m) => s + m.count365d, 0);
   const total90d = sortedMunis.reduce((s, m) => s + m.count90d, 0);
   const latestDate = sortedMunis.reduce<string | null>(
@@ -118,7 +117,7 @@ export default async function PrefPage({ params }: Props) {
   return (
     <PageShell
       title={`${pref}のクマ出没予報`}
-      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。累計 ${totalCount.toLocaleString()} 件 / 直近1年 ${total365d.toLocaleString()} 件 / 直近90日 ${total90d.toLocaleString()} 件 (最終更新 ${latestDate ?? "-"})。`}
+      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。直近1年 ${total365d.toLocaleString()} 件 / 直近90日 ${total90d.toLocaleString()} 件 (最終更新 ${latestDate ?? "-"})。`}
     >
       <script
         type="application/ld+json"
@@ -147,53 +146,49 @@ export default async function PrefPage({ params }: Props) {
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
       <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {sortedMunis.map((m) => (
+        {sortedMunis.map((m) => {
+          // 「直近の活動」基準で表示の濃淡を決める。lat/lon 再帰属の結果、
+          // 累計は全市町村で > 0 になるが、1 年・90 日が両方 0 なら現状は静か。
+          const isActive = m.count365d > 0 || m.count90d > 0;
+          return (
           <li key={m.cityCode}>
             <Link
               href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
               className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm hover:border-amber-400 hover:bg-amber-50 ${
-                m.count > 0
+                isActive
                   ? "border-gray-200 bg-white text-gray-800"
                   : "border-gray-100 bg-gray-50 text-gray-500"
               }`}
             >
-              <span className={m.count > 0 ? "font-medium" : ""}>
+              <span className={isActive ? "font-medium" : ""}>
                 {m.cityName}
               </span>
               <span className="flex items-baseline gap-1.5 text-xs text-gray-500">
-                {m.count === 0 ? (
-                  <span className="text-gray-400">0 件</span>
-                ) : (
-                  <>
-                    {/* 累計 / 直近1年 / 直近90日 の 3 段表示。
-                        値 0 の段は淡色チップで残し、スケール感の比較を担保。 */}
-                    <span className="tabular-nums">
-                      累計 {m.count.toLocaleString()}
-                    </span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                        m.count365d > 0
-                          ? "bg-amber-100 text-amber-900"
-                          : "bg-stone-100 text-stone-400"
-                      }`}
-                    >
-                      1年 {m.count365d.toLocaleString()}
-                    </span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                        m.count90d > 0
-                          ? "bg-red-100 text-red-700"
-                          : "bg-stone-100 text-stone-400"
-                      }`}
-                    >
-                      90日 {m.count90d.toLocaleString()}
-                    </span>
-                  </>
-                )}
+                {/* 直近1年 / 直近90日 の 2 段。累計は古いソースで歪むので外す。
+                    値 0 でも淡色チップを残し、市町村間のスケール感を担保。 */}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                    m.count365d > 0
+                      ? "bg-amber-100 text-amber-900"
+                      : "bg-stone-100 text-stone-400"
+                  }`}
+                >
+                  1年 {m.count365d.toLocaleString()}
+                </span>
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                    m.count90d > 0
+                      ? "bg-red-100 text-red-700"
+                      : "bg-stone-100 text-stone-400"
+                  }`}
+                >
+                  90日 {m.count90d.toLocaleString()}
+                </span>
               </span>
             </Link>
           </li>
-        ))}
+          );
+        })}
       </ul>
 
       {/* 当該県にある観光地・登山口へのクロスリンク。SEO 観点で内部リンク強化と
