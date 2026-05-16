@@ -145,7 +145,7 @@ export default async function PrefPage({ params }: Props) {
       <p className="text-sm text-stone-600">
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
-      <ul className="not-prose grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <ul className="not-prose grid list-none grid-cols-1 gap-2 sm:grid-cols-2">
         {sortedMunis.map((m) => {
           // 「直近の活動」基準で表示の濃淡を決める。lat/lon 再帰属の結果、
           // 累計は全市町村で > 0 になるが、1 年・90 日が両方 0 なら現状は静か。

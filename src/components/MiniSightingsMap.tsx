@@ -17,6 +17,9 @@ type Props = {
   zoom?: number;
   height?: string;
   recencyHighlightDays?: number;
+  /** 中央の黄色マーク（代表地点）を表示するか。デフォルト false（市町村ページでは
+   *  「代表地点」が利用者の関心と無関係なので非表示にする）。 */
+  showCenterMarker?: boolean;
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -30,6 +33,7 @@ export default function MiniSightingsMap({
   zoom = 11,
   height = "360px",
   recencyHighlightDays = 90,
+  showCenterMarker = false,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<unknown>(null);
@@ -52,13 +56,15 @@ export default function MiniSightingsMap({
 
       L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
 
-      L.circleMarker([centerLat, centerLon], {
-        radius: 11,
-        color: "#92400e",
-        weight: 2,
-        fillColor: "#fde68a",
-        fillOpacity: 0.7,
-      }).addTo(map);
+      if (showCenterMarker) {
+        L.circleMarker([centerLat, centerLon], {
+          radius: 11,
+          color: "#92400e",
+          weight: 2,
+          fillColor: "#fde68a",
+          fillOpacity: 0.7,
+        }).addTo(map);
+      }
 
       const now = Date.now();
       const recentMs = recencyHighlightDays * 86_400_000;
@@ -98,7 +104,7 @@ export default function MiniSightingsMap({
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [centerLat, centerLon, zoom, records, recencyHighlightDays]);
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker]);
 
   return (
     <div

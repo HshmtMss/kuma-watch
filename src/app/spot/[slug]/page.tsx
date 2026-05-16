@@ -395,6 +395,7 @@ export default async function SpotPage({ params }: Props) {
             sectionName: n.sectionName,
           }))}
           zoom={11}
+          showCenterMarker
         />
       </div>
       <p className="not-prose mb-6 text-xs text-stone-500">

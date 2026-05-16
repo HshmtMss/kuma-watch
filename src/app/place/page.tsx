@@ -145,17 +145,18 @@ export default async function PlacePage({
                 <li key={pref}>
                   <Link
                     href={`/place/${encodeURIComponent(pref)}`}
-                    className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-3 hover:border-amber-400 hover:bg-amber-50/40 ${
+                    className={`flex flex-col gap-1.5 rounded-xl border bg-white px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50/40 ${
                       isHot ? "border-red-200" : "border-stone-200"
                     }`}
                   >
-                    <span className="text-base font-semibold text-stone-900">
+                    {/* 県名を 1 行で確実に収めるため縦スタックにする。
+                        横並びだと右側のチップに押されて「北海\n道」のように
+                        2 行折返しが起きていた。 */}
+                    <span className="whitespace-nowrap text-base font-semibold text-stone-900">
                       {pref}
                     </span>
-                    {/* 直近1年 / 直近90日 の 2 段だけを並べる。累計は古い source の
-                        影響を受けやすく、現状の危険度を直感に反映しないので外す。
-                        値 0 でも淡色チップで残し、スケール比較を可能に。 */}
-                    <span className="flex flex-wrap items-baseline gap-1.5 text-[11px]">
+                    {/* 直近1年 / 直近90日 の 2 段。値 0 でも淡色で残しスケール比較可能に。 */}
+                    <span className="flex flex-wrap items-baseline gap-1 text-[11px]">
                       <span
                         className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
                           count365 > 0

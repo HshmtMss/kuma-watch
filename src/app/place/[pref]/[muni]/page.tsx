@@ -165,19 +165,10 @@ export default async function MuniPage({ params }: Props) {
     }))
     .sort((a, b) => a.distanceKm - b.distanceKm);
 
-  // 半径サマリー: 20km / 50km 圏内のセル集約。各ページで全市町村別の
-  // 数値が変わるため、Google から見たコンテンツ差別化に効く。
-  const within20km = cellsWithDistance.filter((c) => c.distanceKm <= 20);
-  const within50km = cellsWithDistance.filter((c) => c.distanceKm <= 50);
-  const r20Count365d = within20km.reduce((s, c) => s + c.count365d, 0);
-  const r20Count90d = within20km.reduce((s, c) => s + c.count90d, 0);
-  const r50Count365d = within50km.reduce((s, c) => s + c.count365d, 0);
-  const r50Count90d = within50km.reduce((s, c) => s + c.count90d, 0);
-  const r20HotCities = within20km.filter((c) => c.count90d > 0).length;
-  const r50HotCities = within50km.filter((c) => c.count90d > 0).length;
-  // 最も近い「直近90日に出没のあった市町村」。県跨ぎで探す。
-  const nearestHot =
-    cellsWithDistance.find((c) => c.count90d > 0) ?? null;
+  // 旧「周辺の出没状況（半径サマリー）」セクションは UI 上削除済み。
+  // 関連集計（within20km/50km, r20Count*, r50Count*, nearestHot）も
+  // 利用箇所が消えたので除去。距離ベースの内部リンク（近隣カード・
+  // 周辺ランドマーク）は別計算 (cellsWithDistance) を引き続き使う。
 
   // 県内コンテキスト用の集計は「県内での位置づけ」ブロック内で
   // prefSummary.count365d / count90d / cell.count365d / cell.count90d を
@@ -353,12 +344,14 @@ export default async function MuniPage({ params }: Props) {
   const seasonalAdvice = getSeasonalAdvice(pref, month);
 
   // ダイナミック lead — 数値を必ず織り込み、SERP スニペットの具体性も上げる。
+  // 「5km メッシュで確認できます」は本ページでは確認できない（全国マップ側の機能）
+  // ためミスリーディングなので削除。
   const dynamicLead =
     cell.count90d > 0 && cell.latestDate
-      ? `過去 90 日で ${cell.count90d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の警戒レベルを 5km メッシュで確認できます。`
+      ? `過去 90 日で ${cell.count90d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} のクマ出没状況をまとめています。`
       : cell.count365d > 0 && cell.latestDate
-        ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の警戒レベルを 5km メッシュで確認できます。`
-        : `${pref} ${muni} のクマ出没情報・警戒レベルを 5km メッシュで確認できます。`;
+        ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} のクマ出没状況をまとめています。`
+        : `${pref} ${muni} のクマ出没情報をまとめています。`;
 
   return (
     <PageShell
@@ -488,8 +481,9 @@ export default async function MuniPage({ params }: Props) {
           zoom={11}
         />
       </div>
-      {/* 凡例 — 文章ではなくアイコン凡例にして視覚的に直読できるように。 */}
-      <ul className="not-prose mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-600">
+      {/* 凡例 — 文章ではなくアイコン凡例にして視覚的に直読できるように。
+          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。 */}
+      <ul className="not-prose mb-3 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
           直近 90 日
@@ -497,10 +491,6 @@ export default async function MuniPage({ params }: Props) {
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
           1 年以上前
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-amber-300 ring-1 ring-amber-500" />
-          {muni} の代表地点
         </li>
       </ul>
       <p className="not-prose mb-10">
@@ -516,84 +506,10 @@ export default async function MuniPage({ params }: Props) {
           縦の余白と区切り線のみで分節する（h2 ラベルは削除）。 */}
       <hr className="not-prose mb-8 border-stone-200" />
 
-      {/* 半径サマリー — 市町村ごとに違う数値と最寄りホット市町村が出るため、
-          ページ本文の差別化 (Google の重複コンテンツ回避) に直接効く。
-          0 件の市町村でも周辺の出没状況が分かるので「安心したい」ユーザーにも価値あり。 */}
-      <h2>周辺の出没状況</h2>
-      <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-            <div className="text-[11px] font-semibold text-stone-600">
-              半径 20km 圏内
-            </div>
-            <div className="mt-1 flex items-baseline gap-1">
-              <span
-                className={`text-xl font-bold ${r20Count90d > 0 ? "text-red-700" : "text-stone-700"}`}
-              >
-                {r20Count90d}
-              </span>
-              <span className="text-[11px] text-stone-500">
-                件 / 過去90日
-              </span>
-            </div>
-            <div className="mt-0.5 text-[11px] text-stone-500">
-              直近1年 {r20Count365d.toLocaleString()} 件・{r20HotCities} 市町村で直近の出没
-            </div>
-          </div>
-          <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-            <div className="text-[11px] font-semibold text-stone-600">
-              半径 50km 圏内
-            </div>
-            <div className="mt-1 flex items-baseline gap-1">
-              <span
-                className={`text-xl font-bold ${r50Count90d > 0 ? "text-red-700" : "text-stone-700"}`}
-              >
-                {r50Count90d}
-              </span>
-              <span className="text-[11px] text-stone-500">
-                件 / 過去90日
-              </span>
-            </div>
-            <div className="mt-0.5 text-[11px] text-stone-500">
-              直近1年 {r50Count365d.toLocaleString()} 件・{r50HotCities} 市町村で直近の出没
-            </div>
-          </div>
-        </div>
-        {nearestHot ? (
-          <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-            <div className="text-[11px] font-semibold text-amber-900">
-              最も近い直近の出没
-            </div>
-            <div className="mt-1 text-sm text-amber-950">
-              <Link
-                href={`/place/${encodeURIComponent(nearestHot.prefectureName)}/${encodeURIComponent(nearestHot.cityName)}`}
-                className="font-semibold underline hover:no-underline"
-              >
-                {nearestHot.prefectureName === pref
-                  ? nearestHot.cityName
-                  : `${nearestHot.prefectureName} ${nearestHot.cityName}`}
-              </Link>
-              <span className="ml-2 text-xs">
-                {nearestHot.distanceKm.toFixed(1)} km
-              </span>
-              {nearestHot.latestDate && (
-                <span className="ml-2 text-xs">
-                  / 最新 {formatDate(nearestHot.latestDate)}
-                </span>
-              )}
-            </div>
-            <div className="mt-0.5 text-[11px] text-amber-800">
-              過去90日に {nearestHot.count90d} 件の出没。{muni} からの直線距離。
-            </div>
-          </div>
-        ) : (
-          <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
-            半径 50km 圏内で過去 90 日に出没事例は記録されていません。ただし
-            季節・天候・年によって状況は変わるため、入山・遠出の前には最新情報を
-            ご確認ください。
-          </p>
-        )}
-      </div>
+      {/* 半径サマリー（半径20km/50km の集計と「最も近い直近の出没」）は、
+          ユーザー指摘で「文章で数字が並んで重い」「重複情報感がある」と判断し
+          全削除。同じ情報は「県内での位置づけ」と「近隣で出没している市町村」
+          で十分に表現できている。 */}
 
       <h2>クマ出没の傾向</h2>
       {cell.count365d > 0 || cell.count90d > 0 ? (
@@ -601,7 +517,7 @@ export default async function MuniPage({ params }: Props) {
           {pref}{muni} では過去 1 年で <strong>{cell.count365d.toLocaleString()} 件</strong>、
           直近 90 日で <strong>{cell.count90d.toLocaleString()} 件</strong> の出没が記録されています。
           {cell.latestDate && <>最新の目撃は {formatDate(cell.latestDate)} です。</>}
-          {" "}各メッシュ (5kmグリッド) ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出されています。
+          {" "}地域ごとの警戒レベルは、過去の出没履歴・季節・時間帯・気象条件を組み合わせて算出しています。詳細な警戒レベルマップは全国マップでご確認ください。
         </p>
       ) : (
         <p>
@@ -893,9 +809,8 @@ export default async function MuniPage({ params }: Props) {
         <>
           <h2>周辺の登山・観光スポット</h2>
           <p className="text-sm">
-            {muni} の代表地点から半径 {NEARBY_LANDMARK_RADIUS_KM} km 圏内にある
-            主要なランドマークです。各スポットのページで、クマ出没情報を集約した
-            周辺マップと警戒レベルをご確認いただけます。
+            {muni} から半径 {NEARBY_LANDMARK_RADIUS_KM} km 圏内にある主要なランドマークです。
+            各スポットのページで、クマ出没情報を集約した周辺マップと警戒レベルをご確認いただけます。
           </p>
           <ul className="not-prose my-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {nearbyLandmarks.map((l) => (
@@ -928,7 +843,7 @@ export default async function MuniPage({ params }: Props) {
       {siblings.length > 0 && (
         <>
           <h2>{pref} の他の市町村</h2>
-          <ul className="not-prose grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <ul className="not-prose grid list-none grid-cols-2 gap-2 sm:grid-cols-3">
             {siblings.map((s) => (
               <li key={s.cityName}>
                 <Link
