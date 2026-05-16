@@ -9,6 +9,7 @@ import {
   getPlaceCell,
   getPlaceCellsByPref,
   getPrefSummary,
+  getMonthlyCountsForPlace,
   getRecordsForPlace,
   getStaticPlaceKeys,
   type PlaceCell,
@@ -125,11 +126,14 @@ export default async function MuniPage({ params }: Props) {
       lonCentroid: masterEntry!.lon,
     };
 
-  const [siblingsRaw, allCells, mapRecords, prefSummary] = await Promise.all([
+  const [siblingsRaw, allCells, mapRecords, prefSummary, monthly] = await Promise.all([
     getPlaceCellsByPref(pref),
     getAllPlaceCells(),
     getRecordsForPlace(pref, muni, 60),
     getPrefSummary(pref),
+    // 月別チャートは getRecordsForPlace の上限 (60) で古い月が落ちるので
+    // 別関数で全件から月別バケット集計する。
+    getMonthlyCountsForPlace(pref, muni),
   ]);
 
   const haversineKm = (
@@ -314,26 +318,9 @@ export default async function MuniPage({ params }: Props) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // 過去 12 ヶ月の月別件数 — 当月から 11 ヶ月前まで時系列で並べ、グラフ化。
-  // 季節性 (秋の急増・冬の減少) を直感的に把握できるようにする。
-  const monthly: { label: string; key: string; count: number }[] = [];
+  // 月別件数は getMonthlyCountsForPlace で全件から集計済み。グラフ用の
+  // 最大値だけここで計算する。
   const now = new Date();
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const y = d.getFullYear();
-    const m = d.getMonth() + 1;
-    monthly.push({
-      label: `${m}月`,
-      key: `${y}-${String(m).padStart(2, "0")}`,
-      count: 0,
-    });
-  }
-  for (const r of mapRecords) {
-    const k = r.date?.slice(0, 7); // YYYY-MM
-    if (!k) continue;
-    const bucket = monthly.find((b) => b.key === k);
-    if (bucket) bucket.count += 1;
-  }
   const monthlyMax = Math.max(1, ...monthly.map((b) => b.count));
 
   // 季節別アドバイス — 県（ヒグマ/ツキノワグマ/絶滅区分）と当月から、
@@ -843,15 +830,19 @@ export default async function MuniPage({ params }: Props) {
       {siblings.length > 0 && (
         <>
           <h2>{pref} の他の市町村</h2>
+          {/* 他の市町村ナビ — 左右の余白を生かすため 2 列カードを
+              「市町村名（中央寄り）+ 件数を右にバッジ」のレイアウトに整える。 */}
           <ul className="not-prose grid list-none grid-cols-2 gap-2 sm:grid-cols-3">
             {siblings.map((s) => (
               <li key={s.cityName}>
                 <Link
                   href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(s.cityName)}`}
-                  className="block rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+                  className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
                 >
-                  <span className="font-medium">{s.cityName}</span>
-                  <span className="ml-1 text-gray-400">({s.count})</span>
+                  <span className="truncate font-medium">{s.cityName}</span>
+                  <span className="shrink-0 tabular-nums text-gray-400">
+                    {s.count}
+                  </span>
                 </Link>
               </li>
             ))}

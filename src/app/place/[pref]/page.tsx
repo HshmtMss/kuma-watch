@@ -91,6 +91,18 @@ export default async function PrefPage({ params }: Props) {
   const totalMuni = sortedMunis.length;
   const total365d = sortedMunis.reduce((s, m) => s + m.count365d, 0);
   const total90d = sortedMunis.reduce((s, m) => s + m.count90d, 0);
+
+  // 都道府県の代表座標 — 全市町村の重心の平均。
+  // 「地図で〇〇を確認する」リンクで全国マップを当該県の位置に開く。
+  const prefCenter = sortedMunis.length
+    ? {
+        lat: sortedMunis.reduce((s, m) => s + m.lat, 0) / sortedMunis.length,
+        lon: sortedMunis.reduce((s, m) => s + m.lon, 0) / sortedMunis.length,
+      }
+    : null;
+  const prefMapUrl = prefCenter
+    ? `/?lat=${prefCenter.lat.toFixed(4)}&lon=${prefCenter.lon.toFixed(4)}&z=8&label=${encodeURIComponent(pref)}`
+    : "/";
   const latestDate = sortedMunis.reduce<string | null>(
     (best, m) => (m.latestDate && (!best || m.latestDate > best) ? m.latestDate : best),
     null,
@@ -145,48 +157,50 @@ export default async function PrefPage({ params }: Props) {
       <p className="text-sm text-stone-600">
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
-      <ul className="not-prose grid list-none grid-cols-1 gap-2 sm:grid-cols-2">
+      {/* 市町村カード — 2 列カードグリッド + 縦スタック構成にして
+          ・市町村名は単独行で 1 行確定（折返し抑制 / 視認性向上）
+          ・1年 / 90日 チップは下段で左右に空きを作らず並べる
+          で「左右いっぱい・バランス良く」配置する。 */}
+      <ul className="not-prose grid list-none grid-cols-2 gap-2 sm:grid-cols-3">
         {sortedMunis.map((m) => {
-          // 「直近の活動」基準で表示の濃淡を決める。lat/lon 再帰属の結果、
-          // 累計は全市町村で > 0 になるが、1 年・90 日が両方 0 なら現状は静か。
           const isActive = m.count365d > 0 || m.count90d > 0;
           return (
-          <li key={m.cityCode}>
-            <Link
-              href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
-              className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm hover:border-amber-400 hover:bg-amber-50 ${
-                isActive
-                  ? "border-gray-200 bg-white text-gray-800"
-                  : "border-gray-100 bg-gray-50 text-gray-500"
-              }`}
-            >
-              <span className={isActive ? "font-medium" : ""}>
-                {m.cityName}
-              </span>
-              <span className="flex items-baseline gap-1.5 text-xs text-gray-500">
-                {/* 直近1年 / 直近90日 の 2 段。累計は古いソースで歪むので外す。
-                    値 0 でも淡色チップを残し、市町村間のスケール感を担保。 */}
+            <li key={m.cityCode}>
+              <Link
+                href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
+                className={`flex h-full flex-col justify-between gap-1.5 rounded-lg border px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50 ${
+                  isActive
+                    ? "border-gray-200 bg-white text-gray-800"
+                    : "border-gray-100 bg-gray-50 text-gray-500"
+                }`}
+              >
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                    m.count365d > 0
-                      ? "bg-amber-100 text-amber-900"
-                      : "bg-stone-100 text-stone-400"
-                  }`}
+                  className={`text-sm leading-tight ${isActive ? "font-semibold" : ""}`}
                 >
-                  1年 {m.count365d.toLocaleString()}
+                  {m.cityName}
                 </span>
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                    m.count90d > 0
-                      ? "bg-red-100 text-red-700"
-                      : "bg-stone-100 text-stone-400"
-                  }`}
-                >
-                  90日 {m.count90d.toLocaleString()}
+                <span className="flex flex-wrap items-baseline gap-1">
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                      m.count365d > 0
+                        ? "bg-amber-100 text-amber-900"
+                        : "bg-stone-100 text-stone-400"
+                    }`}
+                  >
+                    1年 {m.count365d.toLocaleString()}
+                  </span>
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                      m.count90d > 0
+                        ? "bg-red-100 text-red-700"
+                        : "bg-stone-100 text-stone-400"
+                    }`}
+                  >
+                    90日 {m.count90d.toLocaleString()}
+                  </span>
                 </span>
-              </span>
-            </Link>
-          </li>
+              </Link>
+            </li>
           );
         })}
       </ul>
@@ -234,12 +248,15 @@ export default async function PrefPage({ params }: Props) {
         KumaWatch のデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
         あくまで参考情報であり、最新かつ正確な情報は各自治体の公式発表をご確認ください。
       </p>
+      {/* 全国マップを当該県の位置で開く。muni ページの sticky CTA と
+          同じトーン（amber-600 fill + 大きめ）に揃え、サイト全体の
+          「地図を開く系」ボタンとして整合性を保つ。 */}
       <p className="not-prose mt-6">
         <Link
-          href="/"
-          className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+          href={prefMapUrl}
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-sm ring-1 ring-amber-700 hover:bg-amber-700"
         >
-          地図で {pref} を確認する →
+          🗺️ {pref} の警戒レベルマップを開く →
         </Link>
       </p>
     </PageShell>

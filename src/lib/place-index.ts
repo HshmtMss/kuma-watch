@@ -295,6 +295,37 @@ export async function getRecordsForPlace(
   return arr.slice(0, limit);
 }
 
+/** 過去 12 ヶ月の月別件数を直近月から遡って 12 件返す。
+ *  muni ページの月別棒グラフ用。getRecordsForPlace に limit を渡して
+ *  集計すると、件数の多い muni では古い月の record が切り捨てられて
+ *  グラフが歪むため、ここで全件から月別バケット集計する。 */
+export async function getMonthlyCountsForPlace(
+  pref: string,
+  city: string,
+): Promise<{ key: string; label: string; count: number }[]> {
+  const idx = await getIndex();
+  const arr = idx.recordsByKey.get(`${pref}/${city}`) ?? [];
+  const buckets: { key: string; label: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    buckets.push({
+      key: `${y}-${String(m).padStart(2, "0")}`,
+      label: `${m}月`,
+      count: 0,
+    });
+  }
+  for (const r of arr) {
+    const k = r.date?.slice(0, 7);
+    if (!k) continue;
+    const b = buckets.find((x) => x.key === k);
+    if (b) b.count++;
+  }
+  return buckets;
+}
+
 /** 静的生成対象のキー一覧 (count >= minCount のもの) */
 export async function getStaticPlaceKeys(
   minCount = 3,

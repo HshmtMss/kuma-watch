@@ -211,15 +211,9 @@ export default async function SpotIndexPage({
         </ul>
       </section>
 
-      <div className="not-prose mt-10">
-        <Link
-          href="/measures"
-          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-3 text-base font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
-        >
-          <span aria-hidden>←</span>
-          クマ対策トップに戻る
-        </Link>
-      </div>
+      {/* /spot はヘッダーナビから直接来られる top-level なので「クマ対策トップに
+          戻る」ボタンは画面遷移上のミスマッチ。ヘッダーナビ + パンくず + 各観光地
+          内の戻り導線で十分なため、ここでは戻りリンクを置かない。 */}
     </PageShell>
   );
 }
