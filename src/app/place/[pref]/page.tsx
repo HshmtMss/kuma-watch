@@ -157,29 +157,28 @@ export default async function PrefPage({ params }: Props) {
       <p className="text-sm text-stone-600">
         全{totalMuni}市町村を一覧表示しています（出没情報 0 件の市町村も含む）。件数の多い順に並んでいます。
       </p>
-      {/* 市町村カード — 2 列カードグリッド + 縦スタック構成にして
-          ・市町村名は単独行で 1 行確定（折返し抑制 / 視認性向上）
-          ・1年 / 90日 チップは下段で左右に空きを作らず並べる
-          で「左右いっぱい・バランス良く」配置する。 */}
-      <ul className="not-prose grid list-none grid-cols-2 gap-2 sm:grid-cols-3">
+      {/* 市町村カード — モバイルは 1 列・フル幅、PC は 2 列。
+          1 行内で 市町村名（左） + 1年/90日 チップ（右）の両端配置。
+          2 列カードの「左側スペースが空いて見える」問題を解消。 */}
+      <ul className="not-prose grid list-none grid-cols-1 gap-2 sm:grid-cols-2">
         {sortedMunis.map((m) => {
           const isActive = m.count365d > 0 || m.count90d > 0;
           return (
             <li key={m.cityCode}>
               <Link
                 href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`}
-                className={`flex h-full flex-col justify-between gap-1.5 rounded-lg border px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50 ${
+                className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 hover:border-amber-400 hover:bg-amber-50 ${
                   isActive
                     ? "border-gray-200 bg-white text-gray-800"
                     : "border-gray-100 bg-gray-50 text-gray-500"
                 }`}
               >
                 <span
-                  className={`text-sm leading-tight ${isActive ? "font-semibold" : ""}`}
+                  className={`text-sm ${isActive ? "font-semibold" : ""}`}
                 >
                   {m.cityName}
                 </span>
-                <span className="flex flex-wrap items-baseline gap-1">
+                <span className="flex shrink-0 items-baseline gap-1">
                   <span
                     className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
                       m.count365d > 0

@@ -830,17 +830,17 @@ export default async function MuniPage({ params }: Props) {
       {siblings.length > 0 && (
         <>
           <h2>{pref} の他の市町村</h2>
-          {/* 他の市町村ナビ — 左右の余白を生かすため 2 列カードを
-              「市町村名（中央寄り）+ 件数を右にバッジ」のレイアウトに整える。 */}
-          <ul className="not-prose grid list-none grid-cols-2 gap-2 sm:grid-cols-3">
+          {/* 他の市町村ナビ — モバイルは 1 列フル幅にして左側の空きを解消。
+              名前を左端、件数を右端に両端配置で「横幅いっぱい」を確保。 */}
+          <ul className="not-prose grid list-none grid-cols-1 gap-2 sm:grid-cols-2">
             {siblings.map((s) => (
               <li key={s.cityName}>
                 <Link
                   href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(s.cityName)}`}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-800 hover:border-amber-400 hover:bg-amber-50"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 hover:border-amber-400 hover:bg-amber-50"
                 >
                   <span className="truncate font-medium">{s.cityName}</span>
-                  <span className="shrink-0 tabular-nums text-gray-400">
+                  <span className="shrink-0 tabular-nums text-xs text-gray-400">
                     {s.count}
                   </span>
                 </Link>
