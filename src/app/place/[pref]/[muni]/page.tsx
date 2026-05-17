@@ -13,6 +13,7 @@ import {
   getRecordsForPlace,
   getStaticPlaceKeys,
   type PlaceCell,
+  type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
 import { getSeasonalAdvice } from "@/lib/place-content";
@@ -330,12 +331,17 @@ export default async function MuniPage({ params }: Props) {
   // 最近の出没事案 — mapRecords は date desc 済み。
   // 過去 365 日 + sectionName あり、を優先して 15 件まで（より具体性のある情報量）。
   const today = Date.now();
-  const recentIncidents = mapRecords
-    .filter((r) => {
-      const t = Date.parse(r.date);
-      return Number.isFinite(t) && today - t <= 365 * 86_400_000;
-    })
-    .slice(0, 15);
+  const YEAR_MS = 365 * 86_400_000;
+  const within1Year = (r: PlaceRecord) => {
+    const t = Date.parse(r.date);
+    return Number.isFinite(t) && today - t <= YEAR_MS;
+  };
+  const recentIncidents = mapRecords.filter(within1Year).slice(0, 15);
+
+  // 地図プロット用 — 表示対象は「過去 1 年以内のデータ」のみ。
+  // そのうち MiniSightingsMap 側で直近 90 日を赤、それ以外（91 日〜1 年）を
+  // グレーで描く。古すぎる点が混じると最新傾向の解釈を歪めるためここで絞る。
+  const mapRecordsForYear = mapRecords.filter(within1Year);
 
   // 地区別件数 — sectionName で集約して件数の多い順に top 10。
   const sectionCounts = new Map<string, number>();
@@ -494,15 +500,13 @@ export default async function MuniPage({ params }: Props) {
         <MiniSightingsMap
           centerLat={cell.latCentroid}
           centerLon={cell.lonCentroid}
-          records={mapRecords}
+          records={mapRecordsForYear}
           zoom={11}
         />
       </div>
-      {/* 凡例 — 文章ではなくアイコン凡例にして視覚的に直読できるように。
-          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。
-          グレー点は MiniSightingsMap の records (date desc 上位 60) から 90 日内
-          を除いたもの。データ取得期間に厳密な上限が無いため「1 年以上前」と
-          書くと事実と一致しないケースが出るので「90 日より前」と表現する。 */}
+      {/* 凡例 — プロット対象は「過去 1 年以内」のレコードのみ。
+          そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
+          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。 */}
       <ul className="not-prose mb-3 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
@@ -510,7 +514,7 @@ export default async function MuniPage({ params }: Props) {
         </li>
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
-          90 日より前
+          1 年以内
         </li>
       </ul>
       {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部の Sticky CTA
