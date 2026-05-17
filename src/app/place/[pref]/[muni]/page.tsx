@@ -61,6 +61,36 @@ function decode(v: string): string {
   }
 }
 
+// 現在の月から「あわせて読みたい」の季節枠記事を決める。SSG ビルド時に
+// new Date() を読むため、再ビルドの度に季節が反映される。/articles/{spring,
+// summer,autumn,winter} の 4 本に対応。
+function getSeasonalArticle(): { href: string; title: string; sub: string } {
+  const month = new Date().getMonth() + 1; // 1..12
+  if (month >= 3 && month <= 5)
+    return {
+      href: "/articles/spring",
+      title: "春のクマ対策",
+      sub: "冬眠明けの母グマと子グマに注意",
+    };
+  if (month >= 6 && month <= 8)
+    return {
+      href: "/articles/summer",
+      title: "夏のクマ対策",
+      sub: "川遊び・キャンプ・避暑地のリスク",
+    };
+  if (month >= 9 && month <= 11)
+    return {
+      href: "/articles/autumn",
+      title: "秋のクマ対策",
+      sub: "なぜ秋が最も危険なのか",
+    };
+  return {
+    href: "/articles/winter",
+    title: "冬のクマ対策",
+    sub: "穴持たず・冬山のリスク",
+  };
+}
+
 function formatDate(d: string | null): string {
   if (!d) return "-";
   const t = Date.parse(d);
@@ -469,7 +499,10 @@ export default async function MuniPage({ params }: Props) {
         />
       </div>
       {/* 凡例 — 文章ではなくアイコン凡例にして視覚的に直読できるように。
-          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。 */}
+          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。
+          グレー点は MiniSightingsMap の records (date desc 上位 60) から 90 日内
+          を除いたもの。データ取得期間に厳密な上限が無いため「1 年以上前」と
+          書くと事実と一致しないケースが出るので「90 日より前」と表現する。 */}
       <ul className="not-prose mb-3 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
@@ -477,15 +510,19 @@ export default async function MuniPage({ params }: Props) {
         </li>
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
-          1 年以上前
+          90 日より前
         </li>
       </ul>
-      <p className="not-prose mb-10">
+      {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部の Sticky CTA
+          が同じ役割を担うので hidden sm:inline-flex で重複排除。ラベルも
+          Sticky CTA と統一し、「内容は同じなのに 2 つあって紛らわしい」という
+          指摘に対応。 */}
+      <p className="not-prose mb-10 hidden sm:block">
         <Link
           href={mapUrl}
-          className="inline-flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
+          className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
         >
-          🗺️ 全国の警戒レベルマップで他地域も見る →
+          🗺️ {muni} の警戒レベルマップを開く →
         </Link>
       </p>
 
@@ -699,12 +736,14 @@ export default async function MuniPage({ params }: Props) {
       </ul>
 
       <h2>あわせて読みたい</h2>
-      {/* list-none + pl-0 で prose のオレンジマーカーと左余白を排除し、
-          カードを h2 オレンジ下線と同じ幅まで広げる。 */}
+      {/* 4 枠のうち 1 枠は現在の季節に合わせて選定する。「春なのに秋の記事
+          が出る」という指摘に対応。残り 3 枠は通年使える普遍的トピック
+          (遭遇・スプレー・種別比較)。ビルド時に Date を読むため、ISR/SSG
+          再生成のたびに季節が反映される。 */}
       <ul className="not-prose grid list-none grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
         {[
           { href: "/articles/encounter", title: "クマに遭遇したら", sub: "距離別の正しい対処" },
-          { href: "/articles/autumn", title: "秋のクマ対策", sub: "なぜ秋が最も危険なのか" },
+          getSeasonalArticle(),
           { href: "/articles/bear-spray", title: "クマよけスプレー", sub: "使い方と選び方" },
           { href: "/articles/species-difference", title: "ツキノワグマとヒグマ", sub: "行動・対処の違い" },
         ].map((it) => (
@@ -847,14 +886,19 @@ export default async function MuniPage({ params }: Props) {
       </div>
 
       {/* sticky CTA がスクロール末尾で本文を覆わないようスペーサーを置く。
-          /spot/[slug] と同じ h-20 でフッター/本文との重なりを回避。 */}
-      <div className="not-prose h-20 sm:hidden" aria-hidden />
+          ボタン本体 (約 56px) + safe-area + 余白の合計に合わせて h-28 に増量。
+          以前の h-20 (80px) では iOS の home indicator 領域と被って本文や
+          次セクションのカードに乗ってしまう問題があったため。 */}
+      <div className="not-prose h-28 sm:hidden" aria-hidden />
 
       {/* モバイル限定の sticky CTA。スクロールしても常に「地図を開く」が
-          指の届く位置に出る。md 以上ではヒーローカード内のボタンで十分。 */}
+          指の届く位置に出る。bottom を env(safe-area-inset-bottom) + 1rem に
+          することで iOS のホームインジケータ領域に重ならず、ボタンが欠けない。
+          PC は上の inline ボタンを表示するのでここは sm:hidden に限定。 */}
       <Link
         href={mapUrl}
-        className="not-prose fixed inset-x-3 bottom-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-sm font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
+        className="not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
       >
         🗺️ {muni} の警戒レベルマップを開く →
       </Link>
