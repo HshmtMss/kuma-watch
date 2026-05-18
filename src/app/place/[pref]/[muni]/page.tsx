@@ -496,7 +496,7 @@ export default async function MuniPage({ params }: Props) {
           地図直下に「全国マップへ」リンクを設置し、埋め込み地図からも全国
           地図へ遷移できる構造にした。 */}
       <h2>周辺の目撃マップ</h2>
-      <div className="not-prose mb-2">
+      <div className="not-prose mb-1.5">
         <MiniSightingsMap
           centerLat={cell.latCentroid}
           centerLon={cell.lonCentroid}
@@ -507,7 +507,7 @@ export default async function MuniPage({ params }: Props) {
       {/* 凡例 — プロット対象は「過去 1 年以内」のレコードのみ。
           そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
           中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。 */}
-      <ul className="not-prose mb-3 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
+      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
           直近 90 日
@@ -521,7 +521,7 @@ export default async function MuniPage({ params }: Props) {
           が同じ役割を担うので hidden sm:inline-flex で重複排除。ラベルも
           Sticky CTA と統一し、「内容は同じなのに 2 つあって紛らわしい」という
           指摘に対応。 */}
-      <p className="not-prose mb-10 hidden sm:block">
+      <p className="not-prose mb-6 hidden sm:block">
         <Link
           href={mapUrl}
           className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
@@ -530,9 +530,9 @@ export default async function MuniPage({ params }: Props) {
         </Link>
       </p>
 
-      {/* 概要と詳細の境界。明示的な「もっと詳しく」見出しは冗長なので
-          縦の余白と区切り線のみで分節する（h2 ラベルは削除）。 */}
-      <hr className="not-prose mb-8 border-stone-200" />
+      {/* 概要と詳細の境界。次セクション (h2) の上余白で十分なので区切り線は
+          置かない。以前は <hr> を挟んでいたが「凡例の下に薄い線が残っていて
+          見苦しい」との指摘で除去。 */}
 
       {/* 半径サマリー（半径20km/50km の集計と「最も近い直近の出没」）は、
           ユーザー指摘で「文章で数字が並んで重い」「重複情報感がある」と判断し
