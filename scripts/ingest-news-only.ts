@@ -43,26 +43,76 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // 既存の news レコード URL セット (dedup の鍵)
+  // 既存の news レコード URL セット (dedup 第 1 段 = Gemini 呼び出し前)
   // fetchNewsSightings に渡して Gemini 呼び出し前にフィルタリングする。
   // これにより 30 分間隔 cron でも Gemini quota をほぼ消費しない。
   const existingNewsUrls = new Set<string>();
   for (const r of snapshot.records) {
     if (r.source === "news" && r.sourceUrl) existingNewsUrls.add(r.sourceUrl);
   }
+
+  // 既存レコードのフィンガープリント (dedup 第 2 段 = Gemini 抽出後)
+  //
+  // 同一インシデントを複数の報道機関 (NHK / Yahoo 転載 / 地元紙 …) が
+  // 別々の記事 URL で報じると、第 1 段の URL dedup を素通りして地図上で
+  // 3〜4 個のピンが重複する問題が発生していた。
+  //
+  // 粒度: 日付 + 都道府県 + 市町村 + 地区名。「家の敷地」「○○国道沿い」
+  // までは同じインシデントとみなし、それ以下 (時刻・コメント本文) は
+  // ソースごとの言い回し揺れで dedup に使えない。
+  // sharp9110 (警察 110 番) も対象に含めることで、警察発表とニュース
+  // 報道が重なった場合に権威ある sharp9110 を残す副次的効果も得られる。
+  const fingerprint = (r: {
+    date: string;
+    prefectureName: string;
+    cityName: string;
+    sectionName: string;
+  }) =>
+    `${r.date}|${r.prefectureName}|${r.cityName}|${(r.sectionName ?? "").trim()}`;
+  const existingFingerprints = new Set<string>();
+  for (const r of snapshot.records) {
+    if (r.source === "news" || r.source === "sharp9110") {
+      existingFingerprints.add(fingerprint(r));
+    }
+  }
   console.log(
-    `[ingest-news] existing snapshot: ${snapshot.records.length} records (${existingNewsUrls.size} news with URL)`,
+    `[ingest-news] existing snapshot: ${snapshot.records.length} records ` +
+      `(${existingNewsUrls.size} news URLs, ${existingFingerprints.size} fingerprints)`,
   );
 
   // 最新ニュースを取得 (既処理 URL を除外して Gemini 呼び出しコストを最小化)
-  const fresh = await fetchNewsSightings(existingNewsUrls);
+  const freshRaw = await fetchNewsSightings(existingNewsUrls);
 
-  if (fresh.length === 0) {
+  if (freshRaw.length === 0) {
     console.log("[ingest-news] no new items — skipping write");
     return;
   }
 
-  console.log(`[ingest-news] adding ${fresh.length} fresh news records`);
+  // フィンガープリント dedup。バッチ内の同一インシデント重複も同時に弾く
+  // ため、batchSeen にも追加していく。
+  const batchSeen = new Set<string>();
+  const fresh = [];
+  let skippedDup = 0;
+  for (const r of freshRaw) {
+    const fp = fingerprint(r);
+    if (existingFingerprints.has(fp) || batchSeen.has(fp)) {
+      skippedDup++;
+      continue;
+    }
+    batchSeen.add(fp);
+    fresh.push(r);
+  }
+
+  if (fresh.length === 0) {
+    console.log(
+      `[ingest-news] all ${freshRaw.length} fresh items were duplicates — skipping write`,
+    );
+    return;
+  }
+
+  console.log(
+    `[ingest-news] adding ${fresh.length} fresh news records (skipped ${skippedDup} duplicate-incident items)`,
+  );
 
   // 書き戻し: 末尾に append (既存配列の順序を保つ)
   const next: Snapshot = {
