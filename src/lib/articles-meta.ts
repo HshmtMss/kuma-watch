@@ -371,6 +371,36 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "urban-bear",
+    title: "アーバン・ベア — 市街地に出るクマと住民の備え",
+    description:
+      "クマが住宅地・通勤路・商店街に出没する「アーバン・ベア」現象。秋田市・盛岡市・札幌市の事例、クマが市街地に来る理由、住民・自治体の備えを獣医工学ラボが整理。",
+    lead: "クマが住宅地・通勤路・商店街に出る「アーバン・ベア」が常態化。事例・理由・住民の備えと自治体の対応を整理します。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "all",
+    category: "scene",
+    tags: ["市街地", "アーバン・ベア", "住宅地", "通勤", "都市型出没"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
+    slug: "bear-2025-retrospective",
+    title: "2025年クマ大量出没を振り返る — 過去最多年に何が起きたか",
+    description:
+      "2025年は全国で39,801件の出没を記録した歴史的な大量年。10月には1日665件のピークも。秋田・新潟・宮城・青森・北海道の県別動向、原因として指摘されるブナ不作・前年豊作・里山放棄を、KumaWatch の実データで振り返ります。",
+    lead: "2025年は全国で39,801件、平年の5倍超のクマ出没が記録された。月別・県別データと背景要因を、KumaWatch のデータで時系列で振り返ります。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "all",
+    category: "background",
+    tags: ["2025年", "大量出没", "ハイパーフェイジア", "ブナ", "秋田県"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
     slug: "autumn-forecast-2026",
     title: "2026年 秋のクマ大量出没予報 — 過去3年データから読み解く",
     description:
