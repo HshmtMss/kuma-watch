@@ -214,13 +214,44 @@ function readExistingHash(slug: string): string | null {
   return m ? m[1] : null;
 }
 
+// Drive / Docs への HTTP fetch は GitHub Actions ランナー上で稀に
+// ConnectTimeout / 5xx で揺れる。1 度の揺れで全 import が落ちないよう、
+// 指数バックオフで 3 回までリトライする。
+async function fetchWithRetry(
+  url: string,
+  init?: RequestInit,
+  attempts = 3,
+): Promise<Response> {
+  let lastErr: unknown = null;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, init);
+      // 5xx も transient とみなしてリトライ。4xx は永続失敗扱いでそのまま返す。
+      if (res.status >= 500 && res.status < 600) {
+        lastErr = new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
+      } else {
+        return res;
+      }
+    } catch (e) {
+      lastErr = e;
+    }
+    if (i < attempts - 1) {
+      const backoffMs = 1000 * 2 ** i; // 1s, 2s, 4s
+      await new Promise((r) => setTimeout(r, backoffMs));
+    }
+  }
+  throw lastErr instanceof Error
+    ? lastErr
+    : new Error(`fetchWithRetry exhausted attempts for ${url}`);
+}
+
 async function scanFolder(
   folderId: string,
   category: Category,
   label: string,
 ): Promise<DocMeta[]> {
   const url = `https://drive.google.com/drive/folders/${folderId}`;
-  const html = await (await fetch(url)).text();
+  const html = await (await fetchWithRetry(url)).text();
   const ids = uniqueDocIds(html, folderId);
 
   const docs: DocMeta[] = [];
@@ -258,7 +289,7 @@ function uniqueDocIds(html: string, parentId: string): string[] {
 async function fetchFilename(docId: string): Promise<string | null> {
   // Content-Disposition: attachment; filename="20260429.txt"
   const url = `https://docs.google.com/document/d/${docId}/export?format=txt`;
-  const res = await fetch(url, { redirect: "follow", method: "HEAD" });
+  const res = await fetchWithRetry(url, { redirect: "follow", method: "HEAD" });
   const cd = res.headers.get("content-disposition");
   if (!cd) return null;
   const m = cd.match(/filename="([^"]+)"/);
@@ -315,7 +346,7 @@ function listExistingSlugs(): Set<string> {
 
 async function fetchDocHtml(docId: string): Promise<string> {
   const url = `https://docs.google.com/document/d/${docId}/export?format=html`;
-  const res = await fetch(url, { redirect: "follow" });
+  const res = await fetchWithRetry(url, { redirect: "follow" });
   if (!res.ok) throw new Error(`fetch ${docId} failed: ${res.status}`);
   return await res.text();
 }
