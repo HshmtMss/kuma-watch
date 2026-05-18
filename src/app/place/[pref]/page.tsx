@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     summary
       ? {
           count: summary.totalCount,
+          count365d: summary.count365d,
           count90d: summary.count90d,
           latestDate: summary.latestDate,
           muniCount: munis.length,

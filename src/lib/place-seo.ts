@@ -41,20 +41,27 @@ export function buildMuniSeo(
   }
 
   const md = formatMonthDay(cell.latestDate);
-  // タイトル: 件数 + 最新日（あれば）+ 獣医師監修 + ブランド。
-  // count90d=0 でも全件 count を出す。
+  // タイトル: 直近1年の件数 + 最新日 + 獣医師監修 + ブランド。
+  // 旧実装は累計 (cell.count) を表示していたが、累計には京都府 (2010-2018 で
+  // 凍結) や秋田県 (2025 年急増) のような時代差が混入して
+  // 「タイトル: 81件」→「本文: 直近1年14件 / 直近90日1件」と齟齬が出る。
+  // クリック後の期待外れで離脱率が上がり Google からの評価も下がるため、
+  // タイトルも本文と同じ「直近1年」の数値で揃える。
   const fragments: string[] = [];
-  if (cell.count > 0) fragments.push(`${cell.count.toLocaleString()}件`);
+  if (cell.count365d > 0) fragments.push(`直近1年${cell.count365d.toLocaleString()}件`);
   if (md && cell.count90d > 0) fragments.push(`最新${md}`);
   const stat = fragments.length > 0 ? `【${fragments.join("・")}】` : "";
 
   const title = `${place}のクマ出没情報${stat}${SUPERVISION}｜${BRAND}`;
 
   // ディスクリプション: 数値の文脈 + 用途 + 隣接動線。
+  // recencyClause も「累計」ではなく直近1年の件数を主にする。
   const recencyClause =
     cell.count90d > 0 && md
-      ? `過去 90 日で ${cell.count90d.toLocaleString()} 件、最新の目撃は ${md}`
-      : `過去 1 年の累計 ${cell.count365d.toLocaleString()} 件`;
+      ? `直近 90 日で ${cell.count90d.toLocaleString()} 件、最新の目撃は ${md}`
+      : cell.count365d > 0
+        ? `直近 1 年で ${cell.count365d.toLocaleString()} 件`
+        : `直近 1 年の出没記録なし`;
   const description = `${place}のクマ出没情報を 5km メッシュで予報。${recencyClause}。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の安全確認に。隣接市町村・最新事案も併せて確認できます。`;
 
   return { title, description };
@@ -63,7 +70,7 @@ export function buildMuniSeo(
 /** /place/[pref] 用のタイトル・ディスクリプション。 */
 export function buildPrefSeo(
   pref: string,
-  summary?: { count: number; count90d: number; latestDate: string | null; muniCount: number },
+  summary?: { count: number; count365d: number; count90d: number; latestDate: string | null; muniCount: number },
 ): { title: string; description: string } {
   if (!summary) {
     return {
@@ -72,16 +79,21 @@ export function buildPrefSeo(
     };
   }
   const md = formatMonthDay(summary.latestDate);
+  // muni 同様、累計ではなく直近1年の件数をタイトル指標に。
+  // 累計には古い source の歪み (例: 京都府は 2018 年で凍結) があるため。
   const fragments: string[] = [];
-  if (summary.count > 0) fragments.push(`累計${summary.count.toLocaleString()}件`);
+  if (summary.count365d > 0)
+    fragments.push(`直近1年${summary.count365d.toLocaleString()}件`);
   if (md && summary.count90d > 0) fragments.push(`最新${md}`);
   const stat = fragments.length > 0 ? `【${fragments.join("・")}】` : "";
 
   const title = `${pref}のクマ出没情報${stat}${SUPERVISION}｜${BRAND}`;
   const recencyClause =
     summary.count90d > 0 && md
-      ? `過去 90 日で ${summary.count90d.toLocaleString()} 件、最新は ${md}`
-      : `過去 1 年で ${summary.count.toLocaleString()} 件`;
+      ? `直近 90 日で ${summary.count90d.toLocaleString()} 件、最新は ${md}`
+      : summary.count365d > 0
+        ? `直近 1 年で ${summary.count365d.toLocaleString()} 件`
+        : `直近 1 年の出没記録なし`;
   const description = `${pref}のクマ出没情報を市町村別マップで予報。${summary.muniCount} 市町村のデータを 5km メッシュで集約、${recencyClause}。${SUPERVISION}・無料・登録不要。`;
   return { title, description };
 }
