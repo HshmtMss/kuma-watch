@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
-import ProductCard from "@/components/ProductCard";
-import { getProductsForPath } from "@/lib/products";
 
 const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
@@ -43,13 +41,13 @@ const STATS = [
 const VALUE_PROPS = [
   {
     icon: "🧭",
-    title: "観光客・住民に届きます",
-    body: "登山者・キャンパー・観光客が出発前に確認する地点に、貴自治体の情報が掲載されます。「○○市 クマ」で検索したときに表示される独立ページも自動生成。",
+    title: "市町村ページで住民・観光客に届きます",
+    body: "「○○市 クマ」と検索した住民・登山者・観光客に、貴自治体の公式情報の要約・公式ページへのリンクを整理した専用ページを届けます。連携後は自動生成ページの中身がよりリッチになります。",
   },
   {
     icon: "🏛️",
-    title: "新しい運用は不要",
-    body: "現状の公式サイトをそのまま運用していただければ、こちらで自動取り込みします。新しいシステムや専用 API・CSV エクスポートを構築する必要はありません。公式ページがまだ無い自治体さまは、報道・住民投稿で補完します。",
+    title: "新しい運用は不要 / 状況に応じて対応",
+    body: "公式サイトに出没情報が既に公開されていれば、現状のままご運用いただくだけで自動取り込みします。公式ページが整備されていない場合も、報道・住民投稿・隣接県の発表で補完するなど、状況に応じて対応します。新しいシステムや API・CSV のご用意は不要です。",
   },
   {
     icon: "🩺",
@@ -91,7 +89,7 @@ const FAQ = [
   },
   {
     q: "公式の出没情報ページが無い、または更新が稀でも連携できますか？",
-    a: "はい、可能です。公式ページが整備されていない場合は、KumaWatch 側で報道情報・住民投稿・隣接自治体や県の発表を統合し、貴自治体の出没情報を専用ページに整理表示します。住民・観光客に情報を届ける手段がこれまで無かった自治体ほど、効果が大きい連携になります。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。",
+    a: "はい、可能です。公式ページが整備されていない場合や、PDF / 紙運用などで Web に出ていないケースでも、貴自治体の状況に応じて対応します。具体的には、報道情報・住民投稿・隣接自治体や県の発表を統合し、貴自治体の出没情報を専用ページに整理表示します。住民・観光客に情報を届ける手段がこれまで無かった自治体ほど、効果が大きい連携になります。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。",
   },
   {
     q: "情報の出典・著作権はどうなりますか？",
@@ -104,8 +102,6 @@ const FAQ = [
 ];
 
 export default function ForGovPage() {
-  const govProducts = getProductsForPath("/for-gov");
-
   return (
     <PageShell
       title="自治体の方へ"
@@ -178,27 +174,43 @@ export default function ForGovPage() {
       {/* サンプル: 市町村ページのスクショ */}
       <h2>市町村ごとに専用ページを自動生成</h2>
       <p>
-        「○○市 クマ」で検索したときに表示される専用ページを、市町村単位で自動的に用意します。住民・観光客が知りたい貴自治体のクマ出没情報が、地図・期間・件数・最新の動向まで整理された形で届きます。
+        「○○市 クマ」で検索したときに表示される専用ページを、市町村単位で自動的に用意します。連携が始まると、このページに次のような自治体情報が組み込まれます。
       </p>
+      <ul>
+        <li>
+          <strong>自治体公式情報の要約</strong>：直近の出没件数・最新の目撃日・公開されているコメント等を読みやすく整理して表示
+        </li>
+        <li>
+          <strong>公式ページへのリンク</strong>：各事案・各データに自治体公式ページへの参照リンクを併記し、住民・観光客が一次出典に必ず戻れる導線を確保
+        </li>
+        <li>
+          <strong>地図・時系列での把握</strong>：地区別件数・月別件数・周辺市町村との比較を、住民が「自分の生活圏で危ないか」を判断しやすい形で可視化
+        </li>
+      </ul>
       <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
         <div className="relative aspect-[7/5] w-full bg-stone-100">
           <Image
             src="/lp/heatmap.jpg"
-            alt="自治体ページのスクリーンショット例。市町村単位で警戒レベルがメッシュ表示される。"
+            alt="連携自治体専用ページのサンプル画面（準備中）"
             fill
             sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover"
           />
+          {/* 「サンプル準備中」帯を画像左上にオーバーレイ。本番デザインに
+              差し替わるまでユーザーに明示する。 */}
+          <span className="absolute left-3 top-3 rounded-full bg-stone-900/80 px-3 py-1 text-[11px] font-semibold text-white">
+            連携自治体向けサンプル準備中
+          </span>
         </div>
         <div className="border-t border-stone-200 bg-stone-50 px-4 py-3 text-xs text-stone-700">
-          実物：
+          ベースとなる市町村ページの実物は{" "}
           <Link
             href="/place"
-            className="ml-1 font-semibold text-amber-700 underline"
+            className="font-semibold text-amber-700 underline"
           >
             /place
-          </Link>
-          から市町村ページを閲覧できます。
+          </Link>{" "}
+          からご確認いただけます。連携後はこのページに自治体公式情報の要約・公式ページへのリンクが組み込まれます。
         </div>
       </div>
 
@@ -232,31 +244,9 @@ export default function ForGovPage() {
         ))}
       </div>
 
-      {/* 自治体向け対策ソリューション (KumaWatch と組み合わせる現場側の装備) */}
-      {govProducts.length > 0 && (
-        <>
-          <h2 id="solutions">現場で使われる検知・撃退ソリューション</h2>
-          <p>
-            出没情報の配信は KumaWatch が、現場での検知・撃退は各社の専門ソリューションが担う ── という補完関係になります。自治体さまの参考になるよう、導入実績のある AI 検知・撃退装置を整理しました。
-          </p>
-          <ul className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {govProducts.map((p) => (
-              <li key={p.id} className="h-full">
-                <ProductCard product={p} />
-              </li>
-            ))}
-          </ul>
-          <p className="not-prose mt-2 text-xs text-stone-500">
-            電気柵・防護具・コンサル等の自治体さま向け製品・サービスは{" "}
-            <Link
-              href="/products?for=gov"
-              className="font-medium text-amber-700 hover:underline"
-            >
-              対策製品一覧（自治体向け）→
-            </Link>
-          </p>
-        </>
-      )}
+      {/* 旧「現場で使われる検知・撃退ソリューション」セクションは削除。
+          /for-gov は KumaWatch との連携導入に絞った提案ページとして、
+          他社製品の紹介は /products?for=gov に集約する方針。 */}
 
       {/* FAQ */}
       <h2 id="faq">よくあるご質問</h2>
