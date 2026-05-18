@@ -371,6 +371,21 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "beech-mast-bear",
+    title: "ブナとクマ — 結実不作が大量出没を引き起こすメカニズム",
+    description:
+      "クマの大量出没年は、ほぼ例外なくブナ・ミズナラの堅果不作と重なります。ブナの結実周期、凶作年に山で何が起きるか、結実予測情報の見方、過去の凶作年と出没件数の関係を、データと生態学の視点で解説します。",
+    lead: "ブナ・ミズナラの凶作年は秋のクマ出没が爆発的に増えます。結実周期と予測情報の見方を解説。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "autumn",
+    category: "background",
+    tags: ["ブナ", "ミズナラ", "結実", "凶作", "ハイパーフェイジア", "大量出没"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
     slug: "urban-bear",
     title: "アーバン・ベア — 市街地に出るクマと住民の備え",
     description:

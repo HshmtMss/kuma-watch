@@ -87,10 +87,63 @@ function extractArticleSlug(url: string): string | null {
   return m ? m[1] : null;
 }
 
+// 記事クラスタのエイリアス。CSV の related_article は 1 記事しか指定できないが、
+// テーマ的に関連する複数記事をここでまとめて、各記事ページの「関連製品」セクションに
+// 同じ製品群を出せるようにする。例えば autumn-forecast-2026 を開いた読者には、
+// 既に bear-spray / bear-bell / electric-fence 等に紐付いている製品を見せたい。
+const ARTICLE_ALIASES: Record<string, string[]> = {
+  // 秋の予報記事 → 秋向けに必要な装備全般
+  "autumn-forecast-2026": [
+    "autumn",
+    "bear-spray",
+    "bear-bell",
+    "electric-fence",
+    "bear-canister",
+    "home-protection",
+    "weapons",
+  ],
+  // 2025 振り返り → データ・知見系。製品より調査系・自治体ソリューションも
+  "bear-2025-retrospective": [
+    "why-increasing",
+    "culling-debate",
+    "bear-tracks",
+    "bear-laws",
+  ],
+  // ブナ凶作の解説 → 秋系と同じ装備群を見せる
+  "beech-mast-bear": [
+    "autumn",
+    "bear-spray",
+    "bear-bell",
+    "electric-fence",
+    "home-protection",
+  ],
+  // アーバン・ベア → 住宅装備・撃退装備全般
+  "urban-bear": [
+    "home-protection",
+    "bear-spray",
+    "bear-bell",
+    "weapons",
+    "bear-app",
+  ],
+};
+
 export function getProductsForArticleSlug(slug: string): Product[] {
-  return (raw.products as Product[]).filter(
+  const direct = (raw.products as Product[]).filter(
     (p) => extractArticleSlug(p.relatedArticle) === slug,
   );
+  const aliasSlugs = ARTICLE_ALIASES[slug] ?? [];
+  const aliasProducts = aliasSlugs.flatMap((s) =>
+    (raw.products as Product[]).filter(
+      (p) => extractArticleSlug(p.relatedArticle) === s,
+    ),
+  );
+  // id で重複排除（同じ製品が direct とエイリアス双方に当たる場合に備える）
+  const seen = new Set<string>();
+  return [...direct, ...aliasProducts].filter((p) => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
 }
 
 // related_article のパス部分を取り出す。
