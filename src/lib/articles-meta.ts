@@ -371,6 +371,21 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "autumn-forecast-2026",
+    title: "2026年 秋のクマ大量出没予報 — 過去3年データから読み解く",
+    description:
+      "2025年秋は全国で2万件超の出没を記録した歴史的大量出没年だった。2023年秋は4,700件、2024年秋は1,500件と隔年で振れる。過去3年の月別・県別データと2026年春の進行状況から、来たる秋に向けて備えるべきことを獣医工学ラボがまとめます。",
+    lead: "2025年秋は2万件超の出没で歴史的大量年だった。隔年で大きく振れる秋の出没傾向を、過去3年のデータと2026年春の進行から整理。今からできる備えまで解説。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "autumn",
+    category: "season",
+    tags: ["秋", "予報", "ハイパーフェイジア", "2026年", "大量出没", "ブナ"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
     slug: "bear-spray",
     title: "クマよけスプレーの使い方と選び方",
     description:
