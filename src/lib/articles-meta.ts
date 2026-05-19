@@ -382,6 +382,28 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-002",
+    title:
+      "クマ研究ダイジェスト Vol.2 — クマが夜行性に変わった？ Beckmann &amp; Berger 2003 の衝撃",
+    description:
+      "米国・タホ湖の街にすむクロクマは、わずか 30 年で活動時間を「昼」から「夜」へ変えていた。Beckmann & Berger (2003) の長期テレメトリー研究を精読。なぜ夜型化したのか、体は大きくなり冬眠期間は短くなる「都市型クマ」現象は何を意味するか、日本のアーバン・ベアにも通用するかを深掘りします。",
+    lead: "「最近のクマは夜に出る」は本当か。タホ湖で 30 年かけて夜行性に変わったクロクマたちを追った長期研究を精読し、日本のアーバン・ベアとの関係まで掘り下げます。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "アーバン・ベア",
+      "GPS",
+      "夜行性",
+      "Beckmann 2003",
+    ],
+    heroImage: "/articles/research-digest-002.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-001",
     title:
       "クマ研究ダイジェスト Vol.1 — クマスプレーは本当に効くのか？ Smith 2008 の精読",

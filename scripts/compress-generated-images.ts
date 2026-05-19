@@ -28,6 +28,7 @@ const SLUGS = [
   "autumn-forecast-2026",
   "beech-mast-bear",
   "research-digest-001",
+  "research-digest-002",
 ];
 
 // 既に圧縮済みの画像 (< 400KB) を再圧縮すると JPEG が二重劣化するので、

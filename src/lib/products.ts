@@ -201,12 +201,17 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-canister",
     "bear-app",
   ],
-  // 研究ダイジェスト Vol.1 → 検知 AI・GPS・スプレー
+  // 研究ダイジェスト Vol.1 (Smith 2008 スプレー) → スプレー中心
   "research-digest-001": [
-    "bear-detection-ai",
     "bear-spray",
+    "weapons",
     "bear-tracks",
+  ],
+  // 研究ダイジェスト Vol.2 (Beckmann 2003 夜行性) → 家屋・誘引物管理
+  "research-digest-002": [
+    "home-protection",
     "bear-app",
+    "bear-detection-ai",
   ],
 };
 

@@ -124,6 +124,11 @@ const TARGETS: Target[] = [
     prompt:
       "A scientific research desk overhead view with open notebook, pencil, scattered academic papers, a small bear figurine and topographic map of mountains, warm desk lamp light, editorial science magazine photography style, no readable text on papers",
   },
+  {
+    slug: "research-digest-002",
+    prompt:
+      "A quiet suburban street at night near a forest edge, soft yellow streetlight illuminating empty road, distant pine forest silhouette, moody blue-purple sky, sense of nocturnal stillness, urban-wildlife interface, no visible animals or people, cinematic photography",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
