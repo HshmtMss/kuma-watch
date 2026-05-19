@@ -8,7 +8,6 @@
  */
 import { readFileSync, writeFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-// @ts-expect-error sharp は Next.js 経由の transitive dep
 import sharp from "sharp";
 
 const DIR = join(process.cwd(), "public", "articles");

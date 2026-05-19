@@ -19,6 +19,7 @@ import { buildMuniSeo } from "@/lib/place-seo";
 import { getSeasonalAdvice } from "@/lib/place-content";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { getMuniOfficialLink } from "@/data/muni-official-links";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -715,6 +716,58 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
+      {/* 自治体公式情報 — Claude エージェントが収集した自治体公式 HP /
+          クマ情報ページへのリンク。 muni-official-links.ts に未収録の自治体は
+          ブロック自体を非表示にする (false 表示より「項目自体なし」が誠実)。 */}
+      {(() => {
+        const off = getMuniOfficialLink(pref, muni);
+        if (!off || (!off.homeUrl && !off.bearUrl)) return null;
+        return (
+          <>
+            <h2>この自治体の公式情報</h2>
+            <p>
+              一次出典は必ず公式サイトでご確認ください。本ページの集計値・地図と
+              異なる場合は公式情報を優先してください。
+            </p>
+            <ul className="not-prose my-3 list-none space-y-2 pl-0">
+              {off.bearUrl && (
+                <li>
+                  <a
+                    href={off.bearUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-base font-semibold text-amber-900 hover:bg-amber-100"
+                  >
+                    <span aria-hidden>🐻</span>
+                    <span className="flex-1">{muni} のクマ・野生動物情報ページ</span>
+                    <span aria-hidden className="text-xs text-amber-700">↗</span>
+                  </a>
+                </li>
+              )}
+              {off.homeUrl && (
+                <li>
+                  <a
+                    href={off.homeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-base font-semibold text-stone-800 hover:border-amber-400 hover:bg-amber-50"
+                  >
+                    <span aria-hidden>🏛️</span>
+                    <span className="flex-1">{muni} 公式サイト</span>
+                    <span aria-hidden className="text-xs text-stone-500">↗</span>
+                  </a>
+                </li>
+              )}
+            </ul>
+            {off.verifiedAt && (
+              <p className="not-prose mb-4 text-xs text-stone-500">
+                公式ページ最終確認: {off.verifiedAt}
+              </p>
+            )}
+          </>
+        );
+      })()}
+
       <h2>登山・キャンプの注意点</h2>
       <p>
         クマは早朝・夕方・夜間に活動が活発になりやすく、雨上がりや霧の日、
@@ -736,7 +789,6 @@ export default async function MuniPage({ params }: Props) {
           遭遇したときの距離別の対処を覚える (
           <Link href="/articles/encounter">クマに遭遇したらどうする</Link>)
         </li>
-        <li>近隣の自治体公式サイトで最新の出没情報を確認する</li>
       </ul>
 
       <h2>あわせて読みたい</h2>
