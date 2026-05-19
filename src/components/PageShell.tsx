@@ -12,8 +12,10 @@ type Props = {
 export default function PageShell({ title, lead, children }: Props) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="flex items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm sm:px-5">
-        {/* ブランドはモバイルでも「くまウォッチ by 獣医工学ラボ」を表示する (ハンバーガー導入で幅確保)。 */}
+      <header className="flex items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+        {/* ブランドはモバイルでも「くまウォッチ by 獣医工学ラボ」を表示する (ハンバーガー導入で幅確保)。
+            文字サイズは小デバイスでの 1 行収まりを優先しつつ、空きが目立たない最大値に調整:
+            ロゴ画像 h-8→h-9, タイトル base→lg, by 獣医工学ラボ xs→sm。 */}
         <div className="flex min-w-0 shrink items-center gap-2">
           <Link
             href="/"
@@ -24,9 +26,9 @@ export default function PageShell({ title, lead, children }: Props) {
             <img
               src="/logo.png"
               alt="KumaWatch"
-              className="block h-7 w-auto sm:h-8"
+              className="block h-8 w-auto sm:h-9"
             />
-            <span className="truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
+            <span className="truncate text-base font-bold tracking-tight text-stone-900 sm:text-lg">
               くまウォッチ
             </span>
           </Link>
@@ -34,7 +36,7 @@ export default function PageShell({ title, lead, children }: Props) {
             href="https://www.research-coordinate.co.jp/labs/vet/"
             target="_blank"
             rel="noopener noreferrer"
-            className="whitespace-nowrap text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
+            className="whitespace-nowrap text-xs text-stone-500 hover:text-stone-700 sm:text-sm"
             aria-label="獣医工学ラボ (新しいタブで開く)"
           >
             by{" "}

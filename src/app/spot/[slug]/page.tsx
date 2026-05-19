@@ -358,14 +358,10 @@ export default async function SpotPage({ params }: Props) {
             最新の目撃: {formatDate(latestDate)}
           </div>
         )}
-        <div className="mt-3">
-          <Link
-            href={mapUrl}
-            className="inline-flex items-center gap-1 rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-800"
-          >
-            🗺️ 地図で {landmark.name} を見る →
-          </Link>
-        </div>
+        {/* マップへの導線は (1) 「周辺の目撃マップ」直下のデスクトップ CTA と
+            (2) モバイルの Sticky CTA に集約済みなので、ヒーロー内ボタンは削除。
+            ボタンが 3 箇所あると同じ URL なのに違う案内に見える、という muni
+            ページと同様の指摘に対応。 */}
       </div>
 
       {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
@@ -379,12 +375,11 @@ export default async function SpotPage({ params }: Props) {
         </span>
       </p>
 
-      {/* 周辺マップ */}
+      {/* 周辺マップ — /place/[pref]/[muni] と同じレイアウト規約に揃える。
+          凡例はアイコンピル形式、デスクトップは下にインライン CTA、モバイルは
+          末尾の Sticky CTA に集約。 */}
       <h2>周辺の目撃マップ</h2>
-      <p className="text-xs text-stone-500">
-        赤いピンが過去 90 日以内、グレーが 1 年以内の目撃。ピンをタップすると日付や場所が表示されます。
-      </p>
-      <div className="not-prose mb-3">
+      <div className="not-prose mb-1.5">
         <MiniSightingsMap
           centerLat={landmark.lat}
           centerLon={landmark.lon}
@@ -398,8 +393,28 @@ export default async function SpotPage({ params }: Props) {
           showCenterMarker
         />
       </div>
-      <p className="not-prose mb-6 text-xs text-stone-500">
-        中央の黄色マークが {landmark.name} の代表地点。半径 10 km 以内の出没のみ表示。
+      {/* 凡例 — プロット対象は半径 10 km 以内・過去 1 年以内のレコード。
+          そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
+          中央の黄色マーク (代表地点) は凡例から除外。 */}
+      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+          直近 90 日
+        </li>
+        <li className="flex items-center gap-1.5">
+          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
+          1 年以内
+        </li>
+      </ul>
+      {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部 Sticky CTA
+          が同じ役割を担う。muni ページと同じスタイルに統一。 */}
+      <p className="not-prose mb-6 hidden sm:block">
+        <Link
+          href={mapUrl}
+          className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
+        >
+          🗺️ {landmark.name} の警戒レベルマップを開く →
+        </Link>
       </p>
 
       {/* 統計 */}
@@ -487,11 +502,14 @@ export default async function SpotPage({ params }: Props) {
         </Link>
       </div>
 
-      {/* スティッキー CTA — フッターと被らないように本文末尾にスペーサーを置く。 */}
-      <div className="not-prose h-20 sm:hidden" aria-hidden />
+      {/* スティッキー CTA — ボタン本体 (約 56px) + safe-area + 余白の合計に合わせて
+          h-28 のスペーサー。bottom は env(safe-area-inset-bottom) + 1rem で
+          iOS のホームインジケータ領域に重ならず欠けない。muni と同仕様。 */}
+      <div className="not-prose h-28 sm:hidden" aria-hidden />
       <Link
         href={mapUrl}
-        className="not-prose fixed inset-x-3 bottom-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-sm font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
+        className="not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
       >
         🗺️ {landmark.name} の警戒レベルマップを開く →
       </Link>

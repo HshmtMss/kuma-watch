@@ -17,9 +17,11 @@ export default function HeaderNav() {
 
   return (
     <>
-      {/* デスクトップ: 水平リンク */}
+      {/* デスクトップ: 水平リンク。text-xs (12px) は痩せ気味だったので sm (14px) に。
+          gap-4 から gap-5 へ広げて読みやすく。タイトル/ナビ全幅は max-w-3xl の本文より
+          広いヘッダ枠に収まるため改行リスクは無し。 */}
       <nav
-        className="hidden shrink-0 items-center gap-4 text-xs font-medium text-stone-600 sm:flex"
+        className="hidden shrink-0 items-center gap-5 text-sm font-medium text-stone-600 sm:flex"
         aria-label="主要ナビゲーション (デスクトップ)"
       >
         <Link href="/" className="hover:text-stone-900">地図</Link>

@@ -36,26 +36,6 @@ const STATS = [
   { v: "毎日", l: "自動更新" },
 ];
 
-// 3 つのコアメッセージに集約。
-// 1) 観光客・住民への到達 / 2) 追加の運用負担なし / 3) 獣医師監修の信頼性
-const VALUE_PROPS = [
-  {
-    icon: "🧭",
-    title: "市町村ページで住民・観光客に届きます",
-    body: "「○○市 クマ」と検索した住民・登山者・観光客に、貴自治体の公式情報の要約・公式ページへのリンクを整理した専用ページを届けます。連携後は自動生成ページの中身がよりリッチになります。",
-  },
-  {
-    icon: "🏛️",
-    title: "新しい運用は不要 / 状況に応じて対応",
-    body: "公式サイトに出没情報が既に公開されていれば、現状のままご運用いただくだけで自動取り込みします。公式ページが整備されていない場合も、報道・住民投稿・隣接県の発表で補完するなど、状況に応じて対応します。新しいシステムや API・CSV のご用意は不要です。",
-  },
-  {
-    icon: "🩺",
-    title: "獣医師監修の安心安全",
-    body: "獣医療・公衆衛生の専門領域として、獣医師が中心の獣医工学ラボがデータと表現の質を監修。住民・観光客への発信に専門性の裏付けがあります。",
-  },
-];
-
 const PROCESS_STEPS = [
   {
     step: "STEP 1",
@@ -152,39 +132,22 @@ export default function ForGovPage() {
         </div>
       </section>
 
-      {/* Value props */}
-      <h2>3 つの違い</h2>
-      <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {VALUE_PROPS.map((v) => (
-          <div
-            key={v.title}
-            className="rounded-xl border border-stone-200 bg-white p-4"
-          >
-            <div className="text-2xl">{v.icon}</div>
-            <div className="mt-2 text-sm font-semibold text-stone-900">
-              {v.title}
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-stone-600">
-              {v.body}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* サンプル: 市町村ページのスクショ */}
+      {/* 何が起こるか — 旧「3 つの違い」+「市町村ごとに専用ページ…」を
+          1 セクションに統合。Hero の ✓ リストで価値訴求は済んでいるので、
+          ここは「具体的に何が用意されるか」を簡潔に伝えるだけに絞る。 */}
       <h2>市町村ごとに専用ページを自動生成</h2>
       <p>
-        「○○市 クマ」で検索したときに表示される専用ページを、市町村単位で自動的に用意します。連携が始まると、このページに次のような自治体情報が組み込まれます。
+        「○○市 クマ」で検索した住民・登山者・観光客に向けて、市町村単位の専用ページを自動で用意します。連携後は次の情報が組み込まれます。
       </p>
       <ul>
         <li>
-          <strong>自治体公式情報の要約</strong>：直近の出没件数・最新の目撃日・公開されているコメント等を読みやすく整理して表示
+          <strong>公式情報の要約</strong>：直近の出没件数・最新の目撃日・コメント等を読みやすく表示
         </li>
         <li>
-          <strong>公式ページへのリンク</strong>：各事案・各データに自治体公式ページへの参照リンクを併記し、住民・観光客が一次出典に必ず戻れる導線を確保
+          <strong>一次出典へのリンク</strong>：各事案に貴自治体公式ページへの参照リンクを併記
         </li>
         <li>
-          <strong>地図・時系列での把握</strong>：地区別件数・月別件数・周辺市町村との比較を、住民が「自分の生活圏で危ないか」を判断しやすい形で可視化
+          <strong>地図・時系列での把握</strong>：地区別・月別件数・周辺市町村との比較
         </li>
       </ul>
       <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
@@ -196,8 +159,6 @@ export default function ForGovPage() {
             sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover"
           />
-          {/* 「サンプル準備中」帯を画像左上にオーバーレイ。本番デザインに
-              差し替わるまでユーザーに明示する。 */}
           <span className="absolute left-3 top-3 rounded-full bg-stone-900/80 px-3 py-1 text-[11px] font-semibold text-white">
             連携自治体向けサンプル準備中
           </span>
@@ -210,7 +171,7 @@ export default function ForGovPage() {
           >
             /place
           </Link>{" "}
-          からご確認いただけます。連携後はこのページに自治体公式情報の要約・公式ページへのリンクが組み込まれます。
+          からご覧いただけます。
         </div>
       </div>
 
