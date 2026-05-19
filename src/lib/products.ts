@@ -163,6 +163,25 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "electric-fence",
     "weapons",
   ],
+  // 補償ガイド → 保険・全般
+  "bear-compensation": [
+    "bear-insurance",
+    "home-protection",
+    "first-aid",
+  ],
+  // 狩猟免許ガイド → 装備・捕獲
+  "hunter-license-guide": [
+    "weapons",
+    "bear-tracks",
+    "bear-detection-ai",
+  ],
+  // 災害時 → 家屋・装備全般
+  "disaster-bear": [
+    "home-protection",
+    "bear-spray",
+    "electric-fence",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
