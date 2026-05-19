@@ -42,11 +42,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // 研究記事を RESEARCH_ENTRIES から自動収集。新規記事追加時の sitemap 更新漏れを防ぐ。
+  // 例外: rolling 系 (this-week) は publishedAt が固定でも常に最新内容になるので、
+  // lastModified を now、頻度を hourly に上書きする。
+  const ROLLING_SLUGS = new Set(["this-week"]);
   const researchEntries: MetadataRoute.Sitemap = RESEARCH_ENTRIES.map((e) => ({
     url: `${SITE_URL}/research/${e.slug}`,
-    lastModified: new Date(e.publishedAt),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
+    lastModified: ROLLING_SLUGS.has(e.slug) ? now : new Date(e.publishedAt),
+    changeFrequency: ROLLING_SLUGS.has(e.slug)
+      ? ("hourly" as const)
+      : ("monthly" as const),
+    priority: ROLLING_SLUGS.has(e.slug) ? 0.85 : 0.6,
   }));
 
   // 地域別アーカイブ /research/region/[pref]。記事内で言及された都道府県分。
