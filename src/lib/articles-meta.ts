@@ -371,6 +371,34 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "bear-report",
+    title: "クマ目撃時の通報マニュアル — 110番・119番・自治体への正しい連絡",
+    description:
+      "クマを見たらどこに連絡すればいいのか？ 緊急度別に 110 番（警察）・119 番（救急）・市町村役場・自治体専用通報フォームの使い分けを整理。伝えるべき情報・写真撮影の注意・通報後の流れまで実用的に解説します。",
+    lead: "クマを見たらまず通報。緊急度別に 110・119・市町村・専用フォームの使い分け、伝えるべき情報をまとめます。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "all",
+    category: "encounter",
+    tags: ["通報", "110番", "119番", "自治体", "緊急時"],
+    heroImage: "/articles/first-aid.jpg",
+  },
+  {
+    slug: "bear-agriculture",
+    title: "クマと農業 — 果樹園・養蜂・水田・畜産の被害と対策",
+    description:
+      "果樹園のリンゴ・梨・柿・栗、養蜂のミツバチ・蜂蜜、水田・畜舎・サイレージ。農業現場でクマ被害が出やすい品目と、電気柵・誘引物管理・補助金など現実的な対策を、農家・自治体・JA の視点で整理。",
+    lead: "果樹園・養蜂・水田・畜産 — 農業現場のクマ被害は品目ごとに対策が異なる。電気柵設計から補助金活用まで実務目線で解説。",
+    publishedAt: "2026-05-19",
+    updatedAt: "2026-05-19",
+    season: "all",
+    category: "scene",
+    tags: ["農業", "果樹園", "養蜂", "水田", "電気柵", "補助金"],
+    heroImage: "/articles/autumn.jpg",
+    heroCredit: "Photo by Weiqi Xiong on Unsplash",
+    heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
     slug: "beech-mast-bear",
     title: "ブナとクマ — 結実不作が大量出没を引き起こすメカニズム",
     description:

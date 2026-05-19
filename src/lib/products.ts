@@ -117,12 +117,26 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "electric-fence",
     "home-protection",
   ],
+  // 農業従事者向け → 電気柵・撃退装置中心。自治体製品も
+  "bear-agriculture": [
+    "electric-fence",
+    "home-protection",
+    "bear-spray",
+    "bear-tracks",
+  ],
   // アーバン・ベア → 住宅装備・撃退装備全般
   "urban-bear": [
     "home-protection",
     "bear-spray",
     "bear-bell",
     "weapons",
+    "bear-app",
+  ],
+  // 通報マニュアル → 緊急時系（応急処置・スプレー等）
+  "bear-report": [
+    "bear-spray",
+    "home-protection",
+    "first-aid",
     "bear-app",
   ],
 };
