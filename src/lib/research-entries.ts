@@ -24,6 +24,14 @@ export type ResearchEntry = {
 
 export const RESEARCH_ENTRIES: ResearchEntry[] = [
   {
+    slug: "nut-crop-map",
+    title: "ブナ・ナラの結実マップ 2025–2026 — 各都道府県の調査機関一覧と凶作年の検証",
+    lead: "ブナ・ミズナラ・コナラの結実状況はクマの秋の出没を強く左右する。各都道府県の林業研究機関による豊凶調査のソースを集約し、過去の凶作年（2020・2023）と KumaWatch の出没件数の対応を検証。",
+    publishedAt: "2026-05-19",
+    category: "topic",
+    regions: ["北海道", "青森県", "岩手県", "秋田県", "山形県"],
+  },
+  {
     slug: "2026-05-15-daily-report",
     title: "2026年5月15日 国内クマ出没事案の時空間分析と分析報告",
     lead: "2026年5月15日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
