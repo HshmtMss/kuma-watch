@@ -201,6 +201,13 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-canister",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.1 → 検知 AI・GPS・スプレー
+  "research-digest-001": [
+    "bear-detection-ai",
+    "bear-spray",
+    "bear-tracks",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

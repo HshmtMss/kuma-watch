@@ -8,7 +8,8 @@ export type CategoryId =
   | "ecology"
   | "scene"
   | "region"
-  | "background";
+  | "background"
+  | "science";
 
 export type CategoryMeta = {
   id: CategoryId;
@@ -96,6 +97,16 @@ export const CATEGORIES: CategoryMeta[] = [
       "近年のクマ出没急増の背景、過去の重大事故から学べる教訓、鳥獣保護法・狩猟法・銃刀法などクマと関わる法律を、データと史実に基づいて整理します。",
     order: 7,
     emoji: "📊",
+  },
+  {
+    id: "science",
+    slug: "science",
+    name: "研究ダイジェスト",
+    lead: "世界中のクマ研究を、獣医師と編集部がわかりやすく読み解く。論文・新技術・最新知見のダイジェスト。",
+    description:
+      "国際学術誌に掲載されたクマ・人クマ軋轢の最新研究を、論文単位で要点・方法・結果・限界とともに紹介。AI 個体識別・GPS テレメトリー・気候変動と冬眠・スプレー効果検証など、世界の研究の最前線を一般読者にもわかりやすく解説します。",
+    order: 8,
+    emoji: "🔬",
   },
 ];
 
@@ -369,6 +380,20 @@ export const ARTICLES: ArticleMeta[] = [
     heroImage: "/articles/autumn.jpg",
     heroCredit: "Photo by Weiqi Xiong on Unsplash",
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
+  },
+  {
+    slug: "research-digest-001",
+    title: "クマ研究ダイジェスト Vol.1 — スプレーの実証データから AI 個体識別まで",
+    description:
+      "国際学術誌に掲載されたクマ研究を、獣医師と編集部が論文単位で読み解く新シリーズ。Vol.1 ではクマスプレーの撃退率検証（Smith 2008）、GPS テレメトリーが明かす都市型クマの夜行性化、AI 画像認識による個体識別、気候変動と冬眠タイミングのズレを取り上げます。",
+    lead: "世界のクマ研究の最前線を「論文単位で」読み解く新シリーズの第 1 号。スプレー撃退率の科学的根拠、都市型クマの夜行性化、AI 個体識別、気候変動と冬眠のズレを解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: ["論文", "研究ダイジェスト", "AI", "GPS", "気候変動", "クマスプレー"],
+    heroImage: "/articles/research-digest-001.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
   },
   {
     slug: "vehicle-collision",

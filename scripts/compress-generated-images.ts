@@ -27,6 +27,7 @@ const SLUGS = [
   "bear-2025-retrospective",
   "autumn-forecast-2026",
   "beech-mast-bear",
+  "research-digest-001",
 ];
 
 async function compress(slug: string): Promise<void> {

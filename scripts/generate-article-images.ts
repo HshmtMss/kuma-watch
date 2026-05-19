@@ -119,6 +119,11 @@ const TARGETS: Target[] = [
     prompt:
       "Close-up of a Japanese beech tree branch with cluster of beechnuts in late summer, soft natural light filtering through leaves, forest background blurred, botanical photography",
   },
+  {
+    slug: "research-digest-001",
+    prompt:
+      "A scientific research desk overhead view with open notebook, pencil, scattered academic papers, a small bear figurine and topographic map of mountains, warm desk lamp light, editorial science magazine photography style, no readable text on papers",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
