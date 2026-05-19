@@ -139,6 +139,30 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "first-aid",
     "bear-app",
   ],
+  // 犬関連 → 家屋・スプレー・登山
+  "bear-and-dogs": [
+    "home-protection",
+    "bear-spray",
+    "bear-bell",
+    "bear-detection-ai",
+  ],
+  // 製品比較 → 全装備（横断比較なので幅広く）
+  "repellent-comparison": [
+    "bear-spray",
+    "bear-bell",
+    "electric-fence",
+    "home-protection",
+    "bear-canister",
+    "weapons",
+    "bear-tracks",
+  ],
+  // 指定管理鳥獣化 → 自治体系（捕獲・モニタリング）
+  "designated-management-2026": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "electric-fence",
+    "weapons",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
