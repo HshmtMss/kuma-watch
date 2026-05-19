@@ -30,9 +30,19 @@ const SLUGS = [
   "research-digest-001",
 ];
 
+// 既に圧縮済みの画像 (< 400KB) を再圧縮すると JPEG が二重劣化するので、
+// しきい値より大きい場合だけ圧縮する。本スクリプトを複数回実行しても安全。
+const COMPRESS_THRESHOLD_BYTES = 400 * 1024;
+
 async function compress(slug: string): Promise<void> {
   const path = join(DIR, `${slug}.jpg`);
   const before = statSync(path).size;
+  if (before < COMPRESS_THRESHOLD_BYTES) {
+    console.log(
+      `[compress] ${slug}.jpg  ${(before / 1024).toFixed(0)} KB — skip (already small)`,
+    );
+    return;
+  }
   const buf = readFileSync(path);
   const out = await sharp(buf)
     .resize({ width: 1200, withoutEnlargement: true })
