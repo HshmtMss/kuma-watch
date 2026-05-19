@@ -32,7 +32,7 @@ export async function generateMetadata({
     return { title: `${decoded} の研究レポート | KumaWatch`, robots: { index: false } };
   }
   const title = `${decoded} のクマ出没分析レポート（${entries.length}件）｜獣医工学ラボ`;
-  const description = `${decoded} のクマ出没事案を分析した日次・月次レポートを${entries.length}件公開中。獣医工学ラボがAI集約 + 獣医師監修で${decoded}の出没動向・人身被害・行政対応を網羅。`;
+  const description = `${decoded} のクマ出没事案を分析した日次・週次・月次レポートを${entries.length}件公開中。獣医工学ラボがAI集約 + 獣医師監修で${decoded}の出没動向・人身被害・行政対応を網羅。`;
   return {
     title,
     description,
@@ -73,7 +73,7 @@ export default async function ResearchRegionPage({
   return (
     <PageShell
       title={`${decoded} のクマ出没分析レポート`}
-      lead={`獣医工学ラボが公開している、${decoded} に関連するクマ出没事案の分析レポート一覧です。日次・月次の動向、人身被害、行政対応を網羅しています。`}
+      lead={`獣医工学ラボが公開している、${decoded} に関連するクマ出没事案の分析レポート一覧です。日次・週次・月次の動向、人身被害、行政対応を網羅しています。`}
     >
       {/* 件数サマリ + サイト本体への送客導線 */}
       <div className="not-prose mb-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">

@@ -21,6 +21,13 @@ export default function LegalLinks() {
       </Link>
       <span className="text-gray-300" aria-hidden>·</span>
       <Link
+        href="/for-vendors"
+        className="inline-block py-1 hover:text-gray-900 hover:underline"
+      >
+        製品・サービスの掲載
+      </Link>
+      <span className="text-gray-300" aria-hidden>·</span>
+      <Link
         href="/disclaimer"
         className="inline-block py-1 hover:text-gray-900 hover:underline"
       >

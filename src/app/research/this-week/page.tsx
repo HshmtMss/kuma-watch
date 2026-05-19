@@ -347,7 +347,7 @@ export default async function ThisWeekPage() {
         </li>
         <li>
           長期トレンドは{" "}
-          <Link href="/place/ranking">全国出没ランキング（直近 90 日）</Link>、
+          <Link href="/place/ranking">全国クマ警戒マップ（直近 90 日）</Link>、
           年次振り返りは{" "}
           <Link href="/articles/bear-2025-retrospective">
             2025 年クマ大量出没を振り返る

@@ -269,7 +269,7 @@ export default function ForGovPage() {
             研究・知見
           </div>
           <div className="mt-1 text-sm font-semibold text-stone-900">
-            日次・月次の事案レポート
+            日次・週次・月次の事案レポート
           </div>
           <div className="mt-1 text-xs text-stone-600">
             全国のクマ出没事案を時空間で分析。アーバン・ベア（都市型出没）の動向、行政対応の比較等。

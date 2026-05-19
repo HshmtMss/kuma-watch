@@ -429,7 +429,7 @@ export default function WildlifePlansPage() {
           </Link>
         </li>
         <li>
-          <Link href="/place/ranking">全国クマ出没ランキング 直近 90 日</Link>
+          <Link href="/place/ranking">全国クマ警戒マップ 直近 90 日</Link>
         </li>
       </ul>
 

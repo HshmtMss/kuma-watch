@@ -204,7 +204,14 @@ export default async function ProductsPage({
             >
               contact@research-coordinate.co.jp
             </a>{" "}
-            までご連絡ください。
+            までご連絡ください。掲載のご案内は{" "}
+            <Link
+              href="/for-vendors"
+              className="font-medium text-amber-700 hover:underline"
+            >
+              製品・サービスの掲載
+            </Link>
+            ページもご参照ください。
           </li>
         </ul>
       </aside>

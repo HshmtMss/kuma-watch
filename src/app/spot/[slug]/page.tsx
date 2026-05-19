@@ -281,10 +281,10 @@ export default async function SpotPage({ params }: Props) {
 
   const dynamicLead =
     count90 > 0 && latestDate
-      ? `${landmark.name}周辺 10 km で過去 90 日に ${count90} 件の出没（最新 ${formatDate(latestDate)}）。${SUPERVISION}・無料で警戒レベルを確認できます。`
+      ? `${landmark.name}周辺 10 km で過去 90 日に ${count90} 件の出没（最新 ${formatDate(latestDate)}）。登山・観光前の警戒レベル確認に。`
       : count365 > 0 && latestDate
-        ? `${landmark.name}周辺 10 km で過去 1 年に ${count365} 件の出没（最新 ${formatDate(latestDate)}）。${SUPERVISION}・無料で警戒レベルを確認できます。`
-        : `${landmark.name}（${landmark.prefName}）周辺のクマ出没情報。${SUPERVISION}・無料で確認できます。`;
+        ? `${landmark.name}周辺 10 km で過去 1 年に ${count365} 件の出没（最新 ${formatDate(latestDate)}）。登山・観光前の警戒レベル確認に。`
+        : `${landmark.name}（${landmark.prefName}）周辺のクマ出没情報。登山・観光前の警戒レベル確認に。`;
 
   return (
     <PageShell title={`${landmark.name}周辺のクマ出没情報`} lead={dynamicLead}>

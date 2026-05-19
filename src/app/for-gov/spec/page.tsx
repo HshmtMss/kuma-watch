@@ -261,7 +261,7 @@ export default function MunicipalSpecPage() {
                 ["代表メール", "contact@research-coordinate.co.jp"],
                 ["Web", "https://www.research-coordinate.co.jp"],
                 ["事業領域", "獣医療・野生動物・公衆衛生領域の研究支援および技術プロジェクト"],
-                ["主な実績", "全国クマ出没事案の時空間分析・日次/月次レポート公開（kuma-watch.jp/research）"],
+                ["主な実績", "全国クマ出没事案の時空間分析・日次/週次/月次レポート公開（kuma-watch.jp/research）"],
               ]}
               compact
             />

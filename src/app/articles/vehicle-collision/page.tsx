@@ -95,7 +95,7 @@ export default function Page() {
       </ul>
       <p>
         全国の市町村別出没傾向は{" "}
-        <Link href="/place/ranking">出没ランキング</Link>
+        <Link href="/place/ranking">全国クマ警戒マップ</Link>
         で、観光地周辺の傾向は{" "}
         <Link href="/spot">観光地ページ</Link>で確認できます。
       </p>

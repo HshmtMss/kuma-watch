@@ -340,7 +340,7 @@ export default function AboutPage() {
             /research
           </div>
           <div className="mt-1 text-xs text-stone-600">
-            日次・月次の出没動向レポート、政策動向の整理
+            日次・週次・月次の出没動向レポート、政策動向の整理
           </div>
         </Link>
       </div>

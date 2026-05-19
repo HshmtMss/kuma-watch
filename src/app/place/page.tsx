@@ -106,7 +106,7 @@ export default async function PlacePage({
         <span className="font-semibold text-stone-700">都道府県から探す</span>
       </nav>
 
-      {/* 全国ランキングへの誘導カード — 県別から横断的にどの市町村で
+      {/* 全国警戒マップへの誘導カード — 県別から横断的にどの市町村で
           一番出ているかを見たいユーザーをここで拾う。 */}
       <Link
         href="/place/ranking"
@@ -116,10 +116,10 @@ export default async function PlacePage({
           <span aria-hidden className="text-2xl">🏔️</span>
           <span>
             <span className="block text-sm font-bold">
-              全国クマ出没ランキング（直近90日）
+              全国クマ警戒マップ（直近90日）
             </span>
             <span className="block text-xs text-stone-600">
-              全国の市町村を横断して、出没件数の多い上位 50 市町村を一覧
+              全国の市町村を横断して、警戒度の高いエリア 50 市町村を一覧
             </span>
           </span>
         </span>
