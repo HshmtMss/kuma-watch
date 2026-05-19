@@ -182,6 +182,25 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "electric-fence",
     "bear-app",
   ],
+  // 自動車衝突 → 装備・保険・モニタリング
+  "vehicle-collision": [
+    "bear-app",
+    "bear-tracks",
+    "bear-detection-ai",
+  ],
+  // モニタリング → 検知系装備
+  "bear-monitoring": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
+  // インバウンド → 登山装備
+  "inbound-tourism": [
+    "bear-spray",
+    "bear-bell",
+    "bear-canister",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
