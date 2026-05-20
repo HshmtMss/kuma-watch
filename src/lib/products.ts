@@ -348,6 +348,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-detection-ai",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.25 (鳴き声) → モニタリング
+  "research-digest-025": [
+    "bear-detection-ai",
+    "bear-app",
+    "bear-tracks",
+  ],
+  // 研究ダイジェスト Vol.26 (Pagano 2018 エネルギー) → モニタリング
+  "research-digest-026": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

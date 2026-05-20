@@ -239,6 +239,16 @@ const TARGETS: Target[] = [
     prompt:
       "A snowy mountain hillside with a partly hidden rocky den entrance in the side of a slope, undisturbed snow around it, deep winter silence, soft blue evening light, sense of hidden hibernation, no animals visible, nature documentary photography style",
   },
+  {
+    slug: "research-digest-025",
+    prompt:
+      "An abstract conceptual image showing audio waveform patterns overlaid on a misty forest at dawn, suggesting acoustic communication and sound visualization, scientific magazine cover style with cool blue tones, no animals visible, atmospheric photography",
+  },
+  {
+    slug: "research-digest-026",
+    prompt:
+      "A polar bear walking alone across vast white arctic ice under cool gray sky, sense of isolation and energy expenditure in harsh environment, distant horizon, no humans or other animals visible, dramatic nature photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

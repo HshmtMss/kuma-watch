@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-025",
+    title:
+      "クマ研究ダイジェスト Vol.25 — クマは「12 種類の声」で語る。クマ音響コミュニケーション研究",
+    description:
+      "クマは「ガオー」と吠えるだけの動物ではない。母子の鳴き交わし、警告のフー息、求愛のゴロゴロ音、子グマの泣き声 — 行動学者たちが体系的に記録してきたクマの 12 種類以上の鳴き声・音声を整理。Peters 1984 ほかの古典から、最新の AI 音響認識まで、クマ音声コミュニケーションの全体像を精読します。",
+    lead: "クマは 12 種類以上の声で語っている。母子の対話、求愛のゴロゴロ、警告のフー息 — クマの「声の世界」を行動学から AI 音響認識まで解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "鳴き声",
+      "コミュニケーション",
+      "音響",
+      "行動学",
+    ],
+    heroImage: "/articles/research-digest-025.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-026",
+    title:
+      "クマ研究ダイジェスト Vol.26 — クマはアザラシ 1 頭で 1.5 ヶ月生きる。Pagano 2018 Science",
+    description:
+      "ホッキョクグマに小型カメラと加速度センサーを装着し、北極で 11 日間の行動を完全記録した Pagano ら（2018, Science）。彼らが消費するエネルギーの実態は予想以上に大きく、現在の温暖化下では生存が厳しくなりつつあることが定量的に判明。クマのエネルギー収支を初めて野外で精密測定した画期的研究を精読します。",
+    lead: "ホッキョクグマは予想の 50% 多くエネルギーを使っていた。アザラシ 1 頭で 1.5 ヶ月持つ計算だが、捕獲率の低下で生存が厳しい現実を Pagano 2018 で解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "エネルギー収支",
+      "ホッキョクグマ",
+      "気候変動",
+      "Pagano 2018",
+    ],
+    heroImage: "/articles/research-digest-026.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-023",
     title:
       "クマ研究ダイジェスト Vol.23 — クマの赤ちゃんは半分死ぬ。Schwartz 2006",
