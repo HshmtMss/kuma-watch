@@ -1,0 +1,75 @@
+name: Research weekly report
+
+# 月曜朝に前週 (月〜日) の週次レポートを生成し commit + push する。
+# 実装は scripts/generate-research-report.ts (--mode=weekly) を参照。
+#
+# スクリプトは --date を省略すると「昨日」を週末日として扱うので、
+# 月曜朝に走らせれば自動的に「前週の月〜日」が対象になる。
+
+on:
+  schedule:
+    # UTC 月 22:00 = JST 月 07:00。日次レポート (06:00 JST) の後。
+    - cron: '0 22 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-write
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Generate weekly report
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run research:weekly
+
+      - name: Type check generated page
+        run: npx tsc --noEmit
+
+      - name: Commit and push (with rebase retry)
+        run: |
+          if git diff --quiet; then
+            echo "No new weekly report — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            git add src/app/research src/lib/research-entries.ts
+            git commit -m "Research: auto weekly report ($(date -u +%Y-%m-%d))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[research-weekly] push/rebase failed (attempt $attempt) — retrying"
+            git reset --hard origin/main
+            npm run research:weekly
+            npx tsc --noEmit
+            if git diff --quiet; then
+              echo "No changes after re-run — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1

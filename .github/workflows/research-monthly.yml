@@ -1,0 +1,76 @@
+name: Research monthly report
+
+# 月初に前月の月次レポートを生成し commit + push する。
+# 実装は scripts/generate-research-report.ts (--mode=monthly) を参照。
+#
+# スクリプトは --month を省略すると「先月」を対象にするので、月初に
+# 走らせれば自動的に「前月」が対象になる。
+
+on:
+  schedule:
+    # UTC 1 日 0:00 = JST 1 日 09:00。週次より少し遅らせて、月内最終日の
+    # 日次レポートの取り込みが終わってから走らせる。
+    - cron: '0 0 1 * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-write
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Generate monthly report
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run research:monthly
+
+      - name: Type check generated page
+        run: npx tsc --noEmit
+
+      - name: Commit and push (with rebase retry)
+        run: |
+          if git diff --quiet; then
+            echo "No new monthly report — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            git add src/app/research src/lib/research-entries.ts
+            git commit -m "Research: auto monthly report ($(date -u +%Y-%m-%d))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[research-monthly] push/rebase failed (attempt $attempt) — retrying"
+            git reset --hard origin/main
+            npm run research:monthly
+            npx tsc --noEmit
+            if git diff --quiet; then
+              echo "No changes after re-run — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1

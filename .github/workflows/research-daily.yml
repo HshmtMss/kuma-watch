@@ -1,0 +1,80 @@
+name: Research daily report
+
+# sightings.json から前日分の日次レポートを Gemini で生成し
+# /research/<YYYY-MM-DD>-daily-report/page.tsx として commit + push する。
+#
+# 実装は scripts/generate-research-report.ts を参照。
+# 既存の page.tsx があれば自動でスキップするので、複数回走らせても安全。
+#
+# 旧来の手動 Drive 経由 (import-research) と共存。Drive 由来の方が品質高い
+# 場合は Drive 上書きで page.tsx が再生成され、自動生成版を上書きする運用。
+
+on:
+  schedule:
+    # UTC 21:00 = JST 06:00。news-flash の 1 時間サイクルで前日分が確実に
+    # 取り込まれた後に走らせる。
+    - cron: '0 21 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# /research/* への書き込みを他ワークフローと直列化 (push race 防止)
+concurrency:
+  group: research-write
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Generate daily report
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run research:daily
+
+      - name: Type check generated page
+        run: npx tsc --noEmit
+
+      - name: Commit and push (with rebase retry)
+        run: |
+          if git diff --quiet; then
+            echo "No new daily report — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            git add src/app/research src/lib/research-entries.ts
+            git commit -m "Research: auto daily report ($(date -u +%Y-%m-%d))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[research-daily] push/rebase failed (attempt $attempt) — retrying"
+            git reset --hard origin/main
+            npm run research:daily
+            npx tsc --noEmit
+            if git diff --quiet; then
+              echo "No changes after re-run — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1
