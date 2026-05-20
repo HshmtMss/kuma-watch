@@ -159,6 +159,16 @@ const TARGETS: Target[] = [
     prompt:
       "An abstract conceptual photograph blending a sleeping bear silhouette with subtle medical heartbeat line graphics in cool blue tones, scientific magazine cover style, dramatic dark background, atmospheric and thoughtful, no readable text",
   },
+  {
+    slug: "research-digest-009",
+    prompt:
+      "An aerial view of a vast wild Japanese mountain landscape at dawn with mist filling valleys, dense forest cover stretching to the horizon, sense of vastness and unknown wilderness, no animals or people visible, drone photography",
+  },
+  {
+    slug: "research-digest-010",
+    prompt:
+      "An abstract conceptual image of a bear silhouette in profile with subtle glowing neural network or constellation pattern overlay suggesting intelligence and cognition, deep dark background with cool blue and warm amber accents, scientific magazine cover style, no readable text",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

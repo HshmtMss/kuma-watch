@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-009",
+    title:
+      "クマ研究ダイジェスト Vol.9 — クマを移動させても帰ってくる？ Linnell 1997 の冷徹な結論",
+    description:
+      "「市街地に出たクマは捕獲して山奥に放せばいい」という発想は世界中で試されてきた。Linnell ら（1997）が 12 種・100 件以上の食肉目移動事例をレビューした古典的総説を精読。50% が捕獲地点に戻る、30% が死亡する — translocation（捕獲移動）の冷徹な現実と、日本の野生動物管理への教訓を解説します。",
+    lead: "「捕まえて山奥に放せばいい」は本当に効くのか？ 食肉目 12 種の捕獲移動を集約レビューした Linnell 1997 の有名な結論を精読し、日本でなぜ採用されにくいのかを解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "捕獲移動",
+      "translocation",
+      "Linnell 1997",
+      "管理",
+    ],
+    heroImage: "/articles/research-digest-009.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-010",
+    title:
+      "クマ研究ダイジェスト Vol.10 — クマは「数」を理解している。Vonk &amp; Beran 2012",
+    description:
+      "アメリカクロクマ 3 頭にタッチスクリーンで「多い方を選ぶ」課題を出したら、彼らは正解を選んだ。クマがイルカやサル並みの数量理解能力を持つことを示した Vonk &amp; Beran (2012) の認知実験を精読。クマの賢さが「学習する都市型クマ」問題にどう繋がるのかも解説します。",
+    lead: "クマが「2 個と 5 個の点」のどちらが多いかを正しく選べる。動物認知学の名作 Vonk &amp; Beran 2012 を精読し、クマの賢さが人クマ軋轢にどう影響するかを解き明かします。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "認知",
+      "学習能力",
+      "Vonk 2012",
+      "知能",
+    ],
+    heroImage: "/articles/research-digest-010.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-007",
     title:
       "クマ研究ダイジェスト Vol.7 — 長野のリンゴ園で 100% の被害ゼロ。Huygens &amp; Hayashi 2001",
