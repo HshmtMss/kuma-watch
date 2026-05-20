@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-027",
+    title:
+      "クマ研究ダイジェスト Vol.27 — 「クマを見る観光」は世界で年 10 億ドル産業。Penteriani 2017",
+    description:
+      "アラスカ・カナダ・スカンジナビアでは、クマを見るためだけに観光客が訪れ、経済を支えている。Penteriani ら（2017）の世界規模レビューで、ベアウォッチング・ツーリズムの経済効果と保護への貢献、しかし同時に生じるクマへの行動影響と倫理的課題を精読。日本の知床・軽井沢での応用可能性まで解説します。",
+    lead: "アラスカではヒグマ 1 頭が「年 1 万ドル」を観光収入として稼ぐ。Penteriani 2017 で世界のベアウォッチング経済を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "観光",
+      "経済",
+      "保護",
+      "Penteriani 2017",
+    ],
+    heroImage: "/articles/research-digest-027.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-028",
+    title:
+      "クマ研究ダイジェスト Vol.28 — 家畜 1 頭の損失で農家がいくら失うか。Mertens 2001",
+    description:
+      "ルーマニアの羊飼いと家畜被害を 6 年間追跡した Mertens &amp; Promberger（2001）の経済研究を精読。クマ・オオカミに家畜 1 頭を襲われると、農家は最大 800 ユーロを失う。補償制度の設計、共存への投資、保護政策と経済学の交差点を解説。日本の畜産家にも参考になる古典的研究を読み解きます。",
+    lead: "家畜 1 頭が襲われると農家が失うのは、肉の値段だけではない。Mertens &amp; Promberger 2001 で家畜被害の経済学を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "家畜",
+      "経済",
+      "補償",
+      "Mertens 2001",
+    ],
+    heroImage: "/articles/research-digest-028.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-025",
     title:
       "クマ研究ダイジェスト Vol.25 — クマは「12 種類の声」で語る。クマ音響コミュニケーション研究",

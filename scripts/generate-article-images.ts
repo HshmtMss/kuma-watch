@@ -249,6 +249,16 @@ const TARGETS: Target[] = [
     prompt:
       "A polar bear walking alone across vast white arctic ice under cool gray sky, sense of isolation and energy expenditure in harsh environment, distant horizon, no humans or other animals visible, dramatic nature photography style",
   },
+  {
+    slug: "research-digest-027",
+    prompt:
+      "A scenic wooden viewing platform overlooking a beautiful Alaskan river valley with mountains in distance, soft early morning light, tourism nature experience theme, empty platform with binoculars on railing, no people or animals visible, travel magazine photography style",
+  },
+  {
+    slug: "research-digest-028",
+    prompt:
+      "A traditional shepherd's mountain farm in Romania with stone fence and grazing pasture in summer evening light, traditional architecture, sense of pastoral life and livestock husbandry, no people or animals visible, documentary photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
