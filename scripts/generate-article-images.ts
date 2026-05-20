@@ -149,6 +149,16 @@ const TARGETS: Target[] = [
     prompt:
       "An autumn forest floor scattered with abundant acorns, beechnuts and chestnuts in golden hour light, vibrant fall colors of red and orange leaves, sense of harvest abundance, no animals or people, food ecology photography",
   },
+  {
+    slug: "research-digest-007",
+    prompt:
+      "A traditional Japanese apple orchard in autumn with red ripe apples on trees, simple wooden posts and thin electric fence wires running through the orchard, mountain backdrop, soft afternoon light, agricultural photography, no people or animals",
+  },
+  {
+    slug: "research-digest-008",
+    prompt:
+      "An abstract conceptual photograph blending a sleeping bear silhouette with subtle medical heartbeat line graphics in cool blue tones, scientific magazine cover style, dramatic dark background, atmospheric and thoughtful, no readable text",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

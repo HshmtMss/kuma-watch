@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-007",
+    title:
+      "クマ研究ダイジェスト Vol.7 — 長野のリンゴ園で 100% の被害ゼロ。Huygens &amp; Hayashi 2001",
+    description:
+      "長野県のリンゴ園 12 か所で行われた電気柵試験で、ツキノワグマの被害が 92〜100% 減少した日本人研究者による現場研究を精読。電圧・段数・配線パターンの最適仕様、コストパフォーマンス、長期維持の課題まで実務目線で解説します。",
+    lead: "長野県のリンゴ園で実証された「クマ被害ほぼゼロ」電気柵。世界的に引用される日本発の現場研究を、設置仕様・コスト・メンテナンスの実務目線で読み解きます。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "autumn",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "電気柵",
+      "リンゴ園",
+      "長野県",
+      "Huygens 2001",
+    ],
+    heroImage: "/articles/research-digest-007.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-008",
+    title:
+      "クマ研究ダイジェスト Vol.8 — クマの冬眠は人類医学のヒントになる？ Tøien 2011 Science",
+    description:
+      "アラスカでアメリカクロクマに小型センサーを装着し、冬眠中の心拍・呼吸・体温・代謝を連続記録した Tøien et al. (2011, Science) を精読。心拍数 55 → 14 bpm、代謝率は 75% 低下、なのに体温はたった 5°C しか下がらない —「体温に依存しない代謝抑制」という驚きの仕組みと、脳卒中・心臓外科への応用可能性まで解説。",
+    lead: "クマの冬眠は『眠っているだけ』ではなかった。アラスカの最先端研究が明かした、心拍 14 bpm・代謝 25%・体温わずか低下という驚異の生理学を Science 誌掲載論文で精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "winter",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "冬眠",
+      "生理学",
+      "医学応用",
+      "Tøien 2011",
+    ],
+    heroImage: "/articles/research-digest-008.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-005",
     title:
       "クマ研究ダイジェスト Vol.5 — クマの嗅覚は犬の 7 倍。匂いの「世界地図」を見ている",
