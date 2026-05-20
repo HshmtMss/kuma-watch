@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-017",
+    title:
+      "クマ研究ダイジェスト Vol.17 — クマの「噛む力」はライオンの 2 倍。Christiansen 2007",
+    description:
+      "クマの咬合力（噛む力）はどれほどか？ Christiansen &amp; Wroe (2007) が食肉目 151 種の頭骨を計測し、咬合力を体格補正で比較。ヒグマは絶対値でも体格比でも超強力で、骨を砕き、堅果を割り、丸太を引き裂く実力が客観データで明らかに。クマの「噛む」能力の進化的背景と、人クマ遭遇時の意味まで解説します。",
+    lead: "ヒグマの咬合力はライオンの 2 倍、人の 8 倍。骨も丸太も砕ける「噛む力」を 151 種の比較データで解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "咬合力",
+      "解剖学",
+      "進化",
+      "Christiansen 2007",
+    ],
+    heroImage: "/articles/research-digest-017.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-018",
+    title:
+      "クマ研究ダイジェスト Vol.18 — クマは森に「サケの栄養」を運んでいた。Hocking 2011 Science",
+    description:
+      "ブリティッシュコロンビアの川沿い 50 流域を調査した Hocking &amp; Reynolds (2011, Science) は、クマがサケを森に運ぶことで植物の多様性と成長が大きく変わることを実証。クマは「生態系エンジニア」として森と海を繋ぐ稀有な存在だった。日本のクマでも見られる類似現象、保護の意義まで深掘りします。",
+    lead: "クマはただの捕食者ではない。海から森へ栄養を運ぶ「生態系の鍵」だった。Hocking 2011 Science の壮大なフィールド研究を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "生態系",
+      "サケ",
+      "森",
+      "Hocking 2011",
+    ],
+    heroImage: "/articles/research-digest-018.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-015",
     title:
       "クマ研究ダイジェスト Vol.15 — ホッキョクグマは「最近のヒグマ」だった。Liu 2014 Cell",

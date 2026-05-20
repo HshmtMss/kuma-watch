@@ -300,6 +300,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-app",
     "bear-tracks",
   ],
+  // 研究ダイジェスト Vol.17 (Christiansen 2007 咬合力) → 緊急時装備
+  "research-digest-017": [
+    "bear-spray",
+    "first-aid",
+    "weapons",
+  ],
+  // 研究ダイジェスト Vol.18 (Hocking 2011 生態系エンジニア) → モニタリング・全般
+  "research-digest-018": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

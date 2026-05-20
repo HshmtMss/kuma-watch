@@ -199,6 +199,16 @@ const TARGETS: Target[] = [
     prompt:
       "An abstract scientific conceptual image showing colorful bacterial cells under microscope lighting in warm and cool tones, soft glowing dots like a starry sky, biology magazine cover style, microbiome research theme, no readable text",
   },
+  {
+    slug: "research-digest-017",
+    prompt:
+      "Dramatic close-up of a large bear skull resting on a museum display surface, intricate detail of teeth and jaw structure, soft museum lighting from above, scientific anatomy magazine photography style, dark background",
+  },
+  {
+    slug: "research-digest-018",
+    prompt:
+      "A pristine forest stream in autumn with red salmon swimming upstream and golden trees on banks, soft morning mist, sense of ecosystem connection between sea and forest, no animals or people visible on land, nature documentary photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
