@@ -167,18 +167,18 @@ export default async function TagPage({ params }: Props) {
       />
 
       <nav
-        aria-label="パンくず"
-        className="not-prose mb-6 text-xs text-stone-500"
+        aria-label="パンくずリスト"
+        className="not-prose mb-4 flex flex-wrap items-center gap-1 text-sm text-stone-500"
       >
-        <Link href="/" className="hover:text-stone-900 hover:underline">
+        <Link href="/" className="hover:text-stone-900">
           ホーム
         </Link>
-        <span className="mx-1">/</span>
-        <Link href="/articles" className="hover:text-stone-900 hover:underline">
+        <span>›</span>
+        <Link href="/articles" className="hover:text-stone-900">
           記事一覧
         </Link>
-        <span className="mx-1">/</span>
-        <span className="text-stone-700">タグ: {slug}</span>
+        <span>›</span>
+        <span className="font-semibold text-stone-700">タグ: {slug}</span>
       </nav>
 
       <ul className="not-prose space-y-4">
