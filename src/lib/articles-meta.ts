@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-015",
+    title:
+      "クマ研究ダイジェスト Vol.15 — ホッキョクグマは「最近のヒグマ」だった。Liu 2014 Cell",
+    description:
+      "ホッキョクグマとヒグマの遺伝子を比較した Liu ら（2014, Cell 誌）の研究は、両者の分岐がわずか 35〜48 万年前という驚きの結果を示した。それまで「200 万年以上前に分岐」と考えられてきた常識を覆し、極寒環境に適応するため遺伝子が爆速で進化していった事実が明らかに。北極圏のクマがどう生まれたか、その物語を精読します。",
+    lead: "ホッキョクグマはヒグマから 35-48 万年前に分岐した「最近の親戚」だった。脂肪代謝の遺伝子が爆速進化した記録を Cell 誌掲載論文で解き明かします。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "進化",
+      "ゲノム",
+      "ホッキョクグマ",
+      "Liu 2014",
+    ],
+    heroImage: "/articles/research-digest-015.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-016",
+    title:
+      "クマ研究ダイジェスト Vol.16 — クマの「腸内細菌」が冬眠の鍵を握る。Sommer 2016",
+    description:
+      "ヒグマの腸内細菌は冬眠中と活動期で大きく入れ替わる — Sommer ら（2016, Cell Reports）の研究は、無菌マウスにクマの腸内細菌を移植する大胆な実験で、その「代謝制御の力」を直接実証した。クマと細菌の共生関係が肥満・糖尿病研究にもたらす示唆まで、最新の腸内細菌科学を精読します。",
+    lead: "クマの腸内細菌は冬眠中と活動期で別物だった。さらに無菌マウスに移植すると、その代謝がマウスにも伝わる ―― 動物医学の常識を変えた Sommer 2016 を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "winter",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "腸内細菌",
+      "冬眠",
+      "代謝",
+      "Sommer 2016",
+    ],
+    heroImage: "/articles/research-digest-016.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-013",
     title:
       "クマ研究ダイジェスト Vol.13 — クマは「特定の木」を選んで擦りつける。Clapham 2014",

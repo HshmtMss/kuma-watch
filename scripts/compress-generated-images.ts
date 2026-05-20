@@ -41,6 +41,8 @@ const SLUGS = [
   "research-digest-012",
   "research-digest-013",
   "research-digest-014",
+  "research-digest-015",
+  "research-digest-016",
 ];
 
 // 既に圧縮済みの画像 (< 400KB) を再圧縮すると JPEG が二重劣化するので、

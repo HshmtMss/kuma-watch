@@ -189,6 +189,16 @@ const TARGETS: Target[] = [
     prompt:
       "A symbolic world map style overhead photograph of a globe lit by warm and cool light, showing forest regions of the northern hemisphere highlighted, scientific magazine cover style, conceptual photography, no readable text or labels",
   },
+  {
+    slug: "research-digest-015",
+    prompt:
+      "A vast arctic ice landscape under cool blue twilight with distant mountains, sense of isolation and evolutionary time scale, no animals visible, dramatic atmospheric photography conveying cold adaptation theme",
+  },
+  {
+    slug: "research-digest-016",
+    prompt:
+      "An abstract scientific conceptual image showing colorful bacterial cells under microscope lighting in warm and cool tones, soft glowing dots like a starry sky, biology magazine cover style, microbiome research theme, no readable text",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

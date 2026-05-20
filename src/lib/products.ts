@@ -288,6 +288,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-canister",
     "first-aid",
   ],
+  // 研究ダイジェスト Vol.15 (Liu 2014 進化) → モニタリング系
+  "research-digest-015": [
+    "bear-detection-ai",
+    "bear-app",
+    "bear-tracks",
+  ],
+  // 研究ダイジェスト Vol.16 (Sommer 2016 腸内細菌) → モニタリング・全般
+  "research-digest-016": [
+    "bear-detection-ai",
+    "bear-app",
+    "bear-tracks",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
