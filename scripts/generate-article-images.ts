@@ -259,6 +259,16 @@ const TARGETS: Target[] = [
     prompt:
       "A traditional shepherd's mountain farm in Romania with stone fence and grazing pasture in summer evening light, traditional architecture, sense of pastoral life and livestock husbandry, no people or animals visible, documentary photography style",
   },
+  {
+    slug: "research-digest-029",
+    prompt:
+      "A vast Yellowstone-style valley with autumn light, distant mountains and dense forests, sense of wild ecosystem cycles and natural balance, no animals visible, atmospheric ecology magazine photography style",
+  },
+  {
+    slug: "research-digest-030",
+    prompt:
+      "A symbolic photograph of a mountain trail at sunrise where a human footprint and a bear paw print converge in damp earth, hopeful warm light, sense of coexistence and shared paths, no actual humans or animals visible, conceptual photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

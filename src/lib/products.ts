@@ -372,6 +372,20 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "home-protection",
     "bear-tracks",
   ],
+  // 研究ダイジェスト Vol.29 (Wilmers 2003 腐肉食) → モニタリング
+  "research-digest-029": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.30 (Carter & Linnell 2016 総括) → 全カテゴリ横断
+  "research-digest-030": [
+    "bear-spray",
+    "electric-fence",
+    "home-protection",
+    "bear-detection-ai",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-029",
+    title:
+      "クマ研究ダイジェスト Vol.29 — クマは森の「清掃員」だった。腐肉食動物としてのクマ",
+    description:
+      "イエローストーンでオオカミが再導入された後、ヒグマの食事が変わった。Wilmers ら（2003）の研究は、クマがオオカミの食べ残しから栄養を補給する「スカベンジャー（腐肉食動物）」としての側面を定量化。動物の死体が森を巡るリサイクルメカニズムと、クマがその主要プレイヤーである事実を精読します。",
+    lead: "オオカミが獲物を仕留め、クマがその残り物を片付ける。Wilmers 2003 でイエローストーン生態系のクマの「清掃員」役を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "腐肉食",
+      "オオカミ",
+      "イエローストーン",
+      "Wilmers 2003",
+    ],
+    heroImage: "/articles/research-digest-029.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-030",
+    title:
+      "クマ研究ダイジェスト Vol.30 — 人とクマの「共進化」が共存の鍵。Carter &amp; Linnell 2016",
+    description:
+      "本シリーズの締めくくり。Carter &amp; Linnell（2016, TREE）は、人とクマ（および他の大型肉食獣）の共存において、双方が「互いに適応」する「共進化」が長期的な解決の鍵だと論じる総説。シリーズ 30 本の知見を統合し、日本でのクマと人の未来を展望します。",
+    lead: "クマと人の共存に必要なのは「双方の適応」だった。シリーズ 30 本の総まとめとして、Carter &amp; Linnell 2016 を精読し未来を展望。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "共進化",
+      "共存",
+      "Carter 2016",
+      "総括",
+    ],
+    heroImage: "/articles/research-digest-030.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-027",
     title:
       "クマ研究ダイジェスト Vol.27 — 「クマを見る観光」は世界で年 10 億ドル産業。Penteriani 2017",
