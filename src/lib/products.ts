@@ -213,6 +213,19 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-app",
     "bear-detection-ai",
   ],
+  // 研究ダイジェスト Vol.3 (Clapham 2020 AI 顔認識) → モニタリング系
+  "research-digest-003": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.4 (Pigeon 2016 冬眠) → 装備・モニタリング全般
+  "research-digest-004": [
+    "bear-spray",
+    "bear-tracks",
+    "home-protection",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

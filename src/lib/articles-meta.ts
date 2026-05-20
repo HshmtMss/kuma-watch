@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-003",
+    title:
+      "クマ研究ダイジェスト Vol.3 — AI はクマの「顔」を見分けられるか？ Clapham 2020",
+    description:
+      "クマには虎の縞模様もパンダの白黒模様もない。それでも AI は個体識別できるのか？ ブリティッシュコロンビア大学の Clapham らが 4,674 枚のヒグマ画像を深層学習で解析し、個体識別精度 84% を達成した最新研究を精読。野生動物管理の常識を変えつつある AI 個体識別の現在地を解説します。",
+    lead: "クマには「縞模様」も「指紋」もない。それでも顔だけで個体を見分ける AI が登場した。Clapham 2020 の深層学習研究を精読し、日本での応用可能性まで解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "AI",
+      "顔認証",
+      "個体識別",
+      "Clapham 2020",
+    ],
+    heroImage: "/articles/research-digest-003.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-004",
+    title:
+      "クマ研究ダイジェスト Vol.4 — 気候変動でクマの冬眠は短くなっている？ Pigeon 2016",
+    description:
+      "ヨーロッパヒグマの 22 年分の冬眠データを分析した Pigeon et al. (2016) の研究を精読。冬眠開始日は約 2 週間遅れ、覚醒日は 1〜2 週間早まり、活動期間が「年 1 ヶ月以上」も延びていた。気温・積雪・体重・繁殖との関係、そして日本のクマ管理への示唆まで掘り下げます。",
+    lead: "ヨーロッパヒグマの冬眠期間が、過去 22 年間で「1 ヶ月以上」短縮していた。気候変動が直接クマの行動を変えている証拠を Pigeon 2016 で精読します。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "気候変動",
+      "冬眠",
+      "Pigeon 2016",
+      "ヨーロッパヒグマ",
+    ],
+    heroImage: "/articles/research-digest-004.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-002",
     title:
       "クマ研究ダイジェスト Vol.2 — クマが夜行性に変わった？ Beckmann &amp; Berger 2003 の衝撃",

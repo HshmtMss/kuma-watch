@@ -129,6 +129,16 @@ const TARGETS: Target[] = [
     prompt:
       "A quiet suburban street at night near a forest edge, soft yellow streetlight illuminating empty road, distant pine forest silhouette, moody blue-purple sky, sense of nocturnal stillness, urban-wildlife interface, no visible animals or people, cinematic photography",
   },
+  {
+    slug: "research-digest-003",
+    prompt:
+      "Close-up portrait of a brown bear face emerging from soft mist in a dark forest, intense eye contact, detailed fur texture, photorealistic high-detail wildlife photography, slight techy atmosphere suggesting data points, dramatic lighting, single bear face only",
+  },
+  {
+    slug: "research-digest-004",
+    prompt:
+      "A snowy mountain landscape in late winter with bare deciduous trees, small patches of melting snow revealing dark earth, soft overcast light, no animals visible, atmospheric photography conveying climate change and seasonal transition",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
