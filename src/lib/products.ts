@@ -275,6 +275,19 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-canister",
     "first-aid",
   ],
+  // 研究ダイジェスト Vol.13 (Clapham 2014 樹幹マーキング) → 痕跡系
+  "research-digest-013": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.14 (Bombieri 2019 世界襲撃メタ) → 登山装備
+  "research-digest-014": [
+    "bear-spray",
+    "bear-bell",
+    "bear-canister",
+    "first-aid",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

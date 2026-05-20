@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-013",
+    title:
+      "クマ研究ダイジェスト Vol.13 — クマは「特定の木」を選んで擦りつける。Clapham 2014",
+    description:
+      "森を歩いていて、樹皮が剥がれて毛が付着した木を見たことがあるだろうか — それはクマが背中をこすりつけた「マーキング木（rub tree）」だ。Clapham ら（2014）が GPS データと現地調査で、ヒグマがどんな樹木を選びどう情報を残しているかを解析。クマだけの「メッセージボード」とも言える社会通信の仕組みを精読します。",
+    lead: "クマは森のあちこちで背中を擦る。しかも特定の木だけを選んで。Clapham 2014 が解明した「クマだけの SNS」とも言える樹幹マーキングの仕組みを解説します。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "マーキング",
+      "コミュニケーション",
+      "Clapham 2014",
+      "行動学",
+    ],
+    heroImage: "/articles/research-digest-013.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-014",
+    title:
+      "クマ研究ダイジェスト Vol.14 — 世界 664 件のヒグマ襲撃メタ解析。Bombieri 2019",
+    description:
+      "世界中のヒグマ襲撃事案 664 件（2000〜2015 年）を統合解析した壮大な研究。ロシア・東欧で襲撃が多い理由、母グマが関与する割合（北米と欧州の違い）、人間側の行動パターンまで網羅した Bombieri 2019 Scientific Reports を精読。日本のヒグマ・ツキノワグマ事案との比較で見える「世界共通の危険条件」も解説。",
+    lead: "世界 18 ヶ国 664 件のヒグマ襲撃を統計分析。地域別の特徴、母グマ関与率、人間側のリスク要因 — グローバルにクマ襲撃を比較した Bombieri 2019 を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "ヒグマ",
+      "襲撃",
+      "メタ解析",
+      "Bombieri 2019",
+    ],
+    heroImage: "/articles/research-digest-014.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-011",
     title:
       "クマ研究ダイジェスト Vol.11 — クマの妊娠は半年待つ。Spady 2007 に見る繁殖の進化",

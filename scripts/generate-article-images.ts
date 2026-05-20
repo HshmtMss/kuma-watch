@@ -179,6 +179,16 @@ const TARGETS: Target[] = [
     prompt:
       "A serious atmospheric photograph of a deep dense forest with mist between tall trees and a single set of bear tracks on the muddy trail, low ambient light, tension and caution mood, documentary wildlife photography style, no animals or people visible",
   },
+  {
+    slug: "research-digest-013",
+    prompt:
+      "Close-up of a tall conifer tree trunk in a forest showing distinctive bear claw marks and rubbed bark patches with bits of brown fur visible, soft sunlight filtering through canopy, scientific nature photography style, no animals visible",
+  },
+  {
+    slug: "research-digest-014",
+    prompt:
+      "A symbolic world map style overhead photograph of a globe lit by warm and cool light, showing forest regions of the northern hemisphere highlighted, scientific magazine cover style, conceptual photography, no readable text or labels",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
