@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-011",
+    title:
+      "クマ研究ダイジェスト Vol.11 — クマの妊娠は半年待つ。Spady 2007 に見る繁殖の進化",
+    description:
+      "クマは夏に交尾し、受精卵を「半年間も冬眠状態」にしてから冬に出産する。母グマの栄養状態次第で妊娠そのものをキャンセルできる「着床遅延」という独自の繁殖戦略を、Spady ら 2007 の総説で精読。なぜクマはこの仕組みを進化させたのか、現代の保護戦略への含意まで解説します。",
+    lead: "夏に交尾し、半年後に受精卵が動き出す。母体の栄養が足りなければ妊娠キャンセル。クマだけが持つ独自の繁殖戦略を、Spady 2007 の総説で解き明かします。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "繁殖",
+      "着床遅延",
+      "進化",
+      "Spady 2007",
+    ],
+    heroImage: "/articles/research-digest-011.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-012",
+    title:
+      "クマ研究ダイジェスト Vol.12 — クロクマに殺された 63 人の共通点。Herrero 2011",
+    description:
+      "「母グマが危険」「クマは群れで襲う」など、巷で言われるクマ襲撃の常識を覆した北米 110 年分のデータ分析。Herrero ら（2011）が 1900〜2009 年のアメリカクロクマによる致命的襲撃 63 件を統計解析し、襲ったクマの 88% が単独の成獣雄、ほとんどが捕食性襲撃だったことを明らかに。命を守るための実用的な教訓まで深掘りします。",
+    lead: "クロクマに殺された人 63 人を 110 年分のデータから分析。襲ったのは「母グマ」ではなく「単独の成獣雄」。命を守る常識を更新する Herrero 2011 を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "襲撃",
+      "クロクマ",
+      "事例分析",
+      "Herrero 2011",
+    ],
+    heroImage: "/articles/research-digest-012.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-009",
     title:
       "クマ研究ダイジェスト Vol.9 — クマを移動させても帰ってくる？ Linnell 1997 の冷徹な結論",

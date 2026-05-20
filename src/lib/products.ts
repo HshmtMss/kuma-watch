@@ -262,6 +262,19 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-detection-ai",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.11 (Spady 2007 繁殖) → 全般
+  "research-digest-011": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.12 (Herrero 2011 致命的襲撃) → 緊急時装備
+  "research-digest-012": [
+    "bear-spray",
+    "weapons",
+    "bear-canister",
+    "first-aid",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

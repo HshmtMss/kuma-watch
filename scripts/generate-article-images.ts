@@ -169,6 +169,16 @@ const TARGETS: Target[] = [
     prompt:
       "An abstract conceptual image of a bear silhouette in profile with subtle glowing neural network or constellation pattern overlay suggesting intelligence and cognition, deep dark background with cool blue and warm amber accents, scientific magazine cover style, no readable text",
   },
+  {
+    slug: "research-digest-011",
+    prompt:
+      "Soft warm photograph of a quiet snow-covered forest den entrance with subtle glow from inside, mother bear inferred but not visible, sense of life and warmth within winter wilderness, dawn light, gentle conceptual reproductive biology theme",
+  },
+  {
+    slug: "research-digest-012",
+    prompt:
+      "A serious atmospheric photograph of a deep dense forest with mist between tall trees and a single set of bear tracks on the muddy trail, low ambient light, tension and caution mood, documentary wildlife photography style, no animals or people visible",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
