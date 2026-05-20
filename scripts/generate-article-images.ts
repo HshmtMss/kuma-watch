@@ -139,6 +139,16 @@ const TARGETS: Target[] = [
     prompt:
       "A snowy mountain landscape in late winter with bare deciduous trees, small patches of melting snow revealing dark earth, soft overcast light, no animals visible, atmospheric photography conveying climate change and seasonal transition",
   },
+  {
+    slug: "research-digest-005",
+    prompt:
+      "Macro close-up of a bear's nose and muzzle in soft warm light, intricate texture of nose skin, mist or breath rising in cold air, suggesting heightened olfactory sensitivity, blurred dark forest background, scientific nature photography",
+  },
+  {
+    slug: "research-digest-006",
+    prompt:
+      "An autumn forest floor scattered with abundant acorns, beechnuts and chestnuts in golden hour light, vibrant fall colors of red and orange leaves, sense of harvest abundance, no animals or people, food ecology photography",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

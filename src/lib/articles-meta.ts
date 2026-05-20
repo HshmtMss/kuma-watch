@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-005",
+    title:
+      "クマ研究ダイジェスト Vol.5 — クマの嗅覚は犬の 7 倍。匂いの「世界地図」を見ている",
+    description:
+      "ヒグマが数 km 先のクジラの死体を嗅ぎつける、ホッキョクグマが厚さ 1m の氷の下のアザラシを発見する。これらは伝説ではなく、嗅覚受容体遺伝子の解析から裏付けられた科学的事実だった。Niimura 2014 のゲノム解析と Togunov 2017 のホッキョクグマ嗅覚追跡を精読し、クマの「匂いの世界」を解き明かします。",
+    lead: "ヒグマの嗅覚受容体は犬の 7 倍、人の 5 倍。ホッキョクグマは 16 km 先の獲物を嗅ぎつける。クマが「匂いの世界地図」で生きている事実を最新ゲノム研究から解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "嗅覚",
+      "感覚",
+      "ゲノム",
+      "Niimura 2014",
+    ],
+    heroImage: "/articles/research-digest-005.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-006",
+    title:
+      "クマ研究ダイジェスト Vol.6 — クマは「カロリー」より「栄養バランス」で食を選ぶ。Erlenbach 2014",
+    description:
+      "クマが秋に体重を 30% 増やす「ハイパーフェイジア」は何でも食べているのか？ ワシントン州立大学の Erlenbach らがヒグマに自由選択餌を与え、彼らが必ずタンパク質・脂質・炭水化物の比率を「最適点」に揃えることを発見。クマの食性の常識を覆した実験を精読し、日本の秋の出没急増との関係を解説します。",
+    lead: "クマは何でも食べる雑食性 — はかつての常識。実は彼らは栄養バランスを精密に計算して食を選んでいた。Erlenbach 2014 の実験を精読し、秋の市街地出没の本当の理由を解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "autumn",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "食性",
+      "ハイパーフェイジア",
+      "栄養",
+      "Erlenbach 2014",
+    ],
+    heroImage: "/articles/research-digest-006.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-003",
     title:
       "クマ研究ダイジェスト Vol.3 — AI はクマの「顔」を見分けられるか？ Clapham 2020",

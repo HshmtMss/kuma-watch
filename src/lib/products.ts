@@ -226,6 +226,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "home-protection",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.5 (Niimura 2014 嗅覚) → 誘引物管理
+  "research-digest-005": [
+    "home-protection",
+    "bear-canister",
+    "electric-fence",
+  ],
+  // 研究ダイジェスト Vol.6 (Erlenbach 2014 食性) → 農業・家屋
+  "research-digest-006": [
+    "electric-fence",
+    "home-protection",
+    "bear-canister",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
