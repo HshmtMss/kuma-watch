@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-019",
+    title:
+      "クマ研究ダイジェスト Vol.19 — 単独行動の動物に「階層社会」があった。Stonorov 1972",
+    description:
+      "「クマは単独行動の動物」という定説を覆した古典的研究。アラスカ・カルク湖でサケ漁場に集まるヒグマたちを観察した Stonorov &amp; Stokes (1972) は、彼らが明確な「序列社会」を持っていることを発見。雄の体格・年齢・経験で決まる支配関係、子連れ母グマの戦略、まるで人間社会のような複雑なルールが彼らの中にあった。日本のヒグマ・ツキノワグマでの類似研究にも触れて解説します。",
+    lead: "「クマは単独行動」は半分嘘だった。サケ漁場で見せる明確な序列社会を、1972 年の古典的観察研究 Stonorov &amp; Stokes から読み解きます。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "社会行動",
+      "階層",
+      "Stonorov 1972",
+      "行動学",
+    ],
+    heroImage: "/articles/research-digest-019.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-020",
+    title:
+      "クマ研究ダイジェスト Vol.20 — クマを「殺さず追い払う」科学。Beckmann 2004",
+    description:
+      "問題化したクマを駆除するのではなく、行動を変えて自然に戻す「嫌悪条件付け」。Beckmann ら（2004）は、北米でカレリアン・ベアドッグ・ゴム弾・大音響などの非致死的手段を 62 頭のクロクマで試験し、その効果を統計的に比較。何が効いて何が効かないのか、日本での応用可能性を含めて精読します。",
+    lead: "「殺さずにクマを管理する」科学。ベアドッグ・ゴム弾・大音響などの効果を 62 頭で比較した Beckmann 2004 を精読し、軽井沢・北海道での応用例も解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "嫌悪条件付け",
+      "ベアドッグ",
+      "Beckmann 2004",
+      "管理",
+    ],
+    heroImage: "/articles/research-digest-020.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-017",
     title:
       "クマ研究ダイジェスト Vol.17 — クマの「噛む力」はライオンの 2 倍。Christiansen 2007",

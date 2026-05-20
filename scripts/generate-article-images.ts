@@ -209,6 +209,16 @@ const TARGETS: Target[] = [
     prompt:
       "A pristine forest stream in autumn with red salmon swimming upstream and golden trees on banks, soft morning mist, sense of ecosystem connection between sea and forest, no animals or people visible on land, nature documentary photography style",
   },
+  {
+    slug: "research-digest-019",
+    prompt:
+      "A serene salmon stream in Alaska with multiple bears fishing at different positions along the river bank in early morning mist, sense of social spacing and hierarchy, distant view from elevated angle, nature documentary photography style",
+  },
+  {
+    slug: "research-digest-020",
+    prompt:
+      "A trained working dog in the field at dawn looking alert toward a misty forest, scientific outdoor research equipment laid out in foreground including a recorder and orange safety vest, no bears or other people visible, documentary photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

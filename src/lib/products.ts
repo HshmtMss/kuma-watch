@@ -312,6 +312,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-detection-ai",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.19 (Stonorov 1972 社会階層) → モニタリング系
+  "research-digest-019": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.20 (Beckmann 2004 嫌悪条件付け) → 装備全般
+  "research-digest-020": [
+    "bear-spray",
+    "home-protection",
+    "bear-detection-ai",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {
