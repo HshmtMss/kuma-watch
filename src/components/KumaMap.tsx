@@ -182,6 +182,14 @@ export default function KumaMap({
   const landUseRef = useRef<LandUseMap | null>(null);
   const recordsRef = useRef<KumaRecord[]>(records);
   const showHeatmapRef = useRef(showHeatmap);
+  // selectedLocation を ref で最新化。map 初期化 useEffect の closure では
+  // mount 時点の値しか見えないため、leaflet の動的 import が解決した時点で
+  // 既に GPS / URL 由来の selectedLocation が反映されていてもキャプチャできず
+  // 「地図中心がデフォルト位置のまま動かない」現象を起こしていた。
+  const selectedLocationLatestRef = useRef(selectedLocation);
+  useEffect(() => {
+    selectedLocationLatestRef.current = selectedLocation;
+  }, [selectedLocation]);
   const heatmapOpacityRef = useRef(heatmapOpacity);
   const haloOpacityRef = useRef(haloOpacity);
   const levelThresholdsRef = useRef(levelThresholds);
@@ -717,11 +725,13 @@ export default function KumaMap({
       mapRef.current = map;
       if (onMapReady) onMapReady(map);
 
-      // map 生成時点で既に selectedLocation がある (URL ?lat=&lon= 由来など) 場合、
-      // selectedLocation の useEffect は map 未初期化のタイミングで早期 return しているため、
-      // ここで初回 setView を明示的に発火させる。これがないと「観光地から地図を開く」が
-      // 現在地周辺に止まる現象が起きる。
-      const initSel = selectedLocation;
+      // map 生成時点で既に selectedLocation がある (URL ?lat=&lon= 由来 / GPS 即解決 /
+      // sessionStorage 復元 など) 場合、selectedLocation の useEffect は map 未初期化の
+      // タイミングで早期 return しているため、ここで初回 setView を明示的に発火させる。
+      // ★ ref から最新値を読むこと: import("leaflet") の解決待ち中に state 更新があると
+      //   useEffect closure の selectedLocation (mount 時点 = null) には反映されないので、
+      //   常に最新値が入る selectedLocationLatestRef を介して読む。
+      const initSel = selectedLocationLatestRef.current;
       if (initSel) {
         const isMobile =
           typeof window !== "undefined" ? window.innerWidth < 640 : false;
