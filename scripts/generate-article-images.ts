@@ -219,6 +219,16 @@ const TARGETS: Target[] = [
     prompt:
       "A trained working dog in the field at dawn looking alert toward a misty forest, scientific outdoor research equipment laid out in foreground including a recorder and orange safety vest, no bears or other people visible, documentary photography style",
   },
+  {
+    slug: "research-digest-021",
+    prompt:
+      "An Italian Dolomites mountain village viewed from above with vineyards and forested slopes, traditional stone houses, alpine atmosphere, sense of human-wildlife coexistence landscape, no animals visible, late afternoon golden light",
+  },
+  {
+    slug: "research-digest-022",
+    prompt:
+      "An abstract conceptual photograph of a vast mountain wilderness with a faint glowing trail line tracing through forests and across ridges suggesting GPS tracking, soft dawn light, no animals visible, scientific magazine cover style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");

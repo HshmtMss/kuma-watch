@@ -324,6 +324,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "home-protection",
     "bear-detection-ai",
   ],
+  // 研究ダイジェスト Vol.21 (Trentino 再導入) → 全般
+  "research-digest-021": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.22 (GPS テレメトリー) → モニタリング系
+  "research-digest-022": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

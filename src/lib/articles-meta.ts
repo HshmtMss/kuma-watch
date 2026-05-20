@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-021",
+    title:
+      "クマ研究ダイジェスト Vol.21 — 絶滅したヒグマを再導入したトレンティーノの 30 年",
+    description:
+      "1990 年代、イタリア北部トレンティーノ州のヒグマは絶滅寸前まで追い込まれた。EU の支援を得た「Life Ursus」プロジェクトで 1999〜2002 年に 10 頭のスロベニア産ヒグマを再導入。20 年後の現在、個体群は 100 頭超に回復したが、人クマ軋轢という新たな課題も。Mustoni 2003 と後続評価論文で読み解く欧州の壮大な保全実験を精読します。",
+    lead: "10 頭から始まった再導入で個体群が 100 頭超に回復したイタリア北部の壮大な保全実験。成功と新たな課題を Mustoni 2003 ほかで解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "再導入",
+      "保全",
+      "イタリア",
+      "Life Ursus",
+    ],
+    heroImage: "/articles/research-digest-021.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-022",
+    title:
+      "クマ研究ダイジェスト Vol.22 — クマの行動圏は最大 2,000 km²。GPS が明かす移動の真実",
+    description:
+      "GPS テレメトリー技術の発展で、クマの行動圏が初めて精密に測定できるようになった。雌は 50〜300 km²、雄は 500〜2,000 km² — その差は何を意味するのか。Mowat &amp; Heard 2006 ほかの代表研究を精読し、繁殖戦略・食物分布・地形が行動圏を決める仕組みと、日本のヒグマ・ツキノワグマでの近年の知見まで解説します。",
+    lead: "雄ヒグマの行動圏は東京 23 区の 3 倍。GPS テレメトリーが解き明かしたクマの移動の謎を、Mowat 2006 ほかで読み解きます。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "行動圏",
+      "GPS",
+      "テレメトリー",
+      "Mowat 2006",
+    ],
+    heroImage: "/articles/research-digest-022.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-019",
     title:
       "クマ研究ダイジェスト Vol.19 — 単独行動の動物に「階層社会」があった。Stonorov 1972",
