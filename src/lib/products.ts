@@ -336,6 +336,18 @@ const ARTICLE_ALIASES: Record<string, string[]> = {
     "bear-tracks",
     "bear-app",
   ],
+  // 研究ダイジェスト Vol.23 (Schwartz 2006 仔グマ生存率) → モニタリング
+  "research-digest-023": [
+    "bear-detection-ai",
+    "bear-tracks",
+    "bear-app",
+  ],
+  // 研究ダイジェスト Vol.24 (Linnell 2000 巣穴) → 痕跡・モニタリング
+  "research-digest-024": [
+    "bear-tracks",
+    "bear-detection-ai",
+    "bear-app",
+  ],
 };
 
 export function getProductsForArticleSlug(slug: string): Product[] {

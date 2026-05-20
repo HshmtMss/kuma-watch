@@ -382,6 +382,50 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-023",
+    title:
+      "クマ研究ダイジェスト Vol.23 — クマの赤ちゃんは半分死ぬ。Schwartz 2006",
+    description:
+      "イエローストーン国立公園のヒグマを 20 年以上追跡した Schwartz ら（2006）の壮大な人口統計研究。仔グマ 1 年目の生存率は 60〜80%、1 産あたりの平均出産数は 2 頭、母グマ 1 頭が生涯に育て上げる仔は数頭のみ — クマの繁殖の厳しい現実と、個体群維持の難しさを定量的に解説します。",
+    lead: "イエローストーンの 20 年データから読み解くヒグマ繁殖の真実。仔グマ生存率 60-80%、母グマの生涯出産数、人為要因の影響まで Schwartz 2006 を精読。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "all",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "仔グマ",
+      "生存率",
+      "人口統計",
+      "Schwartz 2006",
+    ],
+    heroImage: "/articles/research-digest-023.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
+    slug: "research-digest-024",
+    title:
+      "クマ研究ダイジェスト Vol.24 — クマの冬眠巣穴は「人がいない場所」で選ばれる。Linnell 2000",
+    description:
+      "冬眠中のクマの巣穴は、人間活動からどれくらい離れているのか？ Linnell ら（2000）がスウェーデンの 100 か所の巣穴を測定し、人家・道路・スキー場との距離を解析。冬眠中の母グマと仔グマがどれほど人為的撹乱に弱いか、ヒグマの巣穴選定の戦略を精読します。",
+    lead: "クマは「人がいない場所」を冬眠地に選ぶ。スウェーデン 100 巣穴の調査で判明したヒグマの戦略と、人為撹乱の脆さを Linnell 2000 で解説。",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-05-20",
+    season: "winter",
+    category: "science",
+    tags: [
+      "論文",
+      "研究ダイジェスト",
+      "冬眠",
+      "巣穴",
+      "保護",
+      "Linnell 2000",
+    ],
+    heroImage: "/articles/research-digest-024.jpg",
+    heroCredit: "Generated with Imagen 4 (Google)",
+  },
+  {
     slug: "research-digest-021",
     title:
       "クマ研究ダイジェスト Vol.21 — 絶滅したヒグマを再導入したトレンティーノの 30 年",

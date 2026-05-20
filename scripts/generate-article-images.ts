@@ -229,6 +229,16 @@ const TARGETS: Target[] = [
     prompt:
       "An abstract conceptual photograph of a vast mountain wilderness with a faint glowing trail line tracing through forests and across ridges suggesting GPS tracking, soft dawn light, no animals visible, scientific magazine cover style",
   },
+  {
+    slug: "research-digest-023",
+    prompt:
+      "A peaceful spring forest meadow with new green growth and wildflowers, gentle morning sunlight filtering through trees, sense of new life and beginnings, no animals visible, hopeful tone, conservation photography style",
+  },
+  {
+    slug: "research-digest-024",
+    prompt:
+      "A snowy mountain hillside with a partly hidden rocky den entrance in the side of a slope, undisturbed snow around it, deep winter silence, soft blue evening light, sense of hidden hibernation, no animals visible, nature documentary photography style",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
