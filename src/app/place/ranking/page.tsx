@@ -104,9 +104,11 @@ export default async function RankingPage() {
         クマ出没は一部地域に強く集中する傾向があり、これらのエリアは特に警戒が必要です。
       </p>
 
-      <h2>警戒エリア一覧（直近90日 件数の多い順）</h2>
+      {/* 元の見出しは「警戒エリア一覧（直近90日 件数の多い順）」だったが
+          スマホで不自然に改行されるため、見出しは短く・並び順は補足文に分離。 */}
+      <h2>警戒エリア一覧</h2>
       <p className="text-sm text-stone-600">
-        市町村名をタップすると、地区別の出没傾向・最近の事案・周辺マップなど詳細を確認できます。
+        直近 90 日の出没件数が多い順。市町村名をタップすると、地区別の出没傾向・最近の事案・周辺マップなど詳細を確認できます。
       </p>
 
       <ul className="not-prose grid list-none grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
@@ -167,46 +169,70 @@ export default async function RankingPage() {
         })}
       </ul>
 
-      <h2>使い方</h2>
-      <ul>
-        <li>
-          この警戒マップは KumaWatch が集計する公開情報を基に、{" "}
-          <strong>直近 90 日の出没件数が多い順</strong>
-          に警戒エリアを並べています。同件数の場合は直近 1 年、それでも同じなら累計の多い順です。
-        </li>
-        <li>
-          赤い背景の市町村は直近 90 日で 50 件以上の出没があった「特に警戒度が高い」エリアです。
-        </li>
-        <li>
-          各市町村名をタップすると、地区別の出没傾向・月別件数・周辺市町村との比較などを確認できます。
-        </li>
-        <li>
-          地域別に絞り込みたい場合は{" "}
-          <Link href="/place">都道府県別ページ</Link>
-          、観光地・登山口を中心に見たい場合は{" "}
-          <Link href="/spot">観光地ページ</Link>
-          をご利用ください。
-        </li>
-      </ul>
+      {/* 使い方・注意事項は折り畳み。よく読まれるブロックではないので
+          初期状態を閉じ、本体のランキング表示にスクロールを集中させる。 */}
+      <details className="not-prose group my-8 overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-5 py-3 text-base font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+          <span>使い方</span>
+          <span className="text-stone-400 transition group-open:rotate-180">▼</span>
+        </summary>
+        <ul className="space-y-2 px-5 py-4 text-sm leading-relaxed text-stone-700">
+          <li>
+            この警戒マップは KumaWatch が集計する公開情報を基に、{" "}
+            <strong>直近 90 日の出没件数が多い順</strong>
+            に警戒エリアを並べています。同件数の場合は直近 1 年、それでも同じなら累計の多い順です。
+          </li>
+          <li>
+            赤い背景の市町村は直近 90 日で 50 件以上の出没があった「特に警戒度が高い」エリアです。
+          </li>
+          <li>
+            各市町村名をタップすると、地区別の出没傾向・月別件数・周辺市町村との比較などを確認できます。
+          </li>
+          <li>
+            地域別に絞り込みたい場合は{" "}
+            <Link href="/place" className="text-amber-700 underline">
+              都道府県別ページ
+            </Link>
+            、観光地・登山口を中心に見たい場合は{" "}
+            <Link href="/spot" className="text-amber-700 underline">
+              観光地ページ
+            </Link>
+            をご利用ください。
+          </li>
+        </ul>
+      </details>
 
-      <h2>注意事項</h2>
-      <p>
-        本警戒マップは住民・観光客の安全確認を目的とし、KumaWatch が集計した公開情報（環境省・自治体公式オープンデータ）に基づきます。
-        自治体の情報公開体制・更新頻度には差があり、件数の多寡が必ずしも実際の出没の多さを完全に反映するわけではない点にご留意ください。
-        例えば、公開ページの更新が遅い自治体は実際よりも少なめに見える可能性があります。
-        最新かつ正確な情報は各自治体の公式発表をご確認ください。
-      </p>
-      <p>
-        2025 年の年間動向は{" "}
-        <Link href="/articles/bear-2025-retrospective">
-          2025年クマ大量出没を振り返る
-        </Link>
-        、2026 年秋の見通しは{" "}
-        <Link href="/articles/autumn-forecast-2026">
-          2026年 秋のクマ大量出没予報
-        </Link>
-        をご覧ください。
-      </p>
+      <details className="not-prose group my-6 overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-5 py-3 text-base font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+          <span>注意事項</span>
+          <span className="text-stone-400 transition group-open:rotate-180">▼</span>
+        </summary>
+        <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-stone-700">
+          <p>
+            本警戒マップは住民・観光客の安全確認を目的とし、KumaWatch が集計した公開情報（環境省・自治体公式オープンデータ）に基づきます。
+            自治体の情報公開体制・更新頻度には差があり、件数の多寡が必ずしも実際の出没の多さを完全に反映するわけではない点にご留意ください。
+            例えば、公開ページの更新が遅い自治体は実際よりも少なめに見える可能性があります。
+            最新かつ正確な情報は各自治体の公式発表をご確認ください。
+          </p>
+          <p>
+            2025 年の年間動向は{" "}
+            <Link
+              href="/articles/bear-2025-retrospective"
+              className="text-amber-700 underline"
+            >
+              2025年クマ大量出没を振り返る
+            </Link>
+            、2026 年秋の見通しは{" "}
+            <Link
+              href="/articles/autumn-forecast-2026"
+              className="text-amber-700 underline"
+            >
+              2026年 秋のクマ大量出没予報
+            </Link>
+            をご覧ください。
+          </p>
+        </div>
+      </details>
     </PageShell>
   );
 }
