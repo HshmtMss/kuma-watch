@@ -5,7 +5,7 @@
 //
 // SW のバージョン文字列。更新したら必ずインクリメントしてキャッシュ
 // 整合性を取る。
-const SW_VERSION = "kuma-sw-v1";
+const SW_VERSION = "kuma-sw-v2";
 
 self.addEventListener("install", (event) => {
   // 既存 SW があれば即時置き換え
@@ -31,8 +31,11 @@ self.addEventListener("push", (event) => {
     icon: payload.icon || "/icons/Icon-192.png",
     badge: payload.badge || "/icons/Icon-192.png",
     tag: payload.tag || undefined,
-    // 同一 tag を持つ既存通知を置き換える (true = 置換、false = 累積)
-    renotify: false,
+    // tag は muni 単位 (kuma-{pref}-{city})。同一 muni の通知は 1 件に集約される。
+    // renotify=true で、未読の通知が残っていても新しい出没ごとに必ず再アラート
+    // する (クマ出没は安全情報なので毎回知らせたい)。
+    // 仕様上 renotify=true には tag が必須なので、tag がある時だけ true にする。
+    renotify: Boolean(payload.tag),
     data: {
       url: payload.url || "/",
     },
