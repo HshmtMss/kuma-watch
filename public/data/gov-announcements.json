@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1779325023315,
+  "generatedAt": 1779326207130,
   "items": [
     {
       "id": "env:https://www.env.go.jp/press/press_04725.html",
@@ -22,6 +22,72 @@
       "category": "report",
       "summary": "クマによる人身被害と、はこわなを用いたクマの捕獲に関する二つのレポートが公表された。クマ対策の現状と有効性が詳細に報告される。",
       "ingestedAt": 1779323892568
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_04326.html",
+      "ministry": "env",
+      "date": "2026-04-20",
+      "title": "【鳥獣保護管理室】中央環境審議会自然環境部会 第21回鳥獣の保護及び管理のあり方検討小委員会の開催について",
+      "url": "https://www.env.go.jp/press/press_04326.html",
+      "tag": "自然環境",
+      "category": "meeting",
+      "summary": "中央環境審議会自然環境部会が、第21回鳥獣の保護及び管理のあり方検討小委員会を開催することを発表。日本の野生鳥獣の保護管理に関する議論が行われる予定。",
+      "ingestedAt": 1779326207130
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_03867.html",
+      "ministry": "env",
+      "date": "2026-04-06",
+      "title": "緊急銃猟ガイドラインの改訂について",
+      "url": "https://www.env.go.jp/press/press_03867.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "緊急銃猟ガイドラインの改訂が発表された。鳥獣による被害を軽減するための緊急的な銃器使用に関する指針が更新される。",
+      "ingestedAt": 1779326207130
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_03840.html",
+      "ministry": "env",
+      "date": "2026-04-03",
+      "title": "特定鳥獣保護・管理計画作成のためのガイドライン（クマ編）の改定について",
+      "url": "https://www.env.go.jp/press/press_03840.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "特定鳥獣保護・管理計画作成のためのガイドラインのうち、クマに関する内容が改定されることが発表された。クマ対策の指針が更新される見込み。",
+      "ingestedAt": 1779326207130
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_03319.html",
+      "ministry": "env",
+      "date": "2026-03-17",
+      "title": "令和７年度クマ保護及び管理に関する検討会の開催について",
+      "url": "https://www.env.go.jp/press/press_03319.html",
+      "tag": "自然環境",
+      "category": "meeting",
+      "summary": "令和７年度におけるクマの保護及び管理に関する検討会が開催されることが発表された。専門家がクマ対策について議論する場となる。",
+      "ingestedAt": 1779326207130
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_02679.html",
+      "ministry": "env",
+      "date": "2026-02-16",
+      "title": "特定鳥獣保護・管理計画作成のためのガイドライン（クマ編） 令和７年度版（案）に関する意見募集（パブリックコメント）について",
+      "url": "https://www.env.go.jp/press/press_02679.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "特定鳥獣保護・管理計画作成のためのガイドライン（クマ編）令和７年度版の案について、国民からの意見募集（パブリックコメント）が開始される。クマ対策の指針策定に向けた手続き。",
+      "ingestedAt": 1779326207130
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_02117.html",
+      "ministry": "env",
+      "date": "2025-12-26",
+      "title": "広域鳥獣対策専門官、クマ対策専門官及び外来生物地方調整専門官の募集について",
+      "url": "https://www.env.go.jp/press/press_02117.html",
+      "tag": "自然環境",
+      "category": "press",
+      "summary": "広域鳥獣対策専門官、クマ対策専門官、外来生物地方調整専門官の募集が開始された。野生鳥獣管理体制の強化のため、専門人材を確保する。",
+      "ingestedAt": 1779326207130
     },
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071223.html",
@@ -77,6 +143,17 @@
       "category": "press",
       "summary": "クマ被害対策に関する関係情報が公開された。被害の現状や対策の取り組みに関する最新情報を提供し、国民への注意喚起と理解を深めることを目的とした発表。",
       "ingestedAt": 1779325023315
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_00195.html",
+      "ministry": "env",
+      "date": "2025-07-08",
+      "title": "緊急銃猟ガイドラインの公表について",
+      "url": "https://www.env.go.jp/press/press_00195.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "緊急銃猟ガイドラインの公表が発表された。鳥獣による被害を軽減するための緊急的な銃器使用に関する具体的な指針が示される。",
+      "ingestedAt": 1779326207130
     }
   ]
 }

@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
+import GovAnnouncementTicker from "@/components/GovAnnouncementTicker";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
 import RiskPanel, {
@@ -675,6 +676,10 @@ export default function KumaClient() {
         </div>
         <HeaderNav />
       </header>
+
+      {/* 国の最新発表ティッカー — 30 日以内の発表があれば 1 件だけ細い帯で表示。
+          dismiss すると sessionStorage に記録されて同セッション中は再表示しない。 */}
+      <GovAnnouncementTicker />
 
       {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}
       <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-white px-2 py-2">
