@@ -22,6 +22,7 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
+import { isPushReleased } from "@/lib/push-flag";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -450,8 +451,9 @@ export default async function MuniPage({ params }: Props) {
       </div>
 
       {/* 通知購読 — 「今危険か」の答えを見たユーザに、継続フォローの選択肢を
-          示す。Push 非対応・拒否時はコンポーネント側で何も描画しない。 */}
-      <PushSubscribeButton pref={pref} city={muni} />
+          示す。Push 非対応・拒否時はコンポーネント側で何も描画しない。
+          リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
+      {isPushReleased() && <PushSubscribeButton pref={pref} city={muni} />}
 
       {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
           「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。

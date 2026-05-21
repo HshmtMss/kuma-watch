@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isConfigured, subscribe } from "@/lib/push-storage";
+import { isPushReleased } from "@/lib/push-flag";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,13 @@ type SubscribeBody = {
 };
 
 export async function POST(req: Request) {
+  // リリースフラグが OFF の間は、UI を回避して直接叩かれても購読させない。
+  if (!isPushReleased()) {
+    return NextResponse.json(
+      { error: "push notifications not available" },
+      { status: 403 },
+    );
+  }
   if (!isConfigured()) {
     return NextResponse.json(
       { error: "push notifications not configured" },
