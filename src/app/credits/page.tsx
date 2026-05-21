@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PageShell from "@/components/PageShell";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -126,6 +127,11 @@ export default function CreditsPage() {
       <p>
         加工後のデータは原典そのものではありませんが、各情報には出典自治体名と公式ページへのリンクを必ず併記しており、
         最終的な一次情報は公式サイトでご確認いただけます。
+      </p>
+      <p>
+        <strong>処理の詳細・件数・カバレッジ・既知の制約</strong>は
+        <Link href="/data">データの透明性ページ</Link>
+        で公開しています。研究・報道での引用方法もそちらに記載。
       </p>
 
       <h2>運営者・著作権</h2>
