@@ -20,6 +20,7 @@ import { getSeasonalAdvice } from "@/lib/place-content";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
+import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 
 // 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
 // それ以外のパスは Next.js が即 404 を返す。
@@ -790,6 +791,9 @@ export default async function MuniPage({ params }: Props) {
           <Link href="/articles/encounter">クマに遭遇したらどうする</Link>)
         </li>
       </ul>
+
+      {/* 国の最新発表 — 市町村ページから政府方針への導線 (全市町村共通の国の動き) */}
+      <LatestGovAnnouncements limit={2} />
 
       <h2>あわせて読みたい</h2>
       {/* 4 枠のうち 1 枠は現在の季節に合わせて選定する。「春なのに秋の記事

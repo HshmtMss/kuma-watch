@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
   getMuniAggregatesByPref,
@@ -241,17 +242,27 @@ export default async function PrefPage({ params }: Props) {
         );
       })()}
 
-      <h2>使い方</h2>
-      <p>
-        各市町村のリンクから、過去の目撃件数・最新の目撃日・5kmメッシュ単位の警戒レベル・
-        最近の出没履歴を確認できます。登山・キャンプ・山菜採りなど {pref} 内でアウトドア活動を
-        予定している場合は、出発前の参考にご活用ください。
-      </p>
-      <h2>注意事項</h2>
-      <p>
-        KumaWatch のデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
-        あくまで参考情報であり、最新かつ正確な情報は各自治体の公式発表をご確認ください。
-      </p>
+      {/* 国の最新発表 — 都道府県ページから政府方針への導線 */}
+      <LatestGovAnnouncements limit={3} />
+
+      {/* 使い方・注意事項は読まれにくいので折り畳みに */}
+      <details className="not-prose group my-6 overflow-hidden rounded-xl border border-stone-200 bg-white">
+        <summary className="flex cursor-pointer items-center justify-between gap-2 bg-stone-50 px-5 py-3 text-base font-semibold text-stone-800 marker:hidden [&::-webkit-details-marker]:hidden">
+          <span>使い方・注意事項</span>
+          <span className="text-stone-400 transition group-open:rotate-180">▼</span>
+        </summary>
+        <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-stone-700">
+          <p>
+            各市町村のリンクから、過去の目撃件数・最新の目撃日・5kmメッシュ単位の警戒レベル・
+            最近の出没履歴を確認できます。登山・キャンプ・山菜採りなど {pref} 内でアウトドア活動を
+            予定している場合は、出発前の参考にご活用ください。
+          </p>
+          <p>
+            KumaWatch のデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
+            あくまで参考情報であり、最新かつ正確な情報は各自治体の公式発表をご確認ください。
+          </p>
+        </div>
+      </details>
       {/* 全国マップを当該県の位置で開く。muni ページの sticky CTA と
           同じトーン（amber-600 fill + 大きめ）に揃え、サイト全体の
           「地図を開く系」ボタンとして整合性を保つ。 */}
