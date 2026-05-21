@@ -1,0 +1,27 @@
+{
+  "generatedAt": 1779323892568,
+  "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_04725.html",
+      "ministry": "env",
+      "date": "2026-05-18",
+      "title": "【鳥獣保護管理室】中央環境審議会自然環境部会 第22回鳥獣の保護及び管理のあり方検討小委員会の開催について",
+      "url": "https://www.env.go.jp/press/press_04725.html",
+      "tag": "自然環境",
+      "category": "meeting",
+      "summary": "中央環境審議会の自然環境部会が、鳥獣の保護及び管理のあり方を検討する第22回小委員会を開催。クマを含む野生動物管理の今後について議論される。",
+      "ingestedAt": 1779323892568
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_04487.html",
+      "ministry": "env",
+      "date": "2026-04-27",
+      "title": "クマの人身被害に関するレポート、はこわなによる捕獲に関するレポートの公表について",
+      "url": "https://www.env.go.jp/press/press_04487.html",
+      "tag": "自然環境",
+      "category": "report",
+      "summary": "クマによる人身被害と、はこわなを用いたクマの捕獲に関する二つのレポートが公表された。クマ対策の現状と有効性が詳細に報告される。",
+      "ingestedAt": 1779323892568
+    }
+  ]
+}

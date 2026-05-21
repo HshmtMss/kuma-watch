@@ -1,0 +1,70 @@
+name: Gov announcements ingest
+
+# 環境省・農林水産省・林野庁の press release から、クマ・鳥獣保護管理関連の
+# 発表を 6 時間ごとに収集し /policy ページに反映する。
+# 政府発表は news ほど高頻度ではないため 6h サイクル。
+# 実装は scripts/ingest-gov-announcements.ts を参照。
+
+on:
+  schedule:
+    # UTC 0/6/12/18 = JST 9/15/21/3 時。1 日 4 回。
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# /policy のデータ書き込みを直列化 (他ワークフローと別 group)
+concurrency:
+  group: gov-write
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Ingest gov announcements
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npm run ingest:gov
+
+      - name: Commit and push (with rebase retry)
+        run: |
+          if git diff --quiet public/data/gov-announcements.json; then
+            echo "No new gov announcements — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git add public/data/gov-announcements.json
+            git commit -m "Gov: ingest fresh announcements ($(date -u +%Y-%m-%dT%H:%M))" || true
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            echo "[gov] push/rebase failed (attempt $attempt) — re-running ingest"
+            git reset --hard origin/main
+            npm run ingest:gov
+            if git diff --quiet public/data/gov-announcements.json; then
+              echo "No new records after re-ingest — done"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Failed after 3 attempts"
+          exit 1
