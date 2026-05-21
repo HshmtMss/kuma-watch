@@ -31,9 +31,15 @@ type StoredSubscription = {
 let cached: Redis | null = null;
 
 export function isConfigured(): boolean {
-  return Boolean(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN,
-  );
+  // Redis.fromEnv() と同じフォールバックを見る。Vercel の Upstash 統合は
+  // UPSTASH_REDIS_REST_* で投入するが、旧 KV 名 (KV_REST_API_*) で入る
+  // 環境でも「クライアントは繋がるのに isConfigured() だけ false」で
+  // 503 になるのを防ぐ。
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  return Boolean(url && token);
 }
 
 function client(): Redis {
