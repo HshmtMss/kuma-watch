@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { ARTICLES, CATEGORIES } from "@/lib/articles-meta";
 import {
   RESEARCH_ENTRIES,
@@ -230,6 +231,9 @@ export default function MeasuresPage() {
           </li>
         </ul>
       </section>
+
+      {/* 国の最新発表サイドカード — 対策ハブから政策動向への導線を作る */}
+      <LatestGovAnnouncements />
 
       {/* 自治体連携への CTA — 「対策」とは別軸（パートナーシップ）なのでフッター近くに */}
       <aside className="not-prose mt-12 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 text-base leading-relaxed text-emerald-900">

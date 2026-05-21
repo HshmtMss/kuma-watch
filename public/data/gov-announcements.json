@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1779323892568,
+  "generatedAt": 1779325023315,
   "items": [
     {
       "id": "env:https://www.env.go.jp/press/press_04725.html",
@@ -22,6 +22,61 @@
       "category": "report",
       "summary": "クマによる人身被害と、はこわなを用いたクマの捕獲に関する二つのレポートが公表された。クマ対策の現状と有効性が詳細に報告される。",
       "ingestedAt": 1779323892568
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071223.html",
+      "ministry": "env",
+      "date": "2025-12-23",
+      "title": "クマ被害対策等関係情報のお知らせ（12月23日追加）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071223.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマ被害対策に関する最新情報が12月23日付けで追加公開された。クマによる被害状況や対策の進捗など、関係機関や一般市民への情報共有を目的とした発表。",
+      "ingestedAt": 1779325023315
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071219.html",
+      "ministry": "env",
+      "date": "2025-12-19",
+      "title": "警察職員及び自衛官の退職予定者及び退職者への鳥獣保護管理への協力依頼について",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071219.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "警察職員および自衛官の退職予定者・退職者に対し、鳥獣保護管理への協力を要請する発表。クマ被害対策強化のため、専門知識や経験を持つ人材の活用を促す。",
+      "ingestedAt": 1779325023315
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071128.html",
+      "ministry": "env",
+      "date": "2025-11-28",
+      "title": "「緊急銃猟への協力のお願いについて（R7.11）」の作成について",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071128.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "令和7年11月の緊急銃猟に関する協力依頼文書が作成・公開された。クマ等の鳥獣による被害を軽減するため、狩猟者や関係機関に対し緊急的な捕獲活動への協力を求める。",
+      "ingestedAt": 1779325023315
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071114.html",
+      "ministry": "env",
+      "date": "2025-11-14",
+      "title": "クマ被害対策等関係情報のお知らせ（11月14日追加）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071114.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマ被害対策に関する最新情報が11月14日付けで追加公開された。被害状況の更新や対策の進捗状況など、関係各所への情報共有を目的とした発表である。",
+      "ingestedAt": 1779325023315
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071031.html",
+      "ministry": "env",
+      "date": "2025-10-31",
+      "title": "クマ被害対策等関係情報のお知らせ",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071031.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマ被害対策に関する関係情報が公開された。被害の現状や対策の取り組みに関する最新情報を提供し、国民への注意喚起と理解を深めることを目的とした発表。",
+      "ingestedAt": 1779325023315
     }
   ]
 }

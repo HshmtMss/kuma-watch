@@ -5,6 +5,7 @@ import CategoryFilter, {
   type CategoryFilterItem,
 } from "@/components/CategoryFilter";
 import PageShell from "@/components/PageShell";
+import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import {
   RESEARCH_CATEGORY_LABEL,
   researchEntryMonth,
@@ -342,6 +343,9 @@ export default async function ResearchIndexPage({
           </ul>
         </>
       )}
+
+      {/* 国の最新発表 — 研究レポートのコンテキストとして政策動向を併置 */}
+      <LatestGovAnnouncements title="国の最新クマ対策発表" limit={4} />
 
       <h2>編集方針</h2>
       <p>

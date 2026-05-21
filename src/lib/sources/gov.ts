@@ -169,6 +169,47 @@ function parseRinyaPress(html: string): ParsedItem[] {
 }
 
 // ────────────────────────────────────────
+// 環境省 クマ被害対策専用ページ (effort12) 抽出
+// このページは「クマ被害対策等関係情報のお知らせ」「緊急銃猟への協力依頼」
+// 「通知 (財政支援・退職者協力依頼)」など、クマ特化の高密度ソース。
+// 一般 press フィードよりも先にここを見るのが効率良い。
+//
+// 構造:
+//   <a href="kuma-oshirase-r080212.html">タイトル...（令和8年2月12日、...）</a>
+//   ファイル名末尾の r{YYMMDD} (YY = 令和年) から日付を取り出す。
+//   外部リンク (cas.go.jp など) や非 oshirase ページは取りこぼし許容。
+// ────────────────────────────────────────
+const ENV_CHOJU_EFFORT12_URL =
+  "https://www.env.go.jp/nature/choju/effort/effort12/effort12.html";
+
+function parseEnvChojuEffort12(html: string): ParsedItem[] {
+  const out: ParsedItem[] = [];
+  // pattern A: kuma-oshirase-r{YY}{MM}{DD}.html という決まった命名規則
+  const reA = /<a href="(kuma-oshirase-r(\d{2})(\d{2})(\d{2})\.html)"[^>]*>([^<]+)<\/a>/g;
+  let m: RegExpExecArray | null;
+  while ((m = reA.exec(html))) {
+    const filename = m[1];
+    const reiwa = Number(m[2]);
+    const mo = m[3];
+    const day = m[4];
+    const titleRaw = m[5].trim();
+    const year = reiwaToWestern(reiwa);
+    const date = `${year}-${mo}-${day}`;
+    // 末尾の「（令和X年...）」部分はメタ情報なので除去してタイトルを綺麗に
+    const title = titleRaw.replace(/\s*[（(]令和[^)）]+[)）]\s*$/, "").trim();
+    const url = `https://www.env.go.jp/nature/choju/effort/effort12/${filename}`;
+    out.push({
+      ministry: "env",
+      date,
+      title,
+      url,
+      tag: "クマ被害対策",
+    });
+  }
+  return out;
+}
+
+// ────────────────────────────────────────
 // 各省 fetch + 抽出を統合
 // ────────────────────────────────────────
 async function fetchHtml(url: string): Promise<string | null> {
@@ -193,15 +234,17 @@ async function fetchHtml(url: string): Promise<string | null> {
 }
 
 export async function fetchGovCandidates(): Promise<ParsedItem[]> {
-  const [envHtml, maffHtml, rinyaHtml] = await Promise.all([
+  const [envHtml, maffHtml, rinyaHtml, envChojuHtml] = await Promise.all([
     fetchHtml(ENV_PRESS_URL),
     fetchHtml(MAFF_PRESS_URL),
     fetchHtml(RINYA_PRESS_URL),
+    fetchHtml(ENV_CHOJU_EFFORT12_URL),
   ]);
   const items: ParsedItem[] = [];
   if (envHtml) items.push(...parseEnvPress(envHtml));
   if (maffHtml) items.push(...parseMaffPress(maffHtml, MAFF_PRESS_URL));
   if (rinyaHtml) items.push(...parseRinyaPress(rinyaHtml));
+  if (envChojuHtml) items.push(...parseEnvChojuEffort12(envChojuHtml));
   return items;
 }
 
