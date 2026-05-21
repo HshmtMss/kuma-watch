@@ -94,6 +94,9 @@ export default function KumaClient() {
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
   const [showLegend, setShowLegend] = useState(false);
+  // 「色の意味」のさりげない補足を表示する小さなツールチップの開閉状態。
+  // 過度に怖がらせないための説明を、見たい人だけ見られるように UI を絞る。
+  const [showMapNote, setShowMapNote] = useState(false);
   // 直近 24h フィルタ: ingestedAt が 24 時間以内のレコードだけに絞る速報モード。
   const [freshOnly, setFreshOnly] = useState(false);
   const [selectedLocation, setSelectedLocation] =
@@ -817,17 +820,70 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* データ更新日: 検索バーの真下、地図左上に控えめな chip で常時表示。
-            「いつ更新されたか」のシグナルを地図のコンテキスト内に置く。 */}
+        {/* データ更新日 + マップ補足: 検索バー直下、地図左上に控えめに配置。
+            色の意味について「さりげない説明」を ⓘ から展開できるようにする。 */}
         {!loading && !pickerMode && latestDate && (
-          <div
-            className="pointer-events-none absolute left-3 top-16 z-[900] flex items-baseline gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] text-stone-600 shadow-sm backdrop-blur sm:text-xs"
-            title={`最新事案: ${latestDate}`}
-          >
-            <span className="text-stone-400">更新</span>
-            <span className="tabular-nums font-semibold text-stone-800">
-              {formatLatestDate(latestDate)}
-            </span>
+          <div className="pointer-events-auto absolute left-3 top-16 z-[900] flex items-stretch gap-1">
+            <div
+              className="flex items-baseline gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] text-stone-600 shadow-sm backdrop-blur sm:text-xs"
+              title={`最新事案: ${latestDate}`}
+            >
+              <span className="text-stone-400">更新</span>
+              <span className="tabular-nums font-semibold text-stone-800">
+                {formatLatestDate(latestDate)}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowMapNote((v) => !v)}
+              aria-label="このマップについて"
+              aria-expanded={showMapNote}
+              className={`flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[12px] font-bold text-white shadow-sm ring-1 ring-red-600/40 backdrop-blur transition hover:bg-red-600 ${
+                showMapNote ? "bg-red-600 ring-red-700/50" : ""
+              }`}
+            >
+              ⓘ
+            </button>
+          </div>
+        )}
+
+        {/* マップ補足: ⓘ から開閉。さりげなく、見たい人だけ読める淡いトーンで。 */}
+        {showMapNote && !loading && !pickerMode && (
+          <div className="pointer-events-auto absolute left-3 top-[5.75rem] z-[950] w-72 rounded-2xl border border-stone-200 bg-white/95 p-3.5 text-[12px] leading-relaxed text-stone-700 shadow-lg backdrop-blur">
+            <div className="mb-1.5 flex items-center justify-between">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+                このマップについて
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMapNote(false)}
+                className="-mr-1 -mt-1 text-stone-400 hover:text-stone-800"
+                aria-label="閉じる"
+              >
+                ×
+              </button>
+            </div>
+            <p>
+              日本の多くの地域では、<strong className="font-semibold text-stone-900">昔からクマが普通に生息</strong>
+              しています。ふだんの暮らしで遭遇することは極めて稀です。
+            </p>
+            <p className="mt-2 text-stone-600">
+              過度に怖がる必要はありません。山に入るときは、{" "}
+              <a
+                href="/research/this-week"
+                className="font-medium text-amber-700 underline hover:text-amber-900"
+              >
+                自治体の直近情報
+              </a>
+              {" "}と{" "}
+              <a
+                href="/articles/encounter"
+                className="font-medium text-amber-700 underline hover:text-amber-900"
+              >
+                基本対策
+              </a>
+              （鈴・スプレー・誘引物管理）をお忘れなく。
+            </p>
           </div>
         )}
 
