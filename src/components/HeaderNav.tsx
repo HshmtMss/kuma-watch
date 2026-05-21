@@ -30,10 +30,51 @@ export default function HeaderNav() {
         <Link href="/measures" className="hover:text-stone-900">対策</Link>
         <Link href="/policy" className="hover:text-stone-900">政府発表</Link>
         <Link href="/for-gov" className="hover:text-stone-900">自治体の方へ</Link>
+        <Link
+          href="/search"
+          aria-label="サイト内検索"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:border-stone-400 hover:text-stone-900"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </Link>
       </nav>
 
-      {/* モバイル: ハンバーガー */}
-      <div className="relative sm:hidden">
+      {/* モバイル: 検索アイコン + ハンバーガー */}
+      <div className="flex items-center gap-1.5 sm:hidden">
+        <Link
+          href="/search"
+          aria-label="サイト内検索"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 active:bg-gray-100"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </Link>
+      <div className="relative">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -83,6 +124,7 @@ export default function HeaderNav() {
                 { href: "/measures", label: "対策" },
                 { href: "/policy", label: "政府発表" },
                 { href: "/for-gov", label: "自治体の方へ" },
+                { href: "/search", label: "サイト内検索" },
               ].map((item) => (
                 <Link
                   key={item.href}
@@ -96,6 +138,7 @@ export default function HeaderNav() {
             </nav>
           </>
         )}
+      </div>
       </div>
     </>
   );

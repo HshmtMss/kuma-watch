@@ -65,3 +65,6 @@ docs/
 data/products-staging.csv
 data/discovery-queue.txt
 data/discovery-queries.txt
+
+# 全文検索インデックス (prebuild で生成、コミット不要)
+public/search-index.json

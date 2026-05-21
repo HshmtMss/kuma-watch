@@ -5,7 +5,9 @@
   "description": "KumaWatch（クマウォッチ）— 全国クマ出没予報・危険度マップ",
   "scripts": {
     "dev": "next dev",
+    "prebuild": "tsx scripts/build-search-index.ts",
     "build": "next build",
+    "build:search-index": "tsx scripts/build-search-index.ts",
     "start": "next start",
     "lint": "eslint",
     "build:mesh": "node scripts/build-mesh-data.mjs",
