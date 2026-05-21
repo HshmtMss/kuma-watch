@@ -230,6 +230,23 @@ export default function PushSubscribeButton({
           {message && (
             <p className="mt-2 text-xs text-stone-700">{message}</p>
           )}
+          <details className="mt-2">
+            <summary className="cursor-pointer text-xs text-stone-500 hover:text-stone-700">
+              通知について
+            </summary>
+            <ul className="mt-1.5 list-disc space-y-1 pl-4 text-xs leading-relaxed text-stone-500">
+              <li>アカウント登録は不要・無料です。</li>
+              <li>
+                許可すると、サイトを閉じていても新しい出没情報が届きます。
+              </li>
+              <li>
+                iPhone は、Safari の共有メニューから「ホーム画面に追加」したうえで有効にできます。
+              </li>
+              <li>
+                通知が届かないときは、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。
+              </li>
+            </ul>
+          </details>
         </div>
         <div className="shrink-0">
           {state === "idle" && (
