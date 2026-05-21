@@ -189,6 +189,30 @@ export default function PushSubscribeButton({
     }
   }, [pref, city]);
 
+  // 端末で通知が表示できるかをユーザー自身が確認するためのお試し通知。
+  // サーバ経由ではなく Service Worker からローカルに 1 件表示するだけなので、
+  // 通知許可・OS の通知設定・集中モードの状態をその場で検証できる
+  // (昨日詰まった「許可したのに出ない」をユーザーが自己診断できる)。
+  const sendTest = useCallback(async () => {
+    setMessage("");
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("お試し通知 — KumaWatch", {
+        body: "この通知が見えれば設定は OK です。実際のクマ出没情報ではありません。",
+        icon: "/icons/Icon-192.png",
+        badge: "/icons/Icon-192.png",
+        data: { url: "/" },
+      });
+      setMessage(
+        "お試し通知を送りました。画面に出ない場合は、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。",
+      );
+    } catch (e) {
+      setMessage(
+        `お試し通知の表示に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }, []);
+
   if (state === "unsupported" || state === "not-configured") {
     // 機能が動かない環境では何も出さない (ノイズ削減)
     return null;
@@ -222,6 +246,15 @@ export default function PushSubscribeButton({
           <p className="mt-0.5 text-xs leading-relaxed text-stone-600">
             報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。
           </p>
+          {state === "active" && (
+            <button
+              type="button"
+              onClick={sendTest}
+              className="mt-2 text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+            >
+              お試し通知を送る
+            </button>
+          )}
           {state === "denied" && (
             <p className="mt-2 text-xs text-rose-700">
               ブラウザ通知が拒否されています。ブラウザの設定からこのサイトの通知を許可してください。
