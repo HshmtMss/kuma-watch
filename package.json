@@ -23,7 +23,9 @@
     "build:products": "tsx scripts/build-products.ts",
     "extract:product": "tsx --env-file-if-exists=.env.local scripts/extract-product.ts",
     "discover:products": "tsx --env-file-if-exists=.env.local scripts/discover-products.ts",
-    "search:products": "tsx --env-file-if-exists=.env.local scripts/search-products.ts"
+    "search:products": "tsx --env-file-if-exists=.env.local scripts/search-products.ts",
+    "x:daily": "tsx --env-file-if-exists=.env.local scripts/post-x-daily.ts",
+    "x:alert": "tsx --env-file-if-exists=.env.local scripts/post-x-alert.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.73",
@@ -31,9 +33,9 @@
     "@types/papaparse": "^5.5.2",
     "@types/proj4": "^2.5.6",
     "@upstash/redis": "^1.34.3",
+    "@vercel/blob": "^2.4.0",
     "ai": "^6.0.182",
     "jszip": "^3.10.1",
-    "web-push": "^3.6.7",
     "leaflet": "^1.9.4",
     "next": "16.2.0",
     "papaparse": "^5.5.3",
@@ -41,6 +43,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-leaflet": "^5.0.0",
+    "twitter-api-v2": "^1.29.0",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
