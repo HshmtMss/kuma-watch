@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 /**
@@ -88,7 +88,7 @@ function scoreEntry(entry: SearchEntry, tokens: string[]): number | null {
   return titleScore + TYPE_META[entry.type].rank * 0.5;
 }
 
-export default function SearchUI() {
+export default function SearchUI({ hub }: { hub?: ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") ?? "";
@@ -207,10 +207,8 @@ export default function SearchUI() {
         loadError={loadError}
       />
 
-      {/* 検索が空のときに見せるサジェスト */}
-      {!query.trim() && (
-        <SearchSuggestions />
-      )}
+      {/* 検索が空のときは「見つける」ハブ (server component) を表示 */}
+      {!query.trim() && hub}
     </div>
   );
 }
@@ -290,56 +288,3 @@ function SearchResults({
   );
 }
 
-function SearchSuggestions() {
-  const groups: { title: string; items: { label: string; href: string }[] }[] = [
-    {
-      title: "都道府県を探す",
-      items: [
-        { label: "北海道", href: "/place/%E5%8C%97%E6%B5%B7%E9%81%93" },
-        { label: "秋田県", href: "/place/%E7%A7%8B%E7%94%B0%E7%9C%8C" },
-        { label: "岩手県", href: "/place/%E5%B2%A9%E6%89%8B%E7%9C%8C" },
-        { label: "富山県", href: "/place/%E5%AF%8C%E5%B1%B1%E7%9C%8C" },
-        { label: "長野県", href: "/place/%E9%95%B7%E9%87%8E%E7%9C%8C" },
-      ],
-    },
-    {
-      title: "観光地",
-      items: [
-        { label: "富士山", href: "/spot/%E5%AF%8C%E5%A3%AB%E5%B1%B1" },
-        { label: "白神山地", href: "/spot/%E7%99%BD%E7%A5%9E%E5%B1%B1%E5%9C%B0" },
-        { label: "高尾山", href: "/spot/%E9%AB%98%E5%B0%BE%E5%B1%B1" },
-        { label: "上高地", href: "/spot/%E4%B8%8A%E9%AB%98%E5%9C%B0" },
-      ],
-    },
-    {
-      title: "対策・知見",
-      items: [
-        { label: "対策記事一覧", href: "/articles" },
-        { label: "研究レポート", href: "/research" },
-        { label: "政府発表", href: "/policy" },
-        { label: "警戒エリア Top 50", href: "/place/ranking" },
-      ],
-    },
-  ];
-
-  return (
-    <div className="mt-4 grid gap-4 sm:grid-cols-3">
-      {groups.map((g) => (
-        <div key={g.title} className="rounded-xl border border-stone-200 bg-white p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
-            {g.title}
-          </p>
-          <ul className="flex flex-col gap-1.5 text-sm">
-            {g.items.map((it) => (
-              <li key={it.href}>
-                <Link href={it.href} className="text-emerald-700 hover:underline">
-                  {it.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
-}
