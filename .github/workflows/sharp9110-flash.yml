@@ -90,15 +90,19 @@ jobs:
           fi
           git show HEAD~1:public/data/sightings.json 2>/dev/null > /tmp/prev.json || echo '{"records":[]}' > /tmp/prev.json
           git show HEAD:public/data/sightings.json > /tmp/curr.json
+          # 74k+ records 規模では O(n²) になり 10 分タイムアウトを越えるので、
+          # prev の id を INDEX で hash set 化して O(1) lookup に。
           jq -n \
             --slurpfile prev /tmp/prev.json \
             --slurpfile curr /tmp/curr.json \
-            '{ newRecords: ($curr[0].records | map(. as $r | select(($prev[0].records | map(.id)) | index($r.id) | not)) | map({id, prefectureName, cityName, date, comment, sourceUrl})) }' \
+            '($prev[0].records | INDEX(.id)) as $seen
+             | { newRecords: ($curr[0].records | map(select($seen[.id] == null)) | map({id, prefectureName, cityName, date, comment, sourceUrl})) }' \
             > /tmp/dispatch.json
           COUNT=$(jq '.newRecords | length' /tmp/dispatch.json)
           echo "[sharp9110] $COUNT new records to dispatch"
           if [ "$COUNT" -eq 0 ]; then exit 0; fi
-          RESPONSE=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
+          # curl は最大 60 秒。Vercel が応答しない場合の保険。
+          RESPONSE=$(curl -sS --max-time 60 -o /tmp/resp.json -w "%{http_code}" \
             -X POST https://kuma-watch.jp/api/push/dispatch \
             -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
             -H "Content-Type: application/json" \
