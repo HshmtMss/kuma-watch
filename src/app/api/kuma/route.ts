@@ -3,7 +3,11 @@ import {
   aggregateAllSightings,
   getCachedSightings,
 } from "@/lib/sightings-cache";
-import type { UnifiedSighting } from "@/lib/sources/types";
+import { getApprovedCitizenSightings } from "@/lib/submission-store";
+import type {
+  SightingSourceKind,
+  UnifiedSighting,
+} from "@/lib/sources/types";
 
 export type KumaRecord = {
   id: number | string;
@@ -16,6 +20,8 @@ export type KumaRecord = {
   comment: string;
   headCount: number;
   source?: string;
+  // 情報源の種別。"citizen" (市民投稿) などをバッジ表示で区別するため。
+  sourceKind?: SightingSourceKind;
   // 公式情報源 (自治体・警察) なら true、ニュース報道など二次情報源は false。
   // 未指定 (旧スナップショット由来) は UI 側で「公式扱い」にフォールバック。
   isOfficial?: boolean;
@@ -40,6 +46,7 @@ function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     comment: s.comment,
     headCount: s.headCount,
     source: s.source,
+    sourceKind: s.sourceKind,
     isOfficial: s.isOfficial,
     sourceUrl: s.sourceUrl,
     ingestedAt: s.ingestedAt,
@@ -67,7 +74,11 @@ export async function GET(req: Request) {
     const unified = force
       ? await aggregateAllSightings()
       : await getCachedSightings();
-    const all = unified.map(unifiedToKumaRecord);
+    // 承認済みの市民投稿を地図にマージ (Upstash 障害時も全体を倒さない)
+    const citizen = await getApprovedCitizenSightings().catch(
+      () => [] as UnifiedSighting[],
+    );
+    const all = [...unified, ...citizen].map(unifiedToKumaRecord);
 
     let records = all;
     if (pref) records = records.filter((r) => r.prefectureName === pref);

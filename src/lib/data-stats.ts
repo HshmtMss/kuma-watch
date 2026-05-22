@@ -12,7 +12,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export type SourceKind = "sharp9110" | "news" | "arcgis" | "csv" | "llm-html";
+export type SourceKind =
+  | "sharp9110"
+  | "news"
+  | "arcgis"
+  | "csv"
+  | "llm-html"
+  | "citizen";
 
 export const SOURCE_KIND_LABEL: Record<SourceKind, string> = {
   sharp9110: "公衆衛生通報 (Sharp9110 / 環境省)",
@@ -20,6 +26,7 @@ export const SOURCE_KIND_LABEL: Record<SourceKind, string> = {
   arcgis: "自治体 ArcGIS / Google マイマップ",
   csv: "自治体 CSV / KML / JSON 公開",
   "llm-html": "自治体 Web ページ (AI 抽出)",
+  citizen: "市民投稿",
 };
 
 export const SOURCE_KIND_NOTE: Record<SourceKind, string> = {
@@ -33,6 +40,8 @@ export const SOURCE_KIND_NOTE: Record<SourceKind, string> = {
     "自治体公式の CSV / KML / JSON 公開データ。1 日 2 回同期。",
   "llm-html":
     "自治体公式 Web ページ・PDF を AI でスクレイピング。年度跨ぎや住所表記ゆれを正規化。1 日 2 回同期。",
+  citizen:
+    "サイト利用者からの投稿。獣医工学ラボの管理者が内容を確認・承認したもののみ掲載。承認後すぐに反映。",
 };
 
 export type DataStats = {

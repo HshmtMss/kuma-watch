@@ -52,6 +52,7 @@ type NearbyRecent = Pick<
   | "sectionName"
   | "comment"
   | "headCount"
+  | "sourceKind"
   | "isOfficial"
   | "sourceUrl"
 > & { distanceKm: number };
@@ -232,6 +233,7 @@ function computeNearbyFromRecords(
         sectionName: s.sectionName,
         comment: s.comment,
         headCount: s.headCount,
+        sourceKind: s.sourceKind,
         isOfficial: s.isOfficial,
         sourceUrl: s.sourceUrl,
         distanceKm: d,
@@ -964,7 +966,8 @@ function RiskDetails({
           </h3>
           <ul className="space-y-2">
             {recent90d.slice(0, 3).map((r) => {
-              const isNews = r.isOfficial === false;
+              const isCitizen = r.sourceKind === "citizen";
+              const isNews = !isCitizen && r.isOfficial === false;
               return (
                 <li
                   key={String(r.id)}
@@ -975,13 +978,21 @@ function RiskDetails({
                       <span className="font-medium text-gray-900">{r.date}</span>
                       <span
                         className={`shrink-0 rounded-full px-1.5 py-px text-[10px] font-semibold ${
-                          isNews
-                            ? "border border-amber-300 bg-amber-50 text-amber-800"
-                            : "border border-emerald-200 bg-emerald-50 text-emerald-800"
+                          isCitizen
+                            ? "border border-violet-300 bg-violet-50 text-violet-800"
+                            : isNews
+                              ? "border border-amber-300 bg-amber-50 text-amber-800"
+                              : "border border-emerald-200 bg-emerald-50 text-emerald-800"
                         }`}
-                        title={isNews ? "ニュース報道由来 (未確認)" : "公式情報源"}
+                        title={
+                          isCitizen
+                            ? "市民投稿（管理者承認済み）"
+                            : isNews
+                              ? "ニュース報道由来 (未確認)"
+                              : "公式情報源"
+                        }
                       >
-                        {isNews ? "📰 報道" : "🛡 公式"}
+                        {isCitizen ? "👥 市民投稿" : isNews ? "📰 報道" : "🛡 公式"}
                       </span>
                     </div>
                     <span className="shrink-0 text-xs text-gray-500 sm:text-[10px]">

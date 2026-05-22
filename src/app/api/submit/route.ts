@@ -1,4 +1,13 @@
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
+import {
+  saveSubmission,
+  submissionsConfigured,
+  type StoredSubmission,
+} from "@/lib/submission-store";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export type SubmitPayload = {
   lat: number;
@@ -72,6 +81,55 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
   };
 }
 
+/** 投稿座標を逆ジオコーディングして県・市町村・字を得る (既存 /api/geocode を再利用)。 */
+async function reverseGeocode(
+  origin: string,
+  lat: number,
+  lon: number,
+): Promise<{
+  prefectureName?: string;
+  cityName?: string;
+  sectionName?: string;
+}> {
+  try {
+    const res = await fetch(
+      `${origin}/api/geocode?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+    );
+    if (!res.ok) return {};
+    const j = (await res.json()) as {
+      result?: { prefecture?: string; city?: string; district?: string };
+    };
+    return {
+      prefectureName: j.result?.prefecture,
+      cityName: j.result?.city,
+      sectionName: j.result?.district,
+    };
+  } catch {
+    return {};
+  }
+}
+
+/** 写真 (data URL) を Vercel Blob にアップロードして公開 URL を返す。Blob 未設定なら undefined。 */
+async function uploadPhoto(
+  id: string,
+  dataUrl: string,
+): Promise<string | undefined> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return undefined;
+  const m = /^data:(image\/(\w+));base64,(.+)$/.exec(dataUrl);
+  if (!m) return undefined;
+  const ext = m[2] === "jpeg" ? "jpg" : m[2];
+  const buf = Buffer.from(m[3], "base64");
+  try {
+    const { url } = await put(`submissions/${id}.${ext}`, buf, {
+      access: "public",
+      contentType: m[1],
+    });
+    return url;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function POST(req: Request) {
   let raw: unknown;
   try {
@@ -85,27 +143,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  const id = crypto.randomUUID();
-  // 写真は base64 が長くログに出ないよう別に扱う
-  const { photoDataUrl, ...rest } = result.payload;
-  const submission = {
-    id,
-    ...rest,
-    photoSize: photoDataUrl?.length ?? 0,
-    receivedAt: new Date().toISOString(),
-    status: "pending" as const,
-  };
-
-  // 永続化は Phase 3 で Supabase に接続する。それまでは console に記録のみ。
-  // 公開ローンチ初期は投稿機能を「準備中」表示にし、503 を返してフロントに案内させる。
-  // 個人情報 (連絡先メール・コメント本文) は Vercel ログに残さない。長さだけ記録する。
-  const { contact, comment, ...safeSubmission } = submission;
-  console.log("[submit:queued]", JSON.stringify({
-    ...safeSubmission,
-    contactLen: contact?.length ?? 0,
-    commentLen: comment?.length ?? 0,
-  }));
-
+  // 公開フラグ OFF の間は受け付けない (案内を返す)
   if (process.env.SUBMIT_ENABLED !== "1") {
     return NextResponse.json(
       {
@@ -115,6 +153,62 @@ export async function POST(req: Request) {
           "投稿機能は現在準備中です。公開後に順次有効化します（数日内予定）。",
       },
       { status: 503 },
+    );
+  }
+  if (!submissionsConfigured()) {
+    return NextResponse.json(
+      { ok: false, error: "投稿の保存先が未設定です" },
+      { status: 503 },
+    );
+  }
+
+  const id = crypto.randomUUID();
+  const { photoDataUrl, ...rest } = result.payload;
+  const origin = new URL(req.url).origin;
+
+  // 逆ジオコーディングと写真アップロードを並列実行
+  const [geo, photoUrl] = await Promise.all([
+    reverseGeocode(origin, rest.lat, rest.lon),
+    photoDataUrl ? uploadPhoto(id, photoDataUrl) : Promise.resolve(undefined),
+  ]);
+
+  const submission: StoredSubmission = {
+    id,
+    lat: rest.lat,
+    lon: rest.lon,
+    occurredAt: rest.occurredAt,
+    headCount: rest.headCount,
+    situation: rest.situation,
+    comment: rest.comment,
+    contact: rest.contact,
+    photoUrl,
+    prefectureName: geo.prefectureName,
+    cityName: geo.cityName,
+    sectionName: geo.sectionName,
+    receivedAt: Date.now(),
+    status: "pending",
+  };
+
+  // 個人情報 (連絡先・コメント本文) は Vercel ログに残さない。長さだけ記録。
+  console.log(
+    "[submit:queued]",
+    JSON.stringify({
+      id,
+      situation: submission.situation,
+      pref: submission.prefectureName,
+      city: submission.cityName,
+      hasPhoto: Boolean(photoUrl),
+      contactLen: rest.contact?.length ?? 0,
+      commentLen: rest.comment?.length ?? 0,
+    }),
+  );
+
+  try {
+    await saveSubmission(submission);
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "投稿の保存に失敗しました。時間をおいて再度お試しください。" },
+      { status: 500 },
     );
   }
 
