@@ -36,6 +36,7 @@ const SOURCE_FRESHNESS: Record<SourceKind, string> = {
   arcgis: "1 日 2 回 (refresh-sightings cron)",
   csv: "1 日 2 回 (refresh-sightings cron)",
   "llm-html": "1 日 2 回 (refresh-sightings cron)",
+  citizen: "リアルタイム (管理者承認後すぐ反映)",
 };
 
 function formatDate(iso: string): string {

@@ -1167,6 +1167,9 @@ export default function KumaClient() {
                 <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
               </div>
               <div className="flex items-center gap-2">
+                <span className="inline-block h-2.5 w-2.5 rounded-full bg-violet-500" />市民投稿（承認済み）
+              </div>
+              <div className="flex items-center gap-2">
                 <span className="inline-block h-3 w-3 rounded-full bg-blue-500 ring-2 ring-blue-700" />24時間以内の新着
               </div>
             </div>

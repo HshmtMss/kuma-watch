@@ -3,7 +3,8 @@ export type SightingSourceKind =
   | "arcgis"
   | "csv"
   | "llm-html"
-  | "news"; // Google News RSS から Gemini で抽出したニュース報道
+  | "news" // Google News RSS から Gemini で抽出したニュース報道
+  | "citizen"; // 市民からの投稿 (/submit)。管理者が承認したもののみ公開
 
 export type UnifiedSighting = {
   id: string;

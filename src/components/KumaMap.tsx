@@ -462,16 +462,19 @@ export default function KumaMap({
       for (const r of toRender) {
         // 報道由来 (isOfficial=false) はオレンジ系で「未確認」を示唆。
         // 公式は従来通り 1 頭=灰 / 2 頭以上=赤の頭数強調。
-        const isNews = r.isOfficial === false;
+        const isCitizen = r.sourceKind === "citizen";
+        const isNews = !isCitizen && r.isOfficial === false;
         const isFresh =
           typeof r.ingestedAt === "number" && nowMs - r.ingestedAt <= FRESH_MS;
-        const color = isFresh
-          ? "#3b82f6" // 新着は青で目立たせる
-          : isNews
-            ? "#f59e0b"
-            : r.headCount > 1
-              ? "#ef4444"
-              : "#6b7280";
+        const color = isCitizen
+          ? "#8b5cf6" // 市民投稿は紫で区別
+          : isFresh
+            ? "#3b82f6" // 新着は青で目立たせる
+            : isNews
+              ? "#f59e0b"
+              : r.headCount > 1
+                ? "#ef4444"
+                : "#6b7280";
         // 新着は半径 +4・border 強調。
         const radius =
           (r.headCount > 1 ? rMulti : rSingle) + (isFresh ? 4 : 0);
@@ -506,10 +509,13 @@ export default function KumaMap({
     // 信頼性バッジ: isOfficial が明示的に false のものだけ「報道」と表示し、
     // それ以外 (true・undefined) は公式情報として扱う。undefined は旧
     // スナップショットの後方互換 (公式由来のみだった頃のデータ) のため。
-    const isNews = r.isOfficial === false;
-    const sourceBadge = isNews
-      ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
-      : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
+    const isCitizen = r.sourceKind === "citizen";
+    const isNews = !isCitizen && r.isOfficial === false;
+    const sourceBadge = isCitizen
+      ? `<span style="display:inline-block;background:#ede9fe;color:#5b21b6;border:1px solid #ddd6fe;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">👥 市民投稿</span>`
+      : isNews
+        ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
+        : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
     // 新着バッジ: 取り込みから 24h 以内かつ ingestedAt あり。
     const FRESH_MS = 24 * 60 * 60 * 1000;
     const ingestedAt = r.ingestedAt;
@@ -525,7 +531,7 @@ export default function KumaMap({
       ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🆕 ${ageLabel}</span>`
       : "";
     const sourceLink = r.sourceUrl
-      ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`
+      ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">${isCitizen ? "写真を開く" : "元記事を開く"} ↗</a></div>`
       : "";
     const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
       <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
