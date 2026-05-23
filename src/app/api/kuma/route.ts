@@ -110,7 +110,10 @@ export async function GET(req: Request) {
       },
       {
         headers: {
-          "Cache-Control": "public, max-age=3600, s-maxage=3600",
+          // 承認済み市民投稿や news 由来の新着を地図に早く反映させるため短めに。
+          // stale-while-revalidate で体感速度を保ちつつ ~1 分で更新される。
+          "Cache-Control":
+            "public, max-age=60, s-maxage=60, stale-while-revalidate=600",
         },
       },
     );
