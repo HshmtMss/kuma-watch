@@ -531,13 +531,18 @@ export default function KumaMap({
       ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🆕 ${ageLabel}</span>`
       : "";
     const sourceLink = r.sourceUrl
-      ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">${isCitizen ? "写真を開く" : "元記事を開く"} ↗</a></div>`
+      ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`
+      : "";
+    // 市民投稿の写真。タップで原寸を別タブで開ける。
+    const photoBlock = r.photoUrl
+      ? `<a href="${escapeHtml(r.photoUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(r.photoUrl)}" alt="投稿写真" loading="lazy" style="margin-top:6px;width:100%;max-height:160px;object-fit:cover;border-radius:6px;display:block" /></a>`
       : "";
     const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
       <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
       <div>📅 ${escapeHtml(r.date)}</div><div>🔢 ${r.headCount}頭</div>
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
+      ${photoBlock}
       ${sourceLink}
     </div>`;
     popupRef.current.setLatLng([r.lat, r.lon]).setContent(html).openOn(map);

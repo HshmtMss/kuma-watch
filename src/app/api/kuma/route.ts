@@ -27,6 +27,8 @@ export type KumaRecord = {
   isOfficial?: boolean;
   // ニュース取り込み等で元記事 URL を保持する。Popup の「詳細」リンク用。
   sourceUrl?: string;
+  // 市民投稿の写真 URL。Popup に画像を表示する。
+  photoUrl?: string;
   // 当社が初めて取り込んだ epoch ms。「新着 ○分前」表示用。
   ingestedAt?: number;
 };
@@ -49,6 +51,7 @@ function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     sourceKind: s.sourceKind,
     isOfficial: s.isOfficial,
     sourceUrl: s.sourceUrl,
+    photoUrl: s.photoUrl,
     ingestedAt: s.ingestedAt,
   };
 }
