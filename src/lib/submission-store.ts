@@ -1,17 +1,18 @@
 /**
  * 市民投稿 (/submit) の永続化レイヤ。push と同じ Upstash Redis を使う。
  *
- * フロー: 投稿 → status="pending" で保存 → 管理者が承認/却下 →
+ * フロー: 投稿 → status="pending" で保存 → 管理者が承認/却下/削除 →
  * 承認分のみ getApprovedCitizenSightings() が UnifiedSighting に変換して
  * 地図 (/api/kuma) にマージされ、sourceKind="citizen" で表示される。
+ * 承認・却下はあとから何度でもやり直せる (status を上書きするだけ)。
  *
  * Redis キー:
- *   cs:sub:{id}   → JSON (StoredSubmission)
- *   cs:pending    → Sorted Set <id> (score=receivedAt, 新しい順に取り出す)
- *   cs:approved   → Set <id> (公開中の承認済み投稿)
- *   cs:rejected   → Set <id> (監査用)
+ *   cs:sub:{id}  → JSON (StoredSubmission, status を内包)
+ *   cs:all       → Sorted Set <id> (score=receivedAt) — 全投稿インデックス
+ *   cs:approved  → Set <id> — 公開中(承認済)。地図マージ用の逆引き
  */
 import { Redis } from "@upstash/redis";
+import { del } from "@vercel/blob";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 export type SubmissionStatus = "pending" | "approved" | "rejected";
@@ -35,13 +36,16 @@ export type StoredSubmission = {
   comment?: string;
   contact?: string;
   photoUrl?: string; // Vercel Blob の公開 URL
-  prefectureName?: string; // 投稿時に逆ジオコーディング
+  prefectureName?: string;
   cityName?: string;
   sectionName?: string;
   receivedAt: number; // epoch ms
   status: SubmissionStatus;
   reviewedAt?: number;
 };
+
+const ALL_KEY = "cs:all";
+const APPROVED_KEY = "cs:approved";
 
 let cached: Redis | null = null;
 
@@ -68,7 +72,7 @@ export async function saveSubmission(sub: StoredSubmission): Promise<void> {
   const r = client();
   await Promise.all([
     r.set(`cs:sub:${sub.id}`, JSON.stringify(sub)),
-    r.zadd(`cs:pending`, { score: sub.receivedAt, member: sub.id }),
+    r.zadd(ALL_KEY, { score: sub.receivedAt, member: sub.id }),
   ]);
 }
 
@@ -79,21 +83,26 @@ export async function getSubmission(
   return parse(await r.get<string | StoredSubmission>(`cs:sub:${id}`));
 }
 
-export async function listPending(limit = 100): Promise<StoredSubmission[]> {
+/** 全投稿を新しい順に返す。status 指定で絞り込み。承認/却下/却下後も残る。 */
+export async function listSubmissions(opts?: {
+  status?: SubmissionStatus;
+  limit?: number;
+}): Promise<StoredSubmission[]> {
   const r = client();
-  // 新しい順 (score=receivedAt の降順)
-  const ids = await r.zrange<string[]>(`cs:pending`, 0, limit - 1, {
-    rev: true,
-  });
+  const limit = opts?.limit ?? 300;
+  const ids = await r.zrange<string[]>(ALL_KEY, 0, limit - 1, { rev: true });
   if (!ids || ids.length === 0) return [];
   const raw = await r.mget<(string | StoredSubmission)[]>(
     ...ids.map((id) => `cs:sub:${id}`),
   );
-  return raw
+  let out = raw
     .map((v) => parse(v as string | StoredSubmission | null))
     .filter((s): s is StoredSubmission => s !== null);
+  if (opts?.status) out = out.filter((s) => s.status === opts.status);
+  return out;
 }
 
+/** 承認 / 却下。あとから何度でも切り替え可能 (status を上書き)。 */
 export async function moderateSubmission(
   id: string,
   decision: "approve" | "reject",
@@ -101,34 +110,40 @@ export async function moderateSubmission(
   const r = client();
   const sub = await getSubmission(id);
   if (!sub) return null;
+  const status: SubmissionStatus =
+    decision === "approve" ? "approved" : "rejected";
   const updated: StoredSubmission = {
     ...sub,
-    status: decision === "approve" ? "approved" : "rejected",
+    status,
     reviewedAt: Date.now(),
   };
-  await Promise.all([
-    r.set(`cs:sub:${id}`, JSON.stringify(updated)),
-    r.zrem(`cs:pending`, id),
-    decision === "approve"
-      ? r.sadd(`cs:approved`, id)
-      : r.sadd(`cs:rejected`, id),
-  ]);
+  await r.set(`cs:sub:${id}`, JSON.stringify(updated));
+  // 公開中インデックス (地図マージ用) を同期
+  if (status === "approved") {
+    await r.sadd(APPROVED_KEY, id);
+  } else {
+    await r.srem(APPROVED_KEY, id);
+  }
   return updated;
 }
 
-/** 公開を取り消して承認待ちに戻す (誤承認のリカバリ用) */
-export async function unpublishSubmission(id: string): Promise<void> {
+/** 完全削除。写真も Blob から消す (best-effort)。 */
+export async function deleteSubmission(id: string): Promise<boolean> {
   const r = client();
   const sub = await getSubmission(id);
-  if (!sub) return;
   await Promise.all([
-    r.srem(`cs:approved`, id),
-    r.set(
-      `cs:sub:${id}`,
-      JSON.stringify({ ...sub, status: "pending" as const }),
-    ),
-    r.zadd(`cs:pending`, { score: sub.receivedAt, member: id }),
+    r.zrem(ALL_KEY, id),
+    r.srem(APPROVED_KEY, id),
+    r.del(`cs:sub:${id}`),
   ]);
+  if (sub?.photoUrl) {
+    try {
+      await del(sub.photoUrl);
+    } catch {
+      /* Blob 削除失敗は無視 */
+    }
+  }
+  return Boolean(sub);
 }
 
 function toUnified(sub: StoredSubmission): UnifiedSighting {
@@ -149,7 +164,7 @@ function toUnified(sub: StoredSubmission): UnifiedSighting {
     comment,
     headCount: sub.headCount,
     isOfficial: false,
-    sourceUrl: sub.photoUrl,
+    photoUrl: sub.photoUrl,
     ingestedAt: sub.reviewedAt ?? sub.receivedAt,
   };
 }
@@ -157,7 +172,7 @@ function toUnified(sub: StoredSubmission): UnifiedSighting {
 /** 地図にマージする承認済み市民投稿。/api/kuma から呼ぶ。 */
 export async function getApprovedCitizenSightings(): Promise<UnifiedSighting[]> {
   const r = client();
-  const ids = await r.smembers<string[]>(`cs:approved`);
+  const ids = await r.smembers<string[]>(APPROVED_KEY);
   if (!ids || ids.length === 0) return [];
   const raw = await r.mget<(string | StoredSubmission)[]>(
     ...ids.map((id) => `cs:sub:${id}`),
