@@ -102,7 +102,13 @@ export async function fetchCsvSightings(
     const iHead = idx(m.headCount);
     const prefName = entry.regionLabel.split(" ")[0] ?? entry.regionLabel;
 
+    // 未来日付ガード: 自治体の typo（例: 2025 を 2026 と書き間違い）で
+    // 「今日より先」の日付が入った record を防ぐ。生のクマ目撃データは
+    // 過去・現在のみが現実的。当日まで許容、翌日以降は問答無用でスキップ。
+    const todayIso = new Date().toISOString().slice(0, 10);
+
     const sightings: UnifiedSighting[] = [];
+    let droppedFuture = 0;
     for (let i = 1; i < lines.length && sightings.length < MAX_ROWS; i++) {
       const row = parseCsvRow(lines[i], delim);
       if (iLat < 0 || iLon < 0 || iDate < 0) break;
@@ -112,6 +118,10 @@ export async function fetchCsvSightings(
       if (!inJapanBounds(lat, lon)) continue;
       const date = parseDate(row[iDate] ?? "", csv.dateFormat);
       if (!date) continue;
+      if (date > todayIso) {
+        droppedFuture++;
+        continue;
+      }
       sightings.push({
         id: `${entry.id}-${i}`,
         source: entry.id,
@@ -127,6 +137,11 @@ export async function fetchCsvSightings(
       });
     }
 
+    if (droppedFuture > 0) {
+      console.warn(
+        `[csv:${entry.id}] dropped ${droppedFuture} future-dated records (source data typo?)`,
+      );
+    }
     memo.set(entry.id, { at: now, data: sightings });
     return sightings;
   } catch {

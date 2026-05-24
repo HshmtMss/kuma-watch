@@ -102,6 +102,8 @@ export async function fetchArcGisSightings(
       const dateVal = mappings.date ? attrs[mappings.date] : undefined;
       const date = parseDateValue(dateVal, dateFormat);
       if (!date) continue;
+      // 未来日付ガード: 自治体側 typo（例: 2025→2026）を弾く
+      if (date > new Date().toISOString().slice(0, 10)) continue;
 
       const objectId = attrs.objectid ?? attrs.OBJECTID ?? attrs.ObjectId;
       const city = mappings.city ? cleanString(attrs[mappings.city]) : "";
