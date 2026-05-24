@@ -77,10 +77,15 @@ export async function GET(req: Request) {
     const unified = force
       ? await aggregateAllSightings()
       : await getCachedSightings();
-    // 承認済みの市民投稿を地図にマージ (Upstash 障害時も全体を倒さない)
-    const citizen = await getApprovedCitizenSightings().catch(
-      () => [] as UnifiedSighting[],
-    );
+    // 承認済みの市民投稿を地図にマージ (Upstash 障害時も全体を倒さない)。
+    // SUBMIT_ENABLED=1 のときだけ表示する。これにより、本番でフラグを
+    // ONにするまで市民投稿は地図に出ない (公開タイミングを完全に制御)。
+    const citizen =
+      process.env.SUBMIT_ENABLED === "1"
+        ? await getApprovedCitizenSightings().catch(
+            () => [] as UnifiedSighting[],
+          )
+        : [];
     const all = [...unified, ...citizen].map(unifiedToKumaRecord);
 
     let records = all;
