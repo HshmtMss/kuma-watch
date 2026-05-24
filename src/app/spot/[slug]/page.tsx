@@ -6,6 +6,7 @@ import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getCachedSightings } from "@/lib/sightings-cache";
+import { placeHrefForSighting } from "@/lib/muni-name";
 
 // dynamicParams=false: 登録済みランドマークのみ。それ以外は 404。
 // /spot/[slug] は「高尾山 くま」型の検索受け皿で、対象は手動キュレーション。
@@ -450,23 +451,41 @@ export default async function SpotPage({ params }: Props) {
         <>
           <h2>最近の出没事案</h2>
           <ul className="not-prose space-y-2">
-            {nearby.slice(0, 12).map((r, i) => (
-              <li
-                key={`${r.date}-${i}`}
-                className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm"
-              >
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
-                  <span className="text-xs text-stone-500">
-                    {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
-                    {r.sectionName ? ` ${r.sectionName}` : ""}
-                  </span>
-                </div>
-                {r.comment && (
-                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
-                )}
-              </li>
-            ))}
+            {nearby.slice(0, 12).map((r, i) => {
+              const href = r.cityName
+                ? placeHrefForSighting(landmark.prefName, r.cityName)
+                : null;
+              const body = (
+                <>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
+                    <span className="text-xs text-stone-500">
+                      {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
+                      {r.sectionName ? ` ${r.sectionName}` : ""}
+                    </span>
+                  </div>
+                  {r.comment && (
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
+                  )}
+                </>
+              );
+              return (
+                <li key={`${r.date}-${i}`}>
+                  {href ? (
+                    <Link
+                      href={href}
+                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-amber-400 hover:bg-amber-50/60"
+                    >
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm">
+                      {body}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </>
       )}

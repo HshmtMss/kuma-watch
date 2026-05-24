@@ -8,6 +8,7 @@ import {
   RESEARCH_CATEGORY_LABEL,
   sortedResearchEntries,
 } from "@/lib/research-entries";
+import { placeHrefForSighting } from "@/lib/muni-name";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 
 /**
@@ -90,7 +91,7 @@ export default async function DiscoverHub(): Promise<ReactNode> {
             return (
               <li key={r.id}>
                 <Link
-                  href={`/place/${encodeURIComponent(r.prefectureName)}`}
+                  href={placeHrefForSighting(r.prefectureName, r.cityName)}
                   className="block rounded-xl border border-stone-200 bg-white px-4 py-3 transition hover:border-amber-300 hover:bg-amber-50"
                 >
                   <div className="flex flex-wrap items-baseline gap-2 text-xs">
