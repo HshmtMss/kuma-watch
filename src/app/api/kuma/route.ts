@@ -108,11 +108,21 @@ export async function GET(req: Request) {
       bySource[key] = (bySource[key] ?? 0) + 1;
     }
 
+    // クライアントの軽量ポーリング (/api/kuma/latest) と突き合わせる署名。
+    // フィルタ済み全件 (slice 前) を対象に最大 ingestedAt を取る。
+    let latestIngestedAt = 0;
+    for (const r of records) {
+      if (typeof r.ingestedAt === "number" && r.ingestedAt > latestIngestedAt) {
+        latestIngestedAt = r.ingestedAt;
+      }
+    }
+
     return NextResponse.json(
       {
         records: limited,
         total: all.length,
         matched: records.length,
+        latestIngestedAt,
         shown: limited.length,
         sources: bySource,
       },

@@ -1,8 +1,4 @@
-import {
-  findMunicipalAggregates,
-  findPrefectureAggregate,
-  type MunicipalAggregate,
-} from "@/data/municipal-aggregates";
+import { findPrefectureAggregate } from "@/data/municipal-aggregates";
 
 export type AggregateContext = {
   prefCode: string;

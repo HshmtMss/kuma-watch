@@ -17,6 +17,7 @@ import {
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
 import { getSeasonalAdvice } from "@/lib/place-content";
+import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
@@ -334,12 +335,11 @@ export default async function MuniPage({ params }: Props) {
 
   // 最近の出没事案 — mapRecords は date desc 済み。
   // 過去 365 日 + sectionName あり、を優先して 15 件まで（より具体性のある情報量）。
-  const today = Date.now();
-  const YEAR_MS = 365 * 86_400_000;
-  const within1Year = (r: PlaceRecord) => {
-    const t = Date.parse(r.date);
-    return Number.isFinite(t) && today - t <= YEAR_MS;
-  };
+  // window は JST カレンダー日付で判定 (UTC 解釈の境界 1 日ズレを回避)。
+  const today = jstToday();
+  const cutoff365 = jstDaysAgo(365);
+  const within1Year = (r: PlaceRecord) =>
+    Boolean(r.date) && r.date >= cutoff365 && r.date <= today;
   const recentIncidents = mapRecords.filter(within1Year).slice(0, 15);
 
   // 地図プロット用 — 表示対象は「過去 1 年以内のデータ」のみ。

@@ -7,6 +7,7 @@ import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { placeHrefForSighting } from "@/lib/muni-name";
+import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 
 // dynamicParams=false: 登録済みランドマークのみ。それ以外は 404。
 // /spot/[slug] は「高尾山 くま」型の検索受け皿で、対象は手動キュレーション。
@@ -73,19 +74,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // 周辺出没件数を概算
   const sightings = await getCachedSightings();
-  const cutoff90 = Date.now() - 90 * 86_400_000;
+  const today = jstToday();
+  const cutoff90 = jstDaysAgo(90);
+  const cutoff365 = jstDaysAgo(RECENT_DAYS);
   let count90 = 0;
   let count365 = 0;
   let latestDate: string | null = null;
   for (const s of sightings) {
-    if (!s.date) continue;
+    if (!s.date || s.date > today) continue;
     const d = haversineKm(landmark.lat, landmark.lon, s.lat, s.lon);
     if (d > NEAR_RADIUS_KM) continue;
-    const t = Date.parse(s.date);
-    if (!Number.isFinite(t)) continue;
-    if (Date.now() - t > RECENT_DAYS * 86_400_000) continue;
+    if (s.date < cutoff365) continue;
     count365++;
-    if (t >= cutoff90) count90++;
+    if (s.date >= cutoff90) count90++;
     if (!latestDate || s.date > latestDate) latestDate = s.date;
   }
 
@@ -123,14 +124,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  mountain: "山",
-  national_park: "国立公園・自然保護地",
-  resort: "観光・温泉地",
-  trailhead: "登山口・自然散策地",
-  lake: "湖",
-};
-
 export default async function SpotPage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const slug = decode(rawSlug);
@@ -138,9 +131,9 @@ export default async function SpotPage({ params }: Props) {
   if (!landmark) notFound();
 
   const sightings = await getCachedSightings();
-  const today = Date.now();
-  const cutoff90 = today - 90 * 86_400_000;
-  const cutoff365 = today - 365 * 86_400_000;
+  const today = jstToday();
+  const cutoff90 = jstDaysAgo(90);
+  const cutoff365 = jstDaysAgo(365);
 
   // 周辺 10km の事案を抽出 + ソート (距離・日付)
   type NearSight = {
@@ -160,12 +153,10 @@ export default async function SpotPage({ params }: Props) {
   let count365 = 0;
   let latestDate: string | null = null;
   for (const s of sightings) {
-    if (!s.date) continue;
+    if (!s.date || s.date > today) continue;
     const d = haversineKm(landmark.lat, landmark.lon, s.lat, s.lon);
     if (d > NEAR_RADIUS_KM) continue;
-    const t = Date.parse(s.date);
-    if (!Number.isFinite(t)) continue;
-    if (t < cutoff365) continue;
+    if (s.date < cutoff365) continue;
     nearby.push({
       id: s.id,
       date: s.date,
@@ -179,7 +170,7 @@ export default async function SpotPage({ params }: Props) {
       sourceUrl: s.sourceUrl,
     });
     count365++;
-    if (t >= cutoff90) count90++;
+    if (s.date >= cutoff90) count90++;
     if (!latestDate || s.date > latestDate) latestDate = s.date;
   }
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.distanceKm - b.distanceKm));

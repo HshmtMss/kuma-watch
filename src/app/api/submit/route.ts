@@ -92,8 +92,10 @@ async function reverseGeocode(
   sectionName?: string;
 }> {
   try {
+    // 内部 geocode がハングしても投稿 API 全体を巻き込まないよう 5 秒で打ち切る。
     const res = await fetch(
       `${origin}/api/geocode?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+      { signal: AbortSignal.timeout(5000) },
     );
     if (!res.ok) return {};
     const j = (await res.json()) as {

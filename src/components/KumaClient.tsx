@@ -72,6 +72,27 @@ function computeCutoff(days: number | null): string | null {
   return d.toISOString().slice(0, 10);
 }
 
+// 期間ごとに /api/kuma から取得する件数の上限。短期間は軽く、全期間は最大まで。
+function limitForPeriod(days: number | null): number {
+  return days === null
+    ? 100000
+    : days >= 365
+      ? 50000
+      : days >= 90
+        ? 15000
+        : days >= 30
+          ? 5000
+          : 2000;
+}
+
+type KumaSignature = { matched: number; latestIngestedAt: number };
+
+// 「直近 24h」フィルタの境界 epoch ms。render 中の直接 Date.now() を避けるため
+// ヘルパ化する (freshOnly フィルタが有効なときだけ意味を持つ近似カットオフ)。
+function freshnessCutoffMs(): number {
+  return Date.now() - 24 * 60 * 60 * 1000;
+}
+
 // "2026-05-05" → "5/5"。年は省略してバッジを短く。
 function formatLatestDate(iso: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
@@ -121,6 +142,13 @@ export default function KumaClient() {
   const [returnLabel, setReturnLabel] = useState<string | null>(null);
   const router = useRouter();
   const leafletMapRef = useRef<LeafletMap | null>(null);
+  // ポーリング用: 現在の records と「最後に確認したデータ署名」を ref で保持する。
+  // これで 30 秒ポーリングの effect が records 変化のたびに再購読するのを防ぐ。
+  const recordsRef = useRef<KumaRecord[]>(records);
+  const lastSigRef = useRef<KumaSignature | null>(null);
+  useEffect(() => {
+    recordsRef.current = records;
+  }, [records]);
   const handleMapReady = useCallback((m: LeafletMap) => {
     leafletMapRef.current = m;
   }, []);
@@ -209,7 +237,8 @@ export default function KumaClient() {
     try {
       const t = window.localStorage.getItem(TILE_STYLE_KEY);
       if (t === "standard" || t === "satellite" || t === "topo") {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-once localStorage restore
+        // mount 時に localStorage から 1 度だけ復元する初期化 (意図的な setState)。
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTileStyleRaw(t);
       }
       const o = window.localStorage.getItem(HEATMAP_OPACITY_KEY);
@@ -296,7 +325,8 @@ export default function KumaClient() {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("admin") === "1") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL flag check
+      // URL の ?admin=1 を mount 時に 1 度だけ判定する初期化 (意図的な setState)。
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAdmin(true);
     }
   }, []);
@@ -347,29 +377,39 @@ export default function KumaClient() {
   // periodCutoff が null (= 全期間) のときは from 指定なし、上限 25,000 件まで取得。
   useEffect(() => {
     let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag before external fetch
+    // ローディング表示の開始 (依存変更時の意図的な setState)。
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    // 期間ごとに必要な件数を取る。短期間は軽く、全期間は最大まで。
-    const limit =
-      periodDays === null
-        ? 100000
-        : periodDays >= 365
-          ? 50000
-          : periodDays >= 90
-            ? 15000
-            : periodDays >= 30
-              ? 5000
-              : 2000;
-    const params = new URLSearchParams({ limit: String(limit) });
+    // 期間が変わったらポーリングの基準署名を一旦破棄する (新基準は下で確立)。
+    lastSigRef.current = null;
+    const params = new URLSearchParams({
+      limit: String(limitForPeriod(periodDays)),
+    });
     if (periodCutoff) params.set("from", periodCutoff);
     fetch(`/api/kuma?${params.toString()}`)
       .then((r) => r.json())
-      .then((data: { records?: KumaRecord[]; total?: number }) => {
-        if (cancelled) return;
-        setRecords(Array.isArray(data.records) ? data.records : []);
-        setTotal(typeof data.total === "number" ? data.total : 0);
-        setLoading(false);
-      })
+      .then(
+        (data: {
+          records?: KumaRecord[];
+          total?: number;
+          matched?: number;
+          latestIngestedAt?: number;
+        }) => {
+          if (cancelled) return;
+          const next = Array.isArray(data.records) ? data.records : [];
+          setRecords(next);
+          setTotal(typeof data.total === "number" ? data.total : 0);
+          // ポーリングの基準署名を確立 (/api/kuma/latest と同じ算出基準)。
+          lastSigRef.current = {
+            matched: typeof data.matched === "number" ? data.matched : next.length,
+            latestIngestedAt:
+              typeof data.latestIngestedAt === "number"
+                ? data.latestIngestedAt
+                : 0,
+          };
+          setLoading(false);
+        },
+      )
       .catch(() => {
         if (!cancelled) setLoading(false);
       });
@@ -390,7 +430,8 @@ export default function KumaClient() {
       const params = new URLSearchParams(window.location.search);
       // /submit から「地図から選ぶ」で来た場合はピッカーモード ON
       if (params.get("pick") === "submit") {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- enabling picker from URL
+        // /submit からの「地図から選ぶ」遷移を mount 時に判定する初期化 (意図的)。
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPickerMode("submit");
       }
       const latParam = params.get("lat");
@@ -522,39 +563,75 @@ export default function KumaClient() {
     };
   }, []);
 
-  // C1: 30 秒間隔で /api/kuma の最新分を再フェッチし、新着があればトースト + ピン差分追加。
+  // C1: 30 秒間隔で「軽量サマリ」(/api/kuma/latest) を確認し、件数や最新取り込み
+  // 時刻 (署名) が変化したときだけ本体 (/api/kuma) を取り直す。これにより、毎回
+  // 最大 10 万件の JSON を再 DL せずに新着検知できる (クライアント帯域を大幅削減)。
   // タブ非表示中はポーリングを停止し、再表示時に即時 1 回チェック。
-  // sharp9110-flash が 1 分ごと、news-flash が 5 分ごとにデータを入れるため、
-  // クライアント側 30 秒ポーリングで「最大 30 秒前」の事案までほぼ反映される。
   useEffect(() => {
     if (typeof window === "undefined") return;
     const POLL_MS = 30 * 1000;
     let timer: number | null = null;
 
     async function checkForNew() {
-      // 既存 records と同じ条件で取得
-      const limit =
-        periodDays === null
-          ? 100000
-          : periodDays >= 365
-            ? 50000
-            : periodDays >= 90
-              ? 15000
-              : periodDays >= 30
-                ? 5000
-                : 2000;
-      const params = new URLSearchParams({ limit: String(limit) });
+      // 1. 軽量サマリで署名を取得
+      const sigParams = new URLSearchParams();
+      if (periodCutoff) sigParams.set("from", periodCutoff);
+      let sig: KumaSignature;
+      try {
+        const r = await fetch(`/api/kuma/latest?${sigParams.toString()}`);
+        if (!r.ok) return;
+        const j = (await r.json()) as {
+          matched?: number;
+          latestIngestedAt?: number;
+        };
+        sig = {
+          matched: typeof j.matched === "number" ? j.matched : 0,
+          latestIngestedAt:
+            typeof j.latestIngestedAt === "number" ? j.latestIngestedAt : 0,
+        };
+      } catch {
+        return;
+      }
+
+      // 2. 基準未確立 (主フェッチ前) なら基準を記録するだけ
+      const last = lastSigRef.current;
+      if (!last) {
+        lastSigRef.current = sig;
+        return;
+      }
+      // 3. 件数・最新取り込み時刻に変化が無ければ何もしない (本体は叩かない)
+      if (
+        sig.matched === last.matched &&
+        sig.latestIngestedAt <= last.latestIngestedAt
+      ) {
+        return;
+      }
+
+      // 4. 変化あり → 本体をフル取得して差分を反映
+      const params = new URLSearchParams({
+        limit: String(limitForPeriod(periodDays)),
+      });
       if (periodCutoff) params.set("from", periodCutoff);
       try {
         const r = await fetch(`/api/kuma?${params.toString()}`);
         if (!r.ok) return;
-        const data = (await r.json()) as { records?: KumaRecord[] };
+        const data = (await r.json()) as {
+          records?: KumaRecord[];
+          matched?: number;
+          latestIngestedAt?: number;
+        };
         const next = Array.isArray(data.records) ? data.records : [];
-        // 既存にない id を新着として抽出
-        const known = new Set(records.map((rec) => rec.id));
+        const known = new Set(recordsRef.current.map((rec) => rec.id));
         const fresh = next.filter((rec) => !known.has(rec.id));
+        setRecords(next);
+        lastSigRef.current = {
+          matched: typeof data.matched === "number" ? data.matched : next.length,
+          latestIngestedAt:
+            typeof data.latestIngestedAt === "number"
+              ? data.latestIngestedAt
+              : sig.latestIngestedAt,
+        };
         if (fresh.length > 0) {
-          setRecords(next);
           setCopyToast(`新着 ${fresh.length} 件`);
           window.setTimeout(() => setCopyToast(null), 3000);
         }
@@ -591,9 +668,7 @@ export default function KumaClient() {
       stop();
       document.removeEventListener("visibilitychange", onVis);
     };
-    // records の中身ごとに再購読すると無限ループになるので、長さだけを依存に。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [periodCutoff, periodDays, records.length]);
+  }, [periodCutoff, periodDays]);
 
   // 過去 1 年の目撃をメッシュ別に集計したマップ。
   // ヒートマップとカード両方で「危険度の格上げ」に使い、視覚と数値を完全一致させる。
@@ -617,8 +692,7 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
-    const FRESH_MS = 24 * 60 * 60 * 1000;
-    const cutoffMs = Date.now() - FRESH_MS;
+    const cutoffMs = freshnessCutoffMs();
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;

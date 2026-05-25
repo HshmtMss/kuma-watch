@@ -1,5 +1,6 @@
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
+import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 
 export type PlaceCell = {
   prefectureName: string;
@@ -39,10 +40,6 @@ type Index = {
 
 let cache: Index | null = null;
 const TTL_MS = 6 * 60 * 60 * 1000;
-
-const D_MS = 86_400_000;
-const D90 = 90 * D_MS;
-const D365 = 365 * D_MS;
 
 // 都道府県別の市町村マスター。canonical 名と重心を引くために build() で使う。
 function buildMunisByPref(): Map<
@@ -131,7 +128,12 @@ async function build(): Promise<Index> {
       n: number;
     }
   >();
-  const now = Date.now();
+  // 件数ウィンドウは JST カレンダー日付で判定する (UTC 解釈による境界 1 日
+  // ズレを回避)。未来日付 (上流のタイポ) は today で上限クリップして件数や
+  // 「最新」表示の水増しを防ぐ。
+  const today = jstToday();
+  const cutoff90 = jstDaysAgo(90);
+  const cutoff365 = jstDaysAgo(365);
 
   for (const r of records) {
     if (!r.prefectureName) continue;
@@ -164,13 +166,10 @@ async function build(): Promise<Index> {
     entry.latSum += r.lat;
     entry.lonSum += r.lon;
     entry.n++;
-    if (typeof r.date === "string") {
+    if (typeof r.date === "string" && r.date && r.date <= today) {
       if (!entry.latestDate || r.date > entry.latestDate) entry.latestDate = r.date;
-      const t = Date.parse(r.date);
-      if (Number.isFinite(t)) {
-        if (now - t <= D90) entry.count90d++;
-        if (now - t <= D365) entry.count365d++;
-      }
+      if (r.date >= cutoff90) entry.count90d++;
+      if (r.date >= cutoff365) entry.count365d++;
     }
   }
 

@@ -640,7 +640,7 @@ export default function KumaMap({
   useEffect(() => {
     sightingCountByMeshRef.current = sightingCountByMesh;
     renderMeshLayer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [sightingCountByMesh]);
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import {
   findSourceById,
-  type CsvFieldMappings,
   type CsvSource,
   type DataSourceEntry,
 } from "@/data/data-sources";

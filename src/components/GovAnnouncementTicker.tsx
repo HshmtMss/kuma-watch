@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import {
   MINISTRY_LABEL,
   type GovAnnouncement,
@@ -14,6 +14,11 @@ import announcementsData from "@/../public/data/gov-announcements.json";
  * - クリックで /policy に遷移
  * - 「×」で sessionStorage に「この発表を見た」記録を残し、当該発表は再表示しない
  * - 30 日以内の発表が無ければ何も表示しない (古い情報は出さない)
+ *
+ * dismiss 状態は sessionStorage が外部ストアなので useSyncExternalStore で読む。
+ * useEffect + setState だと初回 SSR で何も描画されず、ハイドレーション後に
+ * バーが「後から差し込まれる」レイアウトシフトが起きていた。本実装では
+ * サーバースナップショットを空配列とし、初回 HTML からバーを描画する。
  */
 
 type Snapshot = { generatedAt: number; items: GovAnnouncement[] };
@@ -33,6 +38,45 @@ function isWithinRecentDays(iso: string, days: number): boolean {
   return Date.now() - t <= days * 86_400_000;
 }
 
+// --- dismissed-ids を保持する sessionStorage バックの外部ストア ---
+const dismissListeners = new Set<() => void>();
+
+function readDismissedRaw(): string {
+  try {
+    return window.sessionStorage.getItem(DISMISS_KEY) ?? "[]";
+  } catch {
+    return "[]";
+  }
+}
+
+function subscribeDismissed(cb: () => void): () => void {
+  dismissListeners.add(cb);
+  return () => {
+    dismissListeners.delete(cb);
+  };
+}
+
+// getSnapshot は値が変わらない限り参照安定であること。string は Object.is で
+// 値比較されるため、内容が同じなら再レンダーは発生しない。
+function getDismissedSnapshot(): string {
+  return readDismissedRaw();
+}
+
+function getDismissedServerSnapshot(): string {
+  return "[]";
+}
+
+function dismissAnnouncement(id: string): void {
+  try {
+    const arr = JSON.parse(readDismissedRaw()) as string[];
+    if (!arr.includes(id)) arr.push(id);
+    window.sessionStorage.setItem(DISMISS_KEY, JSON.stringify(arr));
+  } catch {
+    // ignore
+  }
+  dismissListeners.forEach((cb) => cb());
+}
+
 export default function GovAnnouncementTicker() {
   const latest = useMemo<GovAnnouncement | null>(() => {
     const snap = announcementsData as Snapshot;
@@ -43,37 +87,26 @@ export default function GovAnnouncementTicker() {
     return recent ?? null;
   }, []);
 
-  // 既読 dismiss の判定 (hydration mismatch 防止のため初期は null)
-  const [dismissed, setDismissed] = useState<Set<string> | null>(null);
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const dismissedRaw = useSyncExternalStore(
+    subscribeDismissed,
+    getDismissedSnapshot,
+    getDismissedServerSnapshot,
+  );
+  const dismissed = useMemo<Set<string>>(() => {
     try {
-      const raw = window.sessionStorage.getItem(DISMISS_KEY);
-      const arr = raw ? (JSON.parse(raw) as string[]) : [];
-      setDismissed(new Set(arr));
+      return new Set(JSON.parse(dismissedRaw) as string[]);
     } catch {
-      setDismissed(new Set());
+      return new Set();
     }
-  }, []);
+  }, [dismissedRaw]);
 
   if (!latest) return null;
-  if (dismissed === null) return null;
   if (dismissed.has(latest.id)) return null;
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = new Set(dismissed);
-    next.add(latest.id);
-    setDismissed(next);
-    try {
-      window.sessionStorage.setItem(
-        DISMISS_KEY,
-        JSON.stringify([...next]),
-      );
-    } catch {
-      // ignore
-    }
+    dismissAnnouncement(latest.id);
   };
 
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(latest.date);

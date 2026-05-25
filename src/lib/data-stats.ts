@@ -10,6 +10,7 @@
  * 1 度だけパースされる前提。
  */
 import { readFile } from "node:fs/promises";
+import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { join } from "node:path";
 
 export type SourceKind =
@@ -82,9 +83,10 @@ export async function loadDataStats(): Promise<DataStats> {
   const snap = JSON.parse(raw) as RawSnapshot;
   const records = snap.records ?? [];
 
-  const now = Date.now();
-  const D30 = 30 * 86_400_000;
-  const D90 = 90 * 86_400_000;
+  // 件数ウィンドウは JST カレンダー日付で判定 (UTC 解釈の境界ズレを回避)。
+  const today = jstToday();
+  const cutoff30 = jstDaysAgo(30);
+  const cutoff90 = jstDaysAgo(90);
 
   const sourceKindCounts = new Map<SourceKind, number>();
   const sourceSet = new Set<string>();
@@ -106,10 +108,9 @@ export async function loadDataStats(): Promise<DataStats> {
     if (r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date)) {
       if (r.date < oldest) oldest = r.date;
       if (r.date > newest) newest = r.date;
-      const t = Date.parse(r.date);
-      if (Number.isFinite(t)) {
-        if (now - t <= D30) recent30++;
-        if (now - t <= D90) {
+      if (r.date <= today) {
+        if (r.date >= cutoff30) recent30++;
+        if (r.date >= cutoff90) {
           recent90++;
           if (r.prefectureName) {
             const e = prefCounts.get(r.prefectureName);

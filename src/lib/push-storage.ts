@@ -197,13 +197,35 @@ export async function purgeSubscription(hash: string): Promise<void> {
 
 /**
  * 配信済み sighting ID の重複送信防止セット。
+ *
+ * 肥大化防止のため、配信時刻を score にした companion sorted set
+ * `dispatched:idz` を併せて維持し、保持期間 (DISPATCH_RETENTION_DAYS) を
+ * 過ぎた ID を Set / ZSET 双方から都度プルーニングする。news-flash は
+ * git diff で「直近コミットの新規分」しか渡さないため、古い ID を恒久的に
+ * 保持する必要はない。これで dispatched:ids が無制限に膨らむのを防ぐ。
  */
+const DISPATCH_RETENTION_DAYS = 90;
+
 export async function markDispatched(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   const r = client();
-  // @upstash/redis の sadd は (key, member, ...members) シグネチャを要求する
+  const now = Date.now();
+  // @upstash/redis の sadd / zadd は (key, member, ...members) シグネチャを要求する
   const [first, ...rest] = ids;
   await r.sadd(`dispatched:ids`, first, ...rest);
+  // 時系列インデックス (プルーニング用)。score = 配信時刻 epoch ms。
+  const [firstSm, ...restSm] = ids.map((id) => ({ score: now, member: id }));
+  await r.zadd(`dispatched:idz`, firstSm, ...restSm);
+  // 保持期間を過ぎた古い ID を Set / ZSET 双方から除去する。
+  const cutoff = now - DISPATCH_RETENTION_DAYS * 86_400_000;
+  const stale = await r.zrange<string[]>(`dispatched:idz`, 0, cutoff, {
+    byScore: true,
+  });
+  if (stale.length > 0) {
+    const [s0, ...sRest] = stale;
+    await r.srem(`dispatched:ids`, s0, ...sRest);
+    await r.zremrangebyscore(`dispatched:idz`, 0, cutoff);
+  }
 }
 
 export async function filterUndispatched(ids: string[]): Promise<string[]> {
