@@ -46,7 +46,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4 5; do
             git add public/data/gov-announcements.json
             git commit -m "Gov: ingest fresh announcements ($(date -u +%Y-%m-%dT%H:%M))" || true
             git fetch origin main
@@ -64,7 +64,10 @@ jobs:
               echo "No new records after re-ingest — done"
               exit 0
             fi
-            sleep 3
+            # 指数寄りのバックオフ + ジッタ。長めの一過性 push フレークを乗り切る。
+            backoff=$(( attempt * 3 + (RANDOM % 4) ))
+            echo "[gov] retrying in ${backoff}s"
+            sleep "$backoff"
           done
-          echo "Failed after 3 attempts"
+          echo "Failed after 5 attempts"
           exit 1

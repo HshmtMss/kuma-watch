@@ -62,7 +62,7 @@ jobs:
           # concurrency group があっても、ローカルからの code push や別ワークフロー
           # の git push と race することがある。コンフリクト時は origin/main に
           # 戻して ingest を再実行 (dedup により Gemini コストは最小限) → push。
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4 5; do
             git add public/data/sightings.json
             git commit -m "News flash: ingest fresh news ($(date -u +%Y-%m-%dT%H:%M))" || true
             git fetch origin main
@@ -82,9 +82,12 @@ jobs:
               echo "committed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            sleep 3
+            # 指数寄りのバックオフ + ジッタ。長めの一過性 push フレークを乗り切る。
+            backoff=$(( attempt * 3 + (RANDOM % 4) ))
+            echo "[news-flash] retrying in ${backoff}s"
+            sleep "$backoff"
           done
-          echo "Failed after 3 attempts"
+          echo "Failed after 5 attempts"
           exit 1
 
       - name: Dispatch Web Push for new sightings
