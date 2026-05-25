@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1779326207130,
+  "generatedAt": 1779677066160,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080525.html",
+      "ministry": "env",
+      "date": "2026-05-25",
+      "title": "クマ被害対策等関係情報のお知らせ（令和８年５月25日追加）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080525.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "令和8年5月25日に追加された、クマ被害対策に関する情報のお知らせ。クマによる被害への対策や関連する情報が公開されています。",
+      "ingestedAt": 1779677066160
+    },
     {
       "id": "env:https://www.env.go.jp/press/press_04725.html",
       "ministry": "env",
