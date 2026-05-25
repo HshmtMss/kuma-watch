@@ -1,5 +1,5 @@
 {
-  "generatedAt": 1779677066160,
+  "generatedAt": 1779677251572,
   "items": [
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080525.html",
@@ -9,8 +9,8 @@
       "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080525.html",
       "tag": "クマ被害対策",
       "category": "press",
-      "summary": "令和8年5月25日に追加された、クマ被害対策に関する情報のお知らせ。クマによる被害への対策や関連する情報が公開されています。",
-      "ingestedAt": 1779677066160
+      "summary": "クマ被害対策に関する情報追加の通知。令和8年5月25日に追加されたクマ被害対策に関連する最新情報を提供する。",
+      "ingestedAt": 1779677251572
     },
     {
       "id": "env:https://www.env.go.jp/press/press_04725.html",
@@ -33,6 +33,16 @@
       "category": "report",
       "summary": "クマによる人身被害と、はこわなを用いたクマの捕獲に関する二つのレポートが公表された。クマ対策の現状と有効性が詳細に報告される。",
       "ingestedAt": 1779323892568
+    },
+    {
+      "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-20.pdf",
+      "ministry": "maff",
+      "date": "2026-04-24",
+      "title": "農業現場におけるクマ類の出没及び人身被害防止等に対する指導等の徹底について",
+      "url": "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-20.pdf",
+      "category": "guidance",
+      "summary": "農業現場でのクマ類の出没と人身被害防止を目的とした、指導の徹底を求める通知。農作業者の安全確保と被害軽減を促す内容。",
+      "ingestedAt": 1779677251572
     },
     {
       "id": "env:https://www.env.go.jp/press/press_04326.html",
@@ -145,6 +155,16 @@
       "ingestedAt": 1779325023315
     },
     {
+      "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-16.pdf",
+      "ministry": "maff",
+      "date": "2025-10-31",
+      "title": "農業現場におけるクマ類の出没及び人身被害防止等に対する指導等の徹底について",
+      "url": "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-16.pdf",
+      "category": "guidance",
+      "summary": "農業現場でのクマ類の出没と人身被害防止を目的とした、指導の徹底を求める通知。農作業者の安全確保と被害軽減を促す内容。",
+      "ingestedAt": 1779677251572
+    },
+    {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r071031.html",
       "ministry": "env",
       "date": "2025-10-31",
@@ -156,6 +176,16 @@
       "ingestedAt": 1779325023315
     },
     {
+      "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-14.pdf",
+      "ministry": "maff",
+      "date": "2025-09-26",
+      "title": "農業現場におけるクマ類の出没及び人身被害防止等に対する指導等の徹底について",
+      "url": "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-14.pdf",
+      "category": "guidance",
+      "summary": "農業現場でのクマ類の出没と人身被害防止を目的とした、指導の徹底を求める通知。農作業者の安全確保と被害軽減を促す内容。",
+      "ingestedAt": 1779677251572
+    },
+    {
       "id": "env:https://www.env.go.jp/press/press_00195.html",
       "ministry": "env",
       "date": "2025-07-08",
@@ -165,6 +195,16 @@
       "category": "guidance",
       "summary": "緊急銃猟ガイドラインの公表が発表された。鳥獣による被害を軽減するための緊急的な銃器使用に関する具体的な指針が示される。",
       "ingestedAt": 1779326207130
+    },
+    {
+      "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-13.pdf",
+      "ministry": "maff",
+      "date": "2025-04-24",
+      "title": "農業現場におけるクマ類の出没及び人身被害防止等に対する指導等の徹底について",
+      "url": "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-13.pdf",
+      "category": "guidance",
+      "summary": "農業現場でのクマ類の出没と人身被害防止を目的とした、指導の徹底を求める通知。農作業者の安全確保と被害軽減を促す内容。",
+      "ingestedAt": 1779677251572
     }
   ]
 }

@@ -169,6 +169,48 @@ function parseRinyaPress(html: string): ParsedItem[] {
 }
 
 // ────────────────────────────────────────
+// 農林水産省 クマ注意喚起ページ抽出
+// 汎用 /j/press/ にはクマ記事がほぼ無いため、MAFF のクマ関連発出文書は
+// 鳥獣被害対策コーナー配下のこの専用ページで拾う (env の effort12 相当)。
+// 構造: <a href="...pdf">…（令和N年M月D日）(PDF : …KB)</a>
+//      タイトル末尾の全角括弧内 (令和N年M月D日) から日付を取り出す。
+// ────────────────────────────────────────
+const MAFF_KUMA_URL =
+  "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/index.html";
+
+function parseMaffKumaCaution(html: string, base: string): ParsedItem[] {
+  const out: ParsedItem[] = [];
+  const seen = new Set<string>();
+  const linkRe = /<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
+  let m: RegExpExecArray | null;
+  while ((m = linkRe.exec(html))) {
+    const href = m[1].trim();
+    const rawText = m[2]
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    // タイトル内の (令和N年M月D日) を日付に。クマ系の発出文書は必ず付く。
+    const dm = /[（(]令和(\d+)年(\d{1,2})月(\d{1,2})日[）)]/.exec(rawText);
+    if (!dm) continue;
+    if (!matchesBearKeyword(rawText)) continue;
+    const year = reiwaToWestern(Number(dm[1]));
+    const date = `${year}-${String(Number(dm[2])).padStart(2, "0")}-${String(Number(dm[3])).padStart(2, "0")}`;
+    // 末尾の (PDF : …KB) と日付括弧を落として読みやすいタイトルに整形
+    const title = rawText
+      .replace(/\s*[（(]PDF[^）)]*[）)]\s*$/i, "")
+      .replace(/\s*[（(]令和\d+年\d{1,2}月\d{1,2}日[）)]\s*/, " ")
+      .trim();
+    const url = href.startsWith("http")
+      ? href
+      : new URL(href, base).toString();
+    if (seen.has(url)) continue;
+    seen.add(url);
+    out.push({ ministry: "maff", date, title, url });
+  }
+  return out;
+}
+
+// ────────────────────────────────────────
 // 環境省 クマ被害対策専用ページ (effort12) 抽出
 // このページは「クマ被害対策等関係情報のお知らせ」「緊急銃猟への協力依頼」
 // 「通知 (財政支援・退職者協力依頼)」など、クマ特化の高密度ソース。
@@ -234,17 +276,20 @@ async function fetchHtml(url: string): Promise<string | null> {
 }
 
 export async function fetchGovCandidates(): Promise<ParsedItem[]> {
-  const [envHtml, maffHtml, rinyaHtml, envChojuHtml] = await Promise.all([
-    fetchHtml(ENV_PRESS_URL),
-    fetchHtml(MAFF_PRESS_URL),
-    fetchHtml(RINYA_PRESS_URL),
-    fetchHtml(ENV_CHOJU_EFFORT12_URL),
-  ]);
+  const [envHtml, maffHtml, rinyaHtml, envChojuHtml, maffKumaHtml] =
+    await Promise.all([
+      fetchHtml(ENV_PRESS_URL),
+      fetchHtml(MAFF_PRESS_URL),
+      fetchHtml(RINYA_PRESS_URL),
+      fetchHtml(ENV_CHOJU_EFFORT12_URL),
+      fetchHtml(MAFF_KUMA_URL),
+    ]);
   const items: ParsedItem[] = [];
   if (envHtml) items.push(...parseEnvPress(envHtml));
   if (maffHtml) items.push(...parseMaffPress(maffHtml, MAFF_PRESS_URL));
   if (rinyaHtml) items.push(...parseRinyaPress(rinyaHtml));
   if (envChojuHtml) items.push(...parseEnvChojuEffort12(envChojuHtml));
+  if (maffKumaHtml) items.push(...parseMaffKumaCaution(maffKumaHtml, MAFF_KUMA_URL));
   return items;
 }
 
