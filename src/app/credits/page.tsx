@@ -5,7 +5,7 @@ import PageShell from "@/components/PageShell";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "データ出典・ライセンス｜KumaWatch",
+  title: "データ出典・ライセンス",
   description:
     "KumaWatch が利用している全データソースとライセンス（CC BY 4.0、ODbL 1.0 等）の一覧。クマ出没情報・気象・地図・位置情報の各提供元への正式なクレジット表示。",
   alternates: { canonical: `${SITE_URL}/credits` },

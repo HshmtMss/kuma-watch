@@ -325,6 +325,32 @@ export async function getMonthlyCountsForPlace(
   return buckets;
 }
 
+/** 県内全体の直近事案を date desc で limit 件返す。
+ *  cityName を付与して返すので、呼び出し側で市町村別ページへの内部リンクを
+ *  生成できる。データ薄い (count365d == 0) 市町村ページの補助コンテンツとして
+ *  埋め込み、コンテンツ希薄判定を回避し滞在時間を伸ばすために使う。
+ *  date >= 365 日以内、date <= 今日、で絞る。 */
+export async function getRecentRecordsInPref(
+  pref: string,
+  limit = 5,
+): Promise<(PlaceRecord & { cityName: string })[]> {
+  const idx = await getIndex();
+  const today = jstToday();
+  const cutoff365 = jstDaysAgo(365);
+  const prefix = `${pref}/`;
+  const all: (PlaceRecord & { cityName: string })[] = [];
+  for (const [key, arr] of idx.recordsByKey.entries()) {
+    if (!key.startsWith(prefix)) continue;
+    const cityName = key.slice(prefix.length);
+    for (const r of arr) {
+      if (!r.date || r.date < cutoff365 || r.date > today) continue;
+      all.push({ ...r, cityName });
+    }
+  }
+  all.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  return all.slice(0, limit);
+}
+
 /** 静的生成対象のキー一覧 (count >= minCount のもの) */
 export async function getStaticPlaceKeys(
   minCount = 3,

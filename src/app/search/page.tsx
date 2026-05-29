@@ -10,7 +10,7 @@ const SITE_URL = "https://kuma-watch.jp";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "検索・最新情報｜KumaWatch（クマウォッチ）",
+  title: "検索・最新情報",
   description:
     "全国の市町村・観光地・対策記事・研究レポート・政府発表をまとめて検索。最新のクマ出没情報や国の発表もこのページから一覧できます。",
   alternates: { canonical: `${SITE_URL}/search` },

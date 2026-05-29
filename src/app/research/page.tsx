@@ -17,7 +17,7 @@ import {
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ｜KumaWatch",
+  title: "クマ出没 研究・知見｜獣医師監修 獣医工学ラボ",
   description:
     "獣医師監修・獣医工学ラボ運営。全国のクマ出没事案の時空間分析、アーバン・ベア（都市型出没）研究、自治体・専門家向けの公開知見。日次・週次・月次レポートを地域別・日付別に整理して公開。",
   alternates: { canonical: `${SITE_URL}/research` },

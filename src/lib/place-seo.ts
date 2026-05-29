@@ -37,8 +37,8 @@ export function buildMuniSeo(
 
   if (!cell) {
     return {
-      title: `${muni}のクマ出没情報・警戒レベル｜${pref}・${SUPERVISION}`,
-      description: `${place}のクマ出没情報を 5km メッシュ単位で予報。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の 30 秒チェックに。隣接市町村の出没履歴も併せて確認できます。`,
+      title: `${muni}の熊出没情報マップ・警戒レベル｜${pref}・${SUPERVISION}`,
+      description: `${place}の熊（クマ）出没情報を 5km メッシュ単位で予報。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の 30 秒チェックに。隣接市町村の出没履歴・目撃マップも併せて確認できます。`,
     };
   }
 
@@ -55,24 +55,27 @@ export function buildMuniSeo(
   const stat = fragments.length > 0 ? `【${fragments.join("・")}】` : "";
 
   // タイトル先頭は {muni} で始める。Search Console 上位クエリの圧倒的多数が
-  // 「{市町村名} 熊」「{市町村名} 熊 マップ」の形なので、市町村名を一文字目に
-  // 置くと検索結果での太字化・視認性が上がり CTR が改善する。
+  // 「{市町村名} 熊」「{市町村名} 熊 マップ」「{市町村名} 熊 出没マップ」の形なので、
+  // 市町村名を一文字目に置き、続けて「熊出没情報マップ」を並べる。
+  // 「熊」(漢字) は SC 検索クエリで「クマ」(カナ) より圧倒的多数。
+  // 「マップ」キーワードも検索クエリで多用されるため title に含める。
   // {pref} は文脈として `{stat}` の後ろに移動。layout.tsx 側で末尾に
   // 「｜KumaWatch」が template 付与されるので、ここでは 「くまウォッチ」 を
   // 省きセグメント数を 4 → 3 に削って ｜ で区切られる項目を減らす。
   const title = stat
-    ? `${muni}のクマ出没情報${stat}｜${pref}・${SUPERVISION}`
-    : `${muni}のクマ出没情報｜${pref}・${SUPERVISION}`;
+    ? `${muni}の熊出没情報マップ${stat}｜${pref}・${SUPERVISION}`
+    : `${muni}の熊出没情報マップ｜${pref}・${SUPERVISION}`;
 
   // ディスクリプション: 数値の文脈 + 用途 + 隣接動線。
   // recencyClause も「累計」ではなく直近1年の件数を主にする。
+  // 「熊（クマ）」併記で「クマ」カナ表記の検索クエリも吸収する。
   const recencyClause =
     cell.count90d > 0 && md
       ? `直近 90 日で ${cell.count90d.toLocaleString()} 件、最新の目撃は ${md}`
       : cell.count365d > 0
         ? `直近 1 年で ${cell.count365d.toLocaleString()} 件`
         : `直近 1 年の出没記録なし`;
-  const description = `${place}のクマ出没情報を 5km メッシュで予報。${recencyClause}。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の安全確認に。隣接市町村・最新事案も併せて確認できます。`;
+  const description = `${place}の熊（クマ）出没情報を 5km メッシュで予報。${recencyClause}。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の安全確認に。隣接市町村・最新事案・目撃マップも併せて確認できます。`;
 
   return { title, description };
 }
@@ -84,8 +87,8 @@ export function buildPrefSeo(
 ): { title: string; description: string } {
   if (!summary) {
     return {
-      title: `${pref}のクマ出没情報・市町村別マップ｜${SUPERVISION}`,
-      description: `${pref}のクマ出没情報を市町村別マップで確認。5km メッシュ警戒レベル予報。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の安全確認に。`,
+      title: `${pref}の熊出没情報マップ・市町村別予報｜${SUPERVISION}`,
+      description: `${pref}の熊（クマ）出没情報を市町村別マップで確認。5km メッシュ警戒レベル予報。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の安全確認に。`,
     };
   }
   const md = formatMonthDay(summary.latestDate);
@@ -93,6 +96,7 @@ export function buildPrefSeo(
   // 累計には古い source の歪み (例: 京都府は 2018 年で凍結) があるため。
   // BRAND は layout.tsx の template で末尾「｜KumaWatch」が自動付与される
   // ので、ここでは省きセグメント重複を避ける。
+  // 「熊出没情報マップ」表記は SC 上位クエリ「{県名} 熊 出没マップ」を狙う。
   const fragments: string[] = [];
   if (summary.count365d > 0)
     fragments.push(`直近1年${summary.count365d.toLocaleString()}件`);
@@ -100,14 +104,14 @@ export function buildPrefSeo(
   const stat = fragments.length > 0 ? `【${fragments.join("・")}】` : "";
 
   const title = stat
-    ? `${pref}のクマ出没情報${stat}｜${SUPERVISION}`
-    : `${pref}のクマ出没情報｜${SUPERVISION}`;
+    ? `${pref}の熊出没情報マップ${stat}｜${SUPERVISION}`
+    : `${pref}の熊出没情報マップ｜${SUPERVISION}`;
   const recencyClause =
     summary.count90d > 0 && md
       ? `直近 90 日で ${summary.count90d.toLocaleString()} 件、最新は ${md}`
       : summary.count365d > 0
         ? `直近 1 年で ${summary.count365d.toLocaleString()} 件`
         : `直近 1 年の出没記録なし`;
-  const description = `${pref}のクマ出没情報を市町村別マップで予報。${summary.muniCount} 市町村のデータを 5km メッシュで集約、${recencyClause}。${SUPERVISION}・無料・登録不要。`;
+  const description = `${pref}の熊（クマ）出没情報を市町村別マップで予報。${summary.muniCount} 市町村のデータを 5km メッシュで集約、${recencyClause}。${SUPERVISION}・無料・登録不要。`;
   return { title, description };
 }

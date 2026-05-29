@@ -96,14 +96,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (md && count90 > 0) fragments.push(`最新${md}`);
   const stat = fragments.length > 0 ? `【${fragments.join("・")}】` : "";
 
-  const title = `${landmark.name}周辺のクマ出没情報${stat}${SUPERVISION}`;
+  // SC 上位クエリ「○○ 熊 出没マップ」を意識して「熊出没情報マップ」表記に統一。
+  // 旧実装はセパレータ無しで「クマ出没情報獣医師監修」と続いていたバグも合わせて修正。
+  const title = `${landmark.name}周辺の熊出没情報マップ${stat}｜${SUPERVISION}`;
   const recencyClause =
     count90 > 0 && md
       ? `過去 90 日で ${count90} 件、最新は ${md}`
       : count365 > 0
         ? `過去 1 年で ${count365} 件`
         : "周辺 10 km の出没情報なし";
-  const description = `${landmark.name}（${landmark.prefName}${landmark.muniName ?? ""}）周辺 10 km のクマ出没情報を集約。${recencyClause}。${SUPERVISION}・無料・登録不要。登山・キャンプ・観光前の安全確認に。`;
+  // description は「熊（クマ）」併記でカナ表記のクエリも吸収する。
+  const description = `${landmark.name}（${landmark.prefName}${landmark.muniName ?? ""}）周辺 10 km の熊（クマ）出没情報を集約。${recencyClause}。${SUPERVISION}・無料・登録不要。登山・キャンプ・観光前の安全確認に。`;
   const path = `/spot/${encodeURIComponent(slug)}`;
 
   return {

@@ -14,7 +14,7 @@ import announcementsData from "@/../public/data/gov-announcements.json";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "データの透明性 — 出典・更新頻度・カバレッジ・方法論｜KumaWatch",
+  title: "データの透明性 — 出典・更新頻度・カバレッジ・方法論",
   description:
     "KumaWatch がどのデータを、どの頻度で、どう処理して掲載しているかを公開します。総レコード数・出典別内訳・都道府県別カバレッジ・既知の制約・引用方法まで、研究者・記者・自治体担当者が参照できる形でまとめています。",
   alternates: { canonical: `${SITE_URL}/data` },

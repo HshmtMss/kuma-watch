@@ -10,6 +10,7 @@ import {
   getPlaceCellsByPref,
   getPrefSummary,
   getMonthlyCountsForPlace,
+  getRecentRecordsInPref,
   getRecordsForPlace,
   getStaticPlaceKeys,
   type PlaceCell,
@@ -162,7 +163,7 @@ export default async function MuniPage({ params }: Props) {
       lonCentroid: masterEntry!.lon,
     };
 
-  const [siblingsRaw, allCells, mapRecords, prefSummary, monthly] = await Promise.all([
+  const [siblingsRaw, allCells, mapRecords, prefSummary, monthly, prefRecent] = await Promise.all([
     getPlaceCellsByPref(pref),
     getAllPlaceCells(),
     getRecordsForPlace(pref, muni, 60),
@@ -170,6 +171,9 @@ export default async function MuniPage({ params }: Props) {
     // 月別チャートは getRecordsForPlace の上限 (60) で古い月が落ちるので
     // 別関数で全件から月別バケット集計する。
     getMonthlyCountsForPlace(pref, muni),
+    // データ薄い muni (recentIncidents が出ない) でも、県内の直近事案を
+    // 補助コンテンツとして埋め込み、ページの SEO 上の希薄判定を回避する。
+    getRecentRecordsInPref(pref, 8),
   ]);
 
   const haversineKm = (
@@ -316,10 +320,20 @@ export default async function MuniPage({ params }: Props) {
     ],
   };
 
+  // Place: ページの主題 (主体)。hasMap / containedInPlace / description を
+  // 追加して Google にこのページの地理的文脈を強く伝える。@id で WebPage の
+  // about との連結アンカーを作る。
+  const canonicalPath = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
+  const canonicalUrl = `${SITE_URL}${canonicalPath}`;
   const placeSchema = {
     "@context": "https://schema.org",
     "@type": "Place",
+    "@id": `${canonicalUrl}#place`,
     name: `${pref}${muni}`,
+    description:
+      cell.count365d > 0
+        ? `${pref}${muni}における熊（クマ）出没情報・警戒レベル予報。直近1年${cell.count365d.toLocaleString()}件の出没記録。`
+        : `${pref}${muni}における熊（クマ）出没情報・警戒レベル予報。`,
     address: {
       "@type": "PostalAddress",
       addressRegion: pref,
@@ -331,6 +345,29 @@ export default async function MuniPage({ params }: Props) {
       latitude: cell.latCentroid,
       longitude: cell.lonCentroid,
     },
+    hasMap: canonicalUrl,
+    containedInPlace: {
+      "@type": "AdministrativeArea",
+      name: pref,
+    },
+  };
+
+  // WebPage: ページ自体。about で Place を参照し「このページは ${pref}${muni}
+  // について書かれている」ことを明示する。SC データで「{市町村} 熊出没マップ」
+  // が主要クエリなので、ページとトピックの結び付きを強める。
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": canonicalUrl,
+    url: canonicalUrl,
+    name: `${muni}の熊出没情報マップ`,
+    about: { "@id": `${canonicalUrl}#place` },
+    isPartOf: {
+      "@type": "WebSite",
+      name: "KumaWatch",
+      url: SITE_URL,
+    },
+    inLanguage: "ja",
   };
 
   // 最近の出没事案 — mapRecords は date desc 済み。
@@ -375,14 +412,14 @@ export default async function MuniPage({ params }: Props) {
   // ためミスリーディングなので削除。
   const dynamicLead =
     cell.count90d > 0 && cell.latestDate
-      ? `過去 90 日で ${cell.count90d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} のクマ出没状況をまとめています。`
+      ? `過去 90 日で ${cell.count90d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の熊（クマ）出没状況をまとめています。`
       : cell.count365d > 0 && cell.latestDate
-        ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} のクマ出没状況をまとめています。`
-        : `${pref} ${muni} のクマ出没情報をまとめています。`;
+        ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の熊（クマ）出没状況をまとめています。`
+        : `${pref} ${muni} の熊（クマ）出没情報をまとめています。`;
 
   return (
     <PageShell
-      title={`${muni} のクマ出没情報`}
+      title={`${muni}の熊出没情報マップ`}
       lead={dynamicLead}
     >
       <script
@@ -392,6 +429,10 @@ export default async function MuniPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
       />
 
       {/* 視認できるパンくずリスト。SEO 上の breadcrumb は既に JSON-LD にあるが、
@@ -694,6 +735,52 @@ export default async function MuniPage({ params }: Props) {
             </Link>
             でも詳細を解説しています。
           </p>
+        </>
+      )}
+
+      {/* {muni} 内に直近事案が無い場合の補助コンテンツ。県内最新事案を
+          「市町村名 + 日付」付きで列挙することで、コンテンツ希薄判定を回避し
+          かつユーザーには「この地域は静かでも県内全体ではこれだけ動いている」
+          という文脈情報を提供できる。clickable リンクで内部リンクグラフも強化。 */}
+      {recentIncidents.length === 0 && prefRecent.length > 0 && (
+        <>
+          <h2>{pref}内の直近のクマ出没事案</h2>
+          <p className="text-sm">
+            {muni} には直近 1 年の記録がありませんが、{pref}内では出没が続いています。
+            周辺市町村の最新事案を直近 {prefRecent.length} 件表示します。
+          </p>
+          <ul className="not-prose space-y-2">
+            {prefRecent.map((r, i) => (
+              <li
+                key={`pref-${r.date}-${i}`}
+                className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm"
+              >
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-semibold text-stone-900">
+                    {formatDate(r.date)}
+                  </span>
+                  {r.cityName && (
+                    <Link
+                      href={`/place/${encodeURIComponent(pref)}/${encodeURIComponent(r.cityName)}`}
+                      className="text-xs font-semibold text-amber-700 hover:underline"
+                    >
+                      {r.cityName}
+                    </Link>
+                  )}
+                  {r.sectionName && (
+                    <span className="text-xs text-stone-500">
+                      {r.sectionName}
+                    </span>
+                  )}
+                </div>
+                {r.comment && (
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">
+                    {r.comment}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
         </>
       )}
 

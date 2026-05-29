@@ -6,7 +6,7 @@ import PrintButton from "./PrintButton";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "サービス仕様書｜KumaWatch 自治体連携",
+  title: "サービス仕様書｜自治体連携",
   description:
     "KumaWatch（くまウォッチ）の自治体向け詳細仕様書。自治体さまが住民・観光客に届けたいメッセージを配信。最短 1 回 30 分の打ち合わせで連携開始。機能・連携フロー・技術仕様・運営体制・FAQ をまとめた庁内稟議用資料。",
   alternates: { canonical: `${SITE_URL}/for-gov/spec` },

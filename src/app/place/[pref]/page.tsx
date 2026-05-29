@@ -124,18 +124,66 @@ export default async function PrefPage({ params }: Props) {
     ],
   };
 
+  // 都道府県を AdministrativeArea として明示。WebPage の about で連結し
+  // Google にトピック (都道府県という行政区画) を伝える。
+  const canonicalPrefUrl = `${SITE_URL}/place/${encodeURIComponent(pref)}`;
+  const prefAreaSchema = {
+    "@context": "https://schema.org",
+    "@type": "AdministrativeArea",
+    "@id": `${canonicalPrefUrl}#area`,
+    name: pref,
+    address: {
+      "@type": "PostalAddress",
+      addressRegion: pref,
+      addressCountry: "JP",
+    },
+    ...(prefCenter
+      ? {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: Number(prefCenter.lat.toFixed(4)),
+            longitude: Number(prefCenter.lon.toFixed(4)),
+          },
+        }
+      : {}),
+    hasMap: canonicalPrefUrl,
+    containedInPlace: {
+      "@type": "Country",
+      name: "日本",
+    },
+  };
+
+  const prefWebPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": canonicalPrefUrl,
+    url: canonicalPrefUrl,
+    name: `${pref}の熊出没情報マップ`,
+    about: { "@id": `${canonicalPrefUrl}#area` },
+    isPartOf: { "@type": "WebSite", name: "KumaWatch", url: SITE_URL },
+    inLanguage: "ja",
+  };
+
   // summary は字レベル集計を元にした値なのでヘッダーには使わず、
   // muni 正規化後の値 (totalMuni / totalCount / latestDate) を採用する。
   void summary;
 
   return (
     <PageShell
-      title={`${pref}のクマ出没予報`}
-      lead={`${pref}内 全${totalMuni}市町村のクマ出没情報を整理。直近1年 ${total365d.toLocaleString()} 件 / 直近90日 ${total90d.toLocaleString()} 件 (最終更新 ${latestDate ?? "-"})。`}
+      title={`${pref}の熊出没情報マップ`}
+      lead={`${pref}内 全${totalMuni}市町村の熊（クマ）出没情報を整理。直近1年 ${total365d.toLocaleString()} 件 / 直近90日 ${total90d.toLocaleString()} 件 (最終更新 ${latestDate ?? "-"})。`}
     >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(prefAreaSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(prefWebPageSchema) }}
       />
 
       {/* 視認できるパンくずリスト。SEO 上の breadcrumb は JSON-LD にあるが、

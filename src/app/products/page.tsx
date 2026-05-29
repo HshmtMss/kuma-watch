@@ -16,7 +16,7 @@ import {
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "クマ対策の製品・サービス｜獣医師監修｜KumaWatch",
+  title: "クマ対策の製品・サービス｜獣医師監修",
   description:
     "獣医師監修・獣医工学ラボ運営。クマ撃退スプレー、電気柵、ベアキャニスター、AI 検知システムなど、クマ対策に有効な製品・サービスを個人向け・自治体向けに整理。出典付きで実用情報を提供します。",
   alternates: { canonical: `${SITE_URL}/products` },

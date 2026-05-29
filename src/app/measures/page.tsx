@@ -11,7 +11,7 @@ import productsData from "@/data/products.json";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "クマ対策の総合ガイド｜獣医師監修｜KumaWatch",
+  title: "クマ対策の総合ガイド｜獣医師監修",
   description:
     "獣医師監修・獣医工学ラボ運営。クマ対策に必要な情報・装備・研究を一箇所に整理。一般の方向けの記事・装備、自治体さま向けのソリューション・研究レポートまで、目的別に分かりやすくご案内します。",
   alternates: { canonical: `${SITE_URL}/measures` },
