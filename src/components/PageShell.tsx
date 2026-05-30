@@ -16,7 +16,7 @@ export default function PageShell({ title, lead, children }: Props) {
         {/* ブランドはモバイルでも「くまウォッチ by 獣医工学ラボ」を表示する (ハンバーガー導入で幅確保)。
             文字サイズは小デバイスでの 1 行収まりを優先しつつ、空きが目立たない最大値に調整:
             ロゴ画像 h-8→h-9, タイトル base→lg, by 獣医工学ラボ xs→sm。 */}
-        <div className="flex min-w-0 shrink items-center gap-2">
+        <div className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2">
           <Link
             href="/"
             className="flex items-center gap-2"
@@ -31,6 +31,17 @@ export default function PageShell({ title, lead, children }: Props) {
             <span className="truncate text-base font-bold tracking-tight text-stone-900 sm:text-lg">
               くまウォッチ
             </span>
+          </Link>
+          {/* ベータ版バッジ。免責事項 (情報の精度・限界) ページにリンクして、
+              ユーザーが「これは試験運用中で、情報には限界がある」ことを 1 クリックで
+              確認できるようにする。タイトル隣に小さく置きヘッダー幅を圧迫しない。 */}
+          <Link
+            href="/disclaimer"
+            className="shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-900 hover:bg-amber-300"
+            aria-label="ベータ版運用中 — 免責事項を見る"
+            title="ベータ版運用中"
+          >
+            BETA
           </Link>
           <a
             href="https://www.research-coordinate.co.jp/labs/vet/"
