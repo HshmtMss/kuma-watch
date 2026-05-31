@@ -721,7 +721,7 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        <div className="flex min-w-0 shrink items-center gap-2">
+        <div className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2">
           <Link
             href="/about"
             className="flex items-center gap-2"
@@ -736,6 +736,17 @@ export default function KumaClient() {
             <span className="truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
               くまウォッチ
             </span>
+          </Link>
+          {/* ベータ版バッジ。/disclaimer の精度・限界の説明にリンクし、
+              ユーザーが 1 クリックで「報道由来の位置は概略」などの注意事項を
+              確認できるようにする。 */}
+          <Link
+            href="/disclaimer"
+            className="shrink-0 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold tracking-wide text-amber-900 hover:bg-amber-300 sm:px-1.5 sm:text-[10px]"
+            aria-label="ベータ版運用中 — 免責事項を見る"
+            title="ベータ版運用中"
+          >
+            BETA
           </Link>
           <a
             href="https://www.research-coordinate.co.jp/labs/vet/"
