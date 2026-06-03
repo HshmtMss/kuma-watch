@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
+import BusinessEntryStrip from "@/components/BusinessEntryStrip";
 import GovAnnouncementTicker from "@/components/GovAnnouncementTicker";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
@@ -1293,6 +1294,9 @@ export default function KumaClient() {
         />
       </div>
 
+      {/* B2B エントリ帯。地図トップでも自治体・事業者の入口を常時可視に。
+          ボトムシートの下に shrink-0 で薄く敷く。 */}
+      <BusinessEntryStrip variant="compact" />
     </div>
   );
 }

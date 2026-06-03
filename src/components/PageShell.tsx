@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import LegalLinks from "@/components/LegalLinks";
+import BusinessEntryStrip from "@/components/BusinessEntryStrip";
 
 type Props = {
   title: string;
@@ -65,6 +66,9 @@ export default function PageShell({ title, lead, children }: Props) {
         )}
         <div className="article-body max-w-none">{children}</div>
       </main>
+      {/* B2B エントリ帯 — フッター直上で「次の問い合わせ動線」を提示。
+          地図トップは KumaClient 内で別途同じ帯を出している。 */}
+      <BusinessEntryStrip />
       <footer className="border-t border-black/8 bg-white px-5 py-6 text-sm text-gray-700">
         <div className="mx-auto max-w-3xl">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

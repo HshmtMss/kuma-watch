@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import ContactForm from "@/components/ContactForm";
 
 const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
@@ -95,11 +96,22 @@ export default function ForGovPage() {
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
           自治体さまが伝えたいメッセージを、住民・観光客に届けます。
         </h2>
+        {/* 3 つの即決メッセージ。提案の「30分の打合せで連携開始 / 無料 / 獣医師監修」軸。
+            旧 4 項目から運用形態の説明は本文側に移して「自治体担当者がコスト負担を
+            判断する 3 軸」に圧縮した。 */}
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>最短 1 回 30 分の打ち合わせで連携開始</li>
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>公式 HP・PDF・紙・SNS 等、貴自治体の運用に合わせて対応</li>
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>無料でご利用いただけます</li>
-          <li className="flex gap-2"><span className="text-amber-600">✓</span>獣医師監修の専門サービス</li>
+          <li className="flex gap-2">
+            <span className="text-amber-600">✓</span>
+            <span><strong>最短 1 回 30 分</strong>の打ち合わせで連携開始</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-amber-600">✓</span>
+            <span><strong>無料</strong>でご利用いただけます (連携費用なし)</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-amber-600">✓</span>
+            <span><strong>獣医師監修</strong> / 獣医工学ラボ運営の専門サービス</span>
+          </li>
         </ul>
         <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {STATS.map((s) => (
@@ -293,40 +305,27 @@ export default function ForGovPage() {
         </a>
       </div>
 
-      {/* CTA */}
+      {/* CTA — フォームで「次に何を入力すれば良いか」を視覚化し、
+          自治体担当者の問い合わせハードルを下げる。送信は mailto: で
+          メーラーを開いて入力内容を pre-fill する形式 (サーバ実装なし)。 */}
       <h2 id="contact">お問い合わせ</h2>
-      <div className="not-prose mt-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="text-sm text-stone-800">
-          <div className="mb-3">
-            <a
-              href={CONTACT_MAILTO}
-              className="font-semibold text-blue-700 underline"
-            >
-              contact@research-coordinate.co.jp
-            </a>
-            <span className="ml-2 text-xs text-stone-500">
-              （獣医工学ラボ／3 営業日以内にご返信）
-            </span>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <a
-              href={CONTACT_MAILTO}
-              className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-700"
-              style={{ color: "#fff", textDecoration: "none" }}
-            >
-              メールで相談する →
-            </a>
-            <Link
-              href="/for-gov/spec"
-              className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
-            >
-              庁内稟議用 資料を見る
-            </Link>
-          </div>
-          <p className="mt-3 text-[11px] text-stone-500">
-            「庁内稟議用 資料」は印刷／PDF 保存に対応した A4 仕様の資料ページです。本ページのリンクをそのまま庁内回覧にもご利用いただけます。
-          </p>
-        </div>
+      <p>
+        ご相談内容を以下のフォームに記入して送信ボタンを押すと、ご利用のメールアプリが起動し、入力内容がメール本文に挿入されます。
+      </p>
+      <ContactForm kind="gov" />
+      <div className="not-prose mt-4 flex flex-wrap gap-2 text-xs text-stone-600">
+        <Link
+          href="/for-gov/spec"
+          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
+        >
+          庁内稟議用 資料を見る (印刷対応)
+        </Link>
+        <a
+          href={CONTACT_MAILTO}
+          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
+        >
+          フォームを使わずメールで送る
+        </a>
       </div>
     </PageShell>
   );

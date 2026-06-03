@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
+import ContactForm from "@/components/ContactForm";
 
 const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
@@ -166,6 +167,60 @@ export default function ForVendorsPage() {
         景品表示法・ステマ規制に準拠して、PR 表記を明示。読者が広告であることを誤認しない設計を維持します。
       </p>
 
+      {/* 料金の考え方 — 「個別ご提案」だけだと判断材料が無いので、
+          価格決定の要因を 3 つ明示して、相見積もりレベルの透明性を出す。
+          具体額は事業判断のため明記せず、ご相談 → ご提案の流れに誘導する。 */}
+      <h2 id="pricing">料金の考え方</h2>
+      <p>
+        掲載料金は<strong>個別にご提案</strong>しています。基本構造は以下の 3 軸の組み合わせで、相見積もりがしやすい透明な価格設計を心がけています。
+      </p>
+      <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            1. 掲載先
+          </div>
+          <div className="mt-1 text-sm font-semibold text-stone-900">
+            どこに出すか
+          </div>
+          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
+            <li>• 対策製品データベース (/products)</li>
+            <li>• 対策ハブ (/measures)</li>
+            <li>• 関連記事ページ</li>
+            <li>• 自治体向けページ (/for-gov)</li>
+          </ul>
+        </div>
+        <div className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            2. 露出形式
+          </div>
+          <div className="mt-1 text-sm font-semibold text-stone-900">
+            どう見せるか
+          </div>
+          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
+            <li>• 一覧カード掲載</li>
+            <li>• カテゴリ内 Pin 表示</li>
+            <li>• 記事内 PR 枠</li>
+            <li>• 監修付き解説記事 (協賛型)</li>
+          </ul>
+        </div>
+        <div className="rounded-xl border border-stone-200 bg-white p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+            3. 掲載期間
+          </div>
+          <div className="mt-1 text-sm font-semibold text-stone-900">
+            どのくらい出すか
+          </div>
+          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
+            <li>• 3 か月 / 6 か月 / 1 年単位</li>
+            <li>• シーズン (春・秋) 集中</li>
+            <li>• 自治体導入連動の単発</li>
+          </ul>
+        </div>
+      </div>
+      <p className="text-xs text-stone-500">
+        ご予算感をお伝えいただければ、その範囲で組める案をご提案します。少額からのトライアル枠もご相談ください。
+      </p>
+
       <h2>掲載までの流れ</h2>
       <ol>
         <li>
@@ -225,33 +280,26 @@ export default function ForVendorsPage() {
         </div>
       </details>
 
+      {/* お問い合わせ — フォーム形式で入力ハードルを下げる。
+          送信ボタンで mailto: を開いて入力内容を pre-fill。 */}
       <h2 id="contact">お問い合わせ</h2>
-      <div className="not-prose mt-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="text-sm text-stone-800">
-          <div className="mb-3">
-            <a
-              href={CONTACT_MAILTO}
-              className="font-semibold text-blue-700 underline"
-            >
-              contact@research-coordinate.co.jp
-            </a>
-            <span className="ml-2 text-xs text-stone-500">
-              （獣医工学ラボ／3 営業日以内にご返信）
-            </span>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <a
-              href={CONTACT_MAILTO}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
-              style={{ color: "#fff", textDecoration: "none" }}
-            >
-              掲載について相談する →
-            </a>
-          </div>
-          <p className="mt-3 text-[11px] text-stone-500">
-            お問い合わせには会社名・ご担当者名・連絡先・掲載希望の製品/サービス名をお書き添えいただくと、初回返信がスムーズです。
-          </p>
-        </div>
+      <p>
+        掲載をご検討中の製品・サービスについて、以下のフォームから具体的な内容をお聞かせください。
+      </p>
+      <ContactForm kind="vendor" />
+      <div className="not-prose mt-4 flex flex-wrap gap-2 text-xs text-stone-600">
+        <a
+          href={CONTACT_MAILTO}
+          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
+        >
+          フォームを使わずメールで送る
+        </a>
+        <Link
+          href="/products"
+          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
+        >
+          掲載例: 既存の対策製品データベースを見る
+        </Link>
       </div>
     </PageShell>
   );
