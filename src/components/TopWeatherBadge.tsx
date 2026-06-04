@@ -19,9 +19,13 @@ export default function TopWeatherBadge({ lat, lon }: Props) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- loading flag before external fetch
     setLoading(true);
     fetch(`/api/weather?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`)
-      .then((r) => (r.ok ? (r.json() as Promise<WeatherSnapshot>) : null))
+      .then((r) => (r.ok ? (r.json() as Promise<WeatherSnapshot | { available: false }>) : null))
       .then((data) => {
-        if (!cancelled && data) setWeather(data);
+        // /api/weather は上流失敗時に 200 + { available: false } を返す (リトライ連鎖防止)。
+        // tempC を持たないペイロードは表示しない。
+        if (!cancelled && data && "tempC" in data && typeof data.tempC === "number") {
+          setWeather(data);
+        }
       })
       .catch(() => {})
       .finally(() => {

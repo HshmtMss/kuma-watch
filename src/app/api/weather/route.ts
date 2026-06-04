@@ -3,6 +3,29 @@ import type { WeatherSnapshot } from "@/lib/types";
 
 const UPSTREAM = "https://api.open-meteo.com/v1/forecast";
 const CACHE_SECONDS = 900;
+// 上流タイムアウト。Open-Meteo は通常 200ms 以下で返るが、混雑時に詰まると
+// Vercel Function 実行時間を浪費して 5xx 連鎖を引き起こす。5 秒で打ち切る。
+const UPSTREAM_TIMEOUT_MS = 5000;
+// 上流失敗時の degraded レスポンスのキャッシュ秒数。クライアントが連投して
+// 上流に追い打ちをかけるのを防ぐため、短めだが 0 ではない値を入れる。
+const FAILURE_CACHE_SECONDS_DEFAULT = 60;
+// rate limit 検知時はもう少し長くキャッシュして上流を休ませる。
+const FAILURE_CACHE_SECONDS_RATELIMIT = 120;
+
+/** 上流失敗時の degraded レスポンス。HTTP 200 + { available: false } を返すことで、
+ *  クライアントのリトライ連鎖 (= 上流への追い打ち) を止める。クライアントは
+ *  `tempC` フィールドの有無で表示可否を判定する。 */
+function unavailable(reason: string, cacheSeconds = FAILURE_CACHE_SECONDS_DEFAULT) {
+  return NextResponse.json(
+    { available: false, reason },
+    {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, max-age=${cacheSeconds}, s-maxage=${cacheSeconds}`,
+      },
+    },
+  );
+}
 
 type OpenMeteoResponse = {
   current?: {
@@ -85,16 +108,27 @@ export async function GET(req: Request) {
   url.searchParams.set("timezone", "Asia/Tokyo");
 
   try {
+    // AbortSignal.timeout で 5 秒 hard cut。Lambda 実行時間の浪費を防ぐ。
     const upstream = await fetch(url.toString(), {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
       next: { revalidate: CACHE_SECONDS },
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
 
     if (!upstream.ok) {
-      return NextResponse.json(
-        { error: "気象データの取得に失敗しました", upstreamStatus: upstream.status },
-        { status: 502 },
-      );
+      // 上流ステータス別に degraded 応答 + キャッシュ秒数を切り分ける。
+      // 502/500 を返してしまうとクライアントがリトライして上流に追い打ちを
+      // かけるため、ここでは 200 + { available: false } で連鎖を断つ。
+      if (upstream.status === 429) {
+        return unavailable("upstream_rate_limited", FAILURE_CACHE_SECONDS_RATELIMIT);
+      }
+      if (upstream.status === 404) {
+        return unavailable("upstream_not_found");
+      }
+      if (upstream.status >= 500) {
+        return unavailable("upstream_error");
+      }
+      return unavailable(`upstream_${upstream.status}`);
     }
 
     const data = (await upstream.json()) as OpenMeteoResponse;
@@ -106,10 +140,7 @@ export async function GET(req: Request) {
       typeof current.precipitation !== "number" ||
       typeof current.weather_code !== "number"
     ) {
-      return NextResponse.json(
-        { error: "気象データの形式が予期と異なります" },
-        { status: 502 },
-      );
+      return unavailable("upstream_bad_data");
     }
 
     const currentPressure =
@@ -149,10 +180,13 @@ export async function GET(req: Request) {
         "Cache-Control": `public, max-age=${CACHE_SECONDS}, s-maxage=${CACHE_SECONDS}`,
       },
     });
-  } catch {
-    return NextResponse.json(
-      { error: "気象データ取得時に予期しないエラーが発生しました" },
-      { status: 500 },
-    );
+  } catch (err) {
+    // タイムアウト・DNS 失敗・ネットワーク断などはすべて degraded 応答。
+    // 上流不達でも 5xx を返さずクライアントのリトライ連鎖を止める。
+    const reason =
+      err instanceof Error && err.name === "TimeoutError"
+        ? "upstream_timeout"
+        : "upstream_unreachable";
+    return unavailable(reason);
   }
 }
