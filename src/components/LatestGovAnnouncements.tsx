@@ -47,11 +47,18 @@ export default function LatestGovAnnouncements({
   if (items.length === 0) return null;
 
   return (
-    <aside className="not-prose my-10 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+    <aside className="not-prose my-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+      {/* role + aria-level で h2 セマンティクスを残しつつ、.article-body h2 の
+          グローバルスタイル ('#' プレフィックス・黄色アンダーライン・40px トップ
+          マージン) を回避する。これがないと aside 内側上部に白い余白ができる。 */}
       <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-base font-bold text-stone-900 sm:text-lg">
+        <div
+          role="heading"
+          aria-level={2}
+          className="text-base font-bold text-stone-900 sm:text-lg"
+        >
           {title}
-        </h2>
+        </div>
         <Link
           href="/policy"
           className="text-sm font-semibold text-amber-700 hover:underline"
@@ -98,7 +105,7 @@ export default function LatestGovAnnouncements({
       <div className="mt-3 text-xs text-stone-500">
         環境省・農林水産省・林野庁の最新クマ対策発表を集約。
         <Link href="/policy" className="ml-1 text-amber-700 underline">
-          /policy で全て見る
+          政府発表ページで全て見る
         </Link>
       </div>
     </aside>
