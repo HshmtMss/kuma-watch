@@ -10,6 +10,7 @@ import {
   CATEGORIES,
   getAllTags,
   getArticlesByCategory,
+  getCategory,
   tagToSlug,
   type ArticleMeta,
   type CategoryId,
@@ -43,14 +44,19 @@ const SEASON_LABEL: Record<string, string> = {
 };
 
 function ArticleCard({ a }: { a: ArticleMeta }) {
+  // 画像エリアは「あり/なし」で高さが揃わなくなるため、必ず同じ枠を予約する。
+  // 画像未設定の記事は、カテゴリ絵文字 + グラデ背景のプレースホルダーで埋めて
+  // 全カードのレイアウトを統一する。
+  const category = getCategory(a.category);
+  const placeholderEmoji = category?.emoji ?? "🐻";
   return (
     <li className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50">
       <Link
         href={`/articles/${a.slug}`}
         className="flex flex-col gap-0 sm:flex-row"
       >
-        {a.heroImage && (
-          <div className="relative h-44 w-full shrink-0 sm:h-auto sm:w-52">
+        <div className="relative h-44 w-full shrink-0 bg-stone-100 sm:h-auto sm:min-h-[176px] sm:w-52">
+          {a.heroImage ? (
             <Image
               src={a.heroImage}
               alt={`${a.title} — クマ対策記事のヒーロー画像`}
@@ -58,8 +64,15 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
               sizes="(min-width: 640px) 208px, 100vw"
               className="object-cover"
             />
-          </div>
-        )}
+          ) : (
+            <div
+              className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200"
+              aria-hidden
+            >
+              <span className="text-6xl opacity-60">{placeholderEmoji}</span>
+            </div>
+          )}
+        </div>
         <div className="flex-1 p-5">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             {a.season && (
