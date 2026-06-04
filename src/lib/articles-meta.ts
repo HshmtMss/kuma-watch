@@ -278,6 +278,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "winter",
     category: "ecology",
     tags: ["腎臓", "尿素", "冬眠", "代謝", "獣医学"],
+    heroImage: "/articles/bear-kidney-nitrogen-recycling.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-brain-cognition",
@@ -290,6 +292,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["脳", "認知", "学習", "記憶", "獣医学"],
+    heroImage: "/articles/bear-brain-cognition.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-fat-metabolism",

@@ -269,6 +269,16 @@ const TARGETS: Target[] = [
     prompt:
       "A symbolic photograph of a mountain trail at sunrise where a human footprint and a bear paw print converge in damp earth, hopeful warm light, sense of coexistence and shared paths, no actual humans or animals visible, conceptual photography style",
   },
+  {
+    slug: "bear-kidney-nitrogen-recycling",
+    prompt:
+      "An abstract conceptual cross-section illustration of a hibernating brown bear curled in a winter den, with subtle glowing kidney and intestinal organs softly luminescent in warm amber, faint flowing lines suggesting nitrogen and urea recycling between organs, deep dark blue background, scientific medical magazine cover style, atmospheric and contemplative, no readable text, no labels",
+  },
+  {
+    slug: "bear-brain-cognition",
+    prompt:
+      "A conceptual portrait of a brown bear's head in profile against a deep dark background, with subtle glowing neural network pattern softly overlaid on the brain region, intricate golden neuron lines suggesting intelligence, memory and cognition, dense conifer forest silhouette softly visible at the bottom edge, science magazine cover style, dramatic atmospheric photography, no readable text",
+  },
 ];
 
 const TARGET_DIR = join(process.cwd(), "public", "articles");
