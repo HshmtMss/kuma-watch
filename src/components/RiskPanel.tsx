@@ -757,11 +757,9 @@ export default function RiskPanel({
                 className="h-5 w-5"
                 aria-hidden
               >
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
-                <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
               </svg>
             </button>
           )}
@@ -783,19 +781,33 @@ export default function RiskPanel({
                 className="h-5 w-5"
                 aria-hidden
               >
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <line x1="12" y1="7" x2="12" y2="13" />
+                <line x1="9" y1="10" x2="15" y2="10" />
               </svg>
             </Link>
           )}
           {(state.kind === "ready" || state.kind === "error") && (
             <button
               onClick={() => setExpanded(false)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 sm:h-8 sm:w-8 sm:text-base"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 sm:h-10 sm:w-10"
               aria-label="閉じる"
               title="閉じる (ピンは残ります)"
             >
-              ×
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+                aria-hidden
+              >
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
             </button>
           )}
         </div>
