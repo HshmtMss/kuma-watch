@@ -54,6 +54,25 @@ const CATEGORY_ORDER: LandmarkCategory[] = [
   "trailhead",
 ];
 
+// 都道府県を地理順 (北→南 / JIS X 0401 コード順) で並べるための基準。
+// データ配列の登場順だと「ランダム」に見えるため、一覧表示はこの順に揃える。
+const PREF_ORDER: string[] = [
+  "北海道",
+  "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
+  "岐阜県", "静岡県", "愛知県", "三重県",
+  "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+  "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+  "徳島県", "香川県", "愛媛県", "高知県",
+  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県",
+  "沖縄県",
+];
+const prefRank = (pref: string): number => {
+  const i = PREF_ORDER.indexOf(pref);
+  return i === -1 ? PREF_ORDER.length : i;
+};
+
 type SearchParams = Promise<{ cat?: string }>;
 
 export default async function SpotIndexPage({
@@ -132,7 +151,9 @@ export default async function SpotIndexPage({
               全 {JAPAN_LANDMARKS.length} 件
             </span>
           </div>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* CSS multi-column でマソンリー風に詰める。grid だと件数差で
+              背の低い県の下に大きな空白が出るため columns を採用。 */}
+          <div className="gap-x-8 sm:columns-2 lg:columns-3">
             {(() => {
               const byPref = new Map<string, JapanLandmark[]>();
               for (const l of JAPAN_LANDMARKS) {
@@ -140,27 +161,31 @@ export default async function SpotIndexPage({
                 arr.push(l);
                 byPref.set(l.prefName, arr);
               }
-              return [...byPref.entries()].map(([pref, items]) => (
-                <div key={pref}>
-                  <div className="mb-1.5 border-b border-stone-100 pb-1 text-sm font-semibold tracking-wide text-stone-700">
-                    {pref}
-                    <span className="ml-1.5 text-xs font-normal text-stone-400">
-                      {items.length}
-                    </span>
+              return [...byPref.entries()]
+                .sort((a, b) => prefRank(a[0]) - prefRank(b[0]))
+                .map(([pref, items]) => (
+                  <div key={pref} className="mb-5 break-inside-avoid">
+                    <div className="mb-2 flex items-center gap-2 border-b border-stone-200 pb-1.5">
+                      <span className="text-sm font-bold text-stone-800">
+                        {pref}
+                      </span>
+                      <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-stone-500">
+                        {items.length}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {items.map((l) => (
+                        <Link
+                          key={l.slug}
+                          href={`/spot/${encodeURIComponent(l.slug)}`}
+                          className="inline-block rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-[13px] text-stone-700 transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-900"
+                        >
+                          {l.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {items.map((l) => (
-                      <Link
-                        key={l.slug}
-                        href={`/spot/${encodeURIComponent(l.slug)}`}
-                        className="inline-block rounded-full bg-stone-100 px-2.5 py-1 text-sm text-stone-700 hover:bg-amber-100 hover:text-amber-900"
-                      >
-                        {l.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ));
+                ));
             })()}
           </div>
         </section>
