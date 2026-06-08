@@ -99,6 +99,38 @@ export default async function SpotIndexPage({
       ? JAPAN_LANDMARKS
       : JAPAN_LANDMARKS.filter((l) => l.category === activeCat);
 
+  // 都道府県別一覧: グルーピング → 地理順ソート → 高さがほぼ揃うよう
+  // 3カラムへ順番に分配する。CSS multi-column は列の開始位置がずれて
+  // 見栄えが悪いため、サーバー側で決め打ち分配して flex で並べる。
+  type PrefBlock = [string, JapanLandmark[]];
+  const byPref = new Map<string, JapanLandmark[]>();
+  for (const l of JAPAN_LANDMARKS) {
+    const arr = byPref.get(l.prefName) ?? [];
+    arr.push(l);
+    byPref.set(l.prefName, arr);
+  }
+  const prefBlocks: PrefBlock[] = [...byPref.entries()].sort(
+    (a, b) => prefRank(a[0]) - prefRank(b[0]),
+  );
+  const PREF_COL_COUNT = 3;
+  // 各ブロックの概算高さ (ヘッダー + ピル件数)
+  const blockWeights = prefBlocks.map(([, items]) => items.length + 2);
+  const prefColumns: PrefBlock[][] = Array.from(
+    { length: PREF_COL_COUNT },
+    () => [],
+  );
+  // 地理順のまま「その時点で最も低い列」へ順に積むマソンリー配置。
+  // 先頭行が 北海道 ｜ 青森 ｜ 岩手 … と左→右に並び、列内も北→南を維持。
+  const colHeights = new Array<number>(PREF_COL_COUNT).fill(0);
+  prefBlocks.forEach((block, i) => {
+    let min = 0;
+    for (let c = 1; c < PREF_COL_COUNT; c++) {
+      if (colHeights[c] < colHeights[min]) min = c;
+    }
+    prefColumns[min].push(block);
+    colHeights[min] += blockWeights[i];
+  });
+
   return (
     <PageShell
       title="観光地・登山口から探す"
@@ -151,20 +183,13 @@ export default async function SpotIndexPage({
               全 {JAPAN_LANDMARKS.length} 件
             </span>
           </div>
-          {/* CSS multi-column でマソンリー風に詰める。grid だと件数差で
-              背の低い県の下に大きな空白が出るため columns を採用。 */}
-          <div className="gap-x-8 sm:columns-2 lg:columns-3">
-            {(() => {
-              const byPref = new Map<string, JapanLandmark[]>();
-              for (const l of JAPAN_LANDMARKS) {
-                const arr = byPref.get(l.prefName) ?? [];
-                arr.push(l);
-                byPref.set(l.prefName, arr);
-              }
-              return [...byPref.entries()]
-                .sort((a, b) => prefRank(a[0]) - prefRank(b[0]))
-                .map(([pref, items]) => (
-                  <div key={pref} className="mb-5 break-inside-avoid">
+          {/* サーバー側で3カラムに分配。各列の先頭が揃い、隙間も出ない。
+              モバイル/タブレットでは縦積み (列1→列2→列3 で地理順を維持)。 */}
+          <div className="flex flex-col gap-5 md:flex-row md:gap-x-8 md:gap-y-0">
+            {prefColumns.map((column, ci) => (
+              <div key={ci} className="flex flex-1 flex-col gap-5">
+                {column.map(([pref, items]) => (
+                  <div key={pref}>
                     <div className="mb-2 flex items-center gap-2 border-b border-stone-200 pb-1.5">
                       <span className="text-sm font-bold text-stone-800">
                         {pref}
@@ -185,8 +210,9 @@ export default async function SpotIndexPage({
                       ))}
                     </div>
                   </div>
-                ));
-            })()}
+                ))}
+              </div>
+            ))}
           </div>
         </section>
       )}
