@@ -612,6 +612,10 @@ export default async function MuniPage({ params }: Props) {
           centerLon={cell.lonCentroid}
           records={mapRecordsForYear}
           zoom={11}
+          boundaryUrl={
+            masterEntry ? `/data/boundaries/${masterEntry.prefCode}.json` : undefined
+          }
+          boundaryCode={masterEntry?.cityCode}
         />
       </div>
       {/* 凡例 — プロット対象は「過去 1 年以内」のレコードのみ。
@@ -626,7 +630,17 @@ export default async function MuniPage({ params }: Props) {
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
           1 年以内
         </li>
+        <li className="flex items-center gap-1.5">
+          <span
+            aria-hidden
+            className="inline-block h-2.5 w-3 rounded-sm border-2 border-blue-600 bg-blue-500/10"
+          />
+          {muni}の境界
+        </li>
       </ul>
+      <p className="not-prose mb-2 text-[10px] text-stone-400">
+        行政界データ: 「国土数値情報（行政区域データ）」（国土交通省）を加工して作成
+      </p>
       {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部の Sticky CTA
           が同じ役割を担うので hidden sm:inline-flex で重複排除。ラベルも
           Sticky CTA と統一し、「内容は同じなのに 2 つあって紛らわしい」という

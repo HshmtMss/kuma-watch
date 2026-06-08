@@ -24,6 +24,11 @@ type Props = {
   /** 中心からの半径(km)。指定すると円を描く。観光地ページで「通知/表示はこの範囲」
    *  を視覚化するのに使う（観光地は半径10km基準）。 */
   radiusKm?: number;
+  /** 行政界 GeoJSON のURL (都道府県別ファイル /data/boundaries/{prefCode}.json)。
+   *  boundaryCode と併せて指定すると、その市町村のポリゴンだけを強調表示する。 */
+  boundaryUrl?: string;
+  /** 強調する市町村の 5 桁コード (japan-municipalities の cityCode = N03_007)。 */
+  boundaryCode?: string;
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -39,6 +44,8 @@ export default function MiniSightingsMap({
   recencyHighlightDays = 90,
   showCenterMarker = false,
   radiusKm,
+  boundaryUrl,
+  boundaryCode,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -61,6 +68,42 @@ export default function MiniSightingsMap({
       mapRef.current = map;
 
       L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
+
+      // 行政界の強調（市町村ページ）。県別 GeoJSON を取得し、該当コードの
+      // ポリゴンだけを描いて範囲にフィットさせる。失敗しても地図表示は継続。
+      if (boundaryUrl && boundaryCode) {
+        try {
+          const res = await fetch(boundaryUrl);
+          if (!disposed && res.ok) {
+            const gj = (await res.json()) as {
+              features?: { properties?: { code?: string } }[];
+            };
+            const feats = (gj.features ?? []).filter(
+              (f) => f.properties?.code === boundaryCode,
+            );
+            if (!disposed && feats.length > 0) {
+              const layer = L.geoJSON(
+                { type: "FeatureCollection", features: feats } as never,
+                {
+                  style: {
+                    color: "#2563eb",
+                    weight: 2.5,
+                    fillColor: "#3b82f6",
+                    fillOpacity: 0.06,
+                  },
+                  interactive: false,
+                },
+              ).addTo(map);
+              map.fitBounds(layer.getBounds(), {
+                padding: [16, 16],
+                maxZoom: 13,
+              });
+            }
+          }
+        } catch {
+          /* 境界が引けなくても地図はそのまま表示する */
+        }
+      }
 
       // 半径円（観光地の 10km 圏など）。マーカーより先に敷いて下に置く。
       if (typeof radiusKm === "number" && radiusKm > 0) {
@@ -123,7 +166,7 @@ export default function MiniSightingsMap({
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm]);
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm, boundaryUrl, boundaryCode]);
 
   // 全画面切替時: コンテナのサイズが変わるので Leaflet に再計測させる。
   // 全画面中はホイールズームを有効化（じっくり見たいケースなので操作性を上げる）。
