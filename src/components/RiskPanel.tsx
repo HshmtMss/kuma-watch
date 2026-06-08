@@ -32,9 +32,10 @@ import type { GeocodeHit } from "@/app/api/geocode/route";
 import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
 import RiskCharts from "@/components/RiskCharts";
 import RiskHero from "@/components/RiskHero";
+import GeoPushButton from "@/components/GeoPushButton";
 import { buildAdvice, type AdviceItem } from "@/lib/advice";
 import type { AdviceResponse } from "@/app/api/advice/route";
-import { isPushReleased } from "@/lib/push-flag";
+import { isGeoPushReleased, isPushReleased } from "@/lib/push-flag";
 
 export type LocationSource = "gps" | "tap" | "search" | "url";
 export type SelectedLocation = {
@@ -820,6 +821,7 @@ export default function RiskPanel({
             {state.kind === "ready" && (
               <RiskDetails
                 state={state}
+                location={location}
                 llmAdvice={llmAdvice}
                 llmAdviceLoading={llmAdviceLoading}
                 fullView={fullView}
@@ -845,12 +847,14 @@ export default function RiskPanel({
 
 function RiskDetails({
   state,
+  location,
   llmAdvice,
   llmAdviceLoading,
   fullView,
   onExpandFull,
 }: {
   state: Extract<State, { kind: "ready" }>;
+  location: SelectedLocation | null;
   llmAdvice: AdviceItem[] | null;
   llmAdviceLoading: boolean;
   fullView: boolean;
@@ -882,6 +886,19 @@ function RiskDetails({
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
       />
+
+      {/* この地点の周辺 10km を通知で見張る。任意地点 + 半径の購読 (geo)。
+          フラグ (NEXT_PUBLIC_GEO_PUSH_ENABLED) で段階公開。 */}
+      {isGeoPushReleased() && location && (
+        <div className="px-4 pt-2">
+          <GeoPushButton
+            lat={location.lat}
+            lon={location.lon}
+            label={state.placeName ?? location.label}
+            radiusKm={10}
+          />
+        </div>
+      )}
 
       {!fullView && (
         <div className="px-4 pb-3 pt-2">

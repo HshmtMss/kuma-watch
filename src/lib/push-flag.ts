@@ -25,3 +25,13 @@ export function isSpotPushReleased(): boolean {
     isPushReleased() && process.env.NEXT_PUBLIC_SPOT_PUSH_ENABLED === "true"
   );
 }
+
+/**
+ * 任意地点 + 半径 (geo) 通知の公開フラグ。地図で選んだ地点を中心に通知を
+ * 受け取る機能を段階公開する。isPushReleased() が前提。
+ */
+export function isGeoPushReleased(): boolean {
+  return (
+    isPushReleased() && process.env.NEXT_PUBLIC_GEO_PUSH_ENABLED === "true"
+  );
+}

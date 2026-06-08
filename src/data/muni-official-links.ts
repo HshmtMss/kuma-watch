@@ -1907,7 +1907,7 @@ export const MUNI_OFFICIAL_LINKS: MuniOfficialLink[] = [
   { prefName: "北海道", cityName: "赤平市", homeUrl: "https://www.city.akabira.hokkaido.jp/", bearUrl: "https://www.city.akabira.hokkaido.jp/docs/1931.html", verifiedAt: "2026-05-19" },
   { prefName: "北海道", cityName: "紋別市", homeUrl: "https://mombetsu.jp/", bearUrl: "https://mombetsu.jp/news/detail.html?content=393", verifiedAt: "2026-05-19" },
   { prefName: "北海道", cityName: "士別市", homeUrl: "https://www.city.shibetsu.lg.jp/", bearUrl: "https://www.city.shibetsu.lg.jp/soshikikarasagasu/chikusanrimmuka/rimmukakari/1648.html", verifiedAt: "2026-05-19" },
-  { prefName: "北海道", cityName: "名寄市", homeUrl: "https://www.city.nayoro.lg.jp/", bearUrl: "https://www.city.nayoro.lg.jp/section/rinmu/vdh2d10000007ng0.html", verifiedAt: "2026-05-19" },
+  { prefName: "北海道", cityName: "名寄市", homeUrl: "http://www.city.nayoro.lg.jp/", bearUrl: "http://www.city.nayoro.lg.jp/section/rinmu/vdh2d10000007ng0.html", verifiedAt: "2026-06-09", notes: "公式サイトは http 配信 (https 非対応のため http のまま掲載)" },
   { prefName: "北海道", cityName: "三笠市", homeUrl: "https://www.city.mikasa.hokkaido.jp/", bearUrl: "https://www.city.mikasa.hokkaido.jp/hotnews/group/133.html", verifiedAt: "2026-05-19" },
   { prefName: "北海道", cityName: "根室市", homeUrl: "https://www.city.nemuro.hokkaido.jp/", bearUrl: "https://www.city.nemuro.hokkaido.jp/lifeinfo/kakuka/suisankeizaibu/nourin/higumamokugeki/4218.html", verifiedAt: "2026-05-19" },
   { prefName: "北海道", cityName: "千歳市", homeUrl: "https://www.city.chitose.lg.jp/", bearUrl: "https://www.city.chitose.lg.jp/c50/1002703/1002708/index.html", verifiedAt: "2026-05-19" },

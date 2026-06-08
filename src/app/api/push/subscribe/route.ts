@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
-import { isConfigured, subscribe, subscribeSpot } from "@/lib/push-storage";
-import { isPushReleased, isSpotPushReleased } from "@/lib/push-flag";
+import {
+  isConfigured,
+  subscribe,
+  subscribeGeo,
+  subscribeSpot,
+} from "@/lib/push-storage";
+import {
+  isGeoPushReleased,
+  isPushReleased,
+  isSpotPushReleased,
+} from "@/lib/push-flag";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,10 +19,11 @@ type SubscribeBody = {
     endpoint: string;
     keys: { p256dh: string; auth: string };
   };
-  // 市町村購読は pref + city、観光地購読は slug を送る (排他)。
+  // 市町村購読は pref + city、観光地購読は slug、地点購読は geo を送る (排他)。
   pref?: string;
   city?: string;
   slug?: string;
+  geo?: { lat: number; lon: number; radiusKm: number; label?: string };
 };
 
 export async function POST(req: Request) {
@@ -36,7 +46,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
-  const { subscription, pref, city, slug } = body;
+  const { subscription, pref, city, slug, geo } = body;
   if (
     !subscription?.endpoint ||
     !subscription.keys?.p256dh ||
@@ -47,6 +57,37 @@ export async function POST(req: Request) {
   // 適当な long URL でも受け付けないと意味がないが、極端な長さは弾く
   if (subscription.endpoint.length > 2048) {
     return NextResponse.json({ error: "endpoint too long" }, { status: 400 });
+  }
+
+  // 地点購読 (geo 指定)。任意地点 + 半径。別フラグで段階公開する。
+  if (geo) {
+    if (!isGeoPushReleased()) {
+      return NextResponse.json(
+        { error: "geo notifications not available" },
+        { status: 403 },
+      );
+    }
+    if (
+      typeof geo.lat !== "number" ||
+      typeof geo.lon !== "number" ||
+      typeof geo.radiusKm !== "number" ||
+      geo.radiusKm <= 0 ||
+      geo.radiusKm > 100 ||
+      Math.abs(geo.lat) > 90 ||
+      Math.abs(geo.lon) > 180
+    ) {
+      return NextResponse.json({ error: "invalid geo" }, { status: 400 });
+    }
+    const { id } = await subscribeGeo({
+      endpoint: subscription.endpoint,
+      p256dh: subscription.keys.p256dh,
+      auth: subscription.keys.auth,
+      lat: geo.lat,
+      lon: geo.lon,
+      radiusKm: geo.radiusKm,
+      label: geo.label ? geo.label.slice(0, 60) : undefined,
+    });
+    return NextResponse.json({ ok: true, id });
   }
 
   // 観光地購読 (slug 指定)。市町村通知とは別フラグで段階公開する。

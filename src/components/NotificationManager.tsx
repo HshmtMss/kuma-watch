@@ -13,6 +13,13 @@ import { useCallback, useEffect, useState } from "react";
  */
 
 type MuniItem = { pref: string; city: string };
+type GeoItem = {
+  id: string;
+  lat: number;
+  lon: number;
+  radiusKm: number;
+  label?: string;
+};
 
 type Phase = "loading" | "unsupported" | "no-subscription" | "ready";
 
@@ -21,6 +28,7 @@ export default function NotificationManager() {
   const [endpoint, setEndpoint] = useState<string>("");
   const [munis, setMunis] = useState<MuniItem[]>([]);
   const [spots, setSpots] = useState<string[]>([]);
+  const [geos, setGeos] = useState<GeoItem[]>([]);
   const [message, setMessage] = useState<string>("");
   const [busy, setBusy] = useState<string>(""); // 操作中の項目キー
 
@@ -47,9 +55,11 @@ export default function NotificationManager() {
       const data = (await res.json()) as {
         munis?: MuniItem[];
         spots?: string[];
+        geos?: GeoItem[];
       };
       setMunis(data.munis ?? []);
       setSpots(data.spots ?? []);
+      setGeos(data.geos ?? []);
       setPhase("ready");
     } catch {
       // SW は登録されるまで ready が解決しない場合があるので register も試す
@@ -118,6 +128,31 @@ export default function NotificationManager() {
     [endpoint],
   );
 
+  const removeGeo = useCallback(
+    async (g: GeoItem) => {
+      const key = `geo:${g.id}`;
+      setBusy(key);
+      setMessage("");
+      try {
+        const res = await fetch("/api/push/unsubscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint, geoId: g.id }),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        setGeos((prev) => prev.filter((x) => x.id !== g.id));
+        setMessage(`${g.label || "登録地点"}周辺の通知を解除しました`);
+      } catch (e) {
+        setMessage(
+          `解除に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      } finally {
+        setBusy("");
+      }
+    },
+    [endpoint],
+  );
+
   const removeAll = useCallback(async () => {
     setBusy("all");
     setMessage("");
@@ -137,6 +172,13 @@ export default function NotificationManager() {
             body: JSON.stringify({ endpoint, slug }),
           }),
         ),
+        ...geos.map((g) =>
+          fetch("/api/push/unsubscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ endpoint, geoId: g.id }),
+          }),
+        ),
       ]);
       // ブラウザの購読自体も破棄して、この端末への通知を完全に止める
       try {
@@ -148,6 +190,7 @@ export default function NotificationManager() {
       }
       setMunis([]);
       setSpots([]);
+      setGeos([]);
       setMessage("すべての通知を解除しました");
     } catch (e) {
       setMessage(
@@ -156,7 +199,7 @@ export default function NotificationManager() {
     } finally {
       setBusy("");
     }
-  }, [endpoint, munis, spots]);
+  }, [endpoint, munis, spots, geos]);
 
   if (phase === "loading") {
     return <p className="text-sm text-stone-500">読み込み中…</p>;
@@ -185,7 +228,7 @@ export default function NotificationManager() {
     );
   }
 
-  const total = munis.length + spots.length;
+  const total = munis.length + spots.length + geos.length;
 
   return (
     <div className="not-prose">
@@ -256,6 +299,45 @@ export default function NotificationManager() {
                         type="button"
                         disabled={busy !== ""}
                         onClick={() => removeSpot(slug)}
+                        className="shrink-0 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+                      >
+                        {busy === key ? "解除中…" : "解除"}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
+          {geos.length > 0 && (
+            <section className="mb-6">
+              <h2 className="mb-2 text-sm font-bold text-stone-900">
+                指定した地点（{geos.length}）
+              </h2>
+              <ul className="divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
+                {geos.map((g) => {
+                  const key = `geo:${g.id}`;
+                  return (
+                    <li
+                      key={key}
+                      className="flex items-center justify-between gap-3 px-4 py-3"
+                    >
+                      <span className="min-w-0 text-sm text-stone-800">
+                        <span className="font-semibold">
+                          {g.label || "登録地点"}
+                        </span>
+                        <span className="ml-1 text-xs font-normal text-stone-500">
+                          半径{g.radiusKm}km
+                        </span>
+                        <span className="ml-1 text-[11px] text-stone-400">
+                          ({g.lat.toFixed(3)}, {g.lon.toFixed(3)})
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        disabled={busy !== ""}
+                        onClick={() => removeGeo(g)}
                         className="shrink-0 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50"
                       >
                         {busy === key ? "解除中…" : "解除"}

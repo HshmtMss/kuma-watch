@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSubscriptionsForEndpoint, isConfigured } from "@/lib/push-storage";
+import {
+  getGeoSubscriptions,
+  getSubscriptionsForEndpoint,
+  isConfigured,
+} from "@/lib/push-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +17,12 @@ type Body = { endpoint?: string };
 
 export async function POST(req: Request) {
   if (!isConfigured()) {
-    return NextResponse.json({ configured: false, munis: [], spots: [] });
+    return NextResponse.json({
+      configured: false,
+      munis: [],
+      spots: [],
+      geos: [],
+    });
   }
   let body: Body;
   try {
@@ -24,6 +33,9 @@ export async function POST(req: Request) {
   if (!body.endpoint) {
     return NextResponse.json({ error: "missing endpoint" }, { status: 400 });
   }
-  const { munis, spots } = await getSubscriptionsForEndpoint(body.endpoint);
-  return NextResponse.json({ configured: true, munis, spots });
+  const [{ munis, spots }, geos] = await Promise.all([
+    getSubscriptionsForEndpoint(body.endpoint),
+    getGeoSubscriptions(body.endpoint),
+  ]);
+  return NextResponse.json({ configured: true, munis, spots, geos });
 }

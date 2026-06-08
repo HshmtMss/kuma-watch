@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   isConfigured,
+  unsubscribeGeo,
   unsubscribeMuni,
   unsubscribeSpot,
 } from "@/lib/push-storage";
@@ -10,10 +11,11 @@ export const dynamic = "force-dynamic";
 
 type Body = {
   endpoint: string;
-  // 市町村は pref + city、観光地は slug (排他)
+  // 市町村は pref + city、観光地は slug、地点は geoId (排他)
   pref?: string;
   city?: string;
   slug?: string;
+  geoId?: string;
 };
 
 // 解除はリリースフラグで塞がない。フラグを後で OFF に戻しても、
@@ -33,6 +35,10 @@ export async function POST(req: Request) {
   }
   if (!body.endpoint) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
+  }
+  if (body.geoId) {
+    await unsubscribeGeo({ endpoint: body.endpoint, id: body.geoId });
+    return NextResponse.json({ ok: true });
   }
   if (body.slug) {
     await unsubscribeSpot({ endpoint: body.endpoint, slug: body.slug });

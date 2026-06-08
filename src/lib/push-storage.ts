@@ -18,7 +18,7 @@
  * isConfigured() が false を返し、API ルートは 503 で即終了する。
  */
 import { Redis } from "@upstash/redis";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 type StoredSubscription = {
   endpoint: string;
@@ -26,6 +26,16 @@ type StoredSubscription = {
   auth: string;
   createdAt: number;
   lastSeen: number;
+};
+
+/** 任意地点 + 半径の通知購読 (地図で選んだ「自宅周辺」など) の 1 点。 */
+export type GeoPoint = {
+  id: string;
+  lat: number;
+  lon: number;
+  radiusKm: number;
+  label?: string;
+  createdAt: number;
 };
 
 let cached: Redis | null = null;
@@ -54,6 +64,34 @@ export function hashEndpoint(endpoint: string): string {
 
 function muniKey(pref: string, city: string): string {
   return `${pref}/${city}`;
+}
+
+function parseGeoPoints(raw: string | GeoPoint[] | null): GeoPoint[] {
+  if (!raw) return [];
+  try {
+    const arr = typeof raw === "string" ? (JSON.parse(raw) as GeoPoint[]) : raw;
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * この endpoint がまだ何らかの購読 (muni / spot / geo) を持っているか。
+ * いずれの解除経路でも、全部空になったときだけ sub 本体を削除するために使う。
+ */
+async function endpointStillReferenced(hash: string): Promise<boolean> {
+  const r = client();
+  const [munis, spots, geoRaw] = await Promise.all([
+    r.scard(`sub:munis:${hash}`),
+    r.scard(`sub:spots:${hash}`),
+    r.get<string | GeoPoint[]>(`geo:pts:${hash}`),
+  ]);
+  return (
+    (munis ?? 0) > 0 ||
+    (spots ?? 0) > 0 ||
+    parseGeoPoints(geoRaw ?? null).length > 0
+  );
 }
 
 export async function subscribe(input: {
@@ -100,13 +138,8 @@ export async function unsubscribeMuni(input: {
   if (remaining === 0) {
     await r.srem(`muni:active`, mk);
   }
-  // この endpoint が他の muni / spot も購読してなければ完全削除。
-  // spot も見ないと、市町村を解除しただけで観光地通知まで失効してしまう。
-  const [otherMunis, otherSpots] = await Promise.all([
-    r.scard(`sub:munis:${hash}`),
-    r.scard(`sub:spots:${hash}`),
-  ]);
-  if (otherMunis === 0 && otherSpots === 0) {
+  // この endpoint が他の muni / spot / geo も持っていなければ完全削除。
+  if (!(await endpointStillReferenced(hash))) {
     await r.del(`sub:${hash}`);
   }
 }
@@ -297,12 +330,8 @@ export async function unsubscribeSpot(input: {
   if (remaining === 0) {
     await r.srem(`spot:active`, input.slug);
   }
-  // muni / spot どちらも残っていなければ sub 本体を削除
-  const [otherMunis, otherSpots] = await Promise.all([
-    r.scard(`sub:munis:${hash}`),
-    r.scard(`sub:spots:${hash}`),
-  ]);
-  if (otherMunis === 0 && otherSpots === 0) {
+  // muni / spot / geo いずれも残っていなければ sub 本体を削除
+  if (!(await endpointStillReferenced(hash))) {
     await r.del(`sub:${hash}`);
   }
 }
@@ -382,9 +411,131 @@ export async function getSubscriptionsForEndpoint(endpoint: string): Promise<{
   return { munis, spots: spotMembers ?? [] };
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// 任意地点 + 半径 (geo) 購読。地図で選んだ地点を中心に半径 R km 以内の新規出没を
+// 通知する。観光地 (固定地点) の一般化。1 endpoint が複数地点を持てる。
+//   geo:pts:{hash}   → JSON GeoPoint[] (その endpoint の登録地点リスト)
+//   geo:active       → Set<hash> (geo 購読がある endpoint。dispatch の入口)
+// dispatch では geo:active を起点に各 endpoint の地点を引き、新規出没との距離を見る。
+// ─────────────────────────────────────────────────────────────────────────
+
+async function getGeoPointsRaw(hash: string): Promise<GeoPoint[]> {
+  const r = client();
+  return parseGeoPoints(await r.get<string | GeoPoint[]>(`geo:pts:${hash}`));
+}
+
+export async function subscribeGeo(input: {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  lat: number;
+  lon: number;
+  radiusKm: number;
+  label?: string;
+}): Promise<{ hash: string; id: string }> {
+  const r = client();
+  const hash = hashEndpoint(input.endpoint);
+  const now = Date.now();
+  const sub: StoredSubscription = {
+    endpoint: input.endpoint,
+    p256dh: input.p256dh,
+    auth: input.auth,
+    createdAt: now,
+    lastSeen: now,
+  };
+  const id = randomUUID();
+  const point: GeoPoint = {
+    id,
+    lat: input.lat,
+    lon: input.lon,
+    radiusKm: input.radiusKm,
+    label: input.label,
+    createdAt: now,
+  };
+  const points = await getGeoPointsRaw(hash);
+  points.push(point);
+  await Promise.all([
+    r.set(`sub:${hash}`, JSON.stringify(sub)),
+    r.set(`geo:pts:${hash}`, JSON.stringify(points)),
+    r.sadd(`geo:active`, hash),
+  ]);
+  return { hash, id };
+}
+
+export async function unsubscribeGeo(input: {
+  endpoint: string;
+  id: string;
+}): Promise<void> {
+  const r = client();
+  const hash = hashEndpoint(input.endpoint);
+  const points = (await getGeoPointsRaw(hash)).filter((p) => p.id !== input.id);
+  if (points.length > 0) {
+    await r.set(`geo:pts:${hash}`, JSON.stringify(points));
+  } else {
+    await Promise.all([r.del(`geo:pts:${hash}`), r.srem(`geo:active`, hash)]);
+  }
+  if (!(await endpointStillReferenced(hash))) {
+    await r.del(`sub:${hash}`);
+  }
+}
+
+/** 中央の通知設定ページ用: この endpoint の登録地点一覧。 */
+export async function getGeoSubscriptions(
+  endpoint: string,
+): Promise<GeoPoint[]> {
+  return getGeoPointsRaw(hashEndpoint(endpoint));
+}
+
+/** dispatch 用: geo 購読を持つ全 endpoint と、その購読情報 + 地点リスト。 */
+export async function getAllGeoSubscribers(): Promise<
+  {
+    hash: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+    points: GeoPoint[];
+  }[]
+> {
+  const r = client();
+  const hashes = await r.smembers<string[]>(`geo:active`);
+  if (!hashes || hashes.length === 0) return [];
+  const pipeline = r.pipeline();
+  for (const h of hashes) {
+    pipeline.get(`sub:${h}`);
+    pipeline.get(`geo:pts:${h}`);
+  }
+  const res = (await pipeline.exec()) as (string | StoredSubscription | GeoPoint[] | null)[];
+  const out: {
+    hash: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+    points: GeoPoint[];
+  }[] = [];
+  for (let i = 0; i < hashes.length; i++) {
+    const subRaw = res[i * 2];
+    const ptsRaw = res[i * 2 + 1];
+    if (!subRaw) continue;
+    const sub: StoredSubscription =
+      typeof subRaw === "string"
+        ? (JSON.parse(subRaw) as StoredSubscription)
+        : (subRaw as StoredSubscription);
+    const points = parseGeoPoints(ptsRaw as string | GeoPoint[] | null);
+    if (points.length === 0) continue;
+    out.push({
+      hash: hashes[i],
+      endpoint: sub.endpoint,
+      p256dh: sub.p256dh,
+      auth: sub.auth,
+      points,
+    });
+  }
+  return out;
+}
+
 /**
  * 410/404 などで失効した subscription を完全削除する。dispatch 時に
- * web-push が gone を返したらこれを呼ぶ。muni / spot 両方の逆引きを掃除する。
+ * web-push が gone を返したらこれを呼ぶ。muni / spot / geo の逆引きを掃除する。
  */
 export async function purgeSubscription(hash: string): Promise<void> {
   const r = client();
@@ -399,9 +550,11 @@ export async function purgeSubscription(hash: string): Promise<void> {
   for (const slug of slugs ?? []) {
     pipeline.srem(`spot:${slug}`, hash);
   }
+  pipeline.srem(`geo:active`, hash);
   pipeline.del(`sub:${hash}`);
   pipeline.del(`sub:munis:${hash}`);
   pipeline.del(`sub:spots:${hash}`);
+  pipeline.del(`geo:pts:${hash}`);
   await pipeline.exec();
   // muni:active のクリーンアップは getActiveMunis() 側で空 set を検知して
   // 都度呼ぶには重いので、subscribe/unsubscribeMuni の経路でのみメンテする。

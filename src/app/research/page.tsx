@@ -347,15 +347,27 @@ export default async function ResearchIndexPage({
       {/* 国の最新発表 — 研究レポートのコンテキストとして政策動向を併置 */}
       <LatestGovAnnouncements title="国の最新クマ対策発表" limit={4} />
 
-      <h2>編集方針</h2>
-      <p>
-        研究記事は、公開ニュースおよび自治体発表をもとにした情報集約・要約に、
-        大規模言語モデル（AI）を活用しています。最終的な内容は獣医工学ラボの獣医師が
-        確認・編集の上で公開しており、編集責任は獣医工学ラボに帰属します。
-      </p>
-      <p>
-        事実関係の誤りや、より正確な一次出典をご存じの場合は、お手数ですがフッターの連絡先までご連絡ください。
-      </p>
+      {/* 編集方針 — 普段は畳んでおき、クリックで開く。見出しは article-body の
+          h2 スタイル (# + アンバー下線) をそのまま使い、開閉インジケータを添える。 */}
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-end gap-2 [&::-webkit-details-marker]:hidden">
+          <h2 className="grow">編集方針</h2>
+          <span
+            aria-hidden
+            className="mb-3 shrink-0 text-sm text-stone-400 transition-transform group-open:rotate-180"
+          >
+            ▾
+          </span>
+        </summary>
+        <p>
+          研究記事は、公開ニュースおよび自治体発表をもとにした情報集約・要約に、
+          大規模言語モデル（AI）を活用しています。最終的な内容は獣医工学ラボの獣医師が
+          確認・編集の上で公開しており、編集責任は獣医工学ラボに帰属します。
+        </p>
+        <p>
+          事実関係の誤りや、より正確な一次出典をご存じの場合は、お手数ですがフッターの連絡先までご連絡ください。
+        </p>
+      </details>
     </PageShell>
   );
 }
