@@ -17,7 +17,7 @@ import {
   type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
-import { getSeasonalAdvice } from "@/lib/place-content";
+import { getSeasonalAdvice, getBearRegion } from "@/lib/place-content";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
@@ -434,6 +434,50 @@ export default async function MuniPage({ params }: Props) {
         ? `過去 1 年で ${cell.count365d} 件の出没（最新 ${formatDate(cell.latestDate)}）。${pref} ${muni} の熊（クマ）出没状況をまとめています。`
         : `${pref} ${muni} の熊（クマ）出没情報をまとめています。`;
 
+  // よくある質問 — データ駆動の Q&A。可視セクションと FAQPage 構造化データの
+  // 両方に使う (Google は可視テキストと一致する FAQ を要求)。
+  // 「○○市 クマ 出没する?」「○○市 クマ 最新」等の質問形クエリの受け皿になり、
+  // クマ/熊/ツキノワグマ/ヒグマ/目撃/最新/リアルタイム の表記ゆれも自然に吸収する。
+  const bearRegion = getBearRegion(pref);
+  const speciesAnswer =
+    bearRegion === "hokkaido"
+      ? "北海道に生息するクマはヒグマです。本州のツキノワグマより大型で行動圏も広く、春の冬眠明けから秋にかけて広範囲で活動します。"
+      : bearRegion === "shikoku"
+        ? `${pref}を含む四国のツキノワグマは絶滅危惧 IA 類で、剣山系にごく少数が生息するのみとされています。出没はまれですが、目撃情報には注意してください。`
+        : bearRegion === "kyushu-okinawa"
+          ? `九州のツキノワグマは絶滅したとされ、沖縄にはクマは生息していません。${pref}での「クマ」情報は他の動物の誤認の可能性もあるため、自治体の発表をご確認ください。`
+          : `${pref}に生息するクマは主にツキノワグマです。春の冬眠明けから秋の食い溜め期にかけて、山菜採り・登山道・里山周辺で目撃や出没が報告されます。`;
+  const faqItems: { q: string; a: string }[] = [
+    {
+      q: `${muni}にクマ（熊）は出没しますか？`,
+      a:
+        cell.count365d > 0
+          ? `はい。${pref}${muni}では直近 1 年でクマの出没・目撃情報が ${cell.count365d.toLocaleString()} 件記録されています${cell.latestDate ? `（最新は ${formatDate(cell.latestDate)}）` : ""}。登山・山菜採り・通勤通学などの前には最新情報を確認してください。`
+          : `直近 1 年の出没記録はありませんが、${pref}内ではクマの出没が続いています。季節や年によって状況が変わるため、お出かけ前に最新情報をご確認ください。`,
+    },
+    {
+      q: `${muni}の最新のクマ出没・目撃情報はどこで見られますか？`,
+      a: `本ページ上部の「最新の出没」と地図で、${muni}周辺の最新のクマ出没・目撃情報をリアルタイムに近い形で確認できます。報道・自治体発表などをもとに随時更新しています。`,
+    },
+    {
+      q: `${muni}でクマに遭遇したらどうすればいいですか？`,
+      a: `落ち着いて距離を取り、背を向けて走らず、クマを見ながらゆっくり後退してください。子グマには絶対に近づかないこと。鈴やラジオで存在を知らせる予防も有効です。`,
+    },
+    {
+      q: `${pref}にはどんな種類のクマがいますか？`,
+      a: speciesAnswer,
+    },
+  ];
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <PageShell
       title={`${muni}の熊出没情報マップ`}
@@ -450,6 +494,10 @@ export default async function MuniPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       {/* 視認できるパンくずリスト。SEO 上の breadcrumb は既に JSON-LD にあるが、
@@ -962,6 +1010,23 @@ export default async function MuniPage({ params }: Props) {
 
       {/* 国の最新発表 — 市町村ページから政府方針への導線 (全市町村共通の国の動き) */}
       <LatestGovAnnouncements limit={2} />
+
+      {/* よくある質問 — 質問形クエリの受け皿 + 表記ゆれ吸収。可視テキストは
+          上で組んだ faqItems と完全一致させ、FAQPage 構造化データと整合させる。 */}
+      <h2>{muni}のクマ出没に関するよくある質問</h2>
+      <div className="not-prose space-y-2">
+        {faqItems.map((f, i) => (
+          <details
+            key={i}
+            className="rounded-lg border border-stone-200 bg-white px-4 py-3"
+          >
+            <summary className="cursor-pointer text-sm font-semibold text-stone-900">
+              {f.q}
+            </summary>
+            <p className="mt-2 text-sm leading-relaxed text-stone-600">{f.a}</p>
+          </details>
+        ))}
+      </div>
 
       <h2>あわせて読みたい</h2>
       {/* 4 枠のうち 1 枠は現在の季節に合わせて選定する。「春なのに秋の記事

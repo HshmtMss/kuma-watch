@@ -19,6 +19,7 @@ import { useState } from "react";
 type NavLink = { href: string; label: string; desc?: string };
 
 const EXPLORE_LINKS: NavLink[] = [
+  { href: "/news", label: "出没ニュース・速報", desc: "全国の最新クマ出没情報" },
   { href: "/place", label: "都道府県から探す", desc: "47 都道府県の警戒度マップ" },
   { href: "/spot", label: "観光地・登山口", desc: "高尾山・富士山・知床ほか" },
 ];

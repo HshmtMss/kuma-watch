@@ -351,6 +351,31 @@ export async function getRecentRecordsInPref(
   return all.slice(0, limit);
 }
 
+/**
+ * 全国の直近 1 年の出没レコードを新着順に返す。/news (全国速報) 用。
+ * key = `${pref}/${city}` を分解して都道府県・市町村名を付与する。
+ */
+export async function getRecentRecordsNationwide(
+  limit = 40,
+): Promise<(PlaceRecord & { prefName: string; cityName: string })[]> {
+  const idx = await getIndex();
+  const today = jstToday();
+  const cutoff365 = jstDaysAgo(365);
+  const all: (PlaceRecord & { prefName: string; cityName: string })[] = [];
+  for (const [key, arr] of idx.recordsByKey.entries()) {
+    const slash = key.indexOf("/");
+    if (slash < 0) continue;
+    const prefName = key.slice(0, slash);
+    const cityName = key.slice(slash + 1);
+    for (const r of arr) {
+      if (!r.date || r.date < cutoff365 || r.date > today) continue;
+      all.push({ ...r, prefName, cityName });
+    }
+  }
+  all.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  return all.slice(0, limit);
+}
+
 /** 静的生成対象のキー一覧 (count >= minCount のもの) */
 export async function getStaticPlaceKeys(
   minCount = 3,
