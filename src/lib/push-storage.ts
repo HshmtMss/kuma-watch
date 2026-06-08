@@ -176,6 +176,72 @@ export async function getSubscribersForMuni(
   return out;
 }
 
+export type PushStats = {
+  /** ユニーク購読者数 (= sub:{hash} の件数。1 端末 = 1。複数地域登録でも 1) */
+  totalSubscribers: number;
+  /** 購読者が 1 人以上いる市町村の数 */
+  activeMuniCount: number;
+  /** (購読者 × 地域) のペア総数 (= 各 muni の購読者数の合計)。複数地域ユーザは重複計上 */
+  totalSubscriptions: number;
+  /** 1 購読者あたりの平均登録地域数 (= totalSubscriptions / totalSubscribers) */
+  avgMunisPerSubscriber: number;
+  /** 購読者数の多い市町村ランキング (上位 topN) */
+  topMunis: { pref: string; city: string; count: number }[];
+};
+
+/**
+ * 通知登録状況の集計。管理用 (/api/admin/push-stats) から呼ぶ。
+ *   - 総登録者数: sub:{hash} を SCAN して数える (sub:munis:{hash} は除外)
+ *   - 地域別: muni:active を起点に各 muni:{mk} の SCARD をパイプラインで取得
+ * purgeSubscription は muni:active を掃除しないため、SCARD 0 の muni は除外する。
+ */
+export async function getPushStats(topN = 30): Promise<PushStats> {
+  const r = client();
+
+  // 1) ユニーク購読者数: sub:* を SCAN。ただし sub:munis:* も glob に一致するので除外。
+  let cursor = "0";
+  let totalSubscribers = 0;
+  do {
+    const [next, keys] = await r.scan(cursor, { match: "sub:*", count: 1000 });
+    cursor = typeof next === "string" ? next : String(next);
+    for (const k of keys) {
+      if (!k.startsWith("sub:munis:")) totalSubscribers++;
+    }
+  } while (cursor !== "0");
+
+  // 2) 地域別購読者数: muni:active の各 muni を SCARD。
+  const muniKeys = await r.smembers<string[]>(`muni:active`);
+  let totalSubscriptions = 0;
+  let activeMuniCount = 0;
+  const perMuni: { pref: string; city: string; count: number }[] = [];
+  if (muniKeys.length > 0) {
+    const pipeline = r.pipeline();
+    for (const mk of muniKeys) pipeline.scard(`muni:${mk}`);
+    const counts = (await pipeline.exec()) as number[];
+    for (let i = 0; i < muniKeys.length; i++) {
+      const count = counts[i] ?? 0;
+      if (count <= 0) continue; // 失効後に残った空 muni:active を除外
+      activeMuniCount++;
+      totalSubscriptions += count;
+      const mk = muniKeys[i];
+      const idx = mk.indexOf("/");
+      const pref = idx < 0 ? mk : mk.slice(0, idx);
+      const city = idx < 0 ? "" : mk.slice(idx + 1);
+      perMuni.push({ pref, city, count });
+    }
+  }
+  perMuni.sort((a, b) => b.count - a.count);
+
+  return {
+    totalSubscribers,
+    activeMuniCount,
+    totalSubscriptions,
+    avgMunisPerSubscriber:
+      totalSubscribers > 0 ? totalSubscriptions / totalSubscribers : 0,
+    topMunis: perMuni.slice(0, topN),
+  };
+}
+
 /**
  * 410/404 などで失効した subscription を完全削除する。dispatch 時に
  * web-push が gone を返したらこれを呼ぶ。
