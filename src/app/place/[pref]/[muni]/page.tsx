@@ -109,6 +109,20 @@ function formatDate(d: string | null): string {
   });
 }
 
+// 「最新の出没」を相対表現で添える。1 か月以上前は null（鮮度の演出をしない）。
+// "○○市 クマ"（何があった？）というニュース意図の検索に冒頭で応えるため。
+function daysAgoLabel(dateStr: string): string | null {
+  const t = Date.parse(dateStr);
+  if (!Number.isFinite(t)) return null;
+  const today = Date.parse(jstToday());
+  const diff = Math.round((today - t) / 86_400_000);
+  if (diff <= 0) return "今日";
+  if (diff === 1) return "昨日";
+  if (diff < 7) return `${diff}日前`;
+  if (diff < 31) return `${Math.floor(diff / 7)}週間前`;
+  return null;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { pref: rawPref, muni: rawMuni } = await params;
   const pref = decode(rawPref);
@@ -378,6 +392,9 @@ export default async function MuniPage({ params }: Props) {
   const within1Year = (r: PlaceRecord) =>
     Boolean(r.date) && r.date >= cutoff365 && r.date <= today;
   const recentIncidents = mapRecords.filter(within1Year).slice(0, 15);
+  // 最新事案の相対日数 (冒頭ハイライト用)。
+  const latestRel =
+    recentIncidents.length > 0 ? daysAgoLabel(recentIncidents[0].date) : null;
 
   // 地図プロット用 — 表示対象は「過去 1 年以内のデータ」のみ。
   // そのうち MiniSightingsMap 側で直近 90 日を赤、それ以外（91 日〜1 年）を
@@ -490,6 +507,47 @@ export default async function MuniPage({ params }: Props) {
             複雑だったので削除。マップへの動線は (1) 埋め込みマップ下のリンク
             と (2) Sticky CTA の 2 箇所に集約。 */}
       </div>
+
+      {/* 最新の出没事案ハイライト — 「○○市 クマ」で来たニュース意図の検索に
+          冒頭で即応する。最新事案の日付・地区・内容を 1 件だけ目立たせ、
+          詳細リストへアンカーで誘導。古い事案 (1か月超) でも日付は出すが
+          相対表現 (latestRel) は鮮度がある時だけ添える。 */}
+      {recentIncidents.length > 0 && (
+        <div className="not-prose mb-6 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-amber-600 px-2 py-0.5 text-[11px] font-bold text-white">
+              最新の出没
+            </span>
+            <span className="text-sm font-semibold text-stone-900">
+              {formatDate(recentIncidents[0].date)}
+            </span>
+            {latestRel && (
+              <span className="text-xs font-medium text-amber-700">
+                {latestRel}
+              </span>
+            )}
+            <span className="text-xs text-stone-500">
+              {muni}
+              {recentIncidents[0].sectionName
+                ? `・${recentIncidents[0].sectionName}`
+                : ""}
+            </span>
+          </div>
+          {recentIncidents[0].comment && (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-stone-700">
+              {recentIncidents[0].comment}
+            </p>
+          )}
+          {recentIncidents.length > 1 && (
+            <a
+              href="#recent-incidents"
+              className="mt-2 inline-block text-xs font-medium text-amber-800 hover:underline"
+            >
+              直近の出没事案をすべて見る →
+            </a>
+          )}
+        </div>
+      )}
 
       {/* 通知購読 — 「今危険か」の答えを見たユーザに、継続フォローの選択肢を
           示す。Push 非対応・拒否時はコンポーネント側で何も描画しない。
@@ -705,7 +763,7 @@ export default async function MuniPage({ params }: Props) {
           コメントが空なら sectionName を表示、それも無ければ省略。 */}
       {recentIncidents.length > 0 && (
         <>
-          <h2>最近の出没事案</h2>
+          <h2 id="recent-incidents">最近の出没事案</h2>
           <ul className="not-prose space-y-2">
             {recentIncidents.map((r, i) => (
               <li
