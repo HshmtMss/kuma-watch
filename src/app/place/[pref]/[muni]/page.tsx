@@ -494,7 +494,9 @@ export default async function MuniPage({ params }: Props) {
       {/* 通知購読 — 「今危険か」の答えを見たユーザに、継続フォローの選択肢を
           示す。Push 非対応・拒否時はコンポーネント側で何も描画しない。
           リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
-      {isPushReleased() && <PushSubscribeButton pref={pref} city={muni} />}
+      {isPushReleased() && (
+        <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
+      )}
 
       {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
           「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。

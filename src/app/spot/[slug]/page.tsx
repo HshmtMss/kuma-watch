@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
+import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { placeHrefForSighting } from "@/lib/muni-name";
@@ -358,6 +360,15 @@ export default async function SpotPage({ params }: Props) {
             ボタンが 3 箇所あると同じ URL なのに違う案内に見える、という muni
             ページと同様の指摘に対応。 */}
       </div>
+
+      {/* 通知購読 — この観光地の周辺 10km で新規出没があれば通知する。
+          市町村通知 (NEXT_PUBLIC_PUSH_ENABLED) とは別フラグ
+          (NEXT_PUBLIC_SPOT_PUSH_ENABLED) で段階公開する。 */}
+      {isSpotPushReleased() && (
+        <PushSubscribeButton
+          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+        />
+      )}
 
       {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
       <h2>このスポットについて</h2>

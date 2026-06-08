@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server";
-import { isConfigured, unsubscribeMuni } from "@/lib/push-storage";
+import {
+  isConfigured,
+  unsubscribeMuni,
+  unsubscribeSpot,
+} from "@/lib/push-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Body = {
   endpoint: string;
-  pref: string;
-  city: string;
+  // 市町村は pref + city、観光地は slug (排他)
+  pref?: string;
+  city?: string;
+  slug?: string;
 };
 
+// 解除はリリースフラグで塞がない。フラグを後で OFF に戻しても、
+// 既存購読者がいつでも自分で解除できるようにしておく。
 export async function POST(req: Request) {
   if (!isConfigured()) {
     return NextResponse.json(
@@ -23,9 +31,20 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
-  if (!body.endpoint || !body.pref || !body.city) {
+  if (!body.endpoint) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
-  await unsubscribeMuni(body);
+  if (body.slug) {
+    await unsubscribeSpot({ endpoint: body.endpoint, slug: body.slug });
+    return NextResponse.json({ ok: true });
+  }
+  if (!body.pref || !body.city) {
+    return NextResponse.json({ error: "missing fields" }, { status: 400 });
+  }
+  await unsubscribeMuni({
+    endpoint: body.endpoint,
+    pref: body.pref,
+    city: body.city,
+  });
   return NextResponse.json({ ok: true });
 }

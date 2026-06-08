@@ -100,9 +100,13 @@ export async function unsubscribeMuni(input: {
   if (remaining === 0) {
     await r.srem(`muni:active`, mk);
   }
-  // この endpoint が他の muni も購読してなければ完全削除
-  const otherMunis = await r.scard(`sub:munis:${hash}`);
-  if (otherMunis === 0) {
+  // この endpoint が他の muni / spot も購読してなければ完全削除。
+  // spot も見ないと、市町村を解除しただけで観光地通知まで失効してしまう。
+  const [otherMunis, otherSpots] = await Promise.all([
+    r.scard(`sub:munis:${hash}`),
+    r.scard(`sub:spots:${hash}`),
+  ]);
+  if (otherMunis === 0 && otherSpots === 0) {
     await r.del(`sub:${hash}`);
   }
 }
@@ -198,14 +202,17 @@ export type PushStats = {
 export async function getPushStats(topN = 30): Promise<PushStats> {
   const r = client();
 
-  // 1) ユニーク購読者数: sub:* を SCAN。ただし sub:munis:* も glob に一致するので除外。
+  // 1) ユニーク購読者数: sub:* を SCAN。逆引きキー sub:munis:* / sub:spots:* も
+  //    glob に一致するので除外し、sub:{hash} 本体だけを数える。
   let cursor = "0";
   let totalSubscribers = 0;
   do {
     const [next, keys] = await r.scan(cursor, { match: "sub:*", count: 1000 });
     cursor = typeof next === "string" ? next : String(next);
     for (const k of keys) {
-      if (!k.startsWith("sub:munis:")) totalSubscribers++;
+      if (!k.startsWith("sub:munis:") && !k.startsWith("sub:spots:")) {
+        totalSubscribers++;
+      }
     }
   } while (cursor !== "0");
 
@@ -242,19 +249,159 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// 観光地 (spot) 購読。市町村 (muni) と完全に対になる構造。違いは「出没との
+// 紐付けを名前一致ではなく緯度経度の近傍 (dispatch 側で計算) で行う」点だけで、
+// 保存・解除・購読確認のキー設計は muni をそのままミラーしている。
+//   spot:{slug}        → Set<endpointHash>
+//   spot:active        → Set<slug> (購読者が居る spot 一覧、dispatch 高速化用)
+//   sub:spots:{hash}   → Set<slug> (endpoint の購読 spot 逆引き)
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function subscribeSpot(input: {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  slug: string;
+}): Promise<{ hash: string }> {
+  const r = client();
+  const hash = hashEndpoint(input.endpoint);
+  const now = Date.now();
+  const sub: StoredSubscription = {
+    endpoint: input.endpoint,
+    p256dh: input.p256dh,
+    auth: input.auth,
+    createdAt: now,
+    lastSeen: now,
+  };
+  await Promise.all([
+    r.set(`sub:${hash}`, JSON.stringify(sub)),
+    r.sadd(`spot:${input.slug}`, hash),
+    r.sadd(`spot:active`, input.slug),
+    r.sadd(`sub:spots:${hash}`, input.slug),
+  ]);
+  return { hash };
+}
+
+export async function unsubscribeSpot(input: {
+  endpoint: string;
+  slug: string;
+}): Promise<void> {
+  const r = client();
+  const hash = hashEndpoint(input.endpoint);
+  await Promise.all([
+    r.srem(`spot:${input.slug}`, hash),
+    r.srem(`sub:spots:${hash}`, input.slug),
+  ]);
+  const remaining = await r.scard(`spot:${input.slug}`);
+  if (remaining === 0) {
+    await r.srem(`spot:active`, input.slug);
+  }
+  // muni / spot どちらも残っていなければ sub 本体を削除
+  const [otherMunis, otherSpots] = await Promise.all([
+    r.scard(`sub:munis:${hash}`),
+    r.scard(`sub:spots:${hash}`),
+  ]);
+  if (otherMunis === 0 && otherSpots === 0) {
+    await r.del(`sub:${hash}`);
+  }
+}
+
+export async function checkSpotSubscription(input: {
+  endpoint: string;
+  slug: string;
+}): Promise<{ subscribed: boolean }> {
+  const r = client();
+  const hash = hashEndpoint(input.endpoint);
+  const isMember = await r.sismember(`spot:${input.slug}`, hash);
+  return { subscribed: isMember === 1 };
+}
+
+/** 1 件以上の購読者が居る spot の slug 一覧。dispatch の近傍計算の入口。 */
+export async function getActiveSpots(): Promise<string[]> {
+  const r = client();
+  return (await r.smembers<string[]>(`spot:active`)) ?? [];
+}
+
+/** 指定 spot の購読者 endpoint をすべて返す。dispatch 用。 */
+export async function getSubscribersForSpot(slug: string): Promise<
+  {
+    hash: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+  }[]
+> {
+  const r = client();
+  const hashes = await r.smembers<string[]>(`spot:${slug}`);
+  if (hashes.length === 0) return [];
+  const raw = await Promise.all(
+    hashes.map((h) => r.get<string | StoredSubscription>(`sub:${h}`)),
+  );
+  const out: {
+    hash: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+  }[] = [];
+  for (let i = 0; i < hashes.length; i++) {
+    const v = raw[i];
+    if (!v) continue;
+    const parsed: StoredSubscription =
+      typeof v === "string" ? (JSON.parse(v) as StoredSubscription) : v;
+    out.push({
+      hash: hashes[i],
+      endpoint: parsed.endpoint,
+      p256dh: parsed.p256dh,
+      auth: parsed.auth,
+    });
+  }
+  return out;
+}
+
+/**
+ * この endpoint が登録中の市町村・観光地を逆引きで返す。
+ * 中央の「通知設定」ページ (/notifications) が一覧表示に使う。
+ */
+export async function getSubscriptionsForEndpoint(endpoint: string): Promise<{
+  munis: { pref: string; city: string }[];
+  spots: string[];
+}> {
+  const r = client();
+  const hash = hashEndpoint(endpoint);
+  const [muniMembers, spotMembers] = await Promise.all([
+    r.smembers<string[]>(`sub:munis:${hash}`),
+    r.smembers<string[]>(`sub:spots:${hash}`),
+  ]);
+  const munis = (muniMembers ?? []).map((k) => {
+    const idx = k.indexOf("/");
+    return idx < 0
+      ? { pref: k, city: "" }
+      : { pref: k.slice(0, idx), city: k.slice(idx + 1) };
+  });
+  return { munis, spots: spotMembers ?? [] };
+}
+
 /**
  * 410/404 などで失効した subscription を完全削除する。dispatch 時に
- * web-push が gone を返したらこれを呼ぶ。
+ * web-push が gone を返したらこれを呼ぶ。muni / spot 両方の逆引きを掃除する。
  */
 export async function purgeSubscription(hash: string): Promise<void> {
   const r = client();
-  const mks = (await r.smembers<string[]>(`sub:munis:${hash}`)) ?? [];
+  const [mks, slugs] = await Promise.all([
+    r.smembers<string[]>(`sub:munis:${hash}`),
+    r.smembers<string[]>(`sub:spots:${hash}`),
+  ]);
   const pipeline = r.pipeline();
-  for (const mk of mks) {
+  for (const mk of mks ?? []) {
     pipeline.srem(`muni:${mk}`, hash);
+  }
+  for (const slug of slugs ?? []) {
+    pipeline.srem(`spot:${slug}`, hash);
   }
   pipeline.del(`sub:${hash}`);
   pipeline.del(`sub:munis:${hash}`);
+  pipeline.del(`sub:spots:${hash}`);
   await pipeline.exec();
   // muni:active のクリーンアップは getActiveMunis() 側で空 set を検知して
   // 都度呼ぶには重いので、subscribe/unsubscribeMuni の経路でのみメンテする。

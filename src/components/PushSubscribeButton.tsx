@@ -1,24 +1,33 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 /**
- * 市町村ページに置く Web Push 購読ボタン。
+ * 市町村ページ / 観光地ページに置く Web Push 購読ボタン。
+ *
+ * target で購読対象を切り替える:
+ *   { kind: "muni", pref, city } — 市町村単位 (cityName 完全一致で配信)
+ *   { kind: "spot", slug, name } — 観光地単位 (半径 10km の近傍で配信)
  *
  * 状態遷移:
- *   unsupported           — Push API 非対応 (古いブラウザ / iOS でホーム画面追加前)
- *   denied                — ユーザがブラウザ通知を拒否済み
- *   not-configured        — サーバ側で Upstash/VAPID 未設定 (本番では出ない)
- *   idle                  — 未購読。「通知する」ボタン
- *   active                — 購読中。「通知中 ✓ / 解除」ボタン
- *   loading               — 操作中
+ *   unsupported    — Push API 非対応 (古いブラウザ / iOS でホーム画面追加前)
+ *   denied         — ユーザがブラウザ通知を拒否済み
+ *   not-configured — サーバ側で Upstash/VAPID 未設定 (本番では出ない)
+ *   idle           — 未購読。「通知する」ボタン
+ *   active          — 購読中。「通知中 ✓ / 解除」ボタン
+ *   loading        — 操作中
  *
  * UI 設計:
  *   - 危険度ヒーローカードの直下に置くのが心理的に最も自然
- *     (「いま危険 → 今後の更新も追いたい」)
- *   - 派手すぎず、CTA としては検索 UI のスタイルに合わせた控えめな bordered pill
- *   - 「通知ってどう動くの?」の不安を消すため、説明文を small で添える
+ *   - 控えめな bordered pill。説明文を small で添えて不安を消す
+ *   - 解除の発見性を上げるため、中央の「通知設定」ページ (/notifications) への
+ *     リンクを常に添える (登録した各ページに戻らなくても解除できる導線)
  */
+
+export type PushTarget =
+  | { kind: "muni"; pref: string; city: string }
+  | { kind: "spot"; slug: string; name: string };
 
 type State =
   | "unsupported"
@@ -39,15 +48,33 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return arr;
 }
 
+/** target を API に渡すボディ片へ変換する (subscribe/unsubscribe/check 共通) */
+function targetBody(target: PushTarget): Record<string, string> {
+  return target.kind === "spot"
+    ? { slug: target.slug }
+    : { pref: target.pref, city: target.city };
+}
+
+/** 購読ボタン見出しに使う対象名 */
+function targetHeadline(target: PushTarget): string {
+  return target.kind === "spot"
+    ? `${target.name} 周辺の新規出没を通知で受け取る`
+    : `${target.city} の新規出没を通知で受け取る`;
+}
+
 export default function PushSubscribeButton({
-  pref,
-  city,
+  target,
 }: {
-  pref: string;
-  city: string;
+  target: PushTarget;
 }) {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState<string>("");
+
+  // target の同値性を deps に使うためのキー
+  const targetKey =
+    target.kind === "spot"
+      ? `spot:${target.slug}`
+      : `muni:${target.pref}/${target.city}`;
 
   // 初期化: SW 登録 + 既存購読の確認
   useEffect(() => {
@@ -77,14 +104,13 @@ export default function PushSubscribeButton({
           if (!cancelled) setState("idle");
           return;
         }
-        // 既に endpoint があれば、この muni に紐づいているかを check
+        // 既に endpoint があれば、この対象に紐づいているかを check
         const res = await fetch("/api/push/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             endpoint: existing.endpoint,
-            pref,
-            city,
+            ...targetBody(target),
           }),
         });
         if (!res.ok) throw new Error(String(res.status));
@@ -107,7 +133,9 @@ export default function PushSubscribeButton({
     return () => {
       cancelled = true;
     };
-  }, [pref, city]);
+    // targetKey が変われば再評価する
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetKey]);
 
   const subscribe = useCallback(async () => {
     setState("loading");
@@ -140,8 +168,7 @@ export default function PushSubscribeButton({
             endpoint: json.endpoint,
             keys: json.keys,
           },
-          pref,
-          city,
+          ...targetBody(target),
         }),
       });
       if (!res.ok) {
@@ -155,7 +182,7 @@ export default function PushSubscribeButton({
         `通知の有効化に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
       );
     }
-  }, [pref, city]);
+  }, [target]);
 
   const unsubscribe = useCallback(async () => {
     setState("loading");
@@ -172,13 +199,13 @@ export default function PushSubscribeButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           endpoint: sub.endpoint,
-          pref,
-          city,
+          ...targetBody(target),
         }),
       });
       if (!res.ok) throw new Error(String(res.status));
-      // ブラウザ側の subscription は他 muni にも使われている可能性があるので
-      // 残しておく。完全に解除したいユーザは設定 > サイト権限から行う想定。
+      // ブラウザ側の subscription は他の対象にも使われている可能性があるので
+      // 残しておく。すべて解除したいユーザは /notifications か、ブラウザの
+      // サイト権限から行う想定。
       setState("idle");
       setMessage("通知を解除しました");
     } catch (e) {
@@ -187,12 +214,9 @@ export default function PushSubscribeButton({
         `通知の解除に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
       );
     }
-  }, [pref, city]);
+  }, [target]);
 
   // 端末で通知が表示できるかをユーザー自身が確認するためのお試し通知。
-  // サーバ経由ではなく Service Worker からローカルに 1 件表示するだけなので、
-  // 通知許可・OS の通知設定・集中モードの状態をその場で検証できる
-  // (昨日詰まった「許可したのに出ない」をユーザーが自己診断できる)。
   const sendTest = useCallback(async () => {
     setMessage("");
     try {
@@ -241,7 +265,7 @@ export default function PushSubscribeButton({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-stone-900">
-            {city} の新規出没を通知で受け取る
+            {targetHeadline(target)}
           </p>
           <p className="mt-0.5 text-xs leading-relaxed text-stone-600">
             報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。
@@ -263,6 +287,14 @@ export default function PushSubscribeButton({
           {message && (
             <p className="mt-2 text-xs text-stone-700">{message}</p>
           )}
+          <p className="mt-2 text-xs">
+            <Link
+              href="/notifications"
+              className="font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+            >
+              登録中の通知を管理・解除する
+            </Link>
+          </p>
           <details className="mt-2">
             <summary className="cursor-pointer text-xs text-stone-500 hover:text-stone-700">
               通知について
@@ -271,6 +303,16 @@ export default function PushSubscribeButton({
               <li>アカウント登録は不要・無料です。</li>
               <li>
                 許可すると、サイトを閉じていても新しい出没情報が届きます。
+              </li>
+              <li>
+                登録した地域・観光地の解除は、
+                <Link
+                  href="/notifications"
+                  className="underline decoration-dotted underline-offset-2"
+                >
+                  通知設定ページ
+                </Link>
+                からいつでもまとめて行えます。
               </li>
               <li>
                 iPhone は、Safari の共有メニューから「ホーム画面に追加」したうえで有効にできます。

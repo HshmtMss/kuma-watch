@@ -118,8 +118,8 @@ jobs:
           COUNT=$(jq '.newRecords | length' /tmp/dispatch.json)
           echo "[news-flash] $COUNT new records to dispatch"
           if [ "$COUNT" -eq 0 ]; then exit 0; fi
-          # ペイロードを軽量化 (id, prefectureName, cityName, date, comment, sourceUrl のみ)
-          jq '{ newRecords: (.newRecords | map({id, prefectureName, cityName, date, comment, sourceUrl})) }' \
+          # ペイロードを軽量化。lat/lon は観光地 (spot) 通知の近傍判定に使う。
+          jq '{ newRecords: (.newRecords | map({id, prefectureName, cityName, lat, lon, date, comment, sourceUrl})) }' \
             /tmp/dispatch.json > /tmp/dispatch-slim.json
           # curl は最大 60 秒で諦める。Vercel function が応答しない場合に
           # job 全体がブロックされないよう保険を入れる。

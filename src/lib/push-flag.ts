@@ -13,3 +13,15 @@
 export function isPushReleased(): boolean {
   return process.env.NEXT_PUBLIC_PUSH_ENABLED === "true";
 }
+
+/**
+ * 観光地 (/spot) 通知の公開フラグ。市町村通知 (NEXT_PUBLIC_PUSH_ENABLED) とは
+ * 独立に、観光地ページの購読ボタンだけを段階公開できるようにする。
+ * 観光地通知は市町村通知の上に乗る (Upstash / VAPID / dispatch は共通) ため、
+ * isPushReleased() が前提。未設定 / "true" 以外は OFF (フェイルセーフ)。
+ */
+export function isSpotPushReleased(): boolean {
+  return (
+    isPushReleased() && process.env.NEXT_PUBLIC_SPOT_PUSH_ENABLED === "true"
+  );
+}
