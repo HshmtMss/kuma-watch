@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isPushReleased } from "@/lib/push-flag";
 
 /**
  * 「このサイトについて / 免責事項 / プライバシー / クレジット」の補足リンク群。
@@ -6,6 +7,8 @@ import Link from "next/link";
  *
  * 設計方針: 主要導線はヘッダーに集約、補足の法的・利用規約系リンクは
  * 「お問合せ後に詳しく見たい人」のためにここに置く。視覚的にはフッター感を持たせる。
+ * 通知設定 (/notifications) もここに置き、登録した各ページに戻らなくても
+ * 全ページ共通のフッターから解除へ辿り着けるようにする。
  */
 export default function LegalLinks() {
   return (
@@ -47,6 +50,17 @@ export default function LegalLinks() {
       >
         プライバシー
       </Link>
+      {isPushReleased() && (
+        <>
+          <span className="text-gray-300" aria-hidden>·</span>
+          <Link
+            href="/notifications"
+            className="inline-block py-1 hover:text-gray-900 hover:underline"
+          >
+            通知設定
+          </Link>
+        </>
+      )}
     </nav>
   );
 }
