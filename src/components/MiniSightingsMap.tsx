@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { Map as LeafletMap } from "leaflet";
 
 export type MiniSighting = {
   lat: number;
@@ -20,6 +21,9 @@ type Props = {
   /** 中央の黄色マーク（代表地点）を表示するか。デフォルト false（市町村ページでは
    *  「代表地点」が利用者の関心と無関係なので非表示にする）。 */
   showCenterMarker?: boolean;
+  /** 中心からの半径(km)。指定すると円を描く。観光地ページで「通知/表示はこの範囲」
+   *  を視覚化するのに使う（観光地は半径10km基準）。 */
+  radiusKm?: number;
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -34,9 +38,11 @@ export default function MiniSightingsMap({
   height = "360px",
   recencyHighlightDays = 90,
   showCenterMarker = false,
+  radiusKm,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<unknown>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const [isFull, setIsFull] = useState(false);
 
   useEffect(() => {
     let disposed = false;
@@ -55,6 +61,18 @@ export default function MiniSightingsMap({
       mapRef.current = map;
 
       L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
+
+      // 半径円（観光地の 10km 圏など）。マーカーより先に敷いて下に置く。
+      if (typeof radiusKm === "number" && radiusKm > 0) {
+        L.circle([centerLat, centerLon], {
+          radius: radiusKm * 1000,
+          color: "#0d9488",
+          weight: 1.5,
+          fillColor: "#14b8a6",
+          fillOpacity: 0.06,
+          interactive: false,
+        }).addTo(map);
+      }
 
       if (showCenterMarker) {
         L.circleMarker([centerLat, centerLon], {
@@ -97,6 +115,7 @@ export default function MiniSightingsMap({
 
       cleanup = () => {
         map.remove();
+        mapRef.current = null;
       };
     })();
 
@@ -104,15 +123,66 @@ export default function MiniSightingsMap({
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker]);
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm]);
+
+  // 全画面切替時: コンテナのサイズが変わるので Leaflet に再計測させる。
+  // 全画面中はホイールズームを有効化（じっくり見たいケースなので操作性を上げる）。
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    const id = window.setTimeout(() => {
+      m.invalidateSize();
+      if (isFull) m.scrollWheelZoom.enable();
+      else m.scrollWheelZoom.disable();
+    }, 60);
+    return () => window.clearTimeout(id);
+  }, [isFull]);
+
+  // 全画面中は Esc で閉じる + 背面スクロールをロック。
+  useEffect(() => {
+    if (!isFull) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFull(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isFull]);
 
   return (
-    <div
-      ref={ref}
-      style={{ height, width: "100%", borderRadius: "12px", overflow: "hidden" }}
-      className="border border-stone-200 bg-stone-100"
-      aria-label="周辺のクマ目撃マップ"
-    />
+    <div className={isFull ? "fixed inset-0 z-[2000] bg-white" : "relative"}>
+      <div
+        ref={ref}
+        style={{
+          height: isFull ? "100%" : height,
+          width: "100%",
+          borderRadius: isFull ? 0 : "12px",
+          overflow: "hidden",
+        }}
+        className="border border-stone-200 bg-stone-100"
+        aria-label="周辺のクマ目撃マップ"
+      />
+      <button
+        type="button"
+        onClick={() => setIsFull((v) => !v)}
+        className="absolute right-2 top-2 z-[1000] flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow ring-1 ring-stone-200 backdrop-blur hover:bg-white"
+        aria-label={isFull ? "全画面を閉じる" : "地図を全画面で表示"}
+      >
+        {isFull ? (
+          <>
+            <span aria-hidden>✕</span> 閉じる
+          </>
+        ) : (
+          <>
+            <span aria-hidden>⛶</span> 全画面
+          </>
+        )}
+      </button>
+    </div>
   );
 }
 

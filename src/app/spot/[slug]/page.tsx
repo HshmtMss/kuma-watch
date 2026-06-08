@@ -397,6 +397,7 @@ export default async function SpotPage({ params }: Props) {
           }))}
           zoom={11}
           showCenterMarker
+          radiusKm={NEAR_RADIUS_KM}
         />
       </div>
       {/* 凡例 — プロット対象は半径 10 km 以内・過去 1 年以内のレコード。
