@@ -34,6 +34,7 @@ import RiskCharts from "@/components/RiskCharts";
 import RiskHero from "@/components/RiskHero";
 import { buildAdvice, type AdviceItem } from "@/lib/advice";
 import type { AdviceResponse } from "@/app/api/advice/route";
+import { isPushReleased } from "@/lib/push-flag";
 
 export type LocationSource = "gps" | "tap" | "search" | "url";
 export type SelectedLocation = {
@@ -1108,6 +1109,17 @@ function RiskDetails({
           <Link href="/privacy" className="hover:text-gray-600 hover:underline">
             プライバシー
           </Link>
+          {isPushReleased() && (
+            <>
+              <span aria-hidden>·</span>
+              <Link
+                href="/notifications"
+                className="hover:text-gray-600 hover:underline"
+              >
+                通知設定
+              </Link>
+            </>
+          )}
         </nav>
       </footer>
 
