@@ -9,6 +9,7 @@ import {
   type AggregateContext,
 } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
+import { getMuniOfficialLink } from "@/data/muni-official-links";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -17,6 +18,7 @@ const SUMMARY_CACHE_SECONDS = 21600;
 export type Notice = {
   date: string; // YYYY-MM-DD or YYYY-MM もしくは原文の日付表記
   headline: string;
+  scope?: "pref" | "muni"; // 出典区分: 都道府県公式 / 市区町村公式
 };
 
 export type SummaryResponse = {
@@ -124,8 +126,9 @@ async function callGemini(
                 properties: {
                   date: { type: "string" },
                   headline: { type: "string" },
+                  scope: { type: "string", enum: ["pref", "muni"] },
                 },
-                required: ["date", "headline"],
+                required: ["date", "headline", "scope"],
               },
             },
             summary: { type: "string" },
@@ -168,11 +171,29 @@ function formatSightings(nearby: NearbySighting[]): string {
   return `【この周辺 5km 以内・直近 12 ヶ月の公式出没記録 ${nearby.length} 件（最新 10 件）】\n${lines.join("\n")}`;
 }
 
+// 県・市区町村の両方の原文からお知らせを抽出させる共通指示文。
+const NOTICES_INSTRUCTION = `- notices: 公式サイト原文（都道府県・市区町村の両方）から**日付が明記されているお知らせのみ**抽出し、直近の最大 4 件を配列で返す。
+  - date は元の表記から YYYY-MM-DD（不明箇所は YYYY-MM または原文表記）に整形。
+  - headline は 40 文字以内で 1 行要約。
+  - scope は出典区分: 「都道府県公式サイト原文」由来なら "pref"、「市区町村公式サイト原文」由来なら "muni"。
+  - 市区町村のお知らせがあれば優先的に含めること（より地元密着の情報のため）。市区町村原文が無ければ "pref" のみで良い。
+  - 日付付きのお知らせが無ければ空配列を返すこと（推測で埋めない）。`;
+
+function muniSourceBlock(
+  muniPageText: string | null,
+  muniName?: string,
+): string {
+  if (!muniPageText) return "";
+  return `\n市区町村公式サイト原文（${muniName ?? "市区町村"}・抜粋）:\n${muniPageText}\n`;
+}
+
 function buildPromptFromAggregate(
   prefName: string,
   pageText: string,
   nearby: NearbySighting[],
   aggregate: AggregateContext | null,
+  muniPageText: string | null,
+  muniName?: string,
 ): string {
   const sightingsBlock = formatSightings(nearby);
   const aggregateBlock = aggregate ? formatAggregateForPrompt(aggregate) : "";
@@ -188,10 +209,7 @@ function buildPromptFromAggregate(
 
 制約:
 - summary: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。最後に "（${prefName}公式資料より KumaWatch が要約）" を付けること。
-- notices: 公式サイト原文から**日付が明記されているお知らせのみ**抽出し、直近の 3 件を配列で返す。
-  - date は元の表記から YYYY-MM-DD（不明箇所は YYYY-MM または原文表記）に整形。
-  - headline は 40 文字以内で 1 行要約。
-  - 日付付きのお知らせが無ければ空配列を返すこと（推測で埋めない）。
+${NOTICES_INSTRUCTION}
 
 対象地域: ${prefName}
 
@@ -199,9 +217,9 @@ ${sightingsBlock}
 
 ${aggregateBlock}
 
-公式サイト原文（抜粋）:
+都道府県公式サイト原文（抜粋）:
 ${pageText}
-
+${muniSourceBlock(muniPageText, muniName)}
 要約:`;
 }
 
@@ -210,6 +228,8 @@ function buildPrompt(
   pageText: string,
   nearby: NearbySighting[],
   aggregate: AggregateContext | null,
+  muniPageText: string | null,
+  muniName?: string,
 ): string {
   const species = entry.bearSpecies.includes("higuma") ? "ヒグマ" : "ツキノワグマ";
   const sightingsBlock = formatSightings(nearby);
@@ -226,10 +246,7 @@ function buildPrompt(
 
 制約:
 - summary: 3 文以内、日本語、過度に恐怖を煽らず冷静で実用的、具体的な対策を 1 つ含める。最後に "（${entry.prefNameJa}公式サイトより KumaWatch が要約）" を付けること。
-- notices: 公式サイト原文から**日付が明記されているお知らせのみ**抽出し、直近の 3 件を配列で返す。
-  - date は元の表記から YYYY-MM-DD（不明箇所は YYYY-MM または原文表記）に整形。
-  - headline は 40 文字以内で 1 行要約。
-  - 日付付きのお知らせが無ければ空配列を返すこと（推測で埋めない）。
+${NOTICES_INSTRUCTION}
 
 対象地域: ${entry.prefNameJa}
 対象クマ種: ${species}
@@ -238,9 +255,9 @@ ${sightingsBlock}
 
 ${aggregateBlock}
 
-自治体公式サイト原文（抜粋）:
+都道府県公式サイト原文（抜粋）:
 ${pageText}
-
+${muniSourceBlock(muniPageText, muniName)}
 要約:`;
 }
 
@@ -271,6 +288,16 @@ export async function GET(req: Request) {
         .filter((l) => l.kind === "official_info" || l.kind === "official_map")
         .map((l) => l.url)
     : (aggregate?.sources.map((s) => s.url) ?? []);
+
+  // 選択地点の市区町村公式ページ (muni-official-links)。県だけでなく市区町村の
+  // お知らせも拾えるよう、その地点の bearUrl (無ければ homeUrl) を出典に加える。
+  const prefNameForMuni = entry?.prefNameJa ?? aggregate?.prefName ?? "";
+  const muniLink =
+    muniName && prefNameForMuni
+      ? getMuniOfficialLink(prefNameForMuni, muniName)
+      : null;
+  const muniUrl = muniLink?.bearUrl ?? muniLink?.homeUrl;
+  if (muniUrl && !sourceUrls.includes(muniUrl)) sourceUrls.push(muniUrl);
 
   const lat = latStr ? Number(latStr) : NaN;
   const lon = lonStr ? Number(lonStr) : NaN;
@@ -311,10 +338,14 @@ export async function GET(req: Request) {
     });
   }
 
-  const primaryUrl = sourceUrls[0];
-  const pageText = primaryUrl ? await fetchMunicipalPage(primaryUrl) : null;
+  // 県ページ (official_info/map の先頭) と市区町村ページを並行取得。
+  const primaryUrl = sourceUrls.find((u) => u !== muniUrl) ?? sourceUrls[0];
+  const [pageText, muniPageText] = await Promise.all([
+    primaryUrl ? fetchMunicipalPage(primaryUrl) : Promise.resolve(null),
+    muniUrl ? fetchMunicipalPage(muniUrl) : Promise.resolve(null),
+  ]);
 
-  if (!pageText) {
+  if (!pageText && !muniPageText) {
     const res: SummaryResponse = {
       prefCode,
       prefName,
@@ -334,8 +365,15 @@ export async function GET(req: Request) {
   }
 
   const prompt = entry
-    ? buildPrompt(entry, pageText, nearby, aggregate)
-    : buildPromptFromAggregate(prefName, pageText, nearby, aggregate);
+    ? buildPrompt(entry, pageText ?? "", nearby, aggregate, muniPageText, muniName)
+    : buildPromptFromAggregate(
+        prefName,
+        pageText ?? "",
+        nearby,
+        aggregate,
+        muniPageText,
+        muniName,
+      );
   const llmText = await callGemini(apiKey, prompt);
 
   const parsed = parseSummaryJson(llmText);
@@ -376,17 +414,21 @@ function parseSummaryJson(
     const summary = typeof obj.summary === "string" ? obj.summary : "";
     const rawNotices = Array.isArray(obj.notices) ? obj.notices : [];
     const notices: Notice[] = rawNotices
-      .map((n) => {
+      .map((n): Notice | null => {
         if (typeof n !== "object" || n === null) return null;
-        const r = n as { date?: unknown; headline?: unknown };
+        const r = n as { date?: unknown; headline?: unknown; scope?: unknown };
         if (typeof r.date !== "string" || typeof r.headline !== "string") return null;
         const headline = r.headline.trim();
         const date = r.date.trim();
         if (!headline || !date) return null;
-        return { date, headline } satisfies Notice;
+        const scope: Notice["scope"] =
+          r.scope === "muni" ? "muni" : r.scope === "pref" ? "pref" : undefined;
+        return { date, headline, scope };
       })
       .filter((n): n is Notice => n !== null)
-      .slice(0, 3);
+      // 市区町村のお知らせを優先的に上位へ。
+      .sort((a, b) => (a.scope === "muni" ? 0 : 1) - (b.scope === "muni" ? 0 : 1))
+      .slice(0, 4);
     return { summary, notices };
   } catch {
     return null;

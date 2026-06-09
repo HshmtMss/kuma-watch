@@ -93,6 +93,17 @@ export default function MunicipalNoticeBox({
               key={i}
               className="flex items-start gap-2 text-sm leading-relaxed text-gray-800 sm:text-xs"
             >
+              {n.scope && (
+                <span
+                  className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                    n.scope === "muni"
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {n.scope === "muni" ? "市" : "県"}
+                </span>
+              )}
               <span className="shrink-0 rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-blue-800">
                 {n.date}
               </span>
