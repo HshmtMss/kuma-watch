@@ -82,6 +82,26 @@ const FEEDS: Feed[] = [
     url: "https://news.google.com/rss/search?q=%E3%83%92%E3%82%B0%E3%83%9E+%E5%87%BA%E6%B2%A1&hl=ja&gl=JP&ceid=JP:ja",
     label: "google-news-higuma",
   },
+  // === 地域強化クエリ（西日本の薄いカバレッジ補強）===
+  // 京都・兵庫・和歌山は公式オープンデータが無い/更新停止で、全国一括クエリだと
+  // 東北・北海道の事案に埋もれて拾えていない。県名を添えた検索面を増やし、
+  // 関西・中国地方の事案を明示的に取り込む。重複は URL / フィンガープリントで除外。
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E4%BA%AC%E9%83%BD&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-kyoto",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%85%B5%E5%BA%AB&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-hyogo",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%92%8C%E6%AD%8C%E5%B1%B1&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-wakayama",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%BA%83%E5%B3%B6&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-hiroshima",
+  },
   // === NHK 全国ニュース ===
   // NHK は地域取材網が広く、クマ事案を発生数時間以内に出すことが多い。
   // 一般 feed なので title/description にクマ系キーワードを含むものに絞り込む。
