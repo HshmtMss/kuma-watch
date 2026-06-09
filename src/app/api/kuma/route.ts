@@ -14,6 +14,8 @@ export type KumaRecord = {
   lat: number;
   lon: number;
   date: string;
+  // 出没の時刻 "HH:MM"。分かる場合のみ。Popup で日付に添えて表示。
+  time?: string;
   prefectureName: string;
   cityName: string;
   sectionName: string;
@@ -42,6 +44,7 @@ function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     lat: s.lat,
     lon: s.lon,
     date: s.date,
+    time: s.time,
     prefectureName: s.prefectureName,
     cityName: s.cityName,
     sectionName: s.sectionName,

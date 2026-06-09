@@ -42,6 +42,12 @@ export async function getSharp9110Sightings(): Promise<UnifiedSighting[]> {
         lat: r.Latitude!,
         lon: r.Longitude!,
         date: r.IssueDate ? r.IssueDate.split("T")[0] : "",
+        // IssueDate は "2026-06-09T15:30:00" 形式で時刻を含む (約99%)。
+        // "00:00" は時刻不明の既定値とみなして付けない。
+        time: (() => {
+          const t = r.IssueDate?.split("T")[1]?.slice(0, 5);
+          return t && t !== "00:00" ? t : undefined;
+        })(),
         prefectureName: r.PrefectureName ?? "",
         cityName: r.CityName ?? "",
         sectionName: r.SectionNameText ?? "",

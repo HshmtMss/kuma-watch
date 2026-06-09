@@ -13,6 +13,9 @@ export type UnifiedSighting = {
   lat: number;
   lon: number;
   date: string;
+  // 出没の時刻 "HH:MM" (24時間)。分かる場合のみ。sharp9110 の IssueDate や
+  // 報道記事から抽出する。地図ポップアップで日付に添えて表示する。
+  time?: string;
   prefectureName: string;
   cityName: string;
   sectionName: string;

@@ -140,6 +140,7 @@ type RssItem = {
 type ExtractedDraft = {
   index: number; // articles 配列でのインデックス
   date?: string;
+  time?: string;
   prefectureName?: string;
   cityName?: string;
   sectionName?: string;
@@ -165,6 +166,11 @@ const RESPONSE_SCHEMA = {
             type: "string",
             description:
               "出没日 YYYY-MM-DD。記事内に明示されていなければ pubDate を採用。年が無いときは pubDate の年を採用",
+          },
+          time: {
+            type: "string",
+            description:
+              "出没時刻 HH:MM (24時間表記)。記事に時刻があれば抽出 (例: 「午後3時半ごろ」→ 15:30、「午前6時」→ 06:00)。記事に時刻が書かれていなければ空文字。pubDate の時刻は使わない (報道時刻であり出没時刻ではないため)",
           },
           prefectureName: {
             type: "string",
@@ -285,6 +291,7 @@ function buildPrompt(items: RssItem[]): string {
 - 注意喚起の "全般的な" 文 (具体地点が無い「○○県では出没多発、注意を」) は対象外。
 - 統計記事 (「○○県のクマ出没件数が増加」「シーズン別の捕獲頭数」等) は対象外。
 - 各フィールドは responseSchema の description を厳守。推測しないこと。
+- 記事に出没時刻が書かれていれば time (HH:MM) に入れる (「午後3時半ごろ」→ 15:30)。書かれていなければ空文字。配信時刻(pubDate)は time に使わない。
 - pubDate より未来の日付は NG。
 - 海外のニュース (アメリカ・ロシア等) は対象外。
 - 駆除・捕獲のニュースで「○○市で 1 頭駆除」など具体地点・日付があれば対象。
@@ -405,6 +412,15 @@ export async function fetchNewsSightings(
 
     const id = `news-${article.source}-${s.index}-${i}`;
     const pos = precise ? { lat, lon } : jitter(lat, lon, id);
+    // "HH:MM" (24時間) のみ採用。"9:5"→"09:05" に整える。範囲外は捨てる。
+    const time = (() => {
+      const m = /^(\d{1,2}):(\d{2})$/.exec((s.time ?? "").trim());
+      if (!m) return undefined;
+      const hh = Number(m[1]);
+      const mm = Number(m[2]);
+      if (hh > 23 || mm > 59) return undefined;
+      return `${String(hh).padStart(2, "0")}:${m[2]}`;
+    })();
     out.push({
       id,
       source: "news",
@@ -412,6 +428,7 @@ export async function fetchNewsSightings(
       lat: pos.lat,
       lon: pos.lon,
       date: s.date,
+      ...(time ? { time } : {}),
       prefectureName: prefName,
       cityName: cityName.slice(0, 40),
       sectionName: (s.sectionName ?? "").slice(0, 40),

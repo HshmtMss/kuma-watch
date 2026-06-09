@@ -527,8 +527,10 @@ export default function KumaMap({
         ? `${Math.max(1, Math.round(ageMs / 60 / 1000))} 分前`
         : `${Math.round(ageMs / 60 / 60 / 1000)} 時間前`
       : "";
+    // 「掲載」と明示する。ageLabel は ingestedAt 基準 (KumaWatch が情報を載せた
+    // 時刻) であり、出没の発生時刻ではない。報道の遅れで両者は数時間〜ずれる。
     const freshBadge = isFresh
-      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🆕 ${ageLabel}</span>`
+      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px" title="この情報を地図に掲載した時刻（出没発生時刻ではありません）">🆕 ${ageLabel}に掲載</span>`
       : "";
     const sourceLink = r.sourceUrl
       ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`
@@ -540,7 +542,7 @@ export default function KumaMap({
     const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
       <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
-      <div>📅 ${escapeHtml(r.date)}</div><div>🔢 ${r.headCount}頭</div>
+      <div>📅 ${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div><div>🔢 ${r.headCount}頭</div>
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
       ${photoBlock}
       ${sourceLink}
