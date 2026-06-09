@@ -105,6 +105,28 @@ export default function GeoPushButton({
     }
   }, [lat, lon, radiusKm, label]);
 
+  // 端末で通知が表示できるかをその場で確認するためのお試し通知。
+  // サーバを介さず Service Worker からローカルに 1 件出すだけ。
+  const sendTest = useCallback(async () => {
+    setMessage("");
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification("お試し通知 — KumaWatch", {
+        body: "この通知が見えれば設定は OK です。実際のクマ出没情報ではありません。",
+        icon: "/icons/Icon-192.png",
+        badge: "/icons/Icon-192.png",
+        data: { url: "/" },
+      });
+      setMessage(
+        "お試し通知を送りました。画面に出ない場合は、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。",
+      );
+    } catch (e) {
+      setMessage(
+        `お試し通知の表示に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }, []);
+
   if (state === "unsupported" || state === "not-configured") return null;
 
   return (
@@ -147,7 +169,14 @@ export default function GeoPushButton({
       </div>
       {message && <p className="mt-1.5 text-[11px] text-stone-600">{message}</p>}
       {state === "active" && (
-        <p className="mt-1.5 text-[11px]">
+        <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+          <button
+            type="button"
+            onClick={sendTest}
+            className="font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+          >
+            お試し通知を送る
+          </button>
           <Link
             href="/notifications"
             className="font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
