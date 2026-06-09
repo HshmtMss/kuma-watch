@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
-import BusinessEntryStrip from "@/components/BusinessEntryStrip";
 import GovAnnouncementTicker from "@/components/GovAnnouncementTicker";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
@@ -722,44 +721,27 @@ export default function KumaClient() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
       <header className="relative z-[1100] flex shrink-0 items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        <div className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2">
-          <Link
-            href="/about"
-            className="flex items-center gap-2"
-            aria-label="くまウォッチについて"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="KumaWatch"
-              className="block h-7 w-auto sm:h-8"
-            />
-            <span className="truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
-              くまウォッチ
-            </span>
-          </Link>
-          {/* ベータ版バッジ。/disclaimer の精度・限界の説明にリンクし、
-              ユーザーが 1 クリックで「報道由来の位置は概略」などの注意事項を
-              確認できるようにする。 */}
-          <Link
-            href="/disclaimer"
-            className="shrink-0 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold tracking-wide text-amber-900 hover:bg-amber-300 sm:px-1.5 sm:text-[10px]"
-            aria-label="ベータ版運用中 — 免責事項を見る"
-            title="ベータ版運用中"
-          >
+        {/* ブランド一式 (ロゴ + くまウォッチ + BETA) をまとめてトップ (地図) への
+            1 つのリンクにする。BETA は個別リンクをやめ単なるバッジに。
+            テキスト/バッジは relative top で僅かに下げ、ロゴと上下中央を揃える。 */}
+        <Link
+          href="/"
+          className="flex min-w-0 shrink items-center gap-2"
+          aria-label="くまウォッチ ホーム（地図）"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="KumaWatch"
+            className="block h-7 w-auto sm:h-8"
+          />
+          <span className="relative top-[2px] truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
+            くまウォッチ
+          </span>
+          <span className="relative top-[2px] shrink-0 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold tracking-wide text-amber-900 sm:px-1.5 sm:text-[10px]">
             BETA
-          </Link>
-          <a
-            href="https://www.research-coordinate.co.jp/labs/vet/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="whitespace-nowrap text-[11px] text-stone-500 hover:text-stone-700 sm:text-xs"
-            aria-label="獣医工学ラボ (新しいタブで開く)"
-          >
-            by{" "}
-            <span className="font-medium text-stone-700">獣医工学ラボ</span>
-          </a>
-        </div>
+          </span>
+        </Link>
         <HeaderNav />
       </header>
 
@@ -1293,10 +1275,6 @@ export default function KumaClient() {
           onAskContextChange={setAskContext}
         />
       </div>
-
-      {/* B2B エントリ帯。地図トップでも自治体・事業者の入口を常時可視に。
-          ボトムシートの下に shrink-0 で薄く敷く。 */}
-      <BusinessEntryStrip variant="compact" />
     </div>
   );
 }

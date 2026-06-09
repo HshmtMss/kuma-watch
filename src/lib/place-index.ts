@@ -111,8 +111,30 @@ function resolveCanonicalForIndex(
   return null;
 }
 
+// 同一事案の重複除去。複数のニュースソースが同じ出没を報じると、日付・緯度経度が
+// 完全一致する別レコードとして二重計上される (例: 宇都宮大学峰キャンパスが
+// 「宇都宮大学峰キャンパス」と「峰キャンパス」で 2 件)。date|lat|lon をキーに先頭を残す。
+// 件数 (count*) / 一覧 / 地図ピン すべてに一貫して効かせるため build() 冒頭で適用する。
+function dedupeSightings<
+  T extends { date?: string; lat?: number; lon?: number },
+>(records: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const r of records) {
+    if (typeof r.lat !== "number" || typeof r.lon !== "number" || !r.date) {
+      out.push(r);
+      continue;
+    }
+    const key = `${r.date}|${r.lat}|${r.lon}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(r);
+  }
+  return out;
+}
+
 async function build(): Promise<Index> {
-  const records = await getCachedSightings();
+  const records = dedupeSightings(await getCachedSightings());
   const munisByPref = buildMunisByPref();
   const acc = new Map<
     string,

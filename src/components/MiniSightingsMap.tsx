@@ -143,8 +143,15 @@ export default function MiniSightingsMap({
         });
         const date = r.date || "(日付不明)";
         const where = r.sectionName ? `<div>${escapeHtml(r.sectionName)}</div>` : "";
-        const note = r.comment
-          ? `<div style="margin-top:2px;color:#374151">${escapeHtml(r.comment).slice(0, 120)}</div>`
+        // comment が出典 URL そのものの場合 (例: 報道記事 URL) は、生 URL を
+        // 出さず「報道記事を見る ↗」リンクに置き換える。ユーザーには URL 文字列が
+        // 意味不明なため。テキスト + URL 混在は従来どおりテキスト表示。
+        const rawComment = (r.comment || "").trim();
+        const isUrlComment = /^https?:\/\/\S+$/i.test(rawComment);
+        const note = rawComment
+          ? isUrlComment
+            ? `<div style="margin-top:2px"><a href="${escapeHtml(rawComment)}" target="_blank" rel="noopener noreferrer" style="color:#b45309;text-decoration:underline">報道記事を見る ↗</a></div>`
+            : `<div style="margin-top:2px;color:#374151">${escapeHtml(rawComment).slice(0, 120)}</div>`
           : "";
         marker.bindPopup(
           `<div style="font-size:12px;line-height:1.4">
