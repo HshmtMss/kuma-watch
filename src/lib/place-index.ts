@@ -347,6 +347,102 @@ export async function getMonthlyCountsForPlace(
   return buckets;
 }
 
+// ---------------------------------------------------------------------------
+// 政令指定都市の親ページ用 — 配下の区 (cityName) を合算する。
+// マスターは政令市を「○○市△△区」で持つため「○○市」単独ページが無く 404 に
+// なる。親ページを生成して区データを合算表示するためのヘルパー群。
+// 単一 city を渡せば従来の getRecordsForPlace / getMonthlyCountsForPlace と等価。
+// ---------------------------------------------------------------------------
+
+/** 複数 city を合算して date desc で limit 件返す。 */
+export async function getRecordsForPlaces(
+  pref: string,
+  cityNames: string[],
+  limit = 60,
+): Promise<PlaceRecord[]> {
+  const idx = await getIndex();
+  const out: PlaceRecord[] = [];
+  for (const city of cityNames) {
+    const arr = idx.recordsByKey.get(`${pref}/${city}`);
+    if (arr) out.push(...arr);
+  }
+  out.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  return out.slice(0, limit);
+}
+
+/** 複数 city を合算した直近 12 ヶ月の月別件数。 */
+export async function getMonthlyCountsForPlaces(
+  pref: string,
+  cityNames: string[],
+): Promise<{ key: string; label: string; count: number }[]> {
+  const idx = await getIndex();
+  const buckets: { key: string; label: string; count: number }[] = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    buckets.push({
+      key: `${y}-${String(m).padStart(2, "0")}`,
+      label: `${m}月`,
+      count: 0,
+    });
+  }
+  for (const city of cityNames) {
+    const arr = idx.recordsByKey.get(`${pref}/${city}`);
+    if (!arr) continue;
+    for (const r of arr) {
+      const k = r.date?.slice(0, 7);
+      if (!k) continue;
+      const b = buckets.find((x) => x.key === k);
+      if (b) b.count++;
+    }
+  }
+  return buckets;
+}
+
+/** 政令市の親セル — 配下の区セルを合算した PlaceCell を生成する。
+ *  データの無い親は重心を算出できないため、マスター区平均 (fallback) を使う。 */
+export async function getWardsCell(
+  pref: string,
+  parentName: string,
+  wardNames: string[],
+  fallbackLat: number,
+  fallbackLon: number,
+): Promise<PlaceCell> {
+  const idx = await getIndex();
+  let count = 0;
+  let count90d = 0;
+  let count365d = 0;
+  let latestDate: string | null = null;
+  let latSum = 0;
+  let lonSum = 0;
+  let n = 0;
+  for (const w of wardNames) {
+    const c = idx.byKey.get(`${pref}/${w}`);
+    if (!c) continue;
+    count += c.count;
+    count90d += c.count90d;
+    count365d += c.count365d;
+    if (c.latestDate && (!latestDate || c.latestDate > latestDate)) {
+      latestDate = c.latestDate;
+    }
+    latSum += c.latCentroid * c.count;
+    lonSum += c.lonCentroid * c.count;
+    n += c.count;
+  }
+  return {
+    prefectureName: pref,
+    cityName: parentName,
+    count,
+    count90d,
+    count365d,
+    latestDate,
+    latCentroid: n > 0 ? latSum / n : fallbackLat,
+    lonCentroid: n > 0 ? lonSum / n : fallbackLon,
+  };
+}
+
 /** 県内全体の直近事案を date desc で limit 件返す。
  *  cityName を付与して返すので、呼び出し側で市町村別ページへの内部リンクを
  *  生成できる。データ薄い (count365d == 0) 市町村ページの補助コンテンツとして

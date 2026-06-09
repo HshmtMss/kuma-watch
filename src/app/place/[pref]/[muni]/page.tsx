@@ -9,9 +9,10 @@ import {
   getPlaceCell,
   getPlaceCellsByPref,
   getPrefSummary,
-  getMonthlyCountsForPlace,
+  getMonthlyCountsForPlaces,
   getRecentRecordsInPref,
-  getRecordsForPlace,
+  getRecordsForPlaces,
+  getWardsCell,
   getStaticPlaceKeys,
   type PlaceCell,
   type PlaceRecord,
@@ -37,6 +38,33 @@ export const dynamicParams = false;
 const PREF_NAMES = new Set(Object.values(PREF_CODE_TO_NAME));
 const SITE_URL = "https://kuma-watch.jp";
 
+// 政令指定都市の親 (「○○市」) → 配下の区 cityName 一覧 + マスター区平均座標。
+// マスターは政令市を「○○市△△区」で持つため、親単独ページが無く 404 になる。
+// (例: /place/北海道/札幌市)。親ページを生成し、区を合算して表示するための索引。
+// 「○○市△△区」形式 (政令市) のみ対象。東京特別区は「千代田区」等で市接頭辞が
+// 無いため一致しない。
+const SEIREI_PARENTS = new Map<
+  string,
+  { wards: string[]; lat: number; lon: number; n: number }
+>();
+for (const m of JAPAN_MUNICIPALITIES) {
+  const mt = /^(.+市)(.+区)$/.exec(m.cityName);
+  if (!mt) continue;
+  const key = `${m.prefName}/${mt[1]}`;
+  let e = SEIREI_PARENTS.get(key);
+  if (!e) {
+    e = { wards: [], lat: 0, lon: 0, n: 0 };
+    SEIREI_PARENTS.set(key, e);
+  }
+  e.wards.push(m.cityName);
+  e.lat += m.lat;
+  e.lon += m.lon;
+  e.n += 1;
+}
+function getSeireiParent(pref: string, muni: string) {
+  return SEIREI_PARENTS.get(`${pref}/${muni}`) ?? null;
+}
+
 type Props = { params: Promise<{ pref: string; muni: string }> };
 
 export async function generateStaticParams() {
@@ -49,9 +77,14 @@ export async function generateStaticParams() {
     pref: m.prefName,
     city: m.cityName,
   }));
+  // 政令市の親 (「○○市」)。マスターは区単位なので別途追加する。
+  const fromSeirei = [...SEIREI_PARENTS.keys()].map((key) => {
+    const i = key.indexOf("/");
+    return { pref: key.slice(0, i), city: key.slice(i + 1) };
+  });
   const seen = new Set<string>();
   const merged: { pref: string; city: string }[] = [];
-  for (const k of [...fromMaster, ...fromIndex]) {
+  for (const k of [...fromMaster, ...fromIndex, ...fromSeirei]) {
     const key = `${k.pref}/${k.city}`;
     if (seen.has(key)) continue;
     seen.add(key);
@@ -130,9 +163,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
 
   const cellFromIndex = await getPlaceCell(pref, muni);
+  // 政令市の親は区を合算したセルでタイトルの件数を正確にする。
+  let seoCell = cellFromIndex;
+  if (!cellFromIndex) {
+    const seirei = getSeireiParent(pref, muni);
+    if (seirei) {
+      seoCell = await getWardsCell(
+        pref,
+        muni,
+        seirei.wards,
+        seirei.lat / seirei.n,
+        seirei.lon / seirei.n,
+      );
+    }
+  }
   // 出没データが無い市町村でも、buildMuniSeo の null パスでフォールバック
   // タイトル ("○○のクマ出没情報・警戒レベル｜獣医師監修") を返す。
-  const { title, description } = buildMuniSeo(pref, muni, cellFromIndex);
+  const { title, description } = buildMuniSeo(pref, muni, seoCell);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
   return {
@@ -164,9 +211,27 @@ export default async function MuniPage({ params }: Props) {
   const masterEntry = JAPAN_MUNICIPALITIES.find(
     (m) => m.prefName === pref && m.cityName === muni,
   );
-  if (!cellFromIndex && !masterEntry) notFound();
-  const cell: PlaceCell =
-    cellFromIndex ?? {
+  // 政令市の親 (「○○市」)。マスターには区しか無いので別索引で判定する。
+  const seirei =
+    !cellFromIndex && !masterEntry ? getSeireiParent(pref, muni) : null;
+  if (!cellFromIndex && !masterEntry && !seirei) notFound();
+
+  // データ取得対象の city 一覧。政令市の親は配下の区を合算する。
+  const dataCities = seirei ? seirei.wards : [muni];
+
+  let cell: PlaceCell;
+  if (cellFromIndex) {
+    cell = cellFromIndex;
+  } else if (seirei) {
+    cell = await getWardsCell(
+      pref,
+      muni,
+      seirei.wards,
+      seirei.lat / seirei.n,
+      seirei.lon / seirei.n,
+    );
+  } else {
+    cell = {
       prefectureName: pref,
       cityName: muni,
       count: 0,
@@ -176,15 +241,16 @@ export default async function MuniPage({ params }: Props) {
       latCentroid: masterEntry!.lat,
       lonCentroid: masterEntry!.lon,
     };
+  }
 
   const [siblingsRaw, allCells, mapRecords, prefSummary, monthly, prefRecent] = await Promise.all([
     getPlaceCellsByPref(pref),
     getAllPlaceCells(),
-    getRecordsForPlace(pref, muni, 60),
+    getRecordsForPlaces(pref, dataCities, 60),
     getPrefSummary(pref),
-    // 月別チャートは getRecordsForPlace の上限 (60) で古い月が落ちるので
-    // 別関数で全件から月別バケット集計する。
-    getMonthlyCountsForPlace(pref, muni),
+    // 月別チャートは getRecordsForPlaces の上限 (60) で古い月が落ちるので
+    // 別関数で全件から月別バケット集計する。政令市の親は区を合算。
+    getMonthlyCountsForPlaces(pref, dataCities),
     // データ薄い muni (recentIncidents が出ない) でも、県内の直近事案を
     // 補助コンテンツとして埋め込み、ページの SEO 上の希薄判定を回避する。
     getRecentRecordsInPref(pref, 8),
@@ -412,7 +478,7 @@ export default async function MuniPage({ params }: Props) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // 月別件数は getMonthlyCountsForPlace で全件から集計済み。グラフ用の
+  // 月別件数は getMonthlyCountsForPlaces で全件から集計済み。グラフ用の
   // 最大値だけここで計算する。
   const now = new Date();
   const monthlyMax = Math.max(1, ...monthly.map((b) => b.count));

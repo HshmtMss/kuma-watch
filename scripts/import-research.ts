@@ -29,7 +29,14 @@
  * - サブフォルダ "日次" "月次" の Drive ID は下記定数に直接記載。
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { parse, HTMLElement } from "node-html-parser";
@@ -85,7 +92,7 @@ async function main() {
 
   const allDocs: DocMeta[] = [];
   for (const [key, folder] of Object.entries(FOLDERS)) {
-    const docs = await scanFolder(folder.id, folder.category, key);
+    const docs = await scanFolder(folder.id, folder.category);
     console.log(`[import-research]   ${key}: ${docs.length} docs`);
     allDocs.push(...docs);
   }
@@ -248,7 +255,6 @@ async function fetchWithRetry(
 async function scanFolder(
   folderId: string,
   category: Category,
-  label: string,
 ): Promise<DocMeta[]> {
   const url = `https://drive.google.com/drive/folders/${folderId}`;
   const html = await (await fetchWithRetry(url)).text();
@@ -335,7 +341,6 @@ function listExistingSlugs(): Set<string> {
   const dir = join(ROOT, "src", "app", "research");
   const set = new Set<string>();
   if (!existsSync(dir)) return set;
-  const { readdirSync, statSync } = require("node:fs") as typeof import("node:fs");
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (!statSync(path).isDirectory()) continue;
@@ -359,7 +364,7 @@ function parseDocHtml(html: string): ParsedDoc {
   let title = "";
   const blocks: Block[] = [];
   let inReferences = false;
-  let referencesItems: string[] = [];
+  const referencesItems: string[] = [];
 
   for (const child of body.childNodes) {
     if (!(child instanceof HTMLElement)) continue;
@@ -487,7 +492,7 @@ function parseSingleReference(line: string): Reference | null {
   const urlMatches = cleaned.match(/https?:\/\/[^\s,、。]+/g);
   if (!urlMatches || urlMatches.length === 0) return null;
   const url = urlMatches[urlMatches.length - 1].replace(/[、,。]+$/, "");
-  let titlePart = cleaned
+  const titlePart = cleaned
     .replace(url, "")
     .replace(/[0-9]+月\s*[0-9]+,\s*[0-9]+にアクセス、?/g, "")
     .replace(/、\s*$/, "")
