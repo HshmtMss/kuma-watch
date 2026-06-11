@@ -380,6 +380,351 @@ export const MUNICIPALITIES: MunicipalEntry[] = [
     ],
     verifiedAt: "2026-04-26",
   },
+  // --- 2026-06-11 追加: 主要なクマ生息県の県公式ページ (調査・WebFetch 検証済) ---
+  {
+    prefCode: "02",
+    prefNameJa: "青森県",
+    prefNameEn: "Aomori",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県自然保護課が出没警報・被害記録を掲載、地図はくまログあおもり。",
+    links: [
+      {
+        label: "青森県 クマに注意してください（出没警報）",
+        url: "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        kind: "official_info",
+      },
+      {
+        label: "くまログあおもり（ツキノワグマ等情報マップ）",
+        url: "https://kumalog-aomori.info/",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "04",
+    prefNameJa: "宮城県",
+    prefNameEn: "Miyagi",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県自然保護課の年度別目撃ページに目撃マップと集計を掲載。",
+    links: [
+      {
+        label: "宮城県 クマ目撃等情報（年度別・目撃マップ）",
+        url: "https://www.pref.miyagi.jp/soshiki/sizenhogo/r8kumamokugeki.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "07",
+    prefNameJa: "福島県",
+    prefNameEn: "Fukushima",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県の目撃情報ページに目撃地図と年度別記録を公開。",
+    links: [
+      {
+        label: "福島県 ツキノワグマ目撃情報（地図・年度別記録）",
+        url: "https://www.pref.fukushima.lg.jp/sec/16035b/tukinowaguma-mokugeki.html",
+        kind: "official_info",
+      },
+      {
+        label: "福島県 ツキノワグマに注意してください",
+        url: "https://www.pref.fukushima.lg.jp/sec/01230a/tsukinowaguma.html",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "08",
+    prefNameJa: "茨城県",
+    prefNameEn: "Ibaraki",
+    bearSpecies: ["tsukinowa"],
+    priority: 3,
+    summary: "大子町等の目撃情報と注意喚起を掲載する県公式ページ。",
+    links: [
+      {
+        label: "茨城県 ツキノワグマの目撃情報について",
+        url: "https://www.pref.ibaraki.jp/seikatsukankyo/kansei/chojyuhogo/tsukinowagumamokugeki.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "09",
+    prefNameJa: "栃木県",
+    prefNameEn: "Tochigi",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県自然環境課が月別・年度別の出没件数集計を掲載。",
+    links: [
+      {
+        label: "栃木県 クマ出没（目撃）状況",
+        url: "https://www.pref.tochigi.lg.jp/d04/choujyuu/r4_kuma_shutubotu.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "10",
+    prefNameJa: "群馬県",
+    prefNameEn: "Gunma",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県自然環境課ページから出没マップ（ArcGIS）と被害記録を提供。",
+    links: [
+      {
+        label: "群馬県 ツキノワグマ情報について",
+        url: "https://www.pref.gunma.jp/page/7141.html",
+        kind: "official_info",
+      },
+      {
+        label: "群馬県クマ出没マップ（ArcGIS ダッシュボード）",
+        url: "https://pref-gunma.maps.arcgis.com/apps/dashboards/5276d2ebf02a42da8595ed2a51a334c8",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "11",
+    prefNameJa: "埼玉県",
+    prefNameEn: "Saitama",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "出没注意喚起と出没マップを案内する県公式ページ。",
+    links: [
+      {
+        label: "埼玉県 クマ・イノシシに注意！",
+        url: "https://www.pref.saitama.lg.jp/a0508/tyouzyu/kumatyui.html",
+        kind: "official_info",
+      },
+      {
+        label: "埼玉県ツキノワグマ出没マップ",
+        url: "https://www.pref.saitama.lg.jp/dx-portal/info/kumashutsubotsu.html",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "16",
+    prefNameJa: "富山県",
+    prefNameEn: "Toyama",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県が市町村報告を集約、目撃痕跡情報と地図「クマっぷ」を提供。",
+    links: [
+      {
+        label: "富山県 ツキノワグマの目撃・痕跡情報",
+        url: "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/kj00018641/index.html",
+        kind: "official_info",
+      },
+      {
+        label: "ツキノワグマ出没情報地図（クマっぷ）",
+        url: "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "17",
+    prefNameJa: "石川県",
+    prefNameEn: "Ishikawa",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県公式のクマ被害防止ハブ。最新出没情報と注意喚起へ誘導。",
+    links: [
+      {
+        label: "石川県 ツキノワグマによる人身被害防止のために",
+        url: "https://www.pref.ishikawa.lg.jp/sizen/kuma/navi01.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "19",
+    prefNameJa: "山梨県",
+    prefNameEn: "Yamanashi",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "出没マップとXアラートを備える県公式の注意ページ。",
+    links: [
+      {
+        label: "山梨県 ツキノワグマ出没に対する注意について",
+        url: "https://www.pref.yamanashi.jp/shizen/kuma2.html",
+        kind: "official_info",
+      },
+      {
+        label: "山梨県 ツキノワグマ出没マップ（過年度）",
+        url: "https://www.pref.yamanashi.jp/shizen/kuma2-pastmap.html",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "22",
+    prefNameJa: "静岡県",
+    prefNameEn: "Shizuoka",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "クマ出没マップと年度別記録を同ページに載せる県公式ページ。",
+    links: [
+      {
+        label: "静岡県のツキノワグマ（出没マップ・年度別記録）",
+        url: "https://www.pref.shizuoka.jp/kurashikankyo/shizenkankyo/wild/1017680.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "24",
+    prefNameJa: "三重県",
+    prefNameEn: "Mie",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "クマアラートと出没情報マップを束ねる県公式ハブページ。",
+    links: [
+      {
+        label: "三重県 ツキノワグマの出没にご注意ください！",
+        url: "https://www.pref.mie.lg.jp/JTAISAKU/HP/m0114900048.htm",
+        kind: "official_info",
+      },
+      {
+        label: "三重県 ツキノワグマ出没情報マップ／クマアラート",
+        url: "https://www.pref.mie.lg.jp/TOPICS/m0026100200.htm",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "28",
+    prefNameJa: "兵庫県",
+    prefNameEn: "Hyogo",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県公式の豊凶調査に基づく出没注意喚起と被害防止対策。",
+    links: [
+      {
+        label: "兵庫県 ドングリ類豊凶調査結果とツキノワグマ出没注意喚起",
+        url: "https://web.pref.hyogo.lg.jp/nk20/r7hokyochosa.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "29",
+    prefNameJa: "奈良県",
+    prefNameEn: "Nara",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県が市町村報告を集約、目撃一覧PDFとGISマップを提供。",
+    links: [
+      {
+        label: "奈良県 ツキノワグマ出没情報",
+        url: "https://www.pref.nara.lg.jp/n118/p043003.html",
+        kind: "official_info",
+      },
+      {
+        label: "奈良県ツキノワグマ目撃情報マップ",
+        url: "https://pub-gis.nsa.pref.nara.jp/portal/apps/dashboards/0a8186f4d3194816b64ffe9abc65eff0",
+        kind: "official_map",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "31",
+    prefNameJa: "鳥取県",
+    prefNameEn: "Tottori",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "出没状況・マップ・年次統計を掲載する県の注意喚起ページ。",
+    links: [
+      {
+        label: "鳥取県 クマ出没状況（クマにご注意ください）",
+        url: "https://www.pref.tottori.lg.jp/280334.htm",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "33",
+    prefNameJa: "岡山県",
+    prefNameEn: "Okayama",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "県北中心の出没状況と対処法を載せる注意喚起ページ。",
+    links: [
+      {
+        label: "岡山県 ～ツキノワグマの出没にご注意ください～",
+        url: "https://www.pref.okayama.jp/page/972432.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "35",
+    prefNameJa: "山口県",
+    prefNameEn: "Yamaguchi",
+    bearSpecies: ["tsukinowa"],
+    priority: 2,
+    summary: "自然保護課が市町別・月別の出没情報PDFを掲載。",
+    links: [
+      {
+        label: "山口県 ツキノワグマによる被害を防ぐために",
+        url: "https://www.pref.yamaguchi.lg.jp/soshiki/41/20698.html",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "36",
+    prefNameJa: "徳島県",
+    prefNameEn: "Tokushima",
+    bearSpecies: ["tsukinowa"],
+    priority: 3,
+    summary: "絶滅危惧の剣山系個体の目撃・痕跡を記録する県ページ。",
+    links: [
+      {
+        label: "徳島県 ツキノワグマの目撃・痕跡等について",
+        url: "https://www.pref.tokushima.lg.jp/ippannokata/kurashi/shizen/7241461/",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
+  {
+    prefCode: "39",
+    prefNameJa: "高知県",
+    prefNameEn: "Kochi",
+    bearSpecies: ["tsukinowa"],
+    priority: 3,
+    summary: "剣山系の絶滅危惧個体を扱う保護・注意喚起ページ。",
+    links: [
+      {
+        label: "高知県 ツキノワグマに注意してください！",
+        url: "https://www.pref.kochi.lg.jp/doc/kuma-1/",
+        kind: "official_info",
+      },
+    ],
+    verifiedAt: "2026-06-11",
+  },
 ];
 
 export function findMunicipalityByPrefName(
