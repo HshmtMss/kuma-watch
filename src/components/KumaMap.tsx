@@ -15,8 +15,9 @@ import {
   DEFAULT_LEVEL_THRESHOLDS,
   kumamoriLevel,
   maxLevel,
-  RISK_LEVEL_COLOR,
-  sightingsToLevel,
+  HABITAT_DISPLAY_COLOR,
+  ALERT_DISPLAY_COLOR,
+  ALERT_SIGHTING_THRESHOLDS,
   type LevelThresholds,
 } from "@/lib/score";
 import { meshCodeToCenter } from "@/lib/mesh";
@@ -59,14 +60,6 @@ const TILE_PROVIDERS: Record<TileStyle, TileProvider> = {
     subdomains: ["a", "b", "c"],
     maxZoom: 17,
   },
-};
-
-const RANK: Record<string, number> = {
-  safe: 0,
-  low: 1,
-  moderate: 2,
-  elevated: 3,
-  high: 4,
 };
 
 function mobileCaps() {
@@ -242,15 +235,36 @@ export default function KumaMap({
       const opacity = heatmapOpacityRef.current;
       const sightingMap = sightingCountByMeshRef.current;
 
-      // ヒートマップに反映するレベルは「生息域 vs 過去1年の目撃」の高い方。
+      // セルの塗り色を決める (2026-06 改訂)。生息域と「直近の出没」を色で分離:
+      //  - 直近1年の出没が多い → 警戒色 (黄→橙→赤)。生息域より優先 (rank 高)。
+      //  - それ以外 → 生息域を落ち着いた色 (薄緑→ベージュ)。出没1-2件は最低 low に底上げ。
+      // rank は LOD 集約時の「代表色 = 最も深刻なセル」選択に使う。
       // sightingMap は API /api/sighting-cells から取得したもの。
-      const cellLevel = (
+      const paintCell = (
         meshCode: string,
         s: number,
-      ): "safe" | "low" | "moderate" | "elevated" | "high" | "unknown" => {
-        const habitat = kumamoriLevel(s, levelThresholdsRef.current);
+      ): { color: string; rank: number } | null => {
         const sCount = sightingMap?.get(meshCode) ?? 0;
-        return maxLevel(habitat, sightingsToLevel(sCount));
+        if (sCount >= ALERT_SIGHTING_THRESHOLDS.red)
+          return { color: ALERT_DISPLAY_COLOR.high, rank: 9 };
+        if (sCount >= ALERT_SIGHTING_THRESHOLDS.orange)
+          return { color: ALERT_DISPLAY_COLOR.elevated, rank: 8 };
+        if (sCount >= ALERT_SIGHTING_THRESHOLDS.amber)
+          return { color: ALERT_DISPLAY_COLOR.moderate, rank: 7 };
+        const habitat = kumamoriLevel(s, levelThresholdsRef.current);
+        const lvl = sCount >= 1 ? maxLevel(habitat, "low") : habitat;
+        switch (lvl) {
+          case "high":
+            return { color: HABITAT_DISPLAY_COLOR.high, rank: 4 };
+          case "elevated":
+            return { color: HABITAT_DISPLAY_COLOR.elevated, rank: 3 };
+          case "moderate":
+            return { color: HABITAT_DISPLAY_COLOR.moderate, rank: 2 };
+          case "low":
+            return { color: HABITAT_DISPLAY_COLOR.low, rank: 1 };
+          default:
+            return null; // safe / unknown
+        }
       };
 
       // smoothMeshes には含まれない「生息域なし＋目撃あり」のセルを補う。
@@ -270,14 +284,14 @@ export default function KumaMap({
       }
 
       if (useLOD) {
-        // LOD: 3×3 セルを集約して代表色 (max level) で描く
+        // LOD: 3×3 セルを集約して代表色 (最も深刻なセルの色) で描く
         type LodBucket = {
           minLat: number;
           maxLat: number;
           minLon: number;
           maxLon: number;
           maxRank: number;
-          maxLevel: "safe" | "low" | "moderate" | "elevated" | "high";
+          color: string;
         };
         const buckets = new Map<string, LodBucket>();
         const latBinSize = MESH_LAT_STEP * LOD_STEP;
@@ -285,16 +299,10 @@ export default function KumaMap({
         const accumulate = (
           lat: number,
           lon: number,
-          level:
-            | "safe"
-            | "low"
-            | "moderate"
-            | "elevated"
-            | "high"
-            | "unknown",
+          paint: { color: string; rank: number } | null,
         ) => {
-          if (level === "safe" || level === "unknown") return;
-          const rank = RANK[level];
+          if (!paint) return;
+          const rank = paint.rank;
           const latBin = Math.floor(lat / latBinSize);
           const lonBin = Math.floor(lon / lonBinSize);
           const key = `${latBin}|${lonBin}`;
@@ -310,7 +318,7 @@ export default function KumaMap({
               minLon: cellMinLon,
               maxLon: cellMaxLon,
               maxRank: rank,
-              maxLevel: level as LodBucket["maxLevel"],
+              color: paint.color,
             });
           } else {
             if (cellMinLat < b.minLat) b.minLat = cellMinLat;
@@ -319,21 +327,21 @@ export default function KumaMap({
             if (cellMaxLon > b.maxLon) b.maxLon = cellMaxLon;
             if (rank > b.maxRank) {
               b.maxRank = rank;
-              b.maxLevel = level as LodBucket["maxLevel"];
+              b.color = paint.color;
             }
           }
         };
         for (const m of meshes) {
           if (m.lat < south || m.lat > north) continue;
           if (m.lon < west || m.lon > east) continue;
-          accumulate(m.lat, m.lon, cellLevel(m.m, m.s));
+          accumulate(m.lat, m.lon, paintCell(m.m, m.s));
         }
         for (const c of sightingOnlyCells) {
-          accumulate(c.lat, c.lon, cellLevel(c.m, 0));
+          accumulate(c.lat, c.lon, paintCell(c.m, 0));
         }
         let drawn = 0;
         for (const b of buckets.values()) {
-          const color = RISK_LEVEL_COLOR[b.maxLevel];
+          const color = b.color;
           const rect: Rectangle = L.rectangle(
             [
               [b.minLat, b.minLon],
@@ -359,10 +367,10 @@ export default function KumaMap({
       for (const m of meshes) {
         if (m.lat < south || m.lat > north) continue;
         if (m.lon < west || m.lon > east) continue;
-        const level = cellLevel(m.m, m.s);
-        if (level === "safe" || level === "unknown") continue;
+        const paint = paintCell(m.m, m.s);
+        if (!paint) continue;
 
-        const color = RISK_LEVEL_COLOR[level];
+        const color = paint.color;
         const cellOpacity = m.isHabitat ? opacity : opacity * halo;
         if (cellOpacity <= 0) continue;
         const rect: Rectangle = L.rectangle(
@@ -386,9 +394,9 @@ export default function KumaMap({
       // habitat=false 扱いなので halo opacity を適用する (薄め)。
       for (const c of sightingOnlyCells) {
         if (drawn >= maxRects) break;
-        const level = cellLevel(c.m, 0);
-        if (level === "safe" || level === "unknown") continue;
-        const color = RISK_LEVEL_COLOR[level];
+        const paint = paintCell(c.m, 0);
+        if (!paint) continue;
+        const color = paint.color;
         const cellOpacity = opacity * halo;
         if (cellOpacity <= 0) continue;
         const rect: Rectangle = L.rectangle(

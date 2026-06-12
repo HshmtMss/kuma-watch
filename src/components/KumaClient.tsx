@@ -25,8 +25,9 @@ import TopWeatherBadge from "@/components/TopWeatherBadge";
 import SettingsPanel from "@/components/SettingsPanel";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
-  RISK_LEVEL_COLOR,
   RISK_LEVEL_LABEL,
+  HABITAT_DISPLAY_COLOR,
+  ALERT_DISPLAY_COLOR,
   type LevelThresholds,
 } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
@@ -40,21 +41,13 @@ const SMOOTHING_SIGMA_KEY = "kumaWatch.smoothingSigmaKm";
 const HALO_OPACITY_KEY = "kumaWatch.haloOpacity";
 const LEVEL_THRESHOLDS_KEY = "kumaWatch.levelThresholds";
 const DEFAULT_TILE_STYLE: TileStyle = "standard";
-const DEFAULT_HEATMAP_OPACITY = 0.5;
+const DEFAULT_HEATMAP_OPACITY = 0.4; // 0.5→0.4 に低減 (恐怖感の緩和・2026-06)
 const DEFAULT_SMOOTHING_SIGMA_KM = 1; // 微 (3×3) で穴埋めをデフォルト ON
 // halo (穴埋め) セルの不透明度倍率。1.0 = habitat と同じ濃さで描画。
 // 0.5 などにすると視覚的に薄くなり、カードの危険度バーと色が違って見える原因になるので、
 // 既定は 1.0 に揃える (管理者は ?admin=1 から再調整可能)。
 const DEFAULT_HALO_OPACITY = 1.0;
 const SMOOTHING_SIGMA_OPTIONS = [0, 1, 2, 3, 4] as const;
-
-const RISK_LEGEND_ORDER: RiskLevel[] = [
-  "safe",
-  "low",
-  "moderate",
-  "elevated",
-  "high",
-];
 
 type PeriodOption = { label: string; days: number | null };
 const PERIOD_OPTIONS: PeriodOption[] = [
@@ -1242,21 +1235,49 @@ export default function KumaClient() {
               </div>
             </div>
             <div>
+              {/* 生息域(落ち着いた色)と直近の出没(警戒色)を分けて示す。
+                  「クマがいる地域」と「最近よく出ている所」を混同させない。 */}
               <div className="mb-1 text-xs text-gray-500">
-                警戒レベルヒートマップ
+                クマの生息域
               </div>
-              {RISK_LEGEND_ORDER.map((level) => (
-                <div key={level} className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-2.5 w-2.5 rounded-sm"
-                    style={{
-                      background: RISK_LEVEL_COLOR[level],
-                      opacity: 0.7,
-                    }}
-                  />
-                  {RISK_LEVEL_LABEL[level]}
-                </div>
-              ))}
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ background: HABITAT_DISPLAY_COLOR.low }}
+                />
+                生息の可能性
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ background: HABITAT_DISPLAY_COLOR.high }}
+                />
+                主要な生息域
+              </div>
+              <div className="mb-1 mt-2 text-xs text-gray-500">
+                直近1年の出没
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ background: ALERT_DISPLAY_COLOR.moderate }}
+                />
+                出没あり
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ background: ALERT_DISPLAY_COLOR.elevated }}
+                />
+                出没が多い
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm"
+                  style={{ background: ALERT_DISPLAY_COLOR.high }}
+                />
+                特に多い
+              </div>
             </div>
           </div>
         )}

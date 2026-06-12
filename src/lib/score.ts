@@ -413,8 +413,8 @@ export function computeScore(
   const explanation = [
     historyLabel,
     seasonalLabel,
-    weather
-      ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm}mm${weather.pressureHPa != null ? `・気圧 ${weather.pressureHPa.toFixed(0)}hPa` : ""}）`
+    weather && typeof weather.tempC === "number"
+      ? `気象: ${factors.weather.toFixed(0)} pts（${weather.tempC.toFixed(1)}°C・降水 ${weather.precipMm ?? 0}mm${weather.pressureHPa != null ? `・気圧 ${weather.pressureHPa.toFixed(0)}hPa` : ""}）`
       : `気象: ${factors.weather} pts（取得なし・中央値）`,
     terrainLine,
     `月相: ${factors.lunar} pts（${phaseName}）`,
@@ -509,6 +509,86 @@ export const RISK_LEVEL_COLOR: Record<RiskLevel, string> = {
   elevated: "#F97316", // orange-500
   high: "#EF4444", // red-500
   unknown: "#6b7280",
+};
+
+/**
+ * マップ ヒートマップ表示用パレット (2026-06 改訂)。
+ * 「クマの生息域」と「直近の出没（危険）」を色で分離し、過度な恐怖感を避ける。
+ *  - 生息域: 落ち着いた 薄緑 → ベージュ。広い山地が穏やかに見える。
+ *  - 警戒(直近1年の出没): 黄 → 橙 → 赤。実際に最近よく出ている所だけ強い色。
+ * しきい値 (件/4次メッシュ/年) は ALERT_SIGHTING_THRESHOLDS。
+ */
+export const HABITAT_DISPLAY_COLOR: Record<
+  "low" | "moderate" | "elevated" | "high",
+  string
+> = {
+  low: "#dcead0", // 薄い緑
+  moderate: "#bcd9a4", // 黄緑
+  elevated: "#cdbe93", // ベージュ
+  high: "#b39867", // 濃いベージュ/土色
+};
+export const ALERT_DISPLAY_COLOR: Record<
+  "moderate" | "elevated" | "high",
+  string
+> = {
+  moderate: "#fbbf24", // amber-400 (黄)
+  elevated: "#fb923c", // orange-400 (橙)
+  high: "#ef4444", // red-500 (赤)
+};
+export const ALERT_SIGHTING_THRESHOLDS = {
+  amber: 3,
+  orange: 7,
+  red: 15,
+} as const;
+
+/**
+ * カードの「この地点の状況」判定区分 (2026-06)。マップのセル色と同じ二軸で決める:
+ *  - 直近1年の出没件数 (recentSightingCount = 当該メッシュ・マップと同入力) で
+ *    注意(>=3) / 警戒(>=7) / 危険(>=15) を判定。
+ *  - 出没が無くても生息域なら「生息域」(中立)。生息域でもなければ「情報なし」。
+ * これによりマップが穏やかな所をタップしても、カードが赤い「高い」にならず整合する。
+ */
+export type DisplayCategory =
+  | "none"
+  | "habitat"
+  | "habitatCore"
+  | "caution"
+  | "warning"
+  | "danger";
+export function displayCategory(
+  habitatLevel: RiskLevel,
+  recentSightingCount: number,
+): DisplayCategory {
+  // 直近の出没を主軸に。煽る語は使わず「出没あり/やや多い/多い」で表現する。
+  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.red) return "danger";
+  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.orange) return "warning";
+  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.amber) return "caution";
+  // 出没が無ければ生息域の濃淡で 2 段階 (生息域 / 主要生息域)。
+  if (habitatLevel === "high" || habitatLevel === "elevated")
+    return "habitatCore";
+  if (habitatLevel === "moderate" || habitatLevel === "low") return "habitat";
+  return "none";
+}
+export const DISPLAY_CATEGORY_LABEL: Record<DisplayCategory, string> = {
+  none: "情報なし",
+  habitat: "生息域",
+  habitatCore: "主要生息域",
+  caution: "出没あり",
+  warning: "出没やや多い",
+  danger: "出没多い",
+};
+/** 判定バッジの 背景色 / 文字色。生息域はベージュ系＋濃文字で中立に示し、
+ *  出没は 黄→橙→赤 で強さを表す (語は穏やか・色で程度を伝える)。 */
+export const DISPLAY_CATEGORY_STYLE: Record<
+  DisplayCategory,
+  { bg: string; fg: string }
+> = {
+  none: { bg: "#9ca3af", fg: "#ffffff" },
+  habitat: { bg: "#d8cba3", fg: "#41391f" },
+  habitatCore: { bg: "#c2a86b", fg: "#352c12" },
+  caution: { bg: "#f59e0b", fg: "#ffffff" },
+  warning: { bg: "#ea580c", fg: "#ffffff" },
+  danger: { bg: "#dc2626", fg: "#ffffff" },
 };
 
 /** 非選択時の pale 表示用。5 段階バーで "選択中以外" を薄く見せるのに使う。 */

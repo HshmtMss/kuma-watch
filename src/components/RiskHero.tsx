@@ -3,87 +3,130 @@
 import type { RiskLevel } from "@/lib/types";
 import {
   LEVEL_DESCRIPTION,
-  RISK_LEVEL_COLOR,
-  RISK_LEVEL_COLOR_PALE,
-  RISK_LEVEL_LABEL,
+  displayCategory,
+  DISPLAY_CATEGORY_LABEL,
+  DISPLAY_CATEGORY_STYLE,
+  HABITAT_DISPLAY_COLOR,
+  ALERT_DISPLAY_COLOR,
+  type DisplayCategory,
 } from "@/lib/score";
 
+// 色塗りの意味を示す 6 段階バー (マップの塗り色と一致)。
+// 左 (低) → 右 (高): 情報なし / 生息域 / 主要生息域 / 出没あり / やや多い / 多い。
+const CATEGORY_BAR: { key: DisplayCategory; label: string; color: string }[] = [
+  { key: "none", label: "情報なし", color: "#e5e7eb" },
+  { key: "habitat", label: "生息域", color: HABITAT_DISPLAY_COLOR.moderate },
+  { key: "habitatCore", label: "主要生息域", color: HABITAT_DISPLAY_COLOR.high },
+  { key: "caution", label: "出没あり", color: ALERT_DISPLAY_COLOR.moderate },
+  { key: "warning", label: "やや多い", color: ALERT_DISPLAY_COLOR.elevated },
+  { key: "danger", label: "多い", color: ALERT_DISPLAY_COLOR.high },
+];
+
 type Props = {
-  /** 表示用の (格上げ後) レベル — 5段階バー / バッジで使う */
-  level: RiskLevel;
-  /** 生息域メッシュベースの素のレベル — 「定着個体」ファクトの記述に使う */
+  /** 生息域メッシュベースの素のレベル — 生息域ファクト & 判定の素材 */
   baseLevel?: RiskLevel;
-  /** 過去90日の目撃件数 (周辺 10km) — カード表示用 */
+  /** 過去90日の目撃件数 (周辺 10km) — 「最近の目撃」行に表示 */
   count90d?: number;
-  /** 「周辺」の半径 (km) — chip / "なし" メッセージの表示に使う */
+  /** 「周辺」の半径 (km) */
   nearbyRadiusKm?: number;
+  /** 当該メッシュの直近1年の目撃件数 (マップのセル色と同入力)。判定の主軸。 */
+  recentSightingCount?: number;
 };
 
-const LEVELS: RiskLevel[] = ["safe", "low", "moderate", "elevated", "high"];
-
 export default function RiskHero({
-  level,
   baseLevel,
   count90d = 0,
   nearbyRadiusKm = 10,
+  recentSightingCount = 0,
 }: Props) {
-  // 表示レベル (= 格上げ後) と素レベル (= 生息域メッシュベース) を分けて扱う。
-  // 「定着個体の記録」ファクトは素レベルで、ヴァーディクト/バーは表示レベル。
-  const habitatLevel = baseLevel ?? level;
+  // マップのセル色と同じ二軸 (生息域 / 直近の出没) で「この地点の状況」を判定する。
+  // 生息域だけでは赤い「危険」にせず、直近の出没件数で 注意→警戒→危険 を出す。
+  const habitatLevel = baseLevel ?? "unknown";
+  const cat = displayCategory(habitatLevel, recentSightingCount);
+  const style = DISPLAY_CATEGORY_STYLE[cat];
   const habitatDescription =
-    habitatLevel === "unknown" ? "情報取得中..." : LEVEL_DESCRIPTION[habitatLevel];
-  const verdictLabel = RISK_LEVEL_LABEL[level];
-  const verdictColor = RISK_LEVEL_COLOR[level];
+    habitatLevel === "unknown"
+      ? "情報取得中..."
+      : LEVEL_DESCRIPTION[habitatLevel];
   const hasRecent = count90d > 0;
+
+  // 出没のある区分は「多い/やや多い」の曖昧表現をやめ、件数をそのまま見せる。
+  // 程度は色 (黄→橙→赤) が補助。生息域系はカテゴリ名をそのまま出す。
+  const isAlert = cat === "caution" || cat === "warning" || cat === "danger";
+
+  const blurb =
+    cat === "danger"
+      ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。`
+      : cat === "warning"
+        ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。早朝・夕方は特に注意してください。`
+        : cat === "caution"
+          ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。音を出すなど基本対策を。`
+          : cat === "habitatCore"
+            ? "クマが多く生息する地域です。直近1年の出没情報はありません。季節により状況は変わります。"
+            : cat === "habitat"
+              ? "クマの生息域です。直近1年の出没情報はありません。季節により状況は変わります。"
+              : "この地点の出没・生息データは確認されていません。";
 
   return (
     <section className="px-4 pt-3 pb-2">
-      {/* 1. ヴァーディクト — 横幅は 5 段階バーと一致 (=親要素の幅いっぱい) */}
+      {/* 1. ヴァーディクト — 生息域(中立) / 注意 / 警戒 / 危険。マップのセル色と整合。 */}
       <div className="w-full">
         <div className="mb-1 ml-1 text-xs font-semibold text-stone-500">
-          警戒レベル
+          この地点の状況
         </div>
         <div
-          className="flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-white shadow-sm"
-          style={{ background: verdictColor }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 shadow-sm"
+          style={{ background: style.bg, color: style.fg }}
         >
-          <span className="text-xl font-bold tracking-wide">
-            {verdictLabel}
-          </span>
+          {isAlert ? (
+            <span className="text-xl font-bold tracking-wide">
+              出没 {recentSightingCount}件
+            </span>
+          ) : (
+            <span className="text-xl font-bold tracking-wide">
+              {DISPLAY_CATEGORY_LABEL[cat]}
+            </span>
+          )}
+        </div>
+        <p className="mt-1.5 px-1 text-xs leading-relaxed text-stone-600">
+          {blurb}
+        </p>
+
+        {/* 6 段階バー — マップの色塗りの意味 (生息域の濃淡 + 出没の多寡) を凡例で示す。
+            現在地点の区分をハイライト。 */}
+        <div className="mt-2.5">
+          <div className="flex gap-0.5">
+            {CATEGORY_BAR.map((seg) => (
+              <div
+                key={seg.key}
+                className="h-2.5 flex-1 rounded-full"
+                style={{
+                  background: seg.color,
+                  opacity: seg.key === cat ? 1 : 0.45,
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-1 flex gap-0.5 text-[9px] leading-tight text-stone-500">
+            {CATEGORY_BAR.map((seg) => (
+              <span
+                key={seg.key}
+                className={`flex-1 text-center ${
+                  seg.key === cat ? "font-bold text-stone-900" : ""
+                }`}
+              >
+                {seg.label}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 2. 5 段階バー — ラベルとバーは同じ flex 構造で対応セルが揃う */}
-      <div className="mt-2.5 flex gap-1">
-        {LEVELS.map((lv) => (
-          <div
-            key={lv}
-            className="h-2.5 flex-1 rounded-full"
-            style={{
-              background:
-                lv === level ? RISK_LEVEL_COLOR[lv] : RISK_LEVEL_COLOR_PALE[lv],
-            }}
-          />
-        ))}
-      </div>
-      <div className="mt-1 flex gap-1 text-[11px] text-stone-500">
-        {LEVELS.map((lv) => (
-          <span
-            key={lv}
-            className={`flex-1 text-center ${
-              lv === level ? "font-semibold text-stone-900" : ""
-            }`}
-          >
-            {RISK_LEVEL_LABEL[lv]}
-          </span>
-        ))}
-      </div>
-
-      {/* 3. 並列ファクト 2 行 — ラベル左寄せ・値右寄せで横幅を使い切る */}
-      <div className="mt-4 space-y-2">
+      {/* 2. 並列ファクト 2 行 — 生息域(背景情報) と 最近の目撃(直近の動き) を分けて示す。 */}
+      <div className="mt-3 space-y-2">
         <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5">
           <div className="shrink-0 text-xs font-semibold text-stone-500">
-            定着個体
+            クマの生息域
           </div>
           <div className="min-w-0 flex-1 text-right text-sm font-medium text-stone-800">
             {habitatDescription}
@@ -92,30 +135,28 @@ export default function RiskHero({
         <div
           className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 ${
             hasRecent
-              ? "border-red-200 bg-red-50"
+              ? "border-amber-200 bg-amber-50"
               : "border-stone-200 bg-stone-50"
           }`}
         >
           <div
             className={`shrink-0 text-xs font-semibold ${
-              hasRecent ? "text-red-700" : "text-stone-500"
+              hasRecent ? "text-amber-700" : "text-stone-500"
             }`}
           >
             最近の目撃
           </div>
           <div
             className={`min-w-0 flex-1 text-right text-sm font-medium ${
-              hasRecent ? "text-red-900" : "text-stone-800"
+              hasRecent ? "text-amber-900" : "text-stone-800"
             }`}
           >
-            {hasRecent ? `${count90d} 件 / 周辺${nearbyRadiusKm}km` : `なし / 周辺${nearbyRadiusKm}km`}
+            {hasRecent
+              ? `${count90d} 件 / 周辺${nearbyRadiusKm}km`
+              : `なし / 周辺${nearbyRadiusKm}km`}
           </div>
         </div>
       </div>
-
-      {/* 格上げ注釈は撤去。バー位置で十分伝わるため。 */}
-
-      {/* 自治体公式情報は MunicipalNoticeBox で要約とお知らせを一括表示 */}
     </section>
   );
 }

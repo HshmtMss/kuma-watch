@@ -94,6 +94,8 @@ type State =
       recent90d: NearbyRecent[];
       /** 生息域メッシュベースの素のレベル (ヒートマップと同じ) */
       baseLevel: import("@/lib/types").RiskLevel;
+      /** 当該メッシュの直近1年の目撃件数 (ヒートマップのセル色と同入力)。カード判定の主軸。 */
+      sCellCount: number;
       /** 最近の目撃で格上げされたか */
       levelEscalated: boolean;
       elevationM: number | null;
@@ -498,6 +500,7 @@ export default function RiskPanel({
         count90d,
         recent90d,
         baseLevel,
+        sCellCount,
         levelEscalated,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
@@ -881,10 +884,10 @@ function RiskDetails({
     <div className="border-t border-gray-100 text-sm">
       {/* 1. 危険度 verdict + 並列ファクト + 5段階バー + LLM 補足 */}
       <RiskHero
-        level={breakdown.level}
         baseLevel={state.baseLevel}
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
+        recentSightingCount={state.sCellCount}
       />
 
       {/* この地点の周辺 10km を通知で見張る。任意地点 + 半径の購読 (geo)。
