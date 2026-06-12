@@ -13,7 +13,10 @@ const SITE_TITLE =
   "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch（くまウォッチ）";
 const SITE_DESCRIPTION =
   "獣医師監修・獣医工学ラボ運営の無料 Web アプリ。全国のクマ出没情報をリアルタイム可視化し、5km メッシュ単位で警戒レベルを予報。ツキノワグマ・ヒグマ対応。登山・キャンプ・通勤・山菜採りの前の安全確認に。";
-const GA_ID = "G-GCT59LNNZ2";
+// GA4 測定 ID。env (NEXT_PUBLIC_GA_ID) で差し替え可能。既定は wild-watch-bear。
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-QX9HZRCXS2";
+// 本番ビルドのみ計測する (ローカル dev では本番プロパティを汚さない)。
+const GA_ENABLED = process.env.NODE_ENV === "production" && Boolean(GA_ID);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -288,16 +291,20 @@ export default function RootLayout({
         {children}
         <WebVitalsReporter />
         <ServiceWorkerRegister />
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga-init" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+        {GA_ENABLED && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_ID}');`}
-        </Script>
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );

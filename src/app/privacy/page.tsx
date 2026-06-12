@@ -23,7 +23,7 @@ export default function PrivacyPage() {
 
       <h3>1.2 アクセス解析</h3>
       <p>
-        当サービスは Google Analytics（GA4、測定 ID: G-GCT59LNNZ2）を利用しています。
+        当サービスは Google Analytics（GA4、測定 ID: G-QX9HZRCXS2）を利用しています。
         Google Analytics は Cookie を使用してアクセス情報（閲覧ページ・滞在時間・端末情報等）を収集します。
         収集された情報は Google 社のプライバシーポリシーに基づいて管理されます。
       </p>
