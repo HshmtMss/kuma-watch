@@ -410,6 +410,45 @@ export const ARTICLES: ArticleMeta[] = [
     heroCreditUrl: "https://unsplash.com/photos/p0ISygGws9w",
   },
   {
+    slug: "research-digest-033",
+    title:
+      "クマ研究ダイジェスト Vol.33 — 人に慣れた母グマの息子は早死にする。知床 Shimozuru 2020",
+    description:
+      "知床のヒグマを追った Shimozuru et al.（2020, Scientific Reports）。人に慣れた母グマのもとで育った息子グマは 70% 超が人に殺されていた。「人慣れ」が次世代の運命を決める——餌付け・生ゴミ問題の根を突く日本発の研究を精読します。",
+    lead: "人慣れは母から子へ受け継がれ、息子グマの命を縮めていた。知床の長期追跡から見えた「餌付けの代償」を、Shimozuru 2020 で読み解く。",
+    publishedAt: "2026-06-16",
+    updatedAt: "2026-06-16",
+    season: "all",
+    category: "science",
+    tags: ["論文", "研究ダイジェスト", "知床", "ヒグマ", "人馴れ", "Shimozuru 2020"],
+  },
+  {
+    slug: "research-digest-032",
+    title:
+      "クマ研究ダイジェスト Vol.32 — クマ鈴は本当に効くのか。Jope 1985 と「音」の科学",
+    description:
+      "クマ鈴の効果は実は実証が薄い。グレイシャー国立公園でハイカーとグリズリーの遭遇を観察した Jope（1985, Wildlife Society Bulletin）を起点に、鈴・声・音の何がクマに「人の接近」を伝えるのか、その後の知見も交えて冷静に検証します。",
+    lead: "鈴を鳴らせば安心、ではない。古典 Jope 1985 と近年の評価から、「音で存在を知らせる」対策の本当の有効性と限界を精読。",
+    publishedAt: "2026-06-16",
+    updatedAt: "2026-06-16",
+    season: "all",
+    category: "science",
+    tags: ["論文", "研究ダイジェスト", "クマ鈴", "音", "Jope 1985", "遭遇回避"],
+  },
+  {
+    slug: "research-digest-031",
+    title:
+      "クマ研究ダイジェスト Vol.31 — ブナの凶作がクマを里へ追う。Oka 2004",
+    description:
+      "ブナ堅果の豊凶とツキノワグマの出没・有害捕獲の関係を北日本で解析した Oka et al.（2004, Journal of Wildlife Management）。堅果が凶作の年に出没と捕獲が急増する——日本の「大量出没」の核心を、近年の状況と重ねて精読します。",
+    lead: "クマの大量出没は「不作の年」に起きる。ブナの豊凶とクマの里への出没を結びつけた Oka 2004 を、いまの日本のクマ問題と重ねて読む。",
+    publishedAt: "2026-06-16",
+    updatedAt: "2026-06-16",
+    season: "all",
+    category: "science",
+    tags: ["論文", "研究ダイジェスト", "ブナ", "堅果 凶作", "大量出没", "Oka 2004"],
+  },
+  {
     slug: "research-digest-029",
     title:
       "クマ研究ダイジェスト Vol.29 — クマは森の「清掃員」だった。腐肉食動物としてのクマ",
@@ -1943,6 +1982,9 @@ export function getArticlesByTag(tag: string): ArticleMeta[] {
 /** 各記事の所要時間 (分)。`scripts/...` で page.tsx の日本語字数を 600字/分で割って算出。
  *  記事を追加したら手動でここにも 1 行追加する。未登録は 5 分にフォールバック。 */
 const READING_TIMES: Record<string, number> = {
+  "research-digest-031": 6,
+  "research-digest-032": 6,
+  "research-digest-033": 6,
   autumn: 4,
   "bear-app": 3,
   "bear-bell": 4,
