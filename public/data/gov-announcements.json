@@ -1,6 +1,28 @@
 {
-  "generatedAt": 1779677251572,
+  "generatedAt": 1781568798212,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/injury-qe.pdf",
+      "ministry": "env",
+      "date": "2026-06-12",
+      "title": "クマによる人身被害件数（速報値）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/injury-qe.pdf",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマによる人身被害の速報値を公表します。最新の被害状況を共有し、住民への注意喚起と安全確保に貢献します。",
+      "ingestedAt": 1781568798212
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf",
+      "ministry": "env",
+      "date": "2026-06-02",
+      "title": "クマの出没情報（速報値）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/syutubotu.pdf",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマの出没に関する速報値が発表されました。最新の出没状況を公開し、住民への注意喚起と被害防止に役立てます。",
+      "ingestedAt": 1781568798212
+    },
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080525.html",
       "ministry": "env",
@@ -22,6 +44,17 @@
       "category": "meeting",
       "summary": "中央環境審議会の自然環境部会が、鳥獣の保護及び管理のあり方を検討する第22回小委員会を開催。クマを含む野生動物管理の今後について議論される。",
       "ingestedAt": 1779323892568
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/capture-qe.pdf",
+      "ministry": "env",
+      "date": "2026-05-11",
+      "title": "クマの許可捕獲数（速報値）",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/capture-qe.pdf",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "クマの許可捕獲数に関する速報値が発表されました。捕獲状況を把握し、個体数管理や被害抑制策の検討に資します。",
+      "ingestedAt": 1781568798212
     },
     {
       "id": "env:https://www.env.go.jp/press/press_04487.html",
