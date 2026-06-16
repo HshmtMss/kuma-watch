@@ -248,6 +248,33 @@ function parseEnvChojuEffort12(html: string): ParsedItem[] {
       tag: "クマ被害対策",
     });
   }
+
+  // pattern B: 速報値などの PDF 統計リンク。リンク直後に「令和X年Y月Z日(更新)」が続く。
+  //   例: <a href="syutubotu.pdf">クマの出没情報（速報値）</a>[PDF 967KB]　令和8年6月2日更新
+  //   タイトルに クマ/熊 を含むものだけを対象にし誤検出を避ける。数字は全角/半角あり。
+  const toHalf = (s: string) =>
+    s.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+  const reB =
+    /<a\s+href="([^"]+\.pdf)"[^>]*>\s*([^<]*?(?:クマ|熊)[^<]*?)\s*<\/a>[^<]{0,80}?令和\s*([0-9０-９]+)\s*年\s*([0-9０-９]+)\s*月\s*([0-9０-９]+)\s*日/g;
+  while ((m = reB.exec(html))) {
+    const file = m[1];
+    const title = m[2].replace(/\s+/g, " ").trim();
+    const reiwa = Number(toHalf(m[3]));
+    if (!reiwa) continue;
+    const mo = toHalf(m[4]).padStart(2, "0");
+    const day = toHalf(m[5]).padStart(2, "0");
+    const year = reiwaToWestern(reiwa);
+    const url = file.startsWith("http")
+      ? file
+      : `https://www.env.go.jp/nature/choju/effort/effort12/${file}`;
+    out.push({
+      ministry: "env",
+      date: `${year}-${mo}-${day}`,
+      title,
+      url,
+      tag: "クマ被害対策",
+    });
+  }
   return out;
 }
 

@@ -71,24 +71,34 @@ async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
   } catch {
     // 続けて HTTP フォールバック
   }
-  // 2. Vercel runtime: 同一オリジンの静的ファイルを CDN 経由で取得。
-  //    sharp9110-flash / news-flash が頻繁に sightings.json を更新するので、
-  //    revalidate: 60 (1 分 TTL) で適度に新しい snapshot を取得する。
-  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
-  if (!baseUrl) return null;
-  try {
-    const res = await fetch(`${baseUrl}/data/sightings.json`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    const blob = (await res.json()) as { records?: UnifiedSighting[] };
-    if (Array.isArray(blob.records) && blob.records.length > 0) {
-      return blob.records;
+  // 2. Vercel runtime: serverless bundle に sightings.json は無いのでネット取得。
+  //    取得元は優先順:
+  //      a) GitHub raw (main の最新コミット) — cron が sightings.json のみを
+  //         commit すると should-deploy.sh がビルドをスキップするため、
+  //         デプロイ済み静的ファイルは最大1日 stale。raw なら各 commit が
+  //         ~数分で反映される (public repo なので認証不要)。
+  //      b) 同一オリジンの静的ファイル — raw 取得失敗時のフォールバック。
+  //    どちらも memCache (5分TTL) があるのでフェッチ頻度はインスタンス当り低い。
+  //    22MB と大きいので Data Cache (2MB上限) には載らない → cache:"no-store"。
+  const RAW_URL =
+    "https://raw.githubusercontent.com/HshmtMss/kuma-watch/main/public/data/sightings.json";
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}/data/sightings.json`
+    : null;
+  const candidates = [RAW_URL, baseUrl].filter((u): u is string => Boolean(u));
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) continue;
+      const blob = (await res.json()) as { records?: UnifiedSighting[] };
+      if (Array.isArray(blob.records) && blob.records.length > 0) {
+        return blob.records;
+      }
+    } catch {
+      // 次の候補へ
     }
-    return null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 function writeDiskCache(records: UnifiedSighting[]): void {
