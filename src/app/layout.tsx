@@ -85,6 +85,11 @@ export const metadata: Metadata = {
       ja: SITE_URL + "/",
       "x-default": SITE_URL + "/",
     },
+    types: {
+      "application/rss+xml": [
+        { url: SITE_URL + "/feed.xml", title: SITE_NAME + " — クマ対策解説" },
+      ],
+    },
   },
   openGraph: {
     type: "website",
