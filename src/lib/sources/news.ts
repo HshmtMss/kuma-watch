@@ -21,8 +21,9 @@ const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // 1 回のバッチで Gemini に渡す記事数の上限。
-// FEEDS が 6 系統に増えたためバッチも拡張。Gemini gemini-3-flash は
-// 50 記事程度なら responseSchema の JSON 上限内に収まる。
+// FEEDS が多系統 (全国 + 警察/防災 + 西日本県別 + NHK/Yahoo) に増えたため
+// バッチ分割で処理。Gemini gemini-3-flash は 50 記事程度なら
+// responseSchema の JSON 上限内に収まる。
 const MAX_ARTICLES_PER_BATCH = 50;
 const SOURCE_CACHE_TTL_MS = 60 * 60 * 1000;
 
@@ -83,9 +84,11 @@ const FEEDS: Feed[] = [
     label: "google-news-higuma",
   },
   // === 地域強化クエリ（西日本の薄いカバレッジ補強）===
-  // 京都・兵庫・和歌山は公式オープンデータが無い/更新停止で、全国一括クエリだと
-  // 東北・北海道の事案に埋もれて拾えていない。県名を添えた検索面を増やし、
-  // 関西・中国地方の事案を明示的に取り込む。重複は URL / フィンガープリントで除外。
+  // 京都・兵庫・和歌山・広島は公式オープンデータが無い/更新停止 or 集計のみ公開で
+  // 点データが取れず、全国一括クエリだと東北・北海道の事案に埋もれて拾えていない。
+  // 県名を添えた検索面を増やし、関西・中国地方の事案を明示的に取り込む。
+  // 大阪(能勢)・鳥取・山口・滋賀・奈良もクマ生息地だが公式 extractor が実質 0 件で
+  // news 頼みのため、同様に県名クエリを追加。重複は URL / フィンガープリントで除外。
   {
     url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E4%BA%AC%E9%83%BD&hl=ja&gl=JP&ceid=JP:ja",
     label: "google-news-kyoto",
@@ -101,6 +104,26 @@ const FEEDS: Feed[] = [
   {
     url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%BA%83%E5%B3%B6&hl=ja&gl=JP&ceid=JP:ja",
     label: "google-news-hiroshima",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%A4%A7%E9%98%AA&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-osaka",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E9%B3%A5%E5%8F%96&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-tottori",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%B1%B1%E5%8F%A3&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-yamaguchi",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E6%BB%8B%E8%B3%80&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-shiga",
+  },
+  {
+    url: "https://news.google.com/rss/search?q=%E3%82%AF%E3%83%9E+%E5%A5%88%E8%89%AF&hl=ja&gl=JP&ceid=JP:ja",
+    label: "google-news-nara",
   },
   // === NHK 全国ニュース ===
   // NHK は地域取材網が広く、クマ事案を発生数時間以内に出すことが多い。
