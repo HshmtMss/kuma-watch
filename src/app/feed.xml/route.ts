@@ -5,17 +5,29 @@
  * 解説記事を RSS リーダー・アグリゲータ・IFTTT/Zapier・Discord/Slack webhook 等へ
  * 配信できるよう公開フィードを用意し、検索以外の流入経路とクロール鮮度シグナルを増やす。
  *
- * 内容: 解説記事 (ARTICLES) を publishedAt 降順で最新 40 件。
- * ニュース速報・出没データは更新頻度が高く RSS には不向きなため含めない
- * (それらは /news と地図、X 日次投稿、Web Push でカバー)。
+ * 内容: 解説記事 (ARTICLES) + 日次/週次の研究レポート (RESEARCH_ENTRIES) を
+ * publishedAt 降順で最新 50 件。研究レポートは毎日発行されるため、これを含めることで
+ * フィードが日次更新となりアグリゲータ・RSS リーダーでの鮮度が保たれる。
+ * 個別の出没データ・ニュース速報そのものは更新頻度が高すぎて RSS に不向きなため
+ * 含めない (それらは /news と地図、X 日次投稿、Web Push でカバー)。
  */
 import { ARTICLES } from "@/lib/articles-meta";
+import { RESEARCH_ENTRIES } from "@/lib/research-entries";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch（くまウォッチ）";
 const FEED_DESCRIPTION =
   "獣医師監修・獣医工学ラボ運営。クマの生態・遭遇対処・装備・季節・地域のクマ対策解説記事。";
-const MAX_ITEMS = 40;
+const MAX_ITEMS = 50;
+
+type FeedItem = {
+  url: string;
+  title: string;
+  summary: string;
+  publishedAt: string;
+  updatedAt: string;
+  category: string;
+};
 
 // ISR: 1 時間ごとに再生成。新規記事の追加を程よい遅延で反映する。
 export const revalidate = 3600;
@@ -40,7 +52,25 @@ function toRfc822(dateStr: string): string {
 }
 
 export async function GET() {
-  const items = [...ARTICLES]
+  const articleItems: FeedItem[] = ARTICLES.map((a) => ({
+    url: `${SITE_URL}/articles/${a.slug}`,
+    title: a.title,
+    summary: a.lead || a.description || "",
+    publishedAt: a.publishedAt,
+    updatedAt: a.updatedAt || a.publishedAt,
+    category: a.category,
+  }));
+
+  const researchItems: FeedItem[] = RESEARCH_ENTRIES.map((e) => ({
+    url: `${SITE_URL}/research/${e.slug}`,
+    title: e.title,
+    summary: e.lead || "",
+    publishedAt: e.publishedAt,
+    updatedAt: e.publishedAt,
+    category: `research/${e.category}`,
+  }));
+
+  const items = [...articleItems, ...researchItems]
     .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
     .slice(0, MAX_ITEMS);
 
@@ -49,20 +79,18 @@ export async function GET() {
     : new Date(0).toUTCString();
 
   const itemXml = items
-    .map((a) => {
-      const url = `${SITE_URL}/articles/${a.slug}`;
-      const summary = a.lead || a.description || "";
-      return [
+    .map((it) =>
+      [
         "    <item>",
-        `      <title>${escapeXml(a.title)}</title>`,
-        `      <link>${url}</link>`,
-        `      <guid isPermaLink="true">${url}</guid>`,
-        `      <pubDate>${toRfc822(a.publishedAt)}</pubDate>`,
-        `      <category>${escapeXml(a.category)}</category>`,
-        `      <description>${escapeXml(summary)}</description>`,
+        `      <title>${escapeXml(it.title)}</title>`,
+        `      <link>${it.url}</link>`,
+        `      <guid isPermaLink="true">${it.url}</guid>`,
+        `      <pubDate>${toRfc822(it.publishedAt)}</pubDate>`,
+        `      <category>${escapeXml(it.category)}</category>`,
+        `      <description>${escapeXml(it.summary)}</description>`,
         "    </item>",
-      ].join("\n");
-    })
+      ].join("\n"),
+    )
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
