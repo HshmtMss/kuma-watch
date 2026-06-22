@@ -34,6 +34,16 @@ export type JapanLandmark = {
   imageUrl?: string;
   /** 画像の出典 (Wikipedia 記事タイトル)。クレジット表記に使う。 */
   imageCredit?: string;
+  /** 規模感の補足（年間来訪者数など）。任意・表示用。 */
+  scaleNote?: string;
+  /** 主要コース・エリア。周辺出没を「どのコースで」まで解像度を上げて集計表示する。
+   *  各 area の代表座標に最寄りの出没を割り当てる。設定があるスポットでのみ表示。 */
+  areas?: { name: string; lat: number; lon: number; note?: string }[];
+  /** アクセス（最寄り駅・交通機関）。観光地の安全ハブとして来訪導線を示す。 */
+  access?: { label: string; detail: string; url?: string }[];
+  /** 公式情報源（都道府県・ビジターセンター等）。一次出典への導線。市町村クマ情報は
+   *  別途キュレーション済みの getMuniOfficialLink を優先利用するため重複させない。 */
+  officialLinks?: { label: string; url: string }[];
 };
 
 export const JAPAN_LANDMARKS: JapanLandmark[] = [
@@ -65,6 +75,22 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
       "東京西部の代表的な観光・登山スポット。年間 260 万人を超えるハイカーが訪れる一方、近年は奥高尾・小仏方面でクマの目撃情報が増加。早朝・夕方の単独行動には注意が必要です。",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mt.takao.jpg/1280px-Mt.takao.jpg",
     imageCredit: "高尾山",
+    scaleNote: "年間約 260 万人が訪れる、世界有数の登山者数を誇る山。",
+    areas: [
+      { name: "1号路・表参道（薬王院〜山頂）", lat: 35.6253, lon: 139.2436, note: "ケーブルカー・観光客の主動線" },
+      { name: "稲荷山コース", lat: 35.6268, lon: 139.2505 },
+      { name: "奥高尾・小仏城山〜景信山", lat: 35.6320, lon: 139.2150, note: "目撃が増えている縦走路" },
+      { name: "陣馬山方面", lat: 35.6430, lon: 139.1660 },
+      { name: "高尾山口・麓（京王高尾山口駅周辺）", lat: 35.6322, lon: 139.2690 },
+    ],
+    access: [
+      { label: "鉄道", detail: "京王高尾線「高尾山口駅」から登山口まで徒歩約 5 分" },
+      { label: "ケーブルカー・リフト", detail: "高尾登山電鉄（清滝駅〜高尾山駅）", url: "https://www.takaotozan.co.jp/" },
+    ],
+    officialLinks: [
+      { label: "東京都環境局 ツキノワグマ情報", url: "https://www.kankyo.metro.tokyo.lg.jp/nature/animals_plants/bear" },
+      { label: "高尾ビジターセンター", url: "https://www.ces-net.jp/takaovc/" },
+    ],
   },
   {
     slug: "大菩薩嶺",

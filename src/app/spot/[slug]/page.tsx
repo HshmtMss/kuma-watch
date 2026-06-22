@@ -8,6 +8,7 @@ import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getCachedSightings } from "@/lib/sightings-cache";
+import { getMuniOfficialLink } from "@/data/muni-official-links";
 import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 
@@ -189,6 +190,38 @@ export default async function SpotPage({ params }: Props) {
   const topMunis = [...involvedMunis.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6);
+
+  // コース・エリア別の集計。周辺 10km の各出没を最寄りの登録エリアに割り当て、
+  // 「どのコースで出ているか」までの解像度を出す (B2B デモ: 観光地の安全ハブ)。
+  const areaStats = (landmark.areas ?? []).map((a) => ({
+    name: a.name,
+    note: a.note,
+    lat: a.lat,
+    lon: a.lon,
+    c90: 0,
+    c365: 0,
+  }));
+  if (areaStats.length > 0) {
+    for (const n of nearby) {
+      let best = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < areaStats.length; i++) {
+        const d = haversineKm(areaStats[i].lat, areaStats[i].lon, n.lat, n.lon);
+        if (d < bestD) {
+          bestD = d;
+          best = i;
+        }
+      }
+      areaStats[best].c365++;
+      if (n.date >= cutoff90) areaStats[best].c90++;
+    }
+  }
+  const areaRows = [...areaStats].sort((a, b) => b.c365 - a.c365);
+
+  // 市町村クマ情報の一次出典 (キュレーション済み・検証済み URL)。
+  const officialLink = landmark.muniName
+    ? getMuniOfficialLink(landmark.prefName, landmark.muniName)
+    : null;
 
   // 危険度評価 (周辺 10km の count90 ベース)
   const risk =
@@ -373,6 +406,12 @@ export default async function SpotPage({ params }: Props) {
       {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
       <h2>このスポットについて</h2>
       <p>{landmark.blurb}</p>
+      {landmark.scaleNote && (
+        <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+          <span aria-hidden>👥</span>
+          {landmark.scaleNote}
+        </p>
+      )}
       <p className="not-prose my-3 text-sm text-stone-600">
         <span className="text-stone-500">所在: </span>
         <span className="font-semibold text-stone-900">
@@ -442,6 +481,49 @@ export default async function SpotPage({ params }: Props) {
           <div className="mt-1 text-sm font-semibold text-stone-900">{latestDate ? formatDate(latestDate) : "-"}</div>
         </div>
       </div>
+
+      {/* コース・エリア別 — 「どのコースで出ているか」の解像度。areas 設定があるスポットのみ。 */}
+      {areaRows.length > 0 && (
+        <>
+          <h2>コース・エリア別の出没（直近1年）</h2>
+          <p className="not-prose mb-2 text-xs leading-relaxed text-stone-500">
+            周辺 10 km の出没を最寄りのコース・エリアに割り当てた目安です。ルート選びの参考に。
+          </p>
+          <div className="not-prose my-3 overflow-hidden rounded-xl border border-stone-200">
+            <table className="w-full text-sm">
+              <thead className="bg-stone-50 text-xs text-stone-500">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium">コース・エリア</th>
+                  <th className="px-3 py-2 text-right font-medium">直近90日</th>
+                  <th className="px-3 py-2 text-right font-medium">直近1年</th>
+                </tr>
+              </thead>
+              <tbody>
+                {areaRows.map((a) => (
+                  <tr key={a.name} className="border-t border-stone-100">
+                    <td className="px-3 py-2">
+                      <span className="font-medium text-stone-900">{a.name}</span>
+                      {a.note && (
+                        <span className="ml-1 block text-[11px] text-stone-400 sm:ml-1 sm:inline">
+                          {a.note}
+                        </span>
+                      )}
+                    </td>
+                    <td
+                      className={`px-3 py-2 text-right tabular-nums ${a.c90 > 0 ? "font-semibold text-amber-700" : "text-stone-400"}`}
+                    >
+                      {a.c90}
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums text-stone-700">
+                      {a.c365}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* 季節別アドバイス */}
       <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
@@ -514,6 +596,94 @@ export default async function SpotPage({ params }: Props) {
           </div>
         </>
       )}
+
+      {/* 公式情報・アクセス — 一次出典への導線 (「速く正確に」) と来訪導線。
+          official 情報 or access のどちらかがあるスポットでのみ表示。 */}
+      {(officialLink?.bearUrl ||
+        officialLink?.homeUrl ||
+        (landmark.officialLinks?.length ?? 0) > 0 ||
+        (landmark.access?.length ?? 0) > 0) && (
+        <>
+          <h2>公式情報・アクセス</h2>
+          {(officialLink?.bearUrl ||
+            officialLink?.homeUrl ||
+            (landmark.officialLinks?.length ?? 0) > 0) && (
+            <div className="not-prose my-3 flex flex-wrap gap-2">
+              {officialLink?.bearUrl && (
+                <a
+                  href={officialLink.bearUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-amber-400 hover:bg-amber-50/60"
+                >
+                  <span aria-hidden>🏛️</span>
+                  {landmark.muniName} クマ出没情報（公式）
+                </a>
+              )}
+              {landmark.officialLinks?.map((l) => (
+                <a
+                  key={l.url}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-amber-400 hover:bg-amber-50/60"
+                >
+                  <span aria-hidden>🏛️</span>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          )}
+          {(landmark.access?.length ?? 0) > 0 && (
+            <ul className="not-prose my-3 space-y-1.5 text-sm text-stone-700">
+              {landmark.access!.map((a) => (
+                <li key={a.label} className="flex flex-wrap gap-x-2">
+                  <span className="font-semibold text-stone-900">{a.label}:</span>
+                  <span>
+                    {a.url ? (
+                      <a
+                        href={a.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-700 underline"
+                      >
+                        {a.detail}
+                      </a>
+                    ) : (
+                      a.detail
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+
+      {/* B2B 導線 — 観光地・自治体向けの「安全情報ハブ提供」。全スポット共通の funnel。 */}
+      <div className="not-prose my-8 rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+        <h2 className="m-0 text-base font-bold text-stone-900">
+          この安全情報ハブを、貴施設・自治体に
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-stone-700">
+          {landmark.name}周辺のように、観光地・登山口・施設まわりのクマ出没を、警察・自治体・報道から集約し、
+          来訪者とスタッフへ速く正確に届けます。共同ブランド掲示・スタッフ向け通知・多言語対応などもご相談いただけます（{SUPERVISION}）。
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/for-gov"
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-amber-700"
+          >
+            自治体・観光事業者の方へ →
+          </Link>
+          <Link
+            href="/for-vendors"
+            className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 hover:border-amber-400 hover:bg-amber-50"
+          >
+            製品・サービスの掲載 →
+          </Link>
+        </div>
+      </div>
 
       {/* 戻り導線 — ユーザーが「観光地一覧に戻る」を見失わないよう、
           目立つピル状リンクで本文末尾に明示。 */}
