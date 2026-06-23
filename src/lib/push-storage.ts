@@ -58,6 +58,20 @@ function client(): Redis {
   return cached;
 }
 
+/**
+ * 予測アラートの「前回バンド」を地域キーごとに保持する。
+ * forecast-dispatch が上方クロッシング判定に使う。key 例: "spot:高尾山" / "muni:東京都/八王子市"。
+ */
+export async function getForecastBand(key: string): Promise<string | null> {
+  if (!isConfigured()) return null;
+  return (await client().get<string>(`fcband:${key}`)) ?? null;
+}
+
+export async function setForecastBand(key: string, band: string): Promise<void> {
+  if (!isConfigured()) return;
+  await client().set(`fcband:${key}`, band);
+}
+
 export function hashEndpoint(endpoint: string): string {
   return createHash("sha256").update(endpoint).digest("hex").slice(0, 16);
 }
