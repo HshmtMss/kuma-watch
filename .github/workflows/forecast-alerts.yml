@@ -1,0 +1,42 @@
+name: Forecast threshold alerts
+
+# 予測「閾値アラート」配信 (/api/push/forecast-dispatch)。
+# 既定は dryRun=1 = 送信も状態更新もせず「何を送る予定か」をログに出すだけの観測モード。
+#
+# 本番で実際に配信を始めるには:
+#   1) しばらく dryRun のログで挙動を確認する
+#   2) Vercel に FORECAST_ALERT_ENABLED=true を設定して再デプロイ
+#   3) 下の URL から `?dryRun=1` を外す（このファイルを編集してコミット）
+# ※ FORECAST_ALERT_ENABLED が無い限り、dryRun を外してもサーバ側で送信されない
+#   （二重の安全装置）。
+
+on:
+  schedule:
+    # 週次（予測は緩やかに変化するため日次は不要）。月曜 21:00 UTC = 火曜 06:00 JST。
+    - cron: "0 21 * * 1"
+  workflow_dispatch: {}
+
+# 同時実行を避ける（前回が走っていたらスキップ）。
+concurrency:
+  group: forecast-alerts
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call forecast-dispatch (dryRun = 観測のみ)
+        env:
+          PUSH_DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}
+        run: |
+          if [ -z "${PUSH_DISPATCH_SECRET}" ]; then
+            echo "PUSH_DISPATCH_SECRET not set — skipping"
+            exit 0
+          fi
+          RESPONSE=$(curl -sS --max-time 60 -o /tmp/fc.json -w "%{http_code}" \
+            -X POST "https://kuma-watch.jp/api/push/forecast-dispatch?dryRun=1" \
+            -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}") || true
+          echo "[forecast-alerts] http=$RESPONSE"
+          # 「送る予定」のサマリをログに出す（mode/candidates/plans）。
+          jq '{mode, enabled, candidates, plans: (.plans // [] | map({name, band, vsTypicalPct, prevBand}))}' /tmp/fc.json 2>/dev/null \
+            || cat /tmp/fc.json
