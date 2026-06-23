@@ -11,6 +11,7 @@ import { getCachedSightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
+import { buildSeasonalModel, forecastArea, BAND_LABEL } from "@/lib/forecast";
 
 // dynamicParams=false: 登録済みランドマークのみ。それ以外は 404。
 // /spot/[slug] は「高尾山 くま」型の検索受け皿で、対象は手動キュレーション。
@@ -155,13 +156,18 @@ export default async function SpotPage({ params }: Props) {
     sourceUrl?: string;
   };
   const nearby: NearSight[] = [];
+  // 予測用: 全国の全期間日付（季節シェイプ用）と、当該 10km 圏の全期間日付。
+  const allDates: string[] = [];
+  const areaDatesAll: string[] = [];
   let count90 = 0;
   let count365 = 0;
   let latestDate: string | null = null;
   for (const s of sightings) {
     if (!s.date || s.date > today) continue;
+    allDates.push(s.date);
     const d = haversineKm(landmark.lat, landmark.lon, s.lat, s.lon);
     if (d > NEAR_RADIUS_KM) continue;
+    areaDatesAll.push(s.date);
     if (s.date < cutoff365) continue;
     nearby.push({
       id: s.id,
@@ -222,6 +228,16 @@ export default async function SpotPage({ params }: Props) {
   const officialLink = landmark.muniName
     ? getMuniOfficialLink(landmark.prefName, landmark.muniName)
     : null;
+
+  // 今後 4 週間の出没見通し（統計予測）。全国の季節シェイプ × 当該 10km 圏の直近実測。
+  const seasonalModel = buildSeasonalModel(allDates);
+  const forecast = forecastArea(areaDatesAll, seasonalModel, today);
+  const fcBand: Record<string, { box: string; text: string; dot: string }> = {
+    low: { box: "border-emerald-200 bg-emerald-50", text: "text-emerald-900", dot: "bg-emerald-500" },
+    normal: { box: "border-stone-200 bg-stone-50", text: "text-stone-800", dot: "bg-stone-400" },
+    elevated: { box: "border-amber-200 bg-amber-50", text: "text-amber-900", dot: "bg-amber-500" },
+    high: { box: "border-orange-300 bg-orange-50", text: "text-orange-900", dot: "bg-orange-500" },
+  };
 
   // 危険度評価 (周辺 10km の count90 ベース)
   const risk =
@@ -393,6 +409,44 @@ export default async function SpotPage({ params }: Props) {
             ボタンが 3 箇所あると同じ URL なのに違う案内に見える、という muni
             ページと同様の指摘に対応。 */}
       </div>
+
+      {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
+          現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
+          断定でなくバンド + 例年比で提示し、根拠を全部開示する。 */}
+      {forecast && (
+        <div className={`not-prose mb-6 rounded-2xl border p-5 ${fcBand[forecast.band].box}`}>
+          <div className="flex items-center gap-2">
+            <span aria-hidden>📈</span>
+            <span className={`text-xs font-medium ${fcBand[forecast.band].text}/80`}>
+              今後4週間の出没見通し（統計予測・{SUPERVISION}）
+            </span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className={`text-2xl font-bold ${fcBand[forecast.band].text}`}>
+              {BAND_LABEL[forecast.band]}
+            </span>
+            {forecast.vsTypicalPct !== null && (
+              <span className={`text-sm font-semibold ${fcBand[forecast.band].text}/90`}>
+                例年同期比 {forecast.vsTypicalPct >= 0 ? "+" : ""}
+                {forecast.vsTypicalPct}%
+              </span>
+            )}
+            {forecast.confidence === "low" && (
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-medium text-stone-500">
+                参考値（データ少）
+              </span>
+            )}
+          </div>
+          <ul className={`mt-2 space-y-0.5 text-xs leading-relaxed ${fcBand[forecast.band].text}/90`}>
+            {forecast.basis.map((b) => (
+              <li key={b}>・{b}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
+            過去3年（2023–2025）の季節パターンと直近の実測ペースから算出した統計的見通しです。確定的な予測ではありません。出没は天候・堅果の豊凶等で変動します。
+          </p>
+        </div>
+      )}
 
       {/* 通知購読 — この観光地の周辺 10km で新規出没があれば通知する。
           市町村通知 (NEXT_PUBLIC_PUSH_ENABLED) とは別フラグ
