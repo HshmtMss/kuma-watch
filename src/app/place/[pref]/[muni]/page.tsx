@@ -777,6 +777,16 @@ export default async function MuniPage({ params }: Props) {
           全削除。同じ情報は「県内での位置づけ」と「近隣で出没している市町村」
           で十分に表現できている。 */}
 
+      {/* 詳しく見る — 分析系(傾向・月別・季節・県内での位置づけ)を折りたたみ、
+          来訪目的の核(最近の事案・公式情報)は下に見える形で残す。折りたたみでも
+          本文は HTML に残るので長尾 SEO は維持される（観光地ページと基本UXを統一）。 */}
+      <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
+        <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
+          <span>📊 詳しく見る（傾向・月別件数・季節の注意・県内での位置づけ）</span>
+          <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
+        </summary>
+        <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
+
       <h2>クマ出没の傾向</h2>
       {cell.count365d > 0 || cell.count90d > 0 ? (
         <p>
@@ -886,6 +896,8 @@ export default async function MuniPage({ params }: Props) {
           )}
         </>
       )}
+        </div>
+      </details>
 
       {/* 最近の出没事案 — 具体的な日付・地区の文字列が長尾 SEO に効く。
           コメントが空なら sectionName を表示、それも無ければ省略。 */}
