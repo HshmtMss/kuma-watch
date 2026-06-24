@@ -29,6 +29,9 @@ type Props = {
   boundaryUrl?: string;
   /** 強調する市町村の 5 桁コード (japan-municipalities の cityCode = N03_007)。 */
   boundaryCode?: string;
+  /** 予測リスク面（有料デモ）。生息域×季節強度で算出した 1km セル。
+   *  intensity 0–1 を色（緑→琥珀→橙）と不透明度で表現し、点（過去の出没）の下に敷く。 */
+  riskCells?: { lat: number; lon: number; intensity: number }[];
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -46,6 +49,7 @@ export default function MiniSightingsMap({
   radiusKm,
   boundaryUrl,
   boundaryCode,
+  riskCells,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -102,6 +106,30 @@ export default function MiniSightingsMap({
           }
         } catch {
           /* 境界が引けなくても地図はそのまま表示する */
+        }
+      }
+
+      // 予測リスク面（生息域 × 季節強度）。最下層に敷き、過去の出没点はこの上に置く。
+      // 「過去どこに居たか（点）」に対し「これからどこが危ないか（面）」を重ねて示す。
+      if (riskCells && riskCells.length > 0) {
+        const dLat = 0.0045; // ≈ 1km
+        const dLon = 0.0055;
+        for (const c of riskCells) {
+          const i = Math.max(0, Math.min(1, c.intensity));
+          // 煽らない配色: 緑(低)→琥珀→橙(高)。塗りは薄め。
+          const color = i >= 0.66 ? "#f97316" : i >= 0.33 ? "#f59e0b" : "#10b981";
+          L.rectangle(
+            [
+              [c.lat - dLat, c.lon - dLon],
+              [c.lat + dLat, c.lon + dLon],
+            ],
+            {
+              stroke: false,
+              fillColor: color,
+              fillOpacity: 0.12 + 0.33 * i,
+              interactive: false,
+            },
+          ).addTo(map);
         }
       }
 
@@ -173,7 +201,7 @@ export default function MiniSightingsMap({
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm, boundaryUrl, boundaryCode]);
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm, boundaryUrl, boundaryCode, riskCells]);
 
   // 全画面切替時: コンテナのサイズが変わるので Leaflet に再計測させる。
   // 全画面中はホイールズームを有効化（じっくり見たいケースなので操作性を上げる）。
