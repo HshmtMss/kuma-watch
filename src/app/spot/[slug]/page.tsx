@@ -10,6 +10,7 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
+import { getMuniMessage, type MuniMessage } from "@/data/muni-messages";
 import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { buildSeasonalModel, forecastArea, BAND_LABEL } from "@/lib/forecast";
@@ -259,9 +260,17 @@ export default async function SpotPage({ params }: Props) {
     }
   }
   const hubPrefs = [...new Set(hubMunis.map((m) => m.pref))];
+  // 自治体からのお知らせ（本文）。ハブ内自治体のうちメッセージ登録があるものを表示。
+  const hubMessages: { city: string; msg: MuniMessage }[] = landmark.officialHub
+    ? hubMunis
+        .map((m) => ({ city: m.city, msg: getMuniMessage(m.pref, m.city) }))
+        .filter((x): x is { city: string; msg: MuniMessage } => x.msg !== null)
+    : [];
   const showHub =
     landmark.officialHub === true &&
-    (hubMunis.length > 0 || (landmark.officialLinks?.length ?? 0) > 0);
+    (hubMunis.length > 0 ||
+      hubMessages.length > 0 ||
+      (landmark.officialLinks?.length ?? 0) > 0);
 
   // 今後 4 週間の出没見通し（統計予測）。全国の季節シェイプ × 当該 10km 圏の直近実測。
   const seasonalModel = buildSeasonalModel(allDates);
@@ -562,6 +571,38 @@ export default async function SpotPage({ params }: Props) {
           <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
             {landmark.name}周辺の自治体・公的機関のクマ出没情報を、府県をまたいで一次出典ごと束ねています。各リンクは公式ページに直接アクセスできます。
           </p>
+          {/* 自治体からのお知らせ（本文）— リンクだけでなく伝えたい内容を表示。 */}
+          {hubMessages.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {hubMessages.map(({ city, msg }) => (
+                <div
+                  key={city}
+                  className="rounded-lg border-l-4 border-sky-500 bg-white px-3 py-2.5 shadow-sm"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded bg-sky-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {city}からのお知らせ
+                    </span>
+                    <span className="text-[10px] text-stone-400">
+                      更新: {formatDate(msg.updatedAt)}
+                    </span>
+                    {msg.targetArea && (
+                      <span className="text-[10px] text-stone-500">対象: {msg.targetArea}</span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-stone-700">{msg.message}</p>
+                  <a
+                    href={msg.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-block text-[11px] font-medium text-sky-700"
+                  >
+                    出典: {city}公式 →
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
           {hubMunis.length > 0 && (
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               {hubMunis.map((m) => (
