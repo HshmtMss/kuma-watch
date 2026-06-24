@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -304,50 +302,6 @@ export default async function SpotPage({ params }: Props) {
   const fcMax = Math.max(1, ...fcMonths.map((x) => x.count), fcForecastBar);
   const fcPhaseArrow =
     forecast?.phase === "rising" ? "↑" : forecast?.phase === "falling" ? "↓" : "→";
-
-  // 予測リスク面（高尾山デモ・有料レイヤー）: 生息域(mesh.json) × 季節強度。
-  // 「過去どこに居たか(点)」に対し「これからどこが危ないか(面)」を示す。officialHub のみ。
-  let riskCells: { lat: number; lon: number; intensity: number }[] = [];
-  if (landmark.officialHub) {
-    try {
-      const meshPayload = JSON.parse(
-        readFileSync(join(process.cwd(), "public", "data", "mesh.json"), "utf8"),
-      ) as { meshes?: { s: number; lat: number; lon: number }[] };
-      const meshes = meshPayload.meshes ?? [];
-      // 季節強度 0..1: 全国の月別件数から「今月＋翌月」平均をピーク月で正規化。
-      const monthCounts = new Array(12).fill(0);
-      for (const d of allDates) {
-        const mo = Number(d.slice(5, 7)) - 1;
-        if (mo >= 0 && mo < 12) monthCounts[mo]++;
-      }
-      const monthMax = Math.max(1, ...monthCounts);
-      const cm = Number(today.slice(5, 7)) - 1;
-      const nm = (cm + 1) % 12;
-      const seasonalIntensity = Math.max(
-        0.15,
-        Math.min(1, (monthCounts[cm] + monthCounts[nm]) / 2 / monthMax),
-      );
-      // 生息域の「存在」を基礎(0.4)に、s(調査強度)で加点。当地域では s が 0/1 と粗いため
-      // 存在だけのセルも薄く面に含める。半径は地図が映る範囲に合わせ 14km。
-      const near = meshes.filter(
-        (m) =>
-          typeof m.lat === "number" &&
-          haversineKm(landmark.lat, landmark.lon, m.lat, m.lon) <= 14,
-      );
-      riskCells = near
-        .map((m) => ({
-          lat: m.lat,
-          lon: m.lon,
-          intensity: Math.min(
-            1,
-            (0.4 + 0.6 * Math.min(1, m.s ?? 0)) * seasonalIntensity,
-          ),
-        }))
-        .filter((c) => c.intensity > 0.02);
-    } catch {
-      riskCells = [];
-    }
-  }
 
   // 危険度評価 (周辺 10km の count90 ベース)
   const risk =
@@ -713,11 +667,6 @@ export default async function SpotPage({ params }: Props) {
           凡例はアイコンピル形式、デスクトップは下にインライン CTA、モバイルは
           末尾の Sticky CTA に集約。 */}
       <h2>周辺の目撃マップ</h2>
-      {riskCells.length > 0 && (
-        <p className="not-prose mb-1.5 text-xs leading-relaxed text-stone-600">
-          色の面は<strong>予測リスク面</strong>（生息域 × 季節強度）＝「これからどこが危ないか」の目安。点は過去の出没です。
-        </p>
-      )}
       <div className="not-prose mb-1.5">
         <MiniSightingsMap
           centerLat={landmark.lat}
@@ -731,7 +680,6 @@ export default async function SpotPage({ params }: Props) {
           zoom={11}
           showCenterMarker
           radiusKm={NEAR_RADIUS_KM}
-          riskCells={riskCells}
         />
       </div>
       {/* 凡例 — プロット対象は半径 10 km 以内・過去 1 年以内のレコード。
