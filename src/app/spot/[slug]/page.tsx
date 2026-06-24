@@ -266,12 +266,33 @@ export default async function SpotPage({ params }: Props) {
   // 今後 4 週間の出没見通し（統計予測）。全国の季節シェイプ × 当該 10km 圏の直近実測。
   const seasonalModel = buildSeasonalModel(allDates);
   const forecast = forecastArea(areaDatesAll, seasonalModel, today);
-  const fcBand: Record<string, { box: string; text: string; dot: string }> = {
-    low: { box: "border-emerald-200 bg-emerald-50", text: "text-emerald-900", dot: "bg-emerald-500" },
-    normal: { box: "border-stone-200 bg-stone-50", text: "text-stone-800", dot: "bg-stone-400" },
-    elevated: { box: "border-amber-200 bg-amber-50", text: "text-amber-900", dot: "bg-amber-500" },
-    high: { box: "border-orange-300 bg-orange-50", text: "text-orange-900", dot: "bg-orange-500" },
+  const fcBand: Record<string, { box: string; text: string; dot: string; fill: string }> = {
+    low: { box: "border-emerald-200 bg-emerald-50", text: "text-emerald-900", dot: "bg-emerald-500", fill: "#10b981" },
+    normal: { box: "border-stone-200 bg-stone-50", text: "text-stone-800", dot: "bg-stone-400", fill: "#78716c" },
+    elevated: { box: "border-amber-200 bg-amber-50", text: "text-amber-900", dot: "bg-amber-500", fill: "#f59e0b" },
+    high: { box: "border-orange-300 bg-orange-50", text: "text-orange-900", dot: "bg-orange-500", fill: "#f97316" },
   };
+
+  // 予測カードの図（月別件数バー＋「今後」見通しバー）用の直近12ヶ月シリーズ。
+  const fcMonths: { label: string; count: number }[] = [];
+  {
+    const m = new Map<string, number>();
+    for (const d of areaDatesAll) {
+      const k = d.slice(0, 7);
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
+    const base = new Date(`${today}T00:00:00Z`);
+    for (let i = 11; i >= 0; i--) {
+      const dt = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() - i, 1));
+      const ym = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, "0")}`;
+      fcMonths.push({ label: `${dt.getUTCMonth() + 1}`, count: m.get(ym) ?? 0 });
+    }
+  }
+  // 「今後4週間」の見通し棒は月換算した期待値。実データ棒と区別して提示する。
+  const fcForecastBar = forecast ? Math.round(forecast.expectedCount * (30 / 28)) : 0;
+  const fcMax = Math.max(1, ...fcMonths.map((x) => x.count), fcForecastBar);
+  const fcPhaseArrow =
+    forecast?.phase === "rising" ? "↑" : forecast?.phase === "falling" ? "↓" : "→";
 
   // 危険度評価 (周辺 10km の count90 ベース)
   const risk =
@@ -455,9 +476,9 @@ export default async function SpotPage({ params }: Props) {
               今後4週間の出没見通し（統計予測・{SUPERVISION}）
             </span>
           </div>
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className={`text-2xl font-bold ${fcBand[forecast.band].text}`}>
-              {BAND_LABEL[forecast.band]}
+              {fcPhaseArrow} {BAND_LABEL[forecast.band]}
             </span>
             {forecast.vsTypicalPct !== null && (
               <span className={`text-sm font-semibold ${fcBand[forecast.band].text}/90`}>
@@ -471,13 +492,53 @@ export default async function SpotPage({ params }: Props) {
               </span>
             )}
           </div>
-          <ul className={`mt-2 space-y-0.5 text-xs leading-relaxed ${fcBand[forecast.band].text}/90`}>
-            {forecast.basis.map((b) => (
-              <li key={b}>・{b}</li>
-            ))}
-          </ul>
-          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
-            過去3年（2023–2025）の季節パターンと直近の実測ペースから算出した統計的見通しです。確定的な予測ではありません。出没は天候・堅果の豊凶等で変動します。
+
+          {/* 図メイン: 直近12ヶ月の月別件数バー（グレー）＋「今後」見通しバー（バンド色）。
+              季節の山・今の位置・今後の向きを一目で。件数の断定は避け色と向きで提示。 */}
+          <svg
+            viewBox="0 0 286 72"
+            className="mt-2 w-full"
+            role="img"
+            aria-label={`直近12ヶ月の月別出没件数と今後4週間の見通し（${BAND_LABEL[forecast.band]}）`}
+          >
+            {fcMonths.map((mm, i) => {
+              const h = Math.max(mm.count > 0 ? 2 : 1, (mm.count / fcMax) * 48);
+              const x = i * 22 + (22 - 13) / 2;
+              return (
+                <g key={i}>
+                  <rect x={x} y={54 - h} width={13} height={h} rx={2} fill="#d6d3d1" />
+                  {i % 3 === 0 && (
+                    <text x={x + 6.5} y={66} textAnchor="middle" fontSize={8} fill="#a8a29e">
+                      {mm.label}月
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+            <rect
+              x={12 * 22 + (22 - 13) / 2}
+              y={54 - Math.max(2, (fcForecastBar / fcMax) * 48)}
+              width={13}
+              height={Math.max(2, (fcForecastBar / fcMax) * 48)}
+              rx={2}
+              fill={fcBand[forecast.band].fill}
+              opacity={0.9}
+            />
+            <text
+              x={12 * 22 + 6.5 + (22 - 13) / 2}
+              y={66}
+              textAnchor="middle"
+              fontSize={8}
+              fontWeight="bold"
+              fill={fcBand[forecast.band].fill}
+            >
+              今後
+            </text>
+          </svg>
+
+          <p className={`mt-1 text-xs ${fcBand[forecast.band].text}/90`}>{forecast.basis[0]}</p>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-stone-500">
+            直近12ヶ月の月別件数と過去3年の季節パターンから算出した統計的見通し（確定的な予測ではありません）。
           </p>
         </div>
       )}
