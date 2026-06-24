@@ -706,11 +706,55 @@ export default async function SpotPage({ params }: Props) {
         </Link>
       </p>
 
+      {/* 最近の出没事案 — 「最近何があったか」は来訪目的の核なので折りたたまず表示。 */}
+      {nearby.length > 0 && (
+        <>
+          <h2>最近の出没事案</h2>
+          <ul className="not-prose space-y-2">
+            {nearby.slice(0, 12).map((r, i) => {
+              const href = r.cityName
+                ? placeHrefForSighting(landmark.prefName, r.cityName)
+                : null;
+              const body = (
+                <>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
+                    <span className="text-xs text-stone-500">
+                      {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
+                      {r.sectionName ? ` ${r.sectionName}` : ""}
+                    </span>
+                  </div>
+                  {r.comment && (
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
+                  )}
+                </>
+              );
+              return (
+                <li key={`${r.date}-${i}`}>
+                  {href ? (
+                    <Link
+                      href={href}
+                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-amber-400 hover:bg-amber-50/60"
+                    >
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm">
+                      {body}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+
       {/* 詳しく見る — 二次情報はアコーディオンに畳み、情報過多を解消（IA 再設計）。
           一目で要る「今の状況・予測・自治体情報・地図」を上に残し、深掘りは折りたたむ。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span>📊 詳しく見る（統計・コース別・季節の注意・最近の事案・周辺市町村）</span>
+          <span>📊 詳しく見る（統計・コース別・季節の注意・周辺市町村）</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -785,50 +829,6 @@ export default async function SpotPage({ params }: Props) {
         </div>
         <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">{seasonalAdvice.point}</p>
       </div>
-
-      {/* 最近の出没事案 */}
-      {nearby.length > 0 && (
-        <>
-          <h2>最近の出没事案</h2>
-          <ul className="not-prose space-y-2">
-            {nearby.slice(0, 12).map((r, i) => {
-              const href = r.cityName
-                ? placeHrefForSighting(landmark.prefName, r.cityName)
-                : null;
-              const body = (
-                <>
-                  <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
-                    <span className="text-xs text-stone-500">
-                      {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
-                      {r.sectionName ? ` ${r.sectionName}` : ""}
-                    </span>
-                  </div>
-                  {r.comment && (
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
-                  )}
-                </>
-              );
-              return (
-                <li key={`${r.date}-${i}`}>
-                  {href ? (
-                    <Link
-                      href={href}
-                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-amber-400 hover:bg-amber-50/60"
-                    >
-                      {body}
-                    </Link>
-                  ) : (
-                    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm">
-                      {body}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      )}
 
       {/* 含まれる市町村 */}
       {topMunis.length > 0 && (
