@@ -116,17 +116,20 @@ export default function MiniSightingsMap({
         const dLon = 0.0055;
         for (const c of riskCells) {
           const i = Math.max(0, Math.min(1, c.intensity));
-          // 煽らない配色: 緑(低)→琥珀→橙(高)。塗りは薄め。
-          const color = i >= 0.66 ? "#f97316" : i >= 0.33 ? "#f59e0b" : "#10b981";
+          // 緑系は緑の地形図に埋もれるため暖色系(黄→琥珀→橙)で。薄い枠線でグリッドを視認可能に。
+          const color = i >= 0.66 ? "#ea580c" : i >= 0.33 ? "#f59e0b" : "#fbbf24";
           L.rectangle(
             [
               [c.lat - dLat, c.lon - dLon],
               [c.lat + dLat, c.lon + dLon],
             ],
             {
-              stroke: false,
+              stroke: true,
+              color,
+              weight: 0.5,
+              opacity: 0.45,
               fillColor: color,
-              fillOpacity: 0.12 + 0.33 * i,
+              fillOpacity: 0.28 + 0.32 * i,
               interactive: false,
             },
           ).addTo(map);

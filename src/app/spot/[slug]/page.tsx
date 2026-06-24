@@ -715,7 +715,10 @@ export default async function SpotPage({ params }: Props) {
       <h2>周辺の目撃マップ</h2>
       {riskCells.length > 0 && (
         <p className="not-prose mb-1.5 text-xs leading-relaxed text-stone-600">
-          色の面は<strong>予測リスク面</strong>（生息域 × 季節強度）＝「これからどこが危ないか」の目安。点は過去の出没です。
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-amber-300 align-middle" />
+          〜
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-orange-600 align-middle" />
+          の面は<strong>予測リスク面</strong>（生息域 × 季節強度＝「これからどこが危ないか」の目安。橙ほど高め）。点は過去の出没です。
         </p>
       )}
       <div className="not-prose mb-1.5">
