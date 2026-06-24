@@ -44,6 +44,9 @@ export type JapanLandmark = {
   /** 公式情報源（都道府県・ビジターセンター等）。一次出典への導線。市町村クマ情報は
    *  別途キュレーション済みの getMuniOfficialLink を優先利用するため重複させない。 */
   officialLinks?: { label: string; url: string }[];
+  /** B2B デモ/契約スポット。周辺自治体の公式クマ情報を束ねた「公式情報ハブ」を
+   *  ページ上部に大きく表示する（基本スポットとパッと見で差を出す）。 */
+  officialHub?: boolean;
 };
 
 export const JAPAN_LANDMARKS: JapanLandmark[] = [
@@ -75,6 +78,7 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
       "東京西部の代表的な観光・登山スポット。年間 260 万人を超えるハイカーが訪れる一方、近年は奥高尾・小仏方面でクマの目撃情報が増加。早朝・夕方の単独行動には注意が必要です。",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mt.takao.jpg/1280px-Mt.takao.jpg",
     imageCredit: "高尾山",
+    officialHub: true,
     scaleNote: "年間約 260 万人が訪れる、世界有数の登山者数を誇る山。",
     areas: [
       { name: "1号路・表参道（薬王院〜山頂）", lat: 35.6253, lon: 139.2436, note: "ケーブルカー・観光客の主動線" },

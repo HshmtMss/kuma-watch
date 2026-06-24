@@ -7,6 +7,7 @@ import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import { placeHrefForSighting } from "@/lib/muni-name";
@@ -229,6 +230,39 @@ export default async function SpotPage({ params }: Props) {
     ? getMuniOfficialLink(landmark.prefName, landmark.muniName)
     : null;
 
+  // 公式情報ハブ (B2B): 周辺 18km の「公式クマ情報を持つ自治体」を距離順に集約。
+  // 府県をまたいで束ねるのが価値（高尾山なら神奈川/東京/山梨の 3 府県）。officialHub のみ。
+  type HubMuni = { pref: string; city: string; dist: number; bearUrl?: string; homeUrl?: string };
+  const hubMunis: HubMuni[] = [];
+  if (landmark.officialHub) {
+    const seen = new Set<string>();
+    const cand = JAPAN_MUNICIPALITIES.map((m) => ({
+      m,
+      dist: haversineKm(landmark.lat, landmark.lon, m.lat, m.lon),
+    }))
+      .filter((x) => x.dist <= 18)
+      .sort((a, b) => a.dist - b.dist);
+    for (const { m, dist } of cand) {
+      const key = `${m.prefName}/${m.cityName}`;
+      if (seen.has(key)) continue;
+      const link = getMuniOfficialLink(m.prefName, m.cityName);
+      if (!link?.bearUrl && !link?.homeUrl) continue;
+      seen.add(key);
+      hubMunis.push({
+        pref: m.prefName,
+        city: m.cityName,
+        dist,
+        bearUrl: link.bearUrl,
+        homeUrl: link.homeUrl,
+      });
+      if (hubMunis.length >= 8) break;
+    }
+  }
+  const hubPrefs = [...new Set(hubMunis.map((m) => m.pref))];
+  const showHub =
+    landmark.officialHub === true &&
+    (hubMunis.length > 0 || (landmark.officialLinks?.length ?? 0) > 0);
+
   // 今後 4 週間の出没見通し（統計予測）。全国の季節シェイプ × 当該 10km 圏の直近実測。
   const seasonalModel = buildSeasonalModel(allDates);
   const forecast = forecastArea(areaDatesAll, seasonalModel, today);
@@ -448,6 +482,68 @@ export default async function SpotPage({ params }: Props) {
         </div>
       )}
 
+      {/* 公式情報ハブ (B2B デモの核) — 周辺自治体の公式クマ情報を府県横断で束ねて
+          ページ上部に大きく表示。基本スポット (officialHub なし) には出ないので
+          「基本版 vs 自治体情報ハブ」がパッと見で分かる。 */}
+      {showHub && (
+        <section className="not-prose mb-6 rounded-2xl border-2 border-sky-200 bg-sky-50/50 p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span aria-hidden>🏛️</span>
+            <h2 className="m-0 text-base font-bold text-stone-900">
+              周辺自治体の公式クマ情報ハブ
+            </h2>
+            {hubMunis.length > 0 && (
+              <span className="rounded-full bg-sky-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                {hubPrefs.length}府県 {hubMunis.length}自治体を集約
+              </span>
+            )}
+          </div>
+          <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
+            {landmark.name}周辺の自治体・公的機関のクマ出没情報を、府県をまたいで一次出典ごと束ねています。各リンクは公式ページに直接アクセスできます。
+          </p>
+          {hubMunis.length > 0 && (
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {hubMunis.map((m) => (
+                <a
+                  key={`${m.pref}/${m.city}`}
+                  href={m.bearUrl || m.homeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 hover:border-sky-400 hover:bg-sky-50/60"
+                >
+                  <span className="min-w-0">
+                    <span className="text-[10px] text-stone-400">{m.pref}</span>
+                    <span className="ml-1 text-sm font-semibold text-stone-900">{m.city}</span>
+                    <span className="ml-1 text-[10px] text-stone-400">{m.dist.toFixed(0)}km</span>
+                  </span>
+                  <span className="ml-2 shrink-0 text-[11px] font-medium text-sky-700">
+                    {m.bearUrl ? "クマ情報 →" : "公式 →"}
+                  </span>
+                </a>
+              ))}
+            </div>
+          )}
+          {(landmark.officialLinks?.length ?? 0) > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {landmark.officialLinks!.map((l) => (
+                <a
+                  key={l.url}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-medium text-stone-700 hover:border-sky-400"
+                >
+                  🏛️ {l.label}
+                </a>
+              ))}
+            </div>
+          )}
+          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
+            出典: 各自治体・公的機関の公式ページ（一次情報）。本サイトの出没データは毎日自動更新（{SUPERVISION}）。
+          </p>
+        </section>
+      )}
+
       {/* 通知購読 — この観光地の周辺 10km で新規出没があれば通知する。
           市町村通知 (NEXT_PUBLIC_PUSH_ENABLED) とは別フラグ
           (NEXT_PUBLIC_SPOT_PUSH_ENABLED) で段階公開する。 */}
@@ -653,15 +749,18 @@ export default async function SpotPage({ params }: Props) {
 
       {/* 公式情報・アクセス — 一次出典への導線 (「速く正確に」) と来訪導線。
           official 情報 or access のどちらかがあるスポットでのみ表示。 */}
-      {(officialLink?.bearUrl ||
-        officialLink?.homeUrl ||
-        (landmark.officialLinks?.length ?? 0) > 0 ||
+      {((!showHub &&
+        (officialLink?.bearUrl ||
+          officialLink?.homeUrl ||
+          (landmark.officialLinks?.length ?? 0) > 0)) ||
         (landmark.access?.length ?? 0) > 0) && (
         <>
           <h2>公式情報・アクセス</h2>
-          {(officialLink?.bearUrl ||
-            officialLink?.homeUrl ||
-            (landmark.officialLinks?.length ?? 0) > 0) && (
+          {/* 公式リンクは showHub 時は上部ハブに集約済みなので、ここでは出さない（重複回避）。 */}
+          {!showHub &&
+            (officialLink?.bearUrl ||
+              officialLink?.homeUrl ||
+              (landmark.officialLinks?.length ?? 0) > 0) && (
             <div className="not-prose my-3 flex flex-wrap gap-2">
               {officialLink?.bearUrl && (
                 <a
