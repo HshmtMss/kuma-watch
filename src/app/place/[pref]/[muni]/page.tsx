@@ -663,13 +663,6 @@ export default async function MuniPage({ params }: Props) {
         </div>
       )}
 
-      {/* 通知購読 — 「今危険か」の答えを見たユーザに、継続フォローの選択肢を
-          示す。Push 非対応・拒否時はコンポーネント側で何も描画しない。
-          リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
-      {isPushReleased() && (
-        <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
-      )}
-
       {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
           「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。
           1 年・90 日が両方 0 ならヒーローカードの「直近の出没情報なし」
@@ -938,6 +931,14 @@ export default async function MuniPage({ params }: Props) {
         </>
       )}
 
+      {/* 詳しく見る(2) — 県内の他事案・地区別も折りたたみ。SEO本文は HTML に残る。 */}
+      <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
+        <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
+          <span>📊 県内の他の事案・地区別の件数</span>
+          <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
+        </summary>
+        <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
+
       {/* {muni} 内に直近事案が無い場合の補助コンテンツ。県内最新事案を
           「市町村名 + 日付」付きで列挙することで、コンテンツ希薄判定を回避し
           かつユーザーには「この地域は静かでも県内全体ではこれだけ動いている」
@@ -1010,6 +1011,8 @@ export default async function MuniPage({ params }: Props) {
           </div>
         </>
       )}
+        </div>
+      </details>
 
       {/* 自治体公式情報 — Claude エージェントが収集した自治体公式 HP /
           クマ情報ページへのリンク。 muni-official-links.ts に未収録の自治体は
@@ -1242,6 +1245,12 @@ export default async function MuniPage({ params }: Props) {
             ))}
           </ul>
         </>
+      )}
+
+      {/* 通知購読 — フッター帯に集約（観光地ページと統一）。
+          リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
+      {isPushReleased() && (
+        <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
       )}
 
       {/* 戻り導線 — 市町村ページの末尾で「県のページに戻る」を必ず提供。

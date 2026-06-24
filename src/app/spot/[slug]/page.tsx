@@ -477,7 +477,7 @@ export default async function SpotPage({ params }: Props) {
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
           断定でなくバンド + 例年比で提示し、根拠を全部開示する。 */}
-      {forecast && (
+      {landmark.officialHub && forecast && (
         <div className={`not-prose mb-6 rounded-2xl border p-5 ${fcBand[forecast.band].box}`}>
           <div className="flex items-center gap-2">
             <span aria-hidden>📈</span>
