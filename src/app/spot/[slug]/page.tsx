@@ -544,15 +544,6 @@ export default async function SpotPage({ params }: Props) {
         </section>
       )}
 
-      {/* 通知購読 — この観光地の周辺 10km で新規出没があれば通知する。
-          市町村通知 (NEXT_PUBLIC_PUSH_ENABLED) とは別フラグ
-          (NEXT_PUBLIC_SPOT_PUSH_ENABLED) で段階公開する。 */}
-      {isSpotPushReleased() && (
-        <PushSubscribeButton
-          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-        />
-      )}
-
       {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
       <h2>このスポットについて</h2>
       <p>{landmark.blurb}</p>
@@ -612,6 +603,15 @@ export default async function SpotPage({ params }: Props) {
           🗺️ {landmark.name} の警戒レベルマップを開く →
         </Link>
       </p>
+
+      {/* 詳しく見る — 二次情報はアコーディオンに畳み、情報過多を解消（IA 再設計）。
+          一目で要る「今の状況・予測・自治体情報・地図」を上に残し、深掘りは折りたたむ。 */}
+      <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
+        <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
+          <span>📊 詳しく見る（統計・コース別・季節の注意・最近の事案・周辺市町村）</span>
+          <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
+        </summary>
+        <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
 
       {/* 統計 */}
       <h2>出没統計</h2>
@@ -811,6 +811,16 @@ export default async function SpotPage({ params }: Props) {
             </ul>
           )}
         </>
+      )}
+        </div>
+      </details>
+
+      {/* 通知購読 — フッター帯に集約。周辺 10km で新規出没があれば通知。
+          NEXT_PUBLIC_SPOT_PUSH_ENABLED で段階公開。 */}
+      {isSpotPushReleased() && (
+        <PushSubscribeButton
+          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+        />
       )}
 
       {/* B2B 導線 — 観光地・自治体向けの「安全情報ハブ提供」。全スポット共通の funnel。 */}
