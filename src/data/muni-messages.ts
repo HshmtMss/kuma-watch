@@ -31,6 +31,24 @@ export const MUNI_MESSAGES: MuniMessage[] = [
     sourceUrl:
       "https://www.city.hachioji.tokyo.jp/kurashi/sangyo/004/jyugai/p034133.html",
   },
+  {
+    prefName: "東京都",
+    cityName: "あきる野市",
+    message:
+      "市西部の山間部でクマの目撃・痕跡が報告されています（直近: 6月8日 養沢・西沢入林道付近）。山林・ヤブの近くでは鈴やラジオで音を出し、早朝・夕方の単独行動を避けてください。",
+    targetArea: "養沢・西部山間部",
+    updatedAt: "2026-06-11",
+    sourceUrl: "https://www.city.akiruno.tokyo.jp/0000017429.html",
+  },
+  {
+    prefName: "神奈川県",
+    cityName: "相模原市緑区",
+    message:
+      "相模原市内の山地にはクマが生息しています。生息地の山地や出没情報のある地域に入る際は、鈴やラジオで音を出し、複数人で行動するなど注意してください。",
+    updatedAt: "2025-11-30",
+    sourceUrl:
+      "https://www.city.sagamihara.kanagawa.jp/kurashi/1026489/kankyo/1026504/1015732/1008179.html",
+  },
 ];
 
 export function getMuniMessage(
