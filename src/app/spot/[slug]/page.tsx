@@ -558,18 +558,19 @@ export default async function SpotPage({ params }: Props) {
         </div>
       )}
 
-      {/* 届ける仕組み (B2B デモの核) — 予測 × 自治体メッセージを 1 通知に集約し、
-          「住民・観光客のスマホへ速く適切に届ける」ことを通知プレビューで可視化。officialHub のみ。 */}
+      {/* 通知で受け取る (来訪者向け) — 予測 × 自治体メッセージを 1 通知に集約して見せ、
+          そのまま購読できる。officialHub のみ(予測＋自治体メッセージが揃うため)。
+          ※公開ページなので事業者向けの営業要素はここに置かず、末尾 CTA に集約する。 */}
       {landmark.officialHub && forecast && (
         <section className="not-prose mb-6 rounded-2xl border border-sky-200 bg-gradient-to-b from-sky-50 to-white p-5">
           <div className="flex items-center gap-2">
             <span aria-hidden>📲</span>
             <h2 className="m-0 text-base font-bold text-stone-900">
-              住民・来訪者へ、今この情報を届けています
+              最新の見通しと自治体の注意喚起を「通知」で受け取る
             </h2>
           </div>
           <p className="mt-1 text-xs leading-relaxed text-stone-600">
-            出没予測と自治体の注意喚起を 1 つに集約し、地点・目的に応じてスマホへ速く適切に。（{SUPERVISION}）
+            {landmark.name}周辺の出没予測と、自治体からの注意喚起を 1 つにまとめてお届けします。（{SUPERVISION}）
           </p>
 
           {/* 通知プレビュー（スマホ通知風） */}
@@ -598,26 +599,14 @@ export default async function SpotPage({ params }: Props) {
             </div>
           </div>
 
-          {/* 配信チャネル */}
-          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px]">
-            <span className="text-stone-500">配信チャネル:</span>
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-800">
-              プッシュ通知
-            </span>
-            <span className="rounded-full bg-stone-100 px-2 py-0.5 font-medium text-stone-500">
-              LINE（準備中）
-            </span>
-            <span className="rounded-full bg-stone-100 px-2 py-0.5 font-medium text-stone-500">
-              緊急速報メール（自治体連携）
-            </span>
-          </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
-            「いつ・どこが危ないか（予測）」と「自治体の注意喚起」を、必要な人に必要なタイミングで。配信の運用一式は{" "}
-            <Link href="/for-gov" className="font-semibold text-amber-700 underline">
-              自治体・観光事業者向け
-            </Link>{" "}
-            でご相談いただけます。
-          </p>
+          {/* 通知を受け取る（購読）。来訪者がそのまま登録できる。LINE は準備中。 */}
+          {isSpotPushReleased() && (
+            <div className="mt-3">
+              <PushSubscribeButton
+                target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+              />
+            </div>
+          )}
         </section>
       )}
 
@@ -986,9 +975,8 @@ export default async function SpotPage({ params }: Props) {
         </div>
       </details>
 
-      {/* 通知購読 — フッター帯に集約。周辺 10km で新規出没があれば通知。
-          NEXT_PUBLIC_SPOT_PUSH_ENABLED で段階公開。 */}
-      {isSpotPushReleased() && (
+      {/* 通知購読 — フッター。高尾山(デモ)は上部「通知で受け取る」に置くため二重を避ける。 */}
+      {!landmark.officialHub && isSpotPushReleased() && (
         <PushSubscribeButton
           target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
         />
