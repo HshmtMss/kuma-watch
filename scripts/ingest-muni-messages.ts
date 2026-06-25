@@ -77,6 +77,7 @@ function parseArgs() {
     near: get("near"),
     radius: Number(get("radius") ?? "20"),
     limit: get("limit") ? Number(get("limit")) : undefined,
+    maxAgeDays: Number(get("max-age-days") ?? "21"),
     all: a.includes("--all"),
     force: a.includes("--force"),
   };
@@ -133,7 +134,14 @@ async function main() {
   const byKey = new Map(existing.map((e) => [`${e.prefName}/${e.cityName}`, e]));
 
   if (!args.force) {
-    targets = targets.filter((m) => !byKey.has(`${m.prefName}/${m.cityName}`));
+    // 未取込 or 取込が古い(maxAgeDays 超過)ものだけ処理。週次運用で陳腐化を防ぐ。
+    const staleBefore = new Date(Date.now() - args.maxAgeDays * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    targets = targets.filter((m) => {
+      const e = byKey.get(`${m.prefName}/${m.cityName}`);
+      return !e || (e.crawledAt ?? "") < staleBefore;
+    });
   }
   if (args.limit) targets = targets.slice(0, args.limit);
 
