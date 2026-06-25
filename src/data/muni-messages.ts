@@ -8,6 +8,8 @@
  * 将来: 各自治体ページを LLM で自動抽出して本配列を自動更新する（クローラ層）。
  * 当面はデモ対象（高尾山周辺）を中心に手動キュレーション。
  */
+import GENERATED_RAW from "./muni-messages-generated.json";
+
 export type MuniMessage = {
   prefName: string;
   cityName: string;
@@ -19,7 +21,12 @@ export type MuniMessage = {
   updatedAt: string;
   /** 出典 URL（一次情報）。 */
   sourceUrl: string;
+  /** 自動クローラが取り込んだ日 (ISO)。手動キュレーションには無い。 */
+  crawledAt?: string;
 };
+
+/** クローラ (scripts/ingest-muni-messages.ts) が生成した自動取込メッセージ。 */
+const GENERATED: MuniMessage[] = GENERATED_RAW as MuniMessage[];
 
 export const MUNI_MESSAGES: MuniMessage[] = [
   {
@@ -55,9 +62,14 @@ export function getMuniMessage(
   prefName: string,
   cityName: string,
 ): MuniMessage | null {
+  // 手動キュレーション (MUNI_MESSAGES) を優先し、無ければクローラ生成分を使う。
   return (
     MUNI_MESSAGES.find(
       (m) => m.prefName === prefName && m.cityName === cityName,
-    ) ?? null
+    ) ??
+    GENERATED.find(
+      (m) => m.prefName === prefName && m.cityName === cityName,
+    ) ??
+    null
   );
 }

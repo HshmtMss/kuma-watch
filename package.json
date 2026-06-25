@@ -15,6 +15,7 @@
     "ingest:news": "tsx --env-file-if-exists=.env.local scripts/ingest-news-only.ts",
     "ingest:sharp9110": "tsx --env-file-if-exists=.env.local scripts/ingest-sharp9110-only.ts",
     "ingest:gov": "tsx --env-file-if-exists=.env.local scripts/ingest-gov-announcements.ts",
+    "ingest:muni-messages": "tsx --env-file-if-exists=.env.local scripts/ingest-muni-messages.ts",
     "gen:vapid": "tsx scripts/generate-vapid-keys.ts",
     "import:research": "tsx scripts/import-research.ts",
     "research:daily": "tsx --env-file-if-exists=.env.local scripts/generate-research-report.ts --mode=daily --apply",
