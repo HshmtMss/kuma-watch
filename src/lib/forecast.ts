@@ -41,6 +41,10 @@ export type AreaForecast = {
   expectedHigh: number;
   /** その地域の過去同期（DENSE_YEARS 平均）の件数。 */
   typicalCount: number;
+  /** 直近 90 日の実測件数。 */
+  recent90: number;
+  /** その地域の例年同期（直近 90 日窓）の平均件数。対比表示に使う。 */
+  typical90: number;
   /** 見通しが例年同期比で何 % か。typical が小さすぎる時は null。 */
   vsTypicalPct: number | null;
   band: ForecastBand;
@@ -269,6 +273,8 @@ export function forecastArea(
     expectedLow,
     expectedHigh,
     typicalCount,
+    recent90,
+    typical90,
     vsTypicalPct,
     band,
     phase,

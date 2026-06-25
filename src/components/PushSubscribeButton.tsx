@@ -64,8 +64,11 @@ function targetHeadline(target: PushTarget): string {
 
 export default function PushSubscribeButton({
   target,
+  hideHeading = false,
 }: {
   target: PushTarget;
+  /** 親セクションに見出しがある場合、内部の見出しを省いて二重表示を防ぐ。 */
+  hideHeading?: boolean;
 }) {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState<string>("");
@@ -264,10 +267,12 @@ export default function PushSubscribeButton({
           </svg>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-stone-900">
-            {targetHeadline(target)}
-          </p>
-          <p className="mt-0.5 text-xs leading-relaxed text-stone-600">
+          {!hideHeading && (
+            <p className="text-sm font-semibold text-stone-900">
+              {targetHeadline(target)}
+            </p>
+          )}
+          <p className={`text-xs leading-relaxed text-stone-600 ${hideHeading ? "" : "mt-0.5"}`}>
             報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。
           </p>
           {state === "active" && (

@@ -308,6 +308,10 @@ export default async function SpotPage({ params }: Props) {
   const fcMax = Math.max(1, ...fcMonths.map((x) => x.count), fcForecastBar);
   const fcPhaseArrow =
     forecast?.phase === "rising" ? "↑" : forecast?.phase === "falling" ? "↓" : "→";
+  // ゲージのマーカー位置(%)。低め←→高めの帯のどこに針を置くか。
+  const fcMarkerPct = forecast
+    ? { low: 12, normal: 38, elevated: 63, high: 87 }[forecast.band]
+    : 38;
 
   // 危険度評価 (周辺 10km の count90 ベース)
   const risk =
@@ -492,11 +496,11 @@ export default async function SpotPage({ params }: Props) {
             </span>
           </div>
           <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className={`text-2xl font-bold ${fcBand[forecast.band].text}`}>
+            <span className={`text-3xl font-extrabold ${fcBand[forecast.band].text}`}>
               {fcPhaseArrow} {BAND_LABEL[forecast.band]}
             </span>
             {forecast.vsTypicalPct !== null && (
-              <span className={`text-sm font-semibold ${fcBand[forecast.band].text}/90`}>
+              <span className={`text-base font-bold ${fcBand[forecast.band].text}/90`}>
                 例年同期比 {forecast.vsTypicalPct >= 0 ? "+" : ""}
                 {forecast.vsTypicalPct}%
               </span>
@@ -508,22 +512,63 @@ export default async function SpotPage({ params }: Props) {
             )}
           </div>
 
-          {/* 図メイン: 直近12ヶ月の月別件数バー（グレー）＋「今後」見通しバー（バンド色）。
-              季節の山・今の位置・今後の向きを一目で。件数の断定は避け色と向きで提示。 */}
+          {/* ゲージ: 低め←→高め のどこかを針で一目に。 */}
+          <div className="mt-3">
+            <div
+              className="relative h-3 rounded-full"
+              style={{
+                background:
+                  "linear-gradient(to right,#34d399 0%,#a3e635 28%,#fbbf24 52%,#f59e0b 74%,#f97316 100%)",
+              }}
+            >
+              <div
+                className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-stone-800 shadow-md"
+                style={{ left: `${fcMarkerPct}%` }}
+                aria-hidden
+              />
+            </div>
+            <div className="mt-1 flex justify-between text-[10px] font-medium text-stone-500">
+              <span>低め</span>
+              <span>例年並み</span>
+              <span>やや高め</span>
+              <span>高め</span>
+            </div>
+          </div>
+
+          {/* 対比スタット: 「今」と「例年」の差を大きく見せる（インパクトの核）。 */}
+          <div className="mt-3 flex items-stretch gap-2">
+            <div className="flex-1 rounded-xl border border-stone-200 bg-white/70 px-3 py-2 text-center">
+              <div className="text-[10px] text-stone-500">直近90日（実測）</div>
+              <div className="text-2xl font-bold text-stone-900">
+                {forecast.recent90}
+                <span className="text-xs font-normal text-stone-400"> 件</span>
+              </div>
+            </div>
+            <div className="flex items-center text-xs font-bold text-stone-400">vs</div>
+            <div className="flex-1 rounded-xl border border-stone-200 bg-white/70 px-3 py-2 text-center">
+              <div className="text-[10px] text-stone-500">例年の同期（平均）</div>
+              <div className="text-2xl font-bold text-stone-700">
+                {forecast.typical90 >= 1 ? forecast.typical90.toFixed(0) : "—"}
+                <span className="text-xs font-normal text-stone-400"> 件</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 補助: 月別の季節パターン（小さめ）。グレー=実測, バンド色=今後の見通し。 */}
           <svg
-            viewBox="0 0 286 72"
-            className="mt-2 w-full"
+            viewBox="0 0 286 60"
+            className="mt-3 w-full"
             role="img"
             aria-label={`直近12ヶ月の月別出没件数と今後4週間の見通し（${BAND_LABEL[forecast.band]}）`}
           >
             {fcMonths.map((mm, i) => {
-              const h = Math.max(mm.count > 0 ? 2 : 1, (mm.count / fcMax) * 48);
+              const h = Math.max(mm.count > 0 ? 2 : 1, (mm.count / fcMax) * 38);
               const x = i * 22 + (22 - 13) / 2;
               return (
                 <g key={i}>
-                  <rect x={x} y={54 - h} width={13} height={h} rx={2} fill="#d6d3d1" />
+                  <rect x={x} y={44 - h} width={13} height={h} rx={2} fill="#d6d3d1" />
                   {i % 3 === 0 && (
-                    <text x={x + 6.5} y={66} textAnchor="middle" fontSize={8} fill="#a8a29e">
+                    <text x={x + 6.5} y={56} textAnchor="middle" fontSize={8} fill="#a8a29e">
                       {mm.label}月
                     </text>
                   )}
@@ -532,16 +577,16 @@ export default async function SpotPage({ params }: Props) {
             })}
             <rect
               x={12 * 22 + (22 - 13) / 2}
-              y={54 - Math.max(2, (fcForecastBar / fcMax) * 48)}
+              y={44 - Math.max(2, (fcForecastBar / fcMax) * 38)}
               width={13}
-              height={Math.max(2, (fcForecastBar / fcMax) * 48)}
+              height={Math.max(2, (fcForecastBar / fcMax) * 38)}
               rx={2}
               fill={fcBand[forecast.band].fill}
               opacity={0.9}
             />
             <text
               x={12 * 22 + 6.5 + (22 - 13) / 2}
-              y={66}
+              y={56}
               textAnchor="middle"
               fontSize={8}
               fontWeight="bold"
@@ -551,7 +596,6 @@ export default async function SpotPage({ params }: Props) {
             </text>
           </svg>
 
-          <p className={`mt-1 text-xs ${fcBand[forecast.band].text}/90`}>{forecast.basis[0]}</p>
           <p className="mt-1.5 text-[11px] leading-relaxed text-stone-500">
             直近12ヶ月の月別件数と過去3年の季節パターンから算出した統計的見通し（確定的な予測ではありません）。
           </p>
@@ -599,11 +643,13 @@ export default async function SpotPage({ params }: Props) {
             </div>
           </div>
 
-          {/* 通知を受け取る（購読）。来訪者がそのまま登録できる。LINE は準備中。 */}
+          {/* 通知を受け取る（購読）。来訪者がそのまま登録できる。LINE は準備中。
+              セクションに見出しがあるので購読ボタン側の見出しは隠す（二重表示回避）。 */}
           {isSpotPushReleased() && (
             <div className="mt-3">
               <PushSubscribeButton
                 target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+                hideHeading
               />
             </div>
           )}
