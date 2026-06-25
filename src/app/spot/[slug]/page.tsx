@@ -266,6 +266,12 @@ export default async function SpotPage({ params }: Props) {
         .map((m) => ({ city: m.city, msg: getMuniMessage(m.pref, m.city) }))
         .filter((x): x is { city: string; msg: MuniMessage } => x.msg !== null)
     : [];
+  // 「届ける仕組み」プレビュー用の代表メッセージ（その地点の所属自治体を優先、無ければハブ先頭）。
+  const primaryMessage: MuniMessage | null = landmark.officialHub
+    ? (landmark.muniName
+        ? getMuniMessage(landmark.prefName, landmark.muniName)
+        : null) ?? hubMessages[0]?.msg ?? null
+    : null;
   const showHub =
     landmark.officialHub === true &&
     (hubMunis.length > 0 ||
@@ -550,6 +556,69 @@ export default async function SpotPage({ params }: Props) {
             直近12ヶ月の月別件数と過去3年の季節パターンから算出した統計的見通し（確定的な予測ではありません）。
           </p>
         </div>
+      )}
+
+      {/* 届ける仕組み (B2B デモの核) — 予測 × 自治体メッセージを 1 通知に集約し、
+          「住民・観光客のスマホへ速く適切に届ける」ことを通知プレビューで可視化。officialHub のみ。 */}
+      {landmark.officialHub && forecast && (
+        <section className="not-prose mb-6 rounded-2xl border border-sky-200 bg-gradient-to-b from-sky-50 to-white p-5">
+          <div className="flex items-center gap-2">
+            <span aria-hidden>📲</span>
+            <h2 className="m-0 text-base font-bold text-stone-900">
+              住民・来訪者へ、今この情報を届けています
+            </h2>
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-stone-600">
+            出没予測と自治体の注意喚起を 1 つに集約し、地点・目的に応じてスマホへ速く適切に。（{SUPERVISION}）
+          </p>
+
+          {/* 通知プレビュー（スマホ通知風） */}
+          <div className="mx-auto mt-3 max-w-md rounded-2xl border border-stone-300 bg-white p-3 shadow-md">
+            <div className="flex items-start gap-2">
+              <span className="text-xl leading-none">🐻</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-xs font-bold text-stone-900">
+                    KumaWatch｜{landmark.name}周辺
+                  </span>
+                  <span className="shrink-0 text-[10px] text-stone-400">今</span>
+                </div>
+                <p className="mt-0.5 text-xs font-semibold text-stone-800">
+                  今後4週間の見通し：{fcPhaseArrow} {BAND_LABEL[forecast.band]}
+                  {forecast.vsTypicalPct !== null &&
+                    `（例年比 ${forecast.vsTypicalPct >= 0 ? "+" : ""}${forecast.vsTypicalPct}%）`}
+                </p>
+                {primaryMessage && (
+                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-stone-600">
+                    {landmark.muniName}より：{primaryMessage.message}
+                  </p>
+                )}
+                <p className="mt-1 text-[10px] text-stone-400">タップで地図・最近の事案・対策へ</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 配信チャネル */}
+          <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px]">
+            <span className="text-stone-500">配信チャネル:</span>
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-800">
+              プッシュ通知
+            </span>
+            <span className="rounded-full bg-stone-100 px-2 py-0.5 font-medium text-stone-500">
+              LINE（準備中）
+            </span>
+            <span className="rounded-full bg-stone-100 px-2 py-0.5 font-medium text-stone-500">
+              緊急速報メール（自治体連携）
+            </span>
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
+            「いつ・どこが危ないか（予測）」と「自治体の注意喚起」を、必要な人に必要なタイミングで。配信の運用一式は{" "}
+            <Link href="/for-gov" className="font-semibold text-amber-700 underline">
+              自治体・観光事業者向け
+            </Link>{" "}
+            でご相談いただけます。
+          </p>
+        </section>
       )}
 
       {/* 公式情報ハブ (B2B デモの核) — 周辺自治体の公式クマ情報を府県横断で束ねて
