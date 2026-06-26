@@ -52,7 +52,10 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-Robots-Tag", value: "index, follow" },
+          // 注: 以前あった全パス `X-Robots-Tag: index, follow` は削除。index はデフォルト
+          // 挙動で冗長な上、0 件市町村ページの per-page noindex (meta robots) と HTTP
+          // ヘッダーが衝突し、剪定が効かなくなるため。indexability は各ページの
+          // metadata.robots で制御する。
         ],
       },
       {
