@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import { getCachedSightings } from "@/lib/sightings-cache";
+import { placeHrefForSighting } from "@/lib/muni-name";
 import { sortedResearchEntries } from "@/lib/research-entries";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -239,7 +240,7 @@ export default async function ThisWeekPage() {
           {topMunis.map((m, i) => (
             <li key={`${m.pref}/${m.city}`}>
               <Link
-                href={`/place/${encodeURIComponent(m.pref)}/${encodeURIComponent(m.city)}`}
+                href={placeHrefForSighting(m.pref, m.city)}
                 className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 hover:border-amber-400 hover:bg-amber-50"
               >
                 <span
@@ -279,7 +280,7 @@ export default async function ThisWeekPage() {
                     {formatDate(n.date)}
                   </span>
                   <Link
-                    href={`/place/${encodeURIComponent(n.prefectureName)}/${encodeURIComponent(n.cityName)}`}
+                    href={placeHrefForSighting(n.prefectureName, n.cityName)}
                     className="text-amber-700 hover:underline"
                   >
                     {n.prefectureName} {n.cityName}

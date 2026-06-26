@@ -3,6 +3,7 @@ import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { getRecentRecordsNationwide } from "@/lib/place-index";
+import { placeHrefForSighting } from "@/lib/muni-name";
 import { RESEARCH_ENTRIES } from "@/lib/research-entries";
 import { jstToday } from "@/lib/jst-date";
 
@@ -113,7 +114,7 @@ export default async function NewsPage() {
                     </span>
                   )}
                   <Link
-                    href={`/place/${encodeURIComponent(r.prefName)}/${encodeURIComponent(r.cityName)}`}
+                    href={placeHrefForSighting(r.prefName, r.cityName)}
                     className="text-xs font-semibold text-amber-700 hover:underline"
                   >
                     {r.prefName}

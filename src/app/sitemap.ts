@@ -6,13 +6,13 @@ import {
   researchRegionsWithCount,
 } from "@/lib/research-entries";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
-import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
 
-// ISR: 5 分ごとに sitemap を再生成。新規記事を Google にすぐ通知できるよう、
-// CDN エッジに短い遅延で反映させる。
-export const revalidate = 300;
+// ISR: sitemap を再生成する間隔。以前は 300s だったが、中身がほぼ変わらないのに
+// 高頻度で再生成すると Google に「不安定」と見なされやすく、クロールも安定しない
+// ため 1 時間に緩和。新規記事の通知遅延は最大 1h で実用上問題ない。
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -25,7 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/measures`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
     { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${SITE_URL}/products`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/products?for=gov`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
     { url: `${SITE_URL}/research`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${SITE_URL}/policy`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${SITE_URL}/data`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
@@ -108,8 +107,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: isHot ? 0.9 : 0.7,
       };
     });
-    // sightings 由来 + マスター由来の市町村 URL を全件出力。
-    // 0 件の市町村ページも検索対象にしておく。
+    // 出没データのある (= インデックス対象の) 市町村のみを出力する。
+    // 0 件の市町村ページは muni ページ側で noindex にしているため、サイトマップ
+    // からも除外して「サイトマップ掲載 = index 対象」を一致させる (混在シグナルを
+    // 防ぐ)。getStaticPlaceKeys は canonical なマスター市町村名を返す。
     const muniSeen = new Set<string>();
     const muniArr: { pref: string; city: string }[] = [];
     for (const k of keys) {
@@ -117,13 +118,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!muniSeen.has(key)) {
         muniSeen.add(key);
         muniArr.push(k);
-      }
-    }
-    for (const m of JAPAN_MUNICIPALITIES) {
-      const key = `${m.prefName}/${m.cityName}`;
-      if (!muniSeen.has(key)) {
-        muniSeen.add(key);
-        muniArr.push({ pref: m.prefName, city: m.cityName });
       }
     }
     muniEntries = muniArr.map((k) => ({

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
@@ -13,11 +13,11 @@ import {
   getRecentRecordsInPref,
   getRecordsForPlaces,
   getWardsCell,
-  getStaticPlaceKeys,
   type PlaceCell,
   type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
+import { resolveCanonicalMuniName } from "@/lib/muni-name";
 import { getSeasonalAdvice, getBearRegion } from "@/lib/place-content";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -27,13 +27,19 @@ import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isPushReleased } from "@/lib/push-flag";
 
-// 出没データに存在する市町村のみを許可 (getStaticPlaceKeys で count >= 3)。
-// それ以外のパスは Next.js が即 404 を返す。
-// dynamicParams=true だと、データに無い市町村で叩かれた際に SSR が走って
-// 19MB の sightings.json を読み込もうとし、コールドスタート時に
-// Hobby の 10s タイムアウトを超えて 5xx が返ることがあるため。
-// (Search Console で札幌市・盛岡市等のサーバーエラーとして検出された)
-export const dynamicParams = false;
+// dynamicParams=true: 静的生成 (generateStaticParams) は「不変なマスター市区町村
+// ＋政令市の親」のみ。それ以外のパス (ニュースの生地点名・番地付き・旧 URL 等) は
+// リクエスト時にページ本体へ入り、sightings (19MB) を読む *前* に正規ページへ 308
+// リダイレクトする (下の早期ガード参照)。
+//
+// 以前 dynamicParams=true で 5xx が出たのは、未知の市町村で SSR が sightings.json を
+// 読み込み Hobby の関数タイムアウトを超えたため。今回はリダイレクトを sightings ロード
+// より前に行うので、その経路では重いデータを一切読まない。
+//
+// なぜ false をやめたか: 旧実装は getStaticPlaceKeys (出没データ由来) を静的 params に
+// union していたが、4h ごとの sightings 全件置換で URL セットが毎回変動し、消えた URL が
+// dynamicParams=false の下でハード 404 化していた (GSC「見つかりませんでした」1,800+ 件)。
+export const dynamicParams = true;
 
 const PREF_NAMES = new Set(Object.values(PREF_CODE_TO_NAME));
 const SITE_URL = "https://kuma-watch.jp";
@@ -65,32 +71,39 @@ function getSeireiParent(pref: string, muni: string) {
   return SEIREI_PARENTS.get(`${pref}/${muni}`) ?? null;
 }
 
+// マスター市区町村の O(1) 判定用キー集合 (`prefName/cityName`)。早期リダイレクト判定で
+// sightings をロードせずに「実在ページか」を見極めるために使う。
+const MASTER_KEYS = new Set(
+  JAPAN_MUNICIPALITIES.map((m) => `${m.prefName}/${m.cityName}`),
+);
+
 type Props = { params: Promise<{ pref: string; muni: string }> };
 
 export async function generateStaticParams() {
-  // 全 1,894 市区町村 (geolonia マスター) ＋ 出没データに含まれる市町村名
-  // (cityName 表記が master と異なるエッジケースも拾えるように) を Union して
-  // 重複排除。 0 件の市町村でも「該当なし」状態のページを生成し、検索流入の
-  // 機会損失を解消する。
-  const fromIndex = await getStaticPlaceKeys(1);
+  // 静的生成は「不変なマスター市区町村 (geolonia 1,894) ＋ 政令市の親」のみ。
+  // 以前は出没データ由来の getStaticPlaceKeys を union していたが、4h ごとの sightings
+  // 全件置換で URL セットが毎回変動し、消えた URL が dynamicParams=false の下でハード
+  // 404 化していた。マスターだけに固定すれば URL セットが安定し、新規 404・重複が
+  // 出ない。出没データの表記ゆれ (短縮名・字・番地) は dynamicParams=true の早期
+  // リダイレクトでマスター正規 URL へ集約する。
   const fromMaster = JAPAN_MUNICIPALITIES.map((m) => ({
     pref: m.prefName,
-    city: m.cityName,
+    muni: m.cityName,
   }));
   // 政令市の親 (「○○市」)。マスターは区単位なので別途追加する。
   const fromSeirei = [...SEIREI_PARENTS.keys()].map((key) => {
     const i = key.indexOf("/");
-    return { pref: key.slice(0, i), city: key.slice(i + 1) };
+    return { pref: key.slice(0, i), muni: key.slice(i + 1) };
   });
   const seen = new Set<string>();
-  const merged: { pref: string; city: string }[] = [];
-  for (const k of [...fromMaster, ...fromIndex, ...fromSeirei]) {
-    const key = `${k.pref}/${k.city}`;
+  const merged: { pref: string; muni: string }[] = [];
+  for (const k of [...fromMaster, ...fromSeirei]) {
+    const key = `${k.pref}/${k.muni}`;
     if (seen.has(key)) continue;
     seen.add(key);
     merged.push(k);
   }
-  return merged.map((k) => ({ pref: k.pref, muni: k.city }));
+  return merged;
 }
 
 function decode(v: string): string {
@@ -160,32 +173,44 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { pref: rawPref, muni: rawMuni } = await params;
   const pref = decode(rawPref);
   const muni = decode(rawMuni);
-  if (!PREF_NAMES.has(pref)) return { title: "ページが見つかりません" };
+  if (!PREF_NAMES.has(pref))
+    return { title: "ページが見つかりません", robots: { index: false } };
 
-  const cellFromIndex = await getPlaceCell(pref, muni);
+  // 静的生成外の URL (生地点名・番地・旧 URL) はページ本体が正規ページへ
+  // リダイレクトする。ここでは sightings を読まずに noindex の最小メタだけ返す
+  // (重いデータロードを避けて 5xx を防ぐ)。
+  const isMaster = MASTER_KEYS.has(`${pref}/${muni}`);
+  const seirei = isMaster ? null : getSeireiParent(pref, muni);
+  if (!isMaster && !seirei) {
+    return { title: "くまウォッチ", robots: { index: false } };
+  }
+
   // 政令市の親は区を合算したセルでタイトルの件数を正確にする。
-  let seoCell = cellFromIndex;
-  if (!cellFromIndex) {
-    const seirei = getSeireiParent(pref, muni);
-    if (seirei) {
-      seoCell = await getWardsCell(
-        pref,
-        muni,
-        seirei.wards,
-        seirei.lat / seirei.n,
-        seirei.lon / seirei.n,
-      );
-    }
+  let seoCell = await getPlaceCell(pref, muni);
+  if (!seoCell && seirei) {
+    seoCell = await getWardsCell(
+      pref,
+      muni,
+      seirei.wards,
+      seirei.lat / seirei.n,
+      seirei.lon / seirei.n,
+    );
   }
   // 出没データが無い市町村でも、buildMuniSeo の null パスでフォールバック
   // タイトル ("○○のクマ出没情報・警戒レベル｜獣医師監修") を返す。
   const { title, description } = buildMuniSeo(pref, muni, seoCell);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
+  // 出没 0 件のページは薄く重複しやすいため noindex (剪定)。良質ページにインデックス
+  // を集中させる。サイトマップ (getStaticPlaceKeys 由来) からも除外され整合する。
+  // follow は維持し内部リンク評価は流す。出没が出れば自動で index に戻る。
+  const hasSightings = (seoCell?.count ?? 0) > 0;
+
   return {
     title,
     description,
     alternates: { canonical: `${SITE_URL}${path}` },
+    robots: hasSightings ? undefined : { index: false, follow: true },
     openGraph: {
       title,
       description,
@@ -206,15 +231,27 @@ export default async function MuniPage({ params }: Props) {
   const muni = decode(rawMuni);
   if (!PREF_NAMES.has(pref)) notFound();
 
-  const cellFromIndex = await getPlaceCell(pref, muni);
   // 出没データが無くてもマスターにあれば 0 件カードとして生成。
   const masterEntry = JAPAN_MUNICIPALITIES.find(
     (m) => m.prefName === pref && m.cityName === muni,
   );
   // 政令市の親 (「○○市」)。マスターには区しか無いので別索引で判定する。
-  const seirei =
-    !cellFromIndex && !masterEntry ? getSeireiParent(pref, muni) : null;
-  if (!cellFromIndex && !masterEntry && !seirei) notFound();
+  const seirei = masterEntry ? null : getSeireiParent(pref, muni);
+
+  // 静的生成外の URL (ニュースの生地点名・番地付き・旧表記ゆれ・旧 URL) はここで
+  // 正規ページへ 308 リダイレクト。sightings (19MB) ロードより *前* に判定するので、
+  // この経路では重いデータを読まない (= 5xx を避ける)。マスターに後方一致すれば
+  // その市町村へ、無ければ都道府県ページへ集約し、過去の 404/重複 URL を回収する。
+  if (!masterEntry && !seirei) {
+    const canonical = resolveCanonicalMuniName(pref, muni);
+    permanentRedirect(
+      canonical
+        ? `/place/${encodeURIComponent(pref)}/${encodeURIComponent(canonical)}`
+        : `/place/${encodeURIComponent(pref)}`,
+    );
+  }
+
+  const cellFromIndex = await getPlaceCell(pref, muni);
 
   // データ取得対象の city 一覧。政令市の親は配下の区を合算する。
   const dataCities = seirei ? seirei.wards : [muni];
