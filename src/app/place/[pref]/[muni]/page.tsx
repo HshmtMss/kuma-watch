@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
@@ -17,7 +17,6 @@ import {
   type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
-import { resolveCanonicalMuniName } from "@/lib/muni-name";
 import { getSeasonalAdvice, getBearRegion } from "@/lib/place-content";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -27,19 +26,15 @@ import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isPushReleased } from "@/lib/push-flag";
 
-// dynamicParams=true: 静的生成 (generateStaticParams) は「不変なマスター市区町村
-// ＋政令市の親」のみ。それ以外のパス (ニュースの生地点名・番地付き・旧 URL 等) は
-// リクエスト時にページ本体へ入り、sightings (19MB) を読む *前* に正規ページへ 308
-// リダイレクトする (下の早期ガード参照)。
+// dynamicParams=false: 静的生成 (generateStaticParams) は「不変なマスター市区町村
+// ＋政令市の親」のみ。実在しない市町村 URL (ニュースの生地点名・番地付き・旧 URL 等) は
+// src/proxy.ts がルート描画より前に正規ページへ 308 リダイレクトするため、ここへは届かない
+// (万一すり抜けても dynamicParams=false なので 404 = 安全側に倒れ、5xx にならない)。
 //
-// 以前 dynamicParams=true で 5xx が出たのは、未知の市町村で SSR が sightings.json を
-// 読み込み Hobby の関数タイムアウトを超えたため。今回はリダイレクトを sightings ロード
-// より前に行うので、その経路では重いデータを一切読まない。
-//
-// なぜ false をやめたか: 旧実装は getStaticPlaceKeys (出没データ由来) を静的 params に
-// union していたが、4h ごとの sightings 全件置換で URL セットが毎回変動し、消えた URL が
-// dynamicParams=false の下でハード 404 化していた (GSC「見つかりませんでした」1,800+ 件)。
-export const dynamicParams = true;
+// 注: 以前は getStaticPlaceKeys (出没データ由来) を静的 params に union していたが、4h
+// ごとの sightings 全件置換で URL セットが毎回変動し、消えた URL がハード 404 化していた
+// (GSC「見つかりませんでした」1,800+ 件)。マスター固定 + proxy リダイレクトで解消。
+export const dynamicParams = false;
 
 const PREF_NAMES = new Set(Object.values(PREF_CODE_TO_NAME));
 const SITE_URL = "https://kuma-watch.jp";
@@ -237,19 +232,9 @@ export default async function MuniPage({ params }: Props) {
   );
   // 政令市の親 (「○○市」)。マスターには区しか無いので別索引で判定する。
   const seirei = masterEntry ? null : getSeireiParent(pref, muni);
-
-  // 静的生成外の URL (ニュースの生地点名・番地付き・旧表記ゆれ・旧 URL) はここで
-  // 正規ページへ 308 リダイレクト。sightings (19MB) ロードより *前* に判定するので、
-  // この経路では重いデータを読まない (= 5xx を避ける)。マスターに後方一致すれば
-  // その市町村へ、無ければ都道府県ページへ集約し、過去の 404/重複 URL を回収する。
-  if (!masterEntry && !seirei) {
-    const canonical = resolveCanonicalMuniName(pref, muni);
-    permanentRedirect(
-      canonical
-        ? `/place/${encodeURIComponent(pref)}/${encodeURIComponent(canonical)}`
-        : `/place/${encodeURIComponent(pref)}`,
-    );
-  }
+  // 実在しない市町村 URL は src/proxy.ts が事前に 308 リダイレクトする。万一ここへ
+  // 届いた場合 (dynamicParams=false) は 404 = 安全側。
+  if (!masterEntry && !seirei) notFound();
 
   const cellFromIndex = await getPlaceCell(pref, muni);
 
