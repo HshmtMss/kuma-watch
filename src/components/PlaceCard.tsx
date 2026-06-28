@@ -283,9 +283,9 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-xl px-4 pb-24 pt-3">
+    <div className="mx-auto w-full max-w-xl px-4 pb-24 pt-4">
       {/* 1. Header */}
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => {
             if (typeof window !== "undefined" && window.history.length > 1) {
@@ -294,17 +294,17 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
               router.push("/");
             }
           }}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm hover:bg-gray-50"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-500 hover:bg-stone-50"
           aria-label="戻る"
         >
           ←
         </button>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-base font-bold text-gray-900">
+          <div className="truncate text-base font-bold text-stone-900">
             {src === "gps" && !name ? "現在地" : name || "地点情報"}
           </div>
           {(prefecture || city) && (
-            <div className="truncate text-xs text-gray-500">
+            <div className="truncate text-xs text-stone-500">
               {[prefecture, city].filter(Boolean).join(" / ")}
             </div>
           )}
@@ -313,7 +313,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
 
       {/* 2. Risk hero (場所タイプ × 柔らか判定 × LLM 補足) */}
       {breakdown ? (
-        <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+        <div className="mb-3 overflow-hidden rounded-xl border border-stone-200 bg-white">
           <RiskHero
             baseLevel={breakdown.level}
             count90d={nearby30.length}
@@ -321,66 +321,65 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
           />
         </div>
       ) : (
-        <div className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 text-sm text-gray-500">
+        <div className="mb-3 rounded-xl border border-stone-200 bg-white p-4 text-sm text-stone-500">
           計算中...
         </div>
       )}
 
       {/* 3. 件数 headline */}
-      <section className="mb-4 rounded-2xl bg-amber-50/70 p-4">
-        <div className="text-[10px] font-medium uppercase tracking-wider text-amber-700">
-          過去30日・半径 20km 以内の目撃
+      <section className="mb-3 rounded-xl border border-stone-200 bg-white p-5">
+        <div className="flex items-center gap-2 text-xs font-medium text-stone-500">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
+          過去30日・半径20km以内の目撃
         </div>
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-3xl font-bold tracking-tight text-gray-900">
+        <div className="mt-2 flex items-baseline gap-2">
+          <span className="text-4xl font-bold tracking-tight text-stone-900">
             {nearby30.length.toLocaleString()}
           </span>
-          <span className="text-sm text-gray-600">件</span>
-          <span className="ml-auto text-[11px] text-gray-500">
-            直近7日 {nearby7.length} 件 / 全期間 {nearby.length} 件
+          <span className="text-sm text-stone-500">件</span>
+          <span className="ml-auto text-xs text-stone-400">
+            直近7日 {nearby7.length}件 ・ 全期間 {nearby.length}件
           </span>
         </div>
       </section>
 
       {/* 4. 直近の目撃 */}
-      <section className="mb-4">
-        <h2 className="mb-2 text-sm font-semibold text-gray-900">
-          🕓 直近の目撃
+      <section className="mb-3 rounded-xl border border-stone-200 bg-white p-5">
+        <h2 className="mb-3 text-sm font-semibold text-stone-900">
+          直近の目撃
         </h2>
         {nearby.length > 0 ? (
-          <ul className="space-y-1.5">
+          <ul className="divide-y divide-stone-100">
             {nearby.slice(0, 10).map((r) => (
               <li
                 key={r.id}
-                className="rounded-lg bg-white px-3 py-2.5 text-sm text-gray-700 ring-1 ring-gray-100"
+                className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] text-gray-900">
-                      🐻 {r.prefectureName} {r.cityName}
-                      {r.headCount > 1 && (
-                        <span className="ml-1.5 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] text-red-700">
-                          {r.headCount}頭
-                        </span>
-                      )}
-                    </div>
-                    {r.sectionName && (
-                      <div className="truncate text-xs text-gray-500">
-                        {r.sectionName}
-                      </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm text-stone-900">
+                    {r.prefectureName} {r.cityName}
+                    {r.headCount > 1 && (
+                      <span className="ml-2 rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700">
+                        {r.headCount}頭
+                      </span>
                     )}
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div className="text-xs text-gray-700">{r.date}</div>
-                    <div className="text-[10px] text-gray-400">
-                      {r.distanceKm.toFixed(1)} km
+                  {r.sectionName && (
+                    <div className="truncate text-xs text-stone-500">
+                      {r.sectionName}
                     </div>
+                  )}
+                </div>
+                <div className="shrink-0 text-right">
+                  <div className="text-xs text-stone-600">{r.date}</div>
+                  <div className="text-xs text-stone-400">
+                    {r.distanceKm.toFixed(1)} km
                   </div>
                 </div>
               </li>
             ))}
             {nearby.length > 10 && (
-              <li className="pt-1 text-center text-[11px] text-gray-400">
+              <li className="pt-3 text-center text-xs text-stone-400">
                 他 {nearby.length - 10} 件（
                 <Link
                   className="underline"
@@ -393,7 +392,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
             )}
           </ul>
         ) : (
-          <p className="rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
+          <p className="text-xs text-stone-500">
             近隣 20 km 以内に、公開データに記録された最近のクマ出没はありません。
             ただし実際の目撃が未報告の可能性もあるため、常に注意してください。
           </p>
@@ -401,7 +400,7 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
       </section>
 
       {/* 5. 自治体からのお知らせ + 要約 */}
-      <section className="mb-4">
+      <section className="mb-3">
         <MunicipalNoticeBox
           entry={municipal}
           prefCode={municipal?.prefCode}
@@ -411,27 +410,24 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         />
       </section>
 
-      {/* 6. 行動メモ */}
+      {/* 6. やること */}
       {advice.length > 0 && (
-        <section className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-gray-900">
-            📝 行動メモ
+        <section className="mb-3 rounded-xl border border-stone-200 bg-white p-5">
+          <h2 className="mb-3 text-sm font-semibold text-stone-900">
+            やること
           </h2>
-          <ul className="space-y-1.5">
+          <ul className="space-y-3">
             {advice.map((a, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 rounded-lg bg-white px-3 py-2.5 ring-1 ring-gray-100"
-              >
-                <span className="mt-0.5" aria-hidden>
+              <li key={i} className="flex items-start gap-3">
+                <span className="mt-0.5 text-base" aria-hidden>
                   {a.emoji}
                 </span>
                 <div className="min-w-0">
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className="text-sm font-medium text-stone-900">
                     {a.title}
                   </div>
                   {a.body && (
-                    <div className="text-xs text-gray-600">{a.body}</div>
+                    <div className="text-xs text-stone-500">{a.body}</div>
                   )}
                 </div>
               </li>
@@ -441,45 +437,45 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
       )}
 
       {/* 7. AI 質問 */}
-      <section className="mb-4">
+      <section className="mb-3">
         <AskBox context={askContext} />
       </section>
 
       {/* 8. 詳細（折り畳み） */}
-      <details className="mb-4 rounded-2xl bg-white ring-1 ring-gray-100 group">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-          <span>▾ 詳細データ（時間帯・月別・根拠）</span>
-          <span className="text-[10px] text-gray-400 group-open:hidden">
+      <details className="mb-4 rounded-xl border border-stone-200 bg-white group">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-5 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50">
+          <span>詳細データ（時間帯・月別・根拠）</span>
+          <span className="text-xs text-stone-400 group-open:hidden">
             タップで展開
           </span>
         </summary>
-        <div className="space-y-4 px-4 pb-4">
+        <div className="space-y-4 px-5 pb-5">
           <dl className="grid grid-cols-2 gap-y-2 text-xs">
             <div>
-              <dt className="text-gray-500">気象</dt>
-              <dd className="text-gray-800">
+              <dt className="text-stone-500">気象</dt>
+              <dd className="text-stone-800">
                 {weather
                   ? `${weatherCodeEmoji(weather.weatherCode)} ${weather.tempC.toFixed(1)}°C`
                   : "—"}
               </dd>
             </div>
             <div>
-              <dt className="text-gray-500">降水 / 天気</dt>
-              <dd className="text-gray-800">
+              <dt className="text-stone-500">降水 / 天気</dt>
+              <dd className="text-stone-800">
                 {weather
                   ? `${weather.precipMm} mm / ${weatherCodeLabel(weather.weatherCode)}`
                   : "—"}
               </dd>
             </div>
             <div>
-              <dt className="text-gray-500">時刻・月相</dt>
-              <dd className="text-gray-800">
+              <dt className="text-stone-500">時刻・月相</dt>
+              <dd className="text-stone-800">
                 {hour}時 / {lunarName}
               </dd>
             </div>
             <div>
-              <dt className="text-gray-500">座標</dt>
-              <dd className="font-mono text-gray-800">
+              <dt className="text-stone-500">座標</dt>
+              <dd className="font-mono text-stone-800">
                 {lat.toFixed(4)}, {lon.toFixed(4)}
               </dd>
             </div>
@@ -498,14 +494,14 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
           <MunicipalLinks entry={municipal} />
 
           {breakdown && (
-            <details className="rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-700">
-              <summary className="min-h-9 cursor-pointer font-medium text-gray-800">
+            <details className="rounded-lg bg-stone-50 px-3 py-2 text-xs text-stone-700">
+              <summary className="min-h-9 cursor-pointer font-medium text-stone-800">
                 スコアの根拠
               </summary>
               <ul className="mt-2 space-y-1">
                 {breakdown.explanation.map((line, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-gray-400" />
+                    <span className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-stone-400" />
                     <span>{line}</span>
                   </li>
                 ))}
