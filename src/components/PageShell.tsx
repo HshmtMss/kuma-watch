@@ -11,8 +11,8 @@ type Props = {
 
 export default function PageShell({ title, lead, children }: Props) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="flex items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+    <div className="flex min-h-screen flex-col bg-stone-50">
+      <header className="flex items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
         {/* ブランドはモバイルでも「くまウォッチ by 獣医工学ラボ」を表示する (ハンバーガー導入で幅確保)。
             文字サイズは小デバイスでの 1 行収まりを優先しつつ、空きが目立たない最大値に調整:
             ロゴ画像 h-8→h-9, タイトル base→lg, by 獣医工学ラボ xs→sm。 */}
@@ -48,7 +48,7 @@ export default function PageShell({ title, lead, children }: Props) {
         )}
         <div className="article-body max-w-none">{children}</div>
       </main>
-      <footer className="border-t border-black/8 bg-white px-5 py-6 text-sm text-gray-700">
+      <footer className="border-t border-stone-200 bg-white px-5 py-6 text-sm text-stone-700">
         <div className="mx-auto max-w-3xl">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
@@ -57,15 +57,15 @@ export default function PageShell({ title, lead, children }: Props) {
                 href="https://www.research-coordinate.co.jp/labs/vet/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block py-1 font-medium text-gray-900 hover:underline"
+                className="inline-block py-1 font-medium text-stone-900 hover:underline"
               >
                 獣医工学ラボ
               </a>
             </span>
-            <span className="text-gray-300" aria-hidden>·</span>
+            <span className="text-stone-300" aria-hidden>·</span>
             <a
               href="mailto:contact@research-coordinate.co.jp"
-              className="inline-block py-1 hover:text-gray-900 hover:underline"
+              className="inline-block py-1 hover:text-stone-900 hover:underline"
             >
               お問合せ
             </a>
