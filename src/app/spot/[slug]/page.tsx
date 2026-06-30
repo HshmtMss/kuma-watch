@@ -445,7 +445,7 @@ export default async function SpotPage({ params }: Props) {
               unoptimized
             />
           </div>
-          <figcaption className="border-t border-stone-200 bg-white px-3 py-2 text-[11px] text-stone-500">
+          <figcaption className="border-t border-stone-200 bg-white px-3 py-2 text-xs text-stone-500">
             出典: Wikipedia「
             <a
               href={`https://ja.wikipedia.org/wiki/${encodeURIComponent(landmark.imageCredit ?? landmark.name)}`}
@@ -789,7 +789,7 @@ export default async function SpotPage({ params }: Props) {
       {/* 凡例 — プロット対象は半径 10 km 以内・過去 1 年以内のレコード。
           そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
           中央の黄色マーク (代表地点) は凡例から除外。 */}
-      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
+      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-xs text-stone-600">
         <li className="flex items-center gap-1.5">
           <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
           直近 90 日
@@ -838,7 +838,7 @@ export default async function SpotPage({ params }: Props) {
                   {href ? (
                     <Link
                       href={href}
-                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-amber-400 hover:bg-amber-50/60"
+                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-stone-300 hover:bg-stone-50"
                     >
                       {body}
                     </Link>
@@ -869,12 +869,12 @@ export default async function SpotPage({ params }: Props) {
         <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-center">
           <div className="text-xs text-stone-500">過去90日</div>
           <div className={`mt-1 text-xl font-bold ${count90 > 0 ? "text-amber-700" : "text-stone-700"}`}>{count90}</div>
-          <div className="text-[10px] text-stone-400">件</div>
+          <div className="text-xs text-stone-400">件</div>
         </div>
         <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-center">
           <div className="text-xs text-stone-500">過去1年</div>
           <div className="mt-1 text-xl font-bold text-stone-900">{count365}</div>
-          <div className="text-[10px] text-stone-400">件</div>
+          <div className="text-xs text-stone-400">件</div>
         </div>
         <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 text-center">
           <div className="text-xs text-stone-500">最新目撃</div>
@@ -904,7 +904,7 @@ export default async function SpotPage({ params }: Props) {
                     <td className="px-3 py-2">
                       <span className="font-medium text-stone-900">{a.name}</span>
                       {a.note && (
-                        <span className="ml-1 block text-[11px] text-stone-400 sm:ml-1 sm:inline">
+                        <span className="ml-1 block text-xs text-stone-400 sm:ml-1 sm:inline">
                           {a.note}
                         </span>
                       )}
@@ -943,10 +943,10 @@ export default async function SpotPage({ params }: Props) {
               <Link
                 key={city}
                 href={`/place/${encodeURIComponent(landmark.prefName)}/${encodeURIComponent(city)}`}
-                className="block rounded-lg border border-stone-200 bg-white p-3 hover:border-amber-400 hover:bg-amber-50/40"
+                className="block rounded-lg border border-stone-200 bg-white p-3 hover:border-stone-300 hover:bg-stone-50"
               >
                 <div className="text-sm font-semibold text-stone-900">{city}</div>
-                <div className="text-[11px] text-stone-500">{n} 件</div>
+                <div className="text-xs text-stone-500">{n} 件</div>
               </Link>
             ))}
           </div>
@@ -973,7 +973,7 @@ export default async function SpotPage({ params }: Props) {
                   href={officialLink.bearUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-amber-400 hover:bg-amber-50/60"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-stone-300 hover:bg-stone-50"
                 >
                   <span aria-hidden>🏛️</span>
                   {landmark.muniName} クマ出没情報（公式）
@@ -985,7 +985,7 @@ export default async function SpotPage({ params }: Props) {
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-amber-400 hover:bg-amber-50/60"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-stone-300 hover:bg-stone-50"
                 >
                   <span aria-hidden>🏛️</span>
                   {l.label}
@@ -1046,7 +1046,7 @@ export default async function SpotPage({ params }: Props) {
           </Link>
           <Link
             href="/for-vendors"
-            className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 hover:border-amber-400 hover:bg-amber-50"
+            className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 hover:border-stone-300 hover:bg-stone-50"
           >
             製品・サービスの掲載 →
           </Link>
@@ -1058,7 +1058,7 @@ export default async function SpotPage({ params }: Props) {
       <div className="not-prose mt-8">
         <Link
           href="/spot"
-          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:border-amber-400 hover:bg-amber-50"
+          className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 shadow-sm hover:border-stone-300 hover:bg-stone-50"
         >
           <span aria-hidden>←</span>
           観光地一覧に戻る
