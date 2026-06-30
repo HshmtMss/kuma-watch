@@ -194,7 +194,7 @@ export default async function SpotIndexPage({
                       <span className="text-sm font-bold text-stone-800">
                         {pref}
                       </span>
-                      <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-stone-500">
+                      <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-xs font-medium tabular-nums text-stone-500">
                         {items.length}
                       </span>
                     </div>
@@ -203,7 +203,7 @@ export default async function SpotIndexPage({
                         <Link
                           key={l.slug}
                           href={`/spot/${encodeURIComponent(l.slug)}`}
-                          className="inline-block rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-[13px] text-stone-700 transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-900"
+                          className="inline-block rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-sm text-stone-700 transition-colors hover:border-stone-300 hover:bg-stone-100 hover:text-stone-900"
                         >
                           {l.name}
                         </Link>
@@ -224,7 +224,7 @@ export default async function SpotIndexPage({
             <li key={l.slug}>
               <Link
                 href={`/spot/${encodeURIComponent(l.slug)}`}
-                className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:border-amber-400 hover:shadow"
+                className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:border-stone-300 hover:shadow"
               >
                 {l.imageUrl ? (
                   <div className="relative aspect-[16/10] w-full bg-stone-100">

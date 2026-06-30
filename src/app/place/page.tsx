@@ -66,7 +66,7 @@ export default async function PlacePage({
   // 地点指定モード: 既存のシェアリンク等 (?lat=&lon=) を維持する。
   if (sp.lat != null && sp.lon != null && isValidLat(lat) && isValidLon(lon)) {
     return (
-      <main className="min-h-[100dvh] bg-gray-50">
+      <main className="min-h-[100dvh] bg-stone-50">
         <PlacePointClient lat={lat} lon={lon} name={sp.name} src={sp.src} />
       </main>
     );
@@ -165,7 +165,7 @@ export default async function PlacePage({
                 <li key={pref}>
                   <Link
                     href={`/place/${encodeURIComponent(pref)}`}
-                    className={`flex flex-col gap-1.5 rounded-xl border bg-white px-3 py-2.5 hover:border-amber-400 hover:bg-amber-50/40 ${
+                    className={`flex flex-col gap-1.5 rounded-xl border bg-white px-3 py-2.5 hover:border-stone-300 hover:bg-stone-50 ${
                       isHot ? "border-red-200" : "border-stone-200"
                     }`}
                   >
@@ -176,7 +176,7 @@ export default async function PlacePage({
                       {pref}
                     </span>
                     {/* 直近1年 / 直近90日 の 2 段。値 0 でも淡色で残しスケール比較可能に。 */}
-                    <span className="flex flex-wrap items-baseline gap-1 text-[11px]">
+                    <span className="flex flex-wrap items-baseline gap-1 text-xs">
                       <span
                         className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
                           count365 > 0
