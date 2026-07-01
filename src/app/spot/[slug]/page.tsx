@@ -433,7 +433,7 @@ export default async function SpotPage({ params }: Props) {
 
       {/* ヒーロー画像 (Wikipedia REST 由来 / CC BY-SA 4.0 等) */}
       {landmark.imageUrl && (
-        <figure className="not-prose mb-5 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+        <figure className="not-prose mb-5 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
           <div className="relative aspect-[16/9] w-full">
             <Image
               src={landmark.imageUrl}
@@ -461,9 +461,9 @@ export default async function SpotPage({ params }: Props) {
       )}
 
       {/* 危険度ヒーローカード */}
-      <div className={`not-prose mb-6 rounded-2xl border-2 p-5 ${riskBg[risk.tone]}`}>
+      <div className={`not-prose mb-6 rounded-xl border-2 p-5 ${riskBg[risk.tone]}`}>
         <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${riskBadge[risk.tone]}`}>
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${riskBadge[risk.tone]}`}>
             {risk.label}
           </span>
           <span className={`text-xs font-medium ${riskText[risk.tone]}`}>
@@ -488,7 +488,7 @@ export default async function SpotPage({ params }: Props) {
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
           断定でなくバンド + 例年比で提示し、根拠を全部開示する。 */}
       {landmark.officialHub && forecast && (
-        <div className={`not-prose mb-6 rounded-2xl border p-5 ${fcBand[forecast.band].box}`}>
+        <div className={`not-prose mb-6 rounded-xl border p-5 ${fcBand[forecast.band].box}`}>
           <div className="flex items-center gap-2">
             <span aria-hidden>📈</span>
             <span className={`text-xs font-medium ${fcBand[forecast.band].text}/80`}>
@@ -506,7 +506,7 @@ export default async function SpotPage({ params }: Props) {
               </span>
             )}
             {forecast.confidence === "low" && (
-              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-medium text-stone-500">
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-xs font-medium text-stone-500">
                 参考値（データ少）
               </span>
             )}
@@ -527,7 +527,7 @@ export default async function SpotPage({ params }: Props) {
                 aria-hidden
               />
             </div>
-            <div className="mt-1 flex justify-between text-[10px] font-medium text-stone-500">
+            <div className="mt-1 flex justify-between text-xs font-medium text-stone-500">
               <span>低め</span>
               <span>例年並み</span>
               <span>やや高め</span>
@@ -538,7 +538,7 @@ export default async function SpotPage({ params }: Props) {
           {/* 対比スタット: 「今」と「例年」の差を大きく見せる（インパクトの核）。 */}
           <div className="mt-3 flex items-stretch gap-2">
             <div className="flex-1 rounded-xl border border-stone-200 bg-white/70 px-3 py-2 text-center">
-              <div className="text-[10px] text-stone-500">直近90日（実測）</div>
+              <div className="text-xs text-stone-500">直近90日（実測）</div>
               <div className="text-2xl font-bold text-stone-900">
                 {forecast.recent90}
                 <span className="text-xs font-normal text-stone-400"> 件</span>
@@ -546,7 +546,7 @@ export default async function SpotPage({ params }: Props) {
             </div>
             <div className="flex items-center text-xs font-bold text-stone-400">vs</div>
             <div className="flex-1 rounded-xl border border-stone-200 bg-white/70 px-3 py-2 text-center">
-              <div className="text-[10px] text-stone-500">例年の同期（平均）</div>
+              <div className="text-xs text-stone-500">例年の同期（平均）</div>
               <div className="text-2xl font-bold text-stone-700">
                 {forecast.typical90 >= 1 ? forecast.typical90.toFixed(0) : "—"}
                 <span className="text-xs font-normal text-stone-400"> 件</span>
@@ -596,7 +596,7 @@ export default async function SpotPage({ params }: Props) {
             </text>
           </svg>
 
-          <p className="mt-1.5 text-[11px] leading-relaxed text-stone-500">
+          <p className="mt-1.5 text-xs leading-relaxed text-stone-500">
             直近12ヶ月の月別件数と過去3年の季節パターンから算出した統計的見通し（確定的な予測ではありません）。
           </p>
         </div>
@@ -606,7 +606,7 @@ export default async function SpotPage({ params }: Props) {
           そのまま購読できる。officialHub のみ(予測＋自治体メッセージが揃うため)。
           ※公開ページなので事業者向けの営業要素はここに置かず、末尾 CTA に集約する。 */}
       {landmark.officialHub && forecast && (
-        <section className="not-prose mb-6 rounded-2xl border border-sky-200 bg-gradient-to-b from-sky-50 to-white p-5">
+        <section className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2">
             <span aria-hidden>📲</span>
             <h2 className="m-0 text-base font-bold text-stone-900">
@@ -618,7 +618,7 @@ export default async function SpotPage({ params }: Props) {
           </p>
 
           {/* 通知プレビュー（スマホ通知風） */}
-          <div className="mx-auto mt-3 max-w-md rounded-2xl border border-stone-300 bg-white p-3 shadow-md">
+          <div className="mx-auto mt-3 max-w-md rounded-xl border border-stone-300 bg-white p-3 shadow-md">
             <div className="flex items-start gap-2">
               <span className="text-xl leading-none">🐻</span>
               <div className="min-w-0 flex-1">
@@ -626,7 +626,7 @@ export default async function SpotPage({ params }: Props) {
                   <span className="truncate text-xs font-bold text-stone-900">
                     KumaWatch｜{landmark.name}周辺
                   </span>
-                  <span className="shrink-0 text-[10px] text-stone-400">今</span>
+                  <span className="shrink-0 text-xs text-stone-400">今</span>
                 </div>
                 <p className="mt-0.5 text-xs font-semibold text-stone-800">
                   今後4週間の見通し：{fcPhaseArrow} {BAND_LABEL[forecast.band]}
@@ -634,11 +634,11 @@ export default async function SpotPage({ params }: Props) {
                     `（例年比 ${forecast.vsTypicalPct >= 0 ? "+" : ""}${forecast.vsTypicalPct}%）`}
                 </p>
                 {primaryMessage && (
-                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-stone-600">
+                  <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-stone-600">
                     {landmark.muniName}より：{primaryMessage.message}
                   </p>
                 )}
-                <p className="mt-1 text-[10px] text-stone-400">タップで地図・最近の事案・対策へ</p>
+                <p className="mt-1 text-xs text-stone-400">タップで地図・最近の事案・対策へ</p>
               </div>
             </div>
           </div>
@@ -660,14 +660,14 @@ export default async function SpotPage({ params }: Props) {
           ページ上部に大きく表示。基本スポット (officialHub なし) には出ないので
           「基本版 vs 自治体情報ハブ」がパッと見で分かる。 */}
       {showHub && (
-        <section className="not-prose mb-6 rounded-2xl border-2 border-sky-200 bg-sky-50/50 p-5">
+        <section className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex flex-wrap items-center gap-2">
             <span aria-hidden>🏛️</span>
             <h2 className="m-0 text-base font-bold text-stone-900">
               周辺自治体の公式クマ情報ハブ
             </h2>
             {hubMunis.length > 0 && (
-              <span className="rounded-full bg-sky-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+              <span className="rounded-full bg-stone-800 px-2.5 py-0.5 text-xs font-bold text-white">
                 {hubPrefs.length}府県 {hubMunis.length}自治体を集約
               </span>
             )}
@@ -681,17 +681,17 @@ export default async function SpotPage({ params }: Props) {
               {hubMessages.map(({ city, msg }) => (
                 <div
                   key={city}
-                  className="rounded-lg border-l-4 border-sky-500 bg-white px-3 py-2.5 shadow-sm"
+                  className="rounded-lg border-l-4 border-stone-300 bg-white px-3 py-2.5 shadow-sm"
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded bg-sky-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    <span className="rounded bg-stone-800 px-1.5 py-0.5 text-xs font-bold text-white">
                       {city}からのお知らせ
                     </span>
-                    <span className="text-[10px] text-stone-400">
+                    <span className="text-xs text-stone-400">
                       更新: {formatDate(msg.updatedAt)}
                     </span>
                     {msg.targetArea && (
-                      <span className="text-[10px] text-stone-500">対象: {msg.targetArea}</span>
+                      <span className="text-xs text-stone-500">対象: {msg.targetArea}</span>
                     )}
                   </div>
                   <p className="mt-1.5 text-xs leading-relaxed text-stone-700">{msg.message}</p>
@@ -699,7 +699,7 @@ export default async function SpotPage({ params }: Props) {
                     href={msg.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1 inline-block text-[11px] font-medium text-sky-700"
+                    className="mt-1 inline-block text-xs font-medium text-stone-500"
                   >
                     出典: {city}公式 →
                   </a>
@@ -715,14 +715,14 @@ export default async function SpotPage({ params }: Props) {
                   href={m.bearUrl || m.homeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 hover:border-sky-400 hover:bg-sky-50/60"
+                  className="flex items-center justify-between rounded-lg border border-stone-200 bg-white px-3 py-2 hover:border-stone-300 hover:bg-stone-50"
                 >
                   <span className="min-w-0">
-                    <span className="text-[10px] text-stone-400">{m.pref}</span>
+                    <span className="text-xs text-stone-400">{m.pref}</span>
                     <span className="ml-1 text-sm font-semibold text-stone-900">{m.city}</span>
-                    <span className="ml-1 text-[10px] text-stone-400">{m.dist.toFixed(0)}km</span>
+                    <span className="ml-1 text-xs text-stone-400">{m.dist.toFixed(0)}km</span>
                   </span>
-                  <span className="ml-2 shrink-0 text-[11px] font-medium text-sky-700">
+                  <span className="ml-2 shrink-0 text-xs font-medium text-stone-500">
                     {m.bearUrl ? "クマ情報 →" : "公式 →"}
                   </span>
                 </a>
@@ -737,14 +737,14 @@ export default async function SpotPage({ params }: Props) {
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-medium text-stone-700 hover:border-sky-400"
+                  className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-medium text-stone-700 hover:border-stone-300"
                 >
                   🏛️ {l.label}
                 </a>
               ))}
             </div>
           )}
-          <p className="mt-2 text-[11px] leading-relaxed text-stone-500">
+          <p className="mt-2 text-xs leading-relaxed text-stone-500">
             出典: 各自治体・公的機関の公式ページ（一次情報）。本サイトの出没データは毎日自動更新（{SUPERVISION}）。
           </p>
         </section>
@@ -1029,7 +1029,7 @@ export default async function SpotPage({ params }: Props) {
       )}
 
       {/* B2B 導線 — 観光地・自治体向けの「安全情報ハブ提供」。全スポット共通の funnel。 */}
-      <div className="not-prose my-8 rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+      <div className="not-prose my-8 rounded-xl border border-stone-200 bg-white p-5">
         <h2 className="m-0 text-base font-bold text-stone-900">
           この安全情報ハブを、貴施設・自治体に
         </h2>
