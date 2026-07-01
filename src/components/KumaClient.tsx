@@ -1195,7 +1195,7 @@ export default function KumaClient() {
         {/* 凡例 — ピンの種類のみを下部に横1行のスリムバー(ピル)で常時表示。
             省スペース優先でラベルは短縮 (詳細はピンのポップアップで補う)。生息域/
             直近1年出没の色スケールは地点カードに集約済みのためここには出さない。 */}
-        <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-2.5 gap-y-1 rounded-full border border-stone-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-stone-600 shadow-sm backdrop-blur">
+        <div className="pointer-events-auto absolute bottom-3 left-3 z-[900] flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-2.5 gap-y-1 rounded-full border border-stone-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-stone-600 shadow-sm backdrop-blur">
           <span className="inline-flex items-center gap-1">
             <span className="h-2 w-2 rounded-full bg-gray-500" />1頭
           </span>
