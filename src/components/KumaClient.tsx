@@ -26,8 +26,6 @@ import SettingsPanel from "@/components/SettingsPanel";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
   RISK_LEVEL_LABEL,
-  HABITAT_DISPLAY_COLOR,
-  ALERT_DISPLAY_COLOR,
   type LevelThresholds,
 } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
@@ -108,7 +106,6 @@ export default function KumaClient() {
   }, []);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
-  const [showLegend, setShowLegend] = useState(false);
   // 「色の意味」のさりげない補足を表示する小さなツールチップの開閉状態。
   // 過度に怖がらせないための説明を、見たい人だけ見られるように UI を絞る。
   const [showMapNote, setShowMapNote] = useState(false);
@@ -833,15 +830,6 @@ export default function KumaClient() {
                 />
                 警戒レベル（ヒートマップ）
               </label>
-              <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
-                <input
-                  type="checkbox"
-                  checked={showLegend}
-                  onChange={(e) => setShowLegend(e.target.checked)}
-                  className="h-4 w-4 accent-amber-600"
-                />
-                凡例を表示
-              </label>
               <div className="mt-2 border-t border-stone-100 pt-2">
                 <div className="mb-1.5 px-1.5 text-xs font-medium text-stone-500">
                   地図の種類
@@ -1204,83 +1192,29 @@ export default function KumaClient() {
 
 
 
-        {showLegend && (
-          <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] w-48 rounded-xl border border-black/8 bg-white/95 p-3 text-sm text-gray-700 shadow backdrop-blur">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="font-semibold text-gray-800">凡例</div>
-              <button
-                onClick={() => setShowLegend(false)}
-                className="text-gray-400 hover:text-gray-900"
-                aria-label="凡例を閉じる"
-              >
-                ×
-              </button>
+        {/* 凡例 — ピンの種類のみ常時表示。クマの生息域 / 直近1年の出没の色スケールは
+            下のカード(地点選択時)に説明があるため凡例からは省く。項目を絞ることで
+            小画面でのかぶりも軽減する。 */}
+        <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] w-44 rounded-xl border border-stone-200 bg-white/95 p-3 text-sm text-stone-700 shadow backdrop-blur">
+          <div className="mb-1.5 text-xs font-medium text-stone-500">ピンの種類</div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭（公式）
             </div>
-            <div className="mb-2">
-              <div className="mb-1 text-xs text-gray-500">ピン</div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭（公式）
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上（公式）
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-violet-500" />市民投稿（承認済み）
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-3 w-3 rounded-full bg-blue-500 ring-2 ring-blue-700" />24時間以内の新着
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上（公式）
             </div>
-            <div>
-              {/* 生息域(落ち着いた色)と直近の出没(警戒色)を分けて示す。
-                  「クマがいる地域」と「最近よく出ている所」を混同させない。 */}
-              <div className="mb-1 text-xs text-gray-500">
-                クマの生息域
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ background: HABITAT_DISPLAY_COLOR.low }}
-                />
-                生息の可能性
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ background: HABITAT_DISPLAY_COLOR.high }}
-                />
-                主要な生息域
-              </div>
-              <div className="mb-1 mt-2 text-xs text-gray-500">
-                直近1年の出没
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ background: ALERT_DISPLAY_COLOR.moderate }}
-                />
-                出没あり
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ background: ALERT_DISPLAY_COLOR.elevated }}
-                />
-                出没が多い
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-sm"
-                  style={{ background: ALERT_DISPLAY_COLOR.high }}
-                />
-                特に多い
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-violet-500" />市民投稿（承認済み）
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-block h-3 w-3 rounded-full bg-stone-400 ring-2 ring-blue-500" />24時間以内の新着
             </div>
           </div>
-        )}
+        </div>
 
         {/* 跳ね上げ式カード: map 領域に絶対配置 (下から) */}
         <RiskPanel
