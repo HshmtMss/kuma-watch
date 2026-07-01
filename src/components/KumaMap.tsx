@@ -468,41 +468,52 @@ export default function KumaMap({
       const FRESH_MS = 24 * 60 * 60 * 1000;
       const nowMs = Date.now();
       for (const r of toRender) {
-        // 報道由来 (isOfficial=false) はオレンジ系で「未確認」を示唆。
-        // 公式は従来通り 1 頭=灰 / 2 頭以上=赤の頭数強調。
+        // 塗り (fill) は「情報の出どころ」を表す。新着でも上書きしない。
+        //   紫=市民投稿 / 橙=報道由来 / 赤=公式2頭以上 / 灰=公式1頭
         const isCitizen = r.sourceKind === "citizen";
         const isNews = !isCitizen && r.isOfficial === false;
         const isFresh =
           typeof r.ingestedAt === "number" && nowMs - r.ingestedAt <= FRESH_MS;
-        const color = isCitizen
-          ? "#8b5cf6" // 市民投稿は紫で区別
-          : isFresh
-            ? "#3b82f6" // 新着は青で目立たせる
-            : isNews
-              ? "#f59e0b"
-              : r.headCount > 1
-                ? "#ef4444"
-                : "#6b7280";
-        // 新着は半径 +4・border 強調。
-        const radius =
-          (r.headCount > 1 ? rMulti : rSingle) + (isFresh ? 4 : 0);
-        const weight = isFresh ? borderWeight + 1 : borderWeight;
+        const sourceColor = isCitizen
+          ? "#8b5cf6"
+          : isNews
+            ? "#f59e0b"
+            : r.headCount > 1
+              ? "#ef4444"
+              : "#6b7280";
+        const baseR = r.headCount > 1 ? rMulti : rSingle;
+
+        const openPopup = (e: unknown) => {
+          (e as unknown as LeafletMouseEvent).originalEvent?.stopPropagation?.();
+          showRecordPopup(L, r);
+        };
+
+        // 新着 (直近 24h に取り込み) は、出どころ色のドットの周りに青リング (ハロー)
+        // を重ねて示す。旧仕様は塗りを青で上書きしていたため「報道かつ新着」の際に
+        // 報道色が消えて判別できなかった。出どころ色は残し、新着は別レイヤーの青で。
+        if (isFresh) {
+          const halo: CircleMarker = L.circleMarker([r.lat, r.lon], {
+            radius: baseR + 4,
+            stroke: false,
+            fillColor: "#3b82f6",
+            fillOpacity: 0.95,
+            renderer: canvas,
+          });
+          halo.on("click", openPopup);
+          halo.addTo(layer);
+        }
+
+        // 出どころ色のドット (白フチ)。新着時は上の青ハローの手前に重なり、
+        // 白フチが青リングとの間に隙間を作って「ドット + 青リング」に見える。
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
-          radius,
-          color: isFresh ? "#1d4ed8" : "#ffffff",
-          weight,
-          fillColor: color,
-          fillOpacity: isFresh ? 1 : 0.9,
+          radius: baseR,
+          color: "#ffffff",
+          weight: borderWeight,
+          fillColor: sourceColor,
+          fillOpacity: 0.9,
           renderer: canvas,
         });
-        marker.on("click", (e) => {
-          if ((e as unknown as LeafletMouseEvent).originalEvent) {
-            (
-              e as unknown as LeafletMouseEvent
-            ).originalEvent.stopPropagation?.();
-          }
-          showRecordPopup(L, r);
-        });
+        marker.on("click", openPopup);
         marker.addTo(layer);
       }
     });
