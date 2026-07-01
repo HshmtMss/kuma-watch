@@ -1,11 +1,11 @@
 [
   {
     "prefName": "埼玉県",
-    "cityName": "日高市",
-    "message": "日高市では、近隣市においてクマの目撃情報が寄せられています。クマを含む野生動物と遭遇した際は、近寄らず、背中を見せずにゆっくり後退し、大声を出したり物を投げたりして刺激しないでください。家庭での子どもの行動に注意し、畑の野菜や果樹の取り残しをなくすなど、誘引物管理を徹底してください。",
-    "targetArea": "日高市全域",
-    "updatedAt": "2023-10-30",
-    "sourceUrl": "https://www.city.hidaka.lg.jp/soshiki/shiminseikatsu/sangyoshinko/nosei/kanko/nogyo/boujyo/14391.html",
+    "cityName": "入間郡毛呂山町",
+    "message": "毛呂山町では、令和8年4月20日午前8時頃に葛貫の林で熊のような動物が目撃されています。山に入る際は鈴やラジオなどで音を出し、早朝・夕方の活動に特に注意し、農作物残さや放置果実、揮発性物質が誘引物とならないよう適切に管理してください。子熊を見つけても近づかず、遭遇時は落ち着いてゆっくり後退しましょう。",
+    "targetArea": "毛呂山町全域",
+    "updatedAt": "2026-06-01",
+    "sourceUrl": "https://www.town.moroyama.saitama.jp/soshikikarasagasu/sangyoshinkoka/6/tyoujyuuhigai/2389.html",
     "crawledAt": "2026-06-25"
   },
   {
@@ -19,12 +19,83 @@
   },
   {
     "prefName": "埼玉県",
-    "cityName": "入間郡毛呂山町",
-    "message": "毛呂山町では、令和8年4月20日午前8時頃に葛貫の林で熊のような動物が目撃されています。山に入る際は鈴やラジオなどで音を出し、早朝・夕方の活動に特に注意し、農作物残さや放置果実、揮発性物質が誘引物とならないよう適切に管理してください。子熊を見つけても近づかず、遭遇時は落ち着いてゆっくり後退しましょう。",
-    "targetArea": "毛呂山町全域",
-    "updatedAt": "2026-06-01",
-    "sourceUrl": "https://www.town.moroyama.saitama.jp/soshikikarasagasu/sangyoshinkoka/6/tyoujyuuhigai/2389.html",
+    "cityName": "日高市",
+    "message": "日高市では、近隣市においてクマの目撃情報が寄せられています。クマを含む野生動物と遭遇した際は、近寄らず、背中を見せずにゆっくり後退し、大声を出したり物を投げたりして刺激しないでください。家庭での子どもの行動に注意し、畑の野菜や果樹の取り残しをなくすなど、誘引物管理を徹底してください。",
+    "targetArea": "日高市全域",
+    "updatedAt": "2023-10-30",
+    "sourceUrl": "https://www.city.hidaka.lg.jp/soshiki/shiminseikatsu/sangyoshinko/nosei/kanko/nogyo/boujyo/14391.html",
     "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "下新川郡入善町",
+    "message": "ツキノワグマに遭遇した際は、子グマを見てもそっと立ち去り、親グマが近くにいる可能性があるため特に注意してください。落ち着いて、クマから目を離さずにゆっくり後退し、大声を出したり走って逃げたりせず、クマに逃げる機会を与えてください。人家周辺でも出没があり得るため、常に周囲に細心の注意を払ってください。",
+    "targetArea": "入善町",
+    "updatedAt": "2023-10-30",
+    "sourceUrl": "https://www.town.nyuzen.toyama.jp/gyosei/soshiki/ganbaru/1/1/5479.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "中新川郡上市町",
+    "message": "クマは夏場に食物を求めて広範囲を移動し、人と出会う機会が増えるため注意が必要です。朝夕は山中への立ち入りを避け、単独行動をせずにグループで行動し、鈴や笛などで自分の存在を知らせましょう。また、子グマを見ても近づかず、そっとその場を離れてください。",
+    "targetArea": "上市町",
+    "updatedAt": "2025-10-17",
+    "sourceUrl": "https://www.town.kamiichi.toyama.jp/page/16107.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "富山市",
+    "message": "クマが活発な朝夕は山中への立ち入りを避け、鈴や笛などで音を出し、自分の存在を知らせましょう。昨年ドングリが凶作だったため、身近な場所での出没が増える可能性があります。万一クマを目撃した場合は刺激せず静かにその場を離れ、屋内に移動するか、足跡や糞などの痕跡を見つけたらすぐに引き返してください。",
+    "targetArea": "富山市全域",
+    "updatedAt": "",
+    "sourceUrl": "https://www.city.toyama.lg.jp/business/nourin/1010630/1010631/index.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "小矢部市",
+    "message": "クマの家屋侵入を防ぐため戸締りを徹底し、朝夕の外出時は人家近くでも鈴やラジオなど音が出るものを携帯してクマに自分の存在を知らせましょう。子グマを見ても近づかず、そっとその場を離れてください。クマを目撃した場合や痕跡を見つけた場合は、市役所農林課または警察署に連絡してください。",
+    "targetArea": "小矢部市",
+    "updatedAt": "2026-04-30",
+    "sourceUrl": "https://www.city.oyabe.toyama.jp/sangyobusiness/1002761/1002763.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "氷見市",
+    "message": "令和8年6月29日午後5時50分ごろ、早借地内の一般県道氷見・志雄線の峠道で成獣のクマ1頭が目撃されました。氷見市内ではクマの出没が相次いでいるため、収穫されない果樹や生ごみを適切に管理し、山に入る際や早朝・夕方の単独行動を避け、鈴やラジオなどで音を出してクマに人間の存在を知らせましょう。クマを目撃した際は、刺激せずに静かにその場を離れ、氷見警察署や市役所へ速やかに通報してください。",
+    "targetArea": "氷見市内",
+    "updatedAt": "2026-06-30",
+    "sourceUrl": "https://www.city.himi.toyama.jp/gyosei/soshiki/norinchikusan/1/6036.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "砺波市",
+    "message": "砺波市ではツキノワグマ出没警報が発令されており、クマの出没に警戒が必要です。冬眠明けや春から夏、秋にかけて特に注意し、放任果樹の伐採など誘引物の管理を徹底しましょう。最新の目撃・痕跡情報は「令和8年度クマ目撃・痕跡情報」で確認してください。",
+    "targetArea": "砺波市",
+    "updatedAt": "2026-06-29",
+    "sourceUrl": "https://www.city.tonami.lg.jp/info/70681p/",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "高岡市",
+    "message": "クマを引き寄せないため、自宅や周辺の柿を早めに収穫し、生ごみを外に放置しないでください。山里における朝夕の外出は避け、外出時は鈴や笛などで音を出し、クマに自分の存在を知らせましょう。クマの足跡や糞を見つけたらそれ以上奥に進まず引き返し、住宅や車庫の戸締りを徹底してください。",
+    "updatedAt": "2026-03-04",
+    "sourceUrl": "https://www.city.takaoka.toyama.jp/soshiki/nogyosuisanka/3/5/1_1/2625.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "富山県",
+    "cityName": "黒部市",
+    "message": "クマの行動が活発な朝夕の入山は控え、自宅周辺のカキやクリの実、生ゴミ、未収穫野菜などの誘引物を適切に管理してください。自宅や車庫、納屋の戸締まりを徹底し、やむを得ず入山する際は鈴やラジオ、クマ撃退スプレーを携帯してください。平野部に出没した際は外出を控えてください。",
+    "targetArea": "黒部市",
+    "updatedAt": "2025-12-09",
+    "sourceUrl": "https://www.city.kurobe.toyama.jp/category/menu.aspx?ctgcd=189",
+    "crawledAt": "2026-07-01"
   },
   {
     "prefName": "山梨県",
@@ -33,6 +104,15 @@
     "targetArea": "上野原市",
     "updatedAt": "2023-01-23",
     "sourceUrl": "https://www.city.uenohara.yamanashi.jp/page/1041.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "山梨県",
+    "cityName": "北都留郡小菅村",
+    "message": "令和6年度に入り、小菅村内各地でクマの目撃情報が寄せられています。入山する際は、朝夕や霧が出ている時の単独行動を避け、鈴やラジオなどで音を出し、飲食物は必ず持ち帰りましょう。人里付近では、廃棄野菜や生ごみを屋外に放置せず、畑や養蜂巣箱などの餌場を無防備にしないよう注意し、集落に近い林縁の草刈りも行ってください。",
+    "targetArea": "小菅村全域",
+    "updatedAt": "2024-06-18",
+    "sourceUrl": "http://www.vill.kosuge.yamanashi.jp/living/shinko/news/20240618144738.html",
     "crawledAt": "2026-06-25"
   },
   {
@@ -54,76 +134,84 @@
     "crawledAt": "2026-06-25"
   },
   {
-    "prefName": "山梨県",
-    "cityName": "北都留郡小菅村",
-    "message": "令和6年度に入り、小菅村内各地でクマの目撃情報が寄せられています。入山する際は、朝夕や霧が出ている時の単独行動を避け、鈴やラジオなどで音を出し、飲食物は必ず持ち帰りましょう。人里付近では、廃棄野菜や生ごみを屋外に放置せず、畑や養蜂巣箱などの餌場を無防備にしないよう注意し、集落に近い林縁の草刈りも行ってください。",
-    "targetArea": "小菅村全域",
-    "updatedAt": "2024-06-18",
-    "sourceUrl": "http://www.vill.kosuge.yamanashi.jp/living/shinko/news/20240618144738.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "一関市",
+    "message": "一関市では、令和8年4月22日にツキノワグマの出没に関する警報が発表され、市内でも人里での目撃情報が寄せられています。人身被害防止のため、人家周辺に生ごみや果樹を放置せず、山林に近い場所や朝夕の入山は避け、山に入る際は鈴などで音を出し、クマに自分の存在を知らせてください。",
+    "updatedAt": "2026-04-23",
+    "sourceUrl": "https://www.city.ichinoseki.iwate.jp/index.cfm/29,158129,181,html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "愛甲郡清川村",
-    "message": "清川村内でクマの目撃情報が寄せられています。2026年6月24日には県道70号線大洞橋から約300m先で目撃されました。野菜や残飯など動物の餌となるものを家の外に置かず、早朝・夕方の散歩や登山時は音の出るものを携帯するなど、十分注意してください。",
-    "targetArea": "清川村内",
-    "updatedAt": "2026-01-06",
-    "sourceUrl": "https://www.town.kiyokawa.kanagawa.jp/soshiki/kennou/nourin/bird/235.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "久慈市",
+    "message": "岩手県全域にツキノワグマの出没に関する警報が発令されており、久慈市内および周辺地域でもクマとの遭遇に注意が必要です。山林に入る際は複数人で行動し、鈴やラジオなどで音を出し、明け方・夕方の入山を避けてください。人里では廃棄野菜や生ごみ、庭先果樹の適切な管理、農地周辺のやぶ刈り払いを徹底してください。",
+    "targetArea": "久慈市内及び周辺地域",
+    "updatedAt": "2026-03-26",
+    "sourceUrl": "https://www.city.kuji.lg.jp/soshiki/ringyosuisan/1/1/1/1683.html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "伊勢原市",
-    "message": "伊勢原市内ではクマの痕跡や目撃情報が寄せられています。山に近い場所での早朝や夜間の単独行動は控え、やむを得ず歩く際はラジオや鈴で音を出し、人の存在を知らせましょう。クマに遭遇した際は、刺激せず静かにその場を離れ、子グマを見かけても近づかず速やかに立ち去ってください。",
-    "targetArea": "伊勢原市内（特に山に近い場所）",
-    "updatedAt": "2025-07-17",
-    "sourceUrl": "https://www.city.isehara.kanagawa.jp/docs/2019100100112/",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "北上市",
+    "message": "クマを寄せ付けないため、廃棄野菜、生ごみ、コンポストの適切な管理、庭先果樹の速やかな収穫、屋外へのエサの保管を徹底し、家屋や倉庫は施錠してください。山林内では、複数人で行動し、明け方や夕方の入山を避け、鈴やラジオなどで音を出し人の存在をアピールしましょう。",
+    "targetArea": "北上市",
+    "updatedAt": "2026-07-01",
+    "sourceUrl": "https://www.city.kitakami.iwate.jp/life/soshikikarasagasu/nogyoshinkoka/engeichikusangakari/4/4674.html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "厚木市",
-    "message": "厚木市および丹沢山系周辺ではツキノワグマが出没する可能性があります。クマとの遭遇を避けるため、早朝・夕方の単独行動は避け、鈴などで音を出し、危険な場所には近づかないでください。人里にクマを引き寄せないよう、野山への生ごみや廃棄果樹の投棄は厳禁とし、耕作放棄地の管理を徹底してください。",
-    "targetArea": "厚木市および丹沢山系周辺",
-    "updatedAt": "2025-11-28",
-    "sourceUrl": "https://www.city.atsugi.kanagawa.jp/soshiki/nogyoseisakuka/7/8931.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "大船渡市",
+    "message": "岩手県よりツキノワグマの出没に関する警報が発令されています。クマが活発な早朝・夕方の外出時はラジオなどで音を出し、周囲をよく確認してください。生ごみや放置された果樹などクマを誘引するものは適切に管理し、クマを目撃した場合は市農林課または警察署へ連絡してください。",
+    "targetArea": "大船渡市",
+    "updatedAt": "2026-04-22",
+    "sourceUrl": "https://www.city.ofunato.iwate.jp/archive/contents-18966",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "相模原市緑区",
-    "message": "相模原市内の山中にはクマが生息しており、山地や山間地等の人里での外出やハイキングには十分注意してください。クマが活発に行動する朝夕や霧が出ているときの行動、単独行動は避け、鈴やラジオなどで人の存在を知らせましょう。人里にクマを引き寄せないため、野山に生ごみや畑で余った野菜を捨てたり、カキやクリなどの果実を早めに収穫したりして誘引物をなくしましょう。",
-    "targetArea": "相模原市緑区",
-    "updatedAt": "2025-11-30",
-    "sourceUrl": "https://www.city.sagamihara.kanagawa.jp/kurashi/1026489/kankyo/1026504/1015732/1008179.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "宮古市",
+    "message": "岩手県全域にツキノワグマの出没に関する警報が発令されており、人身被害対策として注意が必要です。入山時や農作業時は複数人で行動し、鈴やラジオなどで音を出し、早朝や夕方の時間帯は特に注意してください。生ごみや果樹などの誘引物を適切に管理し、市の出没情報を確認して被害防止対策を行いましょう。",
+    "targetArea": "岩手県宮古市および県内全域",
+    "updatedAt": "2026-07-01",
+    "sourceUrl": "https://www.city.miyako.iwate.jp/gyosei/soshiki/norin/2/1/1748.html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "足柄上郡松田町",
-    "message": "クマを目撃した場合、近づかず、背を向けずにゆっくり後ずさりし、静かに立ち去ってください。においのする生ゴミや廃棄野菜・果実を屋外に放置せず、農作物は早めに収穫しましょう。山林やヤブの近く、早朝・夜間の外出時は、鈴やラジオなど音の出るものを身につけ、複数人で行動し、犬の散歩時は注意してください。最新の目撃は令和8年4月15日17時頃、町道25号線付近です。",
-    "targetArea": "松田町内",
-    "updatedAt": "2026-04-15",
-    "sourceUrl": "https://town.matsuda.kanagawa.jp/soshiki/9/bear-sight.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "盛岡市",
+    "message": "盛岡市では、令和8年度にクマの目撃情報が多数寄せられており、人身被害も岩手県内で発生しています。山林や山間地に近い農地に入る際は、鈴やラジオなどで音を出し、早朝や夕方の単独行動は避けましょう。生ごみや廃棄野菜、果樹の放置、お墓のお供え物などクマを誘引するものは適切に管理・撤去してください。",
+    "targetArea": "盛岡市全域",
+    "updatedAt": "2026-06-30",
+    "sourceUrl": "https://www.city.morioka.iwate.jp/kurashi/pet/yaseidobutsu/1001651.html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "足柄上郡中井町",
-    "message": "令和7年10月30日19時10分頃、中井町境地区でクマのような動物の目撃情報がありましたが、現地調査ではクマの痕跡は確認されませんでした。中井町周辺でのクマの目撃情報はありませんが、近隣の松田町や秦野市の丹沢地域には生息しています。大型動物を目撃した際は、落ち着いてその場所を離れてください。",
-    "targetArea": "中井町全域、特に境地区",
-    "updatedAt": "2025-10-31",
-    "sourceUrl": "https://www.town.nakai.kanagawa.jp/shigoto_sangyo/nogyo_ringyo_suisangyo/nogyo/3742.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "花巻市",
+    "message": "花巻地域では令和8年6月28日に、石鳥谷地域では令和8年6月20日にツキノワグマの目撃情報がありました。さらに、東和地域では令和8年6月9日にツキノワグマによる人身被害が発生しています。",
+    "targetArea": "花巻地域、石鳥谷地域、東和地域",
+    "updatedAt": "",
+    "sourceUrl": "https://www.city.hanamaki.iwate.jp/kurashi/anshin_anzen/choju_sanrin/1023607/index.html",
+    "crawledAt": "2026-07-01"
   },
   {
-    "prefName": "神奈川県",
-    "cityName": "南足柄市",
-    "message": "南足柄市内では、令和6年10月1日に沼田付近で子グマ、令和7年11月18日に広町の広域農道でクマの目撃情報があります。早朝や夜間の行動時や目撃情報のある場所へは近づかず、クマ鈴などで音を出し自分の存在を知らせてください。クマを人里に近づかせないため、収穫後の農産物や家庭の生ごみ、庭先の柿・栗などは放置せず適切に管理してください。",
-    "targetArea": "南足柄市全域",
-    "updatedAt": "2025-12-17",
-    "sourceUrl": "https://www.city.minamiashigara.kanagawa.jp/kurashi/gomi/pet/p06931.html",
-    "crawledAt": "2026-06-25"
+    "prefName": "岩手県",
+    "cityName": "遠野市",
+    "message": "遠野市内全域にツキノワグマが生息しており、河川敷や民家近くでの出没が増加傾向にあります。屋外では単独行動を避け、クマが侵入できる場所にエサとなるものを放置しないよう、誘引物管理と防除対策を徹底してください。令和8年度の目撃情報は6月1日時点で公開されています。",
+    "targetArea": "市内全域",
+    "updatedAt": "2026-06-02",
+    "sourceUrl": "https://www.city.tono.iwate.jp/index.cfm/46,38143,288,615,html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "陸前高田市",
+    "message": "岩手県全域にツキノワグマの出没に関する警報が発表されており、陸前高田市内でも多くの目撃情報が寄せられています。クマの出没情報のあった場所やクマの餌となる実がなる場所には近づかず、早朝や夜間は遭遇する可能性が高まるため、鈴や大声などで自分の存在を知らせるようにしてください。また、収穫後の農作物や家庭の生ごみを野外に放置せず、庭先の収穫しない柿や栗などは早めに取り除き、ハチの巣があれば除去するなど、クマを引き寄せないための対策を徹底し、車庫や小屋の戸締まりもしっかり行いましょう。",
+    "targetArea": "岩手県全域、陸前高田市内",
+    "updatedAt": "2026-06-22",
+    "sourceUrl": "https://www.city.rikuzentakata.iwate.jp/soshiki/norinka/rinseikakari/1/1/9206.html",
+    "crawledAt": "2026-07-01"
   },
   {
     "prefName": "東京都",
@@ -131,6 +219,15 @@
     "message": "あきる野市養沢（西沢入林道付近）では、2026年6月8日午前10時15分頃にクマ1頭が目撃されています。人家の周りや農地に生ゴミや不要な果実を放置せず、収穫しない果樹は処分してください。山に入る際は鈴などで音を鳴らし、早朝や夕方、夜間の入山や山林近くの散歩は控えましょう。",
     "updatedAt": "2026-06-11",
     "sourceUrl": "https://www.city.akiruno.tokyo.jp/0000017429.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "東京都",
+    "cityName": "八王子市",
+    "message": "ツキノワグマとの遭遇を避けるため、敷地内の柿や栗などの果樹や農作物は早めに収穫し、生ごみを放置しないなど誘引物を管理しましょう。早朝や夕方の薄暗い時間帯の外出時や山林・ヤブの近くでは、鈴やラジオなどで音を出し、自分の存在をクマに知らせてください。",
+    "targetArea": "八王子市",
+    "updatedAt": "2026-05-17",
+    "sourceUrl": "https://www.city.hachioji.tokyo.jp/kurashi/sangyo/004/jyugai/p034133.html",
     "crawledAt": "2026-06-25"
   },
   {
@@ -161,12 +258,190 @@
     "crawledAt": "2026-06-25"
   },
   {
-    "prefName": "東京都",
-    "cityName": "八王子市",
-    "message": "ツキノワグマとの遭遇を避けるため、敷地内の柿や栗などの果樹や農作物は早めに収穫し、生ごみを放置しないなど誘引物を管理しましょう。早朝や夕方の薄暗い時間帯の外出時や山林・ヤブの近くでは、鈴やラジオなどで音を出し、自分の存在をクマに知らせてください。",
-    "targetArea": "八王子市",
-    "updatedAt": "2026-05-17",
-    "sourceUrl": "https://www.city.hachioji.tokyo.jp/kurashi/sangyo/004/jyugai/p034133.html",
+    "prefName": "神奈川県",
+    "cityName": "伊勢原市",
+    "message": "伊勢原市内ではクマの痕跡や目撃情報が寄せられています。山に近い場所での早朝や夜間の単独行動は控え、やむを得ず歩く際はラジオや鈴で音を出し、人の存在を知らせましょう。クマに遭遇した際は、刺激せず静かにその場を離れ、子グマを見かけても近づかず速やかに立ち去ってください。",
+    "targetArea": "伊勢原市内（特に山に近い場所）",
+    "updatedAt": "2025-07-17",
+    "sourceUrl": "https://www.city.isehara.kanagawa.jp/docs/2019100100112/",
     "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "南足柄市",
+    "message": "南足柄市内では、令和6年10月1日に沼田付近で子グマ、令和7年11月18日に広町の広域農道でクマの目撃情報があります。早朝や夜間の行動時や目撃情報のある場所へは近づかず、クマ鈴などで音を出し自分の存在を知らせてください。クマを人里に近づかせないため、収穫後の農産物や家庭の生ごみ、庭先の柿・栗などは放置せず適切に管理してください。",
+    "targetArea": "南足柄市全域",
+    "updatedAt": "2025-12-17",
+    "sourceUrl": "https://www.city.minamiashigara.kanagawa.jp/kurashi/gomi/pet/p06931.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "厚木市",
+    "message": "厚木市および丹沢山系周辺ではツキノワグマが出没する可能性があります。クマとの遭遇を避けるため、早朝・夕方の単独行動は避け、鈴などで音を出し、危険な場所には近づかないでください。人里にクマを引き寄せないよう、野山への生ごみや廃棄果樹の投棄は厳禁とし、耕作放棄地の管理を徹底してください。",
+    "targetArea": "厚木市および丹沢山系周辺",
+    "updatedAt": "2025-11-28",
+    "sourceUrl": "https://www.city.atsugi.kanagawa.jp/soshiki/nogyoseisakuka/7/8931.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "愛甲郡清川村",
+    "message": "清川村内でクマの目撃情報が寄せられています。2026年6月24日には県道70号線大洞橋から約300m先で目撃されました。野菜や残飯など動物の餌となるものを家の外に置かず、早朝・夕方の散歩や登山時は音の出るものを携帯するなど、十分注意してください。",
+    "targetArea": "清川村内",
+    "updatedAt": "2026-01-06",
+    "sourceUrl": "https://www.town.kiyokawa.kanagawa.jp/soshiki/kennou/nourin/bird/235.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "相模原市緑区",
+    "message": "相模原市内の山中にはクマが生息しており、山地や山間地等の人里での外出やハイキングには十分注意してください。クマが活発に行動する朝夕や霧が出ているときの行動、単独行動は避け、鈴やラジオなどで人の存在を知らせましょう。人里にクマを引き寄せないため、野山に生ごみや畑で余った野菜を捨てたり、カキやクリなどの果実を早めに収穫したりして誘引物をなくしましょう。",
+    "targetArea": "相模原市緑区",
+    "updatedAt": "2025-11-30",
+    "sourceUrl": "https://www.city.sagamihara.kanagawa.jp/kurashi/1026489/kankyo/1026504/1015732/1008179.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "足柄上郡中井町",
+    "message": "令和7年10月30日19時10分頃、中井町境地区でクマのような動物の目撃情報がありましたが、現地調査ではクマの痕跡は確認されませんでした。中井町周辺でのクマの目撃情報はありませんが、近隣の松田町や秦野市の丹沢地域には生息しています。大型動物を目撃した際は、落ち着いてその場所を離れてください。",
+    "targetArea": "中井町全域、特に境地区",
+    "updatedAt": "2025-10-31",
+    "sourceUrl": "https://www.town.nakai.kanagawa.jp/shigoto_sangyo/nogyo_ringyo_suisangyo/nogyo/3742.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "神奈川県",
+    "cityName": "足柄上郡松田町",
+    "message": "クマを目撃した場合、近づかず、背を向けずにゆっくり後ずさりし、静かに立ち去ってください。においのする生ゴミや廃棄野菜・果実を屋外に放置せず、農作物は早めに収穫しましょう。山林やヤブの近く、早朝・夜間の外出時は、鈴やラジオなど音の出るものを身につけ、複数人で行動し、犬の散歩時は注意してください。最新の目撃は令和8年4月15日17時頃、町道25号線付近です。",
+    "targetArea": "松田町内",
+    "updatedAt": "2026-04-15",
+    "sourceUrl": "https://town.matsuda.kanagawa.jp/soshiki/9/bear-sight.html",
+    "crawledAt": "2026-06-25"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "にかほ市",
+    "message": "にかほ市内において住宅地付近でクマの目撃が増加しています。屋外での作業や外出の際は十分に注意し、特に農作業中の人身事故にもお気を付けください。",
+    "targetArea": "にかほ市",
+    "updatedAt": "2026-06-29",
+    "sourceUrl": "https://www.city.nikaho.akita.jp/soshikikarasagasu/norinsuisanka/gyomuannai/1/1/4/4347.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "仙北市",
+    "message": "仙北市ではクマの出没が非常に多く、人身被害や小屋への侵入も発生しており、秋田県ではツキノワグマ出没警報が発令されています。クマの行動が活発な早朝・夕方は特に周囲に注意し、ラジオや鈴などで音を出しながら行動してください。生ごみや農作物、果実のなる庭木などの誘引物を適切に管理し、収納庫の扉を閉めるなど対策を徹底してください。",
+    "targetArea": "仙北市",
+    "updatedAt": "2025-09-25",
+    "sourceUrl": "https://www.city.semboku.akita.jp/news_topics/whatsnew.php?id=4623",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "仙北郡美郷町",
+    "message": "美郷町ではクマの目撃情報が公開されており、冬期間も活動しています。外出時は鈴やラジオなどで音を出し、単独行動を避け、早朝や夕暮れ時は特に注意してください。生ごみや放置果樹、廃棄農作物などクマを誘引するものは確実に管理し、車庫や物置の扉は閉めましょう。令和6年1月には町内で柿を食べるクマが目撃されています。",
+    "targetArea": "美郷町",
+    "updatedAt": "2026-02-01",
+    "sourceUrl": "https://www.town.misato.akita.jp/nourinseibi/4307",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "南秋田郡五城目町",
+    "message": "五城目町内でツキノワグマの目撃が相次ぎ人身被害も発生しているため、家や車庫の戸締りを確認し、夕方から早朝にかけての外出は出来るだけ避けてください。外出時は鈴や笛、ラジオなどで音を出し、生ゴミや残飯、果樹などを野外に放置してクマを誘引しないようにしましょう。",
+    "targetArea": "五城目町内",
+    "updatedAt": "2025-11-11",
+    "sourceUrl": "https://www.town.gojome.akita.jp/bosai-anzen/bosai/bosaiinfo/2866",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "大仙市",
+    "message": "大仙市内では市街地を含めクマの目撃情報が増加しており、特に早朝・夕方は十分注意してください。山林への入山時は複数で行動し、クマ鈴など音の出るものを携帯して人間の存在を知らせましょう。生ごみや農産物などの誘引物を放置せず、家の周囲のやぶを刈り払うなどの対策をお願いします。",
+    "targetArea": "大仙市全域",
+    "updatedAt": "2026-06-24",
+    "sourceUrl": "https://www.city.daisen.lg.jp/archive/contents-13554",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "大館市",
+    "message": "秋田県ではツキノワグマ出没警報が発令されており、大館市内では昨年度7件の人身事故が発生しています。山や野外での活動、またごみ捨てや散歩などちょっとした外出でも鈴やラジオなどで音を出し、早朝や夕方の行動は特に警戒してください。生ごみや果樹、農作物などクマの誘引物となるものを放置せず適切に管理し、入山禁止エリアには絶対に立ち入らないでください。",
+    "targetArea": "秋田県全域（ツキノワグマ出没警報発令中）、大館市内全域、および小坂町樹海ライン～鹿角市十和田高原地区、鹿角市八幡平地区～仙北市玉川地区（入山禁止エリア）",
+    "updatedAt": "2026-04-14",
+    "sourceUrl": "https://www.city.odate.lg.jp/city/soshiki/shinrin/p9559",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "山本郡三種町",
+    "message": "三種町ではクマやイノシシの目撃情報を公開しています。最新の出没情報はExcelファイルまたは「クマダス（ツキノワグマ等情報マップシステム）」をご確認ください。クマやイノシシを目撃したり農作物等に被害があった場合は、出没場所や時間を農林課林務係までご連絡ください。",
+    "updatedAt": "2024-08-20",
+    "sourceUrl": "https://www.town.mitane.akita.jp/soshikikarasagasu/norinka/2/3292.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "横手市",
+    "message": "ツキノワグマ出没警報が発令されており、クマによる被害防止に十分ご注意ください。生ごみや廃棄果実などの誘引物を屋外に放置せず適切に管理し、鈴やラジオなどで音を出し複数人で行動しましょう。仙北市玉川地区などの入山禁止地域には絶対に立ち入らないでください。",
+    "targetArea": "横手市",
+    "updatedAt": "2026-05-28",
+    "sourceUrl": "https://www.city.yokote.lg.jp/kurashi/1001136/1001194/1003804.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "湯沢市",
+    "message": "秋田県内全域にツキノワグマ出没警報が令和8年7月31日まで延長されています。クマを誘引する果樹や生ごみ、米ぬかなどを屋外に放置せず、車庫や物置の扉は閉め、家の周囲のやぶを刈り払いましょう。見通しの悪い場所では鈴やラジオなどで音を出し、単独行動を避けてクマとの遭遇を避け、目撃した場合は市町村か警察に通報し、情報共有システム「クマダス」も活用してください。",
+    "targetArea": "湯沢市を含む秋田県全域",
+    "updatedAt": "2026-06-03",
+    "sourceUrl": "https://www.city-yuzawa.jp/soshiki/42/2329.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "潟上市",
+    "message": "春から人の生活圏でクマの目撃が相次いでおり、令和8年4月14日に発令された警報が7月31日まで延長されています。早朝や日没前後の単独行動を避け、鈴やラジオで音を出し、果樹や生ごみなどの誘引物を適切に管理しクマを人里に寄せ付けないように注意してください。",
+    "targetArea": "潟上市内",
+    "updatedAt": "2026-05-27",
+    "sourceUrl": "https://www.city.katagami.lg.jp/soshiki/sangyoushinkoubu/nourinsuisanshinkouka/nosonseibi/norinshinko/442.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "男鹿市",
+    "message": "男鹿市内各地でクマの目撃情報が多数寄せられており、特に令和8年7月1日には寒風山妻恋峠駐車場付近で目撃されています。外出の際は鈴や音の出るものを携帯し、クマの活動が活発な明け方や夕暮れ時の単独行動は避けてください。",
+    "targetArea": "男鹿市全域（特に寒風山妻恋峠駐車場付近、脇本田谷沢地区、野石メロン集荷場付近など男鹿市内各地）",
+    "updatedAt": "2026-07-01",
+    "sourceUrl": "https://www.city.oga.akita.jp/soshik/norinsuisanka/norinsuisan/1410.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "秋田市",
+    "message": "秋田市ではツキノワグマ出没に関する警報が7月31日まで発令されており、市街地や学校周辺での目撃が相次いでいます。クマを誘引する果実、生ごみ、米ぬかなどは放置せず、収集日当日の朝6時から8時の間にごみ出しを徹底してください。また、入山時や朝夕の散歩時はクマ鈴などを携帯し複数人で行動し、目撃時は速やかに警察または農地森林整備課に連絡してください。",
+    "targetArea": "秋田市",
+    "updatedAt": "2026-06-02",
+    "sourceUrl": "https://www.city.akita.lg.jp/kurashi/pet/1006830.html",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "雄勝郡羽後町",
+    "message": "令和6年度以降のツキノワグマ目撃情報は、ツキノワグマ等情報マップシステム「クマダス」で随時更新されています。出先での出没の確認や近所の方との情報共有に「クマダス」をご活用ください。",
+    "targetArea": "羽後町",
+    "updatedAt": "",
+    "sourceUrl": "https://www.town.ugo.lg.jp/life/detail.html?id=2625&category_id=258",
+    "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "鹿角市",
+    "message": "山に入る際は鈴や笛など音の出るものを身につけ、熊の活動時間帯である明け方や夕暮れ時は特に注意してください。食べ残しやゴミは放置せず持ち帰り、農作物は早く収穫し、廃果や肥料の不適切な処理は誘因となるため適切に対応してください。最新の出没情報は秋田県のクマダスで確認し、熊を目撃した場合は直ちに市役所、消防署、警察署に連絡してください。",
+    "updatedAt": "2026-04-24",
+    "sourceUrl": "https://www.city.kazuno.lg.jp/soshiki/nouchirinmu/nouririnmu/gyomu/1/3/2111.html",
+    "crawledAt": "2026-07-01"
   }
 ]
