@@ -263,7 +263,21 @@ function stripHtml(s: string): string {
 
 function parseHeadCount(raw: string | undefined): number {
   if (!raw) return 1;
-  const n = Number(raw.replace(/[^0-9.]/g, ""));
+  // 全角数字→半角に正規化。
+  const s = raw.replace(/[０-９]/g, (d) =>
+    String.fromCharCode(d.charCodeAt(0) - 0xfee0),
+  );
+  // 「成獣N頭 幼獣M頭」形式 (盛岡市公式など: 例 "1頭 2頭" = 親1+子2) は各「N頭」を
+  // 合計する。旧実装は非数字を除去して数字を連結していたため "1頭 2頭" → "12" → 12
+  // と誤集計していた (実際は3頭)。
+  const headGroups = [...s.matchAll(/(\d+)\s*頭/g)];
+  if (headGroups.length > 0) {
+    const sum = headGroups.reduce((acc, m) => acc + Number(m[1]), 0);
+    return sum > 0 ? sum : 1;
+  }
+  // 「頭」表記が無い場合は最初の数値を採用 (連結しない)。
+  const first = s.match(/\d+/);
+  const n = first ? Number(first[0]) : 0;
   return Number.isFinite(n) && n > 0 ? Math.round(n) : 1;
 }
 

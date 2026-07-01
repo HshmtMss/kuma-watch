@@ -889,10 +889,10 @@ export default function KumaClient() {
             </div>
             {/* 凡例 — ピンの種類。更新バッジの右隣に同じ高さで並べる。 */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" />1頭</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />2頭+</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" />公式1頭</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />公式2頭+</span>
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />報道</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-violet-500" />市民</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-violet-500" />市民投稿</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-blue-500" />新着</span>
             </div>
             <button
