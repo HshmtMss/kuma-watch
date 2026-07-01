@@ -140,23 +140,68 @@ export async function aggregateAllSightings(): Promise<UnifiedSighting[]> {
 let memCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
 const MEM_CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
 
+// 近接重複の名寄せ (dedup A)。同一事案が複数ソース (news / sharp9110 / 公式) や 4h 取り込みの
+// 都合で別レコード化し、地図に複数ピンが重なる問題への対処。日付 + 緯度経度を約 220m グリッド
+// に丸めたキーで束ね、代表は「公式 > 報道 > 市民」の優先度 (同順は ingestedAt が新しい方) で
+// 選ぶ。新着性 (青リング) を失わないよう ingestedAt はグループ内の最新を引き継ぐ。map と
+// place-index の件数の両方がこの経路 (getCachedSightings) を通るため、一箇所で両方に効く。
+const DEDUP_GRID_DEG = 0.002; // 緯度で約 220m
+
+function sourceRank(r: UnifiedSighting): number {
+  if (r.sourceKind === "citizen") return 2;
+  if (r.isOfficial === false) return 1; // 報道
+  return 0; // 公式 (true / 未指定)
+}
+
+function dedupeNearbySightings(records: UnifiedSighting[]): UnifiedSighting[] {
+  const groups = new Map<string, UnifiedSighting>();
+  const passthrough: UnifiedSighting[] = [];
+  for (const r of records) {
+    if (typeof r.lat !== "number" || typeof r.lon !== "number" || !r.date) {
+      passthrough.push(r);
+      continue;
+    }
+    const key = `${r.date}|${Math.round(r.lat / DEDUP_GRID_DEG)}|${Math.round(
+      r.lon / DEDUP_GRID_DEG,
+    )}`;
+    const cur = groups.get(key);
+    if (!cur) {
+      groups.set(key, r);
+      continue;
+    }
+    const rep =
+      sourceRank(r) < sourceRank(cur) ||
+      (sourceRank(r) === sourceRank(cur) &&
+        (r.ingestedAt ?? 0) > (cur.ingestedAt ?? 0))
+        ? r
+        : cur;
+    const freshest = Math.max(r.ingestedAt ?? 0, cur.ingestedAt ?? 0);
+    groups.set(key, freshest > 0 ? { ...rep, ingestedAt: freshest } : rep);
+  }
+  return passthrough.concat([...groups.values()]);
+}
+
+function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
+  return dedupeNearbySightings(filterMisgeocoded(records));
+}
+
 export async function getCachedSightings(): Promise<UnifiedSighting[]> {
   if (memCache && Date.now() - memCache.loadedAt < MEM_CACHE_TTL_MS) {
     return memCache.records;
   }
   const disk = readDiskCache();
   if (disk && disk.records.length > 0) {
-    const cleaned = filterMisgeocoded(disk.records);
+    const cleaned = cleanAndDedupe(disk.records);
     memCache = { records: cleaned, loadedAt: Date.now() };
     return cleaned;
   }
   const bundled = await readBundledSnapshot();
   if (bundled && bundled.length > 0) {
-    const cleaned = filterMisgeocoded(bundled);
+    const cleaned = cleanAndDedupe(bundled);
     memCache = { records: cleaned, loadedAt: Date.now() };
     return cleaned;
   }
-  const records = filterMisgeocoded(await aggregateAllSightings());
+  const records = cleanAndDedupe(await aggregateAllSightings());
   memCache = { records, loadedAt: Date.now() };
   return records;
 }
