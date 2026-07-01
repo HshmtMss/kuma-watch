@@ -1192,28 +1192,25 @@ export default function KumaClient() {
 
 
 
-        {/* 凡例 — ピンの種類のみ常時表示。クマの生息域 / 直近1年の出没の色スケールは
-            下のカード(地点選択時)に説明があるため凡例からは省く。項目を絞ることで
-            小画面でのかぶりも軽減する。 */}
-        <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] w-44 rounded-xl border border-stone-200 bg-white/95 p-3 text-sm text-stone-700 shadow backdrop-blur">
-          <div className="mb-1.5 text-xs font-medium text-stone-500">ピンの種類</div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭（公式）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上（公式）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-violet-500" />市民投稿（承認済み）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-3 w-3 rounded-full bg-stone-400 ring-2 ring-blue-500" />24時間以内の新着
-            </div>
-          </div>
+        {/* 凡例 — ピンの種類のみを下部に横1行のスリムバー(ピル)で常時表示。
+            省スペース優先でラベルは短縮 (詳細はピンのポップアップで補う)。生息域/
+            直近1年出没の色スケールは地点カードに集約済みのためここには出さない。 */}
+        <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-2.5 gap-y-1 rounded-full border border-stone-200 bg-white/85 px-3 py-1.5 text-xs font-medium text-stone-600 shadow-sm backdrop-blur">
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-gray-500" />1頭
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-red-500" />2頭+
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-amber-500" />報道
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-violet-500" />市民
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-blue-500" />新着
+          </span>
         </div>
 
         {/* 跳ね上げ式カード: map 領域に絶対配置 (下から) */}
