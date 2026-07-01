@@ -877,7 +877,7 @@ export default function KumaClient() {
         {/* データ更新日 + マップ補足: 検索バー直下、地図左上に控えめに配置。
             色の意味について「さりげない説明」を ⓘ から展開できるようにする。 */}
         {!loading && !pickerMode && latestDate && (
-          <div className="pointer-events-auto absolute left-3 top-16 z-[900] flex items-stretch gap-1">
+          <div className="pointer-events-auto absolute left-3 top-16 z-[900] flex max-w-[calc(100%-1.5rem)] flex-wrap items-stretch gap-1">
             <div
               className="flex items-baseline gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] text-stone-600 shadow-sm backdrop-blur sm:text-xs"
               title={`最新事案: ${latestDate}`}
@@ -886,6 +886,14 @@ export default function KumaClient() {
               <span className="tabular-nums font-semibold text-stone-800">
                 {formatLatestDate(latestDate)}
               </span>
+            </div>
+            {/* 凡例 — ピンの種類。更新バッジの右隣に同じ高さで並べる。 */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" />公式1頭</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />公式2頭+</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />報道</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-violet-500" />市民投稿</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-blue-500" />新着</span>
             </div>
             <button
               type="button"
@@ -918,11 +926,7 @@ export default function KumaClient() {
               </button>
             </div>
             <p>
-              日本の多くの地域では、<strong className="font-semibold text-stone-900">昔からクマが普通に生息</strong>
-              しています。ふだんの暮らしで遭遇することは極めて稀です。
-            </p>
-            <p className="mt-2 text-stone-600">
-              過度に怖がる必要はありません。山に入るときは、{" "}
+              日本の多くの地域では、昔からクマが生息しています。ふだんの暮らしで遭遇することは極めて稀ですが、山に入るときは、{" "}
               <a
                 href="/research/this-week"
                 className="font-medium text-amber-700 underline hover:text-amber-900"
@@ -1192,29 +1196,6 @@ export default function KumaClient() {
 
 
 
-        {/* 凡例 — ピンの種類のみ常時表示。クマの生息域 / 直近1年の出没の色スケールは
-            下のカード(地点選択時)に説明があるため凡例からは省く。項目を絞ることで
-            小画面でのかぶりも軽減する。 */}
-        <div className="pointer-events-auto absolute bottom-[calc(41vh+0.75rem)] left-3 z-[900] w-44 rounded-xl border border-stone-200 bg-white/95 p-3 text-sm text-stone-700 shadow backdrop-blur">
-          <div className="mb-1.5 text-xs font-medium text-stone-500">ピンの種類</div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-gray-500" />1頭（公式）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />2頭以上（公式）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />報道由来
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-violet-500" />市民投稿（承認済み）
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-3 w-3 rounded-full bg-stone-400 ring-2 ring-blue-500" />24時間以内の新着
-            </div>
-          </div>
-        </div>
 
         {/* 跳ね上げ式カード: map 領域に絶対配置 (下から) */}
         <RiskPanel
