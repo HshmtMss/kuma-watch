@@ -12,7 +12,9 @@ export type LandmarkCategory =
   | "national_park"
   | "resort"
   | "trailhead"
-  | "lake";
+  | "lake"
+  | "gorge"
+  | "campground";
 
 export type JapanLandmark = {
   /** URL の path 部分。日本語そのまま使う (Next.js が encode する) */
@@ -1371,5 +1373,190 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
       "由布岳の麓に広がる温泉郷。湯布院とも表記。九州本土にクマは生息せず、出没情報は基本的にないため参考情報として掲載。",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Yufuin_Onsen_-Mus%C5%8Den_02.jpg",
     imageCredit: "由布院温泉",
+  },
+
+  // === 夏の観光地（渓谷・川遊び・高原・キャンプ場）2026-07 追加 ===
+  // 周辺 10km の直近1年出没が実在するもののみ厳選（scout-summer-spots.mjs で検算済）。
+  {
+    slug: "秋川渓谷",
+    name: "秋川渓谷",
+    altNames: ["あきがわけいこく", "Akigawa Valley"],
+    prefName: "東京都",
+    muniName: "あきる野市",
+    category: "gorge",
+    lat: 35.73,
+    lon: 139.19,
+    blurb:
+      "東京都あきる野市を流れる秋川の渓谷。都心から近い川遊び・バーベキュー・キャンプの名所で、夏は多くの家族連れでにぎわいます。周辺の山地ではクマの目撃・痕跡も報告されており、早朝・夕方の沢沿いや林縁では鈴やラジオで音を出すなど注意が必要です。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Akigawa%28Tokyo%29.jpg",
+    imageCredit: "秋川 (東京都)",
+  },
+  {
+    slug: "長瀞",
+    name: "長瀞",
+    altNames: ["ながとろ", "Nagatoro"],
+    prefName: "埼玉県",
+    muniName: "長瀞町",
+    category: "gorge",
+    lat: 36.1,
+    lon: 139.11,
+    blurb:
+      "荒川上流、埼玉県長瀞町の渓谷。岩畳やライン下り、川遊びで知られる夏の観光名所です。周辺の山地ではクマの目撃情報があり、渓谷沿いの遊歩道や早朝・夕方の単独行動では鈴やラジオで存在を知らせるなどの対策を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/5/50/Nagatoro1.jpg",
+    imageCredit: "長瀞町",
+  },
+  {
+    slug: "昇仙峡",
+    name: "昇仙峡",
+    altNames: ["しょうせんきょう", "Shosenkyo"],
+    prefName: "山梨県",
+    muniName: "甲府市",
+    category: "gorge",
+    lat: 35.75,
+    lon: 138.55,
+    blurb:
+      "山梨県甲府市北部、荒川上流の渓谷で日本有数の景勝地。覚円峰や仙娥滝、渓谷沿いの遊歩道が夏の観光客でにぎわいます。周辺の山地ではクマの目撃情報があり、遊歩道や早朝・夕方の単独行動では音を出すなどの対策を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/c/cc/Kakuenpou_in_autumn.jpg",
+    imageCredit: "昇仙峡",
+  },
+  {
+    slug: "寸又峡",
+    name: "寸又峡",
+    altNames: ["すまたきょう", "Sumatakyo"],
+    prefName: "静岡県",
+    muniName: "川根本町",
+    category: "gorge",
+    lat: 35.25,
+    lon: 138.15,
+    blurb:
+      "静岡県川根本町、大井川支流の寸又川がつくる渓谷。「夢の吊橋」やエメラルドグリーンの湖面で知られる秘境の温泉地です。周辺は深い山林でクマの生息域にあたるため、遊歩道では鈴やラジオで音を出し、早朝・夕方の行動に注意しましょう。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Yume-no-Tsuribashi_%2840896906290%29.jpg/1280px-Yume-no-Tsuribashi_%2840896906290%29.jpg",
+    imageCredit: "夢の吊橋",
+  },
+  {
+    slug: "北軽井沢",
+    name: "北軽井沢",
+    altNames: ["きたかるいざわ", "スウィートグラス", "浅間高原"],
+    prefName: "群馬県",
+    muniName: "長野原町",
+    category: "campground",
+    lat: 36.503,
+    lon: 138.553,
+    blurb:
+      "浅間山北麓、標高約1,000mの高原リゾート。避暑地として人気で、スウィートグラスをはじめキャンプ場や別荘が点在します。周辺の森林ではクマの出没が報告されており、キャンプ場での食料・ごみの管理や、早朝・夕方の行動には注意しましょう。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Kita-Karuizawa_Station.jpg/1280px-Kita-Karuizawa_Station.jpg",
+    imageCredit: "北軽井沢駅",
+  },
+  {
+    slug: "嬬恋高原",
+    name: "嬬恋高原",
+    altNames: ["つまごいこうげん", "カンパーニャ嬬恋", "嬬恋村"],
+    prefName: "群馬県",
+    muniName: "嬬恋村",
+    category: "campground",
+    lat: 36.512,
+    lon: 138.5,
+    blurb:
+      "浅間山と四阿山に挟まれた群馬県嬬恋村の高原。キャベツ畑と避暑・キャンプで知られ、カンパーニャ嬬恋など大型キャンプ場があります。周辺ではクマの出没が報告されているため、林縁や農地まわりでは音を出し、生ごみや誘引物の管理に注意してください。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Tsumagoi_Cabbage%26Asamayama.JPG",
+    imageCredit: "嬬恋村",
+  },
+  {
+    slug: "岩洞湖",
+    name: "岩洞湖",
+    altNames: ["がんどうこ", "Gandoko"],
+    prefName: "岩手県",
+    muniName: "盛岡市",
+    category: "campground",
+    lat: 39.872,
+    lon: 141.3,
+    blurb:
+      "岩手県盛岡市玉山区の人造湖。キャンプやワカサギ釣り、避暑で親しまれる高原の湖です。周辺は森林に囲まれクマの生息域にあたるため、湖畔のキャンプ場でも食料・ごみの管理と、早朝・夕方の注意を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/3/38/Gandou-242-r1.jpg",
+    imageCredit: "岩洞湖",
+  },
+  {
+    slug: "苗場",
+    name: "苗場・かぐらみつまた",
+    altNames: ["なえば", "かぐら", "みつまた", "Naeba"],
+    prefName: "新潟県",
+    muniName: "湯沢町",
+    category: "resort",
+    lat: 36.792,
+    lon: 138.79,
+    blurb:
+      "新潟県湯沢町、苗場山麓のリゾートエリア。冬はスキー、夏はドラゴンドラやかぐら・みつまたの高原ハイキングでにぎわいます。周辺の森林ではクマの出没が報告されており、入山前に最新の出没情報の確認を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Naeba_Ski_Resort_%286788805622%29.jpg/1280px-Naeba_Ski_Resort_%286788805622%29.jpg",
+    imageCredit: "苗場スキー場",
+  },
+  {
+    slug: "菅平高原",
+    name: "菅平高原",
+    altNames: ["すがだいらこうげん", "Sugadaira"],
+    prefName: "長野県",
+    muniName: "上田市",
+    category: "resort",
+    lat: 36.522,
+    lon: 138.32,
+    blurb:
+      "長野県上田市、根子岳・四阿山の西麓に広がる標高1,300mの高原。夏はスポーツ合宿や避暑・ハイキングでにぎわいます。周辺の森林ではクマの出没が報告されており、林縁やヤブの近くでは音を出すなどの注意を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Sugadaira2.JPG",
+    imageCredit: "菅平高原",
+  },
+  {
+    slug: "乗鞍高原",
+    name: "乗鞍高原",
+    altNames: ["のりくらこうげん", "Norikura"],
+    prefName: "長野県",
+    muniName: "松本市",
+    category: "resort",
+    lat: 36.1,
+    lon: 137.63,
+    blurb:
+      "長野県松本市、乗鞍岳東麓に広がる標高1,500m前後の高原。滝や湿原の散策、避暑・登山の拠点として夏に多くの人が訪れます。周辺はクマの生息域にあたるため、散策路では音を出し、早朝・夕方の単独行動には注意を。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Norikura_Plateau_from_Mount_Norikura.jpg",
+    imageCredit: "乗鞍高原",
+  },
+  {
+    slug: "奥日光湯元",
+    name: "奥日光・湯元",
+    altNames: ["おくにっこう", "湯ノ湖", "日光湯元温泉"],
+    prefName: "栃木県",
+    muniName: "日光市",
+    category: "resort",
+    lat: 36.79,
+    lon: 139.42,
+    blurb:
+      "栃木県日光市、奥日光の最奥に位置する湯ノ湖畔の温泉地。湯元温泉やハイキング、避暑で知られ、戦場ヶ原へと続く散策路の起点です。一帯はクマの生息域にあたるため、遊歩道では鈴やラジオで音を出し、早朝・夕方の行動に注意してください。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b4/Yumoto%2C_Nikko_National_Park%2C_Tochigi%2C_Japan.jpg",
+    imageCredit: "日光湯元温泉",
+  },
+  {
+    slug: "戸隠",
+    name: "戸隠",
+    altNames: ["とがくし", "戸隠神社", "戸隠高原"],
+    prefName: "長野県",
+    muniName: "長野市",
+    category: "national_park",
+    lat: 36.75,
+    lon: 138.08,
+    blurb:
+      "長野市北西部、妙高戸隠連山国立公園に含まれる高原。戸隠神社や戸隠古道、避暑・トレッキングで知られます。奥社参道の杉並木周辺を含めクマの生息域にあたるため、鈴やラジオで音を出し、早朝・夕方の単独行動は控えめに。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/160430_Togakushi-jinja_Chusha_Nagano_Japan02n.jpg/1280px-160430_Togakushi-jinja_Chusha_Nagano_Japan02n.jpg",
+    imageCredit: "戸隠神社",
+  },
+  {
+    slug: "然別湖",
+    name: "然別湖",
+    altNames: ["しかりべつこ", "Lake Shikaribetsu"],
+    prefName: "北海道",
+    muniName: "鹿追町",
+    category: "lake",
+    lat: 43.3,
+    lon: 143.1,
+    blurb:
+      "北海道鹿追町、大雪山国立公園内の標高約800mにある自然湖。湖畔のキャンプやカヌー、避暑で親しまれています。一帯はヒグマの生息域にあたるため、湖畔・林道では食料やごみの管理を徹底し、単独行動やヤブへの立ち入りは避けましょう。",
+    imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/40/%E7%99%BD%E9%9B%B2%E5%B1%B1%E3%81%8B%E3%82%89%EF%BC%88The_view_from_the_Mt.Hakuun%EF%BC%89_-_panoramio.jpg",
+    imageCredit: "然別湖",
   },
 ];

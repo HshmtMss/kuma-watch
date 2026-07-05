@@ -34,6 +34,8 @@ const CATEGORY_LABEL: Record<LandmarkCategory, string> = {
   mountain: "山岳・登山口",
   national_park: "国立公園",
   resort: "観光・リゾート",
+  gorge: "渓谷・川遊び",
+  campground: "キャンプ場",
   trailhead: "トレイル",
   lake: "湖・湖畔",
 };
@@ -42,6 +44,8 @@ const CATEGORY_EMOJI: Record<LandmarkCategory, string> = {
   mountain: "⛰️",
   national_park: "🏞️",
   resort: "♨️",
+  gorge: "💦",
+  campground: "🏕️",
   trailhead: "🥾",
   lake: "🪷",
 };
@@ -50,6 +54,8 @@ const CATEGORY_ORDER: LandmarkCategory[] = [
   "mountain",
   "national_park",
   "resort",
+  "gorge",
+  "campground",
   "lake",
   "trailhead",
 ];
@@ -89,6 +95,8 @@ export default async function SpotIndexPage({
     mountain: 0,
     national_park: 0,
     resort: 0,
+    gorge: 0,
+    campground: 0,
     trailhead: 0,
     lake: 0,
   };
