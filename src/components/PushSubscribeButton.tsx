@@ -246,11 +246,11 @@ export default function PushSubscribeButton({
   }
 
   return (
-    <div className="not-prose mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4">
+    <div className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-4">
       <div className="flex items-start gap-3">
         <div
           aria-hidden
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-500"
         >
           <svg
             width="18"
@@ -279,7 +279,7 @@ export default function PushSubscribeButton({
             <button
               type="button"
               onClick={sendTest}
-              className="mt-2 text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+              className="mt-2 text-xs font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
             >
               お試し通知を送る
             </button>
@@ -295,7 +295,7 @@ export default function PushSubscribeButton({
           <p className="mt-2 text-xs">
             <Link
               href="/notifications"
-              className="font-medium text-emerald-700 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+              className="font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
             >
               登録中の通知を管理・解除する
             </Link>
@@ -333,7 +333,7 @@ export default function PushSubscribeButton({
             <button
               type="button"
               onClick={subscribe}
-              className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+              className="rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700"
             >
               通知する
             </button>
@@ -342,7 +342,7 @@ export default function PushSubscribeButton({
             <button
               type="button"
               onClick={unsubscribe}
-              className="rounded-full border border-emerald-300 bg-white px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
+              className="rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
             >
               通知中 ✓ / 解除
             </button>
