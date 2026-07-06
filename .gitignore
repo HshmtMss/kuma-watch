@@ -68,3 +68,4 @@ data/discovery-queries.txt
 
 # 全文検索インデックス (prebuild で生成、コミット不要)
 public/search-index.json
+/public/spots-lookup.json

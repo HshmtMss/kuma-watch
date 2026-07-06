@@ -239,6 +239,26 @@ async function loadSpots(): Promise<SearchEntry[]> {
   }));
 }
 
+// 地図トップの検索窓(PlaceSearch)用の軽量ルックアップ。名称/別名/県/カテゴリのみ。
+// 地名ジオコーダ候補に「観光地ページ」候補を並べるために使う。
+async function writeSpotsLookup(): Promise<number> {
+  const mod = await import("../src/data/japan-landmarks");
+  const landmarks = mod.JAPAN_LANDMARKS as Landmark[];
+  const lookup = landmarks.map((l) => ({
+    s: l.slug,
+    n: l.name,
+    p: l.prefName,
+    c: l.category ?? "",
+    ...(l.altNames && l.altNames.length ? { a: l.altNames.join("|") } : {}),
+  }));
+  const out = join(ROOT, "public", "spots-lookup.json");
+  writeFileSync(out, JSON.stringify(lookup));
+  console.log(
+    `[spots-lookup] wrote ${out} (${lookup.length} spots, ${(JSON.stringify(lookup).length / 1024).toFixed(0)} KB)`,
+  );
+  return lookup.length;
+}
+
 // ── 6. 政府発表 ────────────────────────
 type GovAnnouncement = {
   id: string;
@@ -302,6 +322,8 @@ async function main(): Promise<void> {
   console.log(
     `[search-index] wrote ${out} (${(size / 1024).toFixed(0)} KB)`,
   );
+
+  await writeSpotsLookup();
 }
 
 main().catch((e) => {
