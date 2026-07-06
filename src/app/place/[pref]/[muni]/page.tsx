@@ -541,6 +541,19 @@ export default async function MuniPage({ params }: Props) {
         : bearRegion === "kyushu-okinawa"
           ? `九州のツキノワグマは絶滅したとされ、沖縄にはクマは生息していません。${pref}での「クマ」情報は他の動物の誤認の可能性もあるため、自治体の発表をご確認ください。`
           : `${pref}に生息するクマは主にツキノワグマです。春の冬眠明けから秋の食い溜め期にかけて、山菜採り・登山道・里山周辺で目撃や出没が報告されます。`;
+
+  // 出没 0 件ページの「安全確認」ブロック用に、地域のクマ生息状況を一文で。
+  // 県ごとに文面が変わるため 0 件ページの本文差別化 (thin/duplicate 回避) にも効く。
+  const habitatNote =
+    bearRegion === "hokkaido"
+      ? `${pref}はヒグマの生息域です。報告がなくても、山間部や市街地周辺での活動には注意してください。`
+      : bearRegion === "shikoku"
+        ? `四国のツキノワグマは剣山系にごく少数が生息するのみとされ、${pref}での出没はまれです。`
+        : bearRegion === "kyushu-okinawa"
+          ? pref === "沖縄県"
+            ? `沖縄県にクマは生息していません。「クマ」の情報は他の動物の誤認の可能性があります。`
+            : `九州のツキノワグマは絶滅したとされ、現在は生息が確認されていません。`
+          : `${pref}はツキノワグマの生息域です。報告がなくても、季節や年によってクマの行動は変わります。`;
   const faqItems: { q: string; a: string }[] = [
     {
       q: `${muni}にクマ（熊）は出没しますか？`,
@@ -649,6 +662,30 @@ export default async function MuniPage({ params }: Props) {
             複雑だったので削除。マップへの動線は (1) 埋め込みマップ下のリンク
             と (2) Sticky CTA の 2 箇所に集約。 */}
       </div>
+
+      {/* 出没 0 件ページの「安全確認」ブロック。「○○市 クマ 大丈夫?」という
+          安全確認意図に本文で明確に応え、地域のクマ生息状況・季節の注意を添える。
+          静穏バッジだけだと薄いため、prose で読める説明を補い thin content を回避。
+          calm トーン (emerald/stone・危険/警戒の語を使わない) を維持。 */}
+      {cell.count365d === 0 && cell.count90d === 0 && (
+        <div className="not-prose mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+          <h2 className="text-base font-bold text-emerald-900">
+            {muni}のクマ出没状況（安全確認）
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-stone-700">
+            {muni}では、報道・自治体発表などをもとにした直近 1 年のクマ（熊）の
+            出没・目撃情報の報告は
+            <strong className="font-bold">ありません</strong>。{habitatNote}
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-stone-700">
+            {seasonalAdvice.season}の注意点：{seasonalAdvice.point}
+          </p>
+          <p className="mt-2 text-xs text-stone-500">
+            新たな出没・目撃が報告され次第、本ページと地図に反映します。登山・
+            山菜採り・お出かけ前の確認にご活用ください。
+          </p>
+        </div>
+      )}
 
       {/* 最新の出没事案ハイライト — 「○○市 クマ」で来たニュース意図の検索に
           冒頭で即応する。最新事案の日付・地区・内容を 1 件だけ目立たせ、
