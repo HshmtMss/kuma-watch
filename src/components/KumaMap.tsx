@@ -21,7 +21,7 @@ import {
   type LevelThresholds,
 } from "@/lib/score";
 import { meshCodeToCenter } from "@/lib/mesh";
-import { isFreshRecord } from "@/lib/freshness";
+import { isRecentSighting, recentSightingLabel } from "@/lib/freshness";
 import { loadLandUse, loadMeshes, type LandUseMap, type MeshEntry } from "@/lib/mesh-data";
 import { smoothMeshes, type SmoothedCell } from "@/lib/smooth";
 
@@ -484,10 +484,10 @@ export default function KumaMap({
       const nowMs = Date.now();
       for (const r of toRender) {
         // 出どころ・頭数によらず一律ダークブラウン (#78350f)。公式/報道/市民の
-        // 別はポップアップのバッジで示す。新着だけは青ハローで区別。
-        // 新着 = 掲載が直近 24h かつ出没日も最近 (過去事案の再報道を除外)。
+        // 別はポップアップのバッジで示す。最近の出没だけは青ハローで区別。
+        // 「最近」= 出没日が直近 N 日以内 (掲載時刻は使わない)。
         const PIN_COLOR = "#78350f";
-        const isFresh = isFreshRecord(r, nowMs);
+        const isFresh = isRecentSighting(r, nowMs);
         const sourceColor = PIN_COLOR;
         const baseR = pinR;
 
@@ -543,20 +543,11 @@ export default function KumaMap({
       : isNews
         ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
-    // 新着バッジ: 掲載が直近 24h かつ出没日も最近 (過去事案の再報道を除外)。
-    const ingestedAt = r.ingestedAt;
-    const ageMs =
-      typeof ingestedAt === "number" ? Date.now() - ingestedAt : Infinity;
-    const isFresh = isFreshRecord(r, Date.now());
-    const ageLabel = isFresh
-      ? ageMs < 60 * 60 * 1000
-        ? `${Math.max(1, Math.round(ageMs / 60 / 1000))} 分前`
-        : `${Math.round(ageMs / 60 / 60 / 1000)} 時間前`
-      : "";
-    // 「掲載」と明示する。ageLabel は ingestedAt 基準 (KumaWatch が情報を載せた
-    // 時刻) であり、出没の発生時刻ではない。報道の遅れで両者は数時間〜ずれる。
-    const freshBadge = isFresh
-      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px" title="この情報を地図に掲載した時刻（出没発生時刻ではありません）">🆕 ${ageLabel}に掲載</span>`
+    // 最近バッジ: 出没日が直近 N 日以内なら「本日 / 昨日 / N日前 出没」を出す。
+    // 掲載時刻ではなく出没日を基準にする (スクレイプ周期に揺れないため)。
+    const recentLabel = recentSightingLabel(r.date, Date.now());
+    const freshBadge = recentLabel
+      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px" title="出没日を基準にした鮮度です">🆕 ${recentLabel} 出没</span>`
       : "";
     const sourceLink = r.sourceUrl
       ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`

@@ -28,7 +28,6 @@ import {
   RISK_LEVEL_LABEL,
   type LevelThresholds,
 } from "@/lib/score";
-import { isFreshRecord } from "@/lib/freshness";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
@@ -79,12 +78,6 @@ function limitForPeriod(days: number | null): number {
 
 type KumaSignature = { matched: number; latestIngestedAt: number };
 
-// render 中の直接 Date.now() を避けるためのヘルパ (impure 呼び出しを関数内に隠す)。
-// 直近24h フィルタの現在時刻に使う。
-function nowMsForFresh(): number {
-  return Date.now();
-}
-
 // "2026-05-05" → "5/5"。年は省略してバッジを短く。
 function formatLatestDate(iso: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
@@ -110,8 +103,6 @@ export default function KumaClient() {
   // 「色の意味」のさりげない補足を表示する小さなツールチップの開閉状態。
   // 過度に怖がらせないための説明を、見たい人だけ見られるように UI を絞る。
   const [showMapNote, setShowMapNote] = useState(false);
-  // 直近 24h フィルタ: ingestedAt が 24 時間以内のレコードだけに絞る速報モード。
-  const [freshOnly, setFreshOnly] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
@@ -623,7 +614,8 @@ export default function KumaClient() {
               : sig.latestIngestedAt,
         };
         if (fresh.length > 0) {
-          setCopyToast(`新着 ${fresh.length} 件`);
+          // ポーリングで新しく届いた (サイトに追加された) 件数。出没の鮮度とは別概念。
+          setCopyToast(`更新 ${fresh.length} 件`);
           window.setTimeout(() => setCopyToast(null), 3000);
         }
       } catch {
@@ -683,16 +675,14 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
-    const nowMs = nowMsForFresh();
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
+      // 期間フィルタは出没日基準 (最短 1 週間)。掲載時刻は使わない。
       const periodOk = !periodCutoff || r.date >= periodCutoff;
-      // 直近24h モード: 掲載が最近かつ出没日も最近のものだけ (過去事案の再報道を除外)。
-      const freshOk = !freshOnly || isFreshRecord(r, nowMs);
-      return prefOk && periodOk && freshOk;
+      return prefOk && periodOk;
     });
-  }, [records, selectedPref, periodCutoff, showPins, freshOnly]);
+  }, [records, selectedPref, periodCutoff, showPins]);
 
   // データ更新日: 最新の事案発生日を「データの新しさ」の指標として算出する。
   // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
@@ -776,20 +766,6 @@ export default function KumaClient() {
               {filtered.length.toLocaleString()}件
             </span>
           </div>
-
-          {/* 直近 24h フィルタ — 取り込みから 24h 以内の事案だけを表示する速報モード。 */}
-          <label
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 font-medium text-stone-700"
-            title="直近 24 時間以内に取り込んだ事案のみ表示"
-          >
-            <input
-              type="checkbox"
-              checked={freshOnly}
-              onChange={(e) => setFreshOnly(e.target.checked)}
-              className="h-4 w-4 accent-amber-600"
-            />
-            直近24h
-          </label>
 
           {/* 表示設定メニュー: 警戒レベル / 凡例 / 地図種類 を集約。
               スマホで個別ボタンが横にあふれて出没ピン期間設定が見切れる問題を
@@ -888,10 +864,10 @@ export default function KumaClient() {
               </span>
             </div>
             {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。種別はピンを
-                タップするとポップアップで表示。地図では新着だけを区別する。 */}
+                タップするとポップアップで表示。青リングは出没日が直近数日のもの。 */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />新着</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />直近の出没</span>
             </div>
             <button
               type="button"
