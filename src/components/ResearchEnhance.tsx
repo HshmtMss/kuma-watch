@@ -41,6 +41,10 @@ export default function ResearchEnhance() {
 
     const main = document.querySelector("main");
     if (!main) return;
+    // /research インデックスは「種別で絞り込み」タイルがナビを担うため TOC を出さない
+    // (タイルと目次で月次/週次/テーマ/日次レポートが二重表示になるのを防ぐ)。
+    // 目次は個別レポート記事 /research/<slug> でのみ表示する。
+    if (window.location.pathname.replace(/\/+$/, "") === "/research") return;
     const allH2 = Array.from(main.querySelectorAll("h2")) as HTMLHeadingElement[];
     // 「参考文献」「監修・編集」を除外
     const h2s = allH2.filter((h) => {
