@@ -1,5 +1,6 @@
 "use client";
 
+import { Link2, ExternalLink } from "lucide-react";
 import type { MunicipalEntry } from "@/data/municipalities";
 
 type Props = {
@@ -31,8 +32,9 @@ export default function MunicipalLinks({ entry }: Props) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="text-xs font-semibold text-gray-700">
-          🔗 {entry.prefNameJa} の公式リソース
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+          <Link2 size={13} aria-hidden />
+          {entry.prefNameJa} の公式リソース
         </div>
         <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-blue-200">
           {speciesLabel}
@@ -47,7 +49,7 @@ export default function MunicipalLinks({ entry }: Props) {
             rel="noopener noreferrer"
             className="flex min-h-11 items-start gap-2 rounded-md bg-white px-3 py-2 text-sm text-blue-800 ring-1 ring-blue-100 hover:ring-blue-300"
           >
-            <span aria-hidden>🔗</span>
+            <ExternalLink size={14} className="mt-0.5 shrink-0" aria-hidden />
             <span className="min-w-0 flex-1">
               <span className="block font-medium">{link.label}</span>
               <span className="block truncate text-[10px] text-blue-500">

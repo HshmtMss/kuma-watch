@@ -3,6 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  MapPin,
+  AlertTriangle,
+  ClipboardList,
+  Clock,
+  ChartColumn,
+} from "lucide-react";
 import type {
   MeshData,
   ScoreBreakdown,
@@ -700,8 +707,8 @@ export default function RiskPanel({
             className="flex min-w-0 flex-1 items-center gap-2 text-left"
             aria-expanded={expanded}
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-base text-white">
-              📍
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
+              <MapPin size={18} aria-hidden />
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-base font-semibold text-gray-900">
@@ -722,7 +729,10 @@ export default function RiskPanel({
                   </span>
                 )}
                 {state.kind === "error" && (
-                  <span className="text-red-600">⚠️ {state.message}</span>
+                  <span className="inline-flex items-center gap-1 text-red-600">
+                    <AlertTriangle size={13} aria-hidden />
+                    {state.message}
+                  </span>
                 )}
               </div>
             </div>
@@ -936,7 +946,7 @@ function RiskDetails({
         return (
           <section className="border-t border-gray-100 px-4 py-3">
             <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
-              📝 行動メモ
+<ClipboardList size={16} aria-hidden />行動メモ
               {llmAdviceLoading && (
                 <span className="inline-flex items-center gap-1 text-xs font-normal text-gray-400 sm:text-[10px]">
                   <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
@@ -994,8 +1004,9 @@ function RiskDetails({
       {/* 直近の目撃 リスト (過去 3 ヶ月・固定窓) */}
       {recent90d.length > 0 && (
         <section className="border-t border-gray-100 px-4 py-3">
-          <h3 className="mb-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
-            🕓 直近の目撃
+          <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
+            <Clock size={16} aria-hidden />
+            直近の目撃
           </h3>
           <ul className="space-y-2">
             {recent90d.slice(0, 3).map((r) => {
@@ -1025,7 +1036,7 @@ function RiskDetails({
                               : "公式情報源"
                         }
                       >
-                        {isCitizen ? "👥 市民投稿" : isNews ? "📰 報道" : "🛡 公式"}
+                        {isCitizen ? "市民投稿" : isNews ? "報道" : "公式"}
                       </span>
                     </div>
                     <span className="shrink-0 text-xs text-gray-500 sm:text-[10px]">
@@ -1065,8 +1076,9 @@ function RiskDetails({
 
       {/* 4. 危険度予測 (時間帯・月別・根拠) */}
       <section className="border-t border-gray-100 px-4 py-3">
-        <h3 className="mb-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
-          📊 警戒レベル予測
+        <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
+          <ChartColumn size={16} aria-hidden />
+          警戒レベル予測
         </h3>
         <div className="mb-2 flex items-center justify-end text-sm text-gray-500 sm:text-[11px]">
           <span>

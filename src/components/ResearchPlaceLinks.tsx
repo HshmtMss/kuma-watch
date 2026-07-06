@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Map } from "lucide-react";
 import { RESEARCH_ENTRIES } from "@/lib/research-entries";
 
 /**
@@ -28,7 +29,7 @@ export default function ResearchPlaceLinks({ slug }: { slug: string }) {
             href={`/place/${encodeURIComponent(pref)}`}
             className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
           >
-            🗺️ {pref} の出没マップ
+<Map size={14} className="mr-1 inline-block align-text-bottom" aria-hidden />{pref} の出没マップ
           </Link>
         ))}
       </div>

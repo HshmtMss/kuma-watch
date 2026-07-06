@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Landmark } from "lucide-react";
 import type { MunicipalEntry } from "@/data/municipalities";
 import type { SummaryResponse } from "@/app/api/summary/route";
 
@@ -65,7 +66,7 @@ export default function MunicipalNoticeBox({
     <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-sm font-semibold text-blue-900">
-          <span aria-hidden>🏛</span>
+          <Landmark size={15} aria-hidden />
           {prefName ? `${prefName} 自治体からのお知らせ` : "自治体からのお知らせ"}
         </span>
         {sourceUrl && (
