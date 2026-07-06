@@ -1,6 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  BookOpen,
+  ShieldCheck,
+  Landmark,
+  ChartColumn,
+  SprayCan,
+  Bell,
+  Fence,
+  Container,
+  House,
+  Radar,
+  Siren,
+  Camera,
+  Crosshair,
+  CalendarRange,
+  Newspaper,
+  Lightbulb,
+  MapPin,
+  type LucideIcon,
+} from "lucide-react";
 import PageShell from "@/components/PageShell";
+import CategoryGlyph from "@/components/CategoryGlyph";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { ARTICLES, CATEGORIES } from "@/lib/articles-meta";
 import {
@@ -72,7 +93,12 @@ export default function MeasuresPage() {
               className="flex h-full flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:border-amber-400 hover:bg-amber-50/40"
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden className="text-3xl">📖</span>
+                <BookOpen
+                  size={26}
+                  strokeWidth={1.7}
+                  className="text-amber-600"
+                  aria-hidden
+                />
                 <span className="text-lg font-bold text-stone-900">
                   記事で学ぶ
                 </span>
@@ -87,9 +113,13 @@ export default function MeasuresPage() {
                 {CATEGORIES.map((c) => (
                   <li
                     key={c.id}
-                    className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
                   >
-                    <span aria-hidden>{c.emoji}</span>
+                    <CategoryGlyph
+                      slug={c.slug}
+                      size={15}
+                      className="text-stone-500"
+                    />
                     <span>{c.name}</span>
                   </li>
                 ))}
@@ -105,7 +135,12 @@ export default function MeasuresPage() {
               className="flex h-full flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:border-amber-400 hover:bg-amber-50/40"
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden className="text-3xl">🛡️</span>
+                <ShieldCheck
+                  size={26}
+                  strokeWidth={1.7}
+                  className="text-amber-600"
+                  aria-hidden
+                />
                 <span className="text-lg font-bold text-stone-900">
                   装備・製品で備える
                 </span>
@@ -117,19 +152,21 @@ export default function MeasuresPage() {
                 クマ撃退スプレー、クマ鈴、ベアキャニスター、電気柵、センサーライト等。
               </p>
               <ul className="mt-1 flex flex-wrap gap-2">
-                {[
-                  { e: "🌶️", l: "スプレー" },
-                  { e: "🔔", l: "鈴・ホーン" },
-                  { e: "⚡", l: "電気柵" },
-                  { e: "🥫", l: "ベアキャニスター" },
-                  { e: "💡", l: "住宅装備" },
-                ].map((t) => (
+                {(
+                  [
+                    { Icon: SprayCan, l: "スプレー" },
+                    { Icon: Bell, l: "鈴・ホーン" },
+                    { Icon: Fence, l: "電気柵" },
+                    { Icon: Container, l: "ベアキャニスター" },
+                    { Icon: House, l: "住宅装備" },
+                  ] satisfies { Icon: LucideIcon; l: string }[]
+                ).map(({ Icon, l }) => (
                   <li
-                    key={t.l}
-                    className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
+                    key={l}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
                   >
-                    <span aria-hidden>{t.e}</span>
-                    <span>{t.l}</span>
+                    <Icon size={15} className="text-stone-500" aria-hidden />
+                    <span>{l}</span>
                   </li>
                 ))}
               </ul>
@@ -159,7 +196,12 @@ export default function MeasuresPage() {
               className="flex h-full flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/40"
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden className="text-3xl">🏛️</span>
+                <Landmark
+                  size={26}
+                  strokeWidth={1.7}
+                  className="text-emerald-600"
+                  aria-hidden
+                />
                 <span className="text-lg font-bold text-stone-900">
                   自治体向けソリューション
                 </span>
@@ -171,18 +213,20 @@ export default function MeasuresPage() {
                 AI 検知システム、撃退装置、箱罠、林業安全装備、コンサルティング等の業務向け。
               </p>
               <ul className="mt-1 flex flex-wrap gap-2">
-                {[
-                  { e: "🤖", l: "AI 検知" },
-                  { e: "🐺", l: "撃退装置" },
-                  { e: "📷", l: "トレイルカメラ" },
-                  { e: "🪤", l: "捕獲・駆除" },
-                ].map((t) => (
+                {(
+                  [
+                    { Icon: Radar, l: "AI 検知" },
+                    { Icon: Siren, l: "撃退装置" },
+                    { Icon: Camera, l: "トレイルカメラ" },
+                    { Icon: Crosshair, l: "捕獲・駆除" },
+                  ] satisfies { Icon: LucideIcon; l: string }[]
+                ).map(({ Icon, l }) => (
                   <li
-                    key={t.l}
-                    className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
+                    key={l}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
                   >
-                    <span aria-hidden>{t.e}</span>
-                    <span>{t.l}</span>
+                    <Icon size={15} className="text-stone-500" aria-hidden />
+                    <span>{l}</span>
                   </li>
                 ))}
               </ul>
@@ -197,7 +241,12 @@ export default function MeasuresPage() {
               className="flex h-full flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:border-emerald-400 hover:bg-emerald-50/40"
             >
               <div className="flex items-center gap-3">
-                <span aria-hidden className="text-3xl">📊</span>
+                <ChartColumn
+                  size={26}
+                  strokeWidth={1.7}
+                  className="text-emerald-600"
+                  aria-hidden
+                />
                 <span className="text-lg font-bold text-stone-900">
                   研究・分析レポート
                 </span>
@@ -209,18 +258,20 @@ export default function MeasuresPage() {
                 獣医工学ラボによる、全国クマ事案の時空間分析、月次・日次レポート、テーマ解説。
               </p>
               <ul className="mt-1 flex flex-wrap gap-2">
-                {[
-                  { e: "📅", l: "月次レポート" },
-                  { e: "📍", l: "日次レポート" },
-                  { e: "🔍", l: "テーマ解説" },
-                  { e: "🗾", l: "地域別" },
-                ].map((t) => (
+                {(
+                  [
+                    { Icon: CalendarRange, l: "月次レポート" },
+                    { Icon: Newspaper, l: "日次レポート" },
+                    { Icon: Lightbulb, l: "テーマ解説" },
+                    { Icon: MapPin, l: "地域別" },
+                  ] satisfies { Icon: LucideIcon; l: string }[]
+                ).map(({ Icon, l }) => (
                   <li
-                    key={t.l}
-                    className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
+                    key={l}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-1 text-sm font-medium text-stone-700"
                   >
-                    <span aria-hidden>{t.e}</span>
-                    <span>{t.l}</span>
+                    <Icon size={15} className="text-stone-500" aria-hidden />
+                    <span>{l}</span>
                   </li>
                 ))}
               </ul>
