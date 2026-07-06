@@ -1,0 +1,101 @@
+// 全国の旅行スポット候補を OSM Overpass から収集し、出没密度注記＋空間重複排除する。
+// クマ生息域(北海道+本州)を対象。使い方:
+//   node scripts/collect-osm-spots.mjs camp        # キャンプ場
+//   node scripts/collect-osm-spots.mjs attraction  # 著名観光地(wikidata付き)
+//   node scripts/collect-osm-spots.mjs onsen       # 温泉
+//   node scripts/collect-osm-spots.mjs nature      # 滝・渓谷・湖
+// 収集結果は .cache/osm-<cat>.json に保存（再取得を避ける）。
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+
+const CAT = process.argv[2] || "camp";
+const OVERPASS = "https://overpass-api.de/api/interpreter";
+const CACHE = ".cache";
+if (!existsSync(CACHE)) mkdirSync(CACHE);
+
+// クマ生息域: 北海道 + 本州34県（九州・四国・沖縄はクマ不在/絶滅のため除外）
+const PREFS = [
+  "北海道",
+  "青森県","岩手県","宮城県","秋田県","山形県","福島県",
+  "茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県",
+  "新潟県","富山県","石川県","福井県","山梨県","長野県",
+  "岐阜県","静岡県","愛知県","三重県",
+  "滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
+  "鳥取県","島根県","岡山県","広島県","山口県",
+];
+
+// カテゴリ別の Overpass クエリ片（area.a 内）。
+function selector(cat) {
+  switch (cat) {
+    case "camp":
+      return `node["tourism"="camp_site"](area.a);way["tourism"="camp_site"](area.a);`;
+    case "attraction":
+      // 著名なもの＝wikidata か wikipedia タグ付きに限定（ノイズ除去）
+      return [
+        `node["tourism"="attraction"]["wikidata"](area.a);way["tourism"="attraction"]["wikidata"](area.a);`,
+        `node["tourism"="viewpoint"]["wikidata"](area.a);`,
+        `node["tourism"="theme_park"](area.a);way["tourism"="theme_park"](area.a);`,
+      ].join("");
+    case "onsen":
+      return `node["natural"="hot_spring"]["name"](area.a);way["natural"="hot_spring"]["name"](area.a);node["amenity"="public_bath"]["bath:type"="onsen"]["name"](area.a);`;
+    case "nature":
+      return [
+        `node["waterway"="waterfall"]["name"](area.a);node["natural"="waterfall"]["name"](area.a);`,
+        `way["water"="lake"]["name"]["wikidata"](area.a);relation["water"="lake"]["name"]["wikidata"](area.a);`,
+        `node["natural"="valley"]["name"](area.a);way["natural"="valley"]["name"](area.a);`,
+      ].join("");
+    default:
+      throw new Error("unknown cat " + cat);
+  }
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function fetchPref(pref, cat, tries = 3) {
+  const q =
+    `[out:json][timeout:120];\n` +
+    `area["name"="${pref}"]["admin_level"="4"]->.a;\n` +
+    `(${selector(cat)});\nout center tags;`;
+  for (let t = 0; t < tries; t++) {
+    try {
+      const res = await fetch(OVERPASS, {
+        method: "POST",
+        body: q,
+        headers: { "Content-Type": "text/plain", "User-Agent": "kuma-watch/1.0 (spot coverage)" },
+      });
+      if (res.status === 429 || res.status === 504) {
+        await sleep(8000 * (t + 1));
+        continue;
+      }
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const j = await res.json();
+      return j.elements || [];
+    } catch (e) {
+      if (t === tries - 1) { console.error(`  ! ${pref}: ${e.message}`); return []; }
+      await sleep(5000 * (t + 1));
+    }
+  }
+  return [];
+}
+
+const all = [];
+for (const pref of PREFS) {
+  const els = await fetchPref(pref, CAT);
+  for (const e of els) {
+    const c = e.center || e;
+    const name = e.tags && (e.tags["name:ja"] || e.tags.name);
+    if (!name || !Number.isFinite(c.lat)) continue;
+    all.push({
+      name,
+      lat: +c.lat.toFixed(5),
+      lon: +c.lon.toFixed(5),
+      pref,
+      wd: (e.tags && e.tags.wikidata) || null,
+      wp: (e.tags && (e.tags["wikipedia"] || e.tags["wikipedia:ja"])) || null,
+    });
+  }
+  console.error(`${pref}: +${els.length}  (累計 ${all.length})`);
+  await sleep(1500);
+}
+
+writeFileSync(`${CACHE}/osm-${CAT}.json`, JSON.stringify(all));
+console.log(`\n${CAT}: 生収集 ${all.length} 件 -> ${CACHE}/osm-${CAT}.json`);

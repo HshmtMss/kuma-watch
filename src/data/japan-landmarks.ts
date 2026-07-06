@@ -7,6 +7,8 @@
 // 座標は OpenStreetMap / 国土地理院 / Wikipedia 公開情報からの一般的な代表点。
 // カバレッジは Search Console のクエリ実績を見ながら順次拡張する想定。
 
+import GENERATED_SPOTS from "./japan-landmarks-generated.json";
+
 export type LandmarkCategory =
   | "mountain"
   | "national_park"
@@ -14,7 +16,10 @@ export type LandmarkCategory =
   | "trailhead"
   | "lake"
   | "gorge"
-  | "campground";
+  | "campground"
+  | "sightseeing"
+  | "onsen"
+  | "waterfall";
 
 export type JapanLandmark = {
   /** URL の path 部分。日本語そのまま使う (Next.js が encode する) */
@@ -51,7 +56,9 @@ export type JapanLandmark = {
   officialHub?: boolean;
 };
 
-export const JAPAN_LANDMARKS: JapanLandmark[] = [
+// 手キュレーションの主要ランドマーク。OSM 自動収集分より優先される（slug 衝突時は
+// こちらを残す）。B2B デモ(officialHub)やコース(areas)等の作り込みはこちらのみ。
+const CURATED_LANDMARKS: JapanLandmark[] = [
   // === 主要山岳 ===
   {
     slug: "富士山",
@@ -1559,4 +1566,20 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/4/40/%E7%99%BD%E9%9B%B2%E5%B1%B1%E3%81%8B%E3%82%89%EF%BC%88The_view_from_the_Mt.Hakuun%EF%BC%89_-_panoramio.jpg",
     imageCredit: "然別湖",
   },
+];
+
+// OSM 自動収集＋Gemini 生成のスポット（全国網羅拡張）。リリースフラグで公開制御する。
+// NEXT_PUBLIC_SPOT_COVERAGE=1 のときだけ手キュレーション分にマージして公開。
+// 既定(未設定/!=1)は非公開＝従来の手キュレーション分のみ。
+const SPOT_COVERAGE_ENABLED = process.env.NEXT_PUBLIC_SPOT_COVERAGE === "1";
+const _curatedSlugs = new Set(CURATED_LANDMARKS.map((l) => l.slug));
+const _generated = SPOT_COVERAGE_ENABLED
+  ? (GENERATED_SPOTS as unknown as JapanLandmark[]).filter(
+      (l) => !_curatedSlugs.has(l.slug),
+    )
+  : [];
+
+export const JAPAN_LANDMARKS: JapanLandmark[] = [
+  ...CURATED_LANDMARKS,
+  ..._generated,
 ];
