@@ -6,6 +6,7 @@ import {
   researchRegionsWithCount,
 } from "@/lib/research-entries";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
 
@@ -107,25 +108,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: isHot ? 0.9 : 0.7,
       };
     });
-    // 出没データのある (= インデックス対象の) 市町村のみを出力する。
-    // 0 件の市町村ページは muni ページ側で noindex にしているため、サイトマップ
-    // からも除外して「サイトマップ掲載 = index 対象」を一致させる (混在シグナルを
-    // 防ぐ)。getStaticPlaceKeys は canonical なマスター市町村名を返す。
+    // 全国 1,895 市町村（マスター）を出力する。出没 0 件でも「安全確認」の検索
+    // 意図に応える価値があり、muni ページ側も全件 index にしたためサイトマップと
+    // 一致させる（掲載 = index 対象）。突発出没が起きた街を事前インデックス済みに
+    // しておくことで初動のスパイク需要を即座に捕捉できる。
+    // 出没のある市町村は更新頻度・priority を上げ、クロールを優先させる。
+    const sightingKeys = new Set(keys.map((k) => `${k.pref}/${k.city}`));
     const muniSeen = new Set<string>();
     const muniArr: { pref: string; city: string }[] = [];
-    for (const k of keys) {
-      const key = `${k.pref}/${k.city}`;
+    for (const m of JAPAN_MUNICIPALITIES) {
+      const key = `${m.prefName}/${m.cityName}`;
       if (!muniSeen.has(key)) {
         muniSeen.add(key);
-        muniArr.push(k);
+        muniArr.push({ pref: m.prefName, city: m.cityName });
       }
     }
-    muniEntries = muniArr.map((k) => ({
-      url: `${SITE_URL}/place/${encodeURIComponent(k.pref)}/${encodeURIComponent(k.city)}`,
-      lastModified: now,
-      changeFrequency: "daily" as const,
-      priority: 0.6,
-    }));
+    muniEntries = muniArr.map((k) => {
+      const hot = sightingKeys.has(`${k.pref}/${k.city}`);
+      return {
+        url: `${SITE_URL}/place/${encodeURIComponent(k.pref)}/${encodeURIComponent(k.city)}`,
+        lastModified: now,
+        changeFrequency: hot ? ("daily" as const) : ("weekly" as const),
+        priority: hot ? 0.6 : 0.4,
+      };
+    });
   } catch {
     // データ取得失敗時はメインの URL のみ返す
   }

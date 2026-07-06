@@ -196,16 +196,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { title, description } = buildMuniSeo(pref, muni, seoCell);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
-  // 出没 0 件のページは薄く重複しやすいため noindex (剪定)。良質ページにインデックス
-  // を集中させる。サイトマップ (getStaticPlaceKeys 由来) からも除外され整合する。
-  // follow は維持し内部リンク評価は流す。出没が出れば自動で index に戻る。
-  const hasSightings = (seoCell?.count ?? 0) > 0;
+  // 全市町村ページをインデックス対象にする（出没 0 件も含む）。
+  //   ・「○○市はクマが出るのか / 大丈夫か」という安全確認の検索意図に応える価値がある
+  //     (出没ゼロ = 静穏、という情報自体がユーザーの求める答え)。
+  //   ・クマ出没は突発イベントで発生地が予測できない。0 件の街に突然出没した際、
+  //     事前にインデックス済みなら初動のスパイク需要を即座に捕捉できる (noindex だと
+  //     index 切替→再クロールがスパイクの窓に間に合わず取り逃す)。
+  //   ・0 件ページも季節別アドバイス・地域別のクマ種解説・市名入り FAQ で本文を
+  //     差別化済み (thin/duplicate を避ける作りは既にある)。
+  // 以前 (b1e3d2b, 2026-06-26) は 404/重複の緊急対策に抱き合わせで 0 件を noindex 剪定
+  // していたが、安全確認の価値と突発需要への即応性を優先し全件 index へ戻す。
 
   return {
     title,
     description,
     alternates: { canonical: `${SITE_URL}${path}` },
-    robots: hasSightings ? undefined : { index: false, follow: true },
+    robots: { index: true, follow: true },
     openGraph: {
       title,
       description,
