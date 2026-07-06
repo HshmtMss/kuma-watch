@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PawPrint } from "lucide-react";
 import ClientRedirect from "./ClientRedirect";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -64,7 +65,7 @@ export default async function SharePage({ searchParams }: Props) {
     <>
       <ClientRedirect to={target} />
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-        <div className="text-3xl">🐻</div>
+        <PawPrint size={34} className="text-amber-600" aria-hidden />
         <h1 className="mt-3 text-xl font-bold text-stone-900">
           {label} のクマ情報を表示します
         </h1>
