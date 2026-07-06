@@ -443,10 +443,11 @@ export default function KumaMap({
         typeof window !== "undefined" ? window.innerWidth < 768 : false;
       const z = map.getZoom();
       const zoomBoost = z >= 13 ? 2.0 : z >= 11 ? 1.5 : 1.0;
-      const baseSingle = isNarrow ? 8 : 5;
-      const baseMulti = isNarrow ? 10 : 6;
-      const rSingle = Math.round(baseSingle * zoomBoost);
-      const rMulti = Math.round(baseMulti * zoomBoost);
+      // 出没ピンは出どころ (公式/報道/市民) も頭数も区別せず一律の見た目に
+      // 統一する。種別・頭数はクリック時のポップアップで示す。地図では
+      // 「どこで出たか」だけを等価に見せ、色や大きさで煽らない方針。
+      const baseR0 = isNarrow ? 8 : 5;
+      const pinR = Math.round(baseR0 * zoomBoost);
       const borderWeight = isNarrow ? 1.6 : 1.2;
       // bounds 内のレコードを先に集めてから均等サンプリング。
       // recs は日付降順ソート済み。早い者勝ち break で打ち切ると、
@@ -468,20 +469,13 @@ export default function KumaMap({
       const FRESH_MS = 24 * 60 * 60 * 1000;
       const nowMs = Date.now();
       for (const r of toRender) {
-        // 塗り (fill) は「情報の出どころ」を表す。新着でも上書きしない。
-        //   紫=市民投稿 / 橙=報道由来 / 赤=公式2頭以上 / 灰=公式1頭
-        const isCitizen = r.sourceKind === "citizen";
-        const isNews = !isCitizen && r.isOfficial === false;
+        // 出どころ・頭数によらず一律ダークブラウン (#78350f)。公式/報道/市民の
+        // 別はポップアップのバッジで示す。新着 (直近 24h) だけは青ハローで区別。
+        const PIN_COLOR = "#78350f";
         const isFresh =
           typeof r.ingestedAt === "number" && nowMs - r.ingestedAt <= FRESH_MS;
-        const sourceColor = isCitizen
-          ? "#8b5cf6"
-          : isNews
-            ? "#f59e0b"
-            : r.headCount > 1
-              ? "#ef4444"
-              : "#6b7280";
-        const baseR = r.headCount > 1 ? rMulti : rSingle;
+        const sourceColor = PIN_COLOR;
+        const baseR = pinR;
 
         const openPopup = (e: unknown) => {
           (e as unknown as LeafletMouseEvent).originalEvent?.stopPropagation?.();

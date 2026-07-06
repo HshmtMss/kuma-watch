@@ -418,6 +418,10 @@ export async function fetchNewsSightings(
     const prefName = (s.prefectureName ?? "").trim();
     const cityName = (s.cityName ?? "").trim();
     if (!prefName) continue;
+    // 記事から明示座標が取れず市区町村も特定できない事案はスキップ。
+    // 県名だけだと geocodePlace が県代表点 (例: 埼玉県→坂戸市付近) を返し、
+    // クマの出ない市街地に誤ピンが立つ。県レベルの曖昧な報道は地図に載せない。
+    if (!cityName && typeof s.lat !== "number") continue;
 
     let lat = typeof s.lat === "number" ? s.lat : undefined;
     let lon = typeof s.lon === "number" ? s.lon : undefined;

@@ -887,13 +887,12 @@ export default function KumaClient() {
                 {formatLatestDate(latestDate)}
               </span>
             </div>
-            {/* 凡例 — ピンの種類。更新バッジの右隣に同じ高さで並べる。 */}
+            {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。種別はピンを
+                タップするとポップアップで表示。地図では新着だけを区別する。 */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" />公式1頭</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" />公式2頭+</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" />報道</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-violet-500" />市民投稿</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-stone-400 ring-2 ring-blue-500" />新着</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />新着</span>
+              <span className="text-stone-400">タップで公式/報道/市民の別を表示</span>
             </div>
             <button
               type="button"

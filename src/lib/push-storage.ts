@@ -19,6 +19,7 @@
  */
 import { Redis } from "@upstash/redis";
 import { createHash, randomUUID } from "node:crypto";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 
 type StoredSubscription = {
   endpoint: string;
@@ -238,6 +239,12 @@ export type PushStats = {
   avgMunisPerSubscriber: number;
   /** 購読者数の多い市町村ランキング (上位 topN) */
   topMunis: { pref: string; city: string; count: number }[];
+  /** 購読者が 1 人以上いる観光地 (spot) の数 */
+  activeSpotCount: number;
+  /** (購読者 × 観光地) のペア総数 */
+  totalSpotSubscriptions: number;
+  /** 購読者数の多い観光地ランキング (上位 topN)。slug と表示名・県を含む */
+  topSpots: { slug: string; name: string; pref: string; count: number }[];
 };
 
 /**
@@ -286,6 +293,34 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
   }
   perMuni.sort((a, b) => b.count - a.count);
 
+  // 3) 観光地別購読者数: spot:active の各 slug を SCARD。muni と同じ手順。
+  //    slug → 表示名・県は JAPAN_LANDMARKS で引く (未登録 slug は slug をそのまま名前に)。
+  const spotSlugs = await r.smembers<string[]>(`spot:active`);
+  let totalSpotSubscriptions = 0;
+  let activeSpotCount = 0;
+  const perSpot: { slug: string; name: string; pref: string; count: number }[] =
+    [];
+  if (spotSlugs.length > 0) {
+    const pipeline = r.pipeline();
+    for (const slug of spotSlugs) pipeline.scard(`spot:${slug}`);
+    const counts = (await pipeline.exec()) as number[];
+    for (let i = 0; i < spotSlugs.length; i++) {
+      const count = counts[i] ?? 0;
+      if (count <= 0) continue; // 失効後に残った空 spot:active を除外
+      activeSpotCount++;
+      totalSpotSubscriptions += count;
+      const slug = spotSlugs[i];
+      const lm = JAPAN_LANDMARKS.find((l) => l.slug === slug);
+      perSpot.push({
+        slug,
+        name: lm?.name ?? slug,
+        pref: lm?.prefName ?? "",
+        count,
+      });
+    }
+  }
+  perSpot.sort((a, b) => b.count - a.count);
+
   return {
     totalSubscribers,
     activeMuniCount,
@@ -293,6 +328,9 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
     avgMunisPerSubscriber:
       totalSubscribers > 0 ? totalSubscriptions / totalSubscribers : 0,
     topMunis: perMuni.slice(0, topN),
+    activeSpotCount,
+    totalSpotSubscriptions,
+    topSpots: perSpot.slice(0, topN),
   };
 }
 

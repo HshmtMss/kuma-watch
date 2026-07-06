@@ -126,21 +126,32 @@ export async function geocodePlace(
   cityName: string | undefined,
   sectionName: string | undefined,
 ): Promise<GeocodeResult | null> {
-  const full = [prefName, cityName, sectionName].filter(Boolean).join(" ").trim();
+  const city = (cityName ?? "").trim();
+  const section = (sectionName ?? "").trim();
+
+  // 都道府県名だけでは「県のどこか」しか分からない。Nominatim は県名クエリに
+  // 対して県の代表点を 1 点返す (例: 「埼玉県」→ 35.9754,139.4160 = 坂戸市付近)
+  // ため、市区町村不明の事案が全部その一点に積み上がり、クマの出ない市街地に
+  // 大量の誤ピンが立つ。市区町村まで特定できないものはジオコード不可とする。
+  if (!city) return null;
+
+  const full = [prefName, city, section].filter(Boolean).join(" ").trim();
   if (full) {
     const r = await geocodeQuery(full);
     if (r) return { ...r, precise: true };
   }
-  if (sectionName) {
-    const head = sectionName.trim().split(/[\s 　]/)[0];
-    if (head && head !== sectionName) {
-      const q = [prefName, cityName, head].filter(Boolean).join(" ").trim();
+  if (section) {
+    const head = section.split(/[\s 　]/)[0];
+    if (head && head !== section) {
+      const q = [prefName, city, head].filter(Boolean).join(" ").trim();
       const r = await geocodeQuery(q);
       if (r) return { ...r, precise: true };
     }
   }
-  const cityOnly = [prefName, cityName].filter(Boolean).join(" ").trim();
-  if (cityOnly && cityOnly !== full) {
+  // 市区町村までは特定できたが地区が拾えなかった場合の丸め。市中心点に
+  // 落ちるので precise=false とし、呼び出し側で ~3km ジッターを掛ける。
+  const cityOnly = [prefName, city].join(" ").trim();
+  if (cityOnly !== full) {
     const r = await geocodeQuery(cityOnly);
     if (r) return { ...r, precise: false };
   }

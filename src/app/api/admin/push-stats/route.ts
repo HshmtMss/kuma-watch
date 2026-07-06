@@ -8,12 +8,14 @@ export const dynamic = "force-dynamic";
  * 管理者向け：Web Push 通知の登録状況サマリ。
  * ADMIN_SECRET (合言葉) を Bearer で送って認証する (市民投稿 admin と共通)。
  *   GET ?top=30 → { totalSubscribers, activeMuniCount, totalSubscriptions,
- *                    avgMunisPerSubscriber, topMunis: [...] }
+ *                    avgMunisPerSubscriber, topMunis: [...],
+ *                    activeSpotCount, totalSpotSubscriptions, topSpots: [...] }
  *
  *   - totalSubscribers       実登録者数 (1 端末 = 1。複数地域登録でも 1)
  *   - totalSubscriptions     (購読者 × 地域) のペア総数。複数地域ユーザは重複計上
  *   - avgMunisPerSubscriber  1 人あたり平均登録地域数 (コスト試算の A に相当)
- *   - topMunis               地域別の購読者数ランキング
+ *   - topMunis               自治体別の購読者数ランキング (自治体アプローチ用)
+ *   - topSpots               観光地別の購読者数ランキング (観光地アプローチ用)
  */
 function authed(req: Request): boolean {
   const secret = process.env.ADMIN_SECRET;

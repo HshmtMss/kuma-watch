@@ -211,14 +211,22 @@ export default function AdminSubmissions() {
         <h1 className="text-xl font-bold text-stone-900">
           市民投稿モデレーション
         </h1>
-        <button
-          type="button"
-          onClick={() => load(secret, status)}
-          disabled={loading}
-          className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
-        >
-          {loading ? "更新中…" : "更新"}
-        </button>
+        <div className="flex items-center gap-2">
+          <a
+            href="/admin/push-stats"
+            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+          >
+            通知登録状況
+          </a>
+          <button
+            type="button"
+            onClick={() => load(secret, status)}
+            disabled={loading}
+            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+          >
+            {loading ? "更新中…" : "更新"}
+          </button>
+        </div>
       </div>
 
       {/* ステータス絞り込みタブ */}
