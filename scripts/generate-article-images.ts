@@ -44,6 +44,113 @@ const COMMON_SUFFIX =
   ", professional photography, cinematic lighting, high quality, no text, no logos, no watermarks";
 
 const TARGETS: Target[] = [
+  // --- 2026-07-06 追加: heroImage 未設定だった 21 記事 ---
+  {
+    slug: "bear-territory",
+    prompt:
+      "Large deep claw marks and scratches on the bark of a tall tree in a Japanese mountain forest, bear territorial marking, moss and detailed bark texture, dappled forest light, documentary wildlife style, no animals",
+  },
+  {
+    slug: "bear-communication",
+    prompt:
+      "Two Asian black bears at a distance in a misty forest clearing in Japan, one standing alert on hind legs, quiet interaction, atmospheric morning fog, telephoto documentary style, seen from afar",
+  },
+  {
+    slug: "bear-learning",
+    prompt:
+      "An Asian black bear cautiously approaching the edge of a rural Japanese village at dusk, a persimmon tree and old wooden houses in the background, seen from behind, quiet tense documentary mood",
+  },
+  {
+    slug: "bear-phylogeny",
+    prompt:
+      "A natural history museum display of several different bear skulls arranged in a row on a dark background, scientific specimen lighting, evolutionary comparison, museum documentary photography",
+  },
+  {
+    slug: "bear-japan-evolution",
+    prompt:
+      "An epic Japanese wilderness landscape with glacial valleys and dense ancient beech forest, primeval atmosphere, golden hour light, vast evolutionary time scale, no animals",
+  },
+  {
+    slug: "bear-aging",
+    prompt:
+      "An old grey-muzzled Asian black bear resting in a quiet Japanese woodland, weathered fur, soft late afternoon light, contemplative side portrait, documentary wildlife style",
+  },
+  {
+    slug: "bear-anesthesia",
+    prompt:
+      "Wildlife veterinary field equipment neatly laid out in an open case on the forest floor, monitoring devices and instruments, soft natural light, scientific documentary style, no people, no animals",
+  },
+  {
+    slug: "bear-reproduction",
+    prompt:
+      "The snowy entrance of a quiet winter den in a Japanese mountain, soft warm light glowing from inside, protective and peaceful atmosphere, documentary nature style, no visible animals",
+  },
+  {
+    slug: "bear-zoonosis",
+    prompt:
+      "A microscope and laboratory glassware in a clean bright scientific lab, a blurred green forest visible through the window, medical research atmosphere, documentary style",
+  },
+  {
+    slug: "bear-bite-force",
+    prompt:
+      "Dramatic close-up of a bear skull with powerful jaws and teeth on a museum specimen stand, strong side lighting against a dark background, scientific specimen photography",
+  },
+  {
+    slug: "bear-vision",
+    prompt:
+      "A dark Japanese forest at night lit faintly by moonlight, shallow depth of field, mysterious nocturnal atmosphere, faint distant glowing points suggesting animal eyes deep in the darkness, documentary style",
+  },
+  {
+    slug: "bear-fat-metabolism",
+    prompt:
+      "A healthy well-fed Asian black bear foraging on abundant autumn acorns and berries on a colorful forest floor, rich fall colors, seen from behind, documentary wildlife style",
+  },
+  {
+    slug: "bear-gallbladder",
+    prompt:
+      "A traditional Japanese apothecary shelf with old wooden medicine drawers and glass jars, warm dim light, historical pharmacy atmosphere, documentary still life",
+  },
+  {
+    slug: "bear-detection-ai",
+    prompt:
+      "A wildlife monitoring camera on a tree and a laptop showing abstract flowing data visualization in a Japanese forest research setting, cool blue-green tech ambiance, documentary style, no readable text",
+  },
+  {
+    slug: "bear-insurance",
+    prompt:
+      "An open document folder and reading glasses on a wooden desk, a house and mountain softly visible through a window, calm administrative scene, soft natural light, no readable text",
+  },
+  {
+    slug: "spray-travel",
+    prompt:
+      "A can of bear spray beside a hiking backpack and a train ticket on a wooden station bench in Japan, travel and transport theme, clean documentary product style, no readable text",
+  },
+  {
+    slug: "bear-cycling",
+    prompt:
+      "A cyclist riding a quiet mountain road through a forested Japanese landscape in early morning mist, back view, dynamic outdoor sports photography, no animals",
+  },
+  {
+    slug: "bear-economic-impact",
+    prompt:
+      "A damaged rural Japanese cornfield at the edge of a forest under an overcast sky, trampled crops, quiet agricultural loss, documentary style, no people, no animals",
+  },
+  {
+    slug: "research-digest-031",
+    prompt:
+      "A beech forest floor in late autumn with only a few scattered fallen beech nuts, bare branches overhead, muted overcast light, sense of a poor mast crop year, documentary nature style, no animals",
+  },
+  {
+    slug: "research-digest-032",
+    prompt:
+      "A brass bear bell hanging from a hiking backpack strap on a forest trail, close-up with soft green bokeh behind, sound and safety theme, warm documentary style",
+  },
+  {
+    slug: "research-digest-033",
+    prompt:
+      "A mother Asian black bear with a cub at a distance in the wild coastal Shiretoko landscape of Hokkaido, misty mountains and forest, telephoto documentary wildlife style, atmospheric",
+  },
+  // --- 既存ターゲット ---
   {
     slug: "vehicle-collision",
     prompt:

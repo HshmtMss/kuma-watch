@@ -146,6 +146,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["縄張り", "行動圏", "マーキング", "ベアスクラブ", "行動学"],
+    heroImage: "/articles/bear-territory.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-communication",
@@ -158,6 +160,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["コミュニケーション", "鳴き声", "フェロモン", "姿勢", "行動学"],
+    heroImage: "/articles/bear-communication.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-learning",
@@ -170,6 +174,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["学習", "記憶", "人慣れ", "アーバンベア", "行動学"],
+    heroImage: "/articles/bear-learning.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-phylogeny",
@@ -182,6 +188,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["系統樹", "進化", "クマ科", "ジャイアントパンダ", "ホッキョクグマ"],
+    heroImage: "/articles/bear-phylogeny.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-japan-evolution",
@@ -194,6 +202,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["進化史", "氷河期", "渡来", "地域個体群", "日本"],
+    heroImage: "/articles/bear-japan-evolution.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-aging",
@@ -206,6 +216,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["寿命", "老化", "老齢医学", "比較医学", "飼育"],
+    heroImage: "/articles/bear-aging.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-anesthesia",
@@ -218,6 +230,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["麻酔", "捕獲", "獣医処置", "麻酔薬", "保護"],
+    heroImage: "/articles/bear-anesthesia.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-reproduction",
@@ -230,6 +244,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["繁殖", "妊娠", "着床遅延", "新生児", "獣医学"],
+    heroImage: "/articles/bear-reproduction.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-zoonosis",
@@ -242,6 +258,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["感染症", "ズーノーシス", "パスツレラ", "破傷風", "獣医学"],
+    heroImage: "/articles/bear-zoonosis.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-bite-force",
@@ -254,6 +272,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["咬合力", "歯", "顎", "解剖学", "獣医学"],
+    heroImage: "/articles/bear-bite-force.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-vision",
@@ -266,6 +286,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["視力", "色覚", "タペタム", "夜行性", "獣医学"],
+    heroImage: "/articles/bear-vision.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-kidney-nitrogen-recycling",
@@ -306,6 +328,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "autumn",
     category: "ecology",
     tags: ["脂肪", "代謝", "ハイパーフェイジア", "レプチン", "獣医学"],
+    heroImage: "/articles/bear-fat-metabolism.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-gallbladder",
@@ -318,6 +342,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "ecology",
     tags: ["胆嚢", "熊胆", "UDCA", "漢方", "保全", "獣医学"],
+    heroImage: "/articles/bear-gallbladder.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-detection-ai",
@@ -330,6 +356,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "background",
     tags: ["AI", "獣医工学ラボ", "技術", "検知", "ドローン"],
+    heroImage: "/articles/bear-detection-ai.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-insurance",
@@ -342,6 +370,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "background",
     tags: ["保険", "損害保険", "山岳保険", "賠償", "農作物"],
+    heroImage: "/articles/bear-insurance.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "spray-travel",
@@ -354,6 +384,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "gear",
     tags: ["クマよけスプレー", "飛行機", "新幹線", "持ち込み", "航空法"],
+    heroImage: "/articles/spray-travel.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-cycling",
@@ -366,6 +398,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "scene",
     tags: ["サイクリング", "自転車", "MTB", "ロードバイク", "速度"],
+    heroImage: "/articles/bear-cycling.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "bear-economic-impact",
@@ -378,6 +412,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "background",
     tags: ["経済損失", "農業被害", "観光業", "自治体", "統計"],
+    heroImage: "/articles/bear-economic-impact.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "encounter",
@@ -421,6 +457,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "science",
     tags: ["論文", "研究ダイジェスト", "知床", "ヒグマ", "人馴れ", "Shimozuru 2020"],
+    heroImage: "/articles/research-digest-033.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "research-digest-032",
@@ -434,6 +472,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "science",
     tags: ["論文", "研究ダイジェスト", "クマ鈴", "音", "Jope 1985", "遭遇回避"],
+    heroImage: "/articles/research-digest-032.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "research-digest-031",
@@ -447,6 +487,8 @@ export const ARTICLES: ArticleMeta[] = [
     season: "all",
     category: "science",
     tags: ["論文", "研究ダイジェスト", "ブナ", "堅果 凶作", "大量出没", "Oka 2004"],
+    heroImage: "/articles/research-digest-031.jpg",
+    heroCredit: "Imagen 4 (Google AI)",
   },
   {
     slug: "research-digest-029",

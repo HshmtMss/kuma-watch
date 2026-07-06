@@ -59,6 +59,28 @@ const SLUGS = [
   "research-digest-030",
   "bear-kidney-nitrogen-recycling",
   "bear-brain-cognition",
+  // 2026-07-06 追加分
+  "bear-territory",
+  "bear-communication",
+  "bear-learning",
+  "bear-phylogeny",
+  "bear-japan-evolution",
+  "bear-aging",
+  "bear-anesthesia",
+  "bear-reproduction",
+  "bear-zoonosis",
+  "bear-bite-force",
+  "bear-vision",
+  "bear-fat-metabolism",
+  "bear-gallbladder",
+  "bear-detection-ai",
+  "bear-insurance",
+  "spray-travel",
+  "bear-cycling",
+  "bear-economic-impact",
+  "research-digest-031",
+  "research-digest-032",
+  "research-digest-033",
 ];
 
 // 既に圧縮済みの画像 (< 400KB) を再圧縮すると JPEG が二重劣化するので、
