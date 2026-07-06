@@ -10,8 +10,8 @@
 // 日付は日本の情報源由来の JST カレンダー日付。now(実時刻)との差は JST の
 // カレンダー日差で数える (深夜の UTC ずれで「昨日/本日」が 1 日ずれないように)。
 
-/** この日数以内の出没を「最近」として強調する (本日=0 起点)。 */
-export const RECENT_EVENT_DAYS = 3;
+/** この日数以内の出没を「最近」として強調する (本日=0 起点, 1週間)。 */
+export const RECENT_EVENT_DAYS = 7;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;

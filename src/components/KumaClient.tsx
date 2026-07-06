@@ -864,7 +864,7 @@ export default function KumaClient() {
               </span>
             </div>
             {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。種別はピンを
-                タップするとポップアップで表示。青リングは出没日が直近数日のもの。 */}
+                タップするとポップアップで表示。青リングは出没日が直近1週間のもの。 */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />直近の出没</span>
