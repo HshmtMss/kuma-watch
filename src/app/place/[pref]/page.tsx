@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Map } from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
@@ -319,7 +320,8 @@ export default async function PrefPage({ params }: Props) {
           href={prefMapUrl}
           className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-sm ring-1 ring-amber-700 hover:bg-amber-700"
         >
-          🗺️ {pref} の警戒レベルマップを開く →
+          <Map size={16} aria-hidden />
+          {pref} の警戒レベルマップを開く →
         </Link>
       </p>
     </PageShell>

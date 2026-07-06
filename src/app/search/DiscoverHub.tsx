@@ -1,6 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import {
+  PawPrint,
+  BookOpen,
+  Mountain,
+  ChartColumn,
+  Compass,
+  Map,
+  MapPin,
+  TrendingUp,
+  ShieldCheck,
+  Landmark,
+  Send,
+  type LucideIcon,
+} from "lucide-react";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { ARTICLES } from "@/lib/articles-meta";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
@@ -34,14 +48,26 @@ function SectionHead({
   title,
   href,
   more,
+  Icon,
 }: {
   title: string;
   href?: string;
   more?: string;
+  Icon?: LucideIcon;
 }) {
   return (
     <div className="mb-3 flex items-baseline justify-between gap-3">
-      <h2 className="text-base font-bold text-stone-900 sm:text-lg">{title}</h2>
+      <h2 className="flex items-center gap-2 text-base font-bold text-stone-900 sm:text-lg">
+        {Icon && (
+          <Icon
+            size={19}
+            strokeWidth={1.8}
+            className="shrink-0 text-amber-600"
+            aria-hidden
+          />
+        )}
+        {title}
+      </h2>
       {href && more && (
         <Link
           href={href}
@@ -54,13 +80,13 @@ function SectionHead({
   );
 }
 
-const QUICK_LINKS: { label: string; href: string }[] = [
-  { label: "🗺 出没マップ", href: "/" },
-  { label: "📍 都道府県一覧", href: "/place" },
-  { label: "⚠️ 警戒エリア Top", href: "/place/ranking" },
-  { label: "🛡 クマ対策トップ", href: "/measures" },
-  { label: "🏛 政府発表", href: "/policy" },
-  { label: "📨 自治体の方へ", href: "/for-gov" },
+const QUICK_LINKS: { label: string; href: string; Icon: LucideIcon }[] = [
+  { label: "出没マップ", href: "/", Icon: Map },
+  { label: "都道府県一覧", href: "/place", Icon: MapPin },
+  { label: "警戒エリア Top", href: "/place/ranking", Icon: TrendingUp },
+  { label: "クマ対策トップ", href: "/measures", Icon: ShieldCheck },
+  { label: "政府発表", href: "/policy", Icon: Landmark },
+  { label: "自治体の方へ", href: "/for-gov", Icon: Send },
 ];
 
 export default async function DiscoverHub(): Promise<ReactNode> {
@@ -84,7 +110,12 @@ export default async function DiscoverHub(): Promise<ReactNode> {
     <div className="not-prose mt-2">
       {/* 1. 最新の出没情報 */}
       <section>
-        <SectionHead title="🐻 最新の出没情報" href="/" more="地図で見る →" />
+        <SectionHead
+          title="最新の出没情報"
+          Icon={PawPrint}
+          href="/"
+          more="地図で見る →"
+        />
         <ul className="flex flex-col gap-2">
           {latest.map((r) => {
             const isNews = r.sourceKind === "news";
@@ -130,7 +161,12 @@ export default async function DiscoverHub(): Promise<ReactNode> {
 
       {/* 3. 対策・知見の記事 */}
       <section className="mt-8">
-        <SectionHead title="📚 対策・知見の記事" href="/articles" more="記事一覧 →" />
+        <SectionHead
+          title="対策・知見の記事"
+          Icon={BookOpen}
+          href="/articles"
+          more="記事一覧 →"
+        />
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {recentArticles.map((a) => (
             <li key={a.slug}>
@@ -165,7 +201,12 @@ export default async function DiscoverHub(): Promise<ReactNode> {
 
       {/* 4. 観光地のクマ情報 */}
       <section className="mt-8">
-        <SectionHead title="⛰ 観光地のクマ情報" href="/spot" more="観光地一覧 →" />
+        <SectionHead
+          title="観光地のクマ情報"
+          Icon={Mountain}
+          href="/spot"
+          more="観光地一覧 →"
+        />
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {spots.map((l) => (
             <li key={l.slug}>
@@ -200,7 +241,8 @@ export default async function DiscoverHub(): Promise<ReactNode> {
       {/* 5. 研究レポート */}
       <section className="mt-8">
         <SectionHead
-          title="📊 研究レポート"
+          title="研究レポート"
+          Icon={ChartColumn}
           href="/research"
           more="レポート一覧 →"
         />
@@ -235,14 +277,15 @@ export default async function DiscoverHub(): Promise<ReactNode> {
 
       {/* 6. 主要ページ */}
       <section className="mt-8">
-        <SectionHead title="🧭 主要ページ" />
+        <SectionHead title="主要ページ" Icon={Compass} />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {QUICK_LINKS.map((q) => (
             <Link
               key={q.href}
               href={q.href}
-              className="rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:border-amber-400 hover:bg-amber-50"
+              className="flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:border-amber-400 hover:bg-amber-50"
             >
+              <q.Icon size={15} className="shrink-0 text-stone-500" aria-hidden />
               {q.label}
             </Link>
           ))}

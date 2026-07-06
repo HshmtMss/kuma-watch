@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { MapPin, Settings } from "lucide-react";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
@@ -960,7 +961,10 @@ export default function KumaClient() {
         {pickerMode === "submit" && (
           <div className="pointer-events-auto absolute inset-x-3 top-3 z-[1000] flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50/95 px-3 py-2 shadow-lg backdrop-blur">
             <div className="flex-1 text-xs text-amber-900">
-              <div className="font-semibold">📍 投稿地点を選んでください</div>
+              <div className="flex items-center gap-1 font-semibold">
+                <MapPin size={13} aria-hidden />
+                投稿地点を選んでください
+              </div>
               <div className="text-[11px] text-amber-700">
                 {selectedLocation
                   ? `${selectedLocation.lat.toFixed(5)}, ${selectedLocation.lon.toFixed(5)} を選択中`
@@ -1063,8 +1067,9 @@ export default function KumaClient() {
         {isAdmin && (
           <div className="pointer-events-auto absolute left-3 top-3 z-[1000] max-h-[80vh] w-72 overflow-y-auto rounded-2xl border border-stone-200 bg-white/95 p-3 shadow-xl backdrop-blur">
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-bold text-stone-800">
-                ⚙ 管理者設定
+              <span className="flex items-center gap-1 text-xs font-bold text-stone-800">
+                <Settings size={13} aria-hidden />
+                管理者設定
               </span>
               <button
                 type="button"

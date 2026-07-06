@@ -3,7 +3,7 @@ import Link from "next/link";
 import CategoryTiles, {
   type CategoryTileItem,
 } from "@/components/CategoryTiles";
-import { MapPin, LayoutGrid } from "lucide-react";
+import { MapPin, LayoutGrid, Mountain } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import PlacePointClient from "./PlacePointClient";
 import { getAllPrefSummaries } from "@/lib/place-index";
@@ -114,7 +114,7 @@ export default async function PlacePage({
         className="not-prose mb-6 flex items-center justify-between gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-stone-900 hover:bg-amber-100"
       >
         <span className="flex items-center gap-3">
-          <span aria-hidden className="text-2xl">🏔️</span>
+          <Mountain size={26} strokeWidth={1.7} className="text-amber-600" aria-hidden />
           <span>
             <span className="block text-sm font-bold">
               全国クマ警戒マップ（直近90日）

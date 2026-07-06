@@ -1,8 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Sun,
+  CloudSun,
+  CloudFog,
+  CloudDrizzle,
+  CloudRain,
+  CloudSnow,
+  Snowflake,
+  CloudLightning,
+  Cloud,
+  Droplet,
+  type LucideIcon,
+} from "lucide-react";
 import type { WeatherSnapshot } from "@/lib/types";
-import { weatherCodeEmoji, weatherCodeLabel } from "@/lib/weather";
+import { weatherCodeLabel } from "@/lib/weather";
+
+// Open-Meteo weather code → Lucide アイコン (weatherCodeEmoji と同じ区分)。
+function weatherIcon(code: number | null | undefined): LucideIcon {
+  if (code == null) return Cloud;
+  if (code === 0) return Sun;
+  if (code <= 3) return CloudSun;
+  if (code <= 48) return CloudFog;
+  if (code <= 57) return CloudDrizzle;
+  if (code <= 67) return CloudRain;
+  if (code <= 77) return CloudSnow;
+  if (code <= 86) return Snowflake;
+  if (code <= 99) return CloudLightning;
+  return Cloud;
+}
 
 type Props = {
   lat: number | null;
@@ -50,15 +77,23 @@ export default function TopWeatherBadge({ lat, lon }: Props) {
       }
     >
       {weather ? (
-        <>
-          <span aria-hidden>{weatherCodeEmoji(weather.weatherCode)}</span>
-          <span className="tabular-nums">{Math.round(weather.tempC)}°C</span>
-          {weather.precipMm > 0 && (
-            <span className="text-blue-600">
-              💧{weather.precipMm.toFixed(1)}
-            </span>
-          )}
-        </>
+        (() => {
+          const WIcon = weatherIcon(weather.weatherCode);
+          return (
+            <>
+              <WIcon size={15} className="text-amber-500" aria-hidden />
+              <span className="tabular-nums">
+                {Math.round(weather.tempC)}°C
+              </span>
+              {weather.precipMm > 0 && (
+                <span className="flex items-center text-blue-600">
+                  <Droplet size={12} aria-hidden />
+                  {weather.precipMm.toFixed(1)}
+                </span>
+              )}
+            </>
+          );
+        })()
       ) : (
         <span className="flex items-center gap-1.5 text-gray-500">
           <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
