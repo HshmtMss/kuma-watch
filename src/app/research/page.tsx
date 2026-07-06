@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import CategoryFilter, {
-  type CategoryFilterItem,
-} from "@/components/CategoryFilter";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
+import {
+  CalendarRange,
+  CalendarDays,
+  Landmark,
+  Newspaper,
+  LayoutGrid,
+} from "lucide-react";
 import PageShell from "@/components/PageShell";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import {
@@ -58,13 +65,6 @@ const TYPE_LABEL: Record<Exclude<ResearchTypeKey, "all">, string> = {
   "daily-report": "日次レポート",
 };
 
-const TYPE_EMOJI: Record<Exclude<ResearchTypeKey, "all">, string> = {
-  "monthly-report": "📅",
-  "weekly-report": "🗓️",
-  "topic-policy": "💡",
-  "daily-report": "📝",
-};
-
 type SearchParams = Promise<{ type?: string }>;
 
 export default async function ResearchIndexPage({
@@ -113,15 +113,21 @@ export default async function ResearchIndexPage({
   const showDaily = activeType === "all" || activeType === "daily-report";
 
   // フィルタアイテム。エントリ 0 件のタイプは選択肢から除外する。
-  const filterItems: CategoryFilterItem[] = [
-    { key: "all", href: "/research", label: "すべて", count: sorted.length },
+  const filterItems: CategoryTileItem[] = [
+    {
+      key: "all",
+      href: "/research",
+      label: "すべて",
+      icon: LayoutGrid,
+      count: sorted.length,
+    },
   ];
   if (monthly.length > 0) {
     filterItems.push({
       key: "monthly-report",
       href: "/research?type=monthly-report",
       label: TYPE_LABEL["monthly-report"],
-      emoji: TYPE_EMOJI["monthly-report"],
+      icon: CalendarRange,
       count: monthly.length,
     });
   }
@@ -130,7 +136,7 @@ export default async function ResearchIndexPage({
       key: "weekly-report",
       href: "/research?type=weekly-report",
       label: TYPE_LABEL["weekly-report"],
-      emoji: TYPE_EMOJI["weekly-report"],
+      icon: CalendarDays,
       count: weekly.length,
     });
   }
@@ -139,7 +145,7 @@ export default async function ResearchIndexPage({
       key: "topic-policy",
       href: "/research?type=topic-policy",
       label: TYPE_LABEL["topic-policy"],
-      emoji: TYPE_EMOJI["topic-policy"],
+      icon: Landmark,
       count: topicPolicy.length,
     });
   }
@@ -148,7 +154,7 @@ export default async function ResearchIndexPage({
       key: "daily-report",
       href: "/research?type=daily-report",
       label: TYPE_LABEL["daily-report"],
-      emoji: TYPE_EMOJI["daily-report"],
+      icon: Newspaper,
       count: daily.length,
     });
   }
@@ -215,9 +221,8 @@ export default async function ResearchIndexPage({
         </div>
       </div>
 
-      <CategoryFilter
+      <CategoryTiles
         title="種別で絞り込み"
-        accent="emerald"
         activeKey={activeType}
         items={filterItems}
       />

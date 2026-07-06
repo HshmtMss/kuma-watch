@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import CategoryFilter, {
-  type CategoryFilterItem,
-} from "@/components/CategoryFilter";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
+import { MapPin, LayoutGrid } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import PlacePointClient from "./PlacePointClient";
 import { getAllPrefSummaries } from "@/lib/place-index";
@@ -126,21 +127,22 @@ export default async function PlacePage({
         <span aria-hidden className="shrink-0 text-sm font-bold text-amber-700">→</span>
       </Link>
 
-      <CategoryFilter
+      <CategoryTiles
         title="地域で絞り込み"
-        accent="amber"
         activeKey={activeRegion}
         items={[
           {
             key: "all",
             href: "/place",
             label: "すべて",
+            icon: LayoutGrid,
             count: 47,
           },
-          ...REGIONS.map<CategoryFilterItem>((r) => ({
+          ...REGIONS.map<CategoryTileItem>((r) => ({
             key: r.label,
             href: `/place?region=${encodeURIComponent(r.label)}`,
             label: r.label,
+            icon: MapPin,
             count: r.prefs.length,
           })),
         ]}

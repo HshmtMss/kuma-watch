@@ -1,9 +1,23 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import CategoryFilter, {
-  type CategoryFilterItem,
-} from "@/components/CategoryFilter";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
+import {
+  Mountain,
+  Trees,
+  Hotel,
+  Waves,
+  Tent,
+  Camera,
+  ThermometerSun,
+  Droplets,
+  Footprints,
+  Sailboat,
+  LayoutGrid,
+  type LucideIcon,
+} from "lucide-react";
 import PageShell from "@/components/PageShell";
 import {
   JAPAN_LANDMARKS,
@@ -41,6 +55,19 @@ const CATEGORY_LABEL: Record<LandmarkCategory, string> = {
   waterfall: "滝・自然",
   trailhead: "トレイル",
   lake: "湖・湖畔",
+};
+
+const CATEGORY_ICON: Record<LandmarkCategory, LucideIcon> = {
+  mountain: Mountain,
+  national_park: Trees,
+  resort: Hotel,
+  gorge: Waves,
+  campground: Tent,
+  sightseeing: Camera,
+  onsen: ThermometerSun,
+  waterfall: Droplets,
+  trailhead: Footprints,
+  lake: Sailboat,
 };
 
 const CATEGORY_EMOJI: Record<LandmarkCategory, string> = {
@@ -171,22 +198,22 @@ export default async function SpotIndexPage({
         <span className="font-semibold text-stone-700">観光地から探す</span>
       </nav>
 
-      <CategoryFilter
+      <CategoryTiles
         title="カテゴリで絞り込み"
-        accent="amber"
         activeKey={activeCat}
         items={[
           {
             key: "all",
             href: "/spot",
             label: "すべて",
+            icon: LayoutGrid,
             count: JAPAN_LANDMARKS.length,
           },
-          ...CATEGORY_ORDER.map<CategoryFilterItem>((cat) => ({
+          ...CATEGORY_ORDER.map<CategoryTileItem>((cat) => ({
             key: cat,
             href: `/spot?cat=${cat}`,
             label: CATEGORY_LABEL[cat],
-            emoji: CATEGORY_EMOJI[cat],
+            icon: CATEGORY_ICON[cat],
             count: countByCat[cat],
           })),
         ]}

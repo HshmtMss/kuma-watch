@@ -1,8 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import CategoryFilter, {
-  type CategoryFilterItem,
-} from "@/components/CategoryFilter";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
+import {
+  User,
+  Landmark,
+  SprayCan,
+  Fence,
+  House,
+  Backpack,
+  Radar,
+  Crosshair,
+  BookOpen,
+  LayoutGrid,
+  type LucideIcon,
+} from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ProductCard from "@/components/ProductCard";
 import {
@@ -14,6 +27,17 @@ import {
 } from "@/lib/products";
 
 const SITE_URL = "https://kuma-watch.jp";
+
+// 製品カテゴリ → Lucide アイコン（絞り込みタイル用）。
+const PRODUCT_CATEGORY_ICON: Record<string, LucideIcon> = {
+  撃退忌避: SprayCan,
+  防護柵: Fence,
+  住宅誘引物: House,
+  個人装備: Backpack,
+  監視検知: Radar,
+  捕獲駆除: Crosshair,
+  情報教育: BookOpen,
+};
 
 export const metadata: Metadata = {
   title: "クマ対策の製品・サービス｜獣医師監修",
@@ -30,17 +54,6 @@ export const metadata: Metadata = {
 };
 
 type SearchParams = Promise<{ for?: string; cat?: string }>;
-
-// 各カテゴリの絵文字。CategoryFilter で表示。
-const CATEGORY_EMOJI: Record<string, string> = {
-  撃退忌避: "🌶️",
-  防護柵: "🚧",
-  住宅誘引物: "🏠",
-  個人装備: "🎒",
-  監視検知: "📷",
-  捕獲駆除: "🪤",
-  情報教育: "📚",
-};
 
 export default async function ProductsPage({
   searchParams,
@@ -95,47 +108,42 @@ export default async function ProductsPage({
         <span className="font-semibold text-stone-700">対策製品</span>
       </nav>
 
-      <CategoryFilter
+      <CategoryTiles
         title="対象で絞り込み"
-        accent="emerald"
         activeKey={audience}
-        sticky={false}
         items={[
           {
             key: "個人",
             href: audienceBaseHref("個人"),
             label: "個人向け",
-            emoji: "🧑",
+            icon: User,
           },
           {
             key: "自治体",
             href: audienceBaseHref("自治体"),
             label: "自治体向け",
-            emoji: "🏛️",
+            icon: Landmark,
           },
         ]}
       />
 
-      <CategoryFilter
+      <CategoryTiles
         title="カテゴリで絞り込み"
-        accent="amber"
         activeKey={activeCat}
         items={[
           {
             key: "all",
             href: catHref("all"),
             label: "すべて",
+            icon: LayoutGrid,
             count: products.length,
           },
-          ...grouped.map<CategoryFilterItem>((g) => ({
+          ...grouped.map<CategoryTileItem>((g) => ({
             key: g.category,
             href: catHref(g.category),
             label: CATEGORY_LABEL[g.category] ?? g.category,
-            emoji: CATEGORY_EMOJI[g.category],
-            count: g.subcategories.reduce(
-              (n, s) => n + s.products.length,
-              0,
-            ),
+            icon: PRODUCT_CATEGORY_ICON[g.category],
+            count: g.subcategories.reduce((n, s) => n + s.products.length, 0),
           })),
         ]}
       />
