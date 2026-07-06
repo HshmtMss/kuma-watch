@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import CategoryFilter, {
-  type CategoryFilterItem,
-} from "@/components/CategoryFilter";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
+import CategoryGlyph from "@/components/CategoryGlyph";
 import PageShell from "@/components/PageShell";
 import {
   ARTICLES,
@@ -45,10 +46,9 @@ const SEASON_LABEL: Record<string, string> = {
 
 function ArticleCard({ a }: { a: ArticleMeta }) {
   // 画像エリアは「あり/なし」で高さが揃わなくなるため、必ず同じ枠を予約する。
-  // 画像未設定の記事は、カテゴリ絵文字 + グラデ背景のプレースホルダーで埋めて
-  // 全カードのレイアウトを統一する。
+  // 画像未設定の記事は、カテゴリの単色アイコン + グラデ背景のプレースホルダーで
+  // 埋めて全カードのレイアウトを統一する。
   const category = getCategory(a.category);
-  const placeholderEmoji = category?.emoji ?? "🐻";
   return (
     <li className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50">
       <Link
@@ -69,7 +69,12 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
               className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200"
               aria-hidden
             >
-              <span className="text-6xl opacity-60">{placeholderEmoji}</span>
+              <CategoryGlyph
+                slug={category?.slug}
+                size={52}
+                strokeWidth={1.5}
+                className="text-amber-700/45"
+              />
             </div>
           )}
         </div>
@@ -151,9 +156,8 @@ export default async function ArticlesIndexPage({
         <span className="font-semibold text-stone-700">記事一覧</span>
       </nav>
 
-      <CategoryFilter
-        title="カテゴリで絞り込み"
-        accent="amber"
+      <CategoryTiles
+        title="カテゴリから探す"
         activeKey={selectedCat}
         items={[
           {
@@ -162,11 +166,10 @@ export default async function ArticlesIndexPage({
             label: "すべて",
             count: ARTICLES.length,
           },
-          ...sortedCategories.map<CategoryFilterItem>((c) => ({
+          ...sortedCategories.map<CategoryTileItem>((c) => ({
             key: c.slug,
             href: `/articles?cat=${c.slug}`,
             label: c.name,
-            emoji: c.emoji,
             count: getArticlesByCategory(c.id).length,
           })),
         ]}

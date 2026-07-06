@@ -3,7 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import CategoryGlyph from "@/components/CategoryGlyph";
+import CategoryTiles, {
+  type CategoryTileItem,
+} from "@/components/CategoryTiles";
 import {
+  ARTICLES,
   CATEGORIES,
   getArticlesByCategory,
   getCategory,
@@ -59,9 +64,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function ArticleCard({ a }: { a: ArticleMeta }) {
   // heroImage 未設定でも左カラム枠を予約してカード高を揃える。
-  // プレースホルダーはカテゴリ絵文字 + グラデ背景。
+  // プレースホルダーはカテゴリの単色アイコン + グラデ背景。
   const category = getCategory(a.category);
-  const placeholderEmoji = category?.emoji ?? "🐻";
   return (
     <li className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50">
       <Link
@@ -82,7 +86,12 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
               className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200"
               aria-hidden
             >
-              <span className="text-5xl opacity-60">{placeholderEmoji}</span>
+              <CategoryGlyph
+                slug={category?.slug}
+                size={46}
+                strokeWidth={1.5}
+                className="text-amber-700/45"
+              />
             </div>
           )}
         </div>
@@ -123,11 +132,6 @@ export default async function CategoryPage({ params }: Props) {
   const articles = getArticlesByCategory(cat.id);
   const url = `${SITE_URL}/articles/category/${cat.slug}`;
 
-  // 他カテゴリへのナビ用に並び順を固定
-  const otherCategories = [...CATEGORIES]
-    .filter((c) => c.id !== cat.id)
-    .sort((a, b) => a.order - b.order);
-
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -157,7 +161,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <PageShell
-      title={`${cat.emoji ?? ""} ${cat.name}の記事`.trim()}
+      title={`${cat.name}の記事`}
       lead={cat.lead}
     >
       <script
@@ -185,6 +189,26 @@ export default async function CategoryPage({ params }: Props) {
         <span className="font-semibold text-stone-700">{cat.name}</span>
       </nav>
 
+      <CategoryTiles
+        activeKey={cat.slug}
+        items={[
+          {
+            key: "all",
+            href: "/articles",
+            label: "すべて",
+            count: ARTICLES.length,
+          },
+          ...[...CATEGORIES]
+            .sort((a, b) => a.order - b.order)
+            .map<CategoryTileItem>((c) => ({
+              key: c.slug,
+              href: `/articles/category/${c.slug}`,
+              label: c.name,
+              count: getArticlesByCategory(c.id).length,
+            })),
+        ]}
+      />
+
       <p className="not-prose mb-8 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-stone-700">
         {cat.description}
       </p>
@@ -203,24 +227,7 @@ export default async function CategoryPage({ params }: Props) {
 
       <hr className="my-10" />
 
-      <h2 className="not-prose mb-3 text-base font-semibold text-stone-900">
-        他のカテゴリ
-      </h2>
-      <ul className="not-prose flex flex-wrap gap-2 text-sm">
-        {otherCategories.map((c) => (
-          <li key={c.id}>
-            <Link
-              href={`/articles/category/${c.slug}`}
-              className="inline-flex items-center gap-1 rounded-full border border-stone-200 bg-white px-3 py-1 text-stone-700 hover:border-amber-400 hover:bg-amber-50"
-            >
-              {c.emoji && <span aria-hidden>{c.emoji}</span>}
-              <span>{c.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <p className="not-prose mt-6 text-xs text-stone-500">
+      <p className="not-prose text-xs text-stone-500">
         <Link href="/articles" className="hover:text-stone-900 underline">
           ← 記事一覧トップへ戻る
         </Link>

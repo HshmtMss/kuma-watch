@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import CategoryGlyph from "@/components/CategoryGlyph";
 import {
   getAllTags,
   getArticlesByTag,
@@ -71,7 +72,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 function ArticleCard({ a }: { a: ArticleMeta }) {
   // heroImage 未設定でも左カラム枠を予約してカード高を揃える。
   const category = getCategory(a.category);
-  const placeholderEmoji = category?.emoji ?? "🐻";
   return (
     <li className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:border-amber-400 hover:bg-amber-50">
       <Link
@@ -92,7 +92,12 @@ function ArticleCard({ a }: { a: ArticleMeta }) {
               className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 via-stone-100 to-stone-200"
               aria-hidden
             >
-              <span className="text-5xl opacity-60">{placeholderEmoji}</span>
+              <CategoryGlyph
+                slug={category?.slug}
+                size={46}
+                strokeWidth={1.5}
+                className="text-amber-700/45"
+              />
             </div>
           )}
         </div>
