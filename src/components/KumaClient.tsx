@@ -28,6 +28,7 @@ import {
   RISK_LEVEL_LABEL,
   type LevelThresholds,
 } from "@/lib/score";
+import { isFreshRecord } from "@/lib/freshness";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
@@ -78,10 +79,10 @@ function limitForPeriod(days: number | null): number {
 
 type KumaSignature = { matched: number; latestIngestedAt: number };
 
-// 「直近 24h」フィルタの境界 epoch ms。render 中の直接 Date.now() を避けるため
-// ヘルパ化する (freshOnly フィルタが有効なときだけ意味を持つ近似カットオフ)。
-function freshnessCutoffMs(): number {
-  return Date.now() - 24 * 60 * 60 * 1000;
+// render 中の直接 Date.now() を避けるためのヘルパ (impure 呼び出しを関数内に隠す)。
+// 直近24h フィルタの現在時刻に使う。
+function nowMsForFresh(): number {
+  return Date.now();
 }
 
 // "2026-05-05" → "5/5"。年は省略してバッジを短く。
@@ -682,14 +683,13 @@ export default function KumaClient() {
 
   const filtered = useMemo(() => {
     if (!showPins) return [];
-    const cutoffMs = freshnessCutoffMs();
+    const nowMs = nowMsForFresh();
     return records.filter((r) => {
       const prefOk =
         selectedPref === "all" || r.prefectureName === selectedPref;
       const periodOk = !periodCutoff || r.date >= periodCutoff;
-      const freshOk =
-        !freshOnly ||
-        (typeof r.ingestedAt === "number" && r.ingestedAt >= cutoffMs);
+      // 直近24h モード: 掲載が最近かつ出没日も最近のものだけ (過去事案の再報道を除外)。
+      const freshOk = !freshOnly || isFreshRecord(r, nowMs);
       return prefOk && periodOk && freshOk;
     });
   }, [records, selectedPref, periodCutoff, showPins, freshOnly]);
@@ -892,7 +892,6 @@ export default function KumaClient() {
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />新着</span>
-              <span className="text-stone-400">タップで公式/報道/市民の別を表示</span>
             </div>
             <button
               type="button"

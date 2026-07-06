@@ -30,7 +30,13 @@ async function main(): Promise<void> {
     );
   }
 
-  const fresh = await aggregateAllSightings();
+  // aggregateAllSightings は news も含めて返すが、news は news-flash が append し
+  // 前回スナップショットから carried で引き継ぐ運用。ここで fresh 側にも news を
+  // 混ぜると、refresh 毎に (fresh の news) + (carried の news) で二重化し、
+  // 同一事案の重複ピンが際限なく増える。fresh からは news を除外する。
+  const fresh = (await aggregateAllSightings()).filter(
+    (r) => r.sourceKind !== "news",
+  );
   const elapsedSec = ((Date.now() - start) / 1000).toFixed(1);
 
   if (fresh.length === 0) {

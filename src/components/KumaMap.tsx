@@ -21,6 +21,7 @@ import {
   type LevelThresholds,
 } from "@/lib/score";
 import { meshCodeToCenter } from "@/lib/mesh";
+import { isFreshRecord } from "@/lib/freshness";
 import { loadLandUse, loadMeshes, type LandUseMap, type MeshEntry } from "@/lib/mesh-data";
 import { smoothMeshes, type SmoothedCell } from "@/lib/smooth";
 
@@ -465,15 +466,13 @@ export default function KumaMap({
           : Array.from({ length: maxPins }, (_, i) =>
               inBounds[Math.floor((i * inBounds.length) / maxPins)],
             );
-      // 直近 24h に取り込まれたレコードは「新着」として強調する閾値。
-      const FRESH_MS = 24 * 60 * 60 * 1000;
       const nowMs = Date.now();
       for (const r of toRender) {
         // 出どころ・頭数によらず一律ダークブラウン (#78350f)。公式/報道/市民の
-        // 別はポップアップのバッジで示す。新着 (直近 24h) だけは青ハローで区別。
+        // 別はポップアップのバッジで示す。新着だけは青ハローで区別。
+        // 新着 = 掲載が直近 24h かつ出没日も最近 (過去事案の再報道を除外)。
         const PIN_COLOR = "#78350f";
-        const isFresh =
-          typeof r.ingestedAt === "number" && nowMs - r.ingestedAt <= FRESH_MS;
+        const isFresh = isFreshRecord(r, nowMs);
         const sourceColor = PIN_COLOR;
         const baseR = pinR;
 
@@ -529,12 +528,11 @@ export default function KumaMap({
       : isNews
         ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
-    // 新着バッジ: 取り込みから 24h 以内かつ ingestedAt あり。
-    const FRESH_MS = 24 * 60 * 60 * 1000;
+    // 新着バッジ: 掲載が直近 24h かつ出没日も最近 (過去事案の再報道を除外)。
     const ingestedAt = r.ingestedAt;
     const ageMs =
       typeof ingestedAt === "number" ? Date.now() - ingestedAt : Infinity;
-    const isFresh = ageMs <= FRESH_MS;
+    const isFresh = isFreshRecord(r, Date.now());
     const ageLabel = isFresh
       ? ageMs < 60 * 60 * 1000
         ? `${Math.max(1, Math.round(ageMs / 60 / 1000))} 分前`
