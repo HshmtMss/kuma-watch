@@ -454,12 +454,27 @@ export default function KumaMap({
       // recs は日付降順ソート済み。早い者勝ち break で打ち切ると、
       // 縮小時 (全国 in-bounds) に古めのデータを持つ県 (例: 岩手) のピンが
       // すっぽり抜ける。bounds 内の全域から均等に間引く。
-      const inBounds: KumaRecord[] = [];
+      //
+      // 同一座標の重なり解消: 「大滝」等の地区名が日付をまたいで同じ点に
+      // ジオコードされると、複数日の出没ピンが完全に重なって描画される。
+      // すると最新 (新着) ピンの青ハローが、クリックスナップで開く古いピンの
+      // ポップアップと食い違い「古い事案が新着に見える」誤解を生む。
+      // 地図では 1 座標につき最新の出没 1 件だけを描く (件数集計とは別経路)。
+      const bestByCoord = new Map<string, KumaRecord>();
       for (const r of recs) {
         if (r.lat < south || r.lat > north) continue;
         if (r.lon < west || r.lon > east) continue;
-        inBounds.push(r);
+        const key = `${r.lat.toFixed(5)}|${r.lon.toFixed(5)}`;
+        const cur = bestByCoord.get(key);
+        if (
+          !cur ||
+          r.date > cur.date ||
+          (r.date === cur.date && (r.ingestedAt ?? 0) > (cur.ingestedAt ?? 0))
+        ) {
+          bestByCoord.set(key, r);
+        }
       }
+      const inBounds: KumaRecord[] = [...bestByCoord.values()];
       const toRender =
         inBounds.length <= maxPins
           ? inBounds
@@ -835,10 +850,22 @@ export default function KumaMap({
             const dx = px.x - clickPx.x;
             const dy = px.y - clickPx.y;
             const distSq = dx * dx + dy * dy;
-            if (distSq <= bestDistSq) {
-              bestRec = r;
-              bestDistSq = distSq;
+            if (distSq > bestDistSq) continue;
+            // 同一座標に複数日の出没が重なるとき (距離が同じ) は、描画している
+            // 代表と同じ「最新の出没」を開く。距離が近い方が優先なのは従来通り。
+            if (
+              bestRec &&
+              distSq === bestDistSq &&
+              !(
+                r.date > bestRec.date ||
+                (r.date === bestRec.date &&
+                  (r.ingestedAt ?? 0) > (bestRec.ingestedAt ?? 0))
+              )
+            ) {
+              continue;
             }
+            bestRec = r;
+            bestDistSq = distSq;
           }
           if (bestRec) {
             const matched = bestRec;
