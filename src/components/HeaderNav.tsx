@@ -4,24 +4,24 @@ import Link from "next/link";
 import { useState } from "react";
 
 /**
- * 全ページ共通ヘッダーナビ。情報階層を 3 グループ + B2B CTA に整理:
- *  - 地図 (ホーム)
- *  - さがす (検索アイコン)
- *  - 「探す」▼: 都道府県 / 観光地
+ * 全ページ共通ヘッダーナビ。「○○で探す」で探し方を明示:
+ *  - 地図で探す (ホーム / 主役)
+ *  - さがす (検索アイコン = キーワード検索)
+ *  - 「探す」▼: 市町村で探す / 観光地で探す / 出没ニュース
  *  - 「学ぶ」▼: クマ対策 / 記事 / 研究レポート / 政府発表
  *  - 「法人」▼ (塗りつぶし CTA): 自治体・観光協会 / 製品掲載 (事業者)
  *
- * 旧実装は 7 項目を水平並列で、B2B が文字埋没していた。
  * ドロップダウンは <details> を使い、クリック (タップ) で開閉。
  * モバイルはハンバーガー内で同じグループ見出しを付けて折り返す。
  */
 
 type NavLink = { href: string; label: string; desc?: string };
 
+// 「探す」ドロップダウン = 地図(常時表示の「地図で探す」)以外の探し方。
 const EXPLORE_LINKS: NavLink[] = [
+  { href: "/place", label: "市町村で探す", desc: "都道府県 → 市町村の警戒度マップ" },
+  { href: "/spot", label: "観光地で探す", desc: "キャンプ場・温泉・登山口・名所ほか" },
   { href: "/news", label: "出没ニュース・速報", desc: "全国の最新クマ出没情報" },
-  { href: "/place", label: "都道府県から探す", desc: "47 都道府県の警戒度マップ" },
-  { href: "/spot", label: "観光地・登山口", desc: "高尾山・富士山・知床ほか" },
 ];
 
 const LEARN_LINKS: NavLink[] = [
@@ -142,7 +142,7 @@ export default function HeaderNav() {
         aria-label="主要ナビゲーション (デスクトップ)"
       >
         <Link href="/" className="rounded-full px-2 py-1.5 hover:text-stone-900">
-          地図
+          地図で探す
         </Link>
         <DesktopDropdown label="探す" items={EXPLORE_LINKS} />
         <DesktopDropdown label="学ぶ" items={LEARN_LINKS} />
@@ -208,7 +208,7 @@ export default function HeaderNav() {
                 className="absolute right-0 top-12 z-[1300] w-72 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
                 aria-label="主要ナビゲーション (モバイル)"
               >
-                <MobileItem href="/" label="地図" onClick={close} />
+                <MobileItem href="/" label="地図で探す" onClick={close} />
                 <MobileItem href="/search" label="さがす" icon onClick={close} />
                 <MobileGroup label="探す">
                   {EXPLORE_LINKS.map((it) => (
