@@ -66,7 +66,11 @@ async function main(): Promise<void> {
   const carried = prevRecords.filter(
     (r) =>
       !REBUILT_KINDS.has(r.sourceKind) &&
-      (r.sourceKind !== "news" || (r.date ?? "") >= newsCutoff),
+      (r.sourceKind !== "news" || (r.date ?? "") >= newsCutoff) &&
+      // 市区町村が特定できていない news は、旧ジオコーダが県代表点
+      // (例: 埼玉県→坂戸市付近) に積み上げた誤ピン。繰り越さず自然に浄化する。
+      // (新規取り込みは news.ts / geocode.ts 側で既に弾いている)
+      (r.sourceKind !== "news" || (r.cityName ?? "").trim() !== ""),
   );
 
   const records = [...fresh, ...carried];
