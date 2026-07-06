@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { X, Maximize } from "lucide-react";
 import type { Map as LeafletMap } from "leaflet";
 
 export type MiniSighting = {
@@ -224,11 +225,11 @@ export default function MiniSightingsMap({
       >
         {isFull ? (
           <>
-            <span aria-hidden>✕</span> 閉じる
+            <X size={14} aria-hidden /> 閉じる
           </>
         ) : (
           <>
-            <span aria-hidden>⛶</span> 全画面
+            <Maximize size={14} aria-hidden /> 全画面
           </>
         )}
       </button>

@@ -70,18 +70,6 @@ const CATEGORY_ICON: Record<LandmarkCategory, LucideIcon> = {
   lake: Sailboat,
 };
 
-const CATEGORY_EMOJI: Record<LandmarkCategory, string> = {
-  mountain: "⛰️",
-  national_park: "🏞️",
-  resort: "♨️",
-  gorge: "💦",
-  campground: "🏕️",
-  sightseeing: "📸",
-  onsen: "♨️",
-  waterfall: "🌊",
-  trailhead: "🥾",
-  lake: "🪷",
-};
 
 const CATEGORY_ORDER: LandmarkCategory[] = [
   "mountain",
@@ -285,8 +273,11 @@ export default async function SpotIndexPage({
                     />
                   </div>
                 ) : (
-                  <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-3xl text-stone-300">
-                    {CATEGORY_EMOJI[l.category]}
+                  <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-stone-300">
+                    {(() => {
+                      const Ico = CATEGORY_ICON[l.category];
+                      return <Ico size={40} strokeWidth={1.4} aria-hidden />;
+                    })()}
                   </div>
                 )}
                 <div className="flex flex-1 flex-col p-4">

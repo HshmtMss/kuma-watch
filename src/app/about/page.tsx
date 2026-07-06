@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Footprints, House, Car, Stethoscope } from "lucide-react";
 import PageShell from "@/components/PageShell";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -242,17 +243,17 @@ export default function AboutPage() {
       <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
           {
-            icon: "🥾",
+            Icon: Footprints,
             who: "登山・キャンプ・山菜採り",
             why: "出発前に登山口周辺の出没状況を確認。クマ鈴・スプレーの携行判断に。",
           },
           {
-            icon: "🏠",
+            Icon: House,
             who: "地域住民・通勤通学",
             why: "近所での目撃情報を地図で確認。市町村ページで最新の動向を追跡。",
           },
           {
-            icon: "🚗",
+            Icon: Car,
             who: "観光・出張・ドライブ",
             why: "旅先の警戒レベルを事前チェック。県境を超えた情報も統合表示。",
           },
@@ -261,7 +262,7 @@ export default function AboutPage() {
             key={p.who}
             className="rounded-xl border border-stone-200 bg-white p-4"
           >
-            <div className="text-2xl">{p.icon}</div>
+            <p.Icon size={26} strokeWidth={1.7} className="text-emerald-600" aria-hidden />
             <div className="mt-2 text-sm font-semibold text-stone-900">
               {p.who}
             </div>
@@ -393,7 +394,7 @@ export default function AboutPage() {
       </div>
       <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
         <p className="mb-2 flex items-center gap-2 text-base font-semibold">
-          <span aria-hidden>🩺</span>
+          <Stethoscope size={18} aria-hidden />
           <span>獣医師監修プロジェクト</span>
         </p>
         <p className="leading-relaxed">
