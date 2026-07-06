@@ -1,5 +1,7 @@
 "use client";
 
+import { PawPrint, MapPin, Map } from "lucide-react";
+
 type Props = {
   onGpsRequest: () => void;
   onDismiss: () => void;
@@ -27,9 +29,12 @@ export default function WelcomeOverlay({
           ×
         </button>
 
-        <div className="mb-1 text-3xl" aria-hidden>
-          🐻
-        </div>
+        <PawPrint
+          className="mb-1 text-amber-600"
+          size={38}
+          strokeWidth={1.7}
+          aria-hidden
+        />
         <h2
           id="kw-welcome-title"
           className="text-lg font-bold leading-tight tracking-tight text-stone-900"
@@ -47,14 +52,14 @@ export default function WelcomeOverlay({
             disabled={gpsLoading}
             className="flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-60"
           >
-            <span aria-hidden>📍</span>
+            <MapPin size={18} aria-hidden />
             {gpsLoading ? "現在地を取得中..." : "現在地で見る"}
           </button>
           <button
             onClick={onDismiss}
             className="flex h-11 items-center justify-center gap-2 rounded-full border border-stone-200 bg-white text-sm font-medium text-stone-700 transition hover:bg-stone-50"
           >
-            <span aria-hidden>🗺️</span>
+            <Map size={18} aria-hidden />
             地図を探索する
           </button>
         </div>

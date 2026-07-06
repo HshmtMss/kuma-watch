@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PawPrint, AlertTriangle } from "lucide-react";
 
 type AskContext = {
   lat?: number;
@@ -93,7 +94,8 @@ export default function AskBox({
           </div>
           <div className="rounded-xl rounded-tl-sm bg-white px-3.5 py-2.5 text-base text-gray-800 ring-1 ring-gray-200">
             <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-gray-500">
-              🐻 ガイド
+              <PawPrint size={13} aria-hidden />
+              ガイド
               {item.mode === "demo" && (
                 <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">
                   demo
@@ -156,7 +158,12 @@ export default function AskBox({
         </button>
       </form>
 
-      {error && <p className="text-sm text-red-600">⚠️ {error}</p>}
+      {error && (
+        <p className="flex items-center gap-1 text-sm text-red-600">
+          <AlertTriangle size={14} aria-hidden />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -539,15 +539,15 @@ export default function KumaMap({
     const isCitizen = r.sourceKind === "citizen";
     const isNews = !isCitizen && r.isOfficial === false;
     const sourceBadge = isCitizen
-      ? `<span style="display:inline-block;background:#ede9fe;color:#5b21b6;border:1px solid #ddd6fe;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">👥 市民投稿</span>`
+      ? `<span style="display:inline-block;background:#ede9fe;color:#5b21b6;border:1px solid #ddd6fe;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">市民投稿</span>`
       : isNews
-        ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">📰 報道</span>`
-        : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">🛡 公式</span>`;
+        ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">報道</span>`
+        : `<span style="display:inline-block;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px">公式</span>`;
     // 最近バッジ: 出没日が直近 N 日以内なら「本日 / 昨日 / N日前 出没」を出す。
     // 掲載時刻ではなく出没日を基準にする (スクレイプ周期に揺れないため)。
     const recentLabel = recentSightingLabel(r.date, Date.now());
     const freshBadge = recentLabel
-      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px" title="出没日を基準にした鮮度です">🆕 ${recentLabel} 出没</span>`
+      ? `<span style="display:inline-block;background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd;border-radius:9999px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px" title="出没日を基準にした鮮度です">${recentLabel} 出没</span>`
       : "";
     const sourceLink = r.sourceUrl
       ? `<div style="margin-top:4px;font-size:11px"><a href="${escapeHtml(r.sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;text-decoration:underline">元記事を開く ↗</a></div>`
@@ -557,9 +557,9 @@ export default function KumaMap({
       ? `<a href="${escapeHtml(r.photoUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(r.photoUrl)}" alt="投稿写真" loading="lazy" style="margin-top:6px;width:100%;max-height:160px;object-fit:cover;border-radius:6px;display:block" /></a>`
       : "";
     const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
-      <b>🐻 ${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
+      <b>${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
-      <div>📅 ${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div><div>🔢 ${r.headCount}頭</div>
+      <div>${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div><div>${r.headCount}頭</div>
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
       ${photoBlock}
       ${sourceLink}

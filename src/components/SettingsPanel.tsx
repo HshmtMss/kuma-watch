@@ -1,6 +1,17 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import {
+  Map,
+  Satellite,
+  Mountain,
+  Layers,
+  Palette,
+  Waves,
+  Ghost,
+  ChartColumn,
+  type LucideIcon,
+} from "lucide-react";
 import type { TileStyle } from "@/components/KumaMap";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
@@ -23,10 +34,10 @@ type Props = {
   onLevelThresholdsChange: (v: LevelThresholds) => void;
 };
 
-const TILE_OPTIONS: { value: TileStyle; label: string; icon: string }[] = [
-  { value: "standard", label: "標準地図", icon: "🗺️" },
-  { value: "satellite", label: "衛星写真", icon: "🛰️" },
-  { value: "topo", label: "地形図", icon: "⛰️" },
+const TILE_OPTIONS: { value: TileStyle; label: string; Icon: LucideIcon }[] = [
+  { value: "standard", label: "標準地図", Icon: Map },
+  { value: "satellite", label: "衛星写真", Icon: Satellite },
+  { value: "topo", label: "地形図", Icon: Mountain },
 ];
 
 const SIGMA_OPTIONS: { value: number; label: string }[] = [
@@ -193,7 +204,7 @@ export default function SettingsPanel({
   return (
     <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3">
       <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-        <span aria-hidden>🗺️</span>
+        <Layers size={15} aria-hidden />
         地図スタイル
       </div>
       <div className="grid grid-cols-3 gap-1.5">
@@ -211,9 +222,7 @@ export default function SettingsPanel({
               }`}
               aria-pressed={active}
             >
-              <span className="text-lg" aria-hidden>
-                {opt.icon}
-              </span>
+              <opt.Icon size={20} strokeWidth={1.7} aria-hidden />
               {opt.label}
             </button>
           );
@@ -221,7 +230,7 @@ export default function SettingsPanel({
       </div>
 
       <div className="mt-4 mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-        <span aria-hidden>🎨</span>
+        <Palette size={15} aria-hidden />
         ヒートマップ不透明度
         <span className="ml-auto text-xs font-medium text-amber-700">
           {Math.round(heatmapOpacity * 100)}%
@@ -239,7 +248,7 @@ export default function SettingsPanel({
       />
 
       <div className="mt-4 mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-        <span aria-hidden>🌊</span>
+        <Waves size={15} aria-hidden />
         ヒートマップ平滑化
         <span className="ml-auto text-xs font-medium text-amber-700">
           {smoothingSigmaKm === 0
@@ -275,7 +284,7 @@ export default function SettingsPanel({
       {smoothingSigmaKm > 0 && (
         <>
           <div className="mt-4 mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-            <span aria-hidden>👻</span>
+            <Ghost size={15} aria-hidden />
             穴埋めセルの濃さ
             <span className="ml-auto text-xs font-medium text-amber-700">
               {Math.round(haloOpacity * 100)}%
@@ -298,7 +307,7 @@ export default function SettingsPanel({
       )}
 
       <div className="mt-4 mb-2 flex items-center gap-1.5 text-sm font-semibold text-amber-900">
-        <span aria-hidden>📊</span>
+        <ChartColumn size={15} aria-hidden />
         5 段階の境界値
         <button
           type="button"

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search, MapPin } from "lucide-react";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
 type Props = {
@@ -99,7 +100,7 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
           className={`pointer-events-none absolute ${compact ? "left-2.5 text-sm" : "left-3.5 text-lg"} top-1/2 -translate-y-1/2 text-gray-400`}
           aria-hidden
         >
-          🔍
+          <Search size={compact ? 16 : 20} />
         </span>
         <input
           ref={inputRef}
@@ -139,8 +140,8 @@ export default function PlaceSearch({ autofocus = false, onPick, compact = false
                   onClick={() => handlePick(hit)}
                   className="flex w-full items-start gap-2 px-4 py-2.5 text-left hover:bg-amber-50"
                 >
-                  <span className="text-base" aria-hidden>
-                    📍
+                  <span className="mt-0.5 text-gray-400" aria-hidden>
+                    <MapPin size={16} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-gray-900">

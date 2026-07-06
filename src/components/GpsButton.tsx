@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MapPin, AlertTriangle } from "lucide-react";
 
 export default function GpsButton({ label = "現在地で確認" }: { label?: string }) {
   const router = useRouter();
@@ -44,10 +45,15 @@ export default function GpsButton({ label = "現在地で確認" }: { label?: st
         disabled={loading}
         className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 text-base font-medium text-gray-800 shadow-sm transition hover:border-amber-400 hover:bg-amber-50 disabled:opacity-60"
       >
-        <span aria-hidden className="text-lg">📍</span>
+        <MapPin size={18} aria-hidden />
         {loading ? "位置情報を取得中..." : label}
       </button>
-      {error && <p className="mt-2 text-center text-xs text-red-600">⚠️ {error}</p>}
+      {error && (
+        <p className="mt-2 flex items-center justify-center gap-1 text-xs text-red-600">
+          <AlertTriangle size={13} aria-hidden />
+          {error}
+        </p>
+      )}
     </div>
   );
 }
