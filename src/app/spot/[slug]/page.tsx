@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  TrendingUp,
+  BellRing,
+  PawPrint,
+  Landmark,
+  Users,
+  Map as MapIcon,
+  ChartColumn,
+  Stethoscope,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
@@ -490,7 +500,7 @@ export default async function SpotPage({ params }: Props) {
       {landmark.officialHub && forecast && (
         <div className={`not-prose mb-6 rounded-xl border p-5 ${fcBand[forecast.band].box}`}>
           <div className="flex items-center gap-2">
-            <span aria-hidden>📈</span>
+            <TrendingUp size={15} aria-hidden />
             <span className={`text-xs font-medium ${fcBand[forecast.band].text}/80`}>
               今後4週間の出没見通し（統計予測・{SUPERVISION}）
             </span>
@@ -608,7 +618,7 @@ export default async function SpotPage({ params }: Props) {
       {landmark.officialHub && forecast && (
         <section className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex items-center gap-2">
-            <span aria-hidden>📲</span>
+            <BellRing size={15} aria-hidden />
             <h2 className="m-0 text-base font-bold text-stone-900">
               最新の見通しと自治体の注意喚起を「通知」で受け取る
             </h2>
@@ -620,7 +630,7 @@ export default async function SpotPage({ params }: Props) {
           {/* 通知プレビュー（スマホ通知風） */}
           <div className="mx-auto mt-3 max-w-md rounded-xl border border-stone-300 bg-white p-3 shadow-md">
             <div className="flex items-start gap-2">
-              <span className="text-xl leading-none">🐻</span>
+              <PawPrint size={20} aria-hidden />
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-xs font-bold text-stone-900">
@@ -662,7 +672,7 @@ export default async function SpotPage({ params }: Props) {
       {showHub && (
         <section className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span aria-hidden>🏛️</span>
+            <Landmark size={15} aria-hidden />
             <h2 className="m-0 text-base font-bold text-stone-900">
               周辺自治体の公式クマ情報ハブ
             </h2>
@@ -739,7 +749,7 @@ export default async function SpotPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-medium text-stone-700 hover:border-stone-300"
                 >
-                  🏛️ {l.label}
+<Landmark size={14} className="mr-1 inline-block align-text-bottom" aria-hidden />{l.label}
                 </a>
               ))}
             </div>
@@ -755,7 +765,7 @@ export default async function SpotPage({ params }: Props) {
       <p>{landmark.blurb}</p>
       {landmark.scaleNote && (
         <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          <span aria-hidden>👥</span>
+          <Users size={15} aria-hidden />
           {landmark.scaleNote}
         </p>
       )}
@@ -806,7 +816,8 @@ export default async function SpotPage({ params }: Props) {
           href={mapUrl}
           className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
         >
-          🗺️ {landmark.name} の警戒レベルマップを開く →
+          <MapIcon size={16} aria-hidden />
+          {landmark.name} の警戒レベルマップを開く →
         </Link>
       </p>
 
@@ -858,7 +869,7 @@ export default async function SpotPage({ params }: Props) {
           一目で要る「今の状況・予測・自治体情報・地図」を上に残し、深掘りは折りたたむ。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span>📊 詳しく見る（統計・コース別・季節の注意・周辺市町村）</span>
+          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（統計・コース別・季節の注意・周辺市町村）</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -928,7 +939,7 @@ export default async function SpotPage({ params }: Props) {
       {/* 季節別アドバイス */}
       <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
         <div className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
-          <span aria-hidden>🩺</span>
+          <Stethoscope size={15} aria-hidden />
           <span>{seasonalAdvice.season} の注意点（獣医師監修）</span>
         </div>
         <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">{seasonalAdvice.point}</p>
@@ -975,7 +986,7 @@ export default async function SpotPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-stone-300 hover:bg-stone-50"
                 >
-                  <span aria-hidden>🏛️</span>
+                  <Landmark size={15} aria-hidden />
                   {landmark.muniName} クマ出没情報（公式）
                 </a>
               )}
@@ -987,7 +998,7 @@ export default async function SpotPage({ params }: Props) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-800 hover:border-stone-300 hover:bg-stone-50"
                 >
-                  <span aria-hidden>🏛️</span>
+                  <Landmark size={15} aria-hidden />
                   {l.label}
                 </a>
               ))}
@@ -1074,7 +1085,8 @@ export default async function SpotPage({ params }: Props) {
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
         className="not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
       >
-        🗺️ {landmark.name} の警戒レベルマップを開く →
+        <MapIcon size={16} aria-hidden />
+        {landmark.name} の警戒レベルマップを開く →
       </Link>
     </PageShell>
   );

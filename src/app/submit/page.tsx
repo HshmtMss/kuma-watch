@@ -3,14 +3,31 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Eye,
+  PawPrint,
+  Zap,
+  Ambulance,
+  CircleCheck,
+  AlertTriangle,
+  MapPin,
+  Map as MapIcon,
+  Camera,
+  type LucideIcon,
+} from "lucide-react";
 
 type Situation = "sight" | "trace" | "damage" | "injury";
 
-const SITUATIONS: Array<{ value: Situation; label: string; emoji: string; hint: string }> = [
-  { value: "sight", label: "目撃した", emoji: "👀", hint: "姿を見た" },
-  { value: "trace", label: "痕跡を見た", emoji: "🐾", hint: "足跡・糞・木の皮" },
-  { value: "damage", label: "物損あり", emoji: "💥", hint: "農作物・建物の被害" },
-  { value: "injury", label: "人身被害", emoji: "🚑", hint: "人への被害" },
+const SITUATIONS: Array<{
+  value: Situation;
+  label: string;
+  Icon: LucideIcon;
+  hint: string;
+}> = [
+  { value: "sight", label: "目撃した", Icon: Eye, hint: "姿を見た" },
+  { value: "trace", label: "痕跡を見た", Icon: PawPrint, hint: "足跡・糞・木の皮" },
+  { value: "damage", label: "物損あり", Icon: Zap, hint: "農作物・建物の被害" },
+  { value: "injury", label: "人身被害", Icon: Ambulance, hint: "人への被害" },
 ];
 
 function toLocalInputValue(d: Date): string {
@@ -221,7 +238,9 @@ function SubmitContent() {
     return (
       <div className="mx-auto w-full max-w-md px-4 py-8">
         <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100">
-          <div className="mb-2 text-4xl">✅</div>
+          <div className="mb-2 flex justify-center">
+            <CircleCheck size={40} className="text-emerald-600" aria-hidden />
+          </div>
           <h2 className="mb-2 text-lg font-bold text-gray-900">ありがとうございました</h2>
           <p className="mb-5 text-sm text-gray-600">
             ご投稿を受け付けました。内容を確認のうえ地図に反映されます。
@@ -268,11 +287,15 @@ function SubmitContent() {
             <span className="font-mono">
               {lat.toFixed(5)}, {lon.toFixed(5)}
             </span>
-            <span className="ml-2 text-amber-700">✓ 場所が指定されています</span>
+            <span className="ml-2 inline-flex items-center gap-1 text-amber-700">
+              <CircleCheck size={13} aria-hidden />
+              場所が指定されています
+            </span>
           </div>
         ) : (
           <p className="mb-2 rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
-            ⚠️ 場所が未指定です。下のボタンから現在地を取得するか、地図上で選んでください。
+            <AlertTriangle size={14} className="mr-1 inline-block align-text-bottom" aria-hidden />
+            場所が未指定です。下のボタンから現在地を取得するか、地図上で選んでください。
           </p>
         )}
         <div className="flex flex-wrap gap-2">
@@ -282,17 +305,24 @@ function SubmitContent() {
             disabled={gpsLoading}
             className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
           >
-            📍 {gpsLoading ? "取得中..." : "現在地を使う"}
+            <MapPin size={16} className="mr-1 inline-block align-text-bottom" aria-hidden />
+            {gpsLoading ? "取得中..." : "現在地を使う"}
           </button>
           <button
             type="button"
             onClick={goPickOnMap}
             className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
           >
-            🗺️ 地図から選ぶ
+            <MapIcon size={16} className="mr-1 inline-block align-text-bottom" aria-hidden />
+            地図から選ぶ
           </button>
         </div>
-        {gpsError && <p className="mt-1 text-[11px] text-red-600">⚠️ {gpsError}</p>}
+        {gpsError && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-red-600">
+            <AlertTriangle size={12} aria-hidden />
+            {gpsError}
+          </p>
+        )}
       </section>
 
       <section className="mb-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
@@ -326,7 +356,7 @@ function SubmitContent() {
               }`}
             >
               <div className="flex items-center gap-1.5">
-                <span aria-hidden>{s.emoji}</span>
+                <s.Icon size={22} aria-hidden />
                 <span className="font-medium text-gray-900">{s.label}</span>
               </div>
               <div className="text-[10px] text-gray-500">{s.hint}</div>
@@ -393,9 +423,7 @@ function SubmitContent() {
           </div>
         ) : (
           <label className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-5 text-xs text-gray-600 hover:bg-gray-100">
-            <span className="text-2xl" aria-hidden>
-              📸
-            </span>
+            <Camera size={24} aria-hidden />
             <span>タップして写真を選択/撮影</span>
             <input
               type="file"
@@ -412,7 +440,8 @@ function SubmitContent() {
             aria-live="assertive"
             className="mt-1 text-[11px] text-red-600"
           >
-            ⚠️ {photoError}
+            <AlertTriangle size={12} className="mr-1 inline-block align-text-bottom" aria-hidden />
+            {photoError}
           </p>
         )}
         <p className="mt-1 text-[10px] text-gray-500">
@@ -466,7 +495,8 @@ function SubmitContent() {
           aria-live="assertive"
           className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700"
         >
-          ⚠️ {submitError}
+          <AlertTriangle size={13} className="mr-1 inline-block align-text-bottom" aria-hidden />
+          {submitError}
         </div>
       )}
 

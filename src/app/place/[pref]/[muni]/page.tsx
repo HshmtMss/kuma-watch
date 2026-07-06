@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  Map as MapIcon,
+  ChartColumn,
+  Stethoscope,
+  PawPrint,
+  Landmark,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
@@ -822,7 +829,8 @@ export default async function MuniPage({ params }: Props) {
           href={mapUrl}
           className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
         >
-          🗺️ {muni} の警戒レベルマップを開く →
+          <MapIcon size={16} aria-hidden />
+          {muni} の警戒レベルマップを開く →
         </Link>
       </p>
 
@@ -840,7 +848,7 @@ export default async function MuniPage({ params }: Props) {
           本文は HTML に残るので長尾 SEO は維持される（観光地ページと基本UXを統一）。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span>📊 詳しく見る（傾向・月別件数・季節の注意・県内での位置づけ）</span>
+          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（傾向・月別件数・季節の注意・県内での位置づけ）</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -914,7 +922,7 @@ export default async function MuniPage({ params }: Props) {
           全市町村で同じ文章になるのを避け、Google の重複コンテンツ判定を回避する。 */}
       <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
         <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-emerald-900">
-          <span aria-hidden>🩺</span>
+          <Stethoscope size={15} aria-hidden />
           <span>
             {pref} の {seasonalAdvice.season} の注意点
           </span>
@@ -999,7 +1007,7 @@ export default async function MuniPage({ params }: Props) {
       {/* 詳しく見る(2) — 県内の他事案・地区別も折りたたみ。SEO本文は HTML に残る。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span>📊 県内の他の事案・地区別の件数</span>
+          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />県内の他の事案・地区別の件数</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -1101,7 +1109,7 @@ export default async function MuniPage({ params }: Props) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-base font-semibold text-amber-900 hover:bg-amber-100"
                   >
-                    <span aria-hidden>🐻</span>
+                    <PawPrint size={14} aria-hidden />
                     <span className="flex-1">{muni} のクマ・野生動物情報ページ</span>
                     <span aria-hidden className="text-xs text-amber-700">↗</span>
                   </a>
@@ -1115,7 +1123,7 @@ export default async function MuniPage({ params }: Props) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-base font-semibold text-stone-800 hover:border-amber-400 hover:bg-amber-50"
                   >
-                    <span aria-hidden>🏛️</span>
+                    <Landmark size={14} aria-hidden />
                     <span className="flex-1">{muni} 公式サイト</span>
                     <span aria-hidden className="text-xs text-stone-500">↗</span>
                   </a>
@@ -1345,7 +1353,8 @@ export default async function MuniPage({ params }: Props) {
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
         className="not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
       >
-        🗺️ {muni} の警戒レベルマップを開く →
+        <MapIcon size={16} aria-hidden />
+        {muni} の警戒レベルマップを開く →
       </Link>
     </PageShell>
   );
