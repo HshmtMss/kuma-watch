@@ -4,12 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 
 /**
- * 全ページ共通ヘッダーナビ。「○○で探す」で探し方を明示:
- *  - 地図で探す (ホーム / 主役)
- *  - さがす (検索アイコン = キーワード検索)
- *  - 「探す」▼: 市町村で探す / 観光地で探す / 出没ニュース
+ * 全ページ共通ヘッダーナビ。探し方を「探す」▼に一本化:
+ *  - 「探す」▼: 地図で探す / 市町村で探す / 観光地で探す / キーワードで探す / 出没ニュース
  *  - 「学ぶ」▼: クマ対策 / 記事 / 研究レポート / 政府発表
  *  - 「法人」▼ (塗りつぶし CTA): 自治体・観光協会 / 製品掲載 (事業者)
+ *  - 地図(トップ)へはロゴで1タップ。モバイルは 🔍 アイコンで検索ハブへクイックアクセス。
  *
  * ドロップダウンは <details> を使い、クリック (タップ) で開閉。
  * モバイルはハンバーガー内で同じグループ見出しを付けて折り返す。
@@ -17,10 +16,13 @@ import { useState } from "react";
 
 type NavLink = { href: string; label: string; desc?: string };
 
-// 「探す」ドロップダウン = 地図(常時表示の「地図で探す」)以外の探し方。
+// 「探す」ドロップダウン = 探し方を1箇所に集約(地図/市町村/観光地/キーワード)。
+// 地図はロゴ(→/)でも1タップで戻れる。末尾に速報ニュースも。
 const EXPLORE_LINKS: NavLink[] = [
+  { href: "/", label: "地図で探す", desc: "全国の出没を地図で見る" },
   { href: "/place", label: "市町村で探す", desc: "都道府県 → 市町村の警戒度マップ" },
   { href: "/spot", label: "観光地で探す", desc: "キャンプ場・温泉・登山口・名所ほか" },
+  { href: "/search", label: "キーワードで探す", desc: "地名・施設名で全文検索・最新情報" },
   { href: "/news", label: "出没ニュース・速報", desc: "全国の最新クマ出没情報" },
 ];
 
@@ -141,18 +143,8 @@ export default function HeaderNav() {
         className="hidden shrink-0 items-center gap-3 text-sm font-medium text-stone-600 sm:flex"
         aria-label="主要ナビゲーション (デスクトップ)"
       >
-        <Link href="/" className="rounded-full px-2 py-1.5 hover:text-stone-900">
-          地図で探す
-        </Link>
         <DesktopDropdown label="探す" items={EXPLORE_LINKS} />
         <DesktopDropdown label="学ぶ" items={LEARN_LINKS} />
-        <Link
-          href="/search"
-          className="flex items-center gap-1.5 rounded-full border border-stone-200 px-3 py-1.5 text-stone-600 hover:border-stone-400 hover:text-stone-900"
-        >
-          <SearchIcon />
-          さがす
-        </Link>
         <DesktopDropdown label="法人" items={BUSINESS_LINKS} variant="cta" />
       </nav>
 
@@ -208,8 +200,6 @@ export default function HeaderNav() {
                 className="absolute right-0 top-12 z-[1300] w-72 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
                 aria-label="主要ナビゲーション (モバイル)"
               >
-                <MobileItem href="/" label="地図で探す" onClick={close} />
-                <MobileItem href="/search" label="さがす" icon onClick={close} />
                 <MobileGroup label="探す">
                   {EXPLORE_LINKS.map((it) => (
                     <MobileItem
