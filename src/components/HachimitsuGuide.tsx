@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 /**
@@ -22,14 +21,8 @@ const ITEMS: { kana: string; emoji: string; action: string; desc: string }[] = [
 
 export default function HachimitsuGuide() {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
-  // 地図(トップ)では KumaClient のコントロール列(現在地ボタンの上)に「対策」ボタンを
-  // 置き、open-hachimitsu イベントでこの共通ポップアップを開く。地図では自前のFABは
-  // 出さない。他ページはこのコンポーネントが左下にFABを出す。
-  const onMap = pathname === "/";
-  // 下部に固定の送信ボタン等がある画面ではFABが重なるので出さない。
-  const hasBottomBar = !!pathname && pathname.startsWith("/submit");
-  const showFab = !onMap && !hasBottomBar;
+  // 「対策」ボタンはトップ(地図)の KumaClient コントロール列だけに置く。他ページには
+  // 出さない。ここは共通ポップアップ本体のみを持ち、open-hachimitsu イベントで開く。
 
   useEffect(() => {
     const openHandler = () => setOpen(true);
@@ -52,23 +45,6 @@ export default function HachimitsuGuide() {
 
   return (
     <>
-      {/* 他ページは左下に常設FAB。地図(/)では KumaClient の「対策」ボタン、
-          下部固定ボタンのある画面(/submit 等)では非表示。 */}
-      {showFab && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="クマ対策の合言葉「はちみつ」を開く"
-          className="fixed bottom-4 left-4 z-[1000] flex items-center gap-1.5 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg ring-2 ring-white transition hover:bg-amber-600 active:scale-95"
-          style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-        >
-          <span className="text-lg" aria-hidden>
-            🍯
-          </span>
-          クマ対策
-        </button>
-      )}
-
       {open && (
         <div
           className="fixed inset-0 z-[1500] flex items-end justify-center sm:items-center"
