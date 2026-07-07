@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import WebVitalsReporter from "@/components/WebVitalsReporter";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import HachimitsuGuide from "@/components/HachimitsuGuide";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
@@ -294,6 +295,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         {children}
+        <HachimitsuGuide />
         <WebVitalsReporter />
         <ServiceWorkerRegister />
         {GA_ENABLED && (
