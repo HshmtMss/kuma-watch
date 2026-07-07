@@ -37,7 +37,7 @@ import {
 import { findSourceByPrefCode } from "@/data/data-sources";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
-import RiskCharts from "@/components/RiskCharts";
+import MonthlySightingsChart from "@/components/MonthlySightingsChart";
 import RiskHero from "@/components/RiskHero";
 import GeoPushButton from "@/components/GeoPushButton";
 import { buildAdvice, type AdviceItem } from "@/lib/advice";
@@ -99,8 +99,11 @@ type State =
       count90d: number;
       /** 過去90日の目撃レコード上位 N 件 (周辺 10km) — もっと見る用 */
       recent90d: NearbyRecent[];
-      /** 周辺 10km・直近365日の月別実測件数 (0=1月..11=12月)。月別チャート(実測版)用。 */
-      monthlyNearby: number[];
+      /** 周辺 10km・今年/昨年の月別実測件数 (0=1月..11=12月)。月別出没チャート(昨年vs今年)用。 */
+      monthlyThisYear: number[];
+      monthlyLastYear: number[];
+      histThisYear: number;
+      histLastYear: number;
       /** 生息域メッシュベースの素のレベル (ヒートマップと同じ) */
       baseLevel: import("@/lib/types").RiskLevel;
       /** 当該メッシュの直近1年の目撃件数 (ヒートマップのセル色と同入力)。カード判定の主軸。 */
@@ -146,8 +149,25 @@ async function fetchNearbyHistory(
   lat: number,
   lon: number,
   radiusKm: number,
-): Promise<{ count365d: number; count90d: number; monthly: number[]; records: NearbyRecent[] }> {
-  const empty = { count365d: 0, count90d: 0, monthly: [], records: [] };
+): Promise<{
+  count365d: number;
+  count90d: number;
+  monthlyThisYear: number[];
+  monthlyLastYear: number[];
+  thisYear: number;
+  lastYear: number;
+  records: NearbyRecent[];
+}> {
+  const nowY = new Date().getFullYear();
+  const empty = {
+    count365d: 0,
+    count90d: 0,
+    monthlyThisYear: [],
+    monthlyLastYear: [],
+    thisYear: nowY,
+    lastYear: nowY - 1,
+    records: [],
+  };
   const r = await fetchWithTimeout(
     `/api/nearby-history?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&radiusKm=${radiusKm}`,
   );
@@ -156,16 +176,21 @@ async function fetchNearbyHistory(
     const data = (await r.json()) as {
       count365d?: number;
       count90d?: number;
-      monthly?: number[];
+      monthlyThisYear?: number[];
+      monthlyLastYear?: number[];
+      thisYear?: number;
+      lastYear?: number;
       records?: NearbyRecent[];
     };
+    const arr12 = (a?: number[]) =>
+      Array.isArray(a) && a.length === 12 ? a : [];
     return {
       count365d: typeof data.count365d === "number" ? data.count365d : 0,
       count90d: typeof data.count90d === "number" ? data.count90d : 0,
-      monthly:
-        Array.isArray(data.monthly) && data.monthly.length === 12
-          ? data.monthly
-          : [],
+      monthlyThisYear: arr12(data.monthlyThisYear),
+      monthlyLastYear: arr12(data.monthlyLastYear),
+      thisYear: typeof data.thisYear === "number" ? data.thisYear : nowY,
+      lastYear: typeof data.lastYear === "number" ? data.lastYear : nowY - 1,
       records: Array.isArray(data.records) ? data.records : [],
     };
   } catch {
@@ -514,7 +539,10 @@ export default function RiskPanel({
         count365d,
         count90d,
         recent90d,
-        monthlyNearby: history.monthly,
+        monthlyThisYear: history.monthlyThisYear,
+        monthlyLastYear: history.monthlyLastYear,
+        histThisYear: history.thisYear,
+        histLastYear: history.lastYear,
         baseLevel,
         sCellCount,
         levelEscalated,
@@ -888,7 +916,6 @@ function RiskDetails({
     mesh,
     nearbySightings,
     nearbyRadiusKm,
-    nearbyWeightedCount,
     recent90d,
   } = state;
   const now = new Date();
@@ -1083,30 +1110,19 @@ function RiskDetails({
         />
       </section>
 
-      {/* 4. 危険度予測 (時間帯・月別・根拠) */}
+      {/* 4. 月別の出没 (昨年 vs 今年の実測比較) */}
       <section className="border-t border-gray-100 px-4 py-3">
         <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
           <ChartColumn size={16} aria-hidden />
-          警戒レベル予測
+          月別の出没
         </h3>
-        <div className="mb-2 flex items-center justify-end text-sm text-gray-500 sm:text-[11px]">
-          <span>
-            {hour}時 / {month}月
-          </span>
-        </div>
-        <RiskCharts
-          mesh={mesh}
-          weather={weather}
-          baseDate={now}
-          monthlyNearby={state.monthlyNearby}
-          nearbyWeightedCount={nearbyWeightedCount}
-          nearbySightings={nearbySightings}
+        <MonthlySightingsChart
+          monthlyThisYear={state.monthlyThisYear}
+          monthlyLastYear={state.monthlyLastYear}
+          thisYear={state.histThisYear}
+          lastYear={state.histLastYear}
+          currentMonth={month - 1}
           nearbyRadiusKm={nearbyRadiusKm}
-          prefCode={state.municipality?.prefCode}
-          elevationM={state.elevationM}
-          slopeDeg={state.slopeDeg}
-          isForest={state.isForest}
-          forestType={state.forestType}
         />
       </section>
 

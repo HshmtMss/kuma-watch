@@ -32,6 +32,10 @@ export async function GET(req: Request) {
   cutoff90.setDate(cutoff90.getDate() - 90);
   const iso365 = cutoff365.toISOString().slice(0, 10);
   const iso90 = cutoff90.toISOString().slice(0, 10);
+  // 昨年・今年の月別比較用。昨年1月1日まで遡って集計する。
+  const thisYear = now.getFullYear();
+  const lastYear = thisYear - 1;
+  const startISO = `${lastYear}-01-01`;
 
   const latDelta = radiusKm / 111;
   const lonDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
@@ -56,17 +60,22 @@ export async function GET(req: Request) {
   let count90 = 0;
   let latest: string | null = null;
   const recent90: NearRecord[] = [];
-  // 周辺・直近365日の「月別」実測件数 (0=1月 .. 11=12月)。カードの月別チャート(実測版)用。
-  const monthly = new Array<number>(12).fill(0);
+  // 昨年・今年の月別実測件数 (0=1月 .. 11=12月)。カードの月別出没チャート(昨年 vs 今年)用。
+  const monthlyThisYear = new Array<number>(12).fill(0);
+  const monthlyLastYear = new Array<number>(12).fill(0);
   for (const s of sightings) {
-    if (!s.date || s.date < iso365) continue;
+    if (!s.date || s.date < startISO) continue;
     if (s.lat < latMin || s.lat > latMax) continue;
     if (s.lon < lonMin || s.lon > lonMax) continue;
     const d = haversineKm(lat, lon, s.lat, s.lon);
     if (d > radiusKm) continue;
-    count365 += 1;
+    const yr = Number(s.date.slice(0, 4));
     const mo = Number(s.date.slice(5, 7)) - 1;
-    if (mo >= 0 && mo < 12) monthly[mo] += 1;
+    if (mo >= 0 && mo < 12) {
+      if (yr === thisYear) monthlyThisYear[mo] += 1;
+      else if (yr === lastYear) monthlyLastYear[mo] += 1;
+    }
+    if (s.date >= iso365) count365 += 1;
     if (!latest || s.date > latest) latest = s.date;
     if (s.date >= iso90) {
       count90 += 1;
@@ -98,7 +107,10 @@ export async function GET(req: Request) {
       count90d: count90,
       latestDate: latest,
       radiusKm,
-      monthly,
+      monthlyThisYear,
+      monthlyLastYear,
+      thisYear,
+      lastYear,
       records,
     },
     { headers: { "Cache-Control": "no-cache" } },
