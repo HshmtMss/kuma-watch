@@ -425,10 +425,12 @@ function SubmitContent() {
           <label className="flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-5 text-xs text-gray-600 hover:bg-gray-100">
             <Camera size={24} aria-hidden />
             <span>タップして写真を選択/撮影</span>
+            {/* capture は付けない。付けるとモバイルでカメラが強制起動し、
+                フォトライブラリからの選択ができなくなる。外すと OS の選択肢
+                (写真を撮る / ライブラリ / ファイル) が出て撮影も選択も可能。 */}
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={onPhotoChange}
               className="hidden"
             />
