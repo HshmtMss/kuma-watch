@@ -138,7 +138,7 @@ export default function GeoPushButton({
       <div className="not-prose rounded-xl border border-stone-200 bg-white px-3 py-2">
         <div className="text-xs font-semibold text-stone-500">通知</div>
         <div className="mt-0.5 text-[11px] leading-tight text-stone-500">
-          出没・自治体の更新
+          新しい出没
         </div>
         {state === "idle" && (
           <button
