@@ -67,8 +67,9 @@ function defaultHeadCount(s: Situation): number {
   return s === "trace" ? 0 : 1;
 }
 
-// ウィザードの各ステップ。数が少なく、1 画面 1 質問。
-const STEPS = ["場所", "いつ", "ようす", "頭数", "写真", "確認"] as const;
+// ウィザードの各ステップ。3 つの入力 + 確認の計 4 画面。
+// 1 画面に関連する 2 項目までをまとめ、遷移を最小限にする。
+const STEPS = ["いつ・どこで", "ようす・頭数", "写真・補足", "確認"] as const;
 const TOTAL_STEPS = STEPS.length;
 
 function SubmitContent() {
@@ -397,159 +398,169 @@ function SubmitContent() {
       <div className="flex-1">
         {step === 0 && (
           <StepCard
-            title="どこで見つけましたか？"
-            subtitle="クマや痕跡を見つけた場所を教えてください。"
+            title="いつ・どこで見ましたか？"
+            subtitle="場所と日時を教えてください。"
           >
-            {hasLocation ? (
-              <div className="mb-4 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-4 text-emerald-800 ring-1 ring-emerald-200">
-                <CircleCheck size={26} aria-hidden />
-                <div>
-                  <div className="text-base font-bold">場所を指定できました</div>
-                  <div className="font-mono text-xs text-emerald-700">
-                    {lat!.toFixed(5)}, {lon!.toFixed(5)}
+            <div className="space-y-6">
+              <div>
+                <SubLabel>
+                  場所 <span className="text-red-500">*</span>
+                </SubLabel>
+                {hasLocation ? (
+                  <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-4 text-emerald-800 ring-1 ring-emerald-200">
+                    <CircleCheck size={26} aria-hidden />
+                    <div>
+                      <div className="text-base font-bold">場所を指定できました</div>
+                      <div className="font-mono text-xs text-emerald-700">
+                        {lat!.toFixed(5)}, {lon!.toFixed(5)}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <p className="flex items-start gap-2 rounded-2xl bg-yellow-50 px-4 py-4 text-base leading-relaxed text-yellow-900 ring-1 ring-yellow-200">
+                    <AlertTriangle size={22} className="mt-0.5 shrink-0" aria-hidden />
+                    下のボタンで場所を指定してください。
+                  </p>
+                )}
+                <BigButton onClick={useGps} disabled={gpsLoading} icon={MapPin}>
+                  {gpsLoading ? "現在地を取得中..." : "現在地を使う（おすすめ）"}
+                </BigButton>
+                <BigButton onClick={goPickOnMap} icon={MapIcon} variant="outline">
+                  地図で選ぶ
+                </BigButton>
+                {gpsError && (
+                  <p
+                    role="alert"
+                    className="mt-2 flex items-start gap-1.5 text-sm leading-relaxed text-red-600"
+                  >
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden />
+                    {gpsError}
+                  </p>
+                )}
               </div>
-            ) : (
-              <p className="mb-4 flex items-start gap-2 rounded-2xl bg-yellow-50 px-4 py-4 text-base leading-relaxed text-yellow-900 ring-1 ring-yellow-200">
-                <AlertTriangle size={22} className="mt-0.5 shrink-0" aria-hidden />
-                下のボタンで場所を指定してください。
-              </p>
-            )}
-            <BigButton onClick={useGps} disabled={gpsLoading} icon={MapPin}>
-              {gpsLoading ? "現在地を取得中..." : "現在地を使う（おすすめ）"}
-            </BigButton>
-            <BigButton onClick={goPickOnMap} icon={MapIcon} variant="outline">
-              地図で選ぶ
-            </BigButton>
-            {gpsError && (
-              <p
-                role="alert"
-                className="mt-2 flex items-start gap-1.5 text-sm leading-relaxed text-red-600"
-              >
-                <AlertTriangle size={16} className="mt-0.5 shrink-0" aria-hidden />
-                {gpsError}
-              </p>
-            )}
+
+              <div className="border-t border-gray-100 pt-5">
+                <SubLabel>日時</SubLabel>
+                <input
+                  type="datetime-local"
+                  value={occurredAt}
+                  onChange={(e) => setOccurredAt(e.target.value)}
+                  max={toLocalInputValue(new Date())}
+                  className="h-14 w-full rounded-2xl border-2 border-gray-200 bg-white px-4 text-lg text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                />
+                <BigButton
+                  onClick={() => setOccurredAt(toLocalInputValue(new Date()))}
+                  icon={Clock}
+                  variant="outline"
+                >
+                  「たった今」にする
+                </BigButton>
+                <p className="mt-2 text-sm text-gray-500">
+                  だいたいで構いません。過去14日以内まで。
+                </p>
+              </div>
+            </div>
           </StepCard>
         )}
 
         {step === 1 && (
           <StepCard
-            title="いつのことですか？"
-            subtitle="だいたいで構いません。過去14日以内まで。"
+            title="何を見ましたか？"
+            subtitle="ようすと頭数を教えてください。"
           >
-            <input
-              type="datetime-local"
-              value={occurredAt}
-              onChange={(e) => setOccurredAt(e.target.value)}
-              max={toLocalInputValue(new Date())}
-              className="h-14 w-full rounded-2xl border-2 border-gray-200 bg-white px-4 text-lg text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
-            />
-            <BigButton
-              onClick={() => setOccurredAt(toLocalInputValue(new Date()))}
-              icon={Clock}
-              variant="outline"
-            >
-              「たった今」にする
-            </BigButton>
+            <div className="space-y-6">
+              <div>
+                <SubLabel>どんなようす？（1つ選ぶ）</SubLabel>
+                <div className="flex flex-col gap-3">
+                  {SITUATIONS.map((s) => {
+                    const selected = situation === s.value;
+                    return (
+                      <button
+                        key={s.value}
+                        type="button"
+                        onClick={() => setSituation(s.value)}
+                        aria-pressed={selected}
+                        className={`flex min-h-[72px] w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition ${
+                          selected
+                            ? "border-amber-500 bg-amber-50 ring-4 ring-amber-100"
+                            : "border-gray-200 bg-white active:bg-gray-50"
+                        }`}
+                      >
+                        <s.Icon
+                          size={30}
+                          className={selected ? "text-amber-700" : "text-gray-500"}
+                          aria-hidden
+                        />
+                        <div className="flex-1">
+                          <div className="text-lg font-bold text-gray-900">
+                            {s.label}
+                          </div>
+                          <div className="text-sm text-gray-500">{s.hint}</div>
+                        </div>
+                        {selected && (
+                          <Check size={24} className="text-amber-600" aria-hidden />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {situation === "injury" && (
+                  <div className="mt-4 rounded-2xl border-2 border-red-500 bg-red-50 p-4">
+                    <div className="flex items-center gap-2 text-base font-bold text-red-700">
+                      <Phone size={20} aria-hidden />
+                      けが人がいるときは今すぐ110番へ
+                    </div>
+                    <p className="mt-1.5 text-sm leading-relaxed text-red-800">
+                      投稿より先に、警察（110番）・救急（119番）へ連絡してください。
+                    </p>
+                    <a
+                      href="tel:110"
+                      className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-red-600 text-base font-bold text-white hover:bg-red-700"
+                    >
+                      <Phone size={18} aria-hidden />
+                      110番に電話する
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-gray-100 pt-5">
+                <SubLabel>クマは何頭？</SubLabel>
+                <div className="flex items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setHeadCount((v) => Math.max(0, v - 1))}
+                    disabled={headCount <= 0}
+                    className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl font-bold text-gray-700 active:bg-gray-200 disabled:opacity-40"
+                    aria-label="頭数を減らす"
+                  >
+                    −
+                  </button>
+                  <div className="text-center">
+                    <span className="text-5xl font-bold tabular-nums text-gray-900">
+                      {headCount}
+                    </span>
+                    <span className="ml-1 text-xl text-gray-500">頭</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setHeadCount((v) => Math.min(20, v + 1))}
+                    disabled={headCount >= 20}
+                    className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl font-bold text-gray-700 active:bg-gray-200 disabled:opacity-40"
+                    aria-label="頭数を増やす"
+                  >
+                    ＋
+                  </button>
+                </div>
+                <p className="mt-2 text-sm text-gray-500">
+                  姿を見ていない場合は 0 のままで構いません。
+                </p>
+              </div>
+            </div>
           </StepCard>
         )}
 
         {step === 2 && (
-          <StepCard
-            title="どんなようすでしたか？"
-            subtitle="いちばん近いものを1つ選んでください。"
-          >
-            <div className="flex flex-col gap-3">
-              {SITUATIONS.map((s) => {
-                const selected = situation === s.value;
-                return (
-                  <button
-                    key={s.value}
-                    type="button"
-                    onClick={() => setSituation(s.value)}
-                    aria-pressed={selected}
-                    className={`flex min-h-[72px] w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left transition ${
-                      selected
-                        ? "border-amber-500 bg-amber-50 ring-4 ring-amber-100"
-                        : "border-gray-200 bg-white active:bg-gray-50"
-                    }`}
-                  >
-                    <s.Icon
-                      size={30}
-                      className={selected ? "text-amber-700" : "text-gray-500"}
-                      aria-hidden
-                    />
-                    <div className="flex-1">
-                      <div className="text-lg font-bold text-gray-900">
-                        {s.label}
-                      </div>
-                      <div className="text-sm text-gray-500">{s.hint}</div>
-                    </div>
-                    {selected && (
-                      <Check size={24} className="text-amber-600" aria-hidden />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {situation === "injury" && (
-              <div className="mt-4 rounded-2xl border-2 border-red-500 bg-red-50 p-4">
-                <div className="flex items-center gap-2 text-base font-bold text-red-700">
-                  <Phone size={20} aria-hidden />
-                  けが人がいるときは今すぐ110番へ
-                </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-red-800">
-                  投稿より先に、警察（110番）・救急（119番）へ連絡してください。
-                </p>
-                <a
-                  href="tel:110"
-                  className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-red-600 text-base font-bold text-white hover:bg-red-700"
-                >
-                  <Phone size={18} aria-hidden />
-                  110番に電話する
-                </a>
-              </div>
-            )}
-          </StepCard>
-        )}
-
-        {step === 3 && (
-          <StepCard
-            title="クマは何頭でしたか？"
-            subtitle="姿を見ていない場合は 0 のままで構いません。"
-          >
-            <div className="flex items-center justify-between gap-4">
-              <button
-                type="button"
-                onClick={() => setHeadCount((v) => Math.max(0, v - 1))}
-                disabled={headCount <= 0}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl font-bold text-gray-700 active:bg-gray-200 disabled:opacity-40"
-                aria-label="頭数を減らす"
-              >
-                −
-              </button>
-              <div className="text-center">
-                <span className="text-5xl font-bold tabular-nums text-gray-900">
-                  {headCount}
-                </span>
-                <span className="ml-1 text-xl text-gray-500">頭</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setHeadCount((v) => Math.min(20, v + 1))}
-                disabled={headCount >= 20}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl font-bold text-gray-700 active:bg-gray-200 disabled:opacity-40"
-                aria-label="頭数を増やす"
-              >
-                ＋
-              </button>
-            </div>
-          </StepCard>
-        )}
-
-        {step === 4 && (
           <StepCard
             title="写真や補足はありますか？"
             subtitle="なくても大丈夫です。そのまま「次へ」を押してください。"
@@ -636,7 +647,7 @@ function SubmitContent() {
           </StepCard>
         )}
 
-        {step === 5 && (
+        {step === 3 && (
           <StepCard
             title="内容を確認してください"
             subtitle="この内容で送信します。直したいときは各行の「なおす」から。"
@@ -651,20 +662,20 @@ function SubmitContent() {
                   <span className="text-red-600">未指定</span>
                 )}
               </SummaryRow>
-              <SummaryRow label="いつ" onEdit={() => setStep(1)}>
+              <SummaryRow label="いつ" onEdit={() => setStep(0)}>
                 {formatOccurred(occurredAt)}
               </SummaryRow>
-              <SummaryRow label="ようす" onEdit={() => setStep(2)}>
+              <SummaryRow label="ようす" onEdit={() => setStep(1)}>
                 {SITUATION_LABEL[situation]}
               </SummaryRow>
-              <SummaryRow label="頭数" onEdit={() => setStep(3)}>
+              <SummaryRow label="頭数" onEdit={() => setStep(1)}>
                 {headCount}頭
               </SummaryRow>
-              <SummaryRow label="写真" onEdit={() => setStep(4)}>
+              <SummaryRow label="写真" onEdit={() => setStep(2)}>
                 {photoDataUrl ? "あり" : "なし"}
               </SummaryRow>
               {comment && (
-                <SummaryRow label="ひとこと" onEdit={() => setStep(4)}>
+                <SummaryRow label="ひとこと" onEdit={() => setStep(2)}>
                   <span className="text-sm">{comment}</span>
                 </SummaryRow>
               )}
@@ -726,6 +737,13 @@ function SubmitContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 1 画面に複数項目をまとめるときの、各項目の見出し。
+function SubLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-2 text-lg font-bold text-gray-800">{children}</div>
   );
 }
 
