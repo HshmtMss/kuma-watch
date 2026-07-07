@@ -49,12 +49,12 @@ export default function RiskHero({
   const style = DISPLAY_CATEGORY_STYLE[cat];
   const hasRecent = count90d > 0;
 
-  // 出没のある区分は「多い/やや多い」の曖昧表現をやめ、件数をそのまま見せる。
-  // 程度は色 (黄→橙→赤) が補助。生息域系はカテゴリ名をそのまま出す。
-  const isAlert = cat === "caution" || cat === "warning" || cat === "danger";
+  // 一番上のヴァーディクトは区分の「言葉」で示す (生息域/主要生息域/出没あり/
+  // やや多い/多い)。件数はセル(約5km)と 10km圏で範囲が違い、隣り合うと矛盾して
+  // 見えるため大表示には出さない。程度は色 (黄→橙→赤) が補助する。
+  // 実数は「最近の目撃」(90日・10km) と月別グラフ側に集約する。
 
-  // 件数は大ヴァーディクト (出没N件・直近1年) に集約したので、説明文では繰り返さない。
-  // 説明文は「どう行動すべきか」に徹する。
+  // 説明文は「どう行動すべきか」に徹する (件数は繰り返さない)。
   const blurb =
     cat === "danger"
       ? "クマの出没が多い地域です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。"
@@ -76,23 +76,12 @@ export default function RiskHero({
           この地点の状況
         </div>
         <div
-          className="flex w-full flex-col items-center justify-center rounded-xl px-4 py-2 shadow-sm"
+          className="flex w-full items-center justify-center rounded-xl px-4 py-2.5 shadow-sm"
           style={{ background: style.bg, color: style.fg }}
         >
-          {isAlert ? (
-            <>
-              <span className="text-xl font-bold tracking-wide">
-                出没 {recentSightingCount}件
-              </span>
-              <span className="text-[10px] font-medium opacity-80">
-                この地点周辺・直近1年
-              </span>
-            </>
-          ) : (
-            <span className="text-xl font-bold tracking-wide">
-              {DISPLAY_CATEGORY_LABEL[cat]}
-            </span>
-          )}
+          <span className="text-xl font-bold tracking-wide">
+            {DISPLAY_CATEGORY_LABEL[cat]}
+          </span>
         </div>
         <p className="mt-1 px-1 text-sm leading-relaxed text-stone-600 sm:text-xs">
           {blurb}
