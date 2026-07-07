@@ -1010,6 +1010,23 @@ export default function KumaClient() {
         {/* 右端縦スタック: 現在地 / ズーム (カード上端に合わせて配置)。
             地図スタイル切替はツールバーの「表示」メニューに集約済み。 */}
         <div className="absolute right-3 bottom-[calc(41vh+0.75rem)] z-[900] flex flex-col gap-2.5">
+          {/* クマ対策の合言葉「はちみつ」を開く。共通の HachimitsuGuide (layout) が
+              open-hachimitsu イベントを受けてポップアップを開く。現在地ボタンの上に同サイズで。 */}
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent("open-hachimitsu"))
+            }
+            className="flex flex-col items-center justify-center rounded-full bg-amber-500 leading-none text-white shadow-lg hover:bg-amber-600"
+            style={{ height: "3.25rem", width: "3.25rem" }}
+            aria-label="クマ対策の合言葉「はちみつ」を開く"
+            title="クマ対策"
+          >
+            <span className="text-base" aria-hidden>
+              🍯
+            </span>
+            <span className="mt-0.5 text-[10px] font-bold">対策</span>
+          </button>
           <button
             type="button"
             onClick={requestCurrentLocation}
