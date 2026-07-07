@@ -98,8 +98,8 @@ export default function HachimitsuGuide() {
             </div>
 
             <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-900">
-              クマの好物は<b>はちみつ</b>。あなたの食べ物・ごみも、クマには“ごちそう”。
-              <b>残さない</b>ことが第一歩。
+              クマにあわない・あっても慌てないための合言葉。
+              <b>は・ち・み・つ</b> の4つを覚えよう。
             </p>
 
             <ul className="mt-3 space-y-2">
@@ -125,6 +125,14 @@ export default function HachimitsuGuide() {
                 </li>
               ))}
             </ul>
+
+            <p className="mt-2.5 flex items-start gap-1.5 px-1 text-xs leading-relaxed text-stone-500">
+              <span aria-hidden>🗑️</span>
+              <span>
+                食べ物・生ごみは<b className="text-stone-700">残さない</b>。
+                においがクマを引き寄せます。
+              </span>
+            </p>
 
             <Link
               href="/measures"
