@@ -121,10 +121,10 @@ export default function RiskHero({
         </div>
       </div>
 
-      {/* 2. 最近の目撃 と 通知 を 1 行 2 列で。通知が無ければ最近の目撃のみ。 */}
-      <div className={`mt-3 ${notification ? "grid grid-cols-2 gap-2" : ""}`}>
+      {/* 2. 最近の目撃 と 通知 を 1 行 2 列で。数字/CTA を大きく、スマホでも一目で。 */}
+      <div className={`mt-3 items-stretch ${notification ? "grid grid-cols-2 gap-2" : ""}`}>
         <div
-          className={`rounded-xl border px-3 py-2 ${
+          className={`flex flex-col justify-center rounded-xl border px-3 py-2.5 ${
             hasRecent
               ? "border-amber-200 bg-amber-50"
               : "border-stone-200 bg-stone-50"
@@ -137,23 +137,18 @@ export default function RiskHero({
           >
             最近の目撃
           </div>
-          <div className={hasRecent ? "text-amber-900" : "text-stone-800"}>
-            {hasRecent ? (
-              <span>
-                <span className="text-lg font-bold leading-none">{count90d}</span>
-                <span className="text-sm font-medium">件</span>{" "}
-                <span className="text-[11px] font-normal text-stone-500">
-                  直近90日 / {nearbyRadiusKm}km
-                </span>
-              </span>
-            ) : (
-              <span className="text-sm font-medium">
-                なし{" "}
-                <span className="text-[11px] font-normal text-stone-500">
-                  直近90日 / {nearbyRadiusKm}km
-                </span>
-              </span>
-            )}
+          <div
+            className={`flex items-baseline gap-1 ${
+              hasRecent ? "text-amber-900" : "text-stone-700"
+            }`}
+          >
+            <span className="text-3xl font-extrabold leading-none">
+              {hasRecent ? count90d : "0"}
+            </span>
+            <span className="text-base font-bold">件</span>
+          </div>
+          <div className="mt-1 text-[11px] font-medium text-stone-500">
+            直近90日 / 周辺{nearbyRadiusKm}km
           </div>
         </div>
         {notification}

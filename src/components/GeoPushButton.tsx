@@ -132,19 +132,19 @@ export default function GeoPushButton({
 
   if (state === "unsupported" || state === "not-configured") return null;
 
-  // 省スペース版: カードの「最近の目撃」タイルと 2 列で並ぶ。緑で目立たせ、CTA はボタン調。
+  // 省スペース版: カードの「最近の目撃」タイルと 2 列で並ぶ。緑で目立たせ、CTA を大きく。
   if (compact) {
     return (
-      <div className="not-prose flex flex-col justify-center rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2">
+      <div className="not-prose flex flex-col justify-center rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2.5">
         <div className="text-xs font-semibold text-emerald-800">通知</div>
-        <div className="mt-0.5 text-[11px] leading-tight text-emerald-700/80">
+        <div className="mt-0.5 mb-1.5 text-[11px] leading-tight text-emerald-700/80">
           新しい出没を通知
         </div>
         {state === "idle" && (
           <button
             type="button"
             onClick={subscribe}
-            className="mt-1.5 w-full rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700"
+            className="flex w-full items-center justify-center gap-1 rounded-full bg-emerald-600 px-3 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
           >
             🔔 受け取る
           </button>
@@ -152,18 +152,18 @@ export default function GeoPushButton({
         {state === "active" && (
           <Link
             href="/notifications"
-            className="mt-1.5 block w-full rounded-full border-2 border-emerald-500 bg-white px-3 py-1 text-center text-xs font-bold text-emerald-700 hover:bg-emerald-50"
+            className="block w-full rounded-full border-2 border-emerald-500 bg-white px-3 py-1.5 text-center text-sm font-bold text-emerald-700 hover:bg-emerald-50"
           >
             通知中 ✓
           </Link>
         )}
         {state === "loading" && (
-          <span className="mt-1.5 block w-full rounded-full bg-emerald-300 px-3 py-1.5 text-center text-xs font-bold text-white">
+          <span className="block w-full rounded-full bg-emerald-300 px-3 py-2 text-center text-sm font-bold text-white">
             処理中…
           </span>
         )}
         {state === "denied" && (
-          <span className="mt-1.5 block w-full rounded-full bg-stone-200 px-3 py-1.5 text-center text-xs font-semibold text-stone-500">
+          <span className="block w-full rounded-full bg-stone-200 px-3 py-2 text-center text-sm font-semibold text-stone-500">
             拒否中
           </span>
         )}
