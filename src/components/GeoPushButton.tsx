@@ -34,11 +34,14 @@ export default function GeoPushButton({
   lon,
   label,
   radiusKm = 10,
+  compact = false,
 }: {
   lat: number;
   lon: number;
   label?: string;
   radiusKm?: number;
+  /** カードの「最近の目撃」と 2 列で並べる省スペースタイル表示。 */
+  compact?: boolean;
 }) {
   const [state, setState] = useState<State>("idle");
   const [message, setMessage] = useState("");
@@ -128,6 +131,45 @@ export default function GeoPushButton({
   }, []);
 
   if (state === "unsupported" || state === "not-configured") return null;
+
+  // 省スペース版: カードの「最近の目撃」タイルと 2 列で並ぶ。出没＋自治体の更新を通知。
+  if (compact) {
+    return (
+      <div className="not-prose rounded-xl border border-stone-200 bg-white px-3 py-2">
+        <div className="text-xs font-semibold text-stone-500">通知</div>
+        <div className="mt-0.5 text-[11px] leading-tight text-stone-500">
+          出没・自治体の更新
+        </div>
+        {state === "idle" && (
+          <button
+            type="button"
+            onClick={subscribe}
+            className="mt-1 w-full rounded-full bg-amber-600 px-2 py-1 text-[11px] font-semibold text-white hover:bg-amber-700"
+          >
+            受け取る
+          </button>
+        )}
+        {state === "active" && (
+          <Link
+            href="/notifications"
+            className="mt-1 block w-full rounded-full border border-stone-300 bg-white px-2 py-1 text-center text-[11px] font-semibold text-stone-700 hover:bg-stone-50"
+          >
+            受信中 ✓
+          </Link>
+        )}
+        {state === "loading" && (
+          <span className="mt-1 block w-full rounded-full bg-stone-300 px-2 py-1 text-center text-[11px] font-semibold text-white">
+            処理中…
+          </span>
+        )}
+        {state === "denied" && (
+          <span className="mt-1 block w-full rounded-full bg-stone-200 px-2 py-1 text-center text-[11px] font-semibold text-stone-500">
+            拒否中
+          </span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="not-prose mt-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-2.5">

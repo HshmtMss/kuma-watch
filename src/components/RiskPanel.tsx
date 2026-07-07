@@ -99,6 +99,8 @@ type State =
       count90d: number;
       /** 過去90日の目撃レコード上位 N 件 (周辺 10km) — もっと見る用 */
       recent90d: NearbyRecent[];
+      /** 周辺 10km・直近365日の月別実測件数 (0=1月..11=12月)。月別チャート(実測版)用。 */
+      monthlyNearby: number[];
       /** 生息域メッシュベースの素のレベル (ヒートマップと同じ) */
       baseLevel: import("@/lib/types").RiskLevel;
       /** 当該メッシュの直近1年の目撃件数 (ヒートマップのセル色と同入力)。カード判定の主軸。 */
@@ -144,24 +146,30 @@ async function fetchNearbyHistory(
   lat: number,
   lon: number,
   radiusKm: number,
-): Promise<{ count365d: number; count90d: number; records: NearbyRecent[] }> {
+): Promise<{ count365d: number; count90d: number; monthly: number[]; records: NearbyRecent[] }> {
+  const empty = { count365d: 0, count90d: 0, monthly: [], records: [] };
   const r = await fetchWithTimeout(
     `/api/nearby-history?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&radiusKm=${radiusKm}`,
   );
-  if (!r || !r.ok) return { count365d: 0, count90d: 0, records: [] };
+  if (!r || !r.ok) return empty;
   try {
     const data = (await r.json()) as {
       count365d?: number;
       count90d?: number;
+      monthly?: number[];
       records?: NearbyRecent[];
     };
     return {
       count365d: typeof data.count365d === "number" ? data.count365d : 0,
       count90d: typeof data.count90d === "number" ? data.count90d : 0,
+      monthly:
+        Array.isArray(data.monthly) && data.monthly.length === 12
+          ? data.monthly
+          : [],
       records: Array.isArray(data.records) ? data.records : [],
     };
   } catch {
-    return { count365d: 0, count90d: 0, records: [] };
+    return empty;
   }
 }
 
@@ -506,6 +514,7 @@ export default function RiskPanel({
         count365d,
         count90d,
         recent90d,
+        monthlyNearby: history.monthly,
         baseLevel,
         sCellCount,
         levelEscalated,
@@ -892,26 +901,26 @@ function RiskDetails({
 
   return (
     <div className="border-t border-gray-100 text-sm">
-      {/* 1. 危険度 verdict + 並列ファクト + 5段階バー + LLM 補足 */}
+      {/* 1. 危険度 verdict + 「最近の目撃」＋「通知」2 列 + 6段階バー。
+          通知(GeoPushButton compact)は RiskHero 内で最近の目撃と横並び。
+          フラグ (NEXT_PUBLIC_GEO_PUSH_ENABLED) で段階公開。 */}
       <RiskHero
         baseLevel={state.baseLevel}
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
         recentSightingCount={state.sCellCount}
+        notification={
+          isGeoPushReleased() && location ? (
+            <GeoPushButton
+              lat={location.lat}
+              lon={location.lon}
+              label={state.placeName ?? location.label}
+              radiusKm={10}
+              compact
+            />
+          ) : undefined
+        }
       />
-
-      {/* この地点の周辺 10km を通知で見張る。任意地点 + 半径の購読 (geo)。
-          フラグ (NEXT_PUBLIC_GEO_PUSH_ENABLED) で段階公開。 */}
-      {isGeoPushReleased() && location && (
-        <div className="px-4 pt-2">
-          <GeoPushButton
-            lat={location.lat}
-            lon={location.lon}
-            label={state.placeName ?? location.label}
-            radiusKm={10}
-          />
-        </div>
-      )}
 
       {!fullView && (
         <div className="px-4 pb-3 pt-2">
@@ -1089,6 +1098,7 @@ function RiskDetails({
           mesh={mesh}
           weather={weather}
           baseDate={now}
+          monthlyNearby={state.monthlyNearby}
           nearbyWeightedCount={nearbyWeightedCount}
           nearbySightings={nearbySightings}
           nearbyRadiusKm={nearbyRadiusKm}

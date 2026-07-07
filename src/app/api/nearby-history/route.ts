@@ -56,6 +56,8 @@ export async function GET(req: Request) {
   let count90 = 0;
   let latest: string | null = null;
   const recent90: NearRecord[] = [];
+  // 周辺・直近365日の「月別」実測件数 (0=1月 .. 11=12月)。カードの月別チャート(実測版)用。
+  const monthly = new Array<number>(12).fill(0);
   for (const s of sightings) {
     if (!s.date || s.date < iso365) continue;
     if (s.lat < latMin || s.lat > latMax) continue;
@@ -63,6 +65,8 @@ export async function GET(req: Request) {
     const d = haversineKm(lat, lon, s.lat, s.lon);
     if (d > radiusKm) continue;
     count365 += 1;
+    const mo = Number(s.date.slice(5, 7)) - 1;
+    if (mo >= 0 && mo < 12) monthly[mo] += 1;
     if (!latest || s.date > latest) latest = s.date;
     if (s.date >= iso90) {
       count90 += 1;
@@ -94,6 +98,7 @@ export async function GET(req: Request) {
       count90d: count90,
       latestDate: latest,
       radiusKm,
+      monthly,
       records,
     },
     { headers: { "Cache-Control": "no-cache" } },

@@ -1,8 +1,8 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { RiskLevel } from "@/lib/types";
 import {
-  LEVEL_DESCRIPTION,
   displayCategory,
   DISPLAY_CATEGORY_LABEL,
   DISPLAY_CATEGORY_STYLE,
@@ -31,6 +31,8 @@ type Props = {
   nearbyRadiusKm?: number;
   /** 当該メッシュの直近1年の目撃件数 (マップのセル色と同入力)。判定の主軸。 */
   recentSightingCount?: number;
+  /** 「最近の目撃」の隣に 2 列で並べる通知タイル (GeoPushButton compact 等)。無ければ 1 列。 */
+  notification?: ReactNode;
 };
 
 export default function RiskHero({
@@ -38,16 +40,13 @@ export default function RiskHero({
   count90d = 0,
   nearbyRadiusKm = 10,
   recentSightingCount = 0,
+  notification,
 }: Props) {
   // マップのセル色と同じ二軸 (生息域 / 直近の出没) で「この地点の状況」を判定する。
   // 生息域だけでは赤い「危険」にせず、直近の出没件数で 注意→警戒→危険 を出す。
   const habitatLevel = baseLevel ?? "unknown";
   const cat = displayCategory(habitatLevel, recentSightingCount);
   const style = DISPLAY_CATEGORY_STYLE[cat];
-  const habitatDescription =
-    habitatLevel === "unknown"
-      ? "情報取得中..."
-      : LEVEL_DESCRIPTION[habitatLevel];
   const hasRecent = count90d > 0;
 
   // 出没のある区分は「多い/やや多い」の曖昧表現をやめ、件数をそのまま見せる。
@@ -122,40 +121,42 @@ export default function RiskHero({
         </div>
       </div>
 
-      {/* 2. 並列ファクト 2 行 — 生息域(背景情報) と 最近の目撃(直近の動き) を分けて示す。 */}
-      <div className="mt-3 space-y-2">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5">
-          <div className="shrink-0 text-xs font-semibold text-stone-500">
-            クマの生息域
-          </div>
-          <div className="min-w-0 flex-1 text-right text-sm font-medium text-stone-800">
-            {habitatDescription}
-          </div>
-        </div>
+      {/* 2. 最近の目撃 と 通知 を 1 行 2 列で。通知が無ければ最近の目撃のみ。 */}
+      <div className={`mt-3 ${notification ? "grid grid-cols-2 gap-2" : ""}`}>
         <div
-          className={`flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5 ${
+          className={`rounded-xl border px-3 py-2 ${
             hasRecent
               ? "border-amber-200 bg-amber-50"
               : "border-stone-200 bg-stone-50"
           }`}
         >
           <div
-            className={`shrink-0 text-xs font-semibold ${
+            className={`text-xs font-semibold ${
               hasRecent ? "text-amber-700" : "text-stone-500"
             }`}
           >
             最近の目撃
           </div>
-          <div
-            className={`min-w-0 flex-1 text-right text-sm font-medium ${
-              hasRecent ? "text-amber-900" : "text-stone-800"
-            }`}
-          >
-            {hasRecent
-              ? `${count90d} 件 / 周辺${nearbyRadiusKm}km`
-              : `なし / 周辺${nearbyRadiusKm}km`}
+          <div className={hasRecent ? "text-amber-900" : "text-stone-800"}>
+            {hasRecent ? (
+              <span>
+                <span className="text-lg font-bold leading-none">{count90d}</span>
+                <span className="text-sm font-medium">件</span>{" "}
+                <span className="text-[11px] font-normal text-stone-500">
+                  直近90日 / {nearbyRadiusKm}km
+                </span>
+              </span>
+            ) : (
+              <span className="text-sm font-medium">
+                なし{" "}
+                <span className="text-[11px] font-normal text-stone-500">
+                  直近90日 / {nearbyRadiusKm}km
+                </span>
+              </span>
+            )}
           </div>
         </div>
+        {notification}
       </div>
     </section>
   );

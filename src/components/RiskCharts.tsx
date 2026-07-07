@@ -12,6 +12,8 @@ type Props = {
   mesh: MeshData | null;
   weather: WeatherSnapshot | null;
   baseDate: Date;
+  /** 周辺 radius・直近365日の月別実測件数 (0=1月..11=12月)。地点固有の月別チャート用。 */
+  monthlyNearby?: number[];
   nearbyWeightedCount?: number;
   nearbySightings?: number;
   nearbyRadiusKm?: number;
@@ -28,6 +30,7 @@ export default function RiskCharts({
   mesh,
   weather,
   baseDate,
+  monthlyNearby,
   nearbyWeightedCount,
   nearbySightings,
   nearbyRadiusKm,
@@ -60,17 +63,13 @@ export default function RiskCharts({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mesh, weather, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode, elevationM, slopeDeg, isForest, forestType]);
 
-  const monthly = useMemo(() => {
-    return Array.from({ length: 12 }, (_, m) => {
-      const d = new Date(baseDate);
-      d.setMonth(m);
-      const b = computeScore(mesh, d, null, scoreOpts);
-      return { month: m, score: b.score, level: b.level };
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mesh, baseDate, nearbyWeightedCount, nearbySightings, nearbyRadiusKm, prefCode, elevationM, slopeDeg, isForest, forestType]);
+  // 月別は「この地点の周辺・直近12ヶ月の実測件数」。全国季節波形(computeScore)は
+  // どの地点でも同形で誤解を招くため廃止し、地点固有の実測に差し替える。
+  const localMonthlyTotal = (monthlyNearby ?? []).reduce((a, b) => a + b, 0);
+  // 件数が少ない地点は形が読めないので月別チャート自体を出さない。
+  const showLocalMonthly = monthlyNearby?.length === 12 && localMonthlyTotal >= 6;
 
-  const hasAnyScore = hourly.some((h) => h.score > 0) || monthly.some((m) => m.score > 0);
+  const hasAnyScore = hourly.some((h) => h.score > 0) || showLocalMonthly;
   if (!hasAnyScore) {
     return null;
   }
@@ -90,20 +89,23 @@ export default function RiskCharts({
         axisLabels={["0", "6", "12", "18", "24"]}
         highlightLegend={`いま (${currentHour}時)`}
       />
-      <ChartSection
-        title="月別"
-        subtitle="今の場所の年間パターン"
-        data={monthly.map((d) => ({
-          label: MONTH_LABEL[d.month],
-          score: d.score,
-          color: RISK_LEVEL_COLOR[d.level],
-          highlighted: d.month === currentMonth,
-          level: RISK_LEVEL_LABEL[d.level],
-        }))}
-        axisLabels={MONTH_LABEL}
-        highlightLegend={`今月 (${MONTH_LABEL[currentMonth]})`}
-        showAllAxis
-      />
+      {showLocalMonthly && (
+        <ChartSection
+          title="月別の出没"
+          subtitle={`周辺${nearbyRadiusKm ?? 10}km・直近12ヶ月の実測`}
+          data={(monthlyNearby ?? []).map((count, m) => ({
+            label: MONTH_LABEL[m],
+            score: count,
+            color: count > 0 ? "#f59e0b" : "#e5e7eb",
+            highlighted: m === currentMonth,
+            level: `${count}件`,
+          }))}
+          axisLabels={MONTH_LABEL}
+          highlightLegend={`今月 (${MONTH_LABEL[currentMonth]})`}
+          maxFloor={1}
+          showAllAxis
+        />
+      )}
     </div>
   );
 }
@@ -123,6 +125,7 @@ function ChartSection({
   axisLabels,
   highlightLegend,
   showAllAxis,
+  maxFloor = 50,
 }: {
   title: string;
   subtitle: string;
@@ -130,8 +133,10 @@ function ChartSection({
   axisLabels: string[];
   highlightLegend: string;
   showAllAxis?: boolean;
+  /** バー高さ正規化の最小分母。スコア系=50、実測件数系=1 (実データの最大に合わせる)。 */
+  maxFloor?: number;
 }) {
-  const max = Math.max(50, ...data.map((d) => d.score));
+  const max = Math.max(maxFloor, ...data.map((d) => d.score));
   return (
     <div>
       <div className="mb-1 flex items-baseline justify-between">
