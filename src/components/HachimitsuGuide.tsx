@@ -27,6 +27,9 @@ export default function HachimitsuGuide() {
   // 置き、open-hachimitsu イベントでこの共通ポップアップを開く。地図では自前のFABは
   // 出さない。他ページはこのコンポーネントが左下にFABを出す。
   const onMap = pathname === "/";
+  // 下部に固定の送信ボタン等がある画面ではFABが重なるので出さない。
+  const hasBottomBar = !!pathname && pathname.startsWith("/submit");
+  const showFab = !onMap && !hasBottomBar;
 
   useEffect(() => {
     const openHandler = () => setOpen(true);
@@ -49,8 +52,9 @@ export default function HachimitsuGuide() {
 
   return (
     <>
-      {/* 他ページは左下に常設FAB。地図(/)では KumaClient の「対策」ボタンに任せる。 */}
-      {!onMap && (
+      {/* 他ページは左下に常設FAB。地図(/)では KumaClient の「対策」ボタン、
+          下部固定ボタンのある画面(/submit 等)では非表示。 */}
+      {showFab && (
         <button
           type="button"
           onClick={() => setOpen(true)}
