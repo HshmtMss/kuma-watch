@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 /**
@@ -21,6 +22,10 @@ const ITEMS: { kana: string; emoji: string; action: string; desc: string }[] = [
 
 export default function HachimitsuGuide() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  // 地図(トップ)ではカード(下部シート)と重ならないよう、左側で拡大縮小ボタンの
+  // 下端(bottom: calc(41vh+0.75rem))に合わせる。他ページは通常の左下。
+  const onMap = pathname === "/";
 
   useEffect(() => {
     if (!open) return;
@@ -37,13 +42,18 @@ export default function HachimitsuGuide() {
 
   return (
     <>
-      {/* 全ページ常設の小さなボタン。地図の右側コントロールと干渉しない左下に。 */}
+      {/* 全ページ常設の小さなボタン。地図では左側・拡大縮小ボタンの下端に合わせ、
+          カード(下部シート)と重ならないように。他ページは通常の左下。 */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="クマ対策の合言葉「はちみつ」を開く"
-        className="fixed bottom-4 left-4 z-[1000] flex items-center gap-1.5 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg ring-2 ring-white transition hover:bg-amber-600 active:scale-95"
-        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
+        className={`fixed left-3 flex items-center gap-1.5 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg ring-2 ring-white transition hover:bg-amber-600 active:scale-95 ${
+          onMap
+            ? "bottom-[calc(41vh+0.75rem)] z-[900]"
+            : "bottom-4 z-[1000]"
+        }`}
+        style={onMap ? undefined : { marginBottom: "env(safe-area-inset-bottom)" }}
       >
         <span className="text-lg" aria-hidden>
           🍯
