@@ -63,8 +63,8 @@ export default function HachimitsuGuide() {
                 <div className="text-base font-bold text-stone-600">
                   クマ対策の合言葉
                 </div>
-                <div className="mt-0.5 flex items-center gap-1.5 text-3xl font-black tracking-wide text-amber-600">
-                  <span aria-hidden>🍯</span>はちみつ
+                <div className="mt-0.5 flex items-center gap-1.5 text-2xl font-black tracking-wide text-amber-600">
+                  <span aria-hidden>🍯</span>はちみつ、のこさない
                 </div>
               </div>
               <button
@@ -78,8 +78,8 @@ export default function HachimitsuGuide() {
             </div>
 
             <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-900">
-              クマにあわない・あっても慌てないための合言葉。
-              <b>は・ち・み・つ</b> の4つを覚えよう。
+              いざという時の4つ<b>「は・ち・み・つ」</b>と、ふだんの1つ
+              <b>「のこさない」</b>を覚えよう。
             </p>
 
             <ul className="mt-3 space-y-2">
@@ -106,13 +106,20 @@ export default function HachimitsuGuide() {
               ))}
             </ul>
 
-            <p className="mt-2.5 flex items-start gap-1.5 px-1 text-xs leading-relaxed text-stone-500">
-              <span aria-hidden>🗑️</span>
-              <span>
-                食べ物・生ごみは<b className="text-stone-700">残さない</b>。
-                においがクマを引き寄せます。
+            {/* ＋1: ふだんの「のこさない」。4文字とは別枠と分かるよう色を濃く。 */}
+            <div className="mt-2 flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-100 px-3 py-2.5">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-500 text-3xl leading-none shadow-sm">
+                🍯
               </span>
-            </p>
+              <div className="min-w-0">
+                <div className="text-lg font-extrabold leading-tight text-stone-900">
+                  のこさない
+                </div>
+                <div className="text-xs leading-snug text-stone-600">
+                  食べ物・生ごみを残さない（においで呼ばない）
+                </div>
+              </div>
+            </div>
 
             <Link
               href="/measures"
