@@ -427,12 +427,6 @@ export default function AboutPage() {
         >
           地図を開く →
         </Link>
-        <Link
-          href="/for-gov"
-          className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
-        >
-          自治体の方はこちら
-        </Link>
       </div>
     </PageShell>
   );

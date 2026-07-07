@@ -1039,7 +1039,9 @@ export default async function SpotPage({ params }: Props) {
         />
       )}
 
-      {/* B2B 導線 — 観光地・自治体向けの「安全情報ハブ提供」。全スポット共通の funnel。 */}
+      {/* B2B 導線 — 「安全情報ハブ提供」の funnel。公式ハブ (自治体デモ) のスポット
+          限定で表示し、一般の観光地ページには出さない (一般ユーザーの導線を邪魔しない)。 */}
+      {landmark.officialHub && (
       <div className="not-prose my-8 rounded-xl border border-stone-200 bg-white p-5">
         <h2 className="m-0 text-base font-bold text-stone-900">
           この安全情報ハブを、貴施設・自治体に
@@ -1063,6 +1065,7 @@ export default async function SpotPage({ params }: Props) {
           </Link>
         </div>
       </div>
+      )}
 
       {/* 戻り導線 — ユーザーが「観光地一覧に戻る」を見失わないよう、
           目立つピル状リンクで本文末尾に明示。 */}

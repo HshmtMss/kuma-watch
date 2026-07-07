@@ -266,11 +266,6 @@ export default function Page() {
           <strong>2025 年改正鳥獣保護管理法</strong>に基づく市街地での特例的猟銃使用の運用ルール整備
         </li>
       </ul>
-      <p>
-        KumaWatch との連携で住民・観光客への情報発信を強化したい自治体さまは{" "}
-        <Link href="/for-gov">自治体の方へ</Link>
-        をご覧ください。
-      </p>
 
       <h2 id="encounter">市街地で遭遇したら</h2>
       <p>

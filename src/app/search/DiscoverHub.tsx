@@ -12,7 +12,6 @@ import {
   TrendingUp,
   ShieldCheck,
   Landmark,
-  Send,
   type LucideIcon,
 } from "lucide-react";
 import { getCachedSightings } from "@/lib/sightings-cache";
@@ -86,7 +85,6 @@ const QUICK_LINKS: { label: string; href: string; Icon: LucideIcon }[] = [
   { label: "警戒エリア Top", href: "/place/ranking", Icon: TrendingUp },
   { label: "クマ対策トップ", href: "/measures", Icon: ShieldCheck },
   { label: "政府発表", href: "/policy", Icon: Landmark },
-  { label: "自治体の方へ", href: "/for-gov", Icon: Send },
 ];
 
 export default async function DiscoverHub(): Promise<ReactNode> {
