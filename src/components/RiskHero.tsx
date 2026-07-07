@@ -53,13 +53,15 @@ export default function RiskHero({
   // 程度は色 (黄→橙→赤) が補助。生息域系はカテゴリ名をそのまま出す。
   const isAlert = cat === "caution" || cat === "warning" || cat === "danger";
 
+  // 件数は大ヴァーディクト (出没N件・直近1年) に集約したので、説明文では繰り返さない。
+  // 説明文は「どう行動すべきか」に徹する。
   const blurb =
     cat === "danger"
-      ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。`
+      ? "クマの出没が多い地域です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。"
       : cat === "warning"
-        ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。早朝・夕方は特に注意してください。`
+        ? "クマの出没が確認されています。早朝・夕方は特に注意してください。"
         : cat === "caution"
-          ? `直近1年でこの周辺の出没は ${recentSightingCount}件です。音を出すなど基本対策を。`
+          ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
           : cat === "habitatCore"
             ? "クマが多く生息する地域です。直近1年の出没情報はありません。季節により状況は変わります。"
             : cat === "habitat"
@@ -67,33 +69,38 @@ export default function RiskHero({
               : "この地点の出没・生息データは確認されていません。";
 
   return (
-    <section className="px-4 pt-3 pb-2">
+    <section className="px-4 pt-2.5 pb-2">
       {/* 1. ヴァーディクト — 生息域(中立) / 注意 / 警戒 / 危険。マップのセル色と整合。 */}
       <div className="w-full">
         <div className="mb-1 ml-1 text-xs font-semibold text-stone-500">
           この地点の状況
         </div>
         <div
-          className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 shadow-sm"
+          className="flex w-full flex-col items-center justify-center rounded-xl px-4 py-2 shadow-sm"
           style={{ background: style.bg, color: style.fg }}
         >
           {isAlert ? (
-            <span className="text-xl font-bold tracking-wide">
-              出没 {recentSightingCount}件
-            </span>
+            <>
+              <span className="text-xl font-bold tracking-wide">
+                出没 {recentSightingCount}件
+              </span>
+              <span className="text-[10px] font-medium opacity-80">
+                この地点周辺・直近1年
+              </span>
+            </>
           ) : (
             <span className="text-xl font-bold tracking-wide">
               {DISPLAY_CATEGORY_LABEL[cat]}
             </span>
           )}
         </div>
-        <p className="mt-1.5 px-1 text-xs leading-relaxed text-stone-600">
+        <p className="mt-1 px-1 text-xs leading-relaxed text-stone-600">
           {blurb}
         </p>
 
         {/* 6 段階バー — マップの色塗りの意味 (生息域の濃淡 + 出没の多寡) を凡例で示す。
             現在地点の区分をハイライト。 */}
-        <div className="mt-2.5">
+        <div className="mt-2">
           <div className="flex gap-0.5">
             {CATEGORY_BAR.map((seg) => (
               <div
@@ -121,8 +128,9 @@ export default function RiskHero({
         </div>
       </div>
 
-      {/* 2. 最近の目撃 と 通知 を 1 行 2 列で。数字/CTA を大きく、スマホでも一目で。 */}
-      <div className={`mt-3 items-stretch ${notification ? "grid grid-cols-2 gap-2" : ""}`}>
+      {/* 2. 最近の目撃 と 通知 を 1 行 2 列で。数字/CTA を大きく、スマホでも一目で。
+          大ヴァーディクト(直近1年)と対になる「直近90日」の窓を示し、件数の役割を分ける。 */}
+      <div className={`mt-2.5 items-stretch ${notification ? "grid grid-cols-2 gap-2" : ""}`}>
         <div
           className={`flex flex-col justify-center rounded-xl border px-3 py-2.5 ${
             hasRecent

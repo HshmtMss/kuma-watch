@@ -9,6 +9,10 @@ import {
   ClipboardList,
   Clock,
   ChartColumn,
+  Share2,
+  MapPinPlus,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import type {
   MeshData,
@@ -41,6 +45,7 @@ import MonthlySightingsChart from "@/components/MonthlySightingsChart";
 import RiskHero from "@/components/RiskHero";
 import GeoPushButton from "@/components/GeoPushButton";
 import { buildAdvice, type AdviceItem } from "@/lib/advice";
+import AdviceIcon from "@/components/AdviceIcon";
 import type { AdviceResponse } from "@/app/api/advice/route";
 import { isGeoPushReleased, isPushReleased } from "@/lib/push-flag";
 
@@ -798,21 +803,7 @@ export default function RiskPanel({
               aria-label="この地点をシェア"
               title="この地点をシェア"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-                aria-hidden
-              >
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
-              </svg>
+              <Share2 size={20} aria-hidden />
             </button>
           )}
           {state.kind === "ready" && (
@@ -822,21 +813,7 @@ export default function RiskPanel({
               aria-label="この地点で目撃情報を投稿"
               title="この地点で目撃情報を投稿"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-                aria-hidden
-              >
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                <line x1="12" y1="7" x2="12" y2="13" />
-                <line x1="9" y1="10" x2="15" y2="10" />
-              </svg>
+              <MapPinPlus size={20} aria-hidden />
             </Link>
           )}
           {(state.kind === "ready" || state.kind === "error") && (
@@ -846,20 +823,7 @@ export default function RiskPanel({
               aria-label="閉じる"
               title="閉じる (ピンは残ります)"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6"
-                aria-hidden
-              >
-                <line x1="6" y1="6" x2="18" y2="18" />
-                <line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
+              <X size={24} aria-hidden />
             </button>
           )}
         </div>
@@ -957,7 +921,7 @@ function RiskDetails({
             className="flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 shadow-sm hover:bg-amber-100"
           >
             もっと見る
-            <span aria-hidden>▼</span>
+            <ChevronDown size={16} aria-hidden />
           </button>
         </div>
       )}
@@ -1002,10 +966,10 @@ function RiskDetails({
                   className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2"
                 >
                   <span
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-2xl"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700"
                     aria-hidden
                   >
-                    {a.emoji}
+                    <AdviceIcon emoji={a.emoji} size={18} />
                   </span>
                   <div className="min-w-0">
                     <div className="text-sm font-semibold leading-tight text-gray-900 sm:text-xs">
