@@ -6,13 +6,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MapPin,
   AlertTriangle,
-  ClipboardList,
   Clock,
   ChartColumn,
   Share2,
   MapPinPlus,
   X,
   ChevronDown,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import type {
   MeshData,
@@ -44,9 +45,6 @@ import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
 import MonthlySightingsChart from "@/components/MonthlySightingsChart";
 import RiskHero from "@/components/RiskHero";
 import GeoPushButton from "@/components/GeoPushButton";
-import { buildAdvice, type AdviceItem } from "@/lib/advice";
-import AdviceIcon from "@/components/AdviceIcon";
-import type { AdviceResponse } from "@/app/api/advice/route";
 import { isGeoPushReleased, isPushReleased } from "@/lib/push-flag";
 
 export type LocationSource = "gps" | "tap" | "search" | "url";
@@ -395,8 +393,6 @@ export default function RiskPanel({
   const [expanded, setExpanded] = useState(false);
   // カードを「危険度バーまで見える最小高さ」と「詳細を見せる広い高さ」の 2 段階に
   const [fullView, setFullView] = useState(false);
-  const [llmAdvice, setLlmAdvice] = useState<AdviceItem[] | null>(null);
-  const [llmAdviceLoading, setLlmAdviceLoading] = useState(false);
 
   // evaluate が records / period / 設定の変化で再生成されないよう ref に逃がす。
   // これがないと /api/kuma 再フェッチや設定変更のたびに evaluate が走り直し、
@@ -568,11 +564,9 @@ export default function RiskPanel({
   useEffect(() => {
     if (!location) {
       setState({ kind: "idle" });
-      setLlmAdvice(null);
       onAskContextChange?.(null);
       return;
     }
-    setLlmAdvice(null);
     // 新しい地点はコンパクト (バーまで) で表示。ユーザーがタップで full に展開
     setFullView(false);
     void evaluate(location);
@@ -608,67 +602,6 @@ export default function RiskPanel({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.kind === "ready" ? state.lat : null, state.kind === "ready" ? state.lon : null, state.kind === "ready" ? state.breakdown.level : null]);
-
-  // 地点が確定したら LLM 対策を取りに行く (失敗時はルールベースを表示)
-  useEffect(() => {
-    if (state.kind !== "ready") return;
-    let cancelled = false;
-    setLlmAdviceLoading(true);
-    const now = new Date();
-    const payload = {
-      level: state.breakdown.level,
-      score: state.breakdown.score,
-      hour: now.getHours(),
-      month: now.getMonth() + 1,
-      lat: state.lat,
-      lon: state.lon,
-      place: state.placeName,
-      muniName: state.muniName,
-      bearSpecies: state.municipality?.bearSpecies.includes("higuma")
-        ? "ヒグマ"
-        : state.municipality
-          ? "ツキノワグマ"
-          : undefined,
-      habitatInside: !!state.mesh,
-      weather: state.weather
-        ? {
-            tempC: state.weather.tempC,
-            precipMm: state.weather.precipMm,
-            label: weatherCodeLabel(state.weather.weatherCode),
-          }
-        : null,
-      nearbySightings: state.nearbySightings,
-      elevationM: state.elevationM,
-      isForest: state.isForest,
-    };
-    fetch("/api/advice", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then((r) => (r.ok ? (r.json() as Promise<AdviceResponse>) : null))
-      .then((data) => {
-        if (cancelled) return;
-        if (data && data.mode === "llm" && data.items.length > 0) {
-          setLlmAdvice(data.items);
-        } else {
-          setLlmAdvice(null);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setLlmAdvice(null);
-      })
-      .finally(() => {
-        if (!cancelled) setLlmAdviceLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // 位置 (lat,lon) が確定するたびに 1 回だけ走らせる。
-    // state 全体ではなく lat/lon だけに絞ることで、ロード後の setLlmAdvice/Loading
-    // による state 変化で再フェッチが連鎖するのを避ける。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.kind === "ready" ? state.lat : null, state.kind === "ready" ? state.lon : null]);
 
   const onUseGps = useCallback(async () => {
     setState({ kind: "loading", stage: "位置情報を取得中" });
@@ -836,8 +769,6 @@ export default function RiskPanel({
               <RiskDetails
                 state={state}
                 location={location}
-                llmAdvice={llmAdvice}
-                llmAdviceLoading={llmAdviceLoading}
                 fullView={fullView}
                 onExpandFull={() => setFullView(true)}
               />
@@ -862,29 +793,21 @@ export default function RiskPanel({
 function RiskDetails({
   state,
   location,
-  llmAdvice,
-  llmAdviceLoading,
   fullView,
   onExpandFull,
 }: {
   state: Extract<State, { kind: "ready" }>;
   location: SelectedLocation | null;
-  llmAdvice: AdviceItem[] | null;
-  llmAdviceLoading: boolean;
   fullView: boolean;
   onExpandFull: () => void;
 }) {
   const {
-    breakdown,
-    weather,
     mesh,
     nearbySightings,
     nearbyRadiusKm,
     recent90d,
   } = state;
-  const now = new Date();
-  const hour = now.getHours();
-  const month = now.getMonth() + 1;
+  const month = new Date().getMonth() + 1;
 
   const isInsufficient = !mesh && (nearbySightings ?? 0) === 0;
   const isBuffer = !mesh && (nearbySightings ?? 0) > 0;
@@ -928,65 +851,27 @@ function RiskDetails({
 
       {fullView && <>
 
-      {/* 1b. 行動メモ (LLM 優先、なければルールベースで fallback) */}
-      {(() => {
-        const ruleAdvice = buildAdvice({
-          breakdown,
-          hour,
-          month,
-          municipal: state.municipality,
-          weather,
-          nearbySightings,
-          elevationM: state.elevationM,
-          isForest: state.isForest,
-        });
-        const advice = llmAdvice ?? ruleAdvice;
-        const isLlm = !!llmAdvice;
-        if (advice.length === 0 && !llmAdviceLoading) return null;
-        return (
-          <section className="border-t border-gray-100 px-4 py-3">
-            <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-gray-800 sm:text-xs sm:text-gray-700">
-<ClipboardList size={16} aria-hidden />行動メモ
-              {llmAdviceLoading && (
-                <span className="inline-flex items-center gap-1 text-xs font-normal text-gray-400 sm:text-[10px]">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                  AI で更新中...
-                </span>
-              )}
-              {isLlm && !llmAdviceLoading && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 sm:text-[9px]">
-                  AI
-                </span>
-              )}
-            </h3>
-            <ul className="space-y-2">
-              {advice.map((a, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2"
-                >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700"
-                    aria-hidden
-                  >
-                    <AdviceIcon emoji={a.emoji} size={18} />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold leading-tight text-gray-900 sm:text-xs">
-                      {a.title}
-                    </div>
-                    {a.body && (
-                      <div className="mt-0.5 text-xs leading-snug text-gray-500 sm:text-[11px]">
-                        {a.body}
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        );
-      })()}
+      {/* 1b. 基本の対策 — 場所を問わず同じ内容 (熊鈴・スプレー・ゴミ) なので、
+          毎回リスト展開せず 1 タップで対策ページへ送る導線に集約する。 */}
+      <section className="border-t border-gray-100 px-4 py-3">
+        <Link
+          href="/measures"
+          className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-emerald-900 hover:bg-emerald-100"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+            <ShieldCheck size={22} aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base font-bold leading-tight">
+              クマに遭わないための基本対策
+            </span>
+            <span className="mt-0.5 block text-sm leading-snug text-emerald-800">
+              熊鈴・クマスプレー・食べ物やゴミの管理など
+            </span>
+          </span>
+          <ChevronRight size={20} aria-hidden className="shrink-0 text-emerald-500" />
+        </Link>
+      </section>
 
 
       {/* 詳細セクション (fullView 時のみ) */}
@@ -995,11 +880,11 @@ function RiskDetails({
           fullView では補足の注意書きだけ出す (生息域なし・緩衝域 等の特殊ケース)。 */}
       {(isInsufficient || isBuffer) && (
         <section className="bg-amber-50/70 px-4 py-3">
-          <p className="text-sm leading-relaxed text-amber-900 sm:text-xs">
+          <p className="text-sm leading-relaxed text-amber-900">
             {isInsufficient &&
-              "生息域調査に記録なし。近隣の公式目撃も未確認。山間部では基本対策を。"}
+              "この場所では、クマがすんでいる記録も目撃の記録も見つかりませんでした。山あいでは念のため基本の対策を。"}
             {isBuffer &&
-              `生息域外の緩衝域。近隣で ${nearbySightings} 件の公式目撃記録あり。`}
+              `クマがすむ地域のすぐ外側です。近くで ${nearbySightings} 件の目撃記録があります。`}
           </p>
         </section>
       )}
@@ -1092,10 +977,6 @@ function RiskDetails({
           nearbyRadiusKm={nearbyRadiusKm}
         />
       </section>
-
-      <p className="px-4 py-3 text-[10px] leading-relaxed text-gray-400">
-        スコアは参考値です。実際のクマの行動は個体差・環境で変わります。必ず自治体の公式情報と合わせてご確認ください。
-      </p>
 
       {/* カード末尾の控えめな運営・補足リンク行。1 行目: 運営 + お問合せ、2 行目: 補足。 */}
       <footer className="border-t border-gray-100 px-4 py-3 text-center text-[11px] leading-relaxed text-gray-400">

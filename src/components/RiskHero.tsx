@@ -63,10 +63,10 @@ export default function RiskHero({
         : cat === "caution"
           ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
           : cat === "habitatCore"
-            ? "クマが多く生息する地域です。直近1年の出没情報はありません。季節により状況は変わります。"
+            ? "クマが多くすんでいる地域です。直近1年の出没情報はありません。季節により状況は変わります。"
             : cat === "habitat"
-              ? "クマの生息域です。直近1年の出没情報はありません。季節により状況は変わります。"
-              : "この地点の出没・生息データは確認されていません。";
+              ? "クマがすんでいる地域です。直近1年の出没情報はありません。季節により状況は変わります。"
+              : "この場所では、クマの記録は見つかりませんでした。";
 
   return (
     <section className="px-4 pt-2.5 pb-2">
@@ -94,7 +94,7 @@ export default function RiskHero({
             </span>
           )}
         </div>
-        <p className="mt-1 px-1 text-xs leading-relaxed text-stone-600">
+        <p className="mt-1 px-1 text-sm leading-relaxed text-stone-600 sm:text-xs">
           {blurb}
         </p>
 
@@ -113,7 +113,7 @@ export default function RiskHero({
               />
             ))}
           </div>
-          <div className="mt-1 flex gap-0.5 text-[9px] leading-tight text-stone-500">
+          <div className="mt-1 flex gap-0.5 text-[10px] leading-tight text-stone-500">
             {CATEGORY_BAR.map((seg) => (
               <span
                 key={seg.key}
@@ -139,7 +139,7 @@ export default function RiskHero({
           }`}
         >
           <div
-            className={`text-xs font-semibold ${
+            className={`text-sm font-semibold sm:text-xs ${
               hasRecent ? "text-amber-700" : "text-stone-500"
             }`}
           >
