@@ -12,8 +12,6 @@ import {
   MapPinPlus,
   X,
   ChevronDown,
-  ChevronRight,
-  ShieldCheck,
 } from "lucide-react";
 import type {
   MeshData,
@@ -801,17 +799,8 @@ function RiskDetails({
   fullView: boolean;
   onExpandFull: () => void;
 }) {
-  const {
-    mesh,
-    nearbySightings,
-    nearbyRadiusKm,
-    recent90d,
-  } = state;
+  const { nearbyRadiusKm, recent90d } = state;
   const month = new Date().getMonth() + 1;
-
-  const isInsufficient = !mesh && (nearbySightings ?? 0) === 0;
-  const isBuffer = !mesh && (nearbySightings ?? 0) > 0;
-
 
   return (
     <div className="border-t border-gray-100 text-sm">
@@ -851,43 +840,8 @@ function RiskDetails({
 
       {fullView && <>
 
-      {/* 1b. 基本の対策 — 場所を問わず同じ内容 (熊鈴・スプレー・ゴミ) なので、
-          毎回リスト展開せず 1 タップで対策ページへ送る導線に集約する。 */}
-      <section className="border-t border-gray-100 px-4 py-3">
-        <Link
-          href="/measures"
-          className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-emerald-900 hover:bg-emerald-100"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-            <ShieldCheck size={22} aria-hidden />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-base font-bold leading-tight">
-              クマに遭わないための基本対策
-            </span>
-            <span className="mt-0.5 block text-sm leading-snug text-emerald-800">
-              熊鈴・クマスプレー・食べ物やゴミの管理など
-            </span>
-          </span>
-          <ChevronRight size={20} aria-hidden className="shrink-0 text-emerald-500" />
-        </Link>
-      </section>
-
-
-      {/* 詳細セクション (fullView 時のみ) */}
-
-      {/* 件数は RiskHero で常時表示しているので重複させない。
-          fullView では補足の注意書きだけ出す (生息域なし・緩衝域 等の特殊ケース)。 */}
-      {(isInsufficient || isBuffer) && (
-        <section className="bg-amber-50/70 px-4 py-3">
-          <p className="text-sm leading-relaxed text-amber-900">
-            {isInsufficient &&
-              "この場所では、クマがすんでいる記録も目撃の記録も見つかりませんでした。山あいでは念のため基本の対策を。"}
-            {isBuffer &&
-              `クマがすむ地域のすぐ外側です。近くで ${nearbySightings} 件の目撃記録があります。`}
-          </p>
-        </section>
-      )}
+      {/* 詳細セクション (fullView 時のみ)。基本対策の導線・注意書きは別途準備中のため
+          カードには置かない (2026-07-07 ユーザー指示)。 */}
 
       {/* 直近の目撃 リスト (過去 3 ヶ月・固定窓) */}
       {recent90d.length > 0 && (
