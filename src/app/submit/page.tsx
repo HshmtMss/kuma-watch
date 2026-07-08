@@ -69,7 +69,7 @@ function defaultHeadCount(s: Situation): number {
 
 // ウィザードの各ステップ。3 つの入力 + 確認の計 4 画面。
 // 1 画面に関連する 2 項目までをまとめ、遷移を最小限にする。
-const STEPS = ["いつ・どこで", "ようす・頭数", "写真・補足", "確認"] as const;
+const STEPS = ["ようす・頭数", "いつ・どこで", "写真・補足", "確認"] as const;
 const TOTAL_STEPS = STEPS.length;
 
 function SubmitContent() {
@@ -251,7 +251,7 @@ function SubmitContent() {
   const submit = async () => {
     if (lat == null || lon == null) {
       setSubmitError("場所を指定してください");
-      setStep(0);
+      setStep(1);
       return;
     }
     setSubmitting(true);
@@ -314,22 +314,8 @@ function SubmitContent() {
 
           {/* 緊急連絡の警告。人身被害・物損など緊急性が高いときは赤で最上部相当に強調。 */}
           {situation === "injury" ? (
-            <div className="mb-5 rounded-2xl border-2 border-red-500 bg-red-50 p-4 text-left">
-              <div className="flex items-center gap-2 text-lg font-bold text-red-700">
-                <Phone size={22} aria-hidden />
-                今すぐ110番へ通報してください
-              </div>
-              <p className="mt-2 text-base leading-relaxed text-red-800">
-                けが人がいるとき、クマが今もその場にいるときは、この投稿だけで終わらせず、
-                <strong>すぐに警察（110番）・救急（119番）</strong>とお住まいの自治体に連絡してください。
-              </p>
-              <a
-                href="tel:110"
-                className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-red-600 text-lg font-bold text-white shadow-sm hover:bg-red-700"
-              >
-                <Phone size={20} aria-hidden />
-                110番に電話する
-              </a>
+            <div className="mb-5 text-left">
+              <InjuryAlert />
             </div>
           ) : (
             <div
@@ -400,8 +386,8 @@ function SubmitContent() {
   // ウィザード本体
   // ─────────────────────────────────────────────────────────────
   const hasLocation = lat !== null && lon !== null;
-  // 各ステップで「次へ」を押せる条件。場所以外は既定値があるので常に進める。
-  const canProceed = step === 0 ? hasLocation : true;
+  // 各ステップで「次へ」を押せる条件。場所 (step 1) 以外は既定値があるので常に進める。
+  const canProceed = step === 1 ? hasLocation : true;
   const isLast = step === TOTAL_STEPS - 1;
 
   const goBack = () => {
@@ -438,7 +424,7 @@ function SubmitContent() {
 
       {/* ステップ内容 */}
       <div className="flex-1">
-        {step === 0 && (
+        {step === 1 && (
           <StepCard
             title="いつ・どこで見ましたか？"
             subtitle="場所と日時を教えてください。"
@@ -490,14 +476,15 @@ function SubmitContent() {
 
               <div className="border-t border-gray-100 pt-5">
                 <SubLabel>いつ見ましたか</SubLabel>
-                {/* 高さは py で作る (h 固定 + appearance-none だと iOS で値が
-                    上寄せになるため)。min-w-0 ではみ出しを防ぐ。文字は大きめ。 */}
+                {/* iOS Safari 対策: appearance-none で枠のはみ出しを防ぎ、高さは
+                    h 固定でなく py で作ることで値の上寄せも防ぐ。値は左寄せ・
+                    余白ゼロにして枠内に収める。文字は大きめ。 */}
                 <input
                   type="datetime-local"
                   value={occurredAt}
                   onChange={(e) => setOccurredAt(e.target.value)}
                   max={toLocalInputValue(new Date())}
-                  className="box-border block w-full min-w-0 max-w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-4 text-xl text-gray-900 [color-scheme:light] [&::-webkit-date-and-time-value]:text-left focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                  className="box-border block w-full min-w-0 max-w-full appearance-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-4 text-xl text-gray-900 [color-scheme:light] [&::-webkit-date-and-time-value]:m-0 [&::-webkit-date-and-time-value]:text-left [&::-webkit-datetime-edit]:p-0 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
                 />
                 <BigButton
                   onClick={() => setOccurredAt(toLocalInputValue(new Date()))}
@@ -514,7 +501,7 @@ function SubmitContent() {
           </StepCard>
         )}
 
-        {step === 1 && (
+        {step === 0 && (
           <StepCard
             title="何を見ましたか？"
             subtitle="ようすと頭数を教えてください。"
@@ -555,24 +542,7 @@ function SubmitContent() {
                     );
                   })}
                 </div>
-                {situation === "injury" && (
-                  <div className="mt-4 rounded-2xl border-2 border-red-500 bg-red-50 p-4">
-                    <div className="flex items-center gap-2 text-base font-bold text-red-700">
-                      <Phone size={20} aria-hidden />
-                      けが人がいるときは今すぐ110番へ
-                    </div>
-                    <p className="mt-1.5 text-sm leading-relaxed text-red-800">
-                      投稿より先に、警察（110番）・救急（119番）へ連絡してください。
-                    </p>
-                    <a
-                      href="tel:110"
-                      className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-red-600 text-base font-bold text-white hover:bg-red-700"
-                    >
-                      <Phone size={18} aria-hidden />
-                      110番に電話する
-                    </a>
-                  </div>
-                )}
+                {situation === "injury" && <InjuryAlert />}
               </div>
 
               <div className="border-t border-gray-100 pt-5">
@@ -694,7 +664,13 @@ function SubmitContent() {
             subtitle="この内容で送信します。直したいときは各行の「なおす」から。"
           >
             <dl className="divide-y divide-gray-100 rounded-2xl border border-gray-200">
-              <SummaryRow label="場所" onEdit={() => setStep(0)}>
+              <SummaryRow label="ようす" onEdit={() => setStep(0)}>
+                {SITUATION_LABEL[situation]}
+              </SummaryRow>
+              <SummaryRow label="頭数" onEdit={() => setStep(0)}>
+                {headCount}頭
+              </SummaryRow>
+              <SummaryRow label="場所" onEdit={() => setStep(1)}>
                 {hasLocation ? (
                   placeName ? (
                     <span>{placeName} 付近</span>
@@ -707,14 +683,8 @@ function SubmitContent() {
                   <span className="text-red-600">未指定</span>
                 )}
               </SummaryRow>
-              <SummaryRow label="いつ" onEdit={() => setStep(0)}>
+              <SummaryRow label="いつ" onEdit={() => setStep(1)}>
                 {formatOccurred(occurredAt)}
-              </SummaryRow>
-              <SummaryRow label="ようす" onEdit={() => setStep(1)}>
-                {SITUATION_LABEL[situation]}
-              </SummaryRow>
-              <SummaryRow label="頭数" onEdit={() => setStep(1)}>
-                {headCount}頭
               </SummaryRow>
               <SummaryRow label="写真" onEdit={() => setStep(2)}>
                 {photoDataUrl ? "あり" : "なし"}
@@ -729,9 +699,16 @@ function SubmitContent() {
             <p className="mt-4 text-xs leading-relaxed text-gray-500">
               匿名で送信されます。内容は確認のうえ、地図や自治体等への共有データに反映される場合があります。
               プライバシーポリシーは{" "}
-              <Link href="/privacy" className="underline">
+              {/* 別タブで開く。同タブ遷移だと戻ったときに入力中のフォームが
+                  リセットされてしまうため。 */}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
                 こちら
-              </Link>
+              </a>
               。
             </p>
 
@@ -780,6 +757,39 @@ function SubmitContent() {
             </button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// 人がケガをしたときの緊急警告。状況ステップと送信完了画面で共通利用。
+// けが人には救急(119)が必要なので、110(警察)と119(救急)の両方を出す。
+function InjuryAlert() {
+  return (
+    <div className="rounded-2xl border-2 border-red-500 bg-red-50 p-4">
+      <div className="flex items-center gap-2 text-base font-bold text-red-700">
+        <Phone size={20} aria-hidden />
+        けが人がいるときは、今すぐ通報を
+      </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-red-800">
+        この投稿だけで終わらせず、
+        <strong>警察（110番）・救急（119番）</strong>とお住まいの自治体に連絡してください。
+      </p>
+      <div className="mt-3 flex gap-2">
+        <a
+          href="tel:110"
+          className="flex h-14 flex-1 flex-col items-center justify-center rounded-2xl bg-red-600 font-bold text-white active:bg-red-700"
+        >
+          <span className="text-lg leading-none">110番</span>
+          <span className="text-xs opacity-90">警察</span>
+        </a>
+        <a
+          href="tel:119"
+          className="flex h-14 flex-1 flex-col items-center justify-center rounded-2xl bg-red-600 font-bold text-white active:bg-red-700"
+        >
+          <span className="text-lg leading-none">119番</span>
+          <span className="text-xs opacity-90">救急・消防</span>
+        </a>
       </div>
     </div>
   );
