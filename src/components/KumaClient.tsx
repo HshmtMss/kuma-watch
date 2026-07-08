@@ -116,6 +116,8 @@ export default function KumaClient() {
   const [showChat, setShowChat] = useState(false);
   // 投稿フローからの「地図から選ぶ」モード (mount 時に URL クエリで判定)
   const [pickerMode, setPickerMode] = useState<null | "submit">(null);
+  // useCallback([]) な検索/GPS ハンドラから最新の pickerMode を読むための ref。
+  const pickerModeRef = useRef<null | "submit">(null);
   // 観光地 / 市町村ページから ?lat=&lon=&label= 経由で来た場合のラベル。
   // 表示中に「← {label} に戻る」ボタンを出して履歴を戻りやすくする。
   const [returnLabel, setReturnLabel] = useState<string | null>(null);
@@ -128,6 +130,9 @@ export default function KumaClient() {
   useEffect(() => {
     recordsRef.current = records;
   }, [records]);
+  useEffect(() => {
+    pickerModeRef.current = pickerMode;
+  }, [pickerMode]);
   const handleMapReady = useCallback((m: LeafletMap) => {
     leafletMapRef.current = m;
   }, []);
@@ -320,6 +325,13 @@ export default function KumaClient() {
   }, []);
 
   const handleSearchPick = useCallback((hit: GeocodeHit) => {
+    // 投稿ピッカー(十字ピン)中は、選択マーカーを出さず地図中心だけ移動する。
+    // 決定時に地図中心を採用するので、選択状態は持たなくてよい。
+    if (pickerModeRef.current === "submit") {
+      const m = leafletMapRef.current;
+      if (m) m.setView([hit.lat, hit.lon], Math.max(m.getZoom(), 14));
+      return;
+    }
     const label =
       [hit.city, hit.district].filter(Boolean).join(" ") ||
       hit.displayName.split(",")[0]?.trim() ||
@@ -343,6 +355,12 @@ export default function KumaClient() {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         setCurrentLocation({ lat, lon });
+        // ピッカー中は選択マーカーを出さず、地図中心を現在地へ寄せるだけ。
+        if (pickerModeRef.current === "submit") {
+          const m = leafletMapRef.current;
+          if (m) m.setView([lat, lon], Math.max(m.getZoom(), 14));
+          return;
+        }
         setSelectedLocation({ lat, lon, source: "gps" });
       },
       () => {
@@ -695,8 +713,14 @@ export default function KumaClient() {
     return latest;
   }, [records]);
 
+  // 投稿の「地図で選ぶ」中は、地点ドロップに専念できるよう画面を最小化する
+  // (ヘッダー・設定バー・カード・対策・天気・出没ピン・メッシュを隠し、中央の
+  //  十字ピンで地点を合わせる)。
+  const isPicking = pickerMode === "submit";
+
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
+      {!isPicking && (
       <header className="relative z-[1100] flex shrink-0 items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
         {/* ブランド一式 (ロゴ + くまウォッチ + BETA) をまとめてトップ (地図) への
             1 つのリンクにする。BETA は個別リンクをやめ単なるバッジに。
@@ -721,8 +745,10 @@ export default function KumaClient() {
         </Link>
         <HeaderNav />
       </header>
+      )}
 
       {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}
+      {!isPicking && (
       <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-white px-2 py-2">
         <div className="flex items-stretch gap-2 text-sm sm:text-xs">
           {/* 出没ピン (表示 ON/OFF + 期間セレクト + 件数) — 横幅を取って広がる */}
@@ -831,6 +857,7 @@ export default function KumaClient() {
           </details>
         </div>
       </div>
+      )}
 
       <div className="relative flex-1 min-h-0">
         {/* 検索バーを地図上にフロート配置。ピッカーモード中はバナーと干渉、
@@ -866,19 +893,37 @@ export default function KumaClient() {
         )}
 
         <KumaMap
-          records={filtered}
-          showHeatmap={showHeatmap}
+          records={isPicking ? [] : filtered}
+          showHeatmap={isPicking ? false : showHeatmap}
           heatmapOpacity={heatmapOpacity}
           smoothingSigmaKm={smoothingSigmaKm}
           haloOpacity={haloOpacity}
           levelThresholds={levelThresholds}
           sightingCountByMesh={sightingCountByMesh}
           tileStyle={tileStyle}
-          selectedLocation={selectedLocation}
+          selectedLocation={isPicking ? null : selectedLocation}
           currentLocation={currentLocation}
           onMapClick={handleMapClick}
           onMapReady={handleMapReady}
         />
+
+        {/* 投稿ピッカーの中央固定ピン。地図を動かして、この先端 (画面中央) を
+            出没地点に合わせてもらう。決定時は地図中心の座標を採用する。 */}
+        {isPicking && (
+          <div className="pointer-events-none absolute inset-0 z-[970]">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
+              <MapPin
+                size={46}
+                strokeWidth={2.5}
+                className="text-amber-600 drop-shadow-md"
+                fill="#fbbf24"
+                aria-hidden
+              />
+            </div>
+            {/* 先端が指す正確な中心点 */}
+            <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-700 ring-2 ring-white" />
+          </div>
+        )}
 
         {/* 観光地・市町村ページから来たときの「戻る」ボタン (検索バー下にフロート)。
             ブラウザ戻るより目立つ位置に置く。 */}
@@ -914,11 +959,9 @@ export default function KumaClient() {
                   <div className="text-base font-bold leading-snug text-amber-900">
                     クマを見た場所を選んでください
                   </div>
-                  {!selectedLocation && (
-                    <div className="mt-0.5 text-sm leading-relaxed text-amber-800">
-                      地図をタップ、または下の検索で地名を探す
-                    </div>
-                  )}
+                  <div className="mt-0.5 text-sm leading-relaxed text-amber-800">
+                    地図を動かして、中央のピンを合わせる（地名検索も可）
+                  </div>
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
@@ -934,18 +977,20 @@ export default function KumaClient() {
                 </button>
                 <button
                   type="button"
-                  disabled={!selectedLocation}
                   onClick={() => {
-                    if (!selectedLocation) return;
+                    // 中央固定ピンが指す = 地図中心の座標を採用する。
+                    const m = leafletMapRef.current;
+                    if (!m) return;
+                    const c = m.getCenter();
                     const params = new URLSearchParams({
-                      lat: selectedLocation.lat.toFixed(5),
-                      lon: selectedLocation.lon.toFixed(5),
+                      lat: c.lat.toFixed(5),
+                      lon: c.lng.toFixed(5),
                       fromPicker: "1",
                     });
                     setPickerMode(null);
                     router.push(`/submit?${params.toString()}`);
                   }}
-                  className="h-12 flex-[2] rounded-full bg-amber-600 text-base font-bold text-white shadow-sm active:bg-amber-700 disabled:opacity-40"
+                  className="h-12 flex-[2] rounded-full bg-amber-600 text-base font-bold text-white shadow-sm active:bg-amber-700"
                 >
                   決定
                 </button>
@@ -958,17 +1003,24 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 地図右上: 天気バッジ (現在地 or 選択地点) */}
-        <TopWeatherBadge
-          lat={selectedLocation?.lat ?? currentLocation?.lat ?? null}
-          lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
-        />
+        {/* 地図右上: 天気バッジ (現在地 or 選択地点)。ピッカー中は隠す。 */}
+        {!isPicking && (
+          <TopWeatherBadge
+            lat={selectedLocation?.lat ?? currentLocation?.lat ?? null}
+            lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
+          />
+        )}
 
-        {/* 右端縦スタック: 現在地 / ズーム (カード上端に合わせて配置)。
-            地図スタイル切替はツールバーの「表示」メニューに集約済み。 */}
-        <div className="absolute right-3 bottom-[calc(41vh+0.75rem)] z-[900] flex flex-col gap-2.5">
+        {/* 右端縦スタック: 現在地 / ズーム。ピッカー中は「対策」を隠し、カードも
+            無いので位置を下 (bottom-3) に寄せる。 */}
+        <div
+          className={`absolute right-3 z-[900] flex flex-col gap-2.5 ${
+            isPicking ? "bottom-3" : "bottom-[calc(41vh+0.75rem)]"
+          }`}
+        >
           {/* クマ対策の合言葉「はちみつ」を開く。共通の HachimitsuGuide (layout) が
               open-hachimitsu イベントを受けてポップアップを開く。現在地ボタンの上に同サイズで。 */}
+          {!isPicking && (
           <button
             type="button"
             onClick={() =>
@@ -983,6 +1035,7 @@ export default function KumaClient() {
               対策
             </span>
           </button>
+          )}
           <button
             type="button"
             onClick={requestCurrentLocation}
@@ -1149,19 +1202,21 @@ export default function KumaClient() {
 
 
 
-        {/* 跳ね上げ式カード: map 領域に絶対配置 (下から) */}
-        <RiskPanel
-          location={selectedLocation}
-          periodDays={periodDays}
-          records={records}
-          onPickGps={handleGpsPick}
-          smoothingSigmaKm={smoothingSigmaKm}
-          levelThresholds={levelThresholds}
-          sightingCountByMesh={sightingCountByMesh}
-          onShare={handleShare}
-          onAskAi={() => setShowChat(true)}
-          onAskContextChange={setAskContext}
-        />
+        {/* 跳ね上げ式カード: map 領域に絶対配置 (下から)。ピッカー中は隠す。 */}
+        {!isPicking && (
+          <RiskPanel
+            location={selectedLocation}
+            periodDays={periodDays}
+            records={records}
+            onPickGps={handleGpsPick}
+            smoothingSigmaKm={smoothingSigmaKm}
+            levelThresholds={levelThresholds}
+            sightingCountByMesh={sightingCountByMesh}
+            onShare={handleShare}
+            onAskAi={() => setShowChat(true)}
+            onAskContextChange={setAskContext}
+          />
+        )}
       </div>
     </div>
   );
