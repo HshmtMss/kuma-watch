@@ -67,6 +67,41 @@ function defaultHeadCount(s: Situation): number {
   return s === "trace" ? 0 : 1;
 }
 
+// 写真を長辺 1600px・JPEG(0.82) に縮小して data URL を返す。
+// スマホの写真は数MBあり、そのまま送ると Vercel のリクエスト上限を超えるため。
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.onload = () => {
+      const src = typeof reader.result === "string" ? reader.result : "";
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        const MAX = 1600;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          const scale = MAX / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(src); // 変換不可なら元データで (小さい画像を想定)
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 // ウィザードの各ステップ。3 つの入力 + 確認の計 4 画面。
 // 1 画面に関連する 2 項目までをまとめ、遷移を最小限にする。
 const STEPS = ["ようす・頭数", "いつ・どこで", "写真・補足", "確認"] as const;
@@ -105,6 +140,7 @@ function SubmitContent() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const setSituation = (s: Situation) => {
     setSituationRaw(s);
@@ -225,7 +261,7 @@ function SubmitContent() {
     );
   };
 
-  const onPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhotoError(null);
     const file = e.target.files?.[0];
     if (!file) return;
@@ -233,19 +269,19 @@ function SubmitContent() {
       setPhotoError("画像ファイルを選んでください");
       return;
     }
-    // 5 MB までに制限
-    if (file.size > 5 * 1024 * 1024) {
-      setPhotoError("ファイルサイズは 5MB 以下にしてください");
+    // 20MB より大きい元ファイルはさすがに弾く (縮小前チェック)。
+    if (file.size > 20 * 1024 * 1024) {
+      setPhotoError("ファイルサイズが大きすぎます");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPhotoDataUrl(typeof reader.result === "string" ? reader.result : null);
-    };
-    reader.onerror = () => {
+    try {
+      // スマホの写真は数MBあり、そのまま送ると Vercel のリクエスト上限(4.5MB)を
+      // 超えて「サーバーエラー」になる。長辺 1600px・JPEG に縮小して送る。
+      const compressed = await compressImage(file);
+      setPhotoDataUrl(compressed);
+    } catch {
       setPhotoError("画像の読み込みに失敗しました");
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const submit = async () => {
@@ -703,16 +739,16 @@ function SubmitContent() {
             <p className="mt-4 text-xs leading-relaxed text-gray-500">
               匿名で送信されます。内容は確認のうえ、地図や自治体等への共有データに反映される場合があります。
               プライバシーポリシーは{" "}
-              {/* 別タブで開く。同タブ遷移だと戻ったときに入力中のフォームが
-                  リセットされてしまうため。 */}
-              <a
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* ページ遷移せずアプリ内モーダルで表示する。ホーム追加(PWA)だと
+                  target="_blank" が新規タブにならず同一画面で開き、入力中の
+                  フォームに戻れなくなるため。 */}
+              <button
+                type="button"
+                onClick={() => setShowPrivacy(true)}
                 className="underline"
               >
                 こちら
-              </a>
+              </button>
               。
             </p>
 
@@ -762,6 +798,29 @@ function SubmitContent() {
           )}
         </div>
       </div>
+
+      {/* プライバシーポリシー: ページ遷移せずアプリ内で全文表示 (PWA でも安全)。 */}
+      {showPrivacy && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-white">
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="text-base font-bold text-gray-900">
+              プライバシーポリシー
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPrivacy(false)}
+              className="h-10 rounded-full px-4 text-base font-semibold text-amber-700 hover:bg-amber-50"
+            >
+              閉じる
+            </button>
+          </div>
+          <iframe
+            src="/privacy"
+            title="プライバシーポリシー"
+            className="min-h-0 w-full flex-1 border-0"
+          />
+        </div>
+      )}
     </div>
   );
 }
