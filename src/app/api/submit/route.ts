@@ -19,6 +19,9 @@ export type SubmitPayload = {
   contact?: string;
   /** data URL 形式 (image/jpeg, image/png など) の写真 */
   photoDataUrl?: string;
+  /** 写真EXIFから読み取った撮影位置（クライアントが圧縮前に抽出）。 */
+  photoLat?: number;
+  photoLon?: number;
 };
 
 const SITUATION_VALUES = new Set(["sight", "trace", "damage", "injury"]);
@@ -66,6 +69,14 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
     photoDataUrl = b.photoDataUrl;
   }
 
+  // 写真EXIFの撮影位置（任意）。地球上の妥当範囲のみ受理し、それ以外は無視。
+  const pLat = Number(b.photoLat);
+  const pLon = Number(b.photoLon);
+  const photoLat =
+    Number.isFinite(pLat) && pLat >= -90 && pLat <= 90 ? pLat : undefined;
+  const photoLon =
+    Number.isFinite(pLon) && pLon >= -180 && pLon <= 180 ? pLon : undefined;
+
   return {
     ok: true,
     payload: {
@@ -77,6 +88,8 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
       comment,
       contact,
       photoDataUrl,
+      photoLat: photoLat != null && photoLon != null ? photoLat : undefined,
+      photoLon: photoLat != null && photoLon != null ? photoLon : undefined,
     },
   };
 }
@@ -184,6 +197,8 @@ export async function POST(req: Request) {
     comment: rest.comment,
     contact: rest.contact,
     photoUrl,
+    photoLat: rest.photoLat,
+    photoLon: rest.photoLon,
     prefectureName: geo.prefectureName,
     cityName: geo.cityName,
     sectionName: geo.sectionName,

@@ -36,6 +36,9 @@ export type StoredSubmission = {
   comment?: string;
   contact?: string;
   photoUrl?: string; // Vercel Blob の公開 URL
+  /** 写真EXIFから読み取った撮影位置（あれば）。ピン位置(lat/lon)とは別。 */
+  photoLat?: number;
+  photoLon?: number;
   prefectureName?: string;
   cityName?: string;
   sectionName?: string;

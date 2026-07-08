@@ -58,11 +58,29 @@ type Submission = {
   comment?: string;
   contact?: string;
   photoUrl?: string;
+  photoLat?: number;
+  photoLon?: number;
   prefectureName?: string;
   cityName?: string;
   sectionName?: string;
   receivedAt: number;
 };
+
+// 2点間の距離(km)。写真の撮影位置とピン位置のズレ確認用。
+function distanceKm(
+  aLat: number,
+  aLon: number,
+  bLat: number,
+  bLon: number,
+): number {
+  const toR = (d: number) => (d * Math.PI) / 180;
+  const dLat = toR(bLat - aLat);
+  const dLon = toR(bLon - aLon);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toR(aLat)) * Math.cos(toR(bLat)) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(s));
+}
 
 type Decision = "approve" | "reject" | "delete";
 
@@ -275,6 +293,9 @@ function SubmissionsContent({
                   <span className="tabular-nums text-stone-500">
                     発生 {fmtDateTime(s.occurredAt)}
                   </span>
+                  <span className="tabular-nums text-stone-400">
+                    受信 {fmtDateTime(new Date(s.receivedAt).toISOString())}
+                  </span>
                 </div>
 
                 <div className="text-sm font-semibold text-stone-900">
@@ -296,9 +317,34 @@ function SubmissionsContent({
                     rel="noopener noreferrer"
                     className="text-blue-700 underline"
                   >
-                    地図で位置確認 ({s.lat.toFixed(4)}, {s.lon.toFixed(4)})
+                    ピン位置を地図で確認 ({s.lat.toFixed(4)}, {s.lon.toFixed(4)})
                   </a>
                   {s.contact && <span>連絡先: {s.contact}</span>}
+                </div>
+
+                {s.photoLat != null && s.photoLon != null && (
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-500">
+                    <span className="rounded bg-stone-100 px-1.5 py-0.5 font-medium text-stone-600">
+                      📷 写真の撮影位置
+                    </span>
+                    <a
+                      href={`https://www.google.com/maps?q=${s.photoLat},${s.photoLon}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-700 underline"
+                    >
+                      {s.photoLat.toFixed(4)}, {s.photoLon.toFixed(4)}
+                    </a>
+                    <span className="tabular-nums">
+                      ピンから{" "}
+                      {distanceKm(s.lat, s.lon, s.photoLat, s.photoLon).toFixed(2)}
+                      km
+                    </span>
+                  </div>
+                )}
+
+                <div className="mt-2 font-mono text-[10px] text-stone-400">
+                  ID: {s.id}
                 </div>
 
                 <div className="mt-3 flex gap-2">

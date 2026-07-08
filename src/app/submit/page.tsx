@@ -20,6 +20,7 @@ import {
   Clock,
   type LucideIcon,
 } from "lucide-react";
+import { readExifGps, type PhotoGps } from "@/lib/exif-gps";
 
 type Situation = "sight" | "trace" | "damage" | "injury";
 
@@ -134,6 +135,8 @@ function SubmitContent() {
   const [contact, setContact] = useState("");
   const [placeName, setPlaceName] = useState<string | null>(null);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  // 写真EXIFから読み取った撮影位置（取れた場合のみ）。投稿に添付し管理画面で照合。
+  const [photoGps, setPhotoGps] = useState<PhotoGps | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
@@ -275,6 +278,10 @@ function SubmitContent() {
       return;
     }
     try {
+      // 圧縮(canvas再エンコード)するとEXIFが剥がれるので、その「前」に元ファイルから
+      // 撮影位置(GPS)を読み取っておく。取れなければ null のまま。
+      const gps = await readExifGps(file);
+      setPhotoGps(gps);
       // スマホの写真は数MBあり、そのまま送ると Vercel のリクエスト上限(4.5MB)を
       // 超えて「サーバーエラー」になる。長辺 1600px・JPEG に縮小して送る。
       const compressed = await compressImage(file);
@@ -305,6 +312,8 @@ function SubmitContent() {
           comment: comment || undefined,
           contact: contact || undefined,
           photoDataUrl: photoDataUrl || undefined,
+          photoLat: photoGps?.lat,
+          photoLon: photoGps?.lon,
         }),
       });
       let data: { id?: string; error?: string } | null = null;
@@ -636,6 +645,7 @@ function SubmitContent() {
                   type="button"
                   onClick={() => {
                     setPhotoDataUrl(null);
+                    setPhotoGps(null);
                     setPhotoError(null);
                   }}
                   className="h-11 rounded-full px-4 text-base font-medium text-red-600 hover:bg-red-50"
