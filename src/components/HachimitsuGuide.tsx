@@ -1,8 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Footprints, Ban, Users, Bell, type LucideIcon } from "lucide-react";
+import {
+  Footprints,
+  Ban,
+  Users,
+  Bell,
+  ExternalLink,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * クマ対策の合言葉「はちみつ」を、地図(トップ)の「対策」ボタンからワンタップで開ける
@@ -155,13 +161,16 @@ export default function HachimitsuGuide() {
               </span>
             </p>
 
-            <Link
+            {/* 別タブで開き、この地図・ポップアップの文脈を残す（戻りやすさ優先）。 */}
+            <a
               href="/measures"
-              onClick={() => setOpen(false)}
-              className="mt-3 flex w-full items-center justify-center rounded-full border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 flex w-full items-center justify-center gap-1 rounded-full border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
-              もっと詳しく（対策の総合ガイド）→
-            </Link>
+              もっと詳しく（対策の総合ガイド）
+              <ExternalLink size={15} strokeWidth={2} aria-hidden />
+            </a>
           </div>
         </div>
       )}
