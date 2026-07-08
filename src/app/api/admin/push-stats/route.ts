@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getPushStats, isConfigured } from "@/lib/push-storage";
+import {
+  getPushStats,
+  getPushHistory,
+  isConfigured,
+} from "@/lib/push-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,6 +39,9 @@ export async function GET(req: Request) {
   }
   const sp = new URL(req.url).searchParams;
   const topN = Math.min(Math.max(Number(sp.get("top")) || 30, 1), 200);
-  const stats = await getPushStats(topN);
-  return NextResponse.json({ ok: true, ...stats });
+  const [stats, history] = await Promise.all([
+    getPushStats(topN),
+    getPushHistory(120),
+  ]);
+  return NextResponse.json({ ok: true, ...stats, history });
 }

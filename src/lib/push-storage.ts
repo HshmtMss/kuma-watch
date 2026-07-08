@@ -363,6 +363,59 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
   };
 }
 
+// ─── 登録数の時系列スナップショット ───
+// 日次で主要な集計値を push:hist (Hash: field=YYYY-MM-DD, value=JSON) に保存し、
+// 管理画面で登録数の推移を見られるようにする。同日再実行は上書き（冪等）。
+
+export type PushSnapshot = {
+  date: string; // YYYY-MM-DD (JST)
+  totalSubscribers: number;
+  totalSubscriptions: number;
+  activeMuniCount: number;
+  activeSpotCount: number;
+  totalGeoPoints: number;
+};
+
+const HIST_KEY = "push:hist";
+
+function jstDate(): string {
+  // "YYYY-MM-DD" (JST)。sv-SE ロケールは ISO 形式で返る。
+  return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+}
+
+/** 現在の集計値を日次スナップショットとして保存する（cron から呼ぶ）。 */
+export async function recordPushSnapshot(): Promise<PushSnapshot> {
+  const s = await getPushStats(0);
+  const snap: PushSnapshot = {
+    date: jstDate(),
+    totalSubscribers: s.totalSubscribers,
+    totalSubscriptions: s.totalSubscriptions,
+    activeMuniCount: s.activeMuniCount,
+    activeSpotCount: s.activeSpotCount,
+    totalGeoPoints: s.totalGeoPoints,
+  };
+  await client().hset(HIST_KEY, { [snap.date]: JSON.stringify(snap) });
+  return snap;
+}
+
+/** 直近 days 日の日次スナップショットを日付昇順で返す。 */
+export async function getPushHistory(days = 120): Promise<PushSnapshot[]> {
+  const all = await client().hgetall<Record<string, string | PushSnapshot>>(
+    HIST_KEY,
+  );
+  if (!all) return [];
+  const list: PushSnapshot[] = [];
+  for (const v of Object.values(all)) {
+    try {
+      list.push(typeof v === "string" ? (JSON.parse(v) as PushSnapshot) : v);
+    } catch {
+      /* skip broken entry */
+    }
+  }
+  list.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return list.slice(-days);
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // 観光地 (spot) 購読。市町村 (muni) と完全に対になる構造。違いは「出没との
 // 紐付けを名前一致ではなく緯度経度の近傍 (dispatch 側で計算) で行う」点だけで、
