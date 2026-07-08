@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { BarChart3, ClipboardList, LayoutDashboard, LogOut } from "lucide-react";
+import {
+  BarChart3,
+  ClipboardList,
+  Eye,
+  EyeOff,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
 
 /**
  * 管理画面の共通シェル。合言葉ログイン（sessionStorage 共有）＋上部ナビ（タブ・
@@ -35,6 +42,8 @@ export default function AdminShell({
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  // 合言葉の表示/非表示トグル。
+  const [showSecret, setShowSecret] = useState(false);
   // 投稿タブに出す承認待ち件数バッジ（全画面で共通表示）。
   const [pendingBadge, setPendingBadge] = useState<number | null>(null);
 
@@ -112,14 +121,32 @@ export default function AdminShell({
           }}
           className="flex flex-col gap-3"
         >
-          <input
-            type="password"
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-            placeholder="合言葉"
-            autoComplete="current-password"
-            className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-base focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
-          />
+          <div className="relative">
+            <input
+              type={showSecret ? "text" : "password"}
+              value={secret}
+              onChange={(e) => setSecret(e.target.value)}
+              placeholder="合言葉"
+              autoComplete="current-password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 pr-12 text-base focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+            />
+            <button
+              type="button"
+              onClick={() => setShowSecret((v) => !v)}
+              aria-label={showSecret ? "合言葉を隠す" : "合言葉を表示"}
+              title={showSecret ? "隠す" : "表示"}
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-stone-400 hover:text-stone-600"
+            >
+              {showSecret ? (
+                <EyeOff size={20} aria-hidden />
+              ) : (
+                <Eye size={20} aria-hidden />
+              )}
+            </button>
+          </div>
           <button
             type="submit"
             disabled={checking || !secret.trim()}
