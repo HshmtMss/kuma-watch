@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import AdminShell from "@/components/admin/AdminShell";
 
 /**
  * 通知登録状況ダッシュボード (合言葉でログイン)。
@@ -28,8 +29,6 @@ type PushStats = {
   topSpots: SpotRow[];
 };
 
-const SECRET_KEY = "kw.admin.secret";
-
 function downloadCsv(filename: string, rows: (string | number)[][]): void {
   const esc = (v: string | number) => {
     const s = String(v);
@@ -47,37 +46,45 @@ function downloadCsv(filename: string, rows: (string | number)[][]): void {
 }
 
 export default function AdminPushStats() {
-  const [secret, setSecret] = useState("");
-  const [authed, setAuthed] = useState(false);
+  return (
+    <AdminShell active="push-stats" title="通知登録状況">
+      {(secret, deauth) => (
+        <PushStatsContent secret={secret} deauth={deauth} />
+      )}
+    </AdminShell>
+  );
+}
+
+function PushStatsContent({
+  secret,
+  deauth,
+}: {
+  secret: string;
+  deauth: () => void;
+}) {
   const [stats, setStats] = useState<PushStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const load = useCallback(async (sec: string) => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const res = await fetch(`/api/admin/push-stats?top=200`, {
-        headers: { Authorization: `Bearer ${sec}` },
+        headers: { Authorization: `Bearer ${secret}` },
         cache: "no-store",
       });
       if (res.status === 401) {
-        setAuthed(false);
-        setError("合言葉が違います。");
-        sessionStorage.removeItem(SECRET_KEY);
+        deauth();
         return;
       }
       if (res.status === 503) {
         setError("通知基盤 (Upstash) が未設定です。");
-        setAuthed(true);
-        sessionStorage.setItem(SECRET_KEY, sec);
         return;
       }
       if (!res.ok) throw new Error(String(res.status));
       const data = (await res.json()) as PushStats;
       setStats(data);
-      setAuthed(true);
-      sessionStorage.setItem(SECRET_KEY, sec);
     } catch (e) {
       setError(
         `読み込みに失敗しました: ${e instanceof Error ? e.message : String(e)}`,
@@ -85,71 +92,23 @@ export default function AdminPushStats() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [secret, deauth]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(SECRET_KEY);
-    if (saved) {
-      setSecret(saved);
-      load(saved);
-    }
+    load();
   }, [load]);
 
-  if (!authed) {
-    return (
-      <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-5">
-        <h1 className="mb-1 text-xl font-bold text-stone-900">通知登録状況</h1>
-        <p className="mb-4 text-sm text-stone-500">
-          管理者用。合言葉を入力してください。
-        </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (secret.trim()) load(secret.trim());
-          }}
-          className="flex flex-col gap-3"
-        >
-          <input
-            type="password"
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-            placeholder="合言葉"
-            autoComplete="current-password"
-            className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-base focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
-          />
-          <button
-            type="submit"
-            disabled={loading || !secret.trim()}
-            className="rounded-xl bg-amber-600 px-4 py-3 text-sm font-semibold text-white hover:bg-amber-700 disabled:bg-stone-300"
-          >
-            {loading ? "確認中…" : "ログイン"}
-          </button>
-          {error && <p className="text-sm text-rose-700">{error}</p>}
-        </form>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto min-h-screen max-w-3xl px-4 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-900">通知登録状況</h1>
-        <div className="flex items-center gap-2">
-          <a
-            href="/admin/submissions"
-            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
-          >
-            投稿モデレーション
-          </a>
-          <button
-            type="button"
-            onClick={() => load(secret)}
-            disabled={loading}
-            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
-          >
-            {loading ? "更新中…" : "更新"}
-          </button>
-        </div>
+    <>
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={load}
+          disabled={loading}
+          className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+        >
+          {loading ? "更新中…" : "更新"}
+        </button>
       </div>
 
       {error && (
@@ -227,7 +186,7 @@ export default function AdminPushStats() {
           データがありません。
         </p>
       )}
-    </div>
+    </>
   );
 }
 

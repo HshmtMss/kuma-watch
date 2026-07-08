@@ -1,7 +1,12 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import AdminDashboard from "./AdminDashboard";
 
-// /admin に来たら投稿モデレーション画面へ転送する。
-// (ブラウザの自動補完で末尾が落ちて /admin になりがちなため)
-export default function AdminIndex() {
-  redirect("/admin/submissions");
+export const metadata: Metadata = {
+  title: "ダッシュボード｜管理",
+  // 管理画面は検索エンジンに載せない
+  robots: { index: false, follow: false },
+};
+
+export default function AdminIndexPage() {
+  return <AdminDashboard />;
 }

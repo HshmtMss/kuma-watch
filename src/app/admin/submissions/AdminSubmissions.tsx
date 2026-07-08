@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AdminSubmissionsMap, { type MapItem } from "./AdminSubmissionsMap";
+import AdminShell from "@/components/admin/AdminShell";
 
 /**
  * 市民投稿モデレーション画面 (合言葉でログイン)。
@@ -65,8 +66,6 @@ type Submission = {
 
 type Decision = "approve" | "reject" | "delete";
 
-const SECRET_KEY = "kw.admin.secret";
-
 function fmtDateTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
@@ -75,8 +74,22 @@ function fmtDateTime(iso: string): string {
 }
 
 export default function AdminSubmissions() {
-  const [secret, setSecret] = useState("");
-  const [authed, setAuthed] = useState(false);
+  return (
+    <AdminShell active="submissions" title="投稿モデレーション">
+      {(secret, deauth) => (
+        <SubmissionsContent secret={secret} deauth={deauth} />
+      )}
+    </AdminShell>
+  );
+}
+
+function SubmissionsContent({
+  secret,
+  deauth,
+}: {
+  secret: string;
+  deauth: () => void;
+}) {
   const [items, setItems] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -84,41 +97,36 @@ export default function AdminSubmissions() {
   const [status, setStatus] = useState("pending");
   const [view, setView] = useState<"list" | "map">("list");
 
-  const load = useCallback(async (sec: string, st: string) => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/admin/submissions?status=${st}`, {
-        headers: { Authorization: `Bearer ${sec}` },
-        cache: "no-store",
-      });
-      if (res.status === 401) {
-        setAuthed(false);
-        setError("合言葉が違います。");
-        sessionStorage.removeItem(SECRET_KEY);
-        return;
+  const load = useCallback(
+    async (st: string) => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(`/api/admin/submissions?status=${st}`, {
+          headers: { Authorization: `Bearer ${secret}` },
+          cache: "no-store",
+        });
+        if (res.status === 401) {
+          deauth();
+          return;
+        }
+        if (!res.ok) throw new Error(String(res.status));
+        const data = (await res.json()) as { submissions: Submission[] };
+        setItems(data.submissions ?? []);
+      } catch (e) {
+        setError(
+          `読み込みに失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      } finally {
+        setLoading(false);
       }
-      if (!res.ok) throw new Error(String(res.status));
-      const data = (await res.json()) as { submissions: Submission[] };
-      setItems(data.submissions ?? []);
-      setAuthed(true);
-      sessionStorage.setItem(SECRET_KEY, sec);
-    } catch (e) {
-      setError(
-        `読み込みに失敗しました: ${e instanceof Error ? e.message : String(e)}`,
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [secret, deauth],
+  );
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(SECRET_KEY);
-    if (saved) {
-      setSecret(saved);
-      load(saved, "pending");
-    }
-  }, [load]);
+    load(status);
+  }, [load, status]);
 
   const moderate = useCallback(
     async (id: string, decision: Decision) => {
@@ -137,7 +145,7 @@ export default function AdminSubmissions() {
         });
         if (!res.ok) throw new Error(String(res.status));
         // ステータスが変わると現在の絞り込みから外れるので再読込
-        await load(secret, status);
+        await load(status);
       } catch (e) {
         setError(
           `操作に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
@@ -151,45 +159,7 @@ export default function AdminSubmissions() {
 
   const changeTab = (key: string) => {
     setStatus(key);
-    load(secret, key);
   };
-
-  if (!authed) {
-    return (
-      <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-5">
-        <h1 className="mb-1 text-xl font-bold text-stone-900">
-          投稿モデレーション
-        </h1>
-        <p className="mb-4 text-sm text-stone-500">
-          管理者用。合言葉を入力してください。
-        </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (secret.trim()) load(secret.trim(), "pending");
-          }}
-          className="flex flex-col gap-3"
-        >
-          <input
-            type="password"
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-            placeholder="合言葉"
-            autoComplete="current-password"
-            className="rounded-xl border border-stone-300 bg-white px-4 py-3 text-base focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
-          />
-          <button
-            type="submit"
-            disabled={loading || !secret.trim()}
-            className="rounded-xl bg-amber-600 px-4 py-3 text-sm font-semibold text-white hover:bg-amber-700 disabled:bg-stone-300"
-          >
-            {loading ? "確認中…" : "ログイン"}
-          </button>
-          {error && <p className="text-sm text-rose-700">{error}</p>}
-        </form>
-      </div>
-    );
-  }
 
   const mapItems: MapItem[] = items.map((s) => ({
     id: s.id,
@@ -206,27 +176,16 @@ export default function AdminSubmissions() {
   }));
 
   return (
-    <div className="mx-auto min-h-screen max-w-2xl px-4 py-6">
-      <div className="mb-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-900">
-          市民投稿モデレーション
-        </h1>
-        <div className="flex items-center gap-2">
-          <a
-            href="/admin/push-stats"
-            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
-          >
-            通知登録状況
-          </a>
-          <button
-            type="button"
-            onClick={() => load(secret, status)}
-            disabled={loading}
-            className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
-          >
-            {loading ? "更新中…" : "更新"}
-          </button>
-        </div>
+    <>
+      <div className="mb-3 flex justify-end">
+        <button
+          type="button"
+          onClick={() => load(status)}
+          disabled={loading}
+          className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+        >
+          {loading ? "更新中…" : "更新"}
+        </button>
       </div>
 
       {/* ステータス絞り込みタブ */}
@@ -373,6 +332,6 @@ export default function AdminSubmissions() {
           ))}
         </ul>
       )}
-    </div>
+    </>
   );
 }
