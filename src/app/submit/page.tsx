@@ -448,26 +448,31 @@ function SubmitContent() {
                 <SubLabel>
                   クマを見た場所 <span className="text-red-500">*</span>
                 </SubLabel>
-                {hasLocation ? (
-                  <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-4 text-emerald-800 ring-1 ring-emerald-200">
-                    <CircleCheck size={26} className="shrink-0" aria-hidden />
-                    <div className="min-w-0">
-                      <div className="text-base font-bold">この場所にします</div>
-                      <div className="truncate text-sm text-emerald-700">
-                        {placeName
-                          ? `${placeName} 付近`
-                          : `${lat!.toFixed(5)}, ${lon!.toFixed(5)}`}
-                      </div>
+                {hasLocation && (
+                  // 選択済みの場所は、次ページの選択肢と同じオレンジの選択表示にする。
+                  <div className="mb-1 flex items-center gap-3 rounded-2xl border-2 border-amber-500 bg-amber-50 px-4 py-4 ring-4 ring-amber-100">
+                    <MapPin size={26} className="shrink-0 text-amber-700" aria-hidden />
+                    <div className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900">
+                      {placeName
+                        ? `${placeName} 付近`
+                        : `${lat!.toFixed(5)}, ${lon!.toFixed(5)}`}
                     </div>
+                    <Check size={24} className="shrink-0 text-amber-600" aria-hidden />
                   </div>
-                ) : (
-                  <p className="flex items-start gap-2 rounded-2xl bg-yellow-50 px-4 py-4 text-base leading-relaxed text-yellow-900 ring-1 ring-yellow-200">
+                )}
+                {!hasLocation && (
+                  <p className="mb-1 flex items-start gap-2 rounded-2xl bg-yellow-50 px-4 py-4 text-base leading-relaxed text-yellow-900 ring-1 ring-yellow-200">
                     <AlertTriangle size={22} className="mt-0.5 shrink-0" aria-hidden />
                     下のボタンで、クマや痕跡を見た場所を指定してください。
                   </p>
                 )}
-                <BigButton onClick={useGps} disabled={gpsLoading} icon={MapPin}>
-                  {gpsLoading ? "現在地を取得中..." : "現在地を使う（おすすめ）"}
+                <BigButton
+                  onClick={useGps}
+                  disabled={gpsLoading}
+                  icon={MapPin}
+                  variant="outline"
+                >
+                  {gpsLoading ? "現在地を取得中..." : "現在地を使う"}
                 </BigButton>
                 <BigButton onClick={goPickOnMap} icon={MapIcon} variant="outline">
                   地図で選ぶ
@@ -485,19 +490,21 @@ function SubmitContent() {
 
               <div className="border-t border-gray-100 pt-5">
                 <SubLabel>いつ見ましたか</SubLabel>
+                {/* 高さは py で作る (h 固定 + appearance-none だと iOS で値が
+                    上寄せになるため)。min-w-0 ではみ出しを防ぐ。文字は大きめ。 */}
                 <input
                   type="datetime-local"
                   value={occurredAt}
                   onChange={(e) => setOccurredAt(e.target.value)}
                   max={toLocalInputValue(new Date())}
-                  className="box-border block h-14 w-full min-w-0 max-w-full appearance-none rounded-2xl border-2 border-gray-200 bg-white px-4 text-lg text-gray-900 [color-scheme:light] focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                  className="box-border block w-full min-w-0 max-w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-4 text-xl text-gray-900 [color-scheme:light] [&::-webkit-date-and-time-value]:text-left focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
                 />
                 <BigButton
                   onClick={() => setOccurredAt(toLocalInputValue(new Date()))}
                   icon={Clock}
                   variant="outline"
                 >
-                  「たった今」にする
+                  たった今
                 </BigButton>
                 <p className="mt-2 text-sm text-gray-500">
                   だいたいで構いません。過去14日以内まで。
