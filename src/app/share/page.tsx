@@ -58,7 +58,14 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SharePage({ searchParams }: Props) {
   const sp = await searchParams;
-  const target = `/${buildQuery(sp)}`;
+  // リダイレクト先の地図には label を渡さない。渡すと「← <地名> に戻る」戻る
+  // ボタンが出て検索バーが隠れ、SNS から来た人に不親切なため。地点名は地図側の
+  // 逆ジオコーディングでカードに出る。label は /share の OG カード専用。
+  const targetParams = new URLSearchParams();
+  if (sp.lat) targetParams.set("lat", sp.lat);
+  if (sp.lon) targetParams.set("lon", sp.lon);
+  const targetQ = targetParams.toString();
+  const target = targetQ ? `/?${targetQ}` : "/";
   const label = sp.label?.slice(0, 40) || "選択地点";
 
   return (

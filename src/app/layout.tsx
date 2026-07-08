@@ -92,6 +92,9 @@ export const metadata: Metadata = {
       ],
     },
   },
+  // og:image / twitter:image は指定しない。ルートの opengraph-image.tsx
+  // (1200×630) がファイル規約で自動付与され、独自画像を持たないページ全体に
+  // 波及する。ここで images を指定すると 512×512 正方形と二重になるため外す。
   openGraph: {
     type: "website",
     locale: "ja_JP",
@@ -99,21 +102,12 @@ export const metadata: Metadata = {
     url: SITE_URL + "/",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [
-      {
-        url: "/icons/Icon-512.png",
-        width: 512,
-        height: 512,
-        alt: "KumaWatch（くまウォッチ）",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch",
     description:
       "獣医師監修・獣医工学ラボ運営。全国のクマ出没情報をリアルタイム可視化。5km メッシュで警戒レベル予報。登山・キャンプ・通勤前の安全確認に。",
-    images: ["/icons/Icon-512.png"],
   },
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],
