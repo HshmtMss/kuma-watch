@@ -6,7 +6,7 @@ import {
   Ban,
   Users,
   Bell,
-  ExternalLink,
+  ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 
@@ -52,6 +52,7 @@ const ITEMS: {
 
 export default function HachimitsuGuide() {
   const [open, setOpen] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   // 「対策」ボタンはトップ(地図)の KumaClient コントロール列だけに置く。他ページには
   // 出さない。ここは共通ポップアップ本体のみを持ち、open-hachimitsu イベントで開く。
 
@@ -166,17 +167,41 @@ export default function HachimitsuGuide() {
               </span>
             </p>
 
-            {/* 別タブで開き、この地図・ポップアップの文脈を残す（戻りやすさ優先）。 */}
-            <a
-              href="/measures"
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* ページ遷移せずアプリ内モーダル(iframe)で開く。PWA(standalone)でも
+                target=_blank が同一画面化して戻れない問題を避け、閉じるとこのまま
+                ポップアップに戻れる。PWA・モバイル・PCで同じ挙動。 */}
+            <button
+              type="button"
+              onClick={() => setShowGuide(true)}
               className="mt-3 flex w-full items-center justify-center gap-1 rounded-full border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700 hover:bg-stone-50"
             >
               もっと詳しく（対策の総合ガイド）
-              <ExternalLink size={15} strokeWidth={2} aria-hidden />
-            </a>
+              <ChevronRight size={16} strokeWidth={2} aria-hidden />
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* 対策の総合ガイドをアプリ内モーダルで表示。閉じると はちみつポップアップに戻る。 */}
+      {showGuide && (
+        <div className="fixed inset-0 z-[1600] flex flex-col bg-white">
+          <div className="flex shrink-0 items-center justify-between border-b border-stone-200 px-4 py-3">
+            <div className="text-base font-bold text-stone-900">
+              クマ対策の総合ガイド
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowGuide(false)}
+              className="h-10 rounded-full px-4 text-base font-semibold text-amber-700 hover:bg-amber-50"
+            >
+              閉じる
+            </button>
+          </div>
+          <iframe
+            src="/measures"
+            title="クマ対策の総合ガイド"
+            className="min-h-0 w-full flex-1 border-0"
+          />
         </div>
       )}
     </>
