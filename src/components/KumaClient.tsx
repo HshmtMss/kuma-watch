@@ -163,13 +163,13 @@ export default function KumaClient() {
       (selectedLocation?.source === "gps" || !selectedLocation
         ? "現在地"
         : "選択地点");
+    // 共有 URL は lat/lon だけにして短く保つ (地名 label は載せない)。
+    // SNS クローラー向けの地点名入り OG カードは /share 側が lat/lon から
+    // 逆ジオコーディングして生成する。開くと /share がトップへリダイレクト。
     const params = new URLSearchParams({
       lat: loc.lat.toFixed(5),
       lon: loc.lon.toFixed(5),
     });
-    if (resolvedName) params.set("label", resolvedName);
-    // /share ルート経由にすることで、SNS のクローラーには地点名入りの OG カードが見える。
-    // ユーザーがリンクを開くと /share がトップへリダイレクトする。
     const shareLink = `${origin}/share?${params.toString()}`;
     const title = `${labelText}のクマ警戒レベルをチェック｜KumaWatch`;
     const text =

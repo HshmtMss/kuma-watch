@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadJaFont } from "@/lib/og-font";
+import { reversePlaceName } from "@/lib/reverse-place";
 
 export const runtime = "nodejs";
 
@@ -19,8 +20,16 @@ function getBearDataUrl(): string {
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const labelRaw = url.searchParams.get("label") ?? "";
-  const label = labelRaw.slice(0, 24) || "選択地点";
+  // 地名は URL の label ではなく lat/lon の逆ジオコーディングで得る (共有 URL を
+  // 短く保つため)。旧共有リンク互換で label が来たら尊重。取れなければ「この地点」。
+  const lat = Number(url.searchParams.get("lat"));
+  const lon = Number(url.searchParams.get("lon"));
+  const geo =
+    Number.isFinite(lat) && Number.isFinite(lon)
+      ? await reversePlaceName(url.origin, lat, lon)
+      : null;
+  const labelRaw = geo ?? url.searchParams.get("label") ?? "";
+  const label = labelRaw.slice(0, 24) || "この地点";
 
   const text = `${label}のクマ警戒レベルKumaWatchクマウォッチ全国マップkumawatchjp1234567890.-`;
   const fontBold = await loadJaFont(text, 700);

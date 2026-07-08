@@ -1,30 +1,54 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
 import ClientRedirect from "./ClientRedirect";
+import { reversePlaceName } from "@/lib/reverse-place";
 
 const SITE_URL = "https://kuma-watch.jp";
 
+// label は URL に載せない (共有 URL を短く保つ)。地名はサーバー側で lat/lon から
+// 逆ジオコーディングして得る。旧共有リンク互換のため label が来たら尊重する。
 type SP = { lat?: string; lon?: string; label?: string };
 type Props = { searchParams: Promise<SP> };
 
-function buildQuery(sp: SP): string {
+// lat/lon のみのクエリ (label は含めない)。
+function latLonQuery(sp: SP): string {
   const params = new URLSearchParams();
   if (sp.lat) params.set("lat", sp.lat);
   if (sp.lon) params.set("lon", sp.lon);
-  if (sp.label) params.set("label", sp.label);
   const s = params.toString();
   return s ? `?${s}` : "";
 }
 
+async function originFromHeaders(): Promise<string> {
+  try {
+    const h = await headers();
+    const host = h.get("host");
+    const proto = h.get("x-forwarded-proto") ?? "https";
+    if (host) return `${proto}://${host}`;
+  } catch {
+    /* fall through */
+  }
+  return SITE_URL;
+}
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const sp = await searchParams;
-  const label = sp.label?.slice(0, 40) || "選択地点";
+  const lat = sp.lat ? Number(sp.lat) : NaN;
+  const lon = sp.lon ? Number(sp.lon) : NaN;
+  const geo =
+    Number.isFinite(lat) && Number.isFinite(lon)
+      ? await reversePlaceName(await originFromHeaders(), lat, lon)
+      : null;
+  // 解決順: 逆ジオコーディング > 旧リンクの label > 「この地点」。
+  const label = geo ?? sp.label?.slice(0, 40) ?? "この地点";
   const title = `${label}周辺のクマ情報｜KumaWatch`;
   const description = `${label}周辺のクマ警戒レベル・最新の出没情報を KumaWatch でチェック。散策・登山前のひと確認に。`;
 
-  const sharePath = `/share${buildQuery(sp)}`;
-  const ogPath = `/share/og${buildQuery(sp)}`;
+  const q = latLonQuery(sp);
+  const sharePath = `/share${q}`;
+  const ogPath = `/share/og${q}`;
 
   return {
     title,
@@ -66,7 +90,6 @@ export default async function SharePage({ searchParams }: Props) {
   if (sp.lon) targetParams.set("lon", sp.lon);
   const targetQ = targetParams.toString();
   const target = targetQ ? `/?${targetQ}` : "/";
-  const label = sp.label?.slice(0, 40) || "選択地点";
 
   return (
     <>
@@ -74,7 +97,7 @@ export default async function SharePage({ searchParams }: Props) {
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
         <PawPrint size={34} className="text-amber-600" aria-hidden />
         <h1 className="mt-3 text-xl font-bold text-stone-900">
-          {label} のクマ情報を表示します
+          この地点のクマ情報を表示します
         </h1>
         <p className="mt-2 text-sm text-stone-600">
           自動でリダイレクトされない場合は
