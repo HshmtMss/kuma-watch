@@ -114,6 +114,8 @@ function SubmissionsContent({
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState("pending");
   const [view, setView] = useState<"list" | "map">("list");
+  // 一括操作の選択状態（リスト表示のチェックボックス）。
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const load = useCallback(
     async (st: string) => {
@@ -175,8 +177,55 @@ function SubmissionsContent({
     [secret, status, load],
   );
 
+  // 選択中の投稿を一括で承認/却下（削除は誤操作防止のため一括対象外）。
+  const bulkModerate = useCallback(
+    async (decision: "approve" | "reject") => {
+      const ids = [...selected];
+      if (ids.length === 0) return;
+      if (
+        !window.confirm(
+          `選択した ${ids.length} 件を${decision === "approve" ? "承認して公開" : "却下"}します。よろしいですか？`,
+        )
+      )
+        return;
+      setBusy("bulk");
+      try {
+        for (const id of ids) {
+          const res = await fetch("/api/admin/submissions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${secret}`,
+            },
+            body: JSON.stringify({ id, decision }),
+          });
+          if (!res.ok) throw new Error(String(res.status));
+        }
+        setSelected(new Set());
+        await load(status);
+      } catch (e) {
+        setError(
+          `一括操作に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      } finally {
+        setBusy(null);
+      }
+    },
+    [selected, secret, status, load],
+  );
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const changeTab = (key: string) => {
     setStatus(key);
+    setSelected(new Set());
   };
 
   const mapItems: MapItem[] = items.map((s) => ({
@@ -264,8 +313,65 @@ function SubmissionsContent({
       )}
 
       {view === "list" && (
-        <ul className="flex flex-col gap-4">
-          {items.map((s) => (
+        <>
+          {items.length > 0 && (
+            <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm">
+              <label className="flex items-center gap-1.5 text-stone-600">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={selected.size > 0 && selected.size === items.length}
+                  ref={(el) => {
+                    if (el)
+                      el.indeterminate =
+                        selected.size > 0 && selected.size < items.length;
+                  }}
+                  onChange={(e) =>
+                    setSelected(
+                      e.target.checked
+                        ? new Set(items.map((i) => i.id))
+                        : new Set(),
+                    )
+                  }
+                />
+                全選択
+              </label>
+              {selected.size > 0 && (
+                <>
+                  <span className="text-stone-500">
+                    {selected.size}件選択中
+                  </span>
+                  <div className="ml-auto flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => bulkModerate("approve")}
+                      disabled={busy === "bulk"}
+                      className="rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      一括承認
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => bulkModerate("reject")}
+                      disabled={busy === "bulk"}
+                      className="rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+                    >
+                      一括却下
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelected(new Set())}
+                      className="rounded-full px-2 py-1.5 text-xs text-stone-500 hover:bg-stone-100"
+                    >
+                      解除
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          <ul className="flex flex-col gap-4">
+            {items.map((s) => (
             <li
               key={s.id}
               className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
@@ -281,6 +387,13 @@ function SubmissionsContent({
               )}
               <div className="p-4">
                 <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    checked={selected.has(s.id)}
+                    onChange={() => toggleSelect(s.id)}
+                    aria-label="この投稿を選択"
+                  />
                   <span
                     className={`rounded-full px-2 py-0.5 font-semibold ${STATUS_STYLE[s.status]}`}
                   >
@@ -378,7 +491,8 @@ function SubmissionsContent({
               </div>
             </li>
           ))}
-        </ul>
+          </ul>
+        </>
       )}
     </>
   );
