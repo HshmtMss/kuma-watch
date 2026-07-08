@@ -542,7 +542,11 @@ function SubmitContent() {
                     );
                   })}
                 </div>
-                {situation === "injury" && <InjuryAlert />}
+                {situation === "injury" && (
+                  <div className="mt-5">
+                    <InjuryAlert />
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-gray-100 pt-5">
