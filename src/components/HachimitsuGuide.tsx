@@ -13,10 +13,30 @@ import { useEffect, useState } from "react";
  */
 
 const ITEMS: { kana: string; emoji: string; action: string; desc: string }[] = [
-  { kana: "は", emoji: "🏃", action: "走らない", desc: "会っても走って逃げない" },
-  { kana: "ち", emoji: "🚷", action: "近づかない", desc: "子グマ・出没した場所・やぶ" },
-  { kana: "み", emoji: "👨‍👩‍👧", action: "みんなで", desc: "ひとりで行かない" },
-  { kana: "つ", emoji: "🔔", action: "伝える", desc: "鈴・ラジオ・声で「人がいるよ」" },
+  {
+    kana: "は",
+    emoji: "🏃",
+    action: "走らない",
+    desc: "背を向けず、クマを見ながらゆっくり後退（走ると追われる）",
+  },
+  {
+    kana: "ち",
+    emoji: "🚷",
+    action: "近づかない",
+    desc: "子グマの近くには母グマ。出没した場所・見通しの悪いやぶも避ける",
+  },
+  {
+    kana: "み",
+    emoji: "👨‍👩‍👧",
+    action: "みんなで",
+    desc: "ひとりで行かない。数人だと気づかれやすく安心",
+  },
+  {
+    kana: "つ",
+    emoji: "🔔",
+    action: "伝える",
+    desc: "鈴・ラジオ・声で「人がいるよ」。不意の遭遇を防ぐ",
+  },
 ];
 
 export default function HachimitsuGuide() {
@@ -78,8 +98,7 @@ export default function HachimitsuGuide() {
             </div>
 
             <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-900">
-              いざという時の4つ<b>「は・ち・み・つ」</b>と、ふだんの1つ
-              <b>「のこさない」</b>を覚えよう。
+              クマから身を守る合言葉。<b>「はちみつ」＋「のこさない」</b>の5つを覚えよう。
             </p>
 
             <ul className="mt-3 space-y-2">
@@ -116,10 +135,17 @@ export default function HachimitsuGuide() {
                   のこさない
                 </div>
                 <div className="text-xs leading-snug text-stone-600">
-                  食べ物・生ごみを残さない（においで呼ばない）
+                  食べ物・生ごみは持ち帰る。においがクマを引き寄せる
                 </div>
               </div>
             </div>
+
+            <p className="mt-2.5 flex items-start gap-1.5 px-1 text-xs leading-relaxed text-stone-500">
+              <span aria-hidden>🕕</span>
+              <span>
+                朝と夕方は特に注意。出かける前に出没情報を確認しましょう。
+              </span>
+            </p>
 
             <Link
               href="/measures"
