@@ -100,9 +100,6 @@ export default function KumaClient() {
   }, []);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showPins, setShowPins] = useState(true);
-  // 「色の意味」のさりげない補足を表示する小さなツールチップの開閉状態。
-  // 過度に怖がらせないための説明を、見たい人だけ見られるように UI を絞る。
-  const [showMapNote, setShowMapNote] = useState(false);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
@@ -865,53 +862,6 @@ export default function KumaClient() {
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
               <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />直近の出没</span>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowMapNote((v) => !v)}
-              aria-label="このマップについて"
-              aria-expanded={showMapNote}
-              className={`flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[12px] font-bold text-white shadow-sm ring-1 ring-red-600/40 backdrop-blur transition hover:bg-red-600 ${
-                showMapNote ? "bg-red-600 ring-red-700/50" : ""
-              }`}
-            >
-              ⓘ
-            </button>
-          </div>
-        )}
-
-        {/* マップ補足: ⓘ から開閉。さりげなく、見たい人だけ読める淡いトーンで。 */}
-        {showMapNote && !loading && !pickerMode && (
-          <div className="pointer-events-auto absolute left-3 top-[5.75rem] z-[950] w-72 rounded-2xl border border-stone-200 bg-white/95 p-3.5 text-[12px] leading-relaxed text-stone-700 shadow-lg backdrop-blur">
-            <div className="mb-1.5 flex items-center justify-between">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-stone-500">
-                このマップについて
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowMapNote(false)}
-                className="-mr-1 -mt-1 text-stone-400 hover:text-stone-800"
-                aria-label="閉じる"
-              >
-                ×
-              </button>
-            </div>
-            <p>
-              日本の多くの地域では、昔からクマが生息しています。ふだんの暮らしで遭遇することは極めて稀ですが、山に入るときは、{" "}
-              <a
-                href="/research/this-week"
-                className="font-medium text-amber-700 underline hover:text-amber-900"
-              >
-                自治体の直近情報
-              </a>
-              {" "}と{" "}
-              <a
-                href="/articles/encounter"
-                className="font-medium text-amber-700 underline hover:text-amber-900"
-              >
-                基本対策
-              </a>
-              （鈴・スプレー・誘引物管理）をお忘れなく。
-            </p>
           </div>
         )}
 
