@@ -133,6 +133,33 @@ jobs:
           # 配信失敗は ingest 成功を上書きしない (exit 0)
           exit 0
 
+      - name: Dispatch LINE for new sightings
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          PUSH_DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}
+        # Web Push 配信ステップで作った /tmp/dispatch-slim.json をそのまま
+        # /api/line/dispatch に渡す。LINE 側は独自の重複送信セット
+        # (ldispatched:*) を持つので、Web Push と二重送信にはならない。
+        # 認証シークレットは Web Push と共用 (PUSH_DISPATCH_SECRET)。
+        run: |
+          if [ -z "${PUSH_DISPATCH_SECRET}" ]; then
+            echo "PUSH_DISPATCH_SECRET not set — skipping LINE dispatch"
+            exit 0
+          fi
+          if [ ! -f /tmp/dispatch-slim.json ]; then
+            echo "[line] dispatch-slim.json not found — skipping"
+            exit 0
+          fi
+          RESPONSE=$(curl -sS --max-time 60 -o /tmp/resp-line.json -w "%{http_code}" \
+            -X POST https://kuma-watch.jp/api/line/dispatch \
+            -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
+            -H "Content-Type: application/json" \
+            --data-binary @/tmp/dispatch-slim.json) || true
+          echo "[line] dispatch http=$RESPONSE"
+          cat /tmp/resp-line.json || true
+          # 配信失敗は ingest 成功を上書きしない (exit 0)
+          exit 0
+
       - name: Post important alerts to X
         if: steps.commit.outputs.committed == 'true'
         env:
