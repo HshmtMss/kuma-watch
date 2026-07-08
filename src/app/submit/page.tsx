@@ -97,7 +97,7 @@ function SubmitContent() {
   const [situation, setSituationRaw] = useState<Situation>("sight");
   const [comment, setComment] = useState("");
   const [contact, setContact] = useState("");
-  const [showContact, setShowContact] = useState(false);
+  const [placeName, setPlaceName] = useState<string | null>(null);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -124,6 +124,39 @@ function SubmitContent() {
     }
   }, [initLat, initLon]);
 
+  // 座標を逆ジオコーディングして「○○県○○市」の地名を出す。
+  // 子ども〜高齢者には緯度経度より地名の方が分かりやすい。
+  useEffect(() => {
+    if (lat == null || lon == null) {
+      setPlaceName(null);
+      return;
+    }
+    const ctrl = new AbortController();
+    setPlaceName(null);
+    fetch(`/api/geocode?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`, {
+      signal: ctrl.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (
+          data: {
+            result?: { prefecture?: string; city?: string; district?: string };
+          } | null,
+        ) => {
+          const h = data?.result;
+          if (!h) return;
+          const name = [h.prefecture, h.city, h.district]
+            .filter(Boolean)
+            .join("");
+          setPlaceName(name || null);
+        },
+      )
+      .catch(() => {
+        /* 取得できなくても座標で表示するので無視 */
+      });
+    return () => ctrl.abort();
+  }, [lat, lon]);
+
   // /?pick=submit から戻ってきた場合、保存していた下書きとステップを復元
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -136,10 +169,7 @@ function SubmitContent() {
       if (typeof draft.headCount === "number") setHeadCount(draft.headCount);
       if (draft.situation) setSituationRaw(draft.situation);
       if (draft.comment) setComment(draft.comment);
-      if (draft.contact) {
-        setContact(draft.contact);
-        setShowContact(true);
-      }
+      if (draft.contact) setContact(draft.contact);
       if (typeof draft.step === "number") setStep(draft.step);
       window.sessionStorage.removeItem(SUBMIT_DRAFT_KEY);
     } catch {
@@ -335,14 +365,26 @@ function SubmitContent() {
             </div>
           )}
 
+          {/* 完了後は地図に戻して、投稿した地点をピンで見せる。/place は地図が
+              無く現在地が分かりにくいため使わない。replace で履歴を置き換え、
+              「戻る」で投稿フォームの最初に戻ってしまう問題も防ぐ。 */}
           <div className="flex flex-col gap-2">
             <Link
-              href={lat && lon ? `/place?lat=${lat}&lon=${lon}` : "/"}
-              className="flex h-12 items-center justify-center rounded-full bg-amber-600 px-5 text-base font-semibold text-white hover:bg-amber-700"
+              replace
+              href={
+                lat && lon
+                  ? `/?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}${
+                      placeName ? `&label=${encodeURIComponent(placeName)}` : ""
+                    }`
+                  : "/"
+              }
+              className="flex h-12 items-center justify-center gap-2 rounded-full bg-amber-600 px-5 text-base font-semibold text-white hover:bg-amber-700"
             >
-              この地点の詳細を見る
+              <MapIcon size={18} aria-hidden />
+              地図で場所を見る
             </Link>
             <Link
+              replace
               href="/"
               className="flex h-11 items-center justify-center text-sm text-gray-500 hover:text-gray-900"
             >
@@ -404,22 +446,24 @@ function SubmitContent() {
             <div className="space-y-6">
               <div>
                 <SubLabel>
-                  場所 <span className="text-red-500">*</span>
+                  クマを見た場所 <span className="text-red-500">*</span>
                 </SubLabel>
                 {hasLocation ? (
                   <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-4 text-emerald-800 ring-1 ring-emerald-200">
-                    <CircleCheck size={26} aria-hidden />
-                    <div>
-                      <div className="text-base font-bold">場所を指定できました</div>
-                      <div className="font-mono text-xs text-emerald-700">
-                        {lat!.toFixed(5)}, {lon!.toFixed(5)}
+                    <CircleCheck size={26} className="shrink-0" aria-hidden />
+                    <div className="min-w-0">
+                      <div className="text-base font-bold">この場所にします</div>
+                      <div className="truncate text-sm text-emerald-700">
+                        {placeName
+                          ? `${placeName} 付近`
+                          : `${lat!.toFixed(5)}, ${lon!.toFixed(5)}`}
                       </div>
                     </div>
                   </div>
                 ) : (
                   <p className="flex items-start gap-2 rounded-2xl bg-yellow-50 px-4 py-4 text-base leading-relaxed text-yellow-900 ring-1 ring-yellow-200">
                     <AlertTriangle size={22} className="mt-0.5 shrink-0" aria-hidden />
-                    下のボタンで場所を指定してください。
+                    下のボタンで、クマや痕跡を見た場所を指定してください。
                   </p>
                 )}
                 <BigButton onClick={useGps} disabled={gpsLoading} icon={MapPin}>
@@ -440,13 +484,13 @@ function SubmitContent() {
               </div>
 
               <div className="border-t border-gray-100 pt-5">
-                <SubLabel>日時</SubLabel>
+                <SubLabel>いつ見ましたか</SubLabel>
                 <input
                   type="datetime-local"
                   value={occurredAt}
                   onChange={(e) => setOccurredAt(e.target.value)}
                   max={toLocalInputValue(new Date())}
-                  className="h-14 w-full rounded-2xl border-2 border-gray-200 bg-white px-4 text-lg text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
+                  className="box-border block h-14 w-full min-w-0 max-w-full appearance-none rounded-2xl border-2 border-gray-200 bg-white px-4 text-lg text-gray-900 [color-scheme:light] focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
                 />
                 <BigButton
                   onClick={() => setOccurredAt(toLocalInputValue(new Date()))}
@@ -622,28 +666,18 @@ function SubmitContent() {
               {comment.length} / 300
             </div>
 
-            {showContact ? (
-              <div className="mt-3">
-                <label className="mb-1 block text-base font-medium text-gray-700">
-                  連絡先メール（非公開・任意）
-                </label>
-                <input
-                  type="email"
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
-                  placeholder="確認が必要なときのみ使います"
-                  className="h-12 w-full rounded-2xl border-2 border-gray-200 bg-white px-4 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
-                />
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowContact(true)}
-                className="mt-3 text-sm text-gray-500 underline"
-              >
-                連絡先を追加する（任意）
-              </button>
-            )}
+            <div className="mt-4">
+              <label className="mb-1 block text-base font-medium text-gray-700">
+                連絡先メール（非公開・任意）
+              </label>
+              <input
+                type="email"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                placeholder="確認が必要なときのみ使います"
+                className="box-border block h-12 w-full min-w-0 max-w-full rounded-2xl border-2 border-gray-200 bg-white px-4 text-base text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-100"
+              />
+            </div>
           </StepCard>
         )}
 
@@ -655,9 +689,13 @@ function SubmitContent() {
             <dl className="divide-y divide-gray-100 rounded-2xl border border-gray-200">
               <SummaryRow label="場所" onEdit={() => setStep(0)}>
                 {hasLocation ? (
-                  <span className="font-mono text-sm">
-                    {lat!.toFixed(5)}, {lon!.toFixed(5)}
-                  </span>
+                  placeName ? (
+                    <span>{placeName} 付近</span>
+                  ) : (
+                    <span className="font-mono text-sm">
+                      {lat!.toFixed(5)}, {lon!.toFixed(5)}
+                    </span>
+                  )
                 ) : (
                   <span className="text-red-600">未指定</span>
                 )}

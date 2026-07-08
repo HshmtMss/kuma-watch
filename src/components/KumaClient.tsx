@@ -958,12 +958,12 @@ export default function KumaClient() {
             <div className="flex-1 text-xs text-amber-900">
               <div className="flex items-center gap-1 font-semibold">
                 <MapPin size={13} aria-hidden />
-                投稿地点を選んでください
+                クマを見た場所を選んでください
               </div>
               <div className="text-[11px] text-amber-700">
                 {selectedLocation
-                  ? `${selectedLocation.lat.toFixed(5)}, ${selectedLocation.lon.toFixed(5)} を選択中`
-                  : "地図をタップで選択 / 検索バーから探す"}
+                  ? "この場所でよければ「決定」を押してください"
+                  : "見た場所を地図でタップ、または検索で探す"}
               </div>
             </div>
             <button
