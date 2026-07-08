@@ -19,7 +19,7 @@ export type AdminTab = "home" | "push-stats" | "submissions";
 const TABS: { key: AdminTab; label: string; href: string; Icon: typeof BarChart3 }[] = [
   { key: "home", label: "ダッシュボード", href: "/admin", Icon: LayoutDashboard },
   { key: "push-stats", label: "通知登録", href: "/admin/push-stats", Icon: BarChart3 },
-  { key: "submissions", label: "投稿モデレーション", href: "/admin/submissions", Icon: ClipboardList },
+  { key: "submissions", label: "投稿", href: "/admin/submissions", Icon: ClipboardList },
 ];
 
 export default function AdminShell({

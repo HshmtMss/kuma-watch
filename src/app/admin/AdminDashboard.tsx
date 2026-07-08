@@ -82,8 +82,8 @@ function DashboardContent({
         <EntryCard
           href="/admin/submissions"
           Icon={ClipboardList}
-          title="投稿モデレーション"
-          desc="市民投稿の承認・却下・地図確認。"
+          title="投稿"
+          desc="市民投稿の承認・却下・地図/表で確認。"
           badge={pending ?? undefined}
         />
       </div>
