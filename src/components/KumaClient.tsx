@@ -902,47 +902,59 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 投稿ピッカーモード時のバナー (地図上部・固定) */}
+        {/* 投稿ピッカーモード: 大きな案内 + 大きなボタン + 検索バーの縦積み。
+            検索バーも出して地名で探せるようにする (見やすさと機能性の両立)。 */}
         {pickerMode === "submit" && (
-          <div className="pointer-events-auto absolute inset-x-3 top-3 z-[1000] flex items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50/95 px-3 py-2 shadow-lg backdrop-blur">
-            <div className="flex-1 text-xs text-amber-900">
-              <div className="flex items-center gap-1 font-semibold">
-                <MapPin size={13} aria-hidden />
-                クマを見た場所を選んでください
+          <div className="pointer-events-none absolute inset-x-3 top-3 z-[1000] flex flex-col gap-2">
+            {/* 案内 + キャンセル/決定 */}
+            <div className="pointer-events-auto rounded-2xl border-2 border-amber-300 bg-amber-50/95 p-3.5 shadow-lg backdrop-blur">
+              <div className="flex items-start gap-2">
+                <MapPin size={22} className="mt-0.5 shrink-0 text-amber-700" aria-hidden />
+                <div className="min-w-0">
+                  <div className="text-base font-bold leading-snug text-amber-900">
+                    クマを見た場所を選んでください
+                  </div>
+                  <div className="mt-0.5 text-sm leading-relaxed text-amber-800">
+                    {selectedLocation
+                      ? "この場所でよければ「決定」を押してください"
+                      : "地図をタップ、または下の検索で地名を探す"}
+                  </div>
+                </div>
               </div>
-              <div className="text-[11px] text-amber-700">
-                {selectedLocation
-                  ? "この場所でよければ「決定」を押してください"
-                  : "見た場所を地図でタップ、または検索で探す"}
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPickerMode(null);
+                    router.push("/submit");
+                  }}
+                  className="h-12 flex-1 rounded-full border-2 border-amber-300 bg-white text-base font-semibold text-amber-800 active:bg-amber-100"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  disabled={!selectedLocation}
+                  onClick={() => {
+                    if (!selectedLocation) return;
+                    const params = new URLSearchParams({
+                      lat: selectedLocation.lat.toFixed(5),
+                      lon: selectedLocation.lon.toFixed(5),
+                      fromPicker: "1",
+                    });
+                    setPickerMode(null);
+                    router.push(`/submit?${params.toString()}`);
+                  }}
+                  className="h-12 flex-[2] rounded-full bg-amber-600 text-base font-bold text-white shadow-sm active:bg-amber-700 disabled:opacity-40"
+                >
+                  この地点に決定
+                </button>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setPickerMode(null);
-                router.push("/submit");
-              }}
-              className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11px] font-medium text-amber-800 hover:bg-amber-100"
-            >
-              キャンセル
-            </button>
-            <button
-              type="button"
-              disabled={!selectedLocation}
-              onClick={() => {
-                if (!selectedLocation) return;
-                const params = new URLSearchParams({
-                  lat: selectedLocation.lat.toFixed(5),
-                  lon: selectedLocation.lon.toFixed(5),
-                  fromPicker: "1",
-                });
-                setPickerMode(null);
-                router.push(`/submit?${params.toString()}`);
-              }}
-              className="rounded-full bg-amber-600 px-3 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-40"
-            >
-              この地点に決定
-            </button>
+            {/* 地名で探せる検索バー */}
+            <div className="pointer-events-auto w-full rounded-full bg-white shadow-md ring-1 ring-black/5">
+              <PlaceSearch compact onPick={handleSearchPick} />
+            </div>
           </div>
         )}
 
