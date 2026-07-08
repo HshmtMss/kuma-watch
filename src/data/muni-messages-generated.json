@@ -98,6 +98,87 @@
     "crawledAt": "2026-07-01"
   },
   {
+    "prefName": "山形県",
+    "cityName": "上山市",
+    "message": "早朝や夕暮れ時はクマが出没しやすいため十分注意し、ラジオや鈴などで音を出し、複数で行動してください。クマのフンや足跡を見つけたらすぐに引き返し、生ごみなどの誘引物を屋外に放置せず、隠れ場所となる草やぶを刈り払いましょう。",
+    "targetArea": "上山市全域",
+    "updatedAt": "2026-04-28",
+    "sourceUrl": "https://www.city.kaminoyama.yamagata.jp/soshiki/11/bearmap-2025.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "天童市",
+    "message": "山形県内全域にクマ出没警報が発令されており、天童市内でも引き続き警戒が必要です。早朝や夜間の外出は控え、音が鳴る物で自分の存在をクマに知らせてください。また、自宅や倉庫には必ず鍵を掛け、果実や生ごみなどの誘引物を放置せず、クマを寄せ付けない対策を徹底してください。",
+    "targetArea": "天童市",
+    "updatedAt": "2026-04-30",
+    "sourceUrl": "https://www.city.tendo.yamagata.jp/busiindust/nourin/kuma_sinrin.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "尾花沢市",
+    "message": "クマとの遭遇を避けるため、音を出す、複数で行動する、ごみを放置しない、見通しを良くするなどの対策をしましょう。クマの目撃情報がある場所では、不要不急の早朝・夜間の外出は控えてください。自宅や倉庫の施錠、情報の共有も重要です。",
+    "targetArea": "尾花沢市",
+    "updatedAt": "2026-06-08",
+    "sourceUrl": "https://www.city.obanazawa.yamagata.jp/kurashi/kikikanri/anzen/3688",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "山形市",
+    "message": "山形市ではツキノワグマの出没が頻発しており、7月8日午前6時50分頃には大字中桜田地内で1頭が目撃されました。クマとの遭遇を避けるため、山に入る際は鈴やラジオなどで音を出し、家屋周辺の草刈りや生ごみ・廃棄農作物の適切な管理でクマを寄せ付けないようにしてください。クマを見ても慌てず、背を向けずにゆっくり後退しましょう。",
+    "targetArea": "山形市全域",
+    "updatedAt": "2026-07-08",
+    "sourceUrl": "https://www.city.yamagata-yamagata.lg.jp/kurashi/kankyohozen/1006552/1002384.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "新庄市",
+    "message": "新庄市内でクマの目撃情報が多数寄せられています。自宅付近にクマの餌となるものを置かないようにし、山などに入る際はラジオや鈴で音を立てて自分の存在を知らせてください。山形県内にはクマ出没警報が発令されています。",
+    "targetArea": "新庄市内",
+    "updatedAt": "2022-07-11",
+    "sourceUrl": "https://www.city.shinjo.yamagata.jp/s008/20220711105301.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "村山市",
+    "message": "村山市では「クマ出没警報」が発令されており、4月24日から30日には市街地で10件以上の目撃がありました。早朝や夕方の山林等への接近を避け、鈴やラジオなどで音を出すとともに、生ごみや放置された果樹などクマを誘引するものを適切に管理してください。",
+    "targetArea": "村山市全域",
+    "updatedAt": "2026-06-08",
+    "sourceUrl": "https://www.city.murayama.lg.jp/kurashi/anzen_anshin/shiminkumasyutubotu.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "東根市",
+    "message": "東根市内ではクマの目撃情報が多数発生しており、直近では7月8日に長瀞地区で足跡が、7月6日には東郷地区でクマが目撃されました。県内全域にクマ出没警報が発令されていますので、付近を通行する際は十分ご注意ください。",
+    "targetArea": "東根市内",
+    "updatedAt": "",
+    "sourceUrl": "https://www.city.higashine.yamagata.jp/section_list/section011/kuma/",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "酒田市",
+    "message": "酒田市では令和8年5月3日に山谷字鷹尾山地内で人身被害が発生し、市街地での目撃が多発し警報が発令されています。早朝や夕方の薄暗い時間の行動や単独作業は避け、鈴やラジオなどで音を出しながら行動してください。クマを誘引する生ごみや放置果実は適切に処理し、倉庫や車庫の出入口は閉めて施錠しましょう。",
+    "targetArea": "酒田市",
+    "updatedAt": "2026-06-03",
+    "sourceUrl": "https://www.city.sakata.lg.jp/kurashi/doubutsu/yasei/kankyo03202.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "鶴岡市",
+    "message": "山形県内にクマ出没警報が発令中です。鶴岡市では斎地区（令和8年6月3日）や藤島地域（令和8年5月22日）でクマの出没情報が確認されています。入山する際はクマに十分ご注意ください。",
+    "targetArea": "鶴岡市全域",
+    "updatedAt": "2026-06-24",
+    "sourceUrl": "https://www.city.tsuruoka.lg.jp/anzen/kuma/index.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
     "prefName": "山梨県",
     "cityName": "上野原市",
     "message": "上野原市では、クマが明け方や夕方に活発に行動するため、ご注意ください。クマと出会っても大声を出したり走ったりせず、静かに背を向けずにゆっくりと立ち去り、子グマには絶対に近づかないでください。万が一襲われた場合は、首や頭を守り身を隠すなど、身の安全を優先してください。",
@@ -143,12 +224,66 @@
   },
   {
     "prefName": "岩手県",
+    "cityName": "上閉伊郡大槌町",
+    "message": "11月1日に町内の山林で狩猟中の男性がクマに襲われ、重傷を負う事故が発生しました。クマは冬の間も活動を続ける場合があるため、カキやクリの実は早めに収穫・回収し、ごみは朝に出すなど、クマを人里に引き寄せない対策をお願いします。クマを見かけた場合は、産業振興課または警察署へご連絡ください。",
+    "targetArea": "大槌町内",
+    "updatedAt": "2025-11-11",
+    "sourceUrl": "https://www.town.otsuchi.iwate.jp/gyosei/docs/460199.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "下閉伊郡田野畑村",
+    "message": "田野畑村内でクマの目撃情報が多数確認されており、直近では7月9日に一の渡で子グマが目撃され、7月7日には子木地で人身被害が発生しました。村内へお出かけの際は、十分ご注意ください。",
+    "targetArea": "田野畑村全域",
+    "updatedAt": "2019-07-16",
+    "sourceUrl": "https://www.vill.tanohata.iwate.jp/docs/2015082000020/",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
     "cityName": "久慈市",
     "message": "岩手県全域にツキノワグマの出没に関する警報が発令されており、久慈市内および周辺地域でもクマとの遭遇に注意が必要です。山林に入る際は複数人で行動し、鈴やラジオなどで音を出し、明け方・夕方の入山を避けてください。人里では廃棄野菜や生ごみ、庭先果樹の適切な管理、農地周辺のやぶ刈り払いを徹底してください。",
     "targetArea": "久慈市内及び周辺地域",
     "updatedAt": "2026-03-26",
     "sourceUrl": "https://www.city.kuji.lg.jp/soshiki/ringyosuisan/1/1/1/1683.html",
     "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "九戸郡九戸村",
+    "message": "クマの冬眠が遅れる可能性があるため、屋外に果物や生ゴミなど餌となるものを放置せず適切に管理し、周辺のヤブを刈り払い見通しを良くしましょう。クマに出会った際は、走って逃げたり背中を見せたりせず、ゆっくり後退してください。最新の目撃は2025年11月12日16時45分頃に細屋のふるさと農道十字路付近で報告されています。",
+    "targetArea": "九戸村全域",
+    "updatedAt": "2025-11-12",
+    "sourceUrl": "https://www.vill.kunohe.iwate.jp/docs/2540.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "二戸市",
+    "message": "例年よりクマの目撃情報や農作物被害が増えています。クマは夕方から早朝にかけて活発なため、この時間帯の外出は控え、外出する際は複数人で鈴などで音を鳴らしましょう。クマを寄せ付けないよう、藪を払い、柿などの果樹や生ごみ、ペットフードを屋外に置かないよう管理してください。",
+    "targetArea": "二戸市",
+    "updatedAt": "2025-11-13",
+    "sourceUrl": "https://www.city.ninohe.lg.jp/info/4364",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "二戸郡一戸町",
+    "message": "一戸町では例年クマの目撃情報が増える傾向にあるため、山へ入る際や山間部に立ち寄る際は十分注意が必要です。単独行動を避け、鈴やラジオで音を出し、夜間、明け方、夕方、悪天候時の入山は避けてください。食べ残しは持ち帰り、地域のクマ情報を確認してから行動しましょう。",
+    "targetArea": "一戸町内",
+    "updatedAt": "2026-03-26",
+    "sourceUrl": "https://www.town.ichinohe.iwate.jp/soshikikarasagasu/norinka/chikusanshinkokakari/762.html",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "八幡平市",
+    "message": "八幡平市内ではクマの目撃情報が多数寄せられており、特に山菜・キノコ採り、登山、農作業などで入山・活動する際は、笛、鈴、ラジオなどで人間の存在を知らせ、早朝や夕方の時間帯は十分に注意してください。家庭から出る生ごみや廃棄農作物はクマの誘引物となるため、地中深く埋めるなど適切に処理しましょう。令和8年度は6月15日時点で目撃情報が150件報告されています。",
+    "targetArea": "八幡平市全域",
+    "updatedAt": "2026-06-16",
+    "sourceUrl": "https://www.city.hachimantai.lg.jp/soshiki/nourin/1771.html",
+    "crawledAt": "2026-07-08"
   },
   {
     "prefName": "岩手県",
@@ -179,6 +314,33 @@
   },
   {
     "prefName": "岩手県",
+    "cityName": "岩手郡岩手町",
+    "message": "人家周辺では生ごみや廃棄野菜、果物の適切な処理を徹底し、クマを引き寄せないようにしましょう。山林やクマ出没地域では、鈴やラジオなどで音を出し、朝夕の活動が活発な時間帯や単独行動を避けてください。クマの糞や足跡を見かけたらすぐに引き返しましょう。",
+    "targetArea": "町北西側近隣地区(西岳と八幡平境中心)、空雲山近隣地区、姫神山近隣地区、北山形、南山形地区",
+    "updatedAt": "2019-04-02",
+    "sourceUrl": "https://town.iwate.iwate.jp/town/life/tsukinowaguma/",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "岩手郡雫石町",
+    "message": "雫石町はクマの出没情報マップを運用しており、最新の出没状況や過去の情報はそちらで確認できます。具体的な注意喚起については、関連記事「ツキノワグマの出没にご注意ください！」をご参照ください。",
+    "targetArea": "雫石町",
+    "updatedAt": "2026-04-09",
+    "sourceUrl": "https://www.town.shizukuishi.iwate.jp/docs/2024040100030/",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "滝沢市",
+    "message": "現在、岩手県全域にツキノワグマの出没に関する警報が発表されており、滝沢市内の山林はクマの生息地です。入山時は鈴、ラジオ、撃退スプレーを必ず携帯し、農地では収穫後の廃棄野菜を放置しないでください。最新の目撃情報は、2026年7月8日11時50分頃、滝沢第二小学校南側付近の林で子グマ1頭が目撃されています。",
+    "targetArea": "滝沢市",
+    "updatedAt": "2026-07-08",
+    "sourceUrl": "https://www.city.takizawa.iwate.jp/business/noringyo/contents-1545/contents-5410",
+    "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "岩手県",
     "cityName": "盛岡市",
     "message": "盛岡市では、令和8年度にクマの目撃情報が多数寄せられており、人身被害も岩手県内で発生しています。山林や山間地に近い農地に入る際は、鈴やラジオなどで音を出し、早朝や夕方の単独行動は避けましょう。生ごみや廃棄野菜、果樹の放置、お墓のお供え物などクマを誘引するものは適切に管理・撤去してください。",
     "targetArea": "盛岡市全域",
@@ -203,6 +365,15 @@
     "updatedAt": "2026-06-02",
     "sourceUrl": "https://www.city.tono.iwate.jp/index.cfm/46,38143,288,615,html",
     "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "岩手県",
+    "cityName": "釜石市",
+    "message": "農作業や散歩、入山時は鈴やラジオを携帯し、見通しの悪い場所では掛け声や音を出してクマに自分の存在を知らせ、遭遇を防ぎましょう。住宅地では、廃棄野菜や生ごみの適正な処理、庭の果樹管理、藪の刈払いなどを行い、クマを寄せ付けない対策を徹底してください。岩手県内全域にツキノワグマの出没に関する警報が発表されており、山菜採りなどでの入山は可能な限り控え、入山する場合は複数人で行動するなど安全対策の徹底をお願いします。",
+    "targetArea": "釜石市全域",
+    "updatedAt": "2026-07-01",
+    "sourceUrl": "https://www.city.kamaishi.iwate.jp/docs/2020090700039",
+    "crawledAt": "2026-07-08"
   },
   {
     "prefName": "岩手県",
