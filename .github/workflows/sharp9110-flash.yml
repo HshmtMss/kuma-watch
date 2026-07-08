@@ -113,3 +113,27 @@ jobs:
           echo "[sharp9110] dispatch http=$RESPONSE"
           cat /tmp/resp.json || true
           exit 0
+
+      - name: Dispatch LINE for new sightings
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          PUSH_DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}
+        # Web Push 配信ステップで作った /tmp/dispatch.json を /api/line/dispatch に
+        # 再利用。LINE は独自 dedup (ldispatched:*) なので二重送信にならない。
+        run: |
+          if [ -z "${PUSH_DISPATCH_SECRET}" ]; then
+            echo "PUSH_DISPATCH_SECRET not set — skipping LINE dispatch"
+            exit 0
+          fi
+          if [ ! -f /tmp/dispatch.json ]; then
+            echo "[line] dispatch.json not found — skipping"
+            exit 0
+          fi
+          RESPONSE=$(curl -sS --max-time 60 -o /tmp/resp-line.json -w "%{http_code}" \
+            -X POST https://kuma-watch.jp/api/line/dispatch \
+            -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
+            -H "Content-Type: application/json" \
+            --data-binary @/tmp/dispatch.json) || true
+          echo "[line] dispatch http=$RESPONSE"
+          cat /tmp/resp-line.json || true
+          exit 0
