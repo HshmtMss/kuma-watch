@@ -391,15 +391,13 @@ function SubmitContent() {
               無く現在地が分かりにくいため使わない。replace で履歴を置き換え、
               「戻る」で投稿フォームの最初に戻ってしまう問題も防ぐ。 */}
           <div className="flex flex-col gap-2">
+            {/* label は付けない。付けると地図に「← <地名> に戻る」ボタンが出て、
+                押しても完了画面には戻らず(履歴はreplace済み)紛らわしいうえ、
+                地図をタップしてもそのラベルが更新されず分かりにくいため。
+                lat/lon だけ渡せば「地図中心 + 赤ピン + その地点のカード」になる。 */}
             <Link
               replace
-              href={
-                lat && lon
-                  ? `/?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}${
-                      placeName ? `&label=${encodeURIComponent(placeName)}` : ""
-                    }`
-                  : "/"
-              }
+              href={lat && lon ? `/?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}` : "/"}
               className="flex h-12 items-center justify-center gap-2 rounded-full bg-amber-600 px-5 text-base font-semibold text-white hover:bg-amber-700"
             >
               <MapIcon size={18} aria-hidden />
