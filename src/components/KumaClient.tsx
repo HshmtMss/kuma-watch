@@ -914,11 +914,11 @@ export default function KumaClient() {
                   <div className="text-base font-bold leading-snug text-amber-900">
                     クマを見た場所を選んでください
                   </div>
-                  <div className="mt-0.5 text-sm leading-relaxed text-amber-800">
-                    {selectedLocation
-                      ? "この場所でよければ「決定」を押してください"
-                      : "地図をタップ、または下の検索で地名を探す"}
-                  </div>
+                  {!selectedLocation && (
+                    <div className="mt-0.5 text-sm leading-relaxed text-amber-800">
+                      地図をタップ、または下の検索で地名を探す
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="mt-3 flex gap-2">
@@ -947,7 +947,7 @@ export default function KumaClient() {
                   }}
                   className="h-12 flex-[2] rounded-full bg-amber-600 text-base font-bold text-white shadow-sm active:bg-amber-700 disabled:opacity-40"
                 >
-                  この地点に決定
+                  決定
                 </button>
               </div>
             </div>
