@@ -2,38 +2,43 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Footprints, Ban, Users, Bell, type LucideIcon } from "lucide-react";
 
 /**
- * クマ対策の合言葉「はちみつ」を、全ページの隅に常設した小さなボタン(FAB)から
- * ワンタップで開けるガイド。普段は省スペース、困ったらどこからでも。
- * 子供〜高齢者まで直感的に分かるよう、大きな文字・大きなピクトグラム・やさしい言葉で。
+ * クマ対策の合言葉「はちみつ」を、地図(トップ)の「対策」ボタンからワンタップで開ける
+ * ガイド。子供〜高齢者まで直感的に分かるよう、大きな文字・シンプルなピクトグラム
+ * (カテゴリと同じ Lucide 系)・やさしい言葉で。
  *
- * は=走らない / ち=近づかない / み=みんなで / つ=伝える。
- * 「クマの好物=はちみつ」で、食べ物・ごみを残さない(誘引しない)も想起させる。
+ * は=走らない / ち=近づかない / み=みんなで / つ=伝える ＋ のこさない。
  */
 
-const ITEMS: { kana: string; emoji: string; action: string; desc: string }[] = [
+const ITEMS: {
+  kana: string;
+  Icon: LucideIcon;
+  action: string;
+  desc: string;
+}[] = [
   {
     kana: "は",
-    emoji: "🏃",
+    Icon: Footprints,
     action: "走らない",
     desc: "背を向けず、クマを見ながらゆっくり後退（走ると追われる）",
   },
   {
     kana: "ち",
-    emoji: "🚷",
+    Icon: Ban,
     action: "近づかない",
     desc: "子グマの近くには母グマ。出没した場所・見通しの悪いやぶも避ける",
   },
   {
     kana: "み",
-    emoji: "👨‍👩‍👧",
+    Icon: Users,
     action: "みんなで",
     desc: "ひとりで行かない。数人だと気づかれやすく安心",
   },
   {
     kana: "つ",
-    emoji: "🔔",
+    Icon: Bell,
     action: "伝える",
     desc: "鈴・ラジオ・声で「人がいるよ」。不意の遭遇を防ぐ",
   },
@@ -110,14 +115,17 @@ export default function HachimitsuGuide() {
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-400 text-3xl font-black leading-none text-white shadow-sm">
                     {it.kana}
                   </span>
-                  <span className="shrink-0 text-2xl" aria-hidden>
-                    {it.emoji}
-                  </span>
+                  <it.Icon
+                    className="shrink-0 text-amber-600"
+                    size={28}
+                    strokeWidth={1.8}
+                    aria-hidden
+                  />
                   <div className="min-w-0">
-                    <div className="text-lg font-extrabold leading-tight text-stone-900">
+                    <div className="text-xl font-extrabold leading-tight text-stone-900">
                       {it.action}
                     </div>
-                    <div className="text-xs leading-snug text-stone-500">
+                    <div className="text-[13px] leading-snug text-stone-500">
                       {it.desc}
                     </div>
                   </div>
@@ -131,10 +139,10 @@ export default function HachimitsuGuide() {
                 🍯
               </span>
               <div className="min-w-0">
-                <div className="text-lg font-extrabold leading-tight text-stone-900">
+                <div className="text-xl font-extrabold leading-tight text-stone-900">
                   のこさない
                 </div>
-                <div className="text-xs leading-snug text-stone-600">
+                <div className="text-[13px] leading-snug text-stone-600">
                   食べ物・生ごみは持ち帰る。においがクマを引き寄せる
                 </div>
               </div>

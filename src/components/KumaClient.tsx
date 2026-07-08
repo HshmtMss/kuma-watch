@@ -1012,15 +1012,14 @@ export default function KumaClient() {
             onClick={() =>
               window.dispatchEvent(new CustomEvent("open-hachimitsu"))
             }
-            className="flex flex-col items-center justify-center rounded-full bg-amber-500 leading-none text-white shadow-lg hover:bg-amber-600"
+            className="flex items-center justify-center rounded-full bg-amber-500 text-white shadow-lg hover:bg-amber-600"
             style={{ height: "3.25rem", width: "3.25rem" }}
             aria-label="クマ対策の合言葉「はちみつ」を開く"
             title="クマ対策"
           >
-            <span className="text-base" aria-hidden>
-              🍯
+            <span className="text-lg font-black leading-none tracking-tight">
+              対策
             </span>
-            <span className="mt-0.5 text-[10px] font-bold">対策</span>
           </button>
           <button
             type="button"
