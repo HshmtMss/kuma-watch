@@ -21,6 +21,8 @@ export type MapItem = {
   cityName?: string;
   comment?: string;
   photoUrl?: string;
+  photoLat?: number;
+  photoLon?: number;
 };
 
 type Decision = "approve" | "reject" | "delete";
@@ -129,6 +131,30 @@ export default function AdminSubmissionsMap({
         marker.bindPopup(html, { maxWidth: 260 });
         marker.addTo(layer);
         bounds.push([s.lat, s.lon]);
+
+        // 写真の撮影位置(EXIF)があれば、点線でピンと結び 📷 マーカーを立てる。
+        if (typeof s.photoLat === "number" && typeof s.photoLon === "number") {
+          L.polyline(
+            [
+              [s.lat, s.lon],
+              [s.photoLat, s.photoLon],
+            ],
+            { color: "#3b82f6", weight: 1.5, dashArray: "4 3", opacity: 0.7 },
+          ).addTo(layer);
+          const photoMarker = L.marker([s.photoLat, s.photoLon], {
+            icon: L.divIcon({
+              className: "",
+              html: `<div style="font-size:18px;line-height:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.45))">📷</div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
+            }),
+          });
+          photoMarker.bindPopup(
+            `<div style="font-size:12px;line-height:1.5">📷 写真の撮影位置<br>${s.photoLat.toFixed(5)}, ${s.photoLon.toFixed(5)}</div>`,
+          );
+          photoMarker.addTo(layer);
+          bounds.push([s.photoLat, s.photoLon]);
+        }
       }
       if (bounds.length > 0) {
         try {

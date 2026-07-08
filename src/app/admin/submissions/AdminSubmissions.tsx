@@ -191,6 +191,8 @@ function SubmissionsContent({
     cityName: s.cityName,
     comment: s.comment,
     photoUrl: s.photoUrl,
+    photoLat: s.photoLat,
+    photoLon: s.photoLon,
   }));
 
   return (
