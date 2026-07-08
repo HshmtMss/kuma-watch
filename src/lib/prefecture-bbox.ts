@@ -82,3 +82,35 @@ export function latLonMatchesPrefecture(
     lon <= bbox.lonMax
   );
 }
+
+/**
+ * 座標をおおまかに都道府県へ割り当てる（BBox ベース・逆ジオコーディング不要）。
+ * BBox が重なる場合は「内包する県のうち中心が最も近い県」、どこにも入らなければ
+ * 「中心が最も近い県」を返す。geo 通知(任意地点)の県別集計など、粗い集計用。
+ */
+export function prefectureForLatLon(lat: number, lon: number): string | null {
+  let insidePref: string | null = null;
+  let insideDist = Infinity;
+  let nearPref: string | null = null;
+  let nearDist = Infinity;
+  for (const [pref, b] of Object.entries(PREFECTURE_BBOX)) {
+    const cLat = (b.latMin + b.latMax) / 2;
+    const cLon = (b.lonMin + b.lonMax) / 2;
+    const d = (lat - cLat) ** 2 + (lon - cLon) ** 2;
+    if (d < nearDist) {
+      nearDist = d;
+      nearPref = pref;
+    }
+    if (
+      lat >= b.latMin &&
+      lat <= b.latMax &&
+      lon >= b.lonMin &&
+      lon <= b.lonMax &&
+      d < insideDist
+    ) {
+      insideDist = d;
+      insidePref = pref;
+    }
+  }
+  return insidePref ?? nearPref;
+}

@@ -17,6 +17,7 @@ import AdminShell from "@/components/admin/AdminShell";
 
 type MuniRow = { pref: string; city: string; count: number };
 type SpotRow = { slug: string; name: string; pref: string; count: number };
+type GeoPrefRow = { pref: string; count: number };
 
 type PushStats = {
   totalSubscribers: number;
@@ -27,6 +28,8 @@ type PushStats = {
   activeSpotCount: number;
   totalSpotSubscriptions: number;
   topSpots: SpotRow[];
+  totalGeoPoints: number;
+  topGeoPrefs: GeoPrefRow[];
 };
 
 function downloadCsv(filename: string, rows: (string | number)[][]): void {
@@ -137,6 +140,11 @@ function PushStatsContent({
               value={Math.round(stats.avgMunisPerSubscriber * 10) / 10}
               unit="地域"
             />
+            <Tile
+              label="地図の任意地点(geo)"
+              value={stats.totalGeoPoints}
+              unit="地点"
+            />
           </div>
 
           <RankTable
@@ -175,6 +183,22 @@ function PushStatsContent({
               downloadCsv("push-spots.csv", [
                 ["観光地", "都道府県", "登録数"],
                 ...stats.topSpots.map((s) => [s.name, s.pref, s.count]),
+              ])
+            }
+          />
+
+          <div className="h-6" />
+
+          <RankTable
+            title="地図の任意地点(geo) 都道府県別"
+            hint="地図で任意地点を登録した通知の県別内訳（座標をBBoxでざっくり割当）。"
+            headers={["#", "都道府県", "地点数"]}
+            rows={stats.topGeoPrefs.map((g, i) => [i + 1, g.pref, g.count])}
+            emptyText="地図の任意地点で登録した通知はまだありません。"
+            onCsv={() =>
+              downloadCsv("push-geo-prefs.csv", [
+                ["都道府県", "地点数"],
+                ...stats.topGeoPrefs.map((g) => [g.pref, g.count]),
               ])
             }
           />

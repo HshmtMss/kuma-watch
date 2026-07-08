@@ -20,6 +20,7 @@
 import { Redis } from "@upstash/redis";
 import { createHash, randomUUID } from "node:crypto";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { prefectureForLatLon } from "@/lib/prefecture-bbox";
 
 type StoredSubscription = {
   endpoint: string;
@@ -245,6 +246,10 @@ export type PushStats = {
   totalSpotSubscriptions: number;
   /** 購読者数の多い観光地ランキング (上位 topN)。slug と表示名・県を含む */
   topSpots: { slug: string; name: string; pref: string; count: number }[];
+  /** 地図の任意地点(geo)登録の総数 (= 全 geo 地点の数)。 */
+  totalGeoPoints: number;
+  /** geo 地点を都道府県にざっくり割り当てたランキング (上位 topN)。 */
+  topGeoPrefs: { pref: string; count: number }[];
 };
 
 /**
@@ -321,6 +326,28 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
   }
   perSpot.sort((a, b) => b.count - a.count);
 
+  // 4) geo(任意地点)別: geo:active の各 endpoint の地点を集め、都道府県にざっくり
+  //    割り当てて数える。任意座標なので muni/spot ランキングには入らない層。
+  const geoHashes = await r.smembers<string[]>(`geo:active`);
+  let totalGeoPoints = 0;
+  const geoPrefCount = new Map<string, number>();
+  if (geoHashes.length > 0) {
+    const pipeline = r.pipeline();
+    for (const h of geoHashes) pipeline.get(`geo:pts:${h}`);
+    const rawList = (await pipeline.exec()) as (string | GeoPoint[] | null)[];
+    for (const raw of rawList) {
+      for (const pt of parseGeoPoints(raw ?? null)) {
+        const pref = prefectureForLatLon(pt.lat, pt.lon);
+        if (!pref) continue;
+        totalGeoPoints++;
+        geoPrefCount.set(pref, (geoPrefCount.get(pref) ?? 0) + 1);
+      }
+    }
+  }
+  const perGeoPref = [...geoPrefCount.entries()]
+    .map(([pref, count]) => ({ pref, count }))
+    .sort((a, b) => b.count - a.count);
+
   return {
     totalSubscribers,
     activeMuniCount,
@@ -331,6 +358,8 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
     activeSpotCount,
     totalSpotSubscriptions,
     topSpots: perSpot.slice(0, topN),
+    totalGeoPoints,
+    topGeoPrefs: perGeoPref.slice(0, topN),
   };
 }
 
