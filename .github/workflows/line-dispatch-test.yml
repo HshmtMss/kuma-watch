@@ -13,15 +13,16 @@ on:
   workflow_dispatch:
     inputs:
       pref:
-        description: 都道府県名 (例: 東京都)
+        # 値に ": " を含む説明文は必ずクォートする (YAML がマッピングと誤読する)
+        description: "都道府県名 (例 東京都)"
         required: true
-        default: 東京都
+        default: "東京都"
       city:
-        description: 市町村名 (例: 八王子市)
+        description: "市町村名 (例 八王子市)"
         required: true
-        default: 八王子市
+        default: "八王子市"
       confirm:
-        description: 購読者に本物の通知が飛びます。実行するなら SEND と入力
+        description: "購読者に本物の通知が飛びます。実行するなら SEND と入力"
         required: true
         default: ""
 
