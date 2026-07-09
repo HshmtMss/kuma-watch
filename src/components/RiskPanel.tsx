@@ -3,7 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import type {
+  TouchEvent as ReactTouchEvent,
+  MouseEvent as ReactMouseEvent,
+} from "react";
 import {
   MapPin,
   AlertTriangle,
@@ -688,20 +691,18 @@ export default function RiskPanel({
     setSnap(nextSnapOnTap);
   };
 
-  // --- ドラッグ (指でシートを上下) ---
-  // pointer capture + 再レンダの組み合わせで iOS が pointermove を取りこぼし、
-  // 「指で押し上がらない (タップだけ効く)」不具合が出るため、pointerdown で window
-  // にリスナを張って移動を確実に拾う。ハンドルは touch-action:none なので、この
-  // ジェスチャがページスクロール/地図パンに化けることもない。
+  // --- ドラッグ (指/マウスでシートを上下) ---
+  // iOS Safari では PointerEvents が touch でスクロールに化けて pointermove を
+  // 取りこぼし「指で押し上がらない」ため、touch は touchmove を非パッシブで受けて
+  // preventDefault し確実に追従させる。デスクトップは mouse で同等に動かす。
   const visForSnapAt = (s: Snap, H: number) =>
     s === "collapsed" ? COLLAPSED_PX : H * SNAP_VISIBLE_FRAC[s];
-  const onHandleDown = (e: ReactPointerEvent) => {
+  const startDrag = (startY: number, kind: "touch" | "mouse") => {
     const el = rootRef.current?.parentElement;
     const H = el ? el.clientHeight : containerH;
     if (el && H !== containerH) setContainerH(H);
     const sh = H * SHEET_FRAC;
     const drag = {
-      startY: e.clientY,
       startD: dragD ?? (open ? sh - visForSnapAt(snap, H) : sh),
       lastD: 0,
       moved: false,
@@ -709,17 +710,26 @@ export default function RiskPanel({
     drag.lastD = drag.startD;
     setDragD(drag.startD);
 
-    const onMove = (ev: PointerEvent) => {
-      const delta = ev.clientY - drag.startY;
+    const update = (y: number) => {
+      const delta = y - startY;
       if (Math.abs(delta) > TAP_THRESHOLD_PX) drag.moved = true;
       const nd = Math.max(0, Math.min(drag.startD + delta, sh));
       drag.lastD = nd;
       setDragD(nd);
     };
-    const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onUp);
+    const onTouchMove = (ev: TouchEvent) => {
+      // ページ/地図スクロールを止めてシートに追従させる (iOS 対策の要)。
+      if (ev.cancelable) ev.preventDefault();
+      const t = ev.touches[0];
+      if (t) update(t.clientY);
+    };
+    const onMouseMove = (ev: MouseEvent) => update(ev.clientY);
+    const finish = () => {
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", finish);
+      window.removeEventListener("touchcancel", finish);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", finish);
       if (!drag.moved) {
         // タップ扱い: idle は GPS、それ以外は展開トグル。
         setDragD(null);
@@ -752,10 +762,20 @@ export default function RiskPanel({
       setSnap(best.k);
       setOpen(true);
     };
-    window.addEventListener("pointermove", onMove, { passive: false });
-    window.addEventListener("pointerup", onUp);
-    window.addEventListener("pointercancel", onUp);
+    if (kind === "touch") {
+      window.addEventListener("touchmove", onTouchMove, { passive: false });
+      window.addEventListener("touchend", finish);
+      window.addEventListener("touchcancel", finish);
+    } else {
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", finish);
+    }
   };
+  const onHandleTouchStart = (e: ReactTouchEvent) => {
+    const t = e.touches[0];
+    if (t) startDrag(t.clientY, "touch");
+  };
+  const onHandleMouseDown = (e: ReactMouseEvent) => startDrag(e.clientY, "mouse");
 
   const showExpandedBody = state.kind === "ready" || state.kind === "error";
 
@@ -781,18 +801,19 @@ export default function RiskPanel({
       }}
     >
       {/* ドラッグハンドル: 指で上下してシート高を調整。タップで開閉。
-          touch-action:none でこのジェスチャがスクロール/地図パンに化けないようにする。
-          移動は onPointerDown 内で window に張ったリスナが拾う (iOS 対策)。
-          ハンドル部を広めに取り、指で掴みやすくする。 */}
+          touch-action:none でこのジェスチャがスクロール/地図パンに化けないようにし、
+          touchmove(非パッシブ)を window で受けて確実に追従させる (iOS 対策)。
+          掴みやすいよう広めのバー + 上下パディングを確保。 */}
       <div
-        onPointerDown={onHandleDown}
-        className="flex w-full shrink-0 cursor-grab touch-none items-center justify-center py-4 active:cursor-grabbing"
+        onTouchStart={onHandleTouchStart}
+        onMouseDown={onHandleMouseDown}
+        className="flex w-full shrink-0 cursor-grab touch-none select-none items-center justify-center py-4 active:cursor-grabbing"
         style={{ touchAction: "none" }}
         role="button"
         tabIndex={0}
         aria-label="カードの高さを調整（指で上下、タップで開閉）"
       >
-        <span className="h-1.5 w-11 rounded-full bg-gray-300" />
+        <span className="h-1.5 w-12 rounded-full bg-gray-300" />
       </div>
 
       <div className="mx-auto w-full max-w-3xl shrink-0">

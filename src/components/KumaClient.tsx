@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MapPin, Settings } from "lucide-react";
+import { MapPin, Settings, CalendarDays } from "lucide-react";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
@@ -47,11 +47,12 @@ const DEFAULT_HALO_OPACITY = 1.0;
 const SMOOTHING_SIGMA_OPTIONS = [0, 1, 2, 3, 4] as const;
 
 type PeriodOption = { label: string; days: number | null };
+// 「直近◯◯」= いつからの出没を地図に出すか (期間フィルタ) を一目で伝える文言。
 const PERIOD_OPTIONS: PeriodOption[] = [
-  { label: "1週間", days: 7 },
-  { label: "1ヶ月", days: 30 },
-  { label: "3ヶ月", days: 90 },
-  { label: "1年", days: 365 },
+  { label: "直近1週間", days: 7 },
+  { label: "直近1ヶ月", days: 30 },
+  { label: "直近3ヶ月", days: 90 },
+  { label: "直近1年", days: 365 },
   { label: "全期間", days: null },
 ];
 const DEFAULT_PERIOD_DAYS: number | null = 90;
@@ -767,20 +768,12 @@ export default function KumaClient() {
               </div>
             )}
 
-            {/* 2 段目: フィルタ chip。出没ピン / 期間 / 表示 (件数・更新は表示内へ集約)。
-                overflow-x-auto は「表示」popover を切り落とすため使わず、
-                狭い画面では折り返す (flex-wrap)。 */}
-            <div className="pointer-events-auto flex flex-wrap items-center gap-1.5">
-              <label className="flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-stone-700 shadow ring-1 ring-black/5">
-                <input
-                  type="checkbox"
-                  checked={showPins}
-                  onChange={(e) => setShowPins(e.target.checked)}
-                  className="h-4 w-4 accent-amber-600"
-                />
-                出没ピン
-              </label>
-              <div className="flex shrink-0 items-center rounded-full bg-white px-2.5 py-1 text-sm shadow ring-1 ring-black/5">
+            {/* 2 段目: 左に「期間」chip、右端に「表示設定」(アイコンのみ)。
+                出没ピンの ON/OFF は表示設定の中へ集約した。 */}
+            <div className="pointer-events-auto flex items-center gap-1.5">
+              {/* 期間 chip: カレンダーアイコン + 「直近◯◯」で、いつからの出没かを明示。 */}
+              <div className="flex shrink-0 items-center gap-1 rounded-full bg-white py-1 pl-2.5 pr-1 text-sm shadow ring-1 ring-black/5">
+                <CalendarDays size={15} className="shrink-0 text-stone-500" aria-hidden />
                 <select
                   value={periodDays ?? ""}
                   onChange={(e) =>
@@ -788,7 +781,7 @@ export default function KumaClient() {
                   }
                   disabled={!showPins}
                   className="bg-transparent py-0.5 pr-1 font-medium text-stone-700 disabled:opacity-40"
-                  aria-label="期間"
+                  aria-label="表示する期間"
                 >
                   {PERIOD_OPTIONS.map((p) => (
                     <option key={p.label} value={p.days ?? ""}>
@@ -797,16 +790,18 @@ export default function KumaClient() {
                   ))}
                 </select>
               </div>
-              {/* 表示: ヒートマップ / 地図種類 / 凡例 を 1 つの popover に集約。 */}
-              <details className="group relative shrink-0">
+
+              {/* 表示設定: アイコンのみ・右端へ寄せる。出没ピン / ヒートマップ /
+                  地図種類 / 凡例 / 件数・更新 をここに集約。 */}
+              <details className="group relative ml-auto shrink-0">
                 <summary
-                  className="flex cursor-pointer items-center gap-1 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-stone-700 shadow ring-1 ring-black/5 marker:hidden [&::-webkit-details-marker]:hidden"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white text-stone-600 shadow ring-1 ring-black/5 marker:hidden [&::-webkit-details-marker]:hidden"
                   aria-label="表示設定を開く"
                   title="表示設定"
                 >
                   <svg
-                    width="15"
-                    height="15"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -818,14 +813,20 @@ export default function KumaClient() {
                     <circle cx="12" cy="12" r="3" />
                     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                   </svg>
-                  表示
-                  <span aria-hidden className="text-[10px] text-stone-400 group-open:rotate-180">
-                    ▼
-                  </span>
                 </summary>
-                <div className="absolute left-0 top-full z-[1100] mt-1.5 w-64 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
-                  {/* 件数・更新日は上部をすっきりさせるためここに集約。 */}
-                  <div className="mb-2 flex items-center justify-between gap-2 border-b border-stone-100 px-1.5 pb-2 text-xs text-stone-500">
+                <div className="absolute right-0 top-full z-[1100] mt-1.5 w-64 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
+                  {/* 出没ピン ON/OFF (旧・独立 chip からここへ移動) */}
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
+                    <input
+                      type="checkbox"
+                      checked={showPins}
+                      onChange={(e) => setShowPins(e.target.checked)}
+                      className="h-4 w-4 accent-amber-600"
+                    />
+                    出没ピンを表示
+                  </label>
+                  {/* 件数・更新日 */}
+                  <div className="my-1 flex items-center justify-between gap-2 border-y border-stone-100 px-1.5 py-1.5 text-xs text-stone-500">
                     <span className="tabular-nums" suppressHydrationWarning>
                       {filtered.length.toLocaleString()}件表示中
                     </span>
