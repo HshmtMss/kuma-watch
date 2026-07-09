@@ -783,8 +783,9 @@ export default function KumaClient() {
             {/* 2 段目: 左に「期間」chip、右端に「表示設定」(アイコンのみ)。
                 出没ピンの ON/OFF は表示設定の中へ集約した。 */}
             <div className="pointer-events-auto flex items-center gap-1.5">
-              {/* 期間 chip: カレンダーアイコン + 「直近◯◯」で、いつからの出没かを明示。 */}
-              <div className="flex shrink-0 items-center gap-1 rounded-full bg-white py-1 pl-2.5 pr-1 text-sm shadow ring-1 ring-black/5">
+              {/* 期間 chip: カレンダーアイコン + 「直近◯◯」で、いつからの出没かを明示。
+                  凡例チップと高さ(h-9)を揃えて上下をきれいに合わせる。 */}
+              <div className="flex h-9 shrink-0 items-center gap-1 rounded-full bg-white pl-2.5 pr-1 text-sm shadow ring-1 ring-black/5">
                 <CalendarDays size={15} className="shrink-0 text-stone-500" aria-hidden />
                 <select
                   value={periodDays ?? ""}
@@ -803,8 +804,9 @@ export default function KumaClient() {
                 </select>
               </div>
 
-              {/* 凡例(鮮度): ローズ色のピン = 直近1週間の出没。期間チップの隣に小さく。 */}
-              <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1.5 text-xs font-medium text-stone-600 shadow ring-1 ring-black/5">
+              {/* 凡例(鮮度): ローズ色のピン = 直近1週間の出没。期間チップと高さ(h-9)を
+                  揃えて上下をきれいに合わせる。 */}
+              <div className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-2.5 text-xs font-medium text-stone-600 shadow ring-1 ring-black/5">
                 <span
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: "#e11d48" }}
