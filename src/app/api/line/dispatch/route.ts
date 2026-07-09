@@ -138,8 +138,8 @@ export async function POST(req: Request) {
     const n = g.records.length;
     const head =
       n === 1
-        ? `${g.city} で新しいクマ出没`
-        : `${g.city} で新しいクマ出没（${n}件）`;
+        ? `${g.city}で新しいクマ出没`
+        : `${g.city}で新しいクマ出没（${n}件）`;
     const top = g.records[0];
     const line = snippet(top, `${top.date ?? ""} ${g.pref}${g.city}`.trim());
     const url = `${base}/place/${encodeURIComponent(g.pref)}/${encodeURIComponent(g.city)}`;
@@ -175,8 +175,8 @@ export async function POST(req: Request) {
       const n = g.records.length;
       const head =
         n === 1
-          ? `${g.name} 周辺で新しいクマ出没`
-          : `${g.name} 周辺で新しいクマ出没（${n}件）`;
+          ? `${g.name}周辺で新しいクマ出没`
+          : `${g.name}周辺で新しいクマ出没（${n}件）`;
       const top = g.records[0];
       const line = snippet(top, `${top.date ?? ""} ${g.name}周辺`.trim());
       const url = `${base}/spot/${encodeURIComponent(g.slug)}`;
@@ -204,8 +204,8 @@ export async function POST(req: Request) {
       const n = matched.length;
       const head =
         n === 1
-          ? `${place} 周辺で新しいクマ出没`
-          : `${place} 周辺で新しいクマ出没（${n}件）`;
+          ? `${place}周辺で新しいクマ出没`
+          : `${place}周辺で新しいクマ出没（${n}件）`;
       const top = matched[0];
       const line = snippet(
         top,
