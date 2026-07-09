@@ -57,9 +57,15 @@ const PERIOD_OPTIONS: PeriodOption[] = [
 ];
 const DEFAULT_PERIOD_DAYS: number | null = 90;
 
+// 期間フィルタの下限日 (これ以降の出没日を表示)。
+// JST カレンダー日で days 日前を求める。地図の青リング (freshness.eventDaysAgo) が
+// JST カレンダー日差で判定しているため、ここも JST 基準に揃える。UTC でスライスして
+// いた旧実装だと境界が 1 日ずれ、「直近1週間フィルタを通るのに青リングが付かない
+// ピン」が出ていた。
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 function computeCutoff(days: number | null): string | null {
   if (days === null) return null;
-  const d = new Date(Date.now() - days * 86_400_000);
+  const d = new Date(Date.now() + JST_OFFSET_MS - days * 86_400_000);
   return d.toISOString().slice(0, 10);
 }
 
@@ -734,10 +740,11 @@ export default function KumaClient() {
                 <Link
                   href="/"
                   aria-label="くまウォッチ ホーム（地図）"
-                  className="flex shrink-0 items-center rounded-full bg-white px-3 py-2.5 shadow-md ring-1 ring-black/5"
+                  className="flex h-11 shrink-0 items-center rounded-xl bg-white p-1 shadow-md ring-1 ring-black/5"
                 >
+                  {/* ロゴは枠で小さく見えないよう、余白を詰めて大きく (文字まで読める)。 */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo.png" alt="KumaWatch" className="block h-6 w-auto" />
+                  <img src="/logo.png" alt="KumaWatch" className="block h-full w-auto" />
                 </Link>
                 <div className="min-w-0 flex-1 rounded-full bg-white shadow-md ring-1 ring-black/5">
                   <PlaceSearch compact onPick={handleSearchPick} />
@@ -795,13 +802,13 @@ export default function KumaClient() {
                   地図種類 / 凡例 / 件数・更新 をここに集約。 */}
               <details className="group relative ml-auto shrink-0">
                 <summary
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white text-stone-600 shadow ring-1 ring-black/5 marker:hidden [&::-webkit-details-marker]:hidden"
+                  className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white text-stone-600 shadow-md ring-1 ring-black/5 marker:hidden [&::-webkit-details-marker]:hidden"
                   aria-label="表示設定を開く"
                   title="表示設定"
                 >
                   <svg
-                    width="18"
-                    height="18"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -883,6 +890,19 @@ export default function KumaClient() {
                   </div>
                 </div>
               </details>
+            </div>
+
+            {/* 3 段目: 凡例(青リング)。青リング=出没日が直近1週間。上部の見やすい
+                位置に常設し、地図の強調表示の意味がすぐ分かるようにする。 */}
+            <div className="flex">
+              <span className="pointer-events-none inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm ring-1 ring-black/5 backdrop-blur">
+                <span
+                  className="h-3 w-3 shrink-0 rounded-full ring-2 ring-blue-500"
+                  style={{ backgroundColor: "#78350f" }}
+                  aria-hidden
+                />
+                青いリング＝直近1週間の出没
+              </span>
             </div>
           </div>
         )}
