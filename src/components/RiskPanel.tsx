@@ -415,10 +415,6 @@ export default function RiskPanel({
   const [dragD, setDragD] = useState<number | null>(null);
   const [containerH, setContainerH] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
-  // ドラッグ中の一時値 (setState の非同期性に依存せず pointerup で参照する)。
-  const dragRef = useRef<{ startY: number; startD: number; lastD: number; moved: boolean } | null>(
-    null,
-  );
   // full のときだけ詳細セクションを描画する (旧 fullView 相当)。
   const fullView = snap === "full";
 
@@ -693,69 +689,72 @@ export default function RiskPanel({
   };
 
   // --- ドラッグ (指でシートを上下) ---
+  // pointer capture + 再レンダの組み合わせで iOS が pointermove を取りこぼし、
+  // 「指で押し上がらない (タップだけ効く)」不具合が出るため、pointerdown で window
+  // にリスナを張って移動を確実に拾う。ハンドルは touch-action:none なので、この
+  // ジェスチャがページスクロール/地図パンに化けることもない。
   const visForSnapAt = (s: Snap, H: number) =>
     s === "collapsed" ? COLLAPSED_PX : H * SNAP_VISIBLE_FRAC[s];
   const onHandleDown = (e: ReactPointerEvent) => {
     const el = rootRef.current?.parentElement;
     const H = el ? el.clientHeight : containerH;
     if (el && H !== containerH) setContainerH(H);
-    const startD = dragD ?? (open ? H * SHEET_FRAC - visForSnapAt(snap, H) : H * SHEET_FRAC);
-    dragRef.current = { startY: e.clientY, startD, lastD: startD, moved: false };
-    setDragD(startD);
-    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-  };
-  const onHandleMove = (e: ReactPointerEvent) => {
-    const d = dragRef.current;
-    if (!d) return;
-    const H = containerH;
     const sh = H * SHEET_FRAC;
-    const delta = e.clientY - d.startY;
-    if (Math.abs(delta) > TAP_THRESHOLD_PX) d.moved = true;
-    const nd = Math.max(0, Math.min(d.startD + delta, sh));
-    d.lastD = nd;
-    setDragD(nd);
-  };
-  const onHandleUp = () => {
-    const d = dragRef.current;
-    dragRef.current = null;
-    const H = containerH;
-    const sh = H * SHEET_FRAC;
-    if (!d) {
-      setDragD(null);
-      return;
-    }
-    if (!d.moved) {
-      // タップ扱い: idle は GPS、それ以外は full ⇄ peek。
-      setDragD(null);
-      if (state.kind === "idle") {
-        void onUseGps();
+    const drag = {
+      startY: e.clientY,
+      startD: dragD ?? (open ? sh - visForSnapAt(snap, H) : sh),
+      lastD: 0,
+      moved: false,
+    };
+    drag.lastD = drag.startD;
+    setDragD(drag.startD);
+
+    const onMove = (ev: PointerEvent) => {
+      const delta = ev.clientY - drag.startY;
+      if (Math.abs(delta) > TAP_THRESHOLD_PX) drag.moved = true;
+      const nd = Math.max(0, Math.min(drag.startD + delta, sh));
+      drag.lastD = nd;
+      setDragD(nd);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      if (!drag.moved) {
+        // タップ扱い: idle は GPS、それ以外は展開トグル。
+        setDragD(null);
+        if (state.kind === "idle") {
+          void onUseGps();
+          return;
+        }
+        setOpen(true);
+        setSnap(nextSnapOnTap);
         return;
       }
-      setOpen(true);
-      setSnap(nextSnapOnTap);
-      return;
-    }
-    // 離した位置の「見え高」に最も近いスナップへ吸着。最小は collapsed (畳んだバー)。
-    // 消さない (open のまま) ので、いつでもハンドルを引き上げて戻せる。
-    const vis = sh - d.lastD;
-    const targets: { k: Snap; v: number }[] = [
-      { k: "collapsed", v: COLLAPSED_PX },
-      { k: "peek", v: H * SNAP_VISIBLE_FRAC.peek },
-      { k: "half", v: H * SNAP_VISIBLE_FRAC.half },
-      { k: "full", v: H * SNAP_VISIBLE_FRAC.full },
-    ];
-    let best = targets[0];
-    let bestDist = Infinity;
-    for (const t of targets) {
-      const dist = Math.abs(t.v - vis);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = t;
+      // 離した「見え高」に最も近いスナップへ吸着。最小は collapsed (消さない)。
+      const vis = sh - drag.lastD;
+      const targets: { k: Snap; v: number }[] = [
+        { k: "collapsed", v: COLLAPSED_PX },
+        { k: "peek", v: H * SNAP_VISIBLE_FRAC.peek },
+        { k: "half", v: H * SNAP_VISIBLE_FRAC.half },
+        { k: "full", v: H * SNAP_VISIBLE_FRAC.full },
+      ];
+      let best = targets[0];
+      let bestDist = Infinity;
+      for (const t of targets) {
+        const dist = Math.abs(t.v - vis);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = t;
+        }
       }
-    }
-    setDragD(null);
-    setSnap(best.k);
-    setOpen(true);
+      setDragD(null);
+      setSnap(best.k);
+      setOpen(true);
+    };
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
   };
 
   const showExpandedBody = state.kind === "ready" || state.kind === "error";
@@ -779,16 +778,15 @@ export default function RiskPanel({
         willChange: "transform",
         display: "flex",
         flexDirection: "column",
-        touchAction: "none",
       }}
     >
-      {/* ドラッグハンドル: 指で上下してシート高を調整。タップで full ⇄ peek。 */}
+      {/* ドラッグハンドル: 指で上下してシート高を調整。タップで開閉。
+          touch-action:none でこのジェスチャがスクロール/地図パンに化けないようにする。
+          移動は onPointerDown 内で window に張ったリスナが拾う (iOS 対策)。
+          ハンドル部を広めに取り、指で掴みやすくする。 */}
       <div
         onPointerDown={onHandleDown}
-        onPointerMove={onHandleMove}
-        onPointerUp={onHandleUp}
-        onPointerCancel={onHandleUp}
-        className="flex w-full shrink-0 cursor-grab items-center justify-center py-3 active:cursor-grabbing"
+        className="flex w-full shrink-0 cursor-grab touch-none items-center justify-center py-4 active:cursor-grabbing"
         style={{ touchAction: "none" }}
         role="button"
         tabIndex={0}

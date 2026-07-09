@@ -21,7 +21,6 @@ import RiskPanel, {
   type AskContext,
 } from "@/components/RiskPanel";
 import AskBox from "@/components/AskBox";
-import TopWeatherBadge from "@/components/TopWeatherBadge";
 import SettingsPanel from "@/components/SettingsPanel";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
@@ -976,18 +975,16 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 地図右上: 天気バッジ (現在地 or 選択地点)。ピッカー中は隠す。 */}
-        {!isPicking && (
-          <TopWeatherBadge
-            lat={selectedLocation?.lat ?? currentLocation?.lat ?? null}
-            lon={selectedLocation?.lon ?? currentLocation?.lon ?? null}
-          />
-        )}
-
-        {/* 右端縦スタック: 対策 / 現在地 / ズーム。地図右下に固定 (Google マップ流)。
-            カード (RiskPanel) を上げると z 順で自然にこの下に隠れる。ピッカー中は
-            「対策」を隠す。 */}
-        <div className="absolute bottom-3 right-3 z-[900] flex flex-col gap-2.5">
+        {/* 右端縦スタック: 対策 / 現在地 / ズーム。地図右下。カードが選択されている
+            間は最小状態 (畳んだバー = 88px) の上に出して常に押せるようにする。カードを
+            peek 以上に上げると z 順で自然にこの下に隠れる。ピッカー中/未選択は最下部。 */}
+        <div
+          className={`absolute right-3 z-[900] flex flex-col gap-2.5 ${
+            !isPicking && selectedLocation
+              ? "bottom-[calc(88px+0.75rem)]"
+              : "bottom-3"
+          }`}
+        >
           {/* クマ対策の合言葉「はちみつ」を開く。共通の HachimitsuGuide (layout) が
               open-hachimitsu イベントを受けてポップアップを開く。現在地ボタンの上に同サイズで。 */}
           {!isPicking && (
