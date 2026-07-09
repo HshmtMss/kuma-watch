@@ -46,8 +46,10 @@ import type { GeocodeHit } from "@/app/api/geocode/route";
 import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
 import MonthlySightingsChart from "@/components/MonthlySightingsChart";
 import RiskHero from "@/components/RiskHero";
-import GeoPushButton from "@/components/GeoPushButton";
-import { isGeoPushReleased, isPushReleased } from "@/lib/push-flag";
+import GeoNotifyTile, {
+  isGeoNotifyAvailable,
+} from "@/components/GeoNotifyTile";
+import { isPushReleased } from "@/lib/push-flag";
 
 export type LocationSource = "gps" | "tap" | "search" | "url";
 export type SelectedLocation = {
@@ -947,21 +949,21 @@ function RiskDetails({
   return (
     <div className="border-t border-gray-100 text-sm">
       {/* 1. 危険度 verdict + 「最近の目撃」＋「通知」2 列 + 6段階バー。
-          通知(GeoPushButton compact)は RiskHero 内で最近の目撃と横並び。
-          フラグ (NEXT_PUBLIC_GEO_PUSH_ENABLED) で段階公開。 */}
+          通知(GeoNotifyTile)は RiskHero 内で最近の目撃と横並び。中身は LINE 主役 +
+          ブラウザ通知が控え。フラグ (NEXT_PUBLIC_LINE_ENTRY_ENABLED /
+          NEXT_PUBLIC_GEO_PUSH_ENABLED) で段階公開。 */}
       <RiskHero
         baseLevel={state.baseLevel}
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
         recentSightingCount={state.sCellCount}
         notification={
-          isGeoPushReleased() && location ? (
-            <GeoPushButton
+          isGeoNotifyAvailable() && location ? (
+            <GeoNotifyTile
               lat={location.lat}
               lon={location.lon}
               label={state.placeName ?? location.label}
               radiusKm={10}
-              compact
             />
           ) : undefined
         }
