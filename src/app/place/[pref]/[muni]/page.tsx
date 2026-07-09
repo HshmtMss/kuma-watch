@@ -32,6 +32,8 @@ import { getMuniOfficialLink } from "@/data/muni-official-links";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isPushReleased } from "@/lib/push-flag";
+import LineNotifyButton from "@/components/LineNotifyButton";
+import { isLineEntryReleased } from "@/lib/line-flag";
 
 // dynamicParams=false: 静的生成 (generateStaticParams) は「不変なマスター市区町村
 // ＋政令市の親」のみ。実在しない市町村 URL (ニュースの生地点名・番地付き・旧 URL 等) は
@@ -1324,6 +1326,11 @@ export default async function MuniPage({ params }: Props) {
           リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
       {isPushReleased() && (
         <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
+      )}
+
+      {/* LINE 通知 — Web Push と併存させ、届き方を二重化する。 */}
+      {isLineEntryReleased() && (
+        <LineNotifyButton target={{ kind: "muni", pref, city: muni }} />
       )}
 
       {/* 戻り導線 — 市町村ページの末尾で「県のページに戻る」を必ず提供。
