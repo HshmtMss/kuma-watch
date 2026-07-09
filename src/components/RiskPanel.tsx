@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   MapPin,
   AlertTriangle,
@@ -119,6 +120,20 @@ type State =
 
 const NEARBY_RADIUS_KM = 10;
 const NEARBY_DECAY_KM = 5;
+
+// ドラッグ式ボトムシートのスナップ位置。地図領域 (親要素) の高さに対する
+// 「見えている割合」で定義する。Google マップの place card と同様に指で上下でき、
+// peek (概要) / half (中) / full (最上) の 3 段にスナップ。下に振り切ると閉じる。
+type Snap = "peek" | "half" | "full";
+const SNAP_VISIBLE_FRAC: Record<Snap, number> = {
+  peek: 0.36,
+  half: 0.6,
+  full: 0.94,
+};
+// シート要素そのものの高さ (= full の見え高)。translateY で上下させて見え幅を変える。
+const SHEET_FRAC = 0.94;
+// ドラッグ移動がこの px 未満なら「タップ」とみなす (展開トグル or GPS)。
+const TAP_THRESHOLD_PX = 6;
 
 // 周辺 API は1つでもハングすると Promise.all 全体が止まり「情報取得中」のまま固まる。
 // 各 fetch にクライアント側タイムアウトを掛け、超過したら fallback 値を返す。
@@ -388,9 +403,21 @@ export default function RiskPanel({
   onAskContextChange,
 }: Props) {
   const [state, setState] = useState<State>({ kind: "idle" });
-  const [expanded, setExpanded] = useState(false);
-  // カードを「危険度バーまで見える最小高さ」と「詳細を見せる広い高さ」の 2 段階に
-  const [fullView, setFullView] = useState(false);
+  // ドラッグ式ボトムシートの状態。
+  //   open   … シートを表示するか (false = 下に隠す)。地点未選択や dismiss で false。
+  //   snap   … peek / half / full の 3 段。full のとき詳細を全表示。
+  //   dragD  … ドラッグ中の translateY(px)。非ドラッグ時は null (snap から算出)。
+  const [open, setOpen] = useState(false);
+  const [snap, setSnap] = useState<Snap>("peek");
+  const [dragD, setDragD] = useState<number | null>(null);
+  const [containerH, setContainerH] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  // ドラッグ中の一時値 (setState の非同期性に依存せず pointerup で参照する)。
+  const dragRef = useRef<{ startY: number; startD: number; lastD: number; moved: boolean } | null>(
+    null,
+  );
+  // full のときだけ詳細セクションを描画する (旧 fullView 相当)。
+  const fullView = snap === "full";
 
   // evaluate が records / period / 設定の変化で再生成されないよう ref に逃がす。
   // これがないと /api/kuma 再フェッチや設定変更のたびに evaluate が走り直し、
@@ -416,7 +443,7 @@ export default function RiskPanel({
         setState({ kind: "loading", stage: "メッシュを特定中" });
         const meshCode = latLonToMeshCode(loc.lat, loc.lon);
         if (!meshCode) {
-          setExpanded(true);
+          setOpen(true);
           setState({
             kind: "error",
             message: "この位置はサービス対象範囲外です（日本域外）",
@@ -516,7 +543,7 @@ export default function RiskPanel({
         ? [rev.prefecture, rev.city].filter(Boolean).join(" ")
         : undefined;
 
-      setExpanded(true);
+      setOpen(true);
       setState({
         kind: "ready",
         lat: loc.lat,
@@ -551,7 +578,7 @@ export default function RiskPanel({
         forestType: forest?.forestType ?? null,
       });
     } catch (err) {
-      setExpanded(true);
+      setOpen(true);
       setState({
         kind: "error",
         message: err instanceof Error ? err.message : "評価に失敗しました",
@@ -562,11 +589,14 @@ export default function RiskPanel({
   useEffect(() => {
     if (!location) {
       setState({ kind: "idle" });
+      setOpen(false);
       onAskContextChange?.(null);
       return;
     }
-    // 新しい地点はコンパクト (バーまで) で表示。ユーザーがタップで full に展開
-    setFullView(false);
+    // 新しい地点は peek (概要) で下から迫り出す。指で上げるか「もっと見る」で full に。
+    setOpen(true);
+    setSnap("peek");
+    setDragD(null);
     void evaluate(location);
   }, [location, evaluate, onAskContextChange]);
 
@@ -619,66 +649,152 @@ export default function RiskPanel({
           : err instanceof Error
             ? err.message
             : "位置情報を取得できませんでした";
-      setExpanded(true);
+      setOpen(true);
       setState({ kind: "error", message: msg });
     }
   }, [onPickGps]);
 
   // 結論バッジは RiskHero の大きなヴァーディクトに統合したのでヘッダーには出さない。
 
-  // タップ時の挙動:
-  //   idle → GPS 取得
-  //   compact (expanded=true, fullView=false) → fullView へ
-  //   full → compact へ戻る (fullView=false)
-  //   完全に閉じる場合は × ボタン
+  // 地図領域 (親要素) の高さを測ってスナップ位置の基準にする。回転・リサイズ追従。
+  useEffect(() => {
+    const el = rootRef.current?.parentElement;
+    if (!el) return;
+    const measure = () => setContainerH(el.clientHeight);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // スナップ位置ごとの translateY(px)。0 = full(最上)、大きいほど下に隠れる。
+  const sheetPx = containerH * SHEET_FRAC;
+  const restD = (s: Snap) => sheetPx - containerH * SNAP_VISIBLE_FRAC[s];
+  const translateY = dragD != null ? dragD : open ? restD(snap) : sheetPx;
+
+  // ヘッダー(タイトル)タップ: idle は GPS、それ以外は full ⇄ peek トグル。
   const handleHeaderClick = () => {
     if (state.kind === "idle") {
       void onUseGps();
       return;
     }
-    if (!expanded) {
-      setExpanded(true);
-      setFullView(false);
+    setOpen(true);
+    setSnap((s) => (s === "full" ? "peek" : "full"));
+  };
+
+  // --- ドラッグ (指でシートを上下) ---
+  const onHandleDown = (e: ReactPointerEvent) => {
+    const el = rootRef.current?.parentElement;
+    const H = el ? el.clientHeight : containerH;
+    if (el && H !== containerH) setContainerH(H);
+    const startD = dragD ?? (open ? H * SHEET_FRAC - H * SNAP_VISIBLE_FRAC[snap] : H * SHEET_FRAC);
+    dragRef.current = { startY: e.clientY, startD, lastD: startD, moved: false };
+    setDragD(startD);
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onHandleMove = (e: ReactPointerEvent) => {
+    const d = dragRef.current;
+    if (!d) return;
+    const H = containerH;
+    const sh = H * SHEET_FRAC;
+    const delta = e.clientY - d.startY;
+    if (Math.abs(delta) > TAP_THRESHOLD_PX) d.moved = true;
+    const nd = Math.max(0, Math.min(d.startD + delta, sh));
+    d.lastD = nd;
+    setDragD(nd);
+  };
+  const onHandleUp = () => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    const H = containerH;
+    const sh = H * SHEET_FRAC;
+    if (!d) {
+      setDragD(null);
+      return;
+    }
+    if (!d.moved) {
+      // タップ扱い: idle は GPS、それ以外は full ⇄ peek。
+      setDragD(null);
+      if (state.kind === "idle") {
+        void onUseGps();
+        return;
+      }
+      setOpen(true);
+      setSnap((s) => (s === "full" ? "peek" : "full"));
+      return;
+    }
+    // 離した位置の「見え高」に最も近いスナップへ吸着。下端付近なら dismiss。
+    const vis = sh - d.lastD;
+    const targets: { k: Snap | "dismiss"; v: number }[] = [
+      { k: "dismiss", v: 0 },
+      { k: "peek", v: H * SNAP_VISIBLE_FRAC.peek },
+      { k: "half", v: H * SNAP_VISIBLE_FRAC.half },
+      { k: "full", v: H * SNAP_VISIBLE_FRAC.full },
+    ];
+    let best = targets[0];
+    let bestDist = Infinity;
+    for (const t of targets) {
+      const dist = Math.abs(t.v - vis);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = t;
+      }
+    }
+    setDragD(null);
+    if (best.k === "dismiss") {
+      setOpen(false);
     } else {
-      setFullView((v) => !v);
+      setSnap(best.k);
+      setOpen(true);
     }
   };
 
-  const showExpandedBody =
-    expanded && (state.kind === "ready" || state.kind === "error");
+  const showExpandedBody = state.kind === "ready" || state.kind === "error";
 
   return (
     <div
+      ref={rootRef}
       className="pointer-events-auto absolute inset-x-0 bottom-0 z-[1000] border-t border-black/8 bg-white shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
       role="region"
       aria-label="警戒レベルと設定"
       style={{
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
-        // compact (危険度バーまで): ピンが見える程度の小さい高さ
-        // full: 詳細含めて広く展開 (カード内スクロール)
-        maxHeight: fullView ? "78vh" : "40vh",
-        transition: "max-height 0.25s ease",
+        // シート高は地図領域の 94%。translateY で peek/half/full/dismiss を切替。
+        height: containerH ? sheetPx : undefined,
+        // 高さ未計測 (初回描画) の間は画面外へ逃がしてチラつきを防ぐ。
+        transform: `translateY(${containerH ? translateY : 4000}px)`,
+        // ドラッグ中は追従性のため transition を切る。離したらスムーズに吸着。
+        transition:
+          dragD != null ? "none" : "transform 0.28s cubic-bezier(0.32,0.72,0,1)",
+        willChange: "transform",
         display: "flex",
         flexDirection: "column",
+        touchAction: "none",
       }}
     >
-      {/* ドラッグハンドル (クリックで展開/折りたたみ) */}
-      <button
-        type="button"
-        onClick={handleHeaderClick}
-        className="flex w-full shrink-0 items-center justify-center py-2"
-        aria-label={showExpandedBody ? "折りたたむ" : "展開する"}
+      {/* ドラッグハンドル: 指で上下してシート高を調整。タップで full ⇄ peek。 */}
+      <div
+        onPointerDown={onHandleDown}
+        onPointerMove={onHandleMove}
+        onPointerUp={onHandleUp}
+        onPointerCancel={onHandleUp}
+        className="flex w-full shrink-0 cursor-grab items-center justify-center py-3 active:cursor-grabbing"
+        style={{ touchAction: "none" }}
+        role="button"
+        tabIndex={0}
+        aria-label="カードの高さを調整（指で上下、タップで開閉）"
       >
-        <span className="h-1 w-10 rounded-full bg-gray-300" />
-      </button>
+        <span className="h-1.5 w-11 rounded-full bg-gray-300" />
+      </div>
 
       <div className="mx-auto w-full max-w-3xl shrink-0">
         <div className="flex items-end gap-2 px-3 pb-2">
           <button
             onClick={handleHeaderClick}
             className="flex min-w-0 flex-1 items-center gap-2 text-left"
-            aria-expanded={expanded}
+            aria-expanded={fullView}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
               <MapPin size={18} aria-hidden />
@@ -749,7 +865,7 @@ export default function RiskPanel({
           )}
           {(state.kind === "ready" || state.kind === "error") && (
             <button
-              onClick={() => setExpanded(false)}
+              onClick={() => setOpen(false)}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 sm:h-10 sm:w-10"
               aria-label="閉じる"
               title="閉じる (ピンは残ります)"
@@ -768,7 +884,10 @@ export default function RiskPanel({
                 state={state}
                 location={location}
                 fullView={fullView}
-                onExpandFull={() => setFullView(true)}
+                onExpandFull={() => {
+                  setSnap("full");
+                  setOpen(true);
+                }}
               />
             )}
             {state.kind === "error" && (

@@ -1011,13 +1011,10 @@ export default function KumaClient() {
           />
         )}
 
-        {/* 右端縦スタック: 現在地 / ズーム。ピッカー中は「対策」を隠し、カードも
-            無いので位置を下 (bottom-3) に寄せる。 */}
-        <div
-          className={`absolute right-3 z-[900] flex flex-col gap-2.5 ${
-            isPicking ? "bottom-3" : "bottom-[calc(41vh+0.75rem)]"
-          }`}
-        >
+        {/* 右端縦スタック: 対策 / 現在地 / ズーム。地図右下に固定 (Google マップ流)。
+            カード (RiskPanel) を上げると z 順で自然にこの下に隠れる。ピッカー中は
+            「対策」を隠す。 */}
+        <div className="absolute bottom-3 right-3 z-[900] flex flex-col gap-2.5">
           {/* クマ対策の合言葉「はちみつ」を開く。共通の HachimitsuGuide (layout) が
               open-hachimitsu イベントを受けてポップアップを開く。現在地ボタンの上に同サイズで。 */}
           {!isPicking && (
