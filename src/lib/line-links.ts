@@ -12,6 +12,11 @@ export type LineTarget =
   | { kind: "spot"; slug: string; name?: string }
   | { kind: "geo"; lat: number; lon: number; radiusKm?: number; label?: string };
 
+/** LIFF が設定済みか (= LINE の登録導線を出せるか)。 */
+export function isLiffConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_LIFF_ID);
+}
+
 /** 公式アカウントの友だち追加 URL。未設定なら既定の basic ID を使う。 */
 export function lineAddFriendUrl(): string {
   const basicId = process.env.NEXT_PUBLIC_LINE_BASIC_ID || "@161qoyhh";
