@@ -418,6 +418,8 @@ export default function RiskPanel({
   const [dragD, setDragD] = useState<number | null>(null);
   const [containerH, setContainerH] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  // 本文スクロール領域。full 時にここを触ったらドラッグせずスクロールさせる判定に使う。
+  const bodyRef = useRef<HTMLDivElement>(null);
   // full のときだけ詳細セクションを描画する (旧 fullView 相当)。
   const fullView = snap === "full";
 
@@ -681,16 +683,6 @@ export default function RiskPanel({
   const nextSnapOnTap = (s: Snap): Snap =>
     s === "collapsed" ? "peek" : s === "full" ? "peek" : "full";
 
-  // ヘッダー(タイトル)タップ: idle は GPS、それ以外は full ⇄ peek トグル。
-  const handleHeaderClick = () => {
-    if (state.kind === "idle") {
-      void onUseGps();
-      return;
-    }
-    setOpen(true);
-    setSnap(nextSnapOnTap);
-  };
-
   // --- ドラッグ (指/マウスでシートを上下) ---
   // iOS Safari では PointerEvents が touch でスクロールに化けて pointermove を
   // 取りこぼし「指で押し上がらない」ため、touch は touchmove を非パッシブで受けて
@@ -771,24 +763,39 @@ export default function RiskPanel({
       window.addEventListener("mouseup", finish);
     }
   };
-  const onHandleTouchStart = (e: ReactTouchEvent) => {
+  // カード全体を掴んでドラッグできるようにする (Google マップ的な操作感)。
+  // ただし ・ボタン/リンク等のコントロール上では発動しない (タップ/操作を優先)
+  //        ・full 表示中に本文(スクロール領域)を触った場合はドラッグせずスクロール
+  const shouldStartDrag = (target: EventTarget | null): boolean => {
+    if (!(target instanceof Element)) return true;
+    if (target.closest("button, a, input, select, textarea")) return false;
+    if (snap === "full" && bodyRef.current?.contains(target)) return false;
+    return true;
+  };
+  const onRootTouchStart = (e: ReactTouchEvent) => {
+    if (!shouldStartDrag(e.target)) return;
     const t = e.touches[0];
     if (t) startDrag(t.clientY, "touch");
   };
-  const onHandleMouseDown = (e: ReactMouseEvent) => startDrag(e.clientY, "mouse");
+  const onRootMouseDown = (e: ReactMouseEvent) => {
+    if (!shouldStartDrag(e.target)) return;
+    startDrag(e.clientY, "mouse");
+  };
 
   const showExpandedBody = state.kind === "ready" || state.kind === "error";
 
   return (
     <div
       ref={rootRef}
-      className="pointer-events-auto absolute inset-x-0 bottom-0 z-[1000] border-t border-black/8 bg-white shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
+      onTouchStart={onRootTouchStart}
+      onMouseDown={onRootMouseDown}
+      className="pointer-events-auto absolute inset-x-0 bottom-0 z-[1000] select-none border-t border-black/8 bg-white shadow-[0_-6px_20px_rgba(0,0,0,0.12)]"
       role="region"
       aria-label="警戒レベルと設定"
       style={{
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
-        // シート高は地図領域の 94%。translateY で peek/half/full/dismiss を切替。
+        // シート高は地図領域の 94%。translateY で peek/half/full/collapsed を切替。
         height: containerH ? sheetPx : undefined,
         // 高さ未計測 (初回描画) の間は画面外へ逃がしてチラつきを防ぐ。
         transform: `translateY(${containerH ? translateY : 4000}px)`,
@@ -800,29 +807,18 @@ export default function RiskPanel({
         flexDirection: "column",
       }}
     >
-      {/* ドラッグハンドル: 指で上下してシート高を調整。タップで開閉。
-          touch-action:none でこのジェスチャがスクロール/地図パンに化けないようにし、
-          touchmove(非パッシブ)を window で受けて確実に追従させる (iOS 対策)。
-          掴みやすいよう広めのバー + 上下パディングを確保。 */}
+      {/* ドラッグハンドル(見た目)。ドラッグ判定はカード全体 (root) に付けているので
+          ここを含めカードのどこを掴んでも上下できる。full の本文だけはスクロール優先。 */}
       <div
-        onTouchStart={onHandleTouchStart}
-        onMouseDown={onHandleMouseDown}
-        className="flex w-full shrink-0 cursor-grab touch-none select-none items-center justify-center py-4 active:cursor-grabbing"
-        style={{ touchAction: "none" }}
-        role="button"
-        tabIndex={0}
-        aria-label="カードの高さを調整（指で上下、タップで開閉）"
+        className="flex w-full shrink-0 cursor-grab items-center justify-center py-4 active:cursor-grabbing"
+        aria-hidden
       >
         <span className="h-1.5 w-12 rounded-full bg-gray-300" />
       </div>
 
       <div className="mx-auto w-full max-w-3xl shrink-0">
         <div className="flex items-end gap-2 px-3 pb-2">
-          <button
-            onClick={handleHeaderClick}
-            className="flex min-w-0 flex-1 items-center gap-2 text-left"
-            aria-expanded={fullView}
-          >
+          <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-600 text-white">
               <MapPin size={18} aria-hidden />
             </div>
@@ -852,7 +848,7 @@ export default function RiskPanel({
                 )}
               </div>
             </div>
-          </button>
+          </div>
           {onAskAi && (
             <button
               onClick={onAskAi}
@@ -904,7 +900,7 @@ export default function RiskPanel({
       </div>
 
       {showExpandedBody && (
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-3xl">
             {state.kind === "ready" && (
               <RiskDetails

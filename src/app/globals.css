@@ -23,6 +23,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* iOS のスクロール連鎖/バウンドを抑制。地図ページでカードを指ドラッグする際、
+     ページ全体が上下に揺れる (rubber-band) のを防ぐ。 */
+  overscroll-behavior: none;
 }
 
 /* TOC のアンカーリンクで遷移したとき、ヘッダーに見出しが隠れないよう余白を取る */
