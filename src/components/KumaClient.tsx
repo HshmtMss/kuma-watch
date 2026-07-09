@@ -740,11 +740,16 @@ export default function KumaClient() {
                 <Link
                   href="/"
                   aria-label="くまウォッチ ホーム（地図）"
-                  className="flex h-11 shrink-0 items-center rounded-xl bg-white p-1 shadow-md ring-1 ring-black/5"
+                  className="flex h-11 shrink-0 items-center"
                 >
-                  {/* ロゴは枠で小さく見えないよう、余白を詰めて大きく (文字まで読める)。 */}
+                  {/* 白い枠は付けず (ロゴ自体が黄色地×青文字で高コントラスト)、地図の上
+                      でも視認できるよう軽いドロップシャドウのみ。枠が無いぶん大きく。 */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/logo.png" alt="KumaWatch" className="block h-full w-auto" />
+                  <img
+                    src="/logo.png"
+                    alt="KumaWatch"
+                    className="block h-full w-auto drop-shadow-md"
+                  />
                 </Link>
                 <div className="min-w-0 flex-1 rounded-full bg-white shadow-md ring-1 ring-black/5">
                   <PlaceSearch compact onPick={handleSearchPick} />
@@ -796,6 +801,16 @@ export default function KumaClient() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* 凡例(鮮度): ローズ色のピン = 直近1週間の出没。期間チップの隣に小さく。 */}
+              <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1.5 text-xs font-medium text-stone-600 shadow ring-1 ring-black/5">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: "#e11d48" }}
+                  aria-hidden
+                />
+                1週間以内の出没
               </div>
 
               {/* 表示設定: アイコンのみ・右端へ寄せる。出没ピン / ヒートマップ /
@@ -876,33 +891,20 @@ export default function KumaClient() {
                       ))}
                     </div>
                   </div>
-                  {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。青リングは
-                      出没日が直近1週間のもの。 */}
+                  {/* 凡例 — 直近1週間の出没はローズ色 (#e11d48)、それ以前はダーク
+                      ブラウン (#78350f)。出どころ (公式/報道/市民) はポップアップで表示。 */}
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-stone-100 pt-2 text-xs font-medium text-stone-600">
                     <span className="inline-flex items-center gap-1">
-                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#78350f" }} />
-                      出没
+                      <span className="h-3 w-3 rounded-full" style={{ backgroundColor: "#e11d48" }} />
+                      直近1週間の出没
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <span className="h-3 w-3 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />
-                      直近の出没（1週間）
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#78350f" }} />
+                      それ以前
                     </span>
                   </div>
                 </div>
               </details>
-            </div>
-
-            {/* 3 段目: 凡例(青リング)。青リング=出没日が直近1週間。上部の見やすい
-                位置に常設し、地図の強調表示の意味がすぐ分かるようにする。 */}
-            <div className="flex">
-              <span className="pointer-events-none inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm ring-1 ring-black/5 backdrop-blur">
-                <span
-                  className="h-3 w-3 shrink-0 rounded-full ring-2 ring-blue-500"
-                  style={{ backgroundColor: "#78350f" }}
-                  aria-hidden
-                />
-                青いリング＝直近1週間の出没
-              </span>
             </div>
           </div>
         )}

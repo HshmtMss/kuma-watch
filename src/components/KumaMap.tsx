@@ -483,12 +483,14 @@ export default function KumaMap({
             );
       const nowMs = Date.now();
       for (const r of toRender) {
-        // 出どころ・頭数によらず一律ダークブラウン (#78350f)。公式/報道/市民の
-        // 別はポップアップのバッジで示す。最近の出没だけは青ハローで区別。
-        // 「最近」= 出没日が直近 N 日以内 (掲載時刻は使わない)。
-        const PIN_COLOR = "#78350f";
+        // ピンの色で鮮度を表す: 直近1週間の出没は目立つローズ系の赤 (#e11d48)、
+        // それ以前は一律ダークブラウン (#78350f)。出どころ (公式/報道/市民) の別は
+        // ポップアップのバッジで示す。「直近1週間」= 出没日が RECENT_EVENT_DAYS 日
+        // 以内 (掲載時刻は使わない)。
+        const PIN_OLD = "#78350f";
+        const PIN_RECENT = "#e11d48";
         const isFresh = isRecentSighting(r, nowMs);
-        const sourceColor = PIN_COLOR;
+        const fill = isFresh ? PIN_RECENT : PIN_OLD;
         const baseR = pinR;
 
         const openPopup = (e: unknown) => {
@@ -496,29 +498,26 @@ export default function KumaMap({
           showRecordPopup(L, r);
         };
 
-        // 新着 (直近 24h に取り込み) は、出どころ色のドットの周りに青リング (ハロー)
-        // を重ねて示す。旧仕様は塗りを青で上書きしていたため「報道かつ新着」の際に
-        // 報道色が消えて判別できなかった。出どころ色は残し、新着は別レイヤーの青で。
+        // 直近1週間はヒートマップの暖色 (黄橙赤) の上でも埋もれないよう、白いハローを
+        // 背後に敷いてから濃い色ドットを重ね、少し大きめ + 白フチで「光って新しい」印象に。
         if (isFresh) {
           const halo: CircleMarker = L.circleMarker([r.lat, r.lon], {
-            radius: baseR + 4,
+            radius: baseR + 3.5,
             stroke: false,
-            fillColor: "#3b82f6",
-            fillOpacity: 0.95,
+            fillColor: "#ffffff",
+            fillOpacity: 0.9,
             renderer: canvas,
           });
           halo.on("click", openPopup);
           halo.addTo(layer);
         }
 
-        // 出どころ色のドット (白フチ)。新着時は上の青ハローの手前に重なり、
-        // 白フチが青リングとの間に隙間を作って「ドット + 青リング」に見える。
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
-          radius: baseR,
+          radius: isFresh ? baseR + 1 : baseR,
           color: "#ffffff",
           weight: borderWeight,
-          fillColor: sourceColor,
-          fillOpacity: 0.9,
+          fillColor: fill,
+          fillOpacity: isFresh ? 1 : 0.9,
           renderer: canvas,
         });
         marker.on("click", openPopup);
