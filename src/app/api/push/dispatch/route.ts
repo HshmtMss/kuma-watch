@@ -219,8 +219,8 @@ export async function POST(req: Request) {
       const n = g.records.length;
       const title =
         n === 1
-          ? `${g.name} 周辺で新規クマ出没`
-          : `${g.name} 周辺で新規クマ出没 (${n} 件)`;
+          ? `${g.name}周辺で新規クマ出没`
+          : `${g.name}周辺で新規クマ出没 (${n} 件)`;
       const top = g.records[0];
       const text =
         top.comment && top.comment.length > 0
@@ -258,8 +258,8 @@ export async function POST(req: Request) {
       const n = matched.length;
       const title =
         n === 1
-          ? `${place} 周辺で新規クマ出没`
-          : `${place} 周辺で新規クマ出没 (${n} 件)`;
+          ? `${place}周辺で新規クマ出没`
+          : `${place}周辺で新規クマ出没 (${n} 件)`;
       const top = matched[0];
       const text =
         top.comment && top.comment.length > 0
