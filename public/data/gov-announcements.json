@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1781568798212,
+  "generatedAt": 1783589411723,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080703.html",
+      "ministry": "env",
+      "date": "2026-07-03",
+      "title": "集落支援員が行う集落点検におけるクマに関する情報共有について",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080703.html",
+      "tag": "クマ被害対策",
+      "category": "press",
+      "summary": "集落支援員が実施する集落点検において、クマに関する情報共有が行われることが発表された。クマ被害対策の一環として、地域住民の安全確保に向けた取り組みを強化する狙いがある。",
+      "ingestedAt": 1783589411723
+    },
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/injury-qe.pdf",
       "ministry": "env",
