@@ -16,7 +16,7 @@ import PageShell from "@/components/PageShell";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isSpotPushReleased } from "@/lib/push-flag";
-import LineNotifyButton from "@/components/LineNotifyButton";
+import NotifyCard from "@/components/NotifyCard";
 import { isLineEntryReleased } from "@/lib/line-flag";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -657,21 +657,22 @@ export default async function SpotPage({ params }: Props) {
 
           {/* 通知を受け取る（購読）。来訪者がそのまま登録できる。
               セクションに見出しがあるので購読ボタン側の見出しは隠す（二重表示回避）。 */}
-          {isSpotPushReleased() && (
+          {isLineEntryReleased() ? (
             <div className="mt-3">
-              <PushSubscribeButton
+              <NotifyCard
                 target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
                 hideHeading
               />
             </div>
-          )}
-          {isLineEntryReleased() && (
-            <div className="mt-3">
-              <LineNotifyButton
-                target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-                hideHeading
-              />
-            </div>
+          ) : (
+            isSpotPushReleased() && (
+              <div className="mt-3">
+                <PushSubscribeButton
+                  target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+                  hideHeading
+                />
+              </div>
+            )
           )}
         </section>
       )}
@@ -1043,16 +1044,18 @@ export default async function SpotPage({ params }: Props) {
       </details>
 
       {/* 通知購読 — フッター。高尾山(デモ)は上部「通知で受け取る」に置くため二重を避ける。 */}
-      {!landmark.officialHub && isSpotPushReleased() && (
-        <PushSubscribeButton
-          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-        />
-      )}
-      {!landmark.officialHub && isLineEntryReleased() && (
-        <LineNotifyButton
-          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-        />
-      )}
+      {!landmark.officialHub &&
+        (isLineEntryReleased() ? (
+          <NotifyCard
+            target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+          />
+        ) : (
+          isSpotPushReleased() && (
+            <PushSubscribeButton
+              target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+            />
+          )
+        ))}
 
       {/* B2B 導線 — 「安全情報ハブ提供」の funnel。公式ハブ (自治体デモ) のスポット
           限定で表示し、一般の観光地ページには出さない (一般ユーザーの導線を邪魔しない)。 */}

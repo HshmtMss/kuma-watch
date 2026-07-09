@@ -32,7 +32,7 @@ import { getMuniOfficialLink } from "@/data/muni-official-links";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isPushReleased } from "@/lib/push-flag";
-import LineNotifyButton from "@/components/LineNotifyButton";
+import NotifyCard from "@/components/NotifyCard";
 import { isLineEntryReleased } from "@/lib/line-flag";
 
 // dynamicParams=false: 静的生成 (generateStaticParams) は「不変なマスター市区町村
@@ -1323,14 +1323,15 @@ export default async function MuniPage({ params }: Props) {
       )}
 
       {/* 通知購読 — フッター帯に集約（観光地ページと統一）。
-          リリースフラグ (NEXT_PUBLIC_PUSH_ENABLED) が OFF の間は出さない。 */}
-      {isPushReleased() && (
-        <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
-      )}
-
-      {/* LINE 通知 — Web Push と併存させ、届き方を二重化する。 */}
-      {isLineEntryReleased() && (
-        <LineNotifyButton target={{ kind: "muni", pref, city: muni }} />
+          LINE 導線が公開されていれば、入口を 1 枚のカードに束ねる
+          (LINE 主役 + ブラウザ通知は「使っていない方へ」の開閉)。
+          リリースフラグが OFF の間は従来どおりブラウザ通知のみ。 */}
+      {isLineEntryReleased() ? (
+        <NotifyCard target={{ kind: "muni", pref, city: muni }} />
+      ) : (
+        isPushReleased() && (
+          <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
+        )
       )}
 
       {/* 戻り導線 — 市町村ページの末尾で「県のページに戻る」を必ず提供。
