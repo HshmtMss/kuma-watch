@@ -38,7 +38,7 @@ export type KumaRecord = {
 const DEFAULT_LIMIT = 8000;
 const MAX_LIMIT = 100000;
 
-function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
+export function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
   return {
     id: s.id,
     lat: s.lat,
@@ -65,6 +65,9 @@ export async function GET(req: Request) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
   const source = searchParams.get("source");
+  // lite=1: 地図の初期描画に必要な最小フィールドだけ返す (comment 等の長文を落として
+  // 転送量を大幅削減)。ポップアップに必要な詳細は /api/kuma/[id] で都度取得する。
+  const lite = searchParams.get("lite") === "1";
   // limit パース: "abc" や "0" や "-5" のような不正値は DEFAULT_LIMIT に倒す。
   // 旧コード `Number(v) || DEFAULT_LIMIT` だと "0" のときに 0 ではなく DEFAULT を
   // 返したいのに、後段の Math.max(1, ...) で 1 になってしまう不整合があった。
@@ -104,6 +107,18 @@ export async function GET(req: Request) {
 
     const sorted = [...records].sort((a, b) => (a.date > b.date ? -1 : 1));
     const limited = sorted.slice(0, limit);
+    // lite は地図描画/採点に必要な最小フィールドのみ (id/lat/lon/date/ingestedAt/
+    // prefectureName)。comment・cityName・sectionName 等は詳細取得に回す。
+    const outRecords = lite
+      ? limited.map((r) => ({
+          id: r.id,
+          lat: r.lat,
+          lon: r.lon,
+          date: r.date,
+          ingestedAt: r.ingestedAt,
+          prefectureName: r.prefectureName,
+        }))
+      : limited;
 
     const bySource: Record<string, number> = {};
     for (const r of all) {
@@ -122,11 +137,11 @@ export async function GET(req: Request) {
 
     return NextResponse.json(
       {
-        records: limited,
+        records: outRecords,
         total: all.length,
         matched: records.length,
         latestIngestedAt,
-        shown: limited.length,
+        shown: outRecords.length,
         sources: bySource,
       },
       {

@@ -171,6 +171,9 @@ export default function KumaMap({
   const pinLayerRef = useRef<LayerGroup | null>(null);
   const selectionLayerRef = useRef<LayerGroup | null>(null);
   const popupRef = useRef<Popup | null>(null);
+  // 地図は lite (最小フィールド) で読み込むため、ポップアップに必要な詳細は id で
+  // 都度取得する。一度取ったものはここにキャッシュして再取得を避ける。
+  const detailCacheRef = useRef<Map<string, KumaRecord>>(new Map());
   const rawMeshesRef = useRef<MeshEntry[] | null>(null);
   const meshDataRef = useRef<SmoothedCell[] | null>(null);
   const landUseRef = useRef<LandUseMap | null>(null);
@@ -526,12 +529,9 @@ export default function KumaMap({
     });
   };
 
-  const showRecordPopup = (L: typeof import("leaflet"), r: KumaRecord) => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (!popupRef.current) {
-      popupRef.current = L.popup({ maxWidth: 280, autoPan: true });
-    }
+  // ポップアップ HTML を生成。lite レコード (詳細フィールド欠落) でも壊れないよう
+  // 各フィールドを ?? でガードする。詳細取得後にこの HTML で差し替える。
+  const buildPopupHtml = (r: KumaRecord): string => {
     // 信頼性バッジ: isOfficial が明示的に false のものだけ「報道」と表示し、
     // それ以外 (true・undefined) は公式情報として扱う。undefined は旧
     // スナップショットの後方互換 (公式由来のみだった頃のデータ) のため。
@@ -555,15 +555,61 @@ export default function KumaMap({
     const photoBlock = r.photoUrl
       ? `<a href="${escapeHtml(r.photoUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(r.photoUrl)}" alt="投稿写真" loading="lazy" style="margin-top:6px;width:100%;max-height:160px;object-fit:cover;border-radius:6px;display:block" /></a>`
       : "";
-    const html = `<div style="min-width:180px;font-size:13px;line-height:1.7">
-      <b>${escapeHtml(r.prefectureName)} ${escapeHtml(r.cityName)}</b>${freshBadge}${sourceBadge}
+    const place = [r.prefectureName, r.cityName].filter(Boolean).join(" ");
+    const headCount =
+      typeof r.headCount === "number" && r.headCount > 0
+        ? `<div>${r.headCount}頭</div>`
+        : "";
+    return `<div style="min-width:180px;font-size:13px;line-height:1.7">
+      <b>${escapeHtml(place)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
-      <div>${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div><div>${r.headCount}頭</div>
+      <div>${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div>${headCount}
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
       ${photoBlock}
       ${sourceLink}
     </div>`;
-    popupRef.current.setLatLng([r.lat, r.lon]).setContent(html).openOn(map);
+  };
+
+  const showRecordPopup = (L: typeof import("leaflet"), r: KumaRecord) => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!popupRef.current) {
+      popupRef.current = L.popup({ maxWidth: 280, autoPan: true });
+    }
+    const popup = popupRef.current;
+    const key = String(r.id);
+    // 詳細が既に手元にある (full レコード or キャッシュ済み) ならそのまま表示。
+    // lite レコードは comment 等が実行時 undefined (型上は必須なので Partial で判定)。
+    const hasFull = (r as Partial<KumaRecord>).comment !== undefined;
+    const detail = hasFull ? r : detailCacheRef.current.get(key);
+    if (detail) {
+      popup.setLatLng([r.lat, r.lon]).setContent(buildPopupHtml(detail)).openOn(map);
+      return;
+    }
+    // lite レコード: まず分かる範囲 + 「読み込み中」を出し、id で詳細取得後に差し替える。
+    const recentLabel = recentSightingLabel(r.date, Date.now());
+    const loading = `<div style="min-width:180px;font-size:13px;line-height:1.7">
+      <b>${escapeHtml(r.prefectureName ?? "")}</b>
+      <div>${escapeHtml(r.date)}${recentLabel ? `（${recentLabel} 出没）` : ""}</div>
+      <div style="color:#888;font-size:12px;margin-top:4px">詳細を読み込み中…</div>
+    </div>`;
+    popup.setLatLng([r.lat, r.lon]).setContent(loading).openOn(map);
+    fetch(`/api/kuma/${encodeURIComponent(key)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { record?: KumaRecord } | null) => {
+        const rec = data?.record;
+        if (!rec) {
+          // フォールバック: 手元の lite 情報だけで最低限表示。
+          popup.setContent(buildPopupHtml(r));
+          return;
+        }
+        detailCacheRef.current.set(key, rec);
+        // まだ同じポップアップが開いている時だけ差し替える (連続タップ対策)。
+        if (map.hasLayer(popup)) popup.setContent(buildPopupHtml(rec));
+      })
+      .catch(() => {
+        popup.setContent(buildPopupHtml(r));
+      });
   };
 
   const renderSelectionLayer = () => {

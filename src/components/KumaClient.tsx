@@ -387,6 +387,9 @@ export default function KumaClient() {
     lastSigRef.current = null;
     const params = new URLSearchParams({
       limit: String(limitForPeriod(periodDays)),
+      // 地図描画に必要な最小フィールドだけ取得 (comment 等の長文を省いて軽量化)。
+      // ポップアップの詳細はピンをタップした時に /api/kuma/[id] から取る。
+      lite: "1",
     });
     if (periodCutoff) params.set("from", periodCutoff);
     fetch(`/api/kuma?${params.toString()}`)
@@ -613,6 +616,7 @@ export default function KumaClient() {
       // 4. 変化あり → 本体をフル取得して差分を反映
       const params = new URLSearchParams({
         limit: String(limitForPeriod(periodDays)),
+        lite: "1",
       });
       if (periodCutoff) params.set("from", periodCutoff);
       try {

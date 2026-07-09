@@ -30,9 +30,11 @@ export default function CategoryTiles({
   activeKey,
 }: Props) {
   return (
-    <nav aria-label={title} className="not-prose mb-8">
-      <div className="mb-3 text-sm font-semibold text-stone-500">{title}</div>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <nav aria-label={title} className="not-prose mb-6">
+      <div className="mb-2 text-sm font-semibold text-stone-500">{title}</div>
+      {/* 縦長の大きな四角はスペースを食うため、アイコン左・ラベル右の横型スリム
+          タイルに。1 行の高さに収まり省スペース。列数は画面幅で増やす。 */}
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((item) => {
           const Icon = item.icon ?? CATEGORY_ICONS[item.key];
           const isActive = item.key === activeKey;
@@ -41,7 +43,7 @@ export default function CategoryTiles({
               <Link
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex h-full flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-6 text-center transition ${
+                className={`flex h-full items-center gap-2.5 rounded-xl border px-3 py-2.5 transition ${
                   isActive
                     ? "border-amber-500 bg-amber-50 text-amber-900 shadow-sm"
                     : "border-stone-200 bg-white text-stone-700 hover:border-amber-300 hover:bg-amber-50/40 hover:shadow-sm"
@@ -49,20 +51,22 @@ export default function CategoryTiles({
               >
                 {Icon && (
                   <Icon
-                    className={isActive ? "text-amber-600" : "text-stone-500"}
-                    size={30}
-                    strokeWidth={1.7}
+                    className={`shrink-0 ${isActive ? "text-amber-600" : "text-stone-500"}`}
+                    size={20}
+                    strokeWidth={1.8}
                     aria-hidden
                   />
                 )}
-                <span className="text-sm font-bold leading-tight">
-                  {item.label}
-                </span>
-                {typeof item.count === "number" && (
-                  <span className="text-xs tabular-nums text-stone-400">
-                    {item.count}件
+                <span className="min-w-0 flex-1 leading-tight">
+                  <span className="block truncate text-sm font-bold">
+                    {item.label}
                   </span>
-                )}
+                  {typeof item.count === "number" && (
+                    <span className="text-[11px] tabular-nums text-stone-400">
+                      {item.count.toLocaleString()}件
+                    </span>
+                  )}
+                </span>
               </Link>
             </li>
           );
