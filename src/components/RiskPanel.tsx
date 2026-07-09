@@ -121,15 +121,18 @@ type State =
 const NEARBY_RADIUS_KM = 10;
 const NEARBY_DECAY_KM = 5;
 
-// ドラッグ式ボトムシートのスナップ位置。地図領域 (親要素) の高さに対する
-// 「見えている割合」で定義する。Google マップの place card と同様に指で上下でき、
-// peek (概要) / half (中) / full (最上) の 3 段にスナップ。下に振り切ると閉じる。
-type Snap = "peek" | "half" | "full";
-const SNAP_VISIBLE_FRAC: Record<Snap, number> = {
+// ドラッグ式ボトムシートのスナップ位置。Google マップの place card と同様に指で
+// 上下でき、collapsed (畳んだ細いバー) / peek (概要) / half (中) / full (最上) の
+// 4 段にスナップ。× や下スワイプでは消さず collapsed まで畳む (いつでも引き上げ可)。
+type Snap = "collapsed" | "peek" | "half" | "full";
+// peek/half/full は地図領域高に対する割合。collapsed はヘッダー高(px)で別扱い。
+const SNAP_VISIBLE_FRAC: Record<Exclude<Snap, "collapsed">, number> = {
   peek: 0.36,
   half: 0.6,
   full: 0.94,
 };
+// collapsed (畳んだ状態) の見え高(px)。ハンドル + タイトル行がちょうど見える高さ。
+const COLLAPSED_PX = 88;
 // シート要素そのものの高さ (= full の見え高)。translateY で上下させて見え幅を変える。
 const SHEET_FRAC = 0.94;
 // ドラッグ移動がこの px 未満なら「タップ」とみなす (展開トグル or GPS)。
@@ -668,10 +671,16 @@ export default function RiskPanel({
     return () => ro.disconnect();
   }, []);
 
-  // スナップ位置ごとの translateY(px)。0 = full(最上)、大きいほど下に隠れる。
+  // スナップ位置ごとの「見え高(px)」と translateY(px)。0 = full(最上)、大きいほど下へ。
   const sheetPx = containerH * SHEET_FRAC;
-  const restD = (s: Snap) => sheetPx - containerH * SNAP_VISIBLE_FRAC[s];
+  const visibleForSnap = (s: Snap) =>
+    s === "collapsed" ? COLLAPSED_PX : containerH * SNAP_VISIBLE_FRAC[s];
+  const restD = (s: Snap) => sheetPx - visibleForSnap(s);
   const translateY = dragD != null ? dragD : open ? restD(snap) : sheetPx;
+
+  // タップでの遷移: collapsed→peek (やさしく開く)、peek/half→full、full→peek。
+  const nextSnapOnTap = (s: Snap): Snap =>
+    s === "collapsed" ? "peek" : s === "full" ? "peek" : "full";
 
   // ヘッダー(タイトル)タップ: idle は GPS、それ以外は full ⇄ peek トグル。
   const handleHeaderClick = () => {
@@ -680,15 +689,17 @@ export default function RiskPanel({
       return;
     }
     setOpen(true);
-    setSnap((s) => (s === "full" ? "peek" : "full"));
+    setSnap(nextSnapOnTap);
   };
 
   // --- ドラッグ (指でシートを上下) ---
+  const visForSnapAt = (s: Snap, H: number) =>
+    s === "collapsed" ? COLLAPSED_PX : H * SNAP_VISIBLE_FRAC[s];
   const onHandleDown = (e: ReactPointerEvent) => {
     const el = rootRef.current?.parentElement;
     const H = el ? el.clientHeight : containerH;
     if (el && H !== containerH) setContainerH(H);
-    const startD = dragD ?? (open ? H * SHEET_FRAC - H * SNAP_VISIBLE_FRAC[snap] : H * SHEET_FRAC);
+    const startD = dragD ?? (open ? H * SHEET_FRAC - visForSnapAt(snap, H) : H * SHEET_FRAC);
     dragRef.current = { startY: e.clientY, startD, lastD: startD, moved: false };
     setDragD(startD);
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -721,13 +732,14 @@ export default function RiskPanel({
         return;
       }
       setOpen(true);
-      setSnap((s) => (s === "full" ? "peek" : "full"));
+      setSnap(nextSnapOnTap);
       return;
     }
-    // 離した位置の「見え高」に最も近いスナップへ吸着。下端付近なら dismiss。
+    // 離した位置の「見え高」に最も近いスナップへ吸着。最小は collapsed (畳んだバー)。
+    // 消さない (open のまま) ので、いつでもハンドルを引き上げて戻せる。
     const vis = sh - d.lastD;
-    const targets: { k: Snap | "dismiss"; v: number }[] = [
-      { k: "dismiss", v: 0 },
+    const targets: { k: Snap; v: number }[] = [
+      { k: "collapsed", v: COLLAPSED_PX },
       { k: "peek", v: H * SNAP_VISIBLE_FRAC.peek },
       { k: "half", v: H * SNAP_VISIBLE_FRAC.half },
       { k: "full", v: H * SNAP_VISIBLE_FRAC.full },
@@ -742,12 +754,8 @@ export default function RiskPanel({
       }
     }
     setDragD(null);
-    if (best.k === "dismiss") {
-      setOpen(false);
-    } else {
-      setSnap(best.k);
-      setOpen(true);
-    }
+    setSnap(best.k);
+    setOpen(true);
   };
 
   const showExpandedBody = state.kind === "ready" || state.kind === "error";
@@ -865,10 +873,10 @@ export default function RiskPanel({
           )}
           {(state.kind === "ready" || state.kind === "error") && (
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => setSnap("collapsed")}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 sm:h-10 sm:w-10"
-              aria-label="閉じる"
-              title="閉じる (ピンは残ります)"
+              aria-label="畳む"
+              title="畳む (下のバーから引き上げて戻せます)"
             >
               <X size={24} aria-hidden />
             </button>

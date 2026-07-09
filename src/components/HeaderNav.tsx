@@ -132,7 +132,12 @@ function DesktopDropdown({
   );
 }
 
-export default function HeaderNav() {
+export default function HeaderNav({
+  hideMobileSearchIcon = false,
+}: {
+  /** 地図ページなど、独自の地名検索バーがある画面ではモバイルの 🔍 (→/search) を隠す。 */
+  hideMobileSearchIcon?: boolean;
+} = {}) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -150,13 +155,15 @@ export default function HeaderNav() {
 
       {/* モバイル: 検索アイコン + ハンバーガー */}
       <div className="flex items-center gap-1.5 sm:hidden">
-        <Link
-          href="/search"
-          aria-label="さがす（検索・最新情報）"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 active:bg-gray-100"
-        >
-          <SearchIcon size={20} />
-        </Link>
+        {!hideMobileSearchIcon && (
+          <Link
+            href="/search"
+            aria-label="さがす（検索・最新情報）"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 active:bg-gray-100"
+          >
+            <SearchIcon size={20} />
+          </Link>
+        )}
         <div className="relative">
           <button
             type="button"

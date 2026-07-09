@@ -745,7 +745,7 @@ export default function KumaClient() {
                 {/* ナビ: モバイルは自前の白丸ボタン (🔍+☰)、PC は白ピル背景で
                     探す▾/学ぶ▾/法人▾ を地図上でも読めるようにする。 */}
                 <div className="flex shrink-0 items-center gap-1.5 rounded-full sm:bg-white sm:px-2 sm:py-1.5 sm:shadow-md sm:ring-1 sm:ring-black/5">
-                  <HeaderNav />
+                  <HeaderNav hideMobileSearchIcon />
                 </div>
               </div>
             ) : (
@@ -768,7 +768,7 @@ export default function KumaClient() {
               </div>
             )}
 
-            {/* 2 段目: フィルタ chip。出没ピン / 期間+件数 / 表示 / 更新。
+            {/* 2 段目: フィルタ chip。出没ピン / 期間 / 表示 (件数・更新は表示内へ集約)。
                 overflow-x-auto は「表示」popover を切り落とすため使わず、
                 狭い画面では折り返す (flex-wrap)。 */}
             <div className="pointer-events-auto flex flex-wrap items-center gap-1.5">
@@ -797,13 +797,6 @@ export default function KumaClient() {
                     </option>
                   ))}
                 </select>
-                <span
-                  className="border-l border-stone-200 pl-2 tabular-nums text-stone-500"
-                  aria-label="該当件数"
-                  suppressHydrationWarning
-                >
-                  {filtered.length.toLocaleString()}件
-                </span>
               </div>
               {/* 表示: ヒートマップ / 地図種類 / 凡例 を 1 つの popover に集約。 */}
               <details className="group relative shrink-0">
@@ -832,6 +825,13 @@ export default function KumaClient() {
                   </span>
                 </summary>
                 <div className="absolute left-0 top-full z-[1100] mt-1.5 w-64 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
+                  {/* 件数・更新日は上部をすっきりさせるためここに集約。 */}
+                  <div className="mb-2 flex items-center justify-between gap-2 border-b border-stone-100 px-1.5 pb-2 text-xs text-stone-500">
+                    <span className="tabular-nums" suppressHydrationWarning>
+                      {filtered.length.toLocaleString()}件表示中
+                    </span>
+                    {latestDate && <span>更新 {formatLatestDate(latestDate)}</span>}
+                  </div>
                   <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
                     <input
                       type="checkbox"
@@ -883,18 +883,6 @@ export default function KumaClient() {
                   </div>
                 </div>
               </details>
-              {/* データ更新日 (最新事案発生日) */}
-              {!loading && latestDate && (
-                <span
-                  className="flex shrink-0 items-center gap-1 rounded-full bg-white/95 px-2.5 py-1.5 text-xs text-stone-500 shadow ring-1 ring-black/5"
-                  title={`最新事案: ${latestDate}`}
-                >
-                  <span className="text-stone-400">更新</span>
-                  <span className="font-semibold tabular-nums text-stone-700">
-                    {formatLatestDate(latestDate)}
-                  </span>
-                </span>
-              )}
             </div>
           </div>
         )}
