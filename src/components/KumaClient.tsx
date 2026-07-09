@@ -720,174 +720,181 @@ export default function KumaClient() {
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden">
-      {!isPicking && (
-      <header className="relative z-[1100] flex shrink-0 items-center justify-between gap-2 border-b border-black/8 bg-white px-3 py-2 shadow-sm">
-        {/* ブランド一式 (ロゴ + くまウォッチ + BETA) をまとめてトップ (地図) への
-            1 つのリンクにする。BETA は個別リンクをやめ単なるバッジに。
-            テキスト/バッジは relative top で僅かに下げ、ロゴと上下中央を揃える。 */}
-        <Link
-          href="/"
-          className="flex min-w-0 shrink items-center gap-2"
-          aria-label="くまウォッチ ホーム（地図）"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt="KumaWatch"
-            className="block h-7 w-auto sm:h-8"
-          />
-          <span className="relative top-[2px] truncate text-sm font-semibold tracking-tight text-stone-900 sm:text-base">
-            くまウォッチ
-          </span>
-          <span className="relative top-[2px] shrink-0 rounded bg-amber-200 px-1 py-0.5 text-[9px] font-bold tracking-wide text-amber-900 sm:px-1.5 sm:text-[10px]">
-            BETA
-          </span>
-        </Link>
-        <HeaderNav />
-      </header>
-      )}
-
-      {/* 表示設定 — flex-1 で要素が横幅を使い切るように分配 */}
-      {!isPicking && (
-      <div className="relative z-[1060] shrink-0 border-b border-black/8 bg-white px-2 py-2">
-        <div className="flex items-stretch gap-2 text-sm sm:text-xs">
-          {/* 出没ピン (表示 ON/OFF + 期間セレクト + 件数) — 横幅を取って広がる */}
-          <div className="flex flex-1 items-center overflow-hidden rounded-full border border-stone-200 bg-stone-50">
-            <label className="flex shrink-0 items-center gap-1.5 px-2.5 py-1.5 font-medium text-stone-700">
-              <input
-                type="checkbox"
-                checked={showPins}
-                onChange={(e) => setShowPins(e.target.checked)}
-                className="h-4 w-4 accent-amber-600"
-              />
-              出没ピン
-            </label>
-            <select
-              value={periodDays ?? ""}
-              onChange={(e) =>
-                setPeriod(e.target.value === "" ? null : Number(e.target.value))
-              }
-              disabled={!showPins}
-              className="flex-1 border-l border-stone-200 bg-white py-1.5 pl-2 pr-1 text-stone-700 disabled:opacity-40"
-              aria-label="期間"
-            >
-              {PERIOD_OPTIONS.map((p) => (
-                <option key={p.label} value={p.days ?? ""}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-            <span
-              className="shrink-0 border-l border-stone-200 bg-white px-2.5 py-1.5 tabular-nums text-stone-600"
-              aria-label="該当件数"
-              suppressHydrationWarning
-            >
-              {filtered.length.toLocaleString()}件
-            </span>
-          </div>
-
-          {/* 表示設定メニュー: 警戒レベル / 凡例 / 地図種類 を集約。
-              スマホで個別ボタンが横にあふれて出没ピン期間設定が見切れる問題を
-              構造的に解決するため、3 つを 1 つの popover にまとめている。 */}
-          <details className="group relative shrink-0">
-            <summary
-              className="flex cursor-pointer items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 font-medium text-stone-700 marker:hidden [&::-webkit-details-marker]:hidden"
-              aria-label="表示設定を開く"
-              title="表示設定"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-              <span className="hidden sm:inline">表示</span>
-              <span aria-hidden className="text-[10px] text-stone-400 group-open:rotate-180">
-                ▼
-              </span>
-            </summary>
-            {/* popover 本体: 右端揃え、絶対配置 */}
-            <div className="absolute right-0 top-full z-[1100] mt-1.5 w-60 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
-              <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
-                <input
-                  type="checkbox"
-                  checked={showHeatmap}
-                  onChange={(e) => setShowHeatmap(e.target.checked)}
-                  className="h-4 w-4 accent-amber-600"
-                />
-                警戒レベル（ヒートマップ）
-              </label>
-              <div className="mt-2 border-t border-stone-100 pt-2">
-                <div className="mb-1.5 px-1.5 text-xs font-medium text-stone-500">
-                  地図の種類
+      <div className="relative flex-1 min-h-0">
+        {/* Google マップ流の全面地図 + 上部フローティング。固定 2 段バー
+            (旧ヘッダー / 旧コントロールバー) を廃止し地図を最大化。
+            1 段目: ブランド + 検索 + ナビ / 2 段目: フィルタ chip。
+            ピッカー中と returnLabel 中はそれぞれ専用 UI を出すため隠す。 */}
+        {!pickerMode && (
+          <div className="pointer-events-none absolute inset-x-2 top-2 z-[950] flex flex-col gap-2">
+            {/* 1 段目: ブランド(→地図ホーム) + 検索 + ナビ。
+                returnLabel 経路 (観光地/市町村から) のときは「戻る」を出す。 */}
+            {!returnLabel ? (
+              <div className="pointer-events-auto flex items-center gap-2">
+                <Link
+                  href="/"
+                  aria-label="くまウォッチ ホーム（地図）"
+                  className="flex shrink-0 items-center rounded-full bg-white px-3 py-2.5 shadow-md ring-1 ring-black/5"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo.png" alt="KumaWatch" className="block h-6 w-auto" />
+                </Link>
+                <div className="min-w-0 flex-1 rounded-full bg-white shadow-md ring-1 ring-black/5">
+                  <PlaceSearch compact onPick={handleSearchPick} />
                 </div>
-                <div className="flex gap-1">
-                  {(
-                    [
-                      { v: "standard", label: "標準" },
-                      { v: "satellite", label: "衛星" },
-                      { v: "topo", label: "地形" },
-                    ] as const
-                  ).map((opt) => (
-                    <button
-                      key={opt.v}
-                      type="button"
-                      onClick={() => setTileStyle(opt.v as TileStyle)}
-                      className={`flex-1 rounded-md px-2 py-1.5 text-xs font-semibold ${
-                        tileStyle === opt.v
-                          ? "bg-amber-100 text-amber-900"
-                          : "bg-stone-50 text-stone-700 hover:bg-stone-100"
-                      }`}
-                      aria-pressed={tileStyle === opt.v}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                {/* ナビ: モバイルは自前の白丸ボタン (🔍+☰)、PC は白ピル背景で
+                    探す▾/学ぶ▾/法人▾ を地図上でも読めるようにする。 */}
+                <div className="flex shrink-0 items-center gap-1.5 rounded-full sm:bg-white sm:px-2 sm:py-1.5 sm:shadow-md sm:ring-1 sm:ring-black/5">
+                  <HeaderNav />
                 </div>
               </div>
-            </div>
-          </details>
-        </div>
-      </div>
-      )}
+            ) : (
+              <div className="pointer-events-auto flex">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined" && window.history.length > 1) {
+                      window.history.back();
+                    } else {
+                      router.push("/spot");
+                    }
+                  }}
+                  className="flex h-11 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-stone-800 shadow-md ring-1 ring-black/5 hover:bg-stone-50"
+                  aria-label={`${returnLabel} のページに戻る`}
+                >
+                  <span aria-hidden>←</span>
+                  <span className="max-w-[12rem] truncate">{returnLabel}に戻る</span>
+                </button>
+              </div>
+            )}
 
-      <div className="relative flex-1 min-h-0">
-        {/* 検索バーを地図上にフロート配置。ピッカーモード中はバナーと干渉、
-            観光地・市町村から戻る経路 (returnLabel) のときは戻るボタンと干渉するので非表示。 */}
-        {!pickerMode && !returnLabel && (
-          <div className="pointer-events-none absolute inset-x-3 top-3 z-[950] flex">
-            <div className="pointer-events-auto w-full max-w-2xl rounded-full bg-white shadow-md ring-1 ring-black/5">
-              <PlaceSearch compact onPick={handleSearchPick} />
-            </div>
-          </div>
-        )}
-
-        {/* データ更新日 + マップ補足: 検索バー直下、地図左上に控えめに配置。
-            色の意味について「さりげない説明」を ⓘ から展開できるようにする。 */}
-        {!loading && !pickerMode && latestDate && (
-          <div className="pointer-events-auto absolute left-3 top-16 z-[900] flex max-w-[calc(100%-1.5rem)] flex-wrap items-stretch gap-1">
-            <div
-              className="flex items-baseline gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] text-stone-600 shadow-sm backdrop-blur sm:text-xs"
-              title={`最新事案: ${latestDate}`}
-            >
-              <span className="text-stone-400">更新</span>
-              <span className="tabular-nums font-semibold text-stone-800">
-                {formatLatestDate(latestDate)}
-              </span>
-            </div>
-            {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。種別はピンを
-                タップするとポップアップで表示。青リングは出没日が直近1週間のもの。 */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-stone-600 shadow-sm backdrop-blur sm:text-xs">
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: "#78350f" }} />出没</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />直近の出没</span>
+            {/* 2 段目: フィルタ chip。出没ピン / 期間+件数 / 表示 / 更新。
+                overflow-x-auto は「表示」popover を切り落とすため使わず、
+                狭い画面では折り返す (flex-wrap)。 */}
+            <div className="pointer-events-auto flex flex-wrap items-center gap-1.5">
+              <label className="flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-stone-700 shadow ring-1 ring-black/5">
+                <input
+                  type="checkbox"
+                  checked={showPins}
+                  onChange={(e) => setShowPins(e.target.checked)}
+                  className="h-4 w-4 accent-amber-600"
+                />
+                出没ピン
+              </label>
+              <div className="flex shrink-0 items-center rounded-full bg-white px-2.5 py-1 text-sm shadow ring-1 ring-black/5">
+                <select
+                  value={periodDays ?? ""}
+                  onChange={(e) =>
+                    setPeriod(e.target.value === "" ? null : Number(e.target.value))
+                  }
+                  disabled={!showPins}
+                  className="bg-transparent py-0.5 pr-1 font-medium text-stone-700 disabled:opacity-40"
+                  aria-label="期間"
+                >
+                  {PERIOD_OPTIONS.map((p) => (
+                    <option key={p.label} value={p.days ?? ""}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+                <span
+                  className="border-l border-stone-200 pl-2 tabular-nums text-stone-500"
+                  aria-label="該当件数"
+                  suppressHydrationWarning
+                >
+                  {filtered.length.toLocaleString()}件
+                </span>
+              </div>
+              {/* 表示: ヒートマップ / 地図種類 / 凡例 を 1 つの popover に集約。 */}
+              <details className="group relative shrink-0">
+                <summary
+                  className="flex cursor-pointer items-center gap-1 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-stone-700 shadow ring-1 ring-black/5 marker:hidden [&::-webkit-details-marker]:hidden"
+                  aria-label="表示設定を開く"
+                  title="表示設定"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                  </svg>
+                  表示
+                  <span aria-hidden className="text-[10px] text-stone-400 group-open:rotate-180">
+                    ▼
+                  </span>
+                </summary>
+                <div className="absolute left-0 top-full z-[1100] mt-1.5 w-64 rounded-xl border border-stone-200 bg-white p-3 shadow-lg">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md px-1.5 py-1.5 text-sm text-stone-800 hover:bg-stone-50">
+                    <input
+                      type="checkbox"
+                      checked={showHeatmap}
+                      onChange={(e) => setShowHeatmap(e.target.checked)}
+                      className="h-4 w-4 accent-amber-600"
+                    />
+                    警戒レベル（ヒートマップ）
+                  </label>
+                  <div className="mt-2 border-t border-stone-100 pt-2">
+                    <div className="mb-1.5 px-1.5 text-xs font-medium text-stone-500">
+                      地図の種類
+                    </div>
+                    <div className="flex gap-1">
+                      {(
+                        [
+                          { v: "standard", label: "標準" },
+                          { v: "satellite", label: "衛星" },
+                          { v: "topo", label: "地形" },
+                        ] as const
+                      ).map((opt) => (
+                        <button
+                          key={opt.v}
+                          type="button"
+                          onClick={() => setTileStyle(opt.v as TileStyle)}
+                          className={`flex-1 rounded-md px-2 py-1.5 text-xs font-semibold ${
+                            tileStyle === opt.v
+                              ? "bg-amber-100 text-amber-900"
+                              : "bg-stone-50 text-stone-700 hover:bg-stone-100"
+                          }`}
+                          aria-pressed={tileStyle === opt.v}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* 凡例 — ピンは出どころ・頭数によらず一律 (#78350f)。青リングは
+                      出没日が直近1週間のもの。 */}
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-stone-100 pt-2 text-xs font-medium text-stone-600">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#78350f" }} />
+                      出没
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-3 w-3 rounded-full ring-2 ring-blue-500" style={{ backgroundColor: "#78350f" }} />
+                      直近の出没（1週間）
+                    </span>
+                  </div>
+                </div>
+              </details>
+              {/* データ更新日 (最新事案発生日) */}
+              {!loading && latestDate && (
+                <span
+                  className="flex shrink-0 items-center gap-1 rounded-full bg-white/95 px-2.5 py-1.5 text-xs text-stone-500 shadow ring-1 ring-black/5"
+                  title={`最新事案: ${latestDate}`}
+                >
+                  <span className="text-stone-400">更新</span>
+                  <span className="font-semibold tabular-nums text-stone-700">
+                    {formatLatestDate(latestDate)}
+                  </span>
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -922,28 +929,6 @@ export default function KumaClient() {
             </div>
             {/* 先端が指す正確な中心点 */}
             <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-700 ring-2 ring-white" />
-          </div>
-        )}
-
-        {/* 観光地・市町村ページから来たときの「戻る」ボタン (検索バー下にフロート)。
-            ブラウザ戻るより目立つ位置に置く。 */}
-        {returnLabel && !pickerMode && (
-          <div className="pointer-events-auto absolute left-3 top-3 z-[960] sm:top-3">
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined" && window.history.length > 1) {
-                  window.history.back();
-                } else {
-                  router.push("/spot");
-                }
-              }}
-              className="flex h-10 items-center gap-1.5 rounded-full bg-white px-3.5 text-sm font-semibold text-stone-800 shadow-md ring-1 ring-stone-200 hover:bg-stone-50"
-              aria-label={`${returnLabel} のページに戻る`}
-            >
-              <span aria-hidden>←</span>
-              <span className="max-w-[10rem] truncate">{returnLabel}に戻る</span>
-            </button>
           </div>
         )}
 
@@ -1119,7 +1104,7 @@ export default function KumaClient() {
 
         {/* コピー結果トースト */}
         {copyToast && (
-          <div className="pointer-events-none absolute left-1/2 top-16 z-[1100] -translate-x-1/2 rounded-full bg-gray-900/90 px-4 py-2 text-xs text-white shadow-lg">
+          <div className="pointer-events-none absolute left-1/2 top-28 z-[1100] -translate-x-1/2 rounded-full bg-gray-900/90 px-4 py-2 text-xs text-white shadow-lg">
             {copyToast}
           </div>
         )}
@@ -1190,7 +1175,7 @@ export default function KumaClient() {
         )}
 
         {loading && (
-          <div className="pointer-events-none absolute left-1/2 top-16 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
+          <div className="pointer-events-none absolute left-1/2 top-28 z-[900] -translate-x-1/2 rounded-full border border-gray-200 bg-white/95 px-3 py-1.5 text-xs text-gray-700 shadow backdrop-blur">
             <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500" />
             出没データ取得中...
           </div>
