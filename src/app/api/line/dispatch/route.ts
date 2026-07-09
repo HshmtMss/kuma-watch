@@ -69,6 +69,21 @@ function siteUrl(): string {
   );
 }
 
+/**
+ * URL のパス片。日本語はそのまま残す。
+ *
+ * LINE は日本語を含む URL もリンク化するので、encodeURIComponent すると
+ * 「/place/%E6%9D%B1%E4%BA%AC%E9%83%BD/…」という長大な文字列がトークに
+ * 出るだけで、読み手 (高齢者含む) に不安を与える。パスを壊す文字が
+ * 含まれるときだけエンコードする。
+ *
+ * 現在の市区町村マスター (1,892 件) と観光地 slug には該当文字は無いが、
+ * データ追加で混入しても壊れないようにしておく。
+ */
+function pathSegment(s: string): string {
+  return /[\s/?#%&+]/.test(s) ? encodeURIComponent(s) : s;
+}
+
 /** 1 出没の本文行 (先頭 90 字)。Web Push の text 生成と揃える。 */
 function snippet(top: NewRecord, fallback: string): string {
   return top.comment && top.comment.length > 0
@@ -142,7 +157,7 @@ export async function POST(req: Request) {
         : `${g.city}で新しいクマ出没（${n}件）`;
     const top = g.records[0];
     const line = snippet(top, `${top.date ?? ""} ${g.pref}${g.city}`.trim());
-    const url = `${base}/place/${encodeURIComponent(g.pref)}/${encodeURIComponent(g.city)}`;
+    const url = `${base}/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`;
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
     const { sent } = await multicast(userIds, [msg]);
     sentCount += sent;
@@ -179,7 +194,7 @@ export async function POST(req: Request) {
           : `${g.name}周辺で新しいクマ出没（${n}件）`;
       const top = g.records[0];
       const line = snippet(top, `${top.date ?? ""} ${g.name}周辺`.trim());
-      const url = `${base}/spot/${encodeURIComponent(g.slug)}`;
+      const url = `${base}/spot/${pathSegment(g.slug)}`;
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
       const { sent } = await multicast(userIds, [msg]);
       sentCount += sent;
