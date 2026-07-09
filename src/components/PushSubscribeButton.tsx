@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { isPushSupported } from "@/lib/push-support";
 
 /**
  * 市町村ページ / 観光地ページに置く Web Push 購読ボタン。
@@ -65,10 +66,16 @@ function targetHeadline(target: PushTarget): string {
 export default function PushSubscribeButton({
   target,
   hideHeading = false,
+  bare = false,
 }: {
   target: PushTarget;
   /** 親セクションに見出しがある場合、内部の見出しを省いて二重表示を防ぐ。 */
   hideHeading?: boolean;
+  /**
+   * カード枠とベルアイコンを省く。NotifyCard の「LINEを使っていない方へ」の
+   * 中に入れ子にするときに使う (カードの二重表示を防ぐ)。
+   */
+  bare?: boolean;
 }) {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState<string>("");
@@ -84,11 +91,7 @@ export default function PushSubscribeButton({
     let cancelled = false;
     async function init() {
       if (typeof window === "undefined") return;
-      if (
-        !("serviceWorker" in navigator) ||
-        !("PushManager" in window) ||
-        !("Notification" in window)
-      ) {
+      if (!isPushSupported()) {
         if (!cancelled) setState("unsupported");
         return;
       }
@@ -246,26 +249,34 @@ export default function PushSubscribeButton({
   }
 
   return (
-    <div className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-4">
+    <div
+      className={
+        bare
+          ? "not-prose"
+          : "not-prose mb-6 rounded-xl border border-stone-200 bg-white p-4"
+      }
+    >
       <div className="flex items-start gap-3">
-        <div
-          aria-hidden
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-500"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {!bare && (
+          <div
+            aria-hidden
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-500"
           >
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-        </div>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           {!hideHeading && (
             <p className="text-sm font-semibold text-stone-900">
@@ -300,7 +311,9 @@ export default function PushSubscribeButton({
               登録中の通知を管理・解除する
             </Link>
           </p>
-          <details className="mt-2">
+          {/* bare は既に「LINEを使っていない方へ」の details の中にいるので、
+              details の入れ子を作らない。iPhone の注意書きは親カード側が持つ。 */}
+          <details className={bare ? "hidden" : "mt-2"}>
             <summary className="cursor-pointer text-xs text-stone-500 hover:text-stone-700">
               通知について
             </summary>

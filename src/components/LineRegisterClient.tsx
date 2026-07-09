@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { lineAddFriendUrl } from "@/lib/line-links";
 
 /**
  * LIFF (LINE 内ブラウザ) で動く通知登録クライアント。
@@ -10,8 +11,11 @@ import { useCallback, useEffect, useState } from "react";
  *   2. 未ログインなら liff.login() (LINE 内なら基本ログイン済み)
  *   3. liff.getIDToken() を取得し、購読 API に idToken を渡す
  *      → サーバ側で検証して本物の userId を得る (なりすまし防止)
- *   4. target が渡っていれば「登録」ボタン、無ければ一覧のみ
- *   5. 現在の登録一覧 (/api/line/list) を表示し、個別解除もできる
+ *   4. 公式アカウントを友だち追加済みか確認する。LINE は友だちでない相手に
+ *      push できないため、未追加のまま購読させると「登録できたのに一生届かない」
+ *      という最悪の失敗になる。未追加なら登録させず友だち追加へ誘導する。
+ *   5. target が渡っていれば「登録」ボタン、無ければ一覧のみ
+ *   6. 現在の登録一覧 (/api/line/list) を表示し、個別解除もできる
  *
  * LIFF_ID 未設定や LIFF 外アクセスなど失敗時は理由を表示して静かに止まる。
  */
@@ -32,6 +36,30 @@ type Subs = {
 
 type Phase = "init" | "ready" | "error";
 
+/**
+ * getFriendship は @line/liff の既定バンドルに同梱されているが、型は
+ * `declare module '@liff/core'` によるモジュール拡張で足されるため、
+ * './exports' 由来の Liff 型からは見えない。存在確認できる形で読む。
+ */
+type FriendshipCapable = {
+  getFriendship?: () => Promise<{ friendFlag: boolean }>;
+};
+
+/**
+ * 友だち追加済みかを返す。API が使えない環境では true (= 通す) にフォールバック
+ * する。ここで false 倒れすると登録自体ができなくなるため、判定不能は通す。
+ */
+async function checkFriendship(liff: unknown): Promise<boolean> {
+  const fn = (liff as FriendshipCapable).getFriendship;
+  if (typeof fn !== "function") return true;
+  try {
+    const { friendFlag } = await fn.call(liff);
+    return friendFlag;
+  } catch {
+    return true;
+  }
+}
+
 function targetLabel(t: Exclude<Target, null>): string {
   if (t.kind === "muni") return `${t.pref}${t.city}`;
   if (t.kind === "spot") return t.name ?? t.slug;
@@ -45,6 +73,7 @@ export default function LineRegisterClient({ target }: { target: Target }) {
   const [subs, setSubs] = useState<Subs | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [isFriend, setIsFriend] = useState(true);
 
   // ── LIFF 初期化 ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -69,6 +98,9 @@ export default function LineRegisterClient({ target }: { target: Target }) {
           setErrMsg("LINE のログイン情報を取得できませんでした。");
           return;
         }
+        const friend = await checkFriendship(liff);
+        if (cancelled) return;
+        setIsFriend(friend);
         setIdToken(token);
         setPhase("ready");
       } catch (e) {
@@ -106,7 +138,7 @@ export default function LineRegisterClient({ target }: { target: Target }) {
 
   // ── 登録 ─────────────────────────────────────────────────────────────
   const register = useCallback(async () => {
-    if (!idToken || !target) return;
+    if (!idToken || !target || !isFriend) return;
     setBusy(true);
     setErrMsg("");
     try {
@@ -137,7 +169,7 @@ export default function LineRegisterClient({ target }: { target: Target }) {
     } finally {
       setBusy(false);
     }
-  }, [idToken, target, loadSubs]);
+  }, [idToken, target, isFriend, loadSubs]);
 
   // ── 解除 ─────────────────────────────────────────────────────────────
   const unregister = useCallback(
@@ -184,6 +216,20 @@ export default function LineRegisterClient({ target }: { target: Target }) {
         登録した地域や場所の周辺で新しい出没情報が入ると、この LINE にお知らせします。
       </p>
 
+      {/* 友だち未追加の警告。target が無い (一覧だけ) 場合でも、
+          既に登録済みの通知が届かない状態なので必ず知らせる。 */}
+      {!isFriend && !target && (
+        <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-800">
+          公式アカウントが友だち追加されていないため、登録済みの通知もお届けできません。
+          <a
+            href={lineAddFriendUrl()}
+            className="mt-1 block font-bold underline underline-offset-2"
+          >
+            友だち追加する
+          </a>
+        </p>
+      )}
+
       {/* 今回の登録対象 */}
       {target && (
         <section className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
@@ -200,6 +246,15 @@ export default function LineRegisterClient({ target }: { target: Target }) {
             <p className="mt-3 rounded-full bg-white px-4 py-2 text-center text-sm font-bold text-emerald-700">
               登録しました ✓
             </p>
+          ) : !isFriend ? (
+            // 友だち未追加のまま登録させると、購読は成立するのに push が
+            // 一生届かない。登録させず追加へ誘導する。
+            <a
+              href={lineAddFriendUrl()}
+              className="mt-3 block w-full rounded-full bg-emerald-600 px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
+            >
+              まず公式アカウントを友だち追加
+            </a>
           ) : (
             <button
               type="button"
@@ -209,6 +264,11 @@ export default function LineRegisterClient({ target }: { target: Target }) {
             >
               {busy ? "処理中…" : "この通知を受け取る"}
             </button>
+          )}
+          {!isFriend && !done && (
+            <p className="mt-2 text-xs leading-relaxed text-stone-500">
+              追加が終わったらこの画面に戻り、もう一度開いてください。
+            </p>
           )}
         </section>
       )}
