@@ -1,0 +1,93 @@
+name: LINE dispatch test
+
+# LINE 配信経路の疎通テスト。手動実行のみ。
+#
+# なぜ必要か: /api/line/dispatch は PUSH_DISPATCH_SECRET で守られているが、
+# この値は Vercel 側で復号できない (env pull しても空で返る) ため、手元から
+# curl で叩けない。シークレットを保持している GitHub Actions から叩く。
+#
+# 注意: 実行すると指定した市町村の購読者全員に本物の LINE メッセージが飛ぶ。
+# 取り消せないので、confirm に "SEND" と入力しないと実行されないようにしている。
+
+on:
+  workflow_dispatch:
+    inputs:
+      pref:
+        description: 都道府県名 (例: 東京都)
+        required: true
+        default: 東京都
+      city:
+        description: 市町村名 (例: 八王子市)
+        required: true
+        default: 八王子市
+      confirm:
+        description: 購読者に本物の通知が飛びます。実行するなら SEND と入力
+        required: true
+        default: ""
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard
+        if: inputs.confirm != 'SEND'
+        run: |
+          echo "confirm に SEND が入力されていないため中止しました。"
+          exit 1
+
+      - name: Dispatch test sighting to LINE
+        env:
+          PUSH_DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}
+          PREF: ${{ inputs.pref }}
+          CITY: ${{ inputs.city }}
+        run: |
+          if [ -z "${PUSH_DISPATCH_SECRET}" ]; then
+            echo "PUSH_DISPATCH_SECRET が設定されていません。"
+            exit 1
+          fi
+
+          # id は毎回変える。同じ id は「配信済み」として弾かれ、何も飛ばない。
+          ID="line-test-$(date -u +%Y%m%dT%H%M%SZ)"
+
+          BODY=$(jq -nc \
+            --arg id "$ID" \
+            --arg pref "$PREF" \
+            --arg city "$CITY" \
+            --arg date "$(date -u +%Y-%m-%d)" \
+            '{newRecords:[{
+               id: $id,
+               prefectureName: $pref,
+               cityName: $city,
+               date: $date,
+               comment: "【テスト送信】配信経路の確認です。実際の出没情報ではありません。"
+             }]}')
+
+          echo "dispatching id=$ID target=${PREF}${CITY}"
+          CODE=$(curl -sS --max-time 60 -o /tmp/resp.json -w "%{http_code}" \
+            -X POST https://kuma-watch.jp/api/line/dispatch \
+            -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
+            -H "Content-Type: application/json" \
+            --data-binary "$BODY")
+
+          echo "http=$CODE"
+          cat /tmp/resp.json
+          echo
+
+          # 判定: recipients=0 なら購読が保存されていない。
+          #       recipients>0 かつ sent=0 なら LINE への送信が拒否されている
+          #       (友だち未追加 / チャネルアクセストークン不正)。
+          if [ "$CODE" != "200" ]; then
+            echo "::error::dispatch が HTTP $CODE を返しました"
+            exit 1
+          fi
+          RECIPIENTS=$(jq -r '.recipients // 0' /tmp/resp.json)
+          SENT=$(jq -r '.sent // 0' /tmp/resp.json)
+          if [ "$RECIPIENTS" = "0" ]; then
+            echo "::error::購読者が 0 件でした。LIFF での登録が保存されていません。"
+            exit 1
+          fi
+          if [ "$SENT" = "0" ]; then
+            echo "::error::購読者はいるのに送信 0 件。友だち未追加かトークン不正の可能性。"
+            exit 1
+          fi
+          echo "::notice::${RECIPIENTS} 人へ ${SENT} 通送信しました。LINE のトークを確認してください。"
