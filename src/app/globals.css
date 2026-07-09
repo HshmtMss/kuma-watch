@@ -34,6 +34,18 @@ html {
   scroll-behavior: smooth;
 }
 
+/* 地域/観光地ページの下部固定 CTA (.map-cta-sticky) は、埋め込み地図が画面内に
+   ある間だけ隠す。CTA の丸い両端が地図の下角に半円状に食い込むのを防ぐ。
+   MiniSightingsMap が body[data-map-onscreen] を IntersectionObserver で切替。 */
+.map-cta-sticky {
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+body[data-map-onscreen] .map-cta-sticky {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* ----------------------------------------------------------------
  * 記事本文 (.article-body) の読みやすさ調整
  * Tailwind v4 + 標準 CSS で記述。@tailwindcss/typography に依存しない。

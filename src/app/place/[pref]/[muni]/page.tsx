@@ -1359,7 +1359,7 @@ export default async function MuniPage({ params }: Props) {
       <Link
         href={mapUrl}
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
-        className="not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
+        className="map-cta-sticky not-prose fixed inset-x-3 z-50 flex items-center justify-center gap-2 rounded-full bg-amber-600 py-3.5 text-base font-bold text-white shadow-2xl ring-1 ring-amber-700 hover:bg-amber-700 sm:hidden print:hidden"
       >
         <MapIcon size={16} aria-hidden />
         {muni} の警戒レベルマップを開く →

@@ -204,6 +204,29 @@ export default function MiniSightingsMap({
     };
   }, [isFull]);
 
+  // この埋め込み地図が画面に入っている間は、ページ下部の固定 CTA (「地図を開く」)
+  // が地図に被って半円状のボタンが食い込んで見えるため、body に data-map-onscreen を
+  // 立てて CTA を隠す (実際の非表示は globals.css 側の CSS で行う)。
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          document.body.setAttribute("data-map-onscreen", "1");
+        } else {
+          document.body.removeAttribute("data-map-onscreen");
+        }
+      },
+      { threshold: 0.15 },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      document.body.removeAttribute("data-map-onscreen");
+    };
+  }, []);
+
   return (
     <div className={isFull ? "fixed inset-0 z-[2000] bg-white" : "relative"}>
       <div
