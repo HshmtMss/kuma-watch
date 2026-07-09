@@ -103,7 +103,12 @@ const prefRank = (pref: string): number => {
   return i === -1 ? PREF_ORDER.length : i;
 };
 
-type SearchParams = Promise<{ cat?: string }>;
+type SearchParams = Promise<{ cat?: string; page?: string }>;
+
+// カード一覧の 1 ページ表示件数。全件 (約2,000+) を一度に描画すると HTML が 8MB
+// 規模になり「観光地から探す」が非常に重くなるため、ページ送りで分割する。
+// 全観光地への網羅リンクは下の「都道府県別一覧」が担保する。
+const CARD_PAGE_SIZE = 60;
 
 export default async function SpotIndexPage({
   searchParams,
@@ -133,6 +138,26 @@ export default async function SpotIndexPage({
     activeCat === "all"
       ? JAPAN_LANDMARKS
       : JAPAN_LANDMARKS.filter((l) => l.category === activeCat);
+
+  // カード一覧のページ送り (初期 HTML を軽くするため一度に CARD_PAGE_SIZE 件のみ)。
+  const totalPages = Math.max(1, Math.ceil(visible.length / CARD_PAGE_SIZE));
+  const currentPage = Math.min(
+    Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1),
+    totalPages,
+  );
+  const pageCards = visible.slice(
+    (currentPage - 1) * CARD_PAGE_SIZE,
+    currentPage * CARD_PAGE_SIZE,
+  );
+  const cardRangeStart = (currentPage - 1) * CARD_PAGE_SIZE + 1;
+  const cardRangeEnd = Math.min(currentPage * CARD_PAGE_SIZE, visible.length);
+  const pageHref = (p: number): string => {
+    const params = new URLSearchParams();
+    if (activeCat !== "all") params.set("cat", activeCat);
+    if (p > 1) params.set("page", String(p));
+    const q = params.toString();
+    return q ? `/spot?${q}` : "/spot";
+  };
 
   // 都道府県別一覧: グルーピング → 地理順ソート → 高さがほぼ揃うよう
   // 3カラムへ順番に分配する。CSS multi-column は列の開始位置がずれて
@@ -238,7 +263,7 @@ export default async function SpotIndexPage({
                         <Link
                           key={l.slug}
                           href={`/spot/${encodeURIComponent(l.slug)}`}
-                          className="inline-block rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-sm text-stone-700 transition-colors hover:border-stone-300 hover:bg-stone-100 hover:text-stone-900"
+                          className="spot-pill"
                         >
                           {l.name}
                         </Link>
@@ -252,10 +277,21 @@ export default async function SpotIndexPage({
         </section>
       )}
 
-      {/* カード一覧 — フィルタ選択中はそのカテゴリのみ */}
+      {/* カード一覧 — フィルタ選択中はそのカテゴリのみ。全件は重いのでページ送り。 */}
       <section className="not-prose mt-6">
+        <div className="mb-2 flex items-baseline justify-between text-sm text-stone-500">
+          <span>
+            {activeCat === "all"
+              ? "すべての観光地"
+              : CATEGORY_LABEL[activeCat as LandmarkCategory]}
+          </span>
+          <span className="tabular-nums">
+            {visible.length.toLocaleString()} 件中 {cardRangeStart.toLocaleString()}–
+            {cardRangeEnd.toLocaleString()} 件
+          </span>
+        </div>
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((l) => (
+          {pageCards.map((l) => (
             <li key={l.slug}>
               <Link
                 href={`/spot/${encodeURIComponent(l.slug)}`}
@@ -298,6 +334,44 @@ export default async function SpotIndexPage({
             </li>
           ))}
         </ul>
+
+        {/* ページ送り。全観光地への網羅リンクは上の「都道府県別一覧」が担保する。 */}
+        {totalPages > 1 && (
+          <nav
+            className="mt-6 flex items-center justify-center gap-4 text-sm font-medium"
+            aria-label="観光地一覧のページ送り"
+          >
+            {currentPage > 1 ? (
+              <Link
+                href={pageHref(currentPage - 1)}
+                className="rounded-full border border-stone-300 bg-white px-4 py-2 text-stone-700 hover:bg-stone-50"
+                rel="prev"
+              >
+                ← 前へ
+              </Link>
+            ) : (
+              <span className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-stone-300">
+                ← 前へ
+              </span>
+            )}
+            <span className="tabular-nums text-stone-500">
+              {currentPage} / {totalPages}
+            </span>
+            {currentPage < totalPages ? (
+              <Link
+                href={pageHref(currentPage + 1)}
+                className="rounded-full border border-stone-300 bg-white px-4 py-2 text-stone-700 hover:bg-stone-50"
+                rel="next"
+              >
+                次へ →
+              </Link>
+            ) : (
+              <span className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-stone-300">
+                次へ →
+              </span>
+            )}
+          </nav>
+        )}
       </section>
 
       {/* /spot はヘッダーナビから直接来られる top-level なので「クマ対策トップに
