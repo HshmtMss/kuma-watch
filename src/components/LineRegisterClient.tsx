@@ -66,7 +66,58 @@ function targetLabel(t: Exclude<Target, null>): string {
   return t.label || "選んだ地点";
 }
 
-export default function LineRegisterClient({ target }: { target: Target }) {
+/**
+ * 未ログインで開かれたときの対象の持ち回し。
+ *
+ * liff.login() は LINE の認可画面へ飛ばし、戻り先ではクエリが失われることが
+ * ある (戻り URL は LIFF エンドポイントで、?pref=... は引き継がれない)。
+ * その結果「LINEで受け取る」を押したのにログイン後は管理画面だけが出て、
+ * 肝心の登録ができない。ログイン前に対象を退避し、戻ってきた回だけ復元する。
+ *
+ * 復元はログイン往復の直後 1 回きり (PENDING_KEY があるときだけ)。そうしないと、
+ * 後日ユーザが管理目的でクエリ無しに開いたときに、古い対象の登録カードが
+ * 蘇ってしまう。
+ */
+const TARGET_KEY = "kw:line-register-target";
+const PENDING_KEY = "kw:line-login-pending";
+
+function stashTarget(t: Exclude<Target, null>): void {
+  try {
+    sessionStorage.setItem(TARGET_KEY, JSON.stringify(t));
+  } catch {
+    // プライベートブラウズ等で使えなくても登録自体は続行させる
+  }
+}
+
+/** ログイン往復の直後なら退避した対象を返し、退避を消す。 */
+function takeStashedTarget(): Target {
+  try {
+    if (!sessionStorage.getItem(PENDING_KEY)) return null;
+    const raw = sessionStorage.getItem(TARGET_KEY);
+    sessionStorage.removeItem(PENDING_KEY);
+    sessionStorage.removeItem(TARGET_KEY);
+    return raw ? (JSON.parse(raw) as Target) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearStash(): void {
+  try {
+    sessionStorage.removeItem(PENDING_KEY);
+    sessionStorage.removeItem(TARGET_KEY);
+  } catch {
+    // noop
+  }
+}
+
+export default function LineRegisterClient({
+  target: initialTarget,
+}: {
+  target: Target;
+}) {
+  // ログイン往復でクエリが落ちた場合は退避から復元するため、対象は state で持つ。
+  const [target, setTarget] = useState<Target>(initialTarget);
   const [phase, setPhase] = useState<Phase>("init");
   const [errMsg, setErrMsg] = useState("");
   const [idToken, setIdToken] = useState<string | null>(null);
@@ -88,8 +139,19 @@ export default function LineRegisterClient({ target }: { target: Target }) {
         const liff = (await import("@line/liff")).default;
         await liff.init({ liffId: LIFF_ID });
         if (!liff.isLoggedIn()) {
-          liff.login();
+          // 戻ってきたときに対象を復元できるよう、飛ぶ前に退避する。
+          if (initialTarget) stashTarget(initialTarget);
+          sessionStorage.setItem(PENDING_KEY, "1");
+          // 既定の戻り先はエンドポイント URL でクエリが落ちるため、明示する。
+          liff.login({ redirectUri: window.location.href });
           return; // login はリダイレクトするので以降は次回ロードで処理
+        }
+        // ログイン往復から戻ってきた回だけ、落ちたクエリの代わりに復元する。
+        if (!initialTarget) {
+          const restored = takeStashedTarget();
+          if (restored && !cancelled) setTarget(restored);
+        } else {
+          clearStash();
         }
         const token = liff.getIDToken();
         if (cancelled) return;
@@ -114,7 +176,7 @@ export default function LineRegisterClient({ target }: { target: Target }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialTarget]);
 
   // ── 現在の登録一覧を取得 ─────────────────────────────────────────────
   const loadSubs = useCallback(async (token: string) => {
