@@ -28,6 +28,15 @@ type SearchEntry = {
   tokens: string;
 };
 
+// 地名ジオコーディング (前方一致) のヒット。サイト内インデックスに無い地名でも
+// (浜名湖・江ノ島など) 地図で該当地点のクマ情報を見られるようにするため。
+type GeoHit = {
+  lat: number;
+  lon: number;
+  displayName: string;
+  city?: string;
+};
+
 const TYPE_META: Record<
   SearchEntry["type"],
   { label: string; chip: string; rank: number }
@@ -95,6 +104,8 @@ export default function SearchUI({ hub }: { hub?: ReactNode }) {
   const [query, setQuery] = useState(initialQ);
   const [index, setIndex] = useState<SearchEntry[] | null>(null);
   const [loadError, setLoadError] = useState(false);
+  // クエリの地名ジオコーディング結果 (最上位ヒット)。地図で見る導線に使う。
+  const [geo, setGeo] = useState<GeoHit | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // 初回マウント時にインデックスを取得 (1 回だけ)
@@ -128,6 +139,36 @@ export default function SearchUI({ hub }: { hub?: ReactNode }) {
       inputRef.current?.focus();
     }
   }, [initialQ]);
+
+  // クエリを地名ジオコーディング (debounce 350ms)。ヒットすれば「地図で見る」導線を
+  // 出す。これで浜名湖・江ノ島など、サイト内インデックスに無い地名でもその地点の
+  // クマ情報に辿り着ける (地図が主役なので地名→地図が最も自然)。
+  useEffect(() => {
+    const q = query.trim();
+    let cancelled = false;
+    const ctrl = new AbortController();
+    // setState はすべて debounce 後 (非同期) に行い、effect 本体では呼ばない。
+    const t = setTimeout(() => {
+      if (q.length < 2) {
+        setGeo(null);
+        return;
+      }
+      fetch(`/api/geocode?q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data: { hits?: GeoHit[] } | null) => {
+          if (cancelled) return;
+          setGeo(data?.hits?.[0] ?? null);
+        })
+        .catch(() => {
+          if (!cancelled) setGeo(null);
+        });
+    }, 350);
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+      clearTimeout(t);
+    };
+  }, [query]);
 
   // URL の ?q= 同期 (debounce 300ms)
   useEffect(() => {
@@ -200,11 +241,15 @@ export default function SearchUI({ hub }: { hub?: ReactNode }) {
         )}
       </div>
 
+      {/* 地名がヒットしたら最上部に「地図で見る」導線 (その地点のクマ情報へ)。 */}
+      {query.trim() && geo && <GeoMapCard query={query.trim()} geo={geo} />}
+
       <SearchResults
         query={query}
         results={results}
         indexReady={index !== null}
         loadError={loadError}
+        geoShown={query.trim().length > 0 && geo !== null}
       />
 
       {/* 検索が空のときは「見つける」ハブ (server component) を表示 */}
@@ -218,11 +263,13 @@ function SearchResults({
   results,
   indexReady,
   loadError,
+  geoShown,
 }: {
   query: string;
   results: { entry: SearchEntry; score: number }[] | null;
   indexReady: boolean;
   loadError: boolean;
+  geoShown: boolean;
 }) {
   if (loadError) {
     return (
@@ -238,6 +285,15 @@ function SearchResults({
     );
   }
   if (results.length === 0) {
+    // 地名がヒットしていれば「地図で見る」カードが上に出ているので、
+    // 冷たい「見つかりませんでした」ではなく補足だけにする。
+    if (geoShown) {
+      return (
+        <p className="text-xs text-stone-500">
+          サイト内の記事・市町村ページには一致がありませんでした（上の「地図で見る」から確認できます）。
+        </p>
+      );
+    }
     return (
       <p className="rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-600">
         「{query}」に一致する結果は見つかりませんでした。<br />
@@ -285,6 +341,32 @@ function SearchResults({
         })}
       </ul>
     </div>
+  );
+}
+
+// 地名ヒット → その地点のクマ出没マップへ (地図が主役なので地名検索の最有力導線)。
+function GeoMapCard({ query, geo }: { query: string; geo: GeoHit }) {
+  // displayName の先頭が最も具体的な地名 (例: "浜名湖, 湖西市, 静岡県, 日本" → "浜名湖")。
+  const primary = geo.displayName.split(",")[0]?.trim() || query;
+  const context = geo.city && !primary.includes(geo.city) ? geo.city : "";
+  return (
+    <Link
+      href={`/?lat=${geo.lat.toFixed(5)}&lon=${geo.lon.toFixed(5)}`}
+      className="mb-3 block rounded-xl border-2 border-amber-300 bg-amber-50 px-4 py-3 transition hover:bg-amber-100"
+    >
+      <div className="flex items-center gap-2">
+        <span className="shrink-0 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
+          地図で見る
+        </span>
+        <span className="truncate text-sm font-semibold text-stone-900">
+          {primary}
+          {context ? `（${context}）` : ""}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-stone-600">
+        「{query}」周辺のクマ出没マップを開く →
+      </p>
+    </Link>
   );
 }
 
