@@ -5,6 +5,11 @@ import CategoryTiles, {
 } from "@/components/CategoryTiles";
 import { MapPin, LayoutGrid, Mountain } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import DirectorySearch, {
+  type DirectoryItem,
+} from "@/components/DirectorySearch";
+import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import PlacePointClient from "./PlacePointClient";
 import { getAllPrefSummaries } from "@/lib/place-index";
 
@@ -106,6 +111,26 @@ export default async function PlacePage({
         <span>›</span>
         <span className="font-semibold text-stone-700">都道府県から探す</span>
       </nav>
+
+      {/* ページ内の絞り込み検索（フラグ裏）。都道府県／市町村名で該当ページへ直行。
+          府県をまたいで市町村名から一発で飛べるのがこの窓の主目的。 */}
+      {isDirectorySearchReleased() && (
+        <DirectorySearch
+          placeholder="都道府県・市町村名で探す（例: 京都市）"
+          items={[
+            ...REGIONS.flatMap((r) => r.prefs).map<DirectoryItem>((pref) => ({
+              label: pref,
+              sub: "都道府県",
+              href: `/place/${encodeURIComponent(pref)}`,
+            })),
+            ...JAPAN_MUNICIPALITIES.map<DirectoryItem>((m) => ({
+              label: m.cityName,
+              sub: m.prefName,
+              href: `/place/${encodeURIComponent(m.prefName)}/${encodeURIComponent(m.cityName)}`,
+            })),
+          ]}
+        />
+      )}
 
       {/* 全国警戒マップへの誘導カード — 県別から横断的にどの市町村で
           一番出ているかを見たいユーザーをここで拾う。 */}

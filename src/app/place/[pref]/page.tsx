@@ -3,6 +3,10 @@ import Link from "next/link";
 import { Map } from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
+import DirectorySearch, {
+  type DirectoryItem,
+} from "@/components/DirectorySearch";
+import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
@@ -203,6 +207,18 @@ export default async function PrefPage({ params }: Props) {
         <span>›</span>
         <span className="font-semibold text-stone-700">{pref}</span>
       </nav>
+
+      {/* ページ内の絞り込み検索（フラグ裏）。当該県の市町村を名前で直行。 */}
+      {isDirectorySearchReleased() && (
+        <DirectorySearch
+          placeholder={`${pref}内の市町村を探す`}
+          items={sortedMunis.map<DirectoryItem>((m) => ({
+            label: m.cityName,
+            sub: pref,
+            href: `/place/${encodeURIComponent(pref)}/${encodeURIComponent(m.cityName)}`,
+          }))}
+        />
+      )}
 
       <h2>市町村別の出没情報</h2>
       <p className="text-sm text-stone-600">

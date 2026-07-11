@@ -19,6 +19,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import DirectorySearch, {
+  type DirectoryItem,
+} from "@/components/DirectorySearch";
+import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
 import {
   JAPAN_LANDMARKS,
   type JapanLandmark,
@@ -210,6 +214,18 @@ export default async function SpotIndexPage({
         <span>›</span>
         <span className="font-semibold text-stone-700">観光地から探す</span>
       </nav>
+
+      {/* ページ内の絞り込み検索（フラグ裏）。観光地・登山口名で該当ページへ直行。 */}
+      {isDirectorySearchReleased() && (
+        <DirectorySearch
+          placeholder="観光地・登山口名で探す（例: 高尾山）"
+          items={JAPAN_LANDMARKS.map<DirectoryItem>((l) => ({
+            label: l.name,
+            sub: l.muniName ? `${l.prefName}・${l.muniName}` : l.prefName,
+            href: `/spot/${encodeURIComponent(l.slug)}`,
+          }))}
+        />
+      )}
 
       <CategoryTiles
         title="カテゴリで絞り込み"
