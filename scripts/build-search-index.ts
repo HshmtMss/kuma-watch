@@ -177,6 +177,18 @@ type JapanMuni = {
   cityName: string;
 };
 
+// 名称→ひらがな読み (gen-name-readings.ts が生成)。tokens に足して「しそう」「えのしま」
+// 等の かな入力/読み検索でも市町村・観光地がヒットするようにする。
+let _readings: Record<string, string> | null = null;
+function getReadings(): Record<string, string> {
+  if (_readings) return _readings;
+  const p = join(process.cwd(), "src/data/name-readings.json");
+  _readings = existsSync(p)
+    ? (JSON.parse(readFileSync(p, "utf8")) as Record<string, string>)
+    : {};
+  return _readings;
+}
+
 async function loadMunis(): Promise<SearchEntry[]> {
   const mod = await import("../src/data/japan-municipalities");
   const munis = mod.JAPAN_MUNICIPALITIES as JapanMuni[];
@@ -197,8 +209,9 @@ async function loadMunis(): Promise<SearchEntry[]> {
     title: `${m.prefName} ${m.cityName}`,
     url: `/place/${encodeURIComponent(m.prefName)}/${encodeURIComponent(m.cityName)}`,
     snippet: `${m.prefName}${m.cityName} のクマ出没予報・警戒レベル`,
-    // 「○○郡△△町」「△△町」両方ヒットするように郡と町を別トークンに
-    tokens: `${m.prefName} ${m.cityName} ${m.cityName.replace(/^[^郡市区町村]+郡/, "")}`.toLowerCase(),
+    // 「○○郡△△町」「△△町」両方ヒットするように郡と町を別トークンに。
+    // 末尾に読み仮名 (かな入力/読み検索用) を足す。
+    tokens: `${m.prefName} ${m.cityName} ${m.cityName.replace(/^[^郡市区町村]+郡/, "")} ${getReadings()[m.cityName] ?? ""}`.toLowerCase(),
   }));
 
   return [...prefEntries, ...muniEntries];
@@ -227,6 +240,7 @@ async function loadSpots(): Promise<SearchEntry[]> {
       `${l.prefName}${l.muniName ? l.muniName : ""} の観光地・登山口`,
     tokens: [
       l.name,
+      getReadings()[l.name] ?? "", // 読み仮名 (かな入力/読み検索用)
       ...(l.altNames ?? []),
       l.prefName,
       l.muniName ?? "",
