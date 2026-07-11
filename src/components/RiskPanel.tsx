@@ -93,6 +93,8 @@ type State =
       breakdown: ScoreBreakdown;
       municipality?: MunicipalEntry;
       placeName?: string;
+      /** 通知の登録名に使う、町丁目まで含んだ地名。カード見出しには使わない。 */
+      placeDetail?: string;
       muniName?: string;
       nearbyWeightedCount: number;
       nearbySightings: number;
@@ -548,6 +550,12 @@ export default function RiskPanel({
       const placeName = rev
         ? [rev.prefecture, rev.city].filter(Boolean).join(" ")
         : undefined;
+      // 通知の登録名は「あとで見たときにどこか分かる」ことが最優先なので、
+      // 逆ジオコーダ (国土地理院) が返す大字・町丁目 (district) まで含める。
+      // カード見出し (placeName) は短さを優先して市区町村までに留める。
+      const placeDetail = rev
+        ? [rev.prefecture, rev.city, rev.district].filter(Boolean).join(" ")
+        : undefined;
 
       setOpen(true);
       setState({
@@ -561,6 +569,7 @@ export default function RiskPanel({
         breakdown,
         municipality,
         placeName,
+        placeDetail,
         muniName: rev?.city,
         nearbyWeightedCount: nearby.weighted,
         nearbySightings: nearby.count,
@@ -962,7 +971,7 @@ function RiskDetails({
             <GeoNotifyTile
               lat={location.lat}
               lon={location.lon}
-              label={state.placeName ?? location.label}
+              label={state.placeDetail ?? state.placeName ?? location.label}
               radiusKm={10}
             />
           ) : undefined

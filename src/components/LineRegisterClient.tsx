@@ -31,8 +31,23 @@ const LIFF_ID = process.env.NEXT_PUBLIC_LIFF_ID ?? "";
 type Subs = {
   munis: { pref: string; city: string }[];
   spots: string[];
-  geos: { id: string; label?: string; radiusKm: number }[];
+  // lat/lon は /api/line/list が元から返している (GeoPoint そのまま)。
+  // 「どこを登録したか分からない」を解消するため、地図へ戻すリンクに使う。
+  geos: { id: string; label?: string; radiusKm: number; lat: number; lon: number }[];
 };
+
+/** 登録地点を地図で開く URL。dispatch の通知リンクと同じ形にそろえる。 */
+function mapUrlForGeo(g: { lat: number; lon: number; label?: string }): string {
+  const params = new URLSearchParams({
+    lat: g.lat.toFixed(5),
+    lon: g.lon.toFixed(5),
+    z: "12",
+  });
+  if (g.label) params.set("label", g.label);
+  // 空白が + にならないようにする (LIFF の外部ブラウザで開くリンクだが、
+  // 表示される URL に + が出るのを避け、lineRegisterUrl と挙動をそろえる)。
+  return `/?${params.toString().replace(/\+/g, "%20")}`;
+}
 
 type Phase = "init" | "ready" | "error";
 
@@ -390,14 +405,23 @@ export default function LineRegisterClient({
                 key={`g-${g.id}`}
                 className="flex items-center justify-between px-3 py-2.5 text-sm"
               >
-                <span className="text-stone-800">
+                <span className="min-w-0 text-stone-800">
                   {g.label || "登録地点"}（周辺 {g.radiusKm}km）
+                  {/* 任意地点は名前だけでは思い出せないことがある。地図へ戻す。 */}
+                  <a
+                    href={mapUrlForGeo(g)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
+                  >
+                    地図で見る
+                  </a>
                 </span>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => unregister({ geoId: g.id })}
-                  className="text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
+                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
                 >
                   解除
                 </button>
