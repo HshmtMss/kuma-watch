@@ -43,6 +43,36 @@ function selector(cat) {
         `way["water"="lake"]["name"]["wikidata"](area.a);relation["water"="lake"]["name"]["wikidata"](area.a);`,
         `node["natural"="valley"]["name"](area.a);way["natural"="valley"]["name"](area.a);`,
       ].join("");
+    // --- 有名どころ拡張 (2026-07): wikidata/wikipedia 付き = 知名度ありに限定 ---
+    case "lake":
+      // 著名な湖 (浜名湖・田沢湖・中禅寺湖…)。ダム湖ノイズは name 側で除外。
+      return [
+        `way["natural"="water"]["name"]["wikidata"](area.a);relation["natural"="water"]["name"]["wikidata"](area.a);`,
+        `way["natural"="water"]["name"]["wikipedia"](area.a);relation["natural"="water"]["name"]["wikipedia"](area.a);`,
+      ].join("");
+    case "mountain":
+      // 著名な山・峰 (wikidata 付き)。
+      return `node["natural"="peak"]["name"]["wikidata"](area.a);node["natural"="peak"]["name"]["wikipedia"](area.a);`;
+    case "natpark":
+      // 国立・国定公園 (面積が大きく本質的に著名なので wikidata 不問、name のみ)。
+      return [
+        `relation["boundary"="national_park"]["name"](area.a);`,
+        `relation["boundary"="protected_area"]["protect_class"="2"]["name"](area.a);`,
+      ].join("");
+    case "historic":
+      // 城・城跡・記念物・史跡などの主要タイプに限定 (wikipedia 付き=著名)。
+      // 神社仏閣 (place_of_worship) は数万件と膨大でノイズ源になるため除外し、
+      // 著名寺社は「検索→地図」(ジオコーディング) 側でカバーする。松本城・鎌倉大仏ほか。
+      return [
+        `node["historic"~"^(castle|monument|memorial|ruins|archaeological_site|fort|city_gate)$"]["name"]["wikipedia"](area.a);`,
+        `way["historic"~"^(castle|monument|memorial|ruins|archaeological_site|fort|city_gate)$"]["name"]["wikipedia"](area.a);`,
+      ].join("");
+    case "island":
+      // 著名な島 (江の島・宮島…、wikidata 付き)。人工島・埠頭は name 側で除外。
+      return [
+        `way["place"="island"]["name"]["wikidata"](area.a);relation["place"="island"]["name"]["wikidata"](area.a);node["place"="island"]["name"]["wikidata"](area.a);`,
+        `way["place"="islet"]["name"]["wikidata"](area.a);node["place"="islet"]["name"]["wikidata"](area.a);`,
+      ].join("");
     default:
       throw new Error("unknown cat " + cat);
   }

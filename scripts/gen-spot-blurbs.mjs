@@ -20,7 +20,16 @@ const BATCH = 40;
 const DELAY_MS = 5200; // ~11-12 req/min（429 回避のため控えめに、1回で多く処理）
 const LIMIT = process.argv[2] ? +process.argv[2] : Infinity;
 
-const CATJP = { campground: "キャンプ場", sightseeing: "観光名所", onsen: "温泉地", waterfall: "滝・渓谷・湖などの自然" };
+const CATJP = {
+  campground: "キャンプ場",
+  sightseeing: "観光名所",
+  onsen: "温泉地",
+  waterfall: "滝・渓谷・湖などの自然",
+  // 有名どころ拡張 (2026-07)
+  lake: "湖・湖畔",
+  mountain: "山・登山口",
+  national_park: "国立公園",
+};
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
 
