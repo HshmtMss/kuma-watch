@@ -49,6 +49,25 @@ function mapUrlForGeo(g: { lat: number; lon: number; label?: string }): string {
   return `/?${params.toString().replace(/\+/g, "%20")}`;
 }
 
+/**
+ * URL のパス片。日本語はそのまま残し、パスを壊す文字だけエンコードする。
+ * dispatch/route.ts の pathSegment と同じ方針 (LINE は日本語 URL もそのまま
+ * リンク化するので、%E6... の長大表示を避ける)。
+ */
+function pathSegment(s: string): string {
+  return /[\s/?#%&+]/.test(s) ? encodeURIComponent(s) : s;
+}
+
+/** 登録した市町村のページ URL。通知の飛び先 (/place/{県}/{市}) にそろえる。 */
+function placeUrlForMuni(m: { pref: string; city: string }): string {
+  return `/place/${pathSegment(m.pref)}/${pathSegment(m.city)}`;
+}
+
+/** 登録した観光地のページ URL。通知の飛び先 (/spot/{slug}) にそろえる。 */
+function pageUrlForSpot(slug: string): string {
+  return `/spot/${pathSegment(slug)}`;
+}
+
 type Phase = "init" | "ready" | "error";
 
 /**
@@ -370,15 +389,24 @@ export default function LineRegisterClient({
                 key={`m-${m.pref}-${m.city}`}
                 className="flex items-center justify-between px-3 py-2.5 text-sm"
               >
-                <span className="text-stone-800">
+                <span className="min-w-0 text-stone-800">
                   {m.pref}
                   {m.city}
+                  {/* 通知と同じ /place ページへ。地域の状況をまとめて見られる。 */}
+                  <a
+                    href={placeUrlForMuni(m)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
+                  >
+                    ページを見る
+                  </a>
                 </span>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => unregister({ pref: m.pref, city: m.city })}
-                  className="text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
+                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
                 >
                   解除
                 </button>
@@ -389,12 +417,23 @@ export default function LineRegisterClient({
                 key={`s-${s}`}
                 className="flex items-center justify-between px-3 py-2.5 text-sm"
               >
-                <span className="text-stone-800">{s}（観光地）</span>
+                <span className="min-w-0 text-stone-800">
+                  {s}（観光地）
+                  {/* 通知と同じ /spot ページへ。 */}
+                  <a
+                    href={pageUrlForSpot(s)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
+                  >
+                    ページを見る
+                  </a>
+                </span>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => unregister({ slug: s })}
-                  className="text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
+                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
                 >
                   解除
                 </button>
