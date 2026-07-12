@@ -352,25 +352,53 @@ export default function KumaClient() {
   // 常設「通知」ボタン (①)。対象地点は 選択地点 → 現在地 → 地図中心 の順で確定。
   // 地図中心 (ref) はここ (イベントハンドラ) でだけ読む。
   const openNotify = useCallback(() => {
-    const p = selectedLocation
-      ? {
-          lat: selectedLocation.lat,
-          lon: selectedLocation.lon,
-          label: selectedLocation.label,
-        }
+    // 1. 座標を確定する。
+    const base = selectedLocation
+      ? { lat: selectedLocation.lat, lon: selectedLocation.lon }
       : currentLocation
-        ? {
-            lat: currentLocation.lat,
-            lon: currentLocation.lon,
-            label: "現在地",
-          }
+        ? { lat: currentLocation.lat, lon: currentLocation.lon }
         : (() => {
             const c = leafletMapRef.current?.getCenter();
             return c ? { lat: c.lat, lon: c.lng } : null;
           })();
-    setNotifyPoint(p);
+    if (!base) {
+      setNotifyPoint(null);
+      setShowNotify(true);
+      return;
+    }
+    // 2. 既に分かっている地名 (タップで解決済み / カードの逆ジオ結果) で即オープン。
+    const known = selectedLocation?.label ?? askContext?.place ?? undefined;
+    setNotifyPoint({ ...base, label: known });
     setShowNotify(true);
-  }, [selectedLocation, currentLocation]);
+    // 3. 正確な地名 (県+市+町丁目) を逆ジオで補完し、取得できたら差し替える。
+    //    「登録地点」のような無名フォールバックで登録されるのを防ぐ (RiskPanel の
+    //    placeDetail と同じ /api/geocode を使い、カードの表記とそろえる)。
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/geocode?lat=${base.lat.toFixed(5)}&lon=${base.lon.toFixed(5)}`,
+          { signal: AbortSignal.timeout(4000) },
+        );
+        if (!res.ok) return;
+        const j = (await res.json()) as {
+          result?: { prefecture?: string; city?: string; district?: string };
+        };
+        const h = j.result;
+        const name = h
+          ? [h.prefecture, h.city, h.district].filter(Boolean).join(" ")
+          : "";
+        if (!name) return;
+        // 対象地点が変わっていなければ差し替える (連打・地点変更のレース対策)。
+        setNotifyPoint((prev) =>
+          prev && prev.lat === base.lat && prev.lon === base.lon
+            ? { ...prev, label: name }
+            : prev,
+        );
+      } catch {
+        // 取得失敗時は known / フォールバックのまま (致命的でない)。
+      }
+    })();
+  }, [selectedLocation, currentLocation, askContext]);
 
   const handleSearchPick = useCallback((hit: GeocodeHit) => {
     // 投稿ピッカー(十字ピン)中は、選択マーカーを出さず地図中心だけ移動する。
