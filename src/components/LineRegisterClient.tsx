@@ -100,6 +100,105 @@ function targetLabel(t: Exclude<Target, null>): string {
   return t.label || "選んだ地点";
 }
 
+// ── 解除対象の記述と、楽観的更新 (即座に一覧から消す) 用のヘルパー ───────────
+// 解除は「押した手応えが分かりづらい」「反応が遅い」の 2 点が課題だった。
+// 遅さの主因は解除 API の後にもう一度 /api/line/list を叩き (LINE の verifyIdToken
+// が 2 回走る)、その完了までカードが消えなかったこと。ここでは再取得をやめ、
+// タップ即座にローカルの一覧から該当項目を消す (失敗時だけ元に戻す)。
+type Removal =
+  | { kind: "muni"; key: string; muni: Subs["munis"][number] }
+  | { kind: "spot"; key: string; slug: string }
+  | { kind: "geo"; key: string; geo: Subs["geos"][number] };
+
+function removeFromSubs(subs: Subs, r: Removal): Subs {
+  if (r.kind === "muni")
+    return {
+      ...subs,
+      munis: subs.munis.filter(
+        (m) => !(m.pref === r.muni.pref && m.city === r.muni.city),
+      ),
+    };
+  if (r.kind === "spot")
+    return { ...subs, spots: subs.spots.filter((s) => s !== r.slug) };
+  return { ...subs, geos: subs.geos.filter((g) => g.id !== r.geo.id) };
+}
+
+// 解除 API 失敗時のロールバック。楽観的に消した項目を戻す (重複追加は防ぐ)。
+function restoreToSubs(subs: Subs, r: Removal): Subs {
+  if (r.kind === "muni")
+    return subs.munis.some((m) => m.pref === r.muni.pref && m.city === r.muni.city)
+      ? subs
+      : { ...subs, munis: [...subs.munis, r.muni] };
+  if (r.kind === "spot")
+    return subs.spots.includes(r.slug)
+      ? subs
+      : { ...subs, spots: [...subs.spots, r.slug] };
+  return subs.geos.some((g) => g.id === r.geo.id)
+    ? subs
+    : { ...subs, geos: [...subs.geos, r.geo] };
+}
+
+function bodyForRemoval(r: Removal): Record<string, unknown> {
+  if (r.kind === "muni") return { pref: r.muni.pref, city: r.muni.city };
+  if (r.kind === "spot") return { slug: r.slug };
+  return { geoId: r.geo.id };
+}
+
+/**
+ * 解除ボタン + その場の確認 UI。
+ *
+ * ふだんは赤枠のピル型ボタン (「ボタンだと分かる」「hover に依存せず常時赤」
+ * 「タップ領域を確保」)。タップすると「解除しますか？」の 2 択に切り替わり、
+ * 押した手応えが一目で分かる。高齢者の誤タップで大事な通知を失う事故も防ぐ。
+ */
+function UnregisterControl({
+  itemKey,
+  label,
+  confirmKey,
+  onAsk,
+  onConfirm,
+  onCancel,
+}: {
+  itemKey: string;
+  label: string;
+  confirmKey: string | null;
+  onAsk: () => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  if (confirmKey === itemKey) {
+    return (
+      <span className="flex shrink-0 items-center gap-1.5">
+        <span className="mr-0.5 text-xs text-stone-500">解除しますか？</span>
+        <button
+          type="button"
+          onClick={onConfirm}
+          className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-bold text-white active:bg-red-700"
+        >
+          解除する
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-600 active:bg-stone-100"
+        >
+          やめる
+        </button>
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onAsk}
+      aria-label={`${label}の通知を解除`}
+      className="shrink-0 self-center rounded-full border border-red-300 px-3.5 py-1.5 text-xs font-semibold text-red-600 active:bg-red-100"
+    >
+      解除
+    </button>
+  );
+}
+
 /**
  * 未ログインで開かれたときの対象の持ち回し。
  *
@@ -159,6 +258,10 @@ export default function LineRegisterClient({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [isFriend, setIsFriend] = useState(true);
+  // 解除の「その場確認」で開いている項目のキー (1 つだけ)。
+  const [confirmKey, setConfirmKey] = useState<string | null>(null);
+  // 解除の結果メッセージ (「解除しました」/ 失敗案内)。
+  const [notice, setNotice] = useState("");
 
   // ── LIFF 初期化 ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -268,22 +371,30 @@ export default function LineRegisterClient({
   }, [idToken, target, isFriend, loadSubs]);
 
   // ── 解除 ─────────────────────────────────────────────────────────────
+  // 楽観的更新: タップした瞬間に一覧から消して手応えを出す。以前は解除 API の
+  // 後に /api/line/list を再取得しており (LINE の verifyIdToken が 2 回・逐次)、
+  // その完了までカードが残って「押しても反応しない」体感になっていた。再取得は
+  // やめ、失敗時だけ元に戻す。
   const unregister = useCallback(
-    async (body: Record<string, unknown>) => {
+    async (r: Removal) => {
       if (!idToken) return;
-      setBusy(true);
+      setConfirmKey(null);
+      setNotice("");
+      setSubs((cur) => (cur ? removeFromSubs(cur, r) : cur));
       try {
         const res = await fetch("/api/line/unsubscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idToken, ...body }),
+          body: JSON.stringify({ idToken, ...bodyForRemoval(r) }),
         });
-        if (res.ok) await loadSubs(idToken);
-      } finally {
-        setBusy(false);
+        if (!res.ok) throw new Error(String(res.status));
+        setNotice("解除しました");
+      } catch {
+        setSubs((cur) => (cur ? restoreToSubs(cur, r) : cur));
+        setNotice("解除できませんでした。もう一度お試しください。");
       }
     },
-    [idToken, loadSubs],
+    [idToken],
   );
 
   // ── 表示 ─────────────────────────────────────────────────────────────
@@ -376,6 +487,17 @@ export default function LineRegisterClient({
       {/* 現在の登録一覧 */}
       <section className="mt-6">
         <h2 className="text-sm font-semibold text-stone-700">現在の登録</h2>
+        {notice && (
+          <p
+            className={`mt-2 rounded-lg px-3 py-2 text-xs font-medium ${
+              notice.includes("できません")
+                ? "bg-red-50 text-red-700"
+                : "bg-emerald-50 text-emerald-700"
+            }`}
+          >
+            {notice}
+          </p>
+        )}
         {!subs ? (
           <p className="mt-2 text-sm text-stone-400">読み込み中…</p>
         ) : subs.munis.length === 0 &&
@@ -402,14 +524,23 @@ export default function LineRegisterClient({
                     ページを見る
                   </a>
                 </span>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => unregister({ pref: m.pref, city: m.city })}
-                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
-                >
-                  解除
-                </button>
+                <UnregisterControl
+                  itemKey={`m-${m.pref}-${m.city}`}
+                  label={`${m.pref}${m.city}`}
+                  confirmKey={confirmKey}
+                  onAsk={() => {
+                    setNotice("");
+                    setConfirmKey(`m-${m.pref}-${m.city}`);
+                  }}
+                  onConfirm={() =>
+                    unregister({
+                      kind: "muni",
+                      key: `m-${m.pref}-${m.city}`,
+                      muni: m,
+                    })
+                  }
+                  onCancel={() => setConfirmKey(null)}
+                />
               </li>
             ))}
             {subs.spots.map((s) => (
@@ -429,14 +560,19 @@ export default function LineRegisterClient({
                     ページを見る
                   </a>
                 </span>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => unregister({ slug: s })}
-                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
-                >
-                  解除
-                </button>
+                <UnregisterControl
+                  itemKey={`s-${s}`}
+                  label={s}
+                  confirmKey={confirmKey}
+                  onAsk={() => {
+                    setNotice("");
+                    setConfirmKey(`s-${s}`);
+                  }}
+                  onConfirm={() =>
+                    unregister({ kind: "spot", key: `s-${s}`, slug: s })
+                  }
+                  onCancel={() => setConfirmKey(null)}
+                />
               </li>
             ))}
             {subs.geos.map((g) => (
@@ -456,14 +592,19 @@ export default function LineRegisterClient({
                     地図で見る
                   </a>
                 </span>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => unregister({ geoId: g.id })}
-                  className="shrink-0 self-start text-xs font-medium text-stone-400 underline decoration-dotted hover:text-red-600"
-                >
-                  解除
-                </button>
+                <UnregisterControl
+                  itemKey={`g-${g.id}`}
+                  label={g.label || "登録地点"}
+                  confirmKey={confirmKey}
+                  onAsk={() => {
+                    setNotice("");
+                    setConfirmKey(`g-${g.id}`);
+                  }}
+                  onConfirm={() =>
+                    unregister({ kind: "geo", key: `g-${g.id}`, geo: g })
+                  }
+                  onCancel={() => setConfirmKey(null)}
+                />
               </li>
             ))}
           </ul>
