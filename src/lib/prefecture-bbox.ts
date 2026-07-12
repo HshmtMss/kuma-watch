@@ -29,7 +29,7 @@ export const PREFECTURE_BBOX: Record<string, PrefBBox> = {
   東京都: { latMin: 24.0, latMax: 35.9, lonMin: 122.9, lonMax: 142.4 }, // 離島含む大きな範囲
   神奈川県: { latMin: 35.1, latMax: 35.7, lonMin: 138.9, lonMax: 139.8 },
   新潟県: { latMin: 36.6, latMax: 38.6, lonMin: 137.5, lonMax: 139.9 },
-  富山県: { latMin: 36.2, latMax: 36.9, lonMin: 136.6, lonMax: 137.8 },
+  富山県: { latMin: 36.2, latMax: 37.0, lonMin: 136.6, lonMax: 137.8 },
   石川県: { latMin: 35.9, latMax: 37.6, lonMin: 136.1, lonMax: 137.4 },
   福井県: { latMin: 35.2, latMax: 36.4, lonMin: 135.4, lonMax: 136.9 },
   山梨県: { latMin: 35.2, latMax: 35.9, lonMin: 138.2, lonMax: 139.2 },

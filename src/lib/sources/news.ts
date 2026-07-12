@@ -16,6 +16,7 @@
 
 import { inJapanBounds, type UnifiedSighting } from "./types";
 import { geocodePlace, jitter } from "./geocode";
+import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -423,8 +424,20 @@ export async function fetchNewsSightings(
     // クマの出ない市街地に誤ピンが立つ。県レベルの曖昧な報道は地図に載せない。
     if (!cityName && typeof s.lat !== "number") continue;
 
-    let lat = typeof s.lat === "number" ? s.lat : undefined;
-    let lon = typeof s.lon === "number" ? s.lon : undefined;
+    // LLM が明示する lat/lon は記事に無い座標を捏造することがあり、県名と
+    // 無関係な遠隔地 (北海道・東北など) に飛ぶ。両方揃っていて かつ 県名の
+    // BBox と整合するときだけ採用し、矛盾する座標は破棄して、県名クエリで
+    // 制約された geocodePlace に委ねる (幻覚ピンの主因への対処)。
+    let lat: number | undefined;
+    let lon: number | undefined;
+    if (
+      typeof s.lat === "number" &&
+      typeof s.lon === "number" &&
+      latLonMatchesPrefecture(prefName, s.lat, s.lon)
+    ) {
+      lat = s.lat;
+      lon = s.lon;
+    }
     let precise = lat !== undefined && lon !== undefined;
     if (lat === undefined || lon === undefined) {
       const g = await geocodePlace(prefName, cityName, s.sectionName);
@@ -436,6 +449,10 @@ export async function fetchNewsSightings(
     }
     if (typeof lat !== "number" || typeof lon !== "number") continue;
     if (!inJapanBounds(lat, lon)) continue;
+    // 最終防衛: geocode 結果も含め、県名と矛盾する座標は地図に載せない。
+    // getCachedSightings の filterMisgeocoded と同じ判定を取り込み段でも掛け、
+    // 誤座標がスナップショット・件数集計・生ファイル参照に混入するのを防ぐ。
+    if (!latLonMatchesPrefecture(prefName, lat, lon)) continue;
 
     const id = `news-${article.source}-${s.index}-${i}`;
     const pos = precise ? { lat, lon } : jitter(lat, lon, id);
