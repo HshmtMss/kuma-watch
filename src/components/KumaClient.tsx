@@ -34,11 +34,11 @@ import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
 
 // 地図右下スタックの常設「通知」ボタン (①)。地点未選択でも押せる通知入口。
-// 完成→フラグで隠す→テスト後に公開、の方針に沿ってリリースフラグ裏で出す。
+// 既定オン。隠したいときだけ NEXT_PUBLIC_MAP_NOTIFY_FAB=false を設定する。
 // 実際に何を出すか (LINE / ブラウザ通知) は GeoNotifyTile が isGeoNotifyAvailable
 // で決めるので、ここは「入口ボタンを見せるか」だけを持つ。
 const MAP_NOTIFY_FAB_ENABLED =
-  process.env.NEXT_PUBLIC_MAP_NOTIFY_FAB === "true";
+  process.env.NEXT_PUBLIC_MAP_NOTIFY_FAB !== "false";
 
 const LAST_LOCATION_KEY = "kumaWatch.lastLocation";
 const LAST_PERIOD_KEY = "kumaWatch.lastPeriodDays";
