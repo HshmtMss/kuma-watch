@@ -9,6 +9,7 @@ import type {
   Popup,
   LeafletMouseEvent,
   TileLayer,
+  Canvas,
 } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import {
@@ -196,6 +197,15 @@ export default function KumaMap({
   const onMapClickRef = useRef(onMapClick);
   const redrawTimerRef = useRef<number | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  // ★ Canvas レンダラーは地図の初期化時に 1 度だけ生成し、再描画のたびに使い回す。
+  //   以前は renderMeshLayer / renderPinLayer が毎回 L.canvas() を新規生成しており、
+  //   layer.clearLayers() ではパス (矩形/ピン) しか消えず、レンダラー本体の <canvas>
+  //   要素 (Leaflet が map._getRenderer 経由で map へ追加する) が overlayPane に残り
+  //   続けていた。パンのたびに全画面 canvas のバッキングストア (Retina で約 10MB/枚)
+  //   が積み上がり、iOS Safari のタブ上限を超えて強制リロード
+  //   (「このページで問題が繰り返し起きました」) を起こしていた。
+  const meshCanvasRef = useRef<Canvas | null>(null);
+  const pinCanvasRef = useRef<Canvas | null>(null);
 
   useEffect(() => {
     onMapClickRef.current = onMapClick;
@@ -233,7 +243,8 @@ export default function KumaMap({
       const west = bounds.getWest() - MESH_LON_HALF;
       const east = bounds.getEast() + MESH_LON_HALF;
 
-      const canvas = L.canvas({ padding: 0.1 });
+      const canvas = meshCanvasRef.current;
+      if (!canvas) return;
       const currentZoom = map.getZoom();
       const useLOD = currentZoom < LOD_ZOOM_THRESHOLD;
       const opacity = heatmapOpacityRef.current;
@@ -437,7 +448,8 @@ export default function KumaMap({
       const west = bounds.getWest();
       const east = bounds.getEast();
 
-      const canvas = L.canvas({ padding: 0.1 });
+      const canvas = pinCanvasRef.current;
+      if (!canvas) return;
       // モバイルはタップ領域を確保するためピンを大きく描く (Apple HIG: 最低 44pt の指針)。
       // canvas renderer は描画半径がそのままヒット判定に使われるので、
       // 視覚サイズを上げることが押しやすさにも直結する。
@@ -842,6 +854,16 @@ export default function KumaMap({
       tile.addTo(map);
       tileLayerRef.current = tile;
 
+      // Canvas レンダラーを 1 度だけ生成し、mesh → pin の順で map に追加して
+      // 重なり順 (ピンがヒートマップの上) を固定する。以降の再描画ではこの
+      // インスタンスを使い回すため、canvas 要素が増殖しない。
+      const meshCanvas = L.canvas({ padding: 0.1 });
+      const pinCanvas = L.canvas({ padding: 0.1 });
+      meshCanvas.addTo(map);
+      pinCanvas.addTo(map);
+      meshCanvasRef.current = meshCanvas;
+      pinCanvasRef.current = pinCanvas;
+
       const meshLayer = L.layerGroup();
       meshLayerRef.current = meshLayer;
       if (showHeatmapRef.current) meshLayer.addTo(map);
@@ -964,6 +986,8 @@ export default function KumaMap({
       meshLayerRef.current = null;
       pinLayerRef.current = null;
       selectionLayerRef.current = null;
+      meshCanvasRef.current = null;
+      pinCanvasRef.current = null;
       popupRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
