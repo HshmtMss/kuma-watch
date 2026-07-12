@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import {
+  trackNotifyClick,
+  trackNotifySubscribed,
+  trackPushPermission,
+  type NotifySurface,
+} from "@/lib/analytics";
 
 /**
  * 地図で選んだ任意地点を中心に、半径 radiusKm 以内の新規出没を通知する購読ボタン。
@@ -35,6 +41,7 @@ export default function GeoPushButton({
   label,
   radiusKm = 10,
   compact = false,
+  surface = "map_card",
 }: {
   lat: number;
   lon: number;
@@ -42,6 +49,8 @@ export default function GeoPushButton({
   radiusKm?: number;
   /** カードの「最近の目撃」と 2 列で並べる省スペースタイル表示。 */
   compact?: boolean;
+  /** GA 計測用。この CTA がどの面に置かれているか。 */
+  surface?: NotifySurface;
 }) {
   const [state, setState] = useState<State>("idle");
   const [message, setMessage] = useState("");
@@ -72,8 +81,10 @@ export default function GeoPushButton({
   const subscribe = useCallback(async () => {
     setState("loading");
     setMessage("");
+    trackNotifyClick({ channel: "push", target: "geo", surface });
     try {
       const permission = await Notification.requestPermission();
+      trackPushPermission({ result: permission, target: "geo", surface });
       if (permission !== "granted") {
         setState(permission === "denied" ? "denied" : "idle");
         return;
@@ -100,13 +111,14 @@ export default function GeoPushButton({
       if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);
       setState("active");
       setMessage(`この地点の半径${radiusKm}kmで通知を有効化しました`);
+      trackNotifySubscribed({ channel: "push", target: "geo", surface });
     } catch (e) {
       setState("idle");
       setMessage(
         `通知の有効化に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
       );
     }
-  }, [lat, lon, radiusKm, label]);
+  }, [lat, lon, radiusKm, label, surface]);
 
   // 端末で通知が表示できるかをその場で確認するためのお試し通知。
   // サーバを介さず Service Worker からローカルに 1 件出すだけ。

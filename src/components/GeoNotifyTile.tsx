@@ -6,6 +6,7 @@ import { isPushSupported } from "@/lib/push-support";
 import { isGeoPushReleased } from "@/lib/push-flag";
 import { isLineEntryReleased } from "@/lib/line-flag";
 import { isLiffConfigured, lineRegisterUrl } from "@/lib/line-links";
+import { trackNotifyClick, trackEvent, type NotifySurface } from "@/lib/analytics";
 
 /**
  * 地図カード (RiskPanel) の「この場所の出没通知」タイル。
@@ -45,11 +46,14 @@ export default function GeoNotifyTile({
   lon,
   label,
   radiusKm = 10,
+  surface = "map_card",
 }: {
   lat: number;
   lon: number;
   label?: string;
   radiusKm?: number;
+  /** GA 計測用。この CTA がどの面に置かれているか (地図カード / 常設ナッジ)。 */
+  surface?: NotifySurface;
 }) {
   const pushSupported = useSyncExternalStore(
     noopSubscribe,
@@ -69,12 +73,26 @@ export default function GeoNotifyTile({
 
   if (!lineHref) {
     return pushReleased ? (
-      <GeoPushButton lat={lat} lon={lon} label={label} radiusKm={radiusKm} compact />
+      <GeoPushButton
+        lat={lat}
+        lon={lon}
+        label={label}
+        radiusKm={radiusKm}
+        compact
+        surface={surface}
+      />
     ) : null;
   }
   if (showPush) {
     return (
-      <GeoPushButton lat={lat} lon={lon} label={label} radiusKm={radiusKm} compact />
+      <GeoPushButton
+        lat={lat}
+        lon={lon}
+        label={label}
+        radiusKm={radiusKm}
+        compact
+        surface={surface}
+      />
     );
   }
 
@@ -87,6 +105,9 @@ export default function GeoNotifyTile({
         href={lineHref}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() =>
+          trackNotifyClick({ channel: "line", target: "geo", surface })
+        }
         className="flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90"
         style={{ backgroundColor: LINE_GREEN }}
       >
@@ -107,7 +128,10 @@ export default function GeoNotifyTile({
       {pushReleased && pushSupported && (
         <button
           type="button"
-          onClick={() => setPushFor(point)}
+          onClick={() => {
+            setPushFor(point);
+            trackEvent("notify_expand_push", { target: "geo", surface });
+          }}
           className="mt-1.5 text-[11px] leading-snug text-emerald-800/70 underline decoration-dotted underline-offset-2 hover:text-emerald-900"
         >
           LINE を使っていない方

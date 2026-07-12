@@ -737,6 +737,21 @@ export default async function MuniPage({ params }: Props) {
         </div>
       )}
 
+      {/* 通知購読 (ファーストビュー) — この街の状況を見た直後が最も登録動機が
+          高い。地名+マップのスパイク流入は一度見て離脱しがちなので、末尾フッター
+          だけでなく冒頭にも通知導線を置き、その場で登録できるようにする。
+          フッターの NotifyCard とは surface (place_hero / place_footer) で計測を分ける。 */}
+      {isLineEntryReleased() ? (
+        <NotifyCard target={{ kind: "muni", pref, city: muni }} surface="place_hero" />
+      ) : (
+        isPushReleased() && (
+          <PushSubscribeButton
+            target={{ kind: "muni", pref, city: muni }}
+            surface="place_hero"
+          />
+        )
+      )}
+
       {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
           「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。
           1 年・90 日が両方 0 ならヒーローカードの「直近の出没情報なし」
@@ -1327,10 +1342,13 @@ export default async function MuniPage({ params }: Props) {
           (LINE 主役 + ブラウザ通知は「使っていない方へ」の開閉)。
           リリースフラグが OFF の間は従来どおりブラウザ通知のみ。 */}
       {isLineEntryReleased() ? (
-        <NotifyCard target={{ kind: "muni", pref, city: muni }} />
+        <NotifyCard target={{ kind: "muni", pref, city: muni }} surface="place_footer" />
       ) : (
         isPushReleased() && (
-          <PushSubscribeButton target={{ kind: "muni", pref, city: muni }} />
+          <PushSubscribeButton
+            target={{ kind: "muni", pref, city: muni }}
+            surface="place_footer"
+          />
         )
       )}
 

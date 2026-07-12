@@ -2,17 +2,7 @@
 
 import { useReportWebVitals } from "next/web-vitals";
 
-type Gtag = (
-  command: "event",
-  action: string,
-  params: Record<string, unknown>,
-) => void;
-
-declare global {
-  interface Window {
-    gtag?: Gtag;
-  }
-}
+// window.gtag の型は @/lib/analytics で一元宣言 (ambient なので import 不要)。
 
 export default function WebVitalsReporter() {
   useReportWebVitals((metric) => {

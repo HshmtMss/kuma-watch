@@ -46,6 +46,25 @@ const BUSINESS_LINKS: NavLink[] = [
   },
 ];
 
+function BellIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
 function SearchIcon({ size = 16 }: { size?: number }) {
   return (
     <svg
@@ -148,6 +167,14 @@ export default function HeaderNav({
         className="hidden shrink-0 items-center gap-3 text-sm font-medium text-stone-600 sm:flex"
         aria-label="主要ナビゲーション (デスクトップ)"
       >
+        {/* 一般向けゴール = 通知登録。常設の入口をヘッダーに置く (③)。獲得LP へ。 */}
+        <Link
+          href="/notify"
+          className="flex items-center gap-1 rounded-full px-2 py-1.5 font-semibold text-emerald-700 hover:text-emerald-800"
+        >
+          <BellIcon />
+          通知
+        </Link>
         <DesktopDropdown label="探す" items={EXPLORE_LINKS} />
         <DesktopDropdown label="学ぶ" items={LEARN_LINKS} />
         <DesktopDropdown label="法人" items={BUSINESS_LINKS} variant="cta" />
@@ -207,6 +234,15 @@ export default function HeaderNav({
                 className="absolute right-0 top-12 z-[1300] w-72 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl"
                 aria-label="主要ナビゲーション (モバイル)"
               >
+                {/* 一般向けゴール = 通知登録。メニュー最上部に常設 (③)。 */}
+                <Link
+                  href="/notify"
+                  onClick={close}
+                  className="flex items-center gap-2 border-b border-gray-100 px-5 py-3 text-base font-bold text-emerald-700 hover:bg-emerald-50 active:bg-emerald-100"
+                >
+                  <BellIcon size={18} />
+                  通知を受け取る
+                </Link>
                 <MobileGroup label="探す">
                   {EXPLORE_LINKS.map((it) => (
                     <MobileItem

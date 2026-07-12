@@ -6,6 +6,7 @@ import PushSubscribeButton, {
 } from "@/components/PushSubscribeButton";
 import { isPushSupported } from "@/lib/push-support";
 import { lineRegisterUrl, lineTargetLabel } from "@/lib/line-links";
+import { trackNotifyClick, type NotifySurface } from "@/lib/analytics";
 
 /**
  * 通知の入口を 1 枚にまとめたカード。/place と /spot のフッターに置く。
@@ -35,10 +36,13 @@ const serverSnapshot = () => false;
 export default function NotifyCard({
   target,
   hideHeading = false,
+  surface = "place_footer",
 }: {
   target: NotifyTarget;
   /** 親セクションに見出しがある場合、カード内の見出しを省く。 */
   hideHeading?: boolean;
+  /** GA 計測用。この CTA がどの面に置かれているか。 */
+  surface?: NotifySurface;
 }) {
   const pushSupported = useSyncExternalStore(
     noopSubscribe,
@@ -51,7 +55,14 @@ export default function NotifyCard({
   const pushTarget: PushTarget = target;
 
   // LIFF 未設定なら LINE 導線を出せない。従来どおりブラウザ通知だけ見せる。
-  if (!href) return <PushSubscribeButton target={pushTarget} hideHeading={hideHeading} />;
+  if (!href)
+    return (
+      <PushSubscribeButton
+        target={pushTarget}
+        hideHeading={hideHeading}
+        surface={surface}
+      />
+    );
 
   const heading =
     target.kind === "muni"
@@ -98,6 +109,9 @@ export default function NotifyCard({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() =>
+            trackNotifyClick({ channel: "line", target: target.kind, surface })
+          }
           className="shrink-0 self-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
           style={{ backgroundColor: LINE_GREEN }}
         >
@@ -112,7 +126,7 @@ export default function NotifyCard({
             LINE を使っていない方は、ブラウザ通知でも受け取れます
           </summary>
           <div className="mt-3">
-            <PushSubscribeButton target={pushTarget} bare hideHeading />
+            <PushSubscribeButton target={pushTarget} bare hideHeading surface={surface} />
           </div>
         </details>
       )}

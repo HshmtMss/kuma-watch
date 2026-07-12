@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { MapPin, Settings, CalendarDays } from "lucide-react";
+import { MapPin, Settings, CalendarDays, Bell } from "lucide-react";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
 import HeaderNav from "@/components/HeaderNav";
@@ -22,6 +22,9 @@ import RiskPanel, {
 } from "@/components/RiskPanel";
 import AskBox from "@/components/AskBox";
 import SettingsPanel from "@/components/SettingsPanel";
+import GeoNotifyTile, {
+  isGeoNotifyAvailable,
+} from "@/components/GeoNotifyTile";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
   RISK_LEVEL_LABEL,
@@ -29,6 +32,13 @@ import {
 } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
+
+// 地図右下スタックの常設「通知」ボタン (①)。地点未選択でも押せる通知入口。
+// 完成→フラグで隠す→テスト後に公開、の方針に沿ってリリースフラグ裏で出す。
+// 実際に何を出すか (LINE / ブラウザ通知) は GeoNotifyTile が isGeoNotifyAvailable
+// で決めるので、ここは「入口ボタンを見せるか」だけを持つ。
+const MAP_NOTIFY_FAB_ENABLED =
+  process.env.NEXT_PUBLIC_MAP_NOTIFY_FAB === "true";
 
 const LAST_LOCATION_KEY = "kumaWatch.lastLocation";
 const LAST_PERIOD_KEY = "kumaWatch.lastPeriodDays";
@@ -120,6 +130,15 @@ export default function KumaClient() {
   const [askContext, setAskContext] = useState<AskContext | null>(null);
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false);
+  // 常設「通知」ボタンで開く、この付近の出没通知ポップオーバー (①)。
+  // 対象地点はボタン押下時に確定させて state に持つ (地図中心の読み取りを
+  // render 中に行わないため — ref は render 中に読まない)。
+  const [showNotify, setShowNotify] = useState(false);
+  const [notifyPoint, setNotifyPoint] = useState<{
+    lat: number;
+    lon: number;
+    label?: string;
+  } | null>(null);
   // 投稿フローからの「地図から選ぶ」モード (mount 時に URL クエリで判定)
   const [pickerMode, setPickerMode] = useState<null | "submit">(null);
   // useCallback([]) な検索/GPS ハンドラから最新の pickerMode を読むための ref。
@@ -329,6 +348,29 @@ export default function KumaClient() {
     setSelectedLocation(loc);
     setCurrentLocation({ lat: loc.lat, lon: loc.lon });
   }, []);
+
+  // 常設「通知」ボタン (①)。対象地点は 選択地点 → 現在地 → 地図中心 の順で確定。
+  // 地図中心 (ref) はここ (イベントハンドラ) でだけ読む。
+  const openNotify = useCallback(() => {
+    const p = selectedLocation
+      ? {
+          lat: selectedLocation.lat,
+          lon: selectedLocation.lon,
+          label: selectedLocation.label,
+        }
+      : currentLocation
+        ? {
+            lat: currentLocation.lat,
+            lon: currentLocation.lon,
+            label: "現在地",
+          }
+        : (() => {
+            const c = leafletMapRef.current?.getCenter();
+            return c ? { lat: c.lat, lon: c.lng } : null;
+          })();
+    setNotifyPoint(p);
+    setShowNotify(true);
+  }, [selectedLocation, currentLocation]);
 
   const handleSearchPick = useCallback((hit: GeocodeHit) => {
     // 投稿ピッカー(十字ピン)中は、選択マーカーを出さず地図中心だけ移動する。
@@ -1004,8 +1046,52 @@ export default function KumaClient() {
           </div>
         )}
 
-        {/* 右端縦スタック: 対策 / 現在地 / ズーム。地図右下。カードが選択されている
-            間は最小状態 (畳んだバー = 88px) の上に出して常に押せるようにする。カードを
+        {/* 常設「通知」ボタンで開く、この付近の出没通知ポップオーバー (①)。
+            対象地点は 選択地点 → 現在地 → 地図中心 の順に決める。中身は既存の
+            GeoNotifyTile を再利用 (LINE 主役 + ブラウザ通知は控え)。地図を煽らない
+            よう、開いたときだけ薄い背景で前面に出し、外側タップで閉じる。 */}
+        {showNotify && (
+          <>
+            <div
+              className="absolute inset-0 z-[1150] bg-black/20"
+              onClick={() => setShowNotify(false)}
+              aria-hidden
+            />
+            <div className="absolute bottom-3 left-1/2 z-[1200] w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-stone-200 bg-white p-4 shadow-xl">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <p className="text-xs leading-relaxed text-stone-500">
+                  {notifyPoint?.label
+                    ? `${notifyPoint.label}の周辺で新しい出没があったらお知らせします。`
+                    : "地図で見ているこの範囲で新しい出没があったらお知らせします。"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowNotify(false)}
+                  aria-label="閉じる"
+                  className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-700"
+                >
+                  ×
+                </button>
+              </div>
+              {notifyPoint ? (
+                <GeoNotifyTile
+                  lat={notifyPoint.lat}
+                  lon={notifyPoint.lon}
+                  label={notifyPoint.label}
+                  radiusKm={10}
+                  surface="map_nudge"
+                />
+              ) : (
+                <p className="text-xs text-stone-500">
+                  地図を動かすか、現在地を取得してから開いてください。
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* 右端縦スタック: 通知 / 対策 / 現在地 / ズーム。地図右下。カードが選択されて
+            いる間は最小状態 (畳んだバー = 88px) の上に出して常に押せるようにする。カードを
             peek 以上に上げると z 順で自然にこの下に隠れる。ピッカー中/未選択は最下部。 */}
         <div
           className={`absolute right-3 z-[900] flex flex-col gap-2.5 ${
@@ -1014,6 +1100,21 @@ export default function KumaClient() {
               : "bottom-3"
           }`}
         >
+          {/* 常設「通知」ボタン (①)。地点未選択でも押せる通知入口。リリースフラグ
+              (NEXT_PUBLIC_MAP_NOTIFY_FAB) と、実際に導線を出せるか (isGeoNotifyAvailable)
+              の両方が真のときだけ。ピッカー中は隠す。 */}
+          {MAP_NOTIFY_FAB_ENABLED && !isPicking && isGeoNotifyAvailable() && (
+            <button
+              type="button"
+              onClick={openNotify}
+              className="flex items-center justify-center rounded-full bg-emerald-600 text-white shadow-lg hover:bg-emerald-700"
+              style={{ height: "3.25rem", width: "3.25rem" }}
+              aria-label="この付近の出没通知を受け取る"
+              title="出没通知を受け取る"
+            >
+              <Bell size={24} aria-hidden />
+            </button>
+          )}
           {/* クマ対策の合言葉「はちみつ」を開く。共通の HachimitsuGuide (layout) が
               open-hachimitsu イベントを受けてポップアップを開く。現在地ボタンの上に同サイズで。 */}
           {!isPicking && (

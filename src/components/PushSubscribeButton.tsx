@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { isPushSupported } from "@/lib/push-support";
+import {
+  trackNotifyClick,
+  trackNotifySubscribed,
+  trackPushPermission,
+  type NotifySurface,
+} from "@/lib/analytics";
 
 /**
  * 市町村ページ / 観光地ページに置く Web Push 購読ボタン。
@@ -67,6 +73,7 @@ export default function PushSubscribeButton({
   target,
   hideHeading = false,
   bare = false,
+  surface = "place_footer",
 }: {
   target: PushTarget;
   /** 親セクションに見出しがある場合、内部の見出しを省いて二重表示を防ぐ。 */
@@ -76,6 +83,8 @@ export default function PushSubscribeButton({
    * 中に入れ子にするときに使う (カードの二重表示を防ぐ)。
    */
   bare?: boolean;
+  /** GA 計測用。この CTA がどの面に置かれているか。 */
+  surface?: NotifySurface;
 }) {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState<string>("");
@@ -146,8 +155,10 @@ export default function PushSubscribeButton({
   const subscribe = useCallback(async () => {
     setState("loading");
     setMessage("");
+    trackNotifyClick({ channel: "push", target: target.kind, surface });
     try {
       const permission = await Notification.requestPermission();
+      trackPushPermission({ result: permission, target: target.kind, surface });
       if (permission !== "granted") {
         setState(permission === "denied" ? "denied" : "idle");
         return;
@@ -182,13 +193,14 @@ export default function PushSubscribeButton({
       }
       setState("active");
       setMessage("通知を有効化しました");
+      trackNotifySubscribed({ channel: "push", target: target.kind, surface });
     } catch (e) {
       setState("idle");
       setMessage(
         `通知の有効化に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
       );
     }
-  }, [target]);
+  }, [target, surface]);
 
   const unsubscribe = useCallback(async () => {
     setState("loading");

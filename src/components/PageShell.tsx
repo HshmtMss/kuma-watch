@@ -69,6 +69,14 @@ export default function PageShell({ title, lead, children }: Props) {
             >
               お問合せ
             </a>
+            <span className="text-stone-300" aria-hidden>·</span>
+            {/* 一般向けゴール = 通知登録。全ページ共通フッターにも常設 (③)。 */}
+            <Link
+              href="/notify"
+              className="inline-block py-1 font-medium text-emerald-700 hover:text-emerald-800 hover:underline"
+            >
+              クマ出没通知を受け取る
+            </Link>
           </div>
           {/* 全ページの最下段に補足リンクを置く。法的ページへの導線をどのページからも辿れるようにする。 */}
           <LegalLinks />

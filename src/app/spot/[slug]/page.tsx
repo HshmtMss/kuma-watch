@@ -662,6 +662,7 @@ export default async function SpotPage({ params }: Props) {
               <NotifyCard
                 target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
                 hideHeading
+                surface="spot_visitor"
               />
             </div>
           ) : (
@@ -670,6 +671,7 @@ export default async function SpotPage({ params }: Props) {
                 <PushSubscribeButton
                   target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
                   hideHeading
+                  surface="spot_visitor"
                 />
               </div>
             )
@@ -1048,11 +1050,13 @@ export default async function SpotPage({ params }: Props) {
         (isLineEntryReleased() ? (
           <NotifyCard
             target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+            surface="spot_footer"
           />
         ) : (
           isSpotPushReleased() && (
             <PushSubscribeButton
               target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+              surface="spot_footer"
             />
           )
         ))}
