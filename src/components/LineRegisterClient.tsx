@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { lineAddFriendUrl } from "@/lib/line-links";
+import { trackNotifySubscribed } from "@/lib/analytics";
 
 /**
  * LIFF (LINE 内ブラウザ) で動く通知登録クライアント。
@@ -262,6 +263,8 @@ export default function LineRegisterClient({
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   // 解除の結果メッセージ (「解除しました」/ 失敗案内)。
   const [notice, setNotice] = useState("");
+  // 友だち追加から戻ったときに再判定するため、liff インスタンスを保持する (⑥)。
+  const liffRef = useRef<unknown>(null);
 
   // ── LIFF 初期化 ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -275,6 +278,7 @@ export default function LineRegisterClient({
       try {
         const liff = (await import("@line/liff")).default;
         await liff.init({ liffId: LIFF_ID });
+        liffRef.current = liff;
         if (!liff.isLoggedIn()) {
           // 戻ってきたときに対象を復元できるよう、飛ぶ前に退避する。
           if (initialTarget) stashTarget(initialTarget);
@@ -314,6 +318,24 @@ export default function LineRegisterClient({
       cancelled = true;
     };
   }, [initialTarget]);
+
+  // ── 友だち追加から戻ったら自動で再判定 (⑥) ───────────────────────────
+  // 未友だちだと「友だち追加 → この画面に戻る」の往復が要る。以前は戻っても
+  // 判定が古いまま (isFriend=false) で「もう一度開いて」と促していた。ここで
+  // タブが再表示されたタイミングに friendship を再取得し、追加済みになって
+  // いれば isFriend を true に上げて、そのまま登録ボタンを押せるようにする。
+  useEffect(() => {
+    if (phase !== "ready" || isFriend) return;
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible") return;
+      const liff = liffRef.current;
+      if (!liff) return;
+      const friend = await checkFriendship(liff);
+      if (friend) setIsFriend(true);
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [phase, isFriend]);
 
   // ── 現在の登録一覧を取得 ─────────────────────────────────────────────
   const loadSubs = useCallback(async (token: string) => {
@@ -362,6 +384,9 @@ export default function LineRegisterClient({
       });
       if (!res.ok) throw new Error(`登録に失敗しました (${res.status})`);
       setDone(true);
+      // LIFF (LINE 内) での購読完了。Web 側クリック (notify_click line) と対に
+      // なる、LINE ファネルの最終コンバージョン。surface は着地時点で不明。
+      trackNotifySubscribed({ channel: "line", target: target.kind });
       await loadSubs(idToken);
     } catch (e) {
       setErrMsg(e instanceof Error ? e.message : String(e));
@@ -474,7 +499,8 @@ export default function LineRegisterClient({
           )}
           {!isFriend && !done && (
             <p className="mt-2 text-xs leading-relaxed text-stone-500">
-              追加が終わったらこの画面に戻り、もう一度開いてください。
+              友だち追加が終わったら、この画面に戻ってください。追加を確認できると、
+              そのまま登録ボタンを押せるようになります。
             </p>
           )}
         </section>
