@@ -366,7 +366,7 @@ export default async function SpotPage({ params }: Props) {
 
   // 地図に飛ぶときに地点名も渡す。トップの選択カードに「富士山」など名前が出るので、
   // どこから来たかが視覚的に保たれ「連続性」が出る。
-  const mapUrl = `/?lat=${landmark.lat.toFixed(5)}&lon=${landmark.lon.toFixed(5)}&label=${encodeURIComponent(landmark.name)}`;
+  const mapUrl = `/?lat=${landmark.lat.toFixed(5)}&lon=${landmark.lon.toFixed(5)}&label=${encodeURIComponent(landmark.name)}&from=${encodeURIComponent(`/spot/${landmark.slug}`)}`;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",

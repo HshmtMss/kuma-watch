@@ -108,7 +108,7 @@ export default async function PrefPage({ params }: Props) {
       }
     : null;
   const prefMapUrl = prefCenter
-    ? `/?lat=${prefCenter.lat.toFixed(4)}&lon=${prefCenter.lon.toFixed(4)}&z=8&label=${encodeURIComponent(pref)}`
+    ? `/?lat=${prefCenter.lat.toFixed(4)}&lon=${prefCenter.lon.toFixed(4)}&z=8&label=${encodeURIComponent(pref)}&from=${encodeURIComponent(`/place/${pref}`)}`
     : "/";
   const latestDate = sortedMunis.reduce<string | null>(
     (best, m) => (m.latestDate && (!best || m.latestDate > best) ? m.latestDate : best),

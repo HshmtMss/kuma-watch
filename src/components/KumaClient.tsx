@@ -143,9 +143,11 @@ export default function KumaClient() {
   const [pickerMode, setPickerMode] = useState<null | "submit">(null);
   // useCallback([]) な検索/GPS ハンドラから最新の pickerMode を読むための ref。
   const pickerModeRef = useRef<null | "submit">(null);
-  // 観光地 / 市町村ページから ?lat=&lon=&label= 経由で来た場合のラベル。
-  // 表示中に「← {label} に戻る」ボタンを出して履歴を戻りやすくする。
+  // 観光地 / 市町村ページから「地図で見る」で来た場合の「← {label} に戻る」。
+  // 出すのは戻り先が明示された (?from=<内部パス>) ときだけ。通知/共有リンクは
+  // label はあっても from が無いので出さない (戻り先が存在しないため)。
   const [returnLabel, setReturnLabel] = useState<string | null>(null);
+  const [returnHref, setReturnHref] = useState<string | null>(null);
   const router = useRouter();
   const leafletMapRef = useRef<LeafletMap | null>(null);
   // ポーリング用: 現在の records と「最後に確認したデータ署名」を ref で保持する。
@@ -517,6 +519,8 @@ export default function KumaClient() {
       const qLon =
         lonParam !== null && lonParam !== "" ? Number(lonParam) : NaN;
       const qLabel = params.get("label") ?? undefined;
+      // 内部ページ (/place・/spot) の「地図で見る」だけが付ける戻り先パス。
+      const qFrom = params.get("from") ?? undefined;
       const fromUrl =
         Number.isFinite(qLat) &&
         Number.isFinite(qLon) &&
@@ -531,8 +535,12 @@ export default function KumaClient() {
           source: "url",
           label: qLabel,
         });
-        // URL に label がある = 観光地・市町村ページ等から戻れる経路。戻るボタンを出す。
-        if (qLabel) setReturnLabel(qLabel);
+        // from=<内部パス> があるときだけ「戻る」を出す。通知・共有リンクは
+        // label だけで from が無いので出さない (戻り先が無いのに「戻る」は誤り)。
+        if (qFrom && qFrom.startsWith("/")) {
+          setReturnHref(qFrom);
+          setReturnLabel(qLabel ?? "前のページ");
+        }
         return;
       }
 
@@ -839,11 +847,9 @@ export default function KumaClient() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (typeof window !== "undefined" && window.history.length > 1) {
-                      window.history.back();
-                    } else {
-                      router.push("/spot");
-                    }
+                    // 戻り先パスへ確実に遷移する (history.back は LINE 等の
+                    // アプリ内ブラウザで戻り先が無く不発になりがち)。
+                    if (returnHref) router.push(returnHref);
                   }}
                   className="flex h-11 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-semibold text-stone-800 shadow-md ring-1 ring-black/5 hover:bg-stone-50"
                   aria-label={`${returnLabel} のページに戻る`}
