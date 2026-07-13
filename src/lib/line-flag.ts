@@ -33,3 +33,18 @@ export function isLineEntryReleased(): boolean {
     isLineReleased() && process.env.NEXT_PUBLIC_LINE_ENTRY_ENABLED === "true"
   );
 }
+
+/**
+ * LINE 内 (LIFF) からの投稿ページ /line/submit を表示するかどうか。
+ *
+ * 「名前も URL も忘れた人が、LINE の友だちから公式アカウントを見つけ直して
+ * そこから投稿できる」ための入口。リッチメニュー等からこの LIFF を開く。
+ * 実際の受け付けは既存の /api/submit + SUBMIT_ENABLED に従う (このフラグは
+ * LIFF 投稿ページの表示可否だけを段階公開するためのもの。isLineEntryReleased
+ * と同じ二段構え)。未設定 / "true" 以外は OFF (フェイルセーフ)。
+ */
+export function isLineSubmitReleased(): boolean {
+  return (
+    isLineReleased() && process.env.NEXT_PUBLIC_LINE_SUBMIT_ENABLED === "true"
+  );
+}

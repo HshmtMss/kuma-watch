@@ -5,6 +5,7 @@ import {
   submissionsConfigured,
   type StoredSubmission,
 } from "@/lib/submission-store";
+import { verifyIdToken } from "@/lib/line-client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -181,10 +182,21 @@ export async function POST(req: Request) {
   const { photoDataUrl, ...rest } = result.payload;
   const origin = new URL(req.url).origin;
 
-  // 逆ジオコーディングと写真アップロードを並列実行
-  const [geo, photoUrl] = await Promise.all([
+  // LINE 内 (LIFF) 投稿は idToken を添えてくる。検証して userId を得る (なりすまし
+  // 防止のためクライアントの申告 userId は信用せず必ず検証)。Web の匿名投稿では
+  // idToken が無く、検証も未設定なら null になる。投稿自体はブロックしない。
+  const rawIdToken =
+    typeof (raw as Record<string, unknown>).idToken === "string"
+      ? ((raw as Record<string, unknown>).idToken as string)
+      : undefined;
+
+  // 逆ジオコーディング・写真アップロード・idToken 検証を並列実行
+  const [geo, photoUrl, lineUser] = await Promise.all([
     reverseGeocode(origin, rest.lat, rest.lon),
     photoDataUrl ? uploadPhoto(id, photoDataUrl) : Promise.resolve(undefined),
+    rawIdToken
+      ? verifyIdToken(rawIdToken).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const submission: StoredSubmission = {
@@ -204,6 +216,7 @@ export async function POST(req: Request) {
     sectionName: geo.sectionName,
     receivedAt: Date.now(),
     status: "pending",
+    lineUserId: lineUser?.userId,
   };
 
   // 個人情報 (連絡先・コメント本文) は Vercel ログに残さない。長さだけ記録。
@@ -215,6 +228,7 @@ export async function POST(req: Request) {
       pref: submission.prefectureName,
       city: submission.cityName,
       hasPhoto: Boolean(photoUrl),
+      via: lineUser ? "line" : "web",
       contactLen: rest.contact?.length ?? 0,
       commentLen: rest.comment?.length ?? 0,
     }),

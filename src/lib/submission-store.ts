@@ -45,6 +45,12 @@ export type StoredSubmission = {
   receivedAt: number; // epoch ms
   status: SubmissionStatus;
   reviewedAt?: number;
+  /**
+   * LINE 内 (LIFF) 投稿で idToken を検証して得た userId。Web からの匿名投稿では
+   * undefined。承認時の「地図に載りました」通知や、同一ユーザーの連投抑制に使う
+   * (投稿の公開表示はあくまで匿名)。
+   */
+  lineUserId?: string;
 };
 
 const ALL_KEY = "cs:all";
