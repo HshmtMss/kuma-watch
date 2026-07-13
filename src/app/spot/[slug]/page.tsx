@@ -1061,34 +1061,6 @@ export default async function SpotPage({ params }: Props) {
           )
         ))}
 
-      {/* B2B 導線 — 「安全情報ハブ提供」の funnel。公式ハブ (自治体デモ) のスポット
-          限定で表示し、一般の観光地ページには出さない (一般ユーザーの導線を邪魔しない)。 */}
-      {landmark.officialHub && (
-      <div className="not-prose my-8 rounded-xl border border-stone-200 bg-white p-5">
-        <h2 className="m-0 text-base font-bold text-stone-900">
-          公式のクマ情報を、来訪者・住民へ届けませんか
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-stone-700">
-          {landmark.name}周辺のように、公式ページで発表されたクマ出没情報を、登録した来訪者・住民の通知へ自動でお届けします。
-          発表を見に来ない方にも、公式情報が速く正確に届きます（{SUPERVISION}）。
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link
-            href="/for-gov"
-            className="inline-flex items-center gap-1.5 rounded-full bg-amber-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-amber-700"
-          >
-            自治体・観光事業者の方へ →
-          </Link>
-          <Link
-            href="/for-vendors"
-            className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 hover:border-stone-300 hover:bg-stone-50"
-          >
-            製品・サービスの掲載 →
-          </Link>
-        </div>
-      </div>
-      )}
-
       {/* 戻り導線 — ユーザーが「観光地一覧に戻る」を見失わないよう、
           目立つピル状リンクで本文末尾に明示。 */}
       <div className="not-prose mt-8">
