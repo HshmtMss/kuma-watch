@@ -70,54 +70,64 @@ export default function NotifyCard({
       : `${label} 周辺の新規出没を LINE で受け取る`;
 
   return (
-    <div className="not-prose mb-6 rounded-xl border border-stone-200 bg-white p-4">
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden
-          className="flex size-9 shrink-0 items-center justify-center rounded-full"
-          style={{ backgroundColor: LINE_GREEN }}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="size-5"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+    <div className="not-prose mb-6 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5">
+      {!hideHeading && (
+        <div className="mb-2.5 flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="flex size-9 shrink-0 items-center justify-center rounded-full"
+            style={{ backgroundColor: LINE_GREEN }}
           >
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-          </svg>
-        </span>
-
-        <div className="min-w-0 flex-1">
-          {!hideHeading && (
-            <p className="text-sm font-semibold text-stone-900">{heading}</p>
-          )}
-          <p
-            className={`text-xs leading-relaxed text-stone-600 ${hideHeading ? "" : "mt-0.5"}`}
-          >
-            新しい出没情報が入ると、LINE のトークに直接お知らせします。
-            アプリを入れたままで受け取れるので、iPhone でも設定は要りません。無料です。
-          </p>
-          <p className="mt-1.5 text-xs leading-relaxed text-stone-500">
-            初回は公式アカウントの友だち追加が必要です。解除は LINE のトーク画面からいつでもできます。
+            <svg
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+          </span>
+          <p className="text-sm font-semibold leading-snug text-stone-900 sm:text-base">
+            {heading}
           </p>
         </div>
+      )}
 
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() =>
-            trackNotifyClick({ channel: "line", target: target.kind, surface })
-          }
-          className="shrink-0 self-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-          style={{ backgroundColor: LINE_GREEN }}
+      <p className="text-xs leading-relaxed text-stone-600 sm:text-sm">
+        新しい出没情報が入ると、LINE のトークに直接お知らせします。
+        アプリを入れたままで受け取れるので、iPhone でも設定は要りません。無料です。
+      </p>
+      <p className="mt-1.5 text-xs leading-relaxed text-stone-500">
+        初回は公式アカウントの友だち追加が必要です。解除は LINE のトーク画面からいつでもできます。
+      </p>
+
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() =>
+          trackNotifyClick({ channel: "line", target: target.kind, surface })
+        }
+        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-opacity hover:opacity-90 sm:w-auto"
+        style={{ backgroundColor: LINE_GREEN }}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="size-4 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
         >
-          LINEで通知
-        </a>
-      </div>
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+        </svg>
+        LINEで通知を受け取る
+      </a>
 
       {/* 控え: ブラウザ通知。Push が使えない環境 (素の iPhone) では出さない。 */}
       {pushSupported && (
