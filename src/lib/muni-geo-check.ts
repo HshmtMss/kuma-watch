@@ -78,6 +78,22 @@ function haversineKm(
 }
 
 /**
+ * cityName が市区町村でなく都道府県名 (例: "埼玉県") になっている報道ピンか。
+ * この値は geocode 時に県代表点 (坂戸市付近など) へ丸められ、クマの出ない
+ * 市街地に目立つ誤ピンを生む「県代表点リーク」の跡。取り込み段 (news.ts) で
+ * 空へ倒して以後は防ぐが、既にスナップショットに載った分を読み取り段で即時に
+ * 隠すためのガード。実在の市町村は市/区/町/村/郡 で終わるので誤除去しない。
+ */
+export function isPrefLevelCity(
+  prefName: string | undefined,
+  cityName: string | undefined,
+): boolean {
+  const c = (cityName ?? "").trim();
+  if (!c) return false;
+  return c === (prefName ?? "").trim() || /[都道府県]$/.test(c);
+}
+
+/**
  * 報道ピンが市町村レベルで誤配置しているか。
  * 照合不能・整合(近い)なら false。
  */

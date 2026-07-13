@@ -419,7 +419,17 @@ export async function fetchNewsSightings(
     if (!article) continue;
     if (!s.date || !/^\d{4}-\d{2}-\d{2}/.test(s.date)) continue;
     const prefName = (s.prefectureName ?? "").trim();
-    const cityName = (s.cityName ?? "").trim();
+    // cityName に「市区町村」でなく都道府県名 (例: cityName="埼玉県") が入る
+    // ことがある。この値を geocodePlace に渡すと `if (!city)` ガードをすり抜け、
+    // Nominatim が県代表点 (埼玉県→坂戸市付近) を 1 点返して、クマの出ない
+    // 市街地に目立つ誤ピンが立つ (「県代表点リーク」)。都道府県名で終わる/
+    // 県名そのものの cityName は市区町村不明として空に倒し、下の県レベル
+    // スキップに流す。実在の市町村は市/区/町/村/郡 で終わるので誤除去しない。
+    const rawCity = (s.cityName ?? "").trim();
+    const cityName =
+      rawCity && (rawCity === prefName || /[都道府県]$/.test(rawCity))
+        ? ""
+        : rawCity;
     if (!prefName) continue;
     // 記事から明示座標が取れず市区町村も特定できない事案はスキップ。
     // 県名だけだと geocodePlace が県代表点 (例: 埼玉県→坂戸市付近) を返し、

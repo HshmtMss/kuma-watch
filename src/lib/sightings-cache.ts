@@ -5,7 +5,7 @@ import { getSharp9110Sightings } from "@/lib/sources/all-records";
 import { fetchNewsSightings } from "@/lib/sources/news";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
-import { isNewsMisplaced } from "@/lib/muni-geo-check";
+import { isNewsMisplaced, isPrefLevelCity } from "@/lib/muni-geo-check";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
@@ -27,7 +27,8 @@ function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
       !isNewsSuppressed(r.source, r.lat, r.lon) &&
       !(
         r.source === "news" &&
-        isNewsMisplaced(r.prefectureName, r.cityName, r.lat, r.lon)
+        (isNewsMisplaced(r.prefectureName, r.cityName, r.lat, r.lon) ||
+          isPrefLevelCity(r.prefectureName, r.cityName))
       ),
   );
 }
