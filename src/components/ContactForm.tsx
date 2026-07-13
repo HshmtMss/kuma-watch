@@ -3,11 +3,13 @@
 import { useState } from "react";
 
 /**
- * 問い合わせフォーム (汎用)。送信は mailto: でメーラーを開き、入力内容を
- * 件名 + 本文に pre-fill する。サーバー側エンドポイントは持たないので
- * メール環境がないユーザーでも、表示されたテンプレートをコピーして送れる。
+ * 問い合わせフォーム (汎用)。送信は /api/contact への JSON POST。サーバー側で
+ * Upstash に保存し (管理画面 /admin/contacts で一覧)、RESEND_API_KEY があれば
+ * メール通知も飛ぶ。送信ボタンだけで完結し、メールアプリは起動しない。送信後は
+ * フォームを空にして「送信しました」を表示する。
  *
  * 自治体 (/for-gov) と事業者 (/for-vendors) で見出し・項目・件名を変えて再利用。
+ * メール環境しか使いたくない人向けに、末尾に直接メールの導線も残す。
  */
 
 export type ContactKind = "gov" | "vendor";
@@ -51,30 +53,69 @@ const CONFIG: Record<ContactKind, { fields: FieldSpec[]; subject: string; intro:
 
 const TO = "contact@research-coordinate.co.jp";
 
+type Status = "idle" | "submitting" | "success" | "error";
+
 export default function ContactForm({ kind }: { kind: ContactKind }) {
   const cfg = CONFIG[kind];
   const [data, setData] = useState<Record<string, string>>({});
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+  // ボット除け (ハニーポット)。人間には見えない。埋まっていたらサーバーが捨てる。
+  const [honeypot, setHoneypot] = useState("");
 
   function handleChange(key: string, v: string) {
     setData((prev) => ({ ...prev, [key]: v }));
+    if (status === "error") setStatus("idle");
   }
 
-  function buildMailto() {
-    const lines = [cfg.intro, ""];
-    for (const f of cfg.fields) {
-      const v = data[f.key] ?? "";
-      lines.push(`■${f.label.replace(" (任意)", "")}:`);
-      lines.push(v || "(未記入)");
-      lines.push("");
-    }
-    const body = encodeURIComponent(lines.join("\n"));
-    const subject = encodeURIComponent(cfg.subject);
-    return `mailto:${TO}?subject=${subject}&body=${body}`;
-  }
-
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    window.location.href = buildMailto();
+    if (status === "submitting") return;
+    setStatus("submitting");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind,
+          name: data.name ?? "",
+          org: data.org ?? "",
+          email: data.email ?? "",
+          phone: data.phone ?? "",
+          message: data.message ?? "",
+          company_website: honeypot,
+        }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setData({});
+      setStatus("success");
+    } catch {
+      setStatus("error");
+      setErrorMsg(
+        "送信に失敗しました。お手数ですが、少し時間をおいて再度お試しいただくか、下記のメールアドレスへ直接ご連絡ください。",
+      );
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="not-prose rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center shadow-sm">
+        <p className="text-base font-semibold text-emerald-900">
+          送信しました。ありがとうございます。
+        </p>
+        <p className="mt-2 text-sm text-emerald-800">
+          担当より 3 営業日以内にご返信いたします。
+        </p>
+        <button
+          type="button"
+          onClick={() => setStatus("idle")}
+          className="mt-4 inline-flex items-center justify-center rounded-full border border-emerald-300 bg-white px-4 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-50"
+        >
+          続けて問い合わせる
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -82,6 +123,17 @@ export default function ContactForm({ kind }: { kind: ContactKind }) {
       onSubmit={handleSubmit}
       className="not-prose space-y-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"
     >
+      {/* ハニーポット: 画面外に隠す。ラベルは人が触らない名前に。 */}
+      <input
+        type="text"
+        name="company_website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        aria-hidden="true"
+        className="absolute left-[-9999px] h-0 w-0 opacity-0"
+      />
       {cfg.fields.map((f) => (
         <div key={f.key} className="space-y-1">
           <label
@@ -114,19 +166,25 @@ export default function ContactForm({ kind }: { kind: ContactKind }) {
           )}
         </div>
       ))}
+      {status === "error" && (
+        <p className="rounded-lg bg-rose-50 px-3 py-2 text-xs leading-relaxed text-rose-700">
+          {errorMsg}
+        </p>
+      )}
       <p className="text-[11px] leading-relaxed text-stone-500">
-        送信ボタンを押すと、ご利用のメールアプリが起動し、入力内容が件名・本文に挿入されます。
-        メールアプリが開かない場合は{" "}
+        送信ボタンを押すと、この内容が運営に届きます。担当より 3 営業日以内にご返信いたします。
+        うまく送れない場合は{" "}
         <a href={`mailto:${TO}`} className="font-semibold text-amber-700 underline">
           {TO}
         </a>{" "}
-        に直接ご連絡ください。3 営業日以内にご返信いたします。
+        へ直接メールでもご連絡いただけます。
       </p>
       <button
         type="submit"
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 sm:w-auto"
+        disabled={status === "submitting"}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:cursor-not-allowed disabled:bg-stone-300 sm:w-auto"
       >
-        この内容で送信する →
+        {status === "submitting" ? "送信中…" : "この内容で送信する →"}
       </button>
     </form>
   );

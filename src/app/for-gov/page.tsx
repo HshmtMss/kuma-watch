@@ -166,7 +166,7 @@ export default function ForGovPage() {
       {/* お問い合わせ */}
       <h2 id="contact">お問い合わせ</h2>
       <p>
-        ご相談内容を以下のフォームに記入して送信ボタンを押すと、ご利用のメールアプリが起動し、入力内容がメール本文に挿入されます。
+        以下のフォームにご記入のうえ送信ボタンを押すと、そのまま運営に届きます。担当より 3 営業日以内にご返信いたします。
       </p>
       <ContactForm kind="gov" />
       <div className="not-prose mt-4 flex flex-wrap gap-2 text-xs text-stone-600">
