@@ -5,22 +5,30 @@ import { getSharp9110Sightings } from "@/lib/sources/all-records";
 import { fetchNewsSightings } from "@/lib/sources/news";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
+import { isNewsMisplaced } from "@/lib/muni-geo-check";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
  * 元ソースのジオコーダー失敗で県名と座標が大きくズレているレコードを除外する。
  * 例: 「徳島県 那賀町」を主張しつつ座標が神奈川県内など。
- * あわせて、地域抑制リスト(news-suppression)に該当する報道ピンも除外する
- * (事実無根の報道由来ピンで実害が出ている地域を、読み取り段で即時に隠す)。
+ * あわせて以下も除外する:
+ *   - 地域抑制リスト(news-suppression)該当の報道ピン(実害地域を即時に隠す)。
+ *   - 市町村レベルの座標整合(muni-geo-check)で誤配置と判定された報道ピン
+ *     (県内での誤配置。県BBoxはすり抜けるので市町村重心で判定)。
  */
 function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
-  return records.filter((r) =>
-    typeof r.lat === "number" &&
-    typeof r.lon === "number" &&
-    Number.isFinite(r.lat) &&
-    Number.isFinite(r.lon) &&
-    latLonMatchesPrefecture(r.prefectureName, r.lat, r.lon) &&
-    !isNewsSuppressed(r.source, r.lat, r.lon),
+  return records.filter(
+    (r) =>
+      typeof r.lat === "number" &&
+      typeof r.lon === "number" &&
+      Number.isFinite(r.lat) &&
+      Number.isFinite(r.lon) &&
+      latLonMatchesPrefecture(r.prefectureName, r.lat, r.lon) &&
+      !isNewsSuppressed(r.source, r.lat, r.lon) &&
+      !(
+        r.source === "news" &&
+        isNewsMisplaced(r.prefectureName, r.cityName, r.lat, r.lon)
+      ),
   );
 }
 
