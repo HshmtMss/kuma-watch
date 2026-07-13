@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { resolveCanonicalMuniName } from "@/lib/muni-name";
 
 /**
- * /place/{pref}/{muni} の市町村ページに対する正規化リダイレクト。
+ * 実在しない URL を *ルート描画より前に* 308 で正規 URL へ集約するリダイレクト層。
+ * /place/{pref}/{muni} と /spot/{slug} はどちらも dynamicParams=false のため、
+ * マスターに無い URL は素の 404 になる。過去にインデックスされた URL が
+ * データ更新で消えると「見つかりませんでした(404)」が積み上がるので、ここで
+ * 関連ページへ 308 集約して 404 化を防ぐ。
  *
- * ニュース/研究ページが出没データの「生の地点名」(番地付き・字・公民館名・
- * バス停名 等) を市町村 URL として参照していた結果、マスターに無い URL が大量に
- * クロールされ、Search Console で「見つかりませんでした(404)」「代替ページ」が
- * 急増していた。
- *
- * ここで実在しない市町村 URL を *ルート描画より前に* 308 で正規 URL へ集約する:
- *   - マスター後方一致 → その市町村ページ (例: 小鹿野町 → 秩父郡小鹿野町)
- *   - 解決できなければ   → 都道府県ページ (/place/{pref})
+ * /place: ニュース/研究ページが出没データの「生の地点名」(番地付き・字・公民館名・
+ *   バス停名 等) を市町村 URL として参照 → マスター後方一致で市町村ページ、
+ *   解決不能なら都道府県ページ (/place/{pref}) へ。
+ * /spot:  ランドマークのマスター(japan-landmarks.ts)は拡張中で slug が
+ *   リネーム/削除されうる。消えた slug は観光地一覧 (/spot) へ 308。
  *
  * なぜ Server Component の permanentRedirect ではなく Proxy か:
  *   ページ本体での permanentRedirect は本番(Vercel)のストリーミング描画経路で
@@ -34,10 +36,27 @@ for (const m of JAPAN_MUNICIPALITIES) {
   if (mt) SEIREI_PARENT_KEYS.add(`${m.prefName}/${mt[1]}`);
 }
 
+// 実在するランドマーク slug。実在ページの O(1) 判定用。
+const LANDMARK_SLUGS = new Set(JAPAN_LANDMARKS.map((l) => l.slug));
+
 export function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
-  // "/place/{pref}/{muni}" の 3 セグメントのみを対象にする。
   const parts = pathname.split("/").filter(Boolean);
+
+  // "/spot/{slug}" の 2 セグメント: 実在しない slug は観光地一覧へ 308。
+  if (parts[0] === "spot" && parts.length === 2) {
+    let slug: string;
+    try {
+      slug = decodeURIComponent(parts[1]);
+    } catch {
+      return NextResponse.next();
+    }
+    if (LANDMARK_SLUGS.has(slug)) return NextResponse.next();
+    // /spot は 1 セグメントで matcher に一致しないためループしない。
+    return NextResponse.redirect(new URL("/spot", req.url), 308);
+  }
+
+  // "/place/{pref}/{muni}" の 3 セグメントのみを対象にする。
   if (parts[0] !== "place" || parts.length !== 3) {
     return NextResponse.next();
   }
@@ -67,5 +86,5 @@ export function proxy(req: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: "/place/:pref/:muni",
+  matcher: ["/place/:pref/:muni", "/spot/:slug"],
 };
