@@ -19,12 +19,12 @@ const SITE_URL = "https://kuma-watch.jp";
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: "都道府県から探す｜獣医師監修クマ出没マップ",
+  title: "市町村で探す｜獣医師監修クマ出没マップ",
   description:
     "獣医師監修・獣医工学ラボ運営。全国 47 都道府県のクマ出没情報を地域別に整理。北海道・東北・関東・中部・近畿・中国・四国・九州の各都道府県ページから、最新の出没件数・市町村別の警戒レベルを確認できます。",
   alternates: { canonical: `${SITE_URL}/place` },
   openGraph: {
-    title: "都道府県から探す｜獣医師監修クマ出没マップ｜KumaWatch",
+    title: "市町村で探す｜獣医師監修クマ出没マップ｜KumaWatch",
     description: "獣医師監修・獣医工学ラボ運営。47 都道府県のクマ出没情報を地域別に整理。",
     url: `${SITE_URL}/place`,
     type: "website",
@@ -98,8 +98,8 @@ export default async function PlacePage({
 
   return (
     <PageShell
-      title="都道府県から探す"
-      lead="47 都道府県のクマ出没情報を地域別に整理。気になる都道府県を選ぶと市町村別の詳細ページに進めます。"
+      title="市町村で探す"
+      lead="全国の市町村のクマ出没情報を整理しています。まず都道府県を選ぶと、市町村別の警戒度マップに進めます。"
     >
       <nav
         aria-label="パンくずリスト"
@@ -109,7 +109,7 @@ export default async function PlacePage({
           ホーム
         </Link>
         <span>›</span>
-        <span className="font-semibold text-stone-700">都道府県から探す</span>
+        <span className="font-semibold text-stone-700">市町村で探す</span>
       </nav>
 
       {/* ページ内の絞り込み検索（フラグ裏）。都道府県／市町村名で該当ページへ直行。

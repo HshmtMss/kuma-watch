@@ -208,11 +208,7 @@ export default async function SpotIndexPage({
           ホーム
         </Link>
         <span>›</span>
-        <Link href="/measures" className="hover:text-stone-900">
-          対策
-        </Link>
-        <span>›</span>
-        <span className="font-semibold text-stone-700">観光地から探す</span>
+        <span className="font-semibold text-stone-700">観光地・登山口から探す</span>
       </nav>
 
       {/* ページ内の絞り込み検索（フラグ裏）。観光地・登山口名で該当ページへ直行。 */}

@@ -220,7 +220,7 @@ export default function Page() {
       </ul>
       <p>
         各市町村の詳細は{" "}
-        <Link href="/place">都道府県から探す</Link>
+        <Link href="/place">市町村で探す</Link>
         で確認できます。
       </p>
 
