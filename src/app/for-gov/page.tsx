@@ -8,14 +8,14 @@ const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
 
 export const metadata: Metadata = {
-  title: "自治体の方へ｜獣医師監修クマ出没情報の連携・配信",
+  title: "自治体の方へ｜公式クマ情報を住民・観光客へ配信",
   description:
-    "獣医師監修・獣医工学ラボ運営。自治体さまが住民・観光客・登山者に届けたいメッセージを、KumaWatch が配信します。最短 1 回 30 分の打ち合わせで連携でき、追加作業はほぼ発生せず、無料でご利用いただけます。",
+    "御自治体が公式ページで発表したクマ出没情報を、登録した住民・観光客の通知へ自動でお届けします。まず 3 ヶ月無料でお試しいただけます。実装・運用は当社が担当します。",
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
     title: "自治体の方へ｜KumaWatch",
     description:
-      "自治体さまが住民・観光客に届けたいメッセージを配信。最短 1 回 30 分の打ち合わせで連携完了、追加作業ほぼなし、無料でご利用いただけます。",
+      "御自治体の公式クマ情報を、住民・観光客の通知へ自動でお届け。まず 3 ヶ月無料でお試しいただけます。",
     url: `${SITE_URL}/for-gov`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "自治体の方へ｜KumaWatch",
     description:
-      "自治体さまが住民・観光客に届けたいメッセージを配信。最短 1 回 30 分の打ち合わせで連携完了、無料でご利用いただけます。",
+      "御自治体の公式クマ情報を、住民・観光客の通知へ自動でお届け。まず 3 ヶ月無料でお試しいただけます。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
@@ -32,15 +32,15 @@ export const metadata: Metadata = {
 const PROCESS_STEPS = [
   {
     title: "ご相談",
-    body: "下のフォームから「連携を検討したい」とご一報ください。公式 HP・PDF・紙・SNS など、貴自治体の運用形態を問わずご対応いたします。",
+    body: "下のフォームからご一報ください。配信元にする公式ページ（HP・PDF・SNS 等）を確認します。運用形態は問いません。",
   },
   {
-    title: "30 分の打ち合わせ",
-    body: "オンライン 30 分で、住民・観光客に届けたいメッセージ・情報源・表示方法を一括ですり合わせます。技術的な実装はすべて当社で完結します。",
+    title: "設定",
+    body: "当社で配信を構築します。御自治体側の作業や、新しいシステム・専用 API・CSV のご準備は必要ありません。",
   },
   {
-    title: "本番反映",
-    body: "貴自治体専用ページが公開され、住民・観光客が「○○市 クマ」検索などで到達します。以降の更新運用も基本的に当社が担当します。",
+    title: "配信開始",
+    body: "御自治体専用の配信を開始します。まずは 3 ヶ月無料でお試しいただけます。",
   },
 ];
 
@@ -48,15 +48,15 @@ const PROCESS_STEPS = [
 const FAQ = [
   {
     q: "費用はかかりますか？",
-    a: "無料でご利用いただけます。自治体さまには連携費用も発生しません。",
+    a: "まず 3 ヶ月無料でお試しいただけます。以降はご利用規模に応じてご案内します。",
   },
   {
-    q: "自治体側の追加負担はありますか？",
-    a: "ほぼ発生しません。最短 1 回 30 分の打ち合わせで連携内容を確認したあとは、技術的な実装はすべて当社で完結します。新しいシステムや専用 API・CSV エクスポートをご準備いただく必要はありません。",
+    q: "自治体側の負担はありますか？",
+    a: "ありません。これまで通り公式ページに発表していただくだけです。検知・配信はすべて当社で完結します。",
   },
   {
-    q: "公式の出没情報ページが無くても連携できますか？",
-    a: "はい、可能です。HP がない、PDF・紙運用、広報誌中心、SNS のみ — 自治体さまの運用に合わせて方法を組み立てます。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。",
+    q: "公式の出没情報ページが無くても導入できますか？",
+    a: "ご相談ください。HP がない、PDF・紙運用、広報誌中心、SNS のみ — 御自治体の運用に合わせて配信元を組み立てます。",
   },
 ];
 
@@ -64,28 +64,31 @@ export default function ForGovPage() {
   return (
     <PageShell
       title="自治体の方へ"
-      lead="自治体さまが住民・観光客に届けたいメッセージを、KumaWatch が配信します。最短 1 回 30 分の打ち合わせで連携でき、追加作業はほぼ発生しません。"
+      lead="御自治体が公式ページで発表したクマ出没情報を、登録した住民・観光客の通知へ自動でお届けします。届けるのは御自治体の一次情報です。"
     >
-      {/* Hero — 3 メッセージ */}
+      {/* Hero */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-800">
-          自治体連携・最短 1 MTG で開始
+          自治体向け・公式情報の配信
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          自治体さまが伝えたいメッセージを、住民・観光客に届けます。
+          御自治体の公式クマ情報を、住民・観光客へ早く、正確に。
         </h2>
+        <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
+          公式ページで発表された情報を、登録した住民・観光客の通知へ自動でお届けします。届けるのは御自治体の一次情報です。
+        </p>
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
           <li className="flex gap-2">
             <span className="text-amber-600">✓</span>
-            <span><strong>最短 1 回 30 分</strong>の打ち合わせで連携開始</span>
+            <span>
+              公式に発表するだけで、見に来ない住民・観光客にも<strong>すぐ届く</strong>
+            </span>
           </li>
           <li className="flex gap-2">
             <span className="text-amber-600">✓</span>
-            <span><strong>無料</strong>でご利用いただけます (連携費用なし)</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-amber-600">✓</span>
-            <span><strong>獣医師監修</strong> / 獣医工学ラボ運営の専門サービス</span>
+            <span>
+              まず<strong>3 ヶ月、無料でお試し</strong>いただけます
+            </span>
           </li>
         </ul>
         <div className="flex flex-wrap gap-2">
@@ -105,30 +108,24 @@ export default function ForGovPage() {
         </div>
       </section>
 
-      {/* 何をするか — 1 段落 + 主要要素のチップで簡潔に */}
-      <h2>連携で何が起きるか</h2>
-      <p>
-        「○○市 クマ」で検索した住民・登山者・観光客に向けて、市町村単位の専用ページを自動で用意し、貴自治体が届けたい情報を組み込みます。公式 HP の取り込みは数ある手段の一例で、貴自治体の運用形態に合わせて柔軟に組み立てます。
-      </p>
+      {/* できること */}
+      <h2>できること</h2>
       <ul>
         <li>
-          <strong>自治体さまからのメッセージ</strong> — 注意喚起・対策呼びかけ・問い合わせ先など、伝えたい内容を掲載
+          御自治体が公式ページで発表した情報を、住民・観光客の通知へ<strong>自動でお届け</strong>
         </li>
         <li>
-          <strong>出没情報の整理表示</strong> — 公式 HP・PDF・広報誌・SNS など貴自治体の情報源に応じた形で整理
+          発表が<strong>すぐ届く</strong>（住民・観光客が見に来なくても届く）
         </li>
         <li>
-          <strong>一次出典へのリンク</strong> — 住民・観光客が公式情報に必ず戻れる導線
-        </li>
-        <li>
-          <strong>地図・時系列での把握</strong> — 地区別・月別件数・周辺市町村との比較
+          一次情報は<strong>御自治体の公式ページへ誘導</strong>（置き換えず、正確に）
         </li>
       </ul>
 
-      {/* 連携の流れ — 3 ステップ */}
+      {/* 導入の流れ — 3 ステップ */}
       <h2 id="process">3 ステップで開始</h2>
       <p>
-        貴自治体側のご対応は<strong>最短 1 回 30 分の打ち合わせ</strong>で完結します。技術的な実装はすべて当社で完結し、以降の運用も基本的に当社が担当します。
+        御自治体側のご対応は<strong>最初のご相談だけ</strong>。設定・運用はすべて当社で完結します。
       </p>
       <div className="not-prose my-5 space-y-3">
         {PROCESS_STEPS.map((p, i) => (
