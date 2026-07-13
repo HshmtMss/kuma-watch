@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import CategoryTiles, {
-  type CategoryTileItem,
-} from "@/components/CategoryTiles";
-import { MapPin, LayoutGrid, Mountain } from "lucide-react";
+import { Mountain } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import DirectorySearch, {
   type DirectoryItem,
 } from "@/components/DirectorySearch";
 import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
-import PlacePointClient from "./PlacePointClient";
+import PlaceDirectory, { type RegionData } from "./PlaceDirectory";
 import { getAllPrefSummaries } from "@/lib/place-index";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -45,56 +42,35 @@ const REGIONS: Region[] = [
   { label: "九州・沖縄", prefs: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"] },
 ];
 
-type SearchParams = Promise<{
-  lat?: string;
-  lon?: string;
-  name?: string;
-  src?: string;
-  region?: string;
-}>;
-
-function isValidLat(n: number) {
-  return Number.isFinite(n) && n >= 20 && n <= 50;
-}
-function isValidLon(n: number) {
-  return Number.isFinite(n) && n >= 120 && n <= 150;
-}
-
-export default async function PlacePage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const sp = await searchParams;
-  const lat = Number(sp.lat);
-  const lon = Number(sp.lon);
-
-  // 地点指定モード: 既存のシェアリンク等 (?lat=&lon=) を維持する。
-  if (sp.lat != null && sp.lon != null && isValidLat(lat) && isValidLon(lon)) {
-    return (
-      <main className="min-h-[100dvh] bg-stone-50">
-        <PlacePointClient lat={lat} lon={lon} name={sp.name} src={sp.src} />
-      </main>
-    );
-  }
-
-  // ディレクトリモード: 47 都道府県を地域ブロック単位で並べる。
+export default async function PlacePage() {
+  // ディレクトリ: 47 都道府県を地域ブロック単位で並べる。集計 (getAllPrefSummaries)
+  // は ISR 再生成時に 1 度だけ走り静的 HTML に焼き込まれる (リクエスト毎に 27MB を
+  // 読み直さない)。地域絞り込み・地点モード (?lat) はクライアント (PlaceDirectory)
+  // に持たせ、このページ自体は searchParams を読まず静的 (ISR) に保つ。
   const summaries = await getAllPrefSummaries();
   const byPref = new Map(summaries.map((s) => [s.prefectureName, s]));
 
-  // 地域フィルタ。URL ?region=北海道・東北 のような形で受け取る。
-  const validRegionLabels = new Set(REGIONS.map((r) => r.label));
-  const activeRegion: string =
-    sp.region && validRegionLabels.has(sp.region) ? sp.region : "all";
-
-  // 出没件数 (90日) でホットスポットを判別。上位 5 県だけ赤バッジで強調し、
-  // 残りは均一なカードでクリーンに見せる。多すぎる色は逆に視認性を下げるため。
+  // 出没件数 (90日) でホットスポットを判別。上位 5 県だけ赤バッジで強調する。
   const topCount90Set = new Set(
     [...summaries]
       .sort((a, b) => b.count90d - a.count90d)
       .slice(0, 5)
       .map((s) => s.prefectureName),
   );
+
+  const regions: RegionData[] = REGIONS.map((r) => ({
+    label: r.label,
+    cells: r.prefs.map((pref) => {
+      const s = byPref.get(pref);
+      const count90 = s?.count90d ?? 0;
+      return {
+        pref,
+        count365: s?.count365d ?? 0,
+        count90,
+        isHot: topCount90Set.has(pref) && count90 > 0,
+      };
+    }),
+  }));
 
   return (
     <PageShell
@@ -152,84 +128,7 @@ export default async function PlacePage({
         <span aria-hidden className="shrink-0 text-sm font-bold text-amber-700">→</span>
       </Link>
 
-      <CategoryTiles
-        title="地域で絞り込み"
-        activeKey={activeRegion}
-        items={[
-          {
-            key: "all",
-            href: "/place",
-            label: "すべて",
-            icon: LayoutGrid,
-            count: 47,
-          },
-          ...REGIONS.map<CategoryTileItem>((r) => ({
-            key: r.label,
-            href: `/place?region=${encodeURIComponent(r.label)}`,
-            label: r.label,
-            icon: MapPin,
-            count: r.prefs.length,
-          })),
-        ]}
-      />
-
-      {/* フィルタ選択時は該当地域のみ、全件時は全 7 ブロック並べる */}
-      {(activeRegion === "all"
-        ? REGIONS
-        : REGIONS.filter((r) => r.label === activeRegion)
-      ).map((region) => (
-        <section key={region.label} className="not-prose mt-6">
-          <h2 className="mb-3 text-lg font-bold text-stone-900 sm:text-xl">
-            {region.label}
-          </h2>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {region.prefs.map((pref) => {
-              const s = byPref.get(pref);
-              const count365 = s?.count365d ?? 0;
-              const count90 = s?.count90d ?? 0;
-              const isHot = topCount90Set.has(pref) && count90 > 0;
-              return (
-                <li key={pref}>
-                  <Link
-                    href={`/place/${encodeURIComponent(pref)}`}
-                    className={`flex flex-col gap-1.5 rounded-xl border bg-white px-3 py-2.5 hover:border-stone-300 hover:bg-stone-50 ${
-                      isHot ? "border-red-200" : "border-stone-200"
-                    }`}
-                  >
-                    {/* 県名を 1 行で確実に収めるため縦スタックにする。
-                        横並びだと右側のチップに押されて「北海\n道」のように
-                        2 行折返しが起きていた。 */}
-                    <span className="whitespace-nowrap text-base font-semibold text-stone-900">
-                      {pref}
-                    </span>
-                    {/* 直近1年 / 直近90日 の 2 段。値 0 でも淡色で残しスケール比較可能に。 */}
-                    <span className="flex flex-wrap items-baseline gap-1 text-xs">
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
-                          count365 > 0
-                            ? "bg-amber-100 text-amber-900"
-                            : "bg-stone-100 text-stone-400"
-                        }`}
-                      >
-                        1年 {count365.toLocaleString()}
-                      </span>
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
-                          count90 > 0
-                            ? "bg-red-100 text-red-700"
-                            : "bg-stone-100 text-stone-400"
-                        }`}
-                      >
-                        90日 {count90.toLocaleString()}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      <PlaceDirectory regions={regions} />
 
       {/* /place はヘッダーナビから直接来られる top-level なので「クマ対策トップに
           戻る」ボタンは画面遷移上のミスマッチ。ヘッダーナビ + パンくず + 各市町村

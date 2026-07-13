@@ -1,36 +1,17 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import CategoryTiles, {
-  type CategoryTileItem,
-} from "@/components/CategoryTiles";
-import {
-  Mountain,
-  Trees,
-  Hotel,
-  Waves,
-  Tent,
-  Camera,
-  ThermometerSun,
-  Droplets,
-  Footprints,
-  Sailboat,
-  LayoutGrid,
-  type LucideIcon,
-} from "lucide-react";
 import PageShell from "@/components/PageShell";
 import DirectorySearch, {
   type DirectoryItem,
 } from "@/components/DirectorySearch";
 import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
-import {
-  JAPAN_LANDMARKS,
-  type JapanLandmark,
-  type LandmarkCategory,
-} from "@/data/japan-landmarks";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import SpotDirectory, { type SpotLite } from "./SpotDirectory";
 
 const SITE_URL = "https://kuma-watch.jp";
 
+// ISR: 30 分ごとに再生成。カテゴリ絞り込み・ページ送りはクライアント側
+// (SpotDirectory) に持たせ、ページ自体は searchParams を読まず静的に保つ。
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
@@ -48,152 +29,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const CATEGORY_LABEL: Record<LandmarkCategory, string> = {
-  mountain: "山岳・登山口",
-  national_park: "国立公園",
-  resort: "観光・リゾート",
-  gorge: "渓谷・川遊び",
-  campground: "キャンプ場",
-  sightseeing: "観光名所",
-  onsen: "温泉地",
-  waterfall: "滝・自然",
-  trailhead: "トレイル",
-  lake: "湖・湖畔",
-};
-
-const CATEGORY_ICON: Record<LandmarkCategory, LucideIcon> = {
-  mountain: Mountain,
-  national_park: Trees,
-  resort: Hotel,
-  gorge: Waves,
-  campground: Tent,
-  sightseeing: Camera,
-  onsen: ThermometerSun,
-  waterfall: Droplets,
-  trailhead: Footprints,
-  lake: Sailboat,
-};
-
-
-const CATEGORY_ORDER: LandmarkCategory[] = [
-  "mountain",
-  "national_park",
-  "resort",
-  "sightseeing",
-  "onsen",
-  "gorge",
-  "waterfall",
-  "campground",
-  "lake",
-  "trailhead",
-];
-
-// 都道府県を地理順 (北→南 / JIS X 0401 コード順) で並べるための基準。
-// データ配列の登場順だと「ランダム」に見えるため、一覧表示はこの順に揃える。
-const PREF_ORDER: string[] = [
-  "北海道",
-  "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
-  "岐阜県", "静岡県", "愛知県", "三重県",
-  "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
-  "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-  "徳島県", "香川県", "愛媛県", "高知県",
-  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県",
-  "沖縄県",
-];
-const prefRank = (pref: string): number => {
-  const i = PREF_ORDER.indexOf(pref);
-  return i === -1 ? PREF_ORDER.length : i;
-};
-
-type SearchParams = Promise<{ cat?: string; page?: string }>;
-
-// カード一覧の 1 ページ表示件数。全件 (約2,000+) を一度に描画すると HTML が 8MB
-// 規模になり「観光地から探す」が非常に重くなるため、ページ送りで分割する。
-// 全観光地への網羅リンクは下の「都道府県別一覧」が担保する。
-const CARD_PAGE_SIZE = 60;
-
-export default async function SpotIndexPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const sp = await searchParams;
-  const validCats = new Set<string>(CATEGORY_ORDER);
-  const activeCat: string = sp.cat && validCats.has(sp.cat) ? sp.cat : "all";
-
-  // カテゴリ毎の件数 (フィルタバー用)
-  const countByCat: Record<LandmarkCategory, number> = {
-    mountain: 0,
-    national_park: 0,
-    resort: 0,
-    gorge: 0,
-    campground: 0,
-    sightseeing: 0,
-    onsen: 0,
-    waterfall: 0,
-    trailhead: 0,
-    lake: 0,
-  };
-  for (const l of JAPAN_LANDMARKS) countByCat[l.category]++;
-
-  const visible =
-    activeCat === "all"
-      ? JAPAN_LANDMARKS
-      : JAPAN_LANDMARKS.filter((l) => l.category === activeCat);
-
-  // カード一覧のページ送り (初期 HTML を軽くするため一度に CARD_PAGE_SIZE 件のみ)。
-  const totalPages = Math.max(1, Math.ceil(visible.length / CARD_PAGE_SIZE));
-  const currentPage = Math.min(
-    Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1),
-    totalPages,
-  );
-  const pageCards = visible.slice(
-    (currentPage - 1) * CARD_PAGE_SIZE,
-    currentPage * CARD_PAGE_SIZE,
-  );
-  const cardRangeStart = (currentPage - 1) * CARD_PAGE_SIZE + 1;
-  const cardRangeEnd = Math.min(currentPage * CARD_PAGE_SIZE, visible.length);
-  const pageHref = (p: number): string => {
-    const params = new URLSearchParams();
-    if (activeCat !== "all") params.set("cat", activeCat);
-    if (p > 1) params.set("page", String(p));
-    const q = params.toString();
-    return q ? `/spot?${q}` : "/spot";
-  };
-
-  // 都道府県別一覧: グルーピング → 地理順ソート → 高さがほぼ揃うよう
-  // 3カラムへ順番に分配する。CSS multi-column は列の開始位置がずれて
-  // 見栄えが悪いため、サーバー側で決め打ち分配して flex で並べる。
-  type PrefBlock = [string, JapanLandmark[]];
-  const byPref = new Map<string, JapanLandmark[]>();
-  for (const l of JAPAN_LANDMARKS) {
-    const arr = byPref.get(l.prefName) ?? [];
-    arr.push(l);
-    byPref.set(l.prefName, arr);
-  }
-  const prefBlocks: PrefBlock[] = [...byPref.entries()].sort(
-    (a, b) => prefRank(a[0]) - prefRank(b[0]),
-  );
-  const PREF_COL_COUNT = 3;
-  // 各ブロックの概算高さ (ヘッダー + ピル件数)
-  const blockWeights = prefBlocks.map(([, items]) => items.length + 2);
-  const prefColumns: PrefBlock[][] = Array.from(
-    { length: PREF_COL_COUNT },
-    () => [],
-  );
-  // 地理順のまま「その時点で最も低い列」へ順に積むマソンリー配置。
-  // 先頭行が 北海道 ｜ 青森 ｜ 岩手 … と左→右に並び、列内も北→南を維持。
-  const colHeights = new Array<number>(PREF_COL_COUNT).fill(0);
-  prefBlocks.forEach((block, i) => {
-    let min = 0;
-    for (let c = 1; c < PREF_COL_COUNT; c++) {
-      if (colHeights[c] < colHeights[min]) min = c;
-    }
-    prefColumns[min].push(block);
-    colHeights[min] += blockWeights[i];
-  });
+export default function SpotIndexPage() {
+  // 全観光地を軽量投影してクライアントに 1 度だけ渡す (静的ページ + 即時フィルタ)。
+  const spots: SpotLite[] = JAPAN_LANDMARKS.map((l) => ({
+    slug: l.slug,
+    name: l.name,
+    prefName: l.prefName,
+    muniName: l.muniName,
+    category: l.category,
+    imageUrl: l.imageUrl,
+    blurb: l.blurb,
+  }));
 
   return (
     <PageShell
@@ -223,168 +69,7 @@ export default async function SpotIndexPage({
         />
       )}
 
-      <CategoryTiles
-        title="カテゴリで絞り込み"
-        activeKey={activeCat}
-        items={[
-          {
-            key: "all",
-            href: "/spot",
-            label: "すべて",
-            icon: LayoutGrid,
-            count: JAPAN_LANDMARKS.length,
-          },
-          ...CATEGORY_ORDER.map<CategoryTileItem>((cat) => ({
-            key: cat,
-            href: `/spot?cat=${cat}`,
-            label: CATEGORY_LABEL[cat],
-            icon: CATEGORY_ICON[cat],
-            count: countByCat[cat],
-          })),
-        ]}
-      />
-
-      {/* 都道府県別一覧 — 全件表示中のみ俯瞰として表示 (フィルタ中は邪魔なので隠す) */}
-      {activeCat === "all" && (
-        <section className="not-prose my-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="text-base font-bold text-stone-900 sm:text-lg">
-              都道府県別一覧
-            </h2>
-            <span className="text-sm text-stone-500">
-              全 {JAPAN_LANDMARKS.length} 件
-            </span>
-          </div>
-          {/* サーバー側で3カラムに分配。各列の先頭が揃い、隙間も出ない。
-              モバイル/タブレットでは縦積み (列1→列2→列3 で地理順を維持)。 */}
-          <div className="flex flex-col gap-5 md:flex-row md:gap-x-8 md:gap-y-0">
-            {prefColumns.map((column, ci) => (
-              <div key={ci} className="flex flex-1 flex-col gap-5">
-                {column.map(([pref, items]) => (
-                  <div key={pref}>
-                    <div className="mb-2 flex items-center gap-2 border-b border-stone-200 pb-1.5">
-                      <span className="text-sm font-bold text-stone-800">
-                        {pref}
-                      </span>
-                      <span className="rounded-full bg-stone-100 px-1.5 py-0.5 text-xs font-medium tabular-nums text-stone-500">
-                        {items.length}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {items.map((l) => (
-                        <Link
-                          key={l.slug}
-                          href={`/spot/${encodeURIComponent(l.slug)}`}
-                          className="spot-pill"
-                        >
-                          {l.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* カード一覧 — フィルタ選択中はそのカテゴリのみ。全件は重いのでページ送り。 */}
-      <section className="not-prose mt-6">
-        <div className="mb-2 flex items-baseline justify-between text-sm text-stone-500">
-          <span>
-            {activeCat === "all"
-              ? "すべての観光地"
-              : CATEGORY_LABEL[activeCat as LandmarkCategory]}
-          </span>
-          <span className="tabular-nums">
-            {visible.length.toLocaleString()} 件中 {cardRangeStart.toLocaleString()}–
-            {cardRangeEnd.toLocaleString()} 件
-          </span>
-        </div>
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {pageCards.map((l) => (
-            <li key={l.slug}>
-              <Link
-                href={`/spot/${encodeURIComponent(l.slug)}`}
-                className="group flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm hover:border-stone-300 hover:shadow"
-              >
-                {l.imageUrl ? (
-                  <div className="relative aspect-[16/10] w-full bg-stone-100">
-                    <Image
-                      src={l.imageUrl}
-                      alt={`${l.name}の写真`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-stone-300">
-                    {(() => {
-                      const Ico = CATEGORY_ICON[l.category];
-                      return <Ico size={40} strokeWidth={1.4} aria-hidden />;
-                    })()}
-                  </div>
-                )}
-                <div className="flex flex-1 flex-col p-4">
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-base font-semibold text-stone-900">
-                      {l.name}
-                    </div>
-                    <div className="text-xs text-stone-500">
-                      {l.prefName}
-                      {l.muniName ? `・${l.muniName}` : ""}
-                    </div>
-                  </div>
-                  <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-stone-600">
-                    {l.blurb}
-                  </p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* ページ送り。全観光地への網羅リンクは上の「都道府県別一覧」が担保する。 */}
-        {totalPages > 1 && (
-          <nav
-            className="mt-6 flex items-center justify-center gap-4 text-sm font-medium"
-            aria-label="観光地一覧のページ送り"
-          >
-            {currentPage > 1 ? (
-              <Link
-                href={pageHref(currentPage - 1)}
-                className="rounded-full border border-stone-300 bg-white px-4 py-2 text-stone-700 hover:bg-stone-50"
-                rel="prev"
-              >
-                ← 前へ
-              </Link>
-            ) : (
-              <span className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-stone-300">
-                ← 前へ
-              </span>
-            )}
-            <span className="tabular-nums text-stone-500">
-              {currentPage} / {totalPages}
-            </span>
-            {currentPage < totalPages ? (
-              <Link
-                href={pageHref(currentPage + 1)}
-                className="rounded-full border border-stone-300 bg-white px-4 py-2 text-stone-700 hover:bg-stone-50"
-                rel="next"
-              >
-                次へ →
-              </Link>
-            ) : (
-              <span className="rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-stone-300">
-                次へ →
-              </span>
-            )}
-          </nav>
-        )}
-      </section>
+      <SpotDirectory spots={spots} />
 
       {/* /spot はヘッダーナビから直接来られる top-level なので「クマ対策トップに
           戻る」ボタンは画面遷移上のミスマッチ。ヘッダーナビ + パンくず + 各観光地

@@ -22,12 +22,19 @@ type Props = {
   items: CategoryTileItem[];
   /** 現在選択中のキー。マッチするタイルを active 表示。 */
   activeKey: string;
+  /**
+   * 指定すると各タイルを Link ではなく button として描画し、クリック時に
+   * onSelect(key) を呼ぶ。ページ遷移せずクライアント側で絞り込みたいとき用
+   * (静的ページ + 即時フィルタ)。未指定なら従来どおり item.href への Link。
+   */
+  onSelect?: (key: string) => void;
 };
 
 export default function CategoryTiles({
   title = "カテゴリから探す",
   items,
   activeKey,
+  onSelect,
 }: Props) {
   return (
     <nav aria-label={title} className="not-prose mb-6">
@@ -38,36 +45,53 @@ export default function CategoryTiles({
         {items.map((item) => {
           const Icon = item.icon ?? CATEGORY_ICONS[item.key];
           const isActive = item.key === activeKey;
+          const className = `flex h-full w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
+            isActive
+              ? "border-amber-500 bg-amber-50 text-amber-900 shadow-sm"
+              : "border-stone-200 bg-white text-stone-700 hover:border-amber-300 hover:bg-amber-50/40 hover:shadow-sm"
+          }`;
+          const inner = (
+            <>
+              {Icon && (
+                <Icon
+                  className={`shrink-0 ${isActive ? "text-amber-600" : "text-stone-500"}`}
+                  size={20}
+                  strokeWidth={1.8}
+                  aria-hidden
+                />
+              )}
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="block truncate text-sm font-bold">
+                  {item.label}
+                </span>
+                {typeof item.count === "number" && (
+                  <span className="text-[11px] tabular-nums text-stone-400">
+                    {item.count.toLocaleString()}件
+                  </span>
+                )}
+              </span>
+            </>
+          );
           return (
             <li key={item.key}>
-              <Link
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex h-full items-center gap-2.5 rounded-xl border px-3 py-2.5 transition ${
-                  isActive
-                    ? "border-amber-500 bg-amber-50 text-amber-900 shadow-sm"
-                    : "border-stone-200 bg-white text-stone-700 hover:border-amber-300 hover:bg-amber-50/40 hover:shadow-sm"
-                }`}
-              >
-                {Icon && (
-                  <Icon
-                    className={`shrink-0 ${isActive ? "text-amber-600" : "text-stone-500"}`}
-                    size={20}
-                    strokeWidth={1.8}
-                    aria-hidden
-                  />
-                )}
-                <span className="min-w-0 flex-1 leading-tight">
-                  <span className="block truncate text-sm font-bold">
-                    {item.label}
-                  </span>
-                  {typeof item.count === "number" && (
-                    <span className="text-[11px] tabular-nums text-stone-400">
-                      {item.count.toLocaleString()}件
-                    </span>
-                  )}
-                </span>
-              </Link>
+              {onSelect ? (
+                <button
+                  type="button"
+                  onClick={() => onSelect(item.key)}
+                  aria-current={isActive ? "page" : undefined}
+                  className={className}
+                >
+                  {inner}
+                </button>
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={className}
+                >
+                  {inner}
+                </Link>
+              )}
             </li>
           );
         })}
