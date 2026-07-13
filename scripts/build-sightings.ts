@@ -14,6 +14,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { aggregateAllSightings } from "../src/lib/sightings-cache";
+import { isPrefLevelCity } from "../src/lib/muni-geo-check";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 // 全体再集約 (aggregateAllSightings) が生成する公式ソースの種別。これらは
@@ -76,7 +77,11 @@ async function main(): Promise<void> {
       // 市区町村が特定できていない news は、旧ジオコーダが県代表点
       // (例: 埼玉県→坂戸市付近) に積み上げた誤ピン。繰り越さず自然に浄化する。
       // (新規取り込みは news.ts / geocode.ts 側で既に弾いている)
-      (r.sourceKind !== "news" || (r.cityName ?? "").trim() !== ""),
+      (r.sourceKind !== "news" || (r.cityName ?? "").trim() !== "") &&
+      // cityName に市区町村でなく都道府県名 (例 "埼玉県") が入った news も
+      // 同じ県代表点リーク。読み取り段では既に隠しているが、スナップショット
+      // 本体・件数からも恒久除去するため繰り越さない (自然浄化)。
+      (r.sourceKind !== "news" || !isPrefLevelCity(r.prefectureName, r.cityName)),
   );
 
   const records = [...fresh, ...carried];

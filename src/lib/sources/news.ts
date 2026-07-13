@@ -413,6 +413,7 @@ export async function fetchNewsSightings(
   }
 
   const out: UnifiedSighting[] = [];
+  let droppedPlaceMismatch = 0;
   for (let i = 0; i < drafts.length; i++) {
     const s = drafts[i];
     const article = items[s.index];
@@ -435,6 +436,27 @@ export async function fetchNewsSightings(
     // 県名だけだと geocodePlace が県代表点 (例: 埼玉県→坂戸市付近) を返し、
     // クマの出ない市街地に誤ピンが立つ。県レベルの曖昧な報道は地図に載せない。
     if (!cityName && typeof s.lat !== "number") continue;
+
+    // 誤帰属 (hallucination) 対策: LLM が返した地名が記事本文 (title+description)
+    // に一切現れない場合、その場所への帰属は捏造の可能性が高い (別地域の記事を
+    // 誤った市町村に紐付ける = 網走・岡山型の苦情の核心)。県名/市町村名/地区名の
+    // 頭のいずれも記事に出てこないレコードは取り込まない。全て不一致の時だけ落とす
+    // 保守的判定なので、記事が地名を明示する正当な事案は残る (「岡山県」表記の
+    // 記事に cityName「鏡野町」だけでも、県名一致で通る)。
+    const hay = `${article.title} ${article.description}`;
+    const sectionHead = (s.sectionName ?? "").split(/[\s　0-9０-９]/)[0];
+    const prefBare = prefName.replace(/[都道府県]$/, "");
+    const cityBare = cityName.replace(/[市区町村]$/, "");
+    const placeMentioned =
+      (prefName.length >= 2 && hay.includes(prefName)) ||
+      (prefBare.length >= 2 && hay.includes(prefBare)) ||
+      (cityName.length >= 2 && hay.includes(cityName)) ||
+      (cityBare.length >= 2 && hay.includes(cityBare)) ||
+      (sectionHead.length >= 2 && hay.includes(sectionHead));
+    if (!placeMentioned) {
+      droppedPlaceMismatch++;
+      continue;
+    }
 
     // LLM が明示する lat/lon は記事に無い座標を捏造することがあり、県名と
     // 無関係な遠隔地 (北海道・東北など) に飛ぶ。両方揃っていて かつ 県名の
@@ -502,7 +524,10 @@ export async function fetchNewsSightings(
     });
   }
 
-  console.log(`[news] extracted ${out.length} sightings from ${items.length} articles`);
+  console.log(
+    `[news] extracted ${out.length} sightings from ${items.length} articles` +
+      ` (dropped ${droppedPlaceMismatch} place-mismatch)`,
+  );
   memo = { at: now, data: out };
   return out;
 }
