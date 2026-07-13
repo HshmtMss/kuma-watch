@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { MapPin } from "lucide-react";
 import { lineAddFriendUrl } from "@/lib/line-links";
 import { trackNotifySubscribed } from "@/lib/analytics";
 
@@ -509,6 +511,28 @@ export default function LineRegisterClient({
       {errMsg && phase === "ready" && (
         <p className="mt-3 text-sm text-red-600">{errMsg}</p>
       )}
+
+      {/* 通知を受け取る場所を選ぶ導線。
+          バラで開いた登録ページ (target 無し) は「登録中の一覧＋個別解除」しか
+          できず、新規に通知を始められない行き止まりだった (リッチメニューや
+          友だち追加あいさつがここに着地する)。地図で場所を選んで登録へ進む入口を
+          常設する。登録先は自宅とは限らない (実家・職場・山畑・お出かけ先など) ため、
+          「場所」を中立に指す文言にし、例示で登録の裾野を示す。 */}
+      <section className="mt-5 rounded-2xl border border-stone-200 bg-white p-4">
+        <p className="text-sm font-bold text-stone-900">
+          通知を受け取る場所を選ぶ
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-stone-500">
+          自宅・実家・職場・よく行く山や畑など、気になる場所ごとに登録できます。
+        </p>
+        <Link
+          href="/"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
+        >
+          <MapPin size={18} aria-hidden />
+          地図で場所を選ぶ
+        </Link>
+      </section>
 
       {/* 現在の登録一覧 */}
       <section className="mt-6">
