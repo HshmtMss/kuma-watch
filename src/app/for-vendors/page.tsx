@@ -202,7 +202,7 @@ export default function ForVendorsPage() {
           <Link href="/for-gov" className="text-amber-700 underline">
             自治体の方へ
           </Link>
-          をご用意しています。住民・観光客に届けたいメッセージの掲載は無料でご利用いただけます。
+          をご用意しています。公式ページで発表されたクマ出没情報を、住民・観光客の通知へ自動でお届けする配信サービスです。
         </div>
       </details>
 

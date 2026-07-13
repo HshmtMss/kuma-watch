@@ -1066,11 +1066,11 @@ export default async function SpotPage({ params }: Props) {
       {landmark.officialHub && (
       <div className="not-prose my-8 rounded-xl border border-stone-200 bg-white p-5">
         <h2 className="m-0 text-base font-bold text-stone-900">
-          この安全情報ハブを、貴施設・自治体に
+          公式のクマ情報を、来訪者・住民へ届けませんか
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-stone-700">
-          {landmark.name}周辺のように、観光地・登山口・施設まわりのクマ出没を、警察・自治体・報道から集約し、
-          来訪者とスタッフへ速く正確に届けます。共同ブランド掲示・スタッフ向け通知・多言語対応などもご相談いただけます（{SUPERVISION}）。
+          {landmark.name}周辺のように、公式ページで発表されたクマ出没情報を、登録した来訪者・住民の通知へ自動でお届けします。
+          発表を見に来ない方にも、公式情報が速く正確に届きます（{SUPERVISION}）。
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link
