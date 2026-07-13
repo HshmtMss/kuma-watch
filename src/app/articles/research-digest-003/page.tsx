@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-003")!;
@@ -40,43 +41,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Automated facial recognition for wildlife that lack unique markings: A deep learning approach for brown bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Clapham, M., Miller, E., Nguyen, M., &amp; Darimont, C. T. (2020).{" "}
-          <em className="not-italic">Ecology and Evolution</em> 10(23): 12883–12892.
-        </div>
-        <a
-          href="https://doi.org/10.1002/ece3.6840"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1002/ece3.6840 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Automated facial recognition for wildlife that lack unique markings: A deep learning approach for brown bears"
+        citation={
+          <>
+            Clapham, M., Miller, E., Nguyen, M., &amp; Darimont, C. T. (2020).{" "}
+            <em className="not-italic">Ecology and Evolution</em> 10(23): 12883–12892.
+          </>
+        }
+        href="https://doi.org/10.1002/ece3.6840"
+        linkText="DOI: 10.1002/ece3.6840 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ヒグマ <strong>132 個体・4,674 枚</strong>の画像を学習し、AI が顔だけで個体識別
-          </li>
-          <li>
+          </>,
+          <>
             人間専門家とほぼ同等の <strong>84% 精度</strong>を達成
-          </li>
-          <li>
+          </>,
+          <>
             個体数推定の <strong>「自動化」</strong>がついに視野に入った
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -348,57 +339,39 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Automated facial recognition for wildlife that lack unique markings: A deep learning approach for brown bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Clapham, M., Miller, E., Nguyen, M., &amp; Darimont, C. T. (2020).{" "}
-              <em className="not-italic">Ecology and Evolution</em> 10(23): 12883–12892.
-            </div>
-            <a
-              href="https://doi.org/10.1002/ece3.6840"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1002/ece3.6840 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Automatically identifying, counting, and describing wild animals in camera-trap images with deep learning（カメラトラップ AI の基礎論文）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Norouzzadeh, M. S., Nguyen, A., Kosmala, M., et al. (2018).{" "}
-              <em className="not-italic">PNAS</em> 115(25): E5716–E5725.
-            </div>
-            <a
-              href="https://doi.org/10.1073/pnas.1719367115"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1073/pnas.1719367115 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              BearID Project — Clapham らの非営利開発プロジェクト
-            </div>
-            <a
-              href="https://bearid.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              bearid.org →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Automated facial recognition for wildlife that lack unique markings: A deep learning approach for brown bears（本号メイン）",
+            citation: (
+              <>
+                Clapham, M., Miller, E., Nguyen, M., &amp; Darimont, C. T. (2020).{" "}
+                <em className="not-italic">Ecology and Evolution</em> 10(23): 12883–12892.
+              </>
+            ),
+            href: "https://doi.org/10.1002/ece3.6840",
+            linkText: "DOI: 10.1002/ece3.6840 →",
+          },
+          {
+            title:
+              "Automatically identifying, counting, and describing wild animals in camera-trap images with deep learning（カメラトラップ AI の基礎論文）",
+            citation: (
+              <>
+                Norouzzadeh, M. S., Nguyen, A., Kosmala, M., et al. (2018).{" "}
+                <em className="not-italic">PNAS</em> 115(25): E5716–E5725.
+              </>
+            ),
+            href: "https://doi.org/10.1073/pnas.1719367115",
+            linkText: "DOI: 10.1073/pnas.1719367115 →",
+          },
+          {
+            title: "BearID Project — Clapham らの非営利開発プロジェクト",
+            href: "https://bearid.org/",
+            linkText: "bearid.org →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -406,16 +379,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.4
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「気候変動でクマの冬眠は短くなっている？」</strong> —
-          ヨーロッパヒグマの 22 年分の冬眠データを分析した Pigeon 2016 を精読。
-          冬眠開始が 2 週間遅れ、覚醒が早まり、活動期間が年 1 ヶ月以上延びる現象を解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.4">
+        <strong>「気候変動でクマの冬眠は短くなっている？」</strong> —
+        ヨーロッパヒグマの 22 年分の冬眠データを分析した Pigeon 2016 を精読。
+        冬眠開始が 2 週間遅れ、覚醒が早まり、活動期間が年 1 ヶ月以上延びる現象を解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

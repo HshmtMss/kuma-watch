@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-028")!;
@@ -39,43 +40,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Economic aspects of large carnivore-livestock conflicts in Romania
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Mertens, A., &amp; Promberger, C. (2001).{" "}
-          <em className="not-italic">Ursus</em> 12: 173–180.
-        </div>
-        <a
-          href="https://www.jstor.org/stable/3873242"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          JSTOR で見る →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Economic aspects of large carnivore-livestock conflicts in Romania"
+        citation={
+          <>
+            Mertens, A., &amp; Promberger, C. (2001).{" "}
+            <em className="not-italic">Ursus</em> 12: 173–180.
+          </>
+        }
+        href="https://www.jstor.org/stable/3873242"
+        linkText="JSTOR で見る →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ルーマニアの羊飼いを 6 年・<strong>200 件超</strong>の家畜被害を追跡
-          </li>
-          <li>
+          </>,
+          <>
             羊 1 頭あたりの損失は <strong>「肉の値段の 5 倍以上」</strong>になる場合も
-          </li>
-          <li>
+          </>,
+          <>
             補償制度・共存技術への <strong>「保護への投資」</strong>が経済的に正解
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -417,49 +408,35 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Economic aspects of large carnivore-livestock conflicts in Romania（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mertens, A., &amp; Promberger, C. (2001).{" "}
-              <em className="not-italic">Ursus</em> 12: 173–180.
-            </div>
-            <a
-              href="https://www.jstor.org/stable/3873242"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              JSTOR で見る →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Economic costs of livestock predation by carnivores in Europe
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Kaczensky, P. (1999).{" "}
-              <em className="not-italic">Ursus</em> 11: 59–71.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              鳥獣被害防止総合対策交付金（農林水産省）
-            </div>
-            <a
-              href="https://www.maff.go.jp/j/seisan/tyozyu/higai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              maff.go.jp →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Economic aspects of large carnivore-livestock conflicts in Romania（本号メイン）",
+            citation: (
+              <>
+                Mertens, A., &amp; Promberger, C. (2001).{" "}
+                <em className="not-italic">Ursus</em> 12: 173–180.
+              </>
+            ),
+            href: "https://www.jstor.org/stable/3873242",
+            linkText: "JSTOR で見る →",
+          },
+          {
+            title: "Economic costs of livestock predation by carnivores in Europe",
+            citation: (
+              <>
+                Kaczensky, P. (1999).{" "}
+                <em className="not-italic">Ursus</em> 11: 59–71.
+              </>
+            ),
+          },
+          {
+            title: "鳥獣被害防止総合対策交付金（農林水産省）",
+            href: "https://www.maff.go.jp/j/seisan/tyozyu/higai/",
+            linkText: "maff.go.jp →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -467,16 +444,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.29
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは森の『清掃員』だった」</strong> —
-          オオカミ・コヨーテと並ぶ重要な腐肉食者としてのクマの生態系役割。
-          動物の死体が森を巡るリサイクルメカニズムを精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.29">
+        <strong>「クマは森の『清掃員』だった」</strong> —
+        オオカミ・コヨーテと並ぶ重要な腐肉食者としてのクマの生態系役割。
+        動物の死体が森を巡るリサイクルメカニズムを精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

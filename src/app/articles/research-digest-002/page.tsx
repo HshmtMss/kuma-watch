@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-002")!;
@@ -38,43 +39,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Rapid ecological and behavioural changes in carnivores: the responses of black bears (Ursus americanus) to altered food
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Beckmann, J. P., &amp; Berger, J. (2003).{" "}
-          <em className="not-italic">Journal of Zoology</em> 261(2): 207–212.
-        </div>
-        <a
-          href="https://doi.org/10.1017/S0952836903004126"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1017/S0952836903004126 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Rapid ecological and behavioural changes in carnivores: the responses of black bears (Ursus americanus) to altered food"
+        citation={
+          <>
+            Beckmann, J. P., &amp; Berger, J. (2003).{" "}
+            <em className="not-italic">Journal of Zoology</em> 261(2): 207–212.
+          </>
+        }
+        href="https://doi.org/10.1017/S0952836903004126"
+        linkText="DOI: 10.1017/S0952836903004126 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             タホ湖周辺のクロクマは <strong>30 年で「昼型」から「夜型」へ</strong>大変化
-          </li>
-          <li>
+          </>,
+          <>
             街のクマは <strong>体が大きく、冬眠期間が短く、子をたくさん産む</strong>
-          </li>
-          <li>
+          </>,
+          <>
             原因は「人のゴミ」。一度学習すると <strong>子グマにも伝わる</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -397,61 +388,46 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Rapid ecological and behavioural changes in carnivores: the responses of black bears to altered food（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Beckmann, J. P., &amp; Berger, J. (2003).{" "}
-              <em className="not-italic">Journal of Zoology</em> 261(2): 207–212.
-            </div>
-            <a
-              href="https://doi.org/10.1017/S0952836903004126"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1017/S0952836903004126 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Carnivores, urban landscapes, and longitudinal studies: a case history of black bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Beckmann, J. P., &amp; Lackey, C. W. (2008).{" "}
-              <em className="not-italic">Human-Wildlife Conflicts</em> 2(2): 168–174.
-            </div>
-            <a
-              href="https://digitalcommons.unl.edu/hwi/55/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              全文（DigitalCommons） →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The influence of human disturbance on wildlife nocturnality（夜行性化のメタ解析）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Gaynor, K. M., Hojnowski, C. E., Carter, N. H., &amp; Brashares, J. S. (2018).{" "}
-              <em className="not-italic">Science</em> 360(6394): 1232–1235.
-            </div>
-            <a
-              href="https://doi.org/10.1126/science.aar7121"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1126/science.aar7121 →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Rapid ecological and behavioural changes in carnivores: the responses of black bears to altered food（本号メイン）",
+            citation: (
+              <>
+                Beckmann, J. P., &amp; Berger, J. (2003).{" "}
+                <em className="not-italic">Journal of Zoology</em> 261(2): 207–212.
+              </>
+            ),
+            href: "https://doi.org/10.1017/S0952836903004126",
+            linkText: "DOI: 10.1017/S0952836903004126 →",
+          },
+          {
+            title:
+              "Carnivores, urban landscapes, and longitudinal studies: a case history of black bears",
+            citation: (
+              <>
+                Beckmann, J. P., &amp; Lackey, C. W. (2008).{" "}
+                <em className="not-italic">Human-Wildlife Conflicts</em> 2(2): 168–174.
+              </>
+            ),
+            href: "https://digitalcommons.unl.edu/hwi/55/",
+            linkText: "全文（DigitalCommons） →",
+          },
+          {
+            title:
+              "The influence of human disturbance on wildlife nocturnality（夜行性化のメタ解析）",
+            citation: (
+              <>
+                Gaynor, K. M., Hojnowski, C. E., Carter, N. H., &amp; Brashares, J. S. (2018).{" "}
+                <em className="not-italic">Science</em> 360(6394): 1232–1235.
+              </>
+            ),
+            href: "https://doi.org/10.1126/science.aar7121",
+            linkText: "DOI: 10.1126/science.aar7121 →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -459,16 +435,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.3
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「カメラトラップ × 深層学習 — AI はクマを見分けられるか？」</strong> —
-          年間 320 万枚の動物画像を学習し、種同定 96.6% を達成した深層学習研究（Norouzzadeh et al. 2018, PNAS）
-          を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.3">
+        <strong>「カメラトラップ × 深層学習 — AI はクマを見分けられるか？」</strong> —
+        年間 320 万枚の動物画像を学習し、種同定 96.6% を達成した深層学習研究（Norouzzadeh et al. 2018, PNAS）
+        を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

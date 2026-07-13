@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-006")!;
@@ -38,43 +39,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Macronutrient optimization and energy maximization determine diets of brown bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Erlenbach, J. A., Rode, K. D., Raubenheimer, D., &amp; Robbins, C. T. (2014).{" "}
-          <em className="not-italic">Journal of Mammalogy</em> 95(1): 160–168.
-        </div>
-        <a
-          href="https://doi.org/10.1644/13-MAMM-A-161.1"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1644/13-MAMM-A-161.1 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Macronutrient optimization and energy maximization determine diets of brown bears"
+        citation={
+          <>
+            Erlenbach, J. A., Rode, K. D., Raubenheimer, D., &amp; Robbins, C. T. (2014).{" "}
+            <em className="not-italic">Journal of Mammalogy</em> 95(1): 160–168.
+          </>
+        }
+        href="https://doi.org/10.1644/13-MAMM-A-161.1"
+        linkText="DOI: 10.1644/13-MAMM-A-161.1 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ヒグマは <strong>カロリーではなく「栄養バランス」</strong>を最適化して食を選ぶ
-          </li>
-          <li>
+          </>,
+          <>
             選ばれる比率は <strong>タンパク 17% / 脂質 + 炭水化物 83%</strong>に集中
-          </li>
-          <li>
+          </>,
+          <>
             秋のクマが市街地で柿・果樹を狙う理由はここにある（高炭水化物・低タンパク食）
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -316,57 +307,39 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Macronutrient optimization and energy maximization determine diets of brown bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Erlenbach, J. A., Rode, K. D., Raubenheimer, D., &amp; Robbins, C. T. (2014).{" "}
-              <em className="not-italic">Journal of Mammalogy</em> 95(1): 160–168.
-            </div>
-            <a
-              href="https://doi.org/10.1644/13-MAMM-A-161.1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1644/13-MAMM-A-161.1 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Macronutrient optimization and seasonal diet mixing in a large omnivore, the grizzly bear: a geometric analysis
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Coogan, S. C., Raubenheimer, D., Stenhouse, G. B., &amp; Nielsen, S. E. (2014).{" "}
-              <em className="not-italic">PLOS ONE</em> 9(5): e97968.
-            </div>
-            <a
-              href="https://doi.org/10.1371/journal.pone.0097968"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1371/journal.pone.0097968 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              WSU Bear Center — Charles T. Robbins 教授の研究施設
-            </div>
-            <a
-              href="https://labs.wsu.edu/bearcenter/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              labs.wsu.edu/bearcenter →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Macronutrient optimization and energy maximization determine diets of brown bears（本号メイン）",
+            citation: (
+              <>
+                Erlenbach, J. A., Rode, K. D., Raubenheimer, D., &amp; Robbins, C. T. (2014).{" "}
+                <em className="not-italic">Journal of Mammalogy</em> 95(1): 160–168.
+              </>
+            ),
+            href: "https://doi.org/10.1644/13-MAMM-A-161.1",
+            linkText: "DOI: 10.1644/13-MAMM-A-161.1 →",
+          },
+          {
+            title:
+              "Macronutrient optimization and seasonal diet mixing in a large omnivore, the grizzly bear: a geometric analysis",
+            citation: (
+              <>
+                Coogan, S. C., Raubenheimer, D., Stenhouse, G. B., &amp; Nielsen, S. E. (2014).{" "}
+                <em className="not-italic">PLOS ONE</em> 9(5): e97968.
+              </>
+            ),
+            href: "https://doi.org/10.1371/journal.pone.0097968",
+            linkText: "DOI: 10.1371/journal.pone.0097968 →",
+          },
+          {
+            title: "WSU Bear Center — Charles T. Robbins 教授の研究施設",
+            href: "https://labs.wsu.edu/bearcenter/",
+            linkText: "labs.wsu.edu/bearcenter →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -374,16 +347,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.7
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「日本のリンゴ園で実証された電気柵の効果」</strong> —
-          長野県のリンゴ園 12 か所での電気柵試験で、ツキノワグマ被害が 92〜100% 減少した
-          Huygens &amp; Hayashi 2001 を精読します。日本人研究者による「世界に通じる現場研究」。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.7">
+        <strong>「日本のリンゴ園で実証された電気柵の効果」</strong> —
+        長野県のリンゴ園 12 か所での電気柵試験で、ツキノワグマ被害が 92〜100% 減少した
+        Huygens &amp; Hayashi 2001 を精読します。日本人研究者による「世界に通じる現場研究」。
+      </NextIssue>
     </ArticleShell>
   );
 }

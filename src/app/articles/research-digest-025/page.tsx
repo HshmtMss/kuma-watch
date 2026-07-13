@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-025")!;
@@ -39,42 +40,44 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く論文群
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          ① The acoustic communication in bears (Ursidae)
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Peters, G. (1984).{" "}
-          <em className="not-italic">Acta Zoologica Fennica</em> 171: 11–24.
-        </div>
-        <div className="mt-3 text-sm font-semibold text-stone-900">
-          ② Vocal repertoire of brown bear cubs
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Wiebe, J. P., &amp; Bunnell, F. L. (1983).{" "}
-          <em className="not-italic">Bears: Their Biology and Management</em>.
-        </div>
-      </div>
+      <PaperCard
+        label="今号で読み解く論文群"
+        papers={[
+          {
+            title: "① The acoustic communication in bears (Ursidae)",
+            citation: (
+              <>
+                Peters, G. (1984).{" "}
+                <em className="not-italic">Acta Zoologica Fennica</em> 171: 11–24.
+              </>
+            ),
+          },
+          {
+            title: "② Vocal repertoire of brown bear cubs",
+            citation: (
+              <>
+                Wiebe, J. P., &amp; Bunnell, F. L. (1983).{" "}
+                <em className="not-italic">Bears: Their Biology and Management</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             クマは <strong>12 種類以上の鳴き声</strong>を状況に応じて使い分ける
-          </li>
-          <li>
+          </>,
+          <>
             母子の鳴き交わしから求愛、警告まで <strong>意味のある通信</strong>
-          </li>
-          <li>
+          </>,
+          <>
             近年は <strong>AI 音響識別</strong>で野生クマのモニタリングに応用も
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -361,36 +364,32 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The acoustic communication in bears (Ursidae)（本号メイン①）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Peters, G. (1984).{" "}
-              <em className="not-italic">Acta Zoologica Fennica</em> 171: 11–24.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Vocal repertoire of brown bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Wiebe, J. P. (1983). University of Calgary thesis.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Passive acoustic monitoring for large carnivores
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Stenset, N. E., et al. (2016).{" "}
-              <em className="not-italic">Wildlife Biology</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "The acoustic communication in bears (Ursidae)（本号メイン①）",
+            citation: (
+              <>
+                Peters, G. (1984).{" "}
+                <em className="not-italic">Acta Zoologica Fennica</em> 171: 11–24.
+              </>
+            ),
+          },
+          {
+            title: "Vocal repertoire of brown bears",
+            citation: "Wiebe, J. P. (1983). University of Calgary thesis.",
+          },
+          {
+            title: "Passive acoustic monitoring for large carnivores",
+            citation: (
+              <>
+                Stenset, N. E., et al. (2016).{" "}
+                <em className="not-italic">Wildlife Biology</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -398,16 +397,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.26
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマはアザラシ 1 頭で 1.5 ヶ月生きる」</strong> —
-          ホッキョクグマに小型カメラを装着して野外でエネルギー収支を初測定した
-          Pagano 2018 Science を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.26">
+        <strong>「クマはアザラシ 1 頭で 1.5 ヶ月生きる」</strong> —
+        ホッキョクグマに小型カメラを装着して野外でエネルギー収支を初測定した
+        Pagano 2018 Science を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

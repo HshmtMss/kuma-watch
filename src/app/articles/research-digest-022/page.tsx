@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-022")!;
@@ -39,49 +40,46 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く論文群
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Major components of grizzly bear diet across North America
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Mowat, G., &amp; Heard, D. C. (2006).{" "}
-          <em className="not-italic">Canadian Journal of Zoology</em> 84(3): 473–489.（行動圏分析含む）
-        </div>
-        <a
-          href="https://doi.org/10.1139/z06-016"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1139/z06-016 →
-        </a>
-        <div className="mt-3 text-sm font-semibold text-stone-900">
-          Ecology and behavior of North American black bears: Home range, habitat, and social organization
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
-        </div>
-      </div>
+      <PaperCard
+        label="今号で読み解く論文群"
+        papers={[
+          {
+            title: "Major components of grizzly bear diet across North America",
+            citation: (
+              <>
+                Mowat, G., &amp; Heard, D. C. (2006).{" "}
+                <em className="not-italic">Canadian Journal of Zoology</em> 84(3): 473–489.（行動圏分析含む）
+              </>
+            ),
+            href: "https://doi.org/10.1139/z06-016",
+            linkText: "DOI: 10.1139/z06-016 →",
+          },
+          {
+            title:
+              "Ecology and behavior of North American black bears: Home range, habitat, and social organization",
+            citation: (
+              <>
+                Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
+              </>
+            ),
+          },
+        ]}
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             雌ヒグマ: <strong>50〜300 km²</strong>、雄ヒグマ: <strong>500〜2,000 km²</strong>
-          </li>
-          <li>
+          </>,
+          <>
             雄が広いのは <strong>繁殖期に雌を探して長距離移動</strong>するため
-          </li>
-          <li>
+          </>,
+          <>
             日本のヒグマ・ツキノワグマでも GPS で <strong>同様のパターン</strong>を確認
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -386,44 +384,39 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Major components of grizzly bear diet across North America（本号メイン①）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mowat, G., &amp; Heard, D. C. (2006).{" "}
-              <em className="not-italic">Canadian Journal of Zoology</em> 84(3): 473–489.
-            </div>
-            <a
-              href="https://doi.org/10.1139/z06-016"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1139/z06-016 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Ecology and behavior of North American black bears: Home range, habitat, and social organization（本号メイン②）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Home range analysis: a review of recent methods
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Walter, W. D., et al. (2015).{" "}
-              <em className="not-italic">Wildlife Society Bulletin</em> 39(2): 380–388.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Major components of grizzly bear diet across North America（本号メイン①）",
+            citation: (
+              <>
+                Mowat, G., &amp; Heard, D. C. (2006).{" "}
+                <em className="not-italic">Canadian Journal of Zoology</em> 84(3): 473–489.
+              </>
+            ),
+            href: "https://doi.org/10.1139/z06-016",
+            linkText: "DOI: 10.1139/z06-016 →",
+          },
+          {
+            title:
+              "Ecology and behavior of North American black bears: Home range, habitat, and social organization（本号メイン②）",
+            citation: (
+              <>
+                Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
+              </>
+            ),
+          },
+          {
+            title: "Home range analysis: a review of recent methods",
+            citation: (
+              <>
+                Walter, W. D., et al. (2015).{" "}
+                <em className="not-italic">Wildlife Society Bulletin</em> 39(2): 380–388.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -431,16 +424,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.23
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの赤ちゃんは何頭生き残るのか — 仔グマ死亡率の真実」</strong> —
-          ヒグマ・クロクマで仔の生存率を 20 年以上追跡した Schwartz ら（2006）を精読。
-          母グマの育て方、人為要因、気候の影響を解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.23">
+        <strong>「クマの赤ちゃんは何頭生き残るのか — 仔グマ死亡率の真実」</strong> —
+        ヒグマ・クロクマで仔の生存率を 20 年以上追跡した Schwartz ら（2006）を精読。
+        母グマの育て方、人為要因、気候の影響を解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

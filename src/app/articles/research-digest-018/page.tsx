@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-018")!;
@@ -38,43 +39,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Impacts of salmon on riparian plant diversity
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Hocking, M. D., &amp; Reynolds, J. D. (2011).{" "}
-          <em className="not-italic">Science</em> 331(6024): 1609–1612.
-        </div>
-        <a
-          href="https://doi.org/10.1126/science.1201079"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1126/science.1201079 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Impacts of salmon on riparian plant diversity"
+        citation={
+          <>
+            Hocking, M. D., &amp; Reynolds, J. D. (2011).{" "}
+            <em className="not-italic">Science</em> 331(6024): 1609–1612.
+          </>
+        }
+        href="https://doi.org/10.1126/science.1201079"
+        linkText="DOI: 10.1126/science.1201079 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ブリティッシュコロンビア <strong>50 流域</strong>でサケと森の関係を調査
-          </li>
-          <li>
+          </>,
+          <>
             クマがサケを森に運ぶことで <strong>植物多様性が変化</strong>し、樹木の成長が早まる
-          </li>
-          <li>
+          </>,
+          <>
             クマは「捕食者」ではなく <strong>「海と森を繋ぐエンジニア」</strong>だった
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -350,45 +341,39 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Impacts of salmon on riparian plant diversity（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Hocking, M. D., &amp; Reynolds, J. D. (2011).{" "}
-              <em className="not-italic">Science</em> 331(6024): 1609–1612.
-            </div>
-            <a
-              href="https://doi.org/10.1126/science.1201079"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1126/science.1201079 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Importance of meat, particularly salmon, to body size, population productivity, and conservation of North American brown bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Hilderbrand, G. V., et al. (1999).{" "}
-              <em className="not-italic">Canadian Journal of Zoology</em> 77(1): 132–138.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Keystone interactions: salmon and bear in riparian forests of Alaska
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Helfield, J. M., &amp; Naiman, R. J. (2006).{" "}
-              <em className="not-italic">Ecosystems</em> 9(2): 167–180.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Impacts of salmon on riparian plant diversity（本号メイン）",
+            citation: (
+              <>
+                Hocking, M. D., &amp; Reynolds, J. D. (2011).{" "}
+                <em className="not-italic">Science</em> 331(6024): 1609–1612.
+              </>
+            ),
+            href: "https://doi.org/10.1126/science.1201079",
+            linkText: "DOI: 10.1126/science.1201079 →",
+          },
+          {
+            title: "Importance of meat, particularly salmon, to body size, population productivity, and conservation of North American brown bears",
+            citation: (
+              <>
+                Hilderbrand, G. V., et al. (1999).{" "}
+                <em className="not-italic">Canadian Journal of Zoology</em> 77(1): 132–138.
+              </>
+            ),
+          },
+          {
+            title: "Keystone interactions: salmon and bear in riparian forests of Alaska",
+            citation: (
+              <>
+                Helfield, J. M., &amp; Naiman, R. J. (2006).{" "}
+                <em className="not-italic">Ecosystems</em> 9(2): 167–180.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -396,16 +381,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.19
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの色覚は思ったより豊か」</strong> —
-          動物園のヒグマで色の識別実験を行った Kelling 2006 ほかを精読。
-          「色盲」のイメージで知られるクマが、実は青・黄・緑をしっかり見分けていた事実を解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.19">
+        <strong>「クマの色覚は思ったより豊か」</strong> —
+        動物園のヒグマで色の識別実験を行った Kelling 2006 ほかを精読。
+        「色盲」のイメージで知られるクマが、実は青・黄・緑をしっかり見分けていた事実を解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

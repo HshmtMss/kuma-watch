@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-017")!;
@@ -41,43 +42,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Bite forces and evolutionary adaptations to feeding ecology in carnivores
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Christiansen, P., &amp; Wroe, S. (2007).{" "}
-          <em className="not-italic">Ecology</em> 88(2): 347–358.
-        </div>
-        <a
-          href="https://doi.org/10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Bite forces and evolutionary adaptations to feeding ecology in carnivores"
+        citation={
+          <>
+            Christiansen, P., &amp; Wroe, S. (2007).{" "}
+            <em className="not-italic">Ecology</em> 88(2): 347–358.
+          </>
+        }
+        href="https://doi.org/10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2"
+        linkText="DOI: 10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             食肉目 <strong>151 種の頭骨</strong>を計測して咬合力をモデル化
-          </li>
-          <li>
+          </>,
+          <>
             ヒグマの咬合力は <strong>約 1,200 N</strong>。ライオン（600 N）の <strong>2 倍</strong>
-          </li>
-          <li>
+          </>,
+          <>
             体格補正でもクマは <strong>上位グループ</strong>。骨や植物繊維も粉砕できる強さ
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -388,45 +379,39 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Bite forces and evolutionary adaptations to feeding ecology in carnivores（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Christiansen, P., &amp; Wroe, S. (2007).{" "}
-              <em className="not-italic">Ecology</em> 88(2): 347–358.
-            </div>
-            <a
-              href="https://doi.org/10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI link →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The dietary specializations of the giant panda from a biomechanical perspective
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Tseng, Z. J., &amp; Wang, X. (2010).{" "}
-              <em className="not-italic">Journal of Vertebrate Paleontology</em>.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Biomechanical evidence of bone-crushing capability in dire wolves
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Wroe, S., McHenry, C., &amp; Thomason, J. (2005).{" "}
-              <em className="not-italic">Proc. Royal Society B</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Bite forces and evolutionary adaptations to feeding ecology in carnivores（本号メイン）",
+            citation: (
+              <>
+                Christiansen, P., &amp; Wroe, S. (2007).{" "}
+                <em className="not-italic">Ecology</em> 88(2): 347–358.
+              </>
+            ),
+            href: "https://doi.org/10.1890/0012-9658(2007)88[347:BFAEAT]2.0.CO;2",
+            linkText: "DOI link →",
+          },
+          {
+            title: "The dietary specializations of the giant panda from a biomechanical perspective",
+            citation: (
+              <>
+                Tseng, Z. J., &amp; Wang, X. (2010).{" "}
+                <em className="not-italic">Journal of Vertebrate Paleontology</em>.
+              </>
+            ),
+          },
+          {
+            title: "Biomechanical evidence of bone-crushing capability in dire wolves",
+            citation: (
+              <>
+                Wroe, S., McHenry, C., &amp; Thomason, J. (2005).{" "}
+                <em className="not-italic">Proc. Royal Society B</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -434,17 +419,12 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.18
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは森に『サケの栄養』を運んでいた」</strong> —
-          ブリティッシュコロンビアの 50 川を調査した Hocking 2011 Science。
-          クマがサケを森に運ぶことで、植物の多様性と樹木の成長が大きく変わる
-          「生態系エンジニア」としてのクマの役割を解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.18">
+        <strong>「クマは森に『サケの栄養』を運んでいた」</strong> —
+        ブリティッシュコロンビアの 50 川を調査した Hocking 2011 Science。
+        クマがサケを森に運ぶことで、植物の多様性と樹木の成長が大きく変わる
+        「生態系エンジニア」としてのクマの役割を解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

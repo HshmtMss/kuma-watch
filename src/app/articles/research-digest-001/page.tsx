@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, Callout, NextIssue, StatCallout, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-001")!;
@@ -38,43 +39,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Efficacy of bear deterrent spray in Alaska
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
-          <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
-        </div>
-        <a
-          href="https://doi.org/10.2193/2006-452"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.2193/2006-452 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Efficacy of bear deterrent spray in Alaska"
+        citation={
+          <>
+            Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
+            <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
+          </>
+        }
+        href="https://doi.org/10.2193/2006-452"
+        linkText="DOI: 10.2193/2006-452 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             攻撃してきたクマに対し、スプレーは <strong>10 回中 9 回</strong>「逃がす」結果に
-          </li>
-          <li>
+          </>,
+          <>
             <strong>3 種類のクマ全部</strong>で、ほぼ同じくらい効いた（生物学的に重要）
-          </li>
-          <li>
+          </>,
+          <>
             ただし<strong>「噴射 = 完全勝利」ではない</strong>。14% は同じクマが戻ってくる
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -130,15 +121,11 @@ export default function Page() {
         175 件のうち、特に厳密な分析対象になったのは <strong>「クマが明らかに人を狙って接近してきた」72 件</strong>。
         この最悪のシナリオで、スプレーがどれだけクマを退けられたかというと —
       </p>
-      <div className="not-prose my-4 rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
-        <div className="text-xs font-semibold uppercase tracking-widest text-green-800">
-          攻撃してきたクマへの撃退成功率
-        </div>
-        <div className="mt-2 text-5xl font-bold text-green-700 tabular-nums">92%</div>
-        <div className="mt-2 text-sm text-stone-700">
-          72 件中 66 件で、クマがその場から離れた
-        </div>
-      </div>
+      <StatCallout
+        label="攻撃してきたクマへの撃退成功率"
+        value="92%"
+        note="72 件中 66 件で、クマがその場から離れた"
+      />
       <p>
         さらに、好奇心で近づいてきたクマには <strong>90%</strong>、
         スプレーを使った人の <strong>98%</strong>が無傷で帰宅、
@@ -230,16 +217,11 @@ export default function Page() {
         あくまで <strong>「自分が安全圏に逃げ込むための時間を稼ぐ道具」</strong>です。
         噴射 → ホッとして座り込む、ではなく、噴射 → 即座に方角を変えて落ち着いて離れる、が正解。
       </p>
-      <div className="not-prose my-4 rounded-xl border border-red-200 bg-red-50 p-4">
-        <div className="text-xs font-semibold uppercase tracking-widest text-red-700">
-          現場での教訓
-        </div>
-        <p className="mt-2 text-sm leading-relaxed text-stone-800">
-          スプレーを使ったあと、「<strong>クマが本当に去ったか</strong>」を確認しながら
-          <strong>静かに後退</strong>するのが原則。決して走らない（追跡本能を刺激する）、
-          背中を見せない、そして<strong>遠くまで離れる</strong>。
-        </p>
-      </div>
+      <Callout label="現場での教訓" tone="red">
+        スプレーを使ったあと、「<strong>クマが本当に去ったか</strong>」を確認しながら
+        <strong>静かに後退</strong>するのが原則。決して走らない（追跡本能を刺激する）、
+        背中を見せない、そして<strong>遠くまで離れる</strong>。
+      </Callout>
 
       <h2 id="no-death">死者ゼロという数字、どう受け止めるか</h2>
       <p>
@@ -436,69 +418,52 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Efficacy of bear deterrent spray in Alaska（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
-            </div>
-            <a
-              href="https://doi.org/10.2193/2006-452"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.2193/2006-452 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Efficacy of firearms for bear deterrence in Alaska（実銃比較編）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Smith, T. S., Herrero, S., DeBruyn, T. D., &amp; Wilder, J. M. (2012).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em> 76(5): 1021–1027.
-            </div>
-            <a
-              href="https://doi.org/10.1002/jwmg.342"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1002/jwmg.342 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Brown bear attacks on humans: a worldwide perspective（世界のヒグマ襲撃メタ解析）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Bombieri, G., Naves, J., Penteriani, V., et al. (2019).{" "}
-              <em className="not-italic">Scientific Reports</em> 9: 8573.
-            </div>
-            <a
-              href="https://doi.org/10.1038/s41598-019-44341-w"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1038/s41598-019-44341-w →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              <em className="not-italic">Bear Attacks: Their Causes and Avoidance</em>（古典書籍）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Herrero, S. (1985, revised 2018). Lyons Press.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Efficacy of bear deterrent spray in Alaska（本号メイン）",
+            citation: (
+              <>
+                Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
+              </>
+            ),
+            href: "https://doi.org/10.2193/2006-452",
+            linkText: "DOI: 10.2193/2006-452 →",
+          },
+          {
+            title: "Efficacy of firearms for bear deterrence in Alaska（実銃比較編）",
+            citation: (
+              <>
+                Smith, T. S., Herrero, S., DeBruyn, T. D., &amp; Wilder, J. M. (2012).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em> 76(5): 1021–1027.
+              </>
+            ),
+            href: "https://doi.org/10.1002/jwmg.342",
+            linkText: "DOI: 10.1002/jwmg.342 →",
+          },
+          {
+            title:
+              "Brown bear attacks on humans: a worldwide perspective（世界のヒグマ襲撃メタ解析）",
+            citation: (
+              <>
+                Bombieri, G., Naves, J., Penteriani, V., et al. (2019).{" "}
+                <em className="not-italic">Scientific Reports</em> 9: 8573.
+              </>
+            ),
+            href: "https://doi.org/10.1038/s41598-019-44341-w",
+            linkText: "DOI: 10.1038/s41598-019-44341-w →",
+          },
+          {
+            title: (
+              <>
+                <em className="not-italic">Bear Attacks: Their Causes and Avoidance</em>（古典書籍）
+              </>
+            ),
+            citation: <>Herrero, S. (1985, revised 2018). Lyons Press.</>,
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -506,15 +471,10 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.2
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「市街地のクマは、本当に夜型になりつつあるのか？」</strong> —
-          世界中の GPS テレメトリー研究を横断し、人慣れクマの行動時間帯シフトを精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.2">
+        <strong>「市街地のクマは、本当に夜型になりつつあるのか？」</strong> —
+        世界中の GPS テレメトリー研究を横断し、人慣れクマの行動時間帯シフトを精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-020")!;
@@ -44,43 +45,37 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Evaluation of deterrent techniques and dogs to alter behavior of &quot;nuisance&quot; black bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Beckmann, J. P., Lackey, C. W., &amp; Berger, J. (2004).{" "}
-          <em className="not-italic">Wildlife Society Bulletin</em> 32(4): 1141–1146.
-        </div>
-        <a
-          href="https://doi.org/10.2193/0091-7648(2004)032%5B1141:EODTAD%5D2.0.CO;2"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI link →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title={
+          <>
+            Evaluation of deterrent techniques and dogs to alter behavior of &quot;nuisance&quot; black bears
+          </>
+        }
+        citation={
+          <>
+            Beckmann, J. P., Lackey, C. W., &amp; Berger, J. (2004).{" "}
+            <em className="not-italic">Wildlife Society Bulletin</em> 32(4): 1141–1146.
+          </>
+        }
+        href="https://doi.org/10.2193/0091-7648(2004)032%5B1141:EODTAD%5D2.0.CO;2"
+        linkText="DOI link →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             問題化したクロクマ <strong>62 頭</strong>で、複数の非致死的手段を試験
-          </li>
-          <li>
+          </>,
+          <>
             ゴム弾・大音響のみだと <strong>戻ってきてしまう</strong>個体が大半
-          </li>
-          <li>
+          </>,
+          <>
             <strong>ベアドッグ + 複数手段の組合せ</strong>で「来なくなる」効果が最大化
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -369,49 +364,39 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Evaluation of deterrent techniques and dogs to alter behavior of &quot;nuisance&quot; black bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Beckmann, J. P., Lackey, C. W., &amp; Berger, J. (2004).{" "}
-              <em className="not-italic">Wildlife Society Bulletin</em> 32(4): 1141–1146.
-            </div>
-            <a
-              href="https://doi.org/10.2193/0091-7648(2004)032%5B1141:EODTAD%5D2.0.CO;2"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI link →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Does aversive conditioning reduce human-black bear conflict?
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mazur, R. L. (2010).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em> 74(1): 48–54.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              NPO ピッキオ — 軽井沢ベアプロジェクト
-            </div>
-            <a
-              href="https://picchio.co.jp/bear/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              picchio.co.jp →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: (
+              <>
+                Evaluation of deterrent techniques and dogs to alter behavior of &quot;nuisance&quot; black bears（本号メイン）
+              </>
+            ),
+            citation: (
+              <>
+                Beckmann, J. P., Lackey, C. W., &amp; Berger, J. (2004).{" "}
+                <em className="not-italic">Wildlife Society Bulletin</em> 32(4): 1141–1146.
+              </>
+            ),
+            href: "https://doi.org/10.2193/0091-7648(2004)032%5B1141:EODTAD%5D2.0.CO;2",
+            linkText: "DOI link →",
+          },
+          {
+            title: "Does aversive conditioning reduce human-black bear conflict?",
+            citation: (
+              <>
+                Mazur, R. L. (2010).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em> 74(1): 48–54.
+              </>
+            ),
+          },
+          {
+            title: "NPO ピッキオ — 軽井沢ベアプロジェクト",
+            href: "https://picchio.co.jp/bear/",
+            linkText: "picchio.co.jp →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -419,16 +404,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.21
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「再導入されたクマが街に出る理由 — トレンティーノの 30 年」</strong> —
-          イタリア・トレンティーノ州での絶滅したヒグマ個体群の再導入プロジェクトを精読。
-          人とクマが密集する欧州での共存実験の成功と苦悩を解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.21">
+        <strong>「再導入されたクマが街に出る理由 — トレンティーノの 30 年」</strong> —
+        イタリア・トレンティーノ州での絶滅したヒグマ個体群の再導入プロジェクトを精読。
+        人とクマが密集する欧州での共存実験の成功と苦悩を解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

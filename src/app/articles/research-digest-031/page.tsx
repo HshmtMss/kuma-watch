@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-031")!;
@@ -38,45 +39,34 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Relationship between changes in beechnut production and Asiatic black
-          bears in northern Japan
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Oka, T., Miura, S., Masaki, T., Suzuki, W., Osumi, K., &amp; Saitoh, S.
-          (2004). <em className="not-italic">Journal of Wildlife Management</em>{" "}
-          68(4): 979–986.
-        </div>
-        <a
-          href="https://scholar.google.com/scholar?q=Relationship+between+changes+in+beechnut+production+and+Asiatic+black+bears+in+northern+Japan"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          Google Scholar で原典を探す →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Relationship between changes in beechnut production and Asiatic black bears in northern Japan"
+        citation={
+          <>
+            Oka, T., Miura, S., Masaki, T., Suzuki, W., Osumi, K., &amp; Saitoh, S.
+            (2004). <em className="not-italic">Journal of Wildlife Management</em>{" "}
+            68(4): 979–986.
+          </>
+        }
+        href="https://scholar.google.com/scholar?q=Relationship+between+changes+in+beechnut+production+and+Asiatic+black+bears+in+northern+Japan"
+        linkText="Google Scholar で原典を探す →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ブナの実は<strong>「豊作 → 翌年は凶作」</strong>を広い範囲で同調して繰り返す
-          </li>
-          <li>
+          </>,
+          <>
             <strong>堅果が凶作の年</strong>に、クマの里への出没と有害捕獲が<strong>急増</strong>した
-          </li>
-          <li>
+          </>,
+          <>
             だから今は各県が<strong>「堅果豊凶調査」で出没を事前予測</strong>している
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -134,17 +124,16 @@ export default function Page() {
         「木の実の出来」と「クマが人の生活圏に現れる頻度」が、
         年単位でしっかり連動していたのです。
       </p>
-      <div className="not-prose my-4 rounded-2xl border border-stone-200 bg-white p-5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-stone-500">
-          論文が示した関係（要約）
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>ブナ豊作の年 → クマは山にとどまる → 出没・捕獲は少ない</li>
-          <li>
+      <KeyPoints
+        label="論文が示した関係（要約）"
+        tone="stone"
+        items={[
+          <>ブナ豊作の年 → クマは山にとどまる → 出没・捕獲は少ない</>,
+          <>
             ブナ凶作の年 → 餌を求めて行動圏が広がる → 里への出没・捕獲が<strong>急増</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <h2 id="mechanism">なぜ凶作だと出てくるのか</h2>
       <p>
@@ -226,30 +215,28 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Relationship between changes in beechnut production and Asiatic
-              black bears in northern Japan（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Oka, T., Miura, S., Masaki, T., Suzuki, W., Osumi, K., &amp;
-              Saitoh, S. (2004).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em>{" "}
-              68(4): 979–986.
-            </div>
-            <a
-              href="https://scholar.google.com/scholar?q=Relationship+between+changes+in+beechnut+production+and+Asiatic+black+bears+in+northern+Japan"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              Google Scholar で原典を探す →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: (
+              <>
+                Relationship between changes in beechnut production and Asiatic
+                black bears in northern Japan（本号メイン）
+              </>
+            ),
+            citation: (
+              <>
+                Oka, T., Miura, S., Masaki, T., Suzuki, W., Osumi, K., &amp;
+                Saitoh, S. (2004).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em>{" "}
+                68(4): 979–986.
+              </>
+            ),
+            href: "https://scholar.google.com/scholar?q=Relationship+between+changes+in+beechnut+production+and+Asiatic+black+bears+in+northern+Japan",
+            linkText: "Google Scholar で原典を探す →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -257,16 +244,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.32
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマ鈴は本当に効くのか？」</strong> —
-          古典 Jope 1985 を起点に、鈴・声・音の何がクマに「人の接近」を伝えるのか、
-          その有効性と限界を冷静に精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.32">
+        <strong>「クマ鈴は本当に効くのか？」</strong> —
+        古典 Jope 1985 を起点に、鈴・声・音の何がクマに「人の接近」を伝えるのか、
+        その有効性と限界を冷静に精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-012")!;
@@ -39,43 +40,34 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Fatal attacks by American black bear on people: 1900–2009
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Herrero, S., Higgins, A., Cardoza, J. E., Hajduk, L. I., &amp; Smith, T. S. (2011).{" "}
-          <em className="not-italic">Journal of Wildlife Management</em> 75(3): 596–603.
-        </div>
-        <a
-          href="https://doi.org/10.1002/jwmg.72"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1002/jwmg.72 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Fatal attacks by American black bear on people: 1900–2009"
+        citation={
+          <>
+            Herrero, S., Higgins, A., Cardoza, J. E., Hajduk, L. I., &amp; Smith, T. S. (2011).{" "}
+            <em className="not-italic">Journal of Wildlife Management</em> 75(3): 596–603.
+          </>
+        }
+        href="https://doi.org/10.1002/jwmg.72"
+        linkText="DOI: 10.1002/jwmg.72 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-red-300 bg-red-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-red-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        tone="red"
+        items={[
+          <>
             北米 110 年分の致命的クロクマ襲撃 <strong>63 件</strong>を統計分析
-          </li>
-          <li>
+          </>,
+          <>
             襲ったクマの <strong>88% が単独の成獣雄</strong>。「母グマが危険」は誤り
-          </li>
-          <li>
+          </>,
+          <>
             大半は <strong>捕食目的</strong>。「驚いた・防衛」ではなく「食べに来た」
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -469,44 +461,34 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Fatal attacks by American black bear on people: 1900–2009（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Herrero, S., Higgins, A., Cardoza, J. E., Hajduk, L. I., &amp; Smith, T. S. (2011).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em> 75(3): 596–603.
-            </div>
-            <a
-              href="https://doi.org/10.1002/jwmg.72"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1002/jwmg.72 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Field use of capsicum spray as a bear deterrent
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Herrero, S., &amp; Higgins, A. (1998).{" "}
-              <em className="not-italic">Ursus</em> 10: 533–537.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              <em className="not-italic">Bear Attacks: Their Causes and Avoidance</em>
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Herrero, S. (1985, revised 2018). Lyons Press.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Fatal attacks by American black bear on people: 1900–2009（本号メイン）",
+            citation: (
+              <>
+                Herrero, S., Higgins, A., Cardoza, J. E., Hajduk, L. I., &amp; Smith, T. S. (2011).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em> 75(3): 596–603.
+              </>
+            ),
+            href: "https://doi.org/10.1002/jwmg.72",
+            linkText: "DOI: 10.1002/jwmg.72 →",
+          },
+          {
+            title: "Field use of capsicum spray as a bear deterrent",
+            citation: (
+              <>
+                Herrero, S., &amp; Higgins, A. (1998).{" "}
+                <em className="not-italic">Ursus</em> 10: 533–537.
+              </>
+            ),
+          },
+          {
+            title: <em className="not-italic">Bear Attacks: Their Causes and Avoidance</em>,
+            citation: <>Herrero, S. (1985, revised 2018). Lyons Press.</>,
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -514,16 +496,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.13
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは何を木に擦りつけているのか — 樹幹マーキングの謎」</strong> —
-          BC 大学の Clapham 2014 が解明した、クマが特定の木を選んで背中をこすりつける行動。
-          そこには「クマだけの SNS」のような複雑な情報交換が隠れていました。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.13">
+        <strong>「クマは何を木に擦りつけているのか — 樹幹マーキングの謎」</strong> —
+        BC 大学の Clapham 2014 が解明した、クマが特定の木を選んで背中をこすりつける行動。
+        そこには「クマだけの SNS」のような複雑な情報交換が隠れていました。
+      </NextIssue>
     </ArticleShell>
   );
 }

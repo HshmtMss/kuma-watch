@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-004")!;
@@ -41,43 +42,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Hibernation patterns in brown bears are influenced by environmental cues
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Pigeon, K. E., Stenhouse, G., &amp; Côté, S. D. (2016).{" "}
-          <em className="not-italic">Journal of Mammalogy</em> 97(5): 1380–1393.（関連: Evans et al. 2016, Frontiers in Zoology）
-        </div>
-        <a
-          href="https://doi.org/10.1093/jmammal/gyw105"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1093/jmammal/gyw105 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Hibernation patterns in brown bears are influenced by environmental cues"
+        citation={
+          <>
+            Pigeon, K. E., Stenhouse, G., &amp; Côté, S. D. (2016).{" "}
+            <em className="not-italic">Journal of Mammalogy</em> 97(5): 1380–1393.（関連: Evans et al. 2016, Frontiers in Zoology）
+          </>
+        }
+        href="https://doi.org/10.1093/jmammal/gyw105"
+        linkText="DOI: 10.1093/jmammal/gyw105 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ヒグマの冬眠開始日は過去 22 年で <strong>平均 6〜10 日遅延</strong>
-          </li>
-          <li>
+          </>,
+          <>
             覚醒日も早まり、<strong>活動期間が年間 2〜3 週間延長</strong>
-          </li>
-          <li>
+          </>,
+          <>
             「冬は安全」という前提が崩れ、<strong>人クマ軋轢のシーズンが拡大</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -336,57 +327,39 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Hibernation patterns in brown bears are influenced by environmental cues（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Pigeon, K. E., Stenhouse, G., &amp; Côté, S. D. (2016).{" "}
-              <em className="not-italic">Journal of Mammalogy</em> 97(5): 1380–1393.
-            </div>
-            <a
-              href="https://doi.org/10.1093/jmammal/gyw105"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1093/jmammal/gyw105 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Climate change drives shorter denning duration in Scandinavian brown bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Evans, A. L., et al. (2016).{" "}
-              <em className="not-italic">Frontiers in Zoology</em> 13: 7.
-            </div>
-            <a
-              href="https://doi.org/10.1186/s12983-016-0140-6"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1186/s12983-016-0140-6 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Scandinavian Brown Bear Research Project（プロジェクト公式）
-            </div>
-            <a
-              href="https://www.scandinavianbearproject.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              scandinavianbearproject.org →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Hibernation patterns in brown bears are influenced by environmental cues（本号メイン）",
+            citation: (
+              <>
+                Pigeon, K. E., Stenhouse, G., &amp; Côté, S. D. (2016).{" "}
+                <em className="not-italic">Journal of Mammalogy</em> 97(5): 1380–1393.
+              </>
+            ),
+            href: "https://doi.org/10.1093/jmammal/gyw105",
+            linkText: "DOI: 10.1093/jmammal/gyw105 →",
+          },
+          {
+            title:
+              "Climate change drives shorter denning duration in Scandinavian brown bears",
+            citation: (
+              <>
+                Evans, A. L., et al. (2016).{" "}
+                <em className="not-italic">Frontiers in Zoology</em> 13: 7.
+              </>
+            ),
+            href: "https://doi.org/10.1186/s12983-016-0140-6",
+            linkText: "DOI: 10.1186/s12983-016-0140-6 →",
+          },
+          {
+            title: "Scandinavian Brown Bear Research Project（プロジェクト公式）",
+            href: "https://www.scandinavianbearproject.org/",
+            linkText: "scandinavianbearproject.org →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -394,16 +367,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.5
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは何を嗅いで人里に来るのか？」</strong> —
-          ヒグマの嗅覚は犬の 7 倍、人の 2,100 倍。匂いだけで数 km 先の食物を見つけられる
-          という驚異の感覚を、行動学・解剖学・心理学の最新研究から精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.5">
+        <strong>「クマは何を嗅いで人里に来るのか？」</strong> —
+        ヒグマの嗅覚は犬の 7 倍、人の 2,100 倍。匂いだけで数 km 先の食物を見つけられる
+        という驚異の感覚を、行動学・解剖学・心理学の最新研究から精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

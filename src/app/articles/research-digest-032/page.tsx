@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import {
+  PaperCard,
+  KeyPoints,
+  NextIssue,
+  References,
+} from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-032")!;
@@ -38,44 +44,34 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Implications of grizzly bear habituation to hikers
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Jope, K. L. (1985).{" "}
-          <em className="not-italic">Wildlife Society Bulletin</em> 13(1): 32–37.
-          （米国グレイシャー国立公園のハイカーとグリズリーの遭遇観察）
-        </div>
-        <a
-          href="https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          Google Scholar で原典を探す →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Implications of grizzly bear habituation to hikers"
+        citation={
+          <>
+            Jope, K. L. (1985).{" "}
+            <em className="not-italic">Wildlife Society Bulletin</em> 13(1):
+            32–37.（米国グレイシャー国立公園のハイカーとグリズリーの遭遇観察）
+          </>
+        }
+        href="https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers"
+        linkText="Google Scholar で原典を探す →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             Jope は<strong>「鈴を鳴らすハイカーの方がクマに突進されにくい」</strong>傾向を観察した
-          </li>
-          <li>
+          </>,
+          <>
             ただし古い観察研究で、<strong>「鈴そのものの効果」を厳密に検証した実験ではない</strong>
-          </li>
-          <li>
+          </>,
+          <>
             大事なのは鈴より<strong>「早めに・確実に人の存在を伝える」</strong>こと。声・スプレーの方が頼れる
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -108,19 +104,18 @@ export default function Page() {
         その中で、<strong>クマ鈴を装着していたハイカー</strong>と
         <strong>していなかったハイカー</strong>で、遭遇の「結末」に差があることに気づきます。
       </p>
-      <div className="not-prose my-4 rounded-2xl border border-stone-200 bg-white p-5">
-        <div className="text-xs font-semibold uppercase tracking-widest text-stone-500">
-          観察された傾向（要約）
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="観察された傾向（要約）"
+        tone="stone"
+        items={[
+          <>
             🔔 <strong>鈴あり</strong> → クマはその場を<strong>立ち去る</strong>か、距離を保って通過する傾向
-          </li>
-          <li>
+          </>,
+          <>
             🚶 <strong>鈴なし</strong> → クマがその場に<strong>とどまる・近づく・突進する</strong>事例が相対的に多い
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
       <p>
         Jope の解釈はこうです。
         鈴は<strong>「人間が近づいているよ」という事前の予告</strong>として働く。
@@ -219,47 +214,35 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Implications of grizzly bear habituation to hikers（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Jope, K. L. (1985).{" "}
-              <em className="not-italic">Wildlife Society Bulletin</em> 13(1):
-              32–37.
-            </div>
-            <a
-              href="https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              Google Scholar で原典を探す →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Efficacy of bear deterrent spray in Alaska（最終手段としてのスプレー）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp;
-              Johnson, K. R. (2008).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em>{" "}
-              72(3): 640–645.
-            </div>
-            <a
-              href="https://doi.org/10.2193/2006-452"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.2193/2006-452 →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Implications of grizzly bear habituation to hikers（本号メイン）",
+            citation: (
+              <>
+                Jope, K. L. (1985).{" "}
+                <em className="not-italic">Wildlife Society Bulletin</em> 13(1):
+                32–37.
+              </>
+            ),
+            href: "https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers",
+            linkText: "Google Scholar で原典を探す →",
+          },
+          {
+            title: "Efficacy of bear deterrent spray in Alaska（最終手段としてのスプレー）",
+            citation: (
+              <>
+                Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp;
+                Johnson, K. R. (2008).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em>{" "}
+                72(3): 640–645.
+              </>
+            ),
+            href: "https://doi.org/10.2193/2006-452",
+            linkText: "DOI: 10.2193/2006-452 →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -267,16 +250,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.33
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「人に慣れた母グマの息子は早死にする」</strong> —
-          知床のヒグマを追った日本発の研究（Shimozuru 2020）から、
-          餌付け・人慣れがなぜ世代を超えてクマを殺すのかを読み解きます。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.33">
+        <strong>「人に慣れた母グマの息子は早死にする」</strong> —
+        知床のヒグマを追った日本発の研究（Shimozuru 2020）から、
+        餌付け・人慣れがなぜ世代を超えてクマを殺すのかを読み解きます。
+      </NextIssue>
     </ArticleShell>
   );
 }

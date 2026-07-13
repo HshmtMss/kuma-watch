@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-005")!;
@@ -39,58 +40,48 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 2 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          ① Extreme expansion of the olfactory receptor gene repertoire in mammals
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Niimura, Y., Matsui, A., &amp; Touhara, K. (2014).{" "}
-          <em className="not-italic">Genome Research</em> 24(9): 1485–1496.
-        </div>
-        <a
-          href="https://doi.org/10.1101/gr.169532.113"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1101/gr.169532.113 →
-        </a>
-        <div className="mt-3 text-sm font-semibold text-stone-900">
-          ② Windscapes and olfactory foraging in a large carnivore
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Togunov, R. R., Derocher, A. E., &amp; Lunn, N. J. (2017).{" "}
-          <em className="not-italic">Scientific Reports</em> 7: 46332.
-        </div>
-        <a
-          href="https://doi.org/10.1038/srep46332"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1038/srep46332 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 2 本の論文"
+        papers={[
+          {
+            title: "① Extreme expansion of the olfactory receptor gene repertoire in mammals",
+            citation: (
+              <>
+                Niimura, Y., Matsui, A., &amp; Touhara, K. (2014).{" "}
+                <em className="not-italic">Genome Research</em> 24(9): 1485–1496.
+              </>
+            ),
+            href: "https://doi.org/10.1101/gr.169532.113",
+            linkText: "DOI: 10.1101/gr.169532.113 →",
+          },
+          {
+            title: "② Windscapes and olfactory foraging in a large carnivore",
+            citation: (
+              <>
+                Togunov, R. R., Derocher, A. E., &amp; Lunn, N. J. (2017).{" "}
+                <em className="not-italic">Scientific Reports</em> 7: 46332.
+              </>
+            ),
+            href: "https://doi.org/10.1038/srep46332",
+            linkText: "DOI: 10.1038/srep46332 →",
+          },
+        ]}
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ヒグマの嗅覚受容体遺伝子は <strong>約 1,600 個</strong>（人の 5 倍、犬の 7 倍）
-          </li>
-          <li>
+          </>,
+          <>
             ホッキョクグマは <strong>16 km 先のアザラシ</strong>を風向きから嗅ぎつけられる
-          </li>
-          <li>
+          </>,
+          <>
             クマは「視覚の世界」ではなく <strong>「匂いの世界地図」</strong>で生きている
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -336,44 +327,33 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Extreme expansion of the olfactory receptor gene repertoire in African elephants and evolutionary dynamics of orthologous gene groups in 13 placental mammals（本号メイン①）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Niimura, Y., Matsui, A., &amp; Touhara, K. (2014).{" "}
-              <em className="not-italic">Genome Research</em> 24(9): 1485–1496.
-            </div>
-            <a
-              href="https://doi.org/10.1101/gr.169532.113"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1101/gr.169532.113 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Windscapes and olfactory foraging in a large carnivore（本号メイン②）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Togunov, R. R., Derocher, A. E., &amp; Lunn, N. J. (2017).{" "}
-              <em className="not-italic">Scientific Reports</em> 7: 46332.
-            </div>
-            <a
-              href="https://doi.org/10.1038/srep46332"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1038/srep46332 →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Extreme expansion of the olfactory receptor gene repertoire in African elephants and evolutionary dynamics of orthologous gene groups in 13 placental mammals（本号メイン①）",
+            citation: (
+              <>
+                Niimura, Y., Matsui, A., &amp; Touhara, K. (2014).{" "}
+                <em className="not-italic">Genome Research</em> 24(9): 1485–1496.
+              </>
+            ),
+            href: "https://doi.org/10.1101/gr.169532.113",
+            linkText: "DOI: 10.1101/gr.169532.113 →",
+          },
+          {
+            title: "Windscapes and olfactory foraging in a large carnivore（本号メイン②）",
+            citation: (
+              <>
+                Togunov, R. R., Derocher, A. E., &amp; Lunn, N. J. (2017).{" "}
+                <em className="not-italic">Scientific Reports</em> 7: 46332.
+              </>
+            ),
+            href: "https://doi.org/10.1038/srep46332",
+            linkText: "DOI: 10.1038/srep46332 →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -381,16 +361,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.6
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは『カロリー』より『栄養バランス』で食を選ぶ」</strong> —
-          ワシントン州立大学の実験で、ヒグマが必ずタンパク質・脂質・炭水化物の比率を
-          最適点に揃えることが判明。秋の市街地出没の本当の理由を Erlenbach 2014 で精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.6">
+        <strong>「クマは『カロリー』より『栄養バランス』で食を選ぶ」</strong> —
+        ワシントン州立大学の実験で、ヒグマが必ずタンパク質・脂質・炭水化物の比率を
+        最適点に揃えることが判明。秋の市街地出没の本当の理由を Erlenbach 2014 で精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-021")!;
@@ -40,50 +41,48 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 2 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          ① Planning the brown bear (Ursus arctos) reintroduction in the Adamello Brenta Natural Park
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Mustoni, A., Carlini, E., Chiarenzi, B., et al. (2003).{" "}
-          <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
-        </div>
-        <div className="mt-3 text-sm font-semibold text-stone-900">
-          ② Brown bear reintroduction in the southern Alps: To what extent are expectations being met?
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Tosi, G., Chirichella, R., Zibordi, F., et al. (2015).{" "}
-          <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.jnc.2015.04.001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.jnc.2015.04.001 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 2 本の論文"
+        papers={[
+          {
+            title:
+              "① Planning the brown bear (Ursus arctos) reintroduction in the Adamello Brenta Natural Park",
+            citation: (
+              <>
+                Mustoni, A., Carlini, E., Chiarenzi, B., et al. (2003).{" "}
+                <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
+              </>
+            ),
+          },
+          {
+            title:
+              "② Brown bear reintroduction in the southern Alps: To what extent are expectations being met?",
+            citation: (
+              <>
+                Tosi, G., Chirichella, R., Zibordi, F., et al. (2015).{" "}
+                <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.jnc.2015.04.001",
+            linkText: "DOI: 10.1016/j.jnc.2015.04.001 →",
+          },
+        ]}
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             残存 <strong>3 頭</strong>のヒグマに、1999〜2002 年でスロベニアから <strong>10 頭</strong>を補強
-          </li>
-          <li>
+          </>,
+          <>
             20 年後の現在、個体群は <strong>100 頭超</strong>に回復（10 倍以上）
-          </li>
-          <li>
+          </>,
+          <>
             新たな課題は <strong>「人クマ軋轢の急増」</strong>。最近年は襲撃事案も発生
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -335,49 +334,36 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Planning the brown bear reintroduction in the Adamello Brenta Natural Park（本号メイン①）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mustoni, A., et al. (2003).{" "}
-              <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Brown bear reintroduction in the southern Alps（本号メイン②）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Tosi, G., et al. (2015).{" "}
-              <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.jnc.2015.04.001"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.jnc.2015.04.001 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Trentino Province annual bear reports（自治体公式報告）
-            </div>
-            <a
-              href="https://grandicarnivori.provincia.tn.it/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              grandicarnivori.provincia.tn.it →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Planning the brown bear reintroduction in the Adamello Brenta Natural Park（本号メイン①）",
+            citation: (
+              <>
+                Mustoni, A., et al. (2003).{" "}
+                <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
+              </>
+            ),
+          },
+          {
+            title: "Brown bear reintroduction in the southern Alps（本号メイン②）",
+            citation: (
+              <>
+                Tosi, G., et al. (2015).{" "}
+                <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.jnc.2015.04.001",
+            linkText: "DOI: 10.1016/j.jnc.2015.04.001 →",
+          },
+          {
+            title: "Trentino Province annual bear reports（自治体公式報告）",
+            href: "https://grandicarnivori.provincia.tn.it/",
+            linkText: "grandicarnivori.provincia.tn.it →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -385,16 +371,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.22
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの行動圏は最大 2,000 km²」</strong> —
-          GPS テレメトリーで初めて精密測定できるようになったクマの行動圏。
-          雄と雌の差、季節変動、地形の影響を Mowat &amp; Heard 2006 ほかで解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.22">
+        <strong>「クマの行動圏は最大 2,000 km²」</strong> —
+        GPS テレメトリーで初めて精密測定できるようになったクマの行動圏。
+        雄と雌の差、季節変動、地形の影響を Mowat &amp; Heard 2006 ほかで解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

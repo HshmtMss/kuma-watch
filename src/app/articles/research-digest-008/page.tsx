@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-008")!;
@@ -40,43 +41,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Hibernation in black bears: independence of metabolic suppression from body temperature
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Tøien, Ø., Blake, J., Edgar, D. M., Grahn, D. A., Heller, H. C., &amp; Barnes, B. M. (2011).{" "}
-          <em className="not-italic">Science</em> 331(6019): 906–909.
-        </div>
-        <a
-          href="https://doi.org/10.1126/science.1199435"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1126/science.1199435 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Hibernation in black bears: independence of metabolic suppression from body temperature"
+        citation={
+          <>
+            Tøien, Ø., Blake, J., Edgar, D. M., Grahn, D. A., Heller, H. C., &amp; Barnes, B. M. (2011).{" "}
+            <em className="not-italic">Science</em> 331(6019): 906–909.
+          </>
+        }
+        href="https://doi.org/10.1126/science.1199435"
+        linkText="DOI: 10.1126/science.1199435 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             冬眠中のクマの心拍数は <strong>55 → 14 bpm</strong>（4 分の 1）に低下
-          </li>
-          <li>
+          </>,
+          <>
             代謝率は <strong>75% も低下</strong>、なのに体温はたった 5°C しか下がらない
-          </li>
-          <li>
+          </>,
+          <>
             この仕組みは <strong>脳卒中・心臓外科・宇宙旅行</strong>への応用が研究されている
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -352,45 +343,40 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Hibernation in black bears: independence of metabolic suppression from body temperature（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Tøien, Ø., Blake, J., Edgar, D. M., Grahn, D. A., Heller, H. C., &amp; Barnes, B. M. (2011).{" "}
-              <em className="not-italic">Science</em> 331(6019): 906–909.
-            </div>
-            <a
-              href="https://doi.org/10.1126/science.1199435"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1126/science.1199435 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Bear-omics: unraveling the molecular basis of hibernation physiology
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mohr, S. M., et al. (2020).{" "}
-              <em className="not-italic">Annual Review of Animal Biosciences</em>.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Hibernating squirrels and bears as biomedical models — レビュー論文
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Andrews, M. T. (2019).{" "}
-              <em className="not-italic">Annual Review of Physiology</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Hibernation in black bears: independence of metabolic suppression from body temperature（本号メイン）",
+            citation: (
+              <>
+                Tøien, Ø., Blake, J., Edgar, D. M., Grahn, D. A., Heller, H. C., &amp; Barnes, B. M. (2011).{" "}
+                <em className="not-italic">Science</em> 331(6019): 906–909.
+              </>
+            ),
+            href: "https://doi.org/10.1126/science.1199435",
+            linkText: "DOI: 10.1126/science.1199435 →",
+          },
+          {
+            title: "Bear-omics: unraveling the molecular basis of hibernation physiology",
+            citation: (
+              <>
+                Mohr, S. M., et al. (2020).{" "}
+                <em className="not-italic">Annual Review of Animal Biosciences</em>.
+              </>
+            ),
+          },
+          {
+            title: "Hibernating squirrels and bears as biomedical models — レビュー論文",
+            citation: (
+              <>
+                Andrews, M. T. (2019).{" "}
+                <em className="not-italic">Annual Review of Physiology</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -398,16 +384,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.9
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマを移動させても元の場所に戻ってくる？」</strong> —
-          欧米で長年議論される「<strong>クマの捕獲移動（translocation）</strong>」の効果と限界について、
-          Linnell ら（1997）の総説とその後の追跡研究を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.9">
+        <strong>「クマを移動させても元の場所に戻ってくる？」</strong> —
+        欧米で長年議論される「<strong>クマの捕獲移動（translocation）</strong>」の効果と限界について、
+        Linnell ら（1997）の総説とその後の追跡研究を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

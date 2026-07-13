@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-007")!;
@@ -41,43 +42,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Use of electric fences to reduce Asiatic black bear depredation in Nagano prefecture, central Japan
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Huygens, O. C., &amp; Hayashi, H. (2001).{" "}
-          <em className="not-italic">Wildlife Society Bulletin</em> 29(3): 959–964.
-        </div>
-        <a
-          href="https://www.jstor.org/stable/3784422"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          JSTOR で見る →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Use of electric fences to reduce Asiatic black bear depredation in Nagano prefecture, central Japan"
+        citation={
+          <>
+            Huygens, O. C., &amp; Hayashi, H. (2001).{" "}
+            <em className="not-italic">Wildlife Society Bulletin</em> 29(3): 959–964.
+          </>
+        }
+        href="https://www.jstor.org/stable/3784422"
+        linkText="JSTOR で見る →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             長野県のリンゴ園 <strong>12 か所</strong>に電気柵を設置し、ツキノワグマ被害を測定
-          </li>
-          <li>
+          </>,
+          <>
             設置 1 年で <strong>92〜100% 被害減少</strong>。多くの園で被害ゼロを達成
-          </li>
-          <li>
+          </>,
+          <>
             費用は 1 園あたり <strong>約 10 万円</strong>。被害額と比べれば即元が取れる
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -411,49 +402,36 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Use of electric fences to reduce Asiatic black bear depredation in Nagano prefecture, central Japan（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Huygens, O. C., &amp; Hayashi, H. (2001).{" "}
-              <em className="not-italic">Wildlife Society Bulletin</em> 29(3): 959–964.
-            </div>
-            <a
-              href="https://www.jstor.org/stable/3784422"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              JSTOR で見る →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Black bear exclusion fences to protect mobile apiaries
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Otto, T. E., &amp; Roloff, G. J. (2015).{" "}
-              <em className="not-italic">Human-Wildlife Interactions</em> 9(1): 78–86.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              鳥獣被害防止総合対策交付金（農林水産省 公式案内）
-            </div>
-            <a
-              href="https://www.maff.go.jp/j/seisan/tyozyu/higai/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              maff.go.jp →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Use of electric fences to reduce Asiatic black bear depredation in Nagano prefecture, central Japan（本号メイン）",
+            citation: (
+              <>
+                Huygens, O. C., &amp; Hayashi, H. (2001).{" "}
+                <em className="not-italic">Wildlife Society Bulletin</em> 29(3): 959–964.
+              </>
+            ),
+            href: "https://www.jstor.org/stable/3784422",
+            linkText: "JSTOR で見る →",
+          },
+          {
+            title: "Black bear exclusion fences to protect mobile apiaries",
+            citation: (
+              <>
+                Otto, T. E., &amp; Roloff, G. J. (2015).{" "}
+                <em className="not-italic">Human-Wildlife Interactions</em> 9(1): 78–86.
+              </>
+            ),
+          },
+          {
+            title: "鳥獣被害防止総合対策交付金（農林水産省 公式案内）",
+            href: "https://www.maff.go.jp/j/seisan/tyozyu/higai/",
+            linkText: "maff.go.jp →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -461,16 +439,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.8
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの冬眠は人類医学のヒントになる？」</strong> —
-          心拍 14 bpm、代謝 25%、なのに体温はたった 5°C しか下がらないクマの冬眠の謎を、
-          Tøien et al. 2011 (Science) を精読しつつ、脳卒中・外科手術への応用研究まで解説。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.8">
+        <strong>「クマの冬眠は人類医学のヒントになる？」</strong> —
+        心拍 14 bpm、代謝 25%、なのに体温はたった 5°C しか下がらないクマの冬眠の謎を、
+        Tøien et al. 2011 (Science) を精読しつつ、脳卒中・外科手術への応用研究まで解説。
+      </NextIssue>
     </ArticleShell>
   );
 }

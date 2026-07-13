@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-009")!;
@@ -43,43 +44,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Translocation of carnivores as a method for managing problem animals: a review
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Linnell, J. D. C., Aanes, R., Swenson, J. E., Odden, J., &amp; Smith, M. E. (1997).{" "}
-          <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
-        </div>
-        <a
-          href="https://doi.org/10.1023/A:1018392013758"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1023/A:1018392013758 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Translocation of carnivores as a method for managing problem animals: a review"
+        citation={
+          <>
+            Linnell, J. D. C., Aanes, R., Swenson, J. E., Odden, J., &amp; Smith, M. E. (1997).{" "}
+            <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
+          </>
+        }
+        href="https://doi.org/10.1023/A:1018392013758"
+        linkText="DOI: 10.1023/A:1018392013758 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             食肉目 12 種・100 件以上の捕獲移動事例をレビューし、その結果を集約
-          </li>
-          <li>
+          </>,
+          <>
             クマでは <strong>50% 以上が元の場所に戻る</strong>、<strong>30% は死亡</strong>
-          </li>
-          <li>
+          </>,
+          <>
             問題行動の解消率は <strong>30% 程度</strong>。「捕獲移動」だけで解決はほぼ不可能
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -403,45 +394,40 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Translocation of carnivores as a method for managing problem animals: a review（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Linnell, J. D. C., et al. (1997).{" "}
-              <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
-            </div>
-            <a
-              href="https://doi.org/10.1023/A:1018392013758"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1023/A:1018392013758 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Translocation of grizzly bears in British Columbia
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Milligan, S., et al. (2018).{" "}
-              <em className="not-italic">Ursus</em> 29(1).
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Predator translocation outcomes review
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Massei, G., et al. (2010).{" "}
-              <em className="not-italic">Wildlife Research</em> 37(5): 428–439.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Translocation of carnivores as a method for managing problem animals: a review（本号メイン）",
+            citation: (
+              <>
+                Linnell, J. D. C., et al. (1997).{" "}
+                <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
+              </>
+            ),
+            href: "https://doi.org/10.1023/A:1018392013758",
+            linkText: "DOI: 10.1023/A:1018392013758 →",
+          },
+          {
+            title: "Translocation of grizzly bears in British Columbia",
+            citation: (
+              <>
+                Milligan, S., et al. (2018).{" "}
+                <em className="not-italic">Ursus</em> 29(1).
+              </>
+            ),
+          },
+          {
+            title: "Predator translocation outcomes review",
+            citation: (
+              <>
+                Massei, G., et al. (2010).{" "}
+                <em className="not-italic">Wildlife Research</em> 37(5): 428–439.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -449,16 +435,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.10
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマは『数』を理解している」</strong> —
-          アメリカクロクマ 3 頭にタッチスクリーンで「多い方を選ぶ」課題を出した動物認知研究。
-          クマがイルカやサル並みの数量理解能力を持つことを示した Vonk &amp; Beran 2012 を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.10">
+        <strong>「クマは『数』を理解している」</strong> —
+        アメリカクロクマ 3 頭にタッチスクリーンで「多い方を選ぶ」課題を出した動物認知研究。
+        クマがイルカやサル並みの数量理解能力を持つことを示した Vonk &amp; Beran 2012 を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

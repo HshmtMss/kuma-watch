@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-026")!;
@@ -39,43 +40,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
-          <em className="not-italic">Science</em> 359(6375): 568–572.
-        </div>
-        <a
-          href="https://doi.org/10.1126/science.aan8677"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1126/science.aan8677 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear"
+        citation={
+          <>
+            Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
+            <em className="not-italic">Science</em> 359(6375): 568–572.
+          </>
+        }
+        href="https://doi.org/10.1126/science.aan8677"
+        linkText="DOI: 10.1126/science.aan8677 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ホッキョクグマ 9 頭にカメラ + 加速度センサー + 同位体追跡で 11 日間記録
-          </li>
-          <li>
+          </>,
+          <>
             消費エネルギーは予想の <strong>1.5 倍</strong>、生存にはアザラシ <strong>2 ヶ月毎に 1 頭以上</strong>必要
-          </li>
-          <li>
+          </>,
+          <>
             気候変動による氷の縮小で <strong>狩猟効率が下がり、種としての将来が危ぶまれる</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -334,49 +325,36 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
-              <em className="not-italic">Science</em> 359(6375): 568–572.
-            </div>
-            <a
-              href="https://doi.org/10.1126/science.aan8677"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1126/science.aan8677 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Behavior and energetics of polar bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Pagano, A. M., et al. (2020).{" "}
-              <em className="not-italic">Journal of Experimental Biology</em>.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              USGS Polar Bear Research
-            </div>
-            <a
-              href="https://www.usgs.gov/centers/alaska-science-center/science/polar-bear-research"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              USGS →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear（本号メイン）",
+            citation: (
+              <>
+                Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
+                <em className="not-italic">Science</em> 359(6375): 568–572.
+              </>
+            ),
+            href: "https://doi.org/10.1126/science.aan8677",
+            linkText: "DOI: 10.1126/science.aan8677 →",
+          },
+          {
+            title: "Behavior and energetics of polar bears",
+            citation: (
+              <>
+                Pagano, A. M., et al. (2020).{" "}
+                <em className="not-italic">Journal of Experimental Biology</em>.
+              </>
+            ),
+          },
+          {
+            title: "USGS Polar Bear Research",
+            href: "https://www.usgs.gov/centers/alaska-science-center/science/polar-bear-research",
+            linkText: "USGS →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -384,16 +362,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.27
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマを見る観光」は世界で年 10 億ドル産業」</strong> —
-          ベアウォッチング・ツーリズムの経済効果と保護への貢献を、
-          世界各国の事例で精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.27">
+        <strong>「クマを見る観光」は世界で年 10 億ドル産業」</strong> —
+        ベアウォッチング・ツーリズムの経済効果と保護への貢献を、
+        世界各国の事例で精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

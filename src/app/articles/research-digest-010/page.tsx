@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-010")!;
@@ -39,43 +40,37 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Vonk, J., &amp; Beran, M. J. (2012).{" "}
-          <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.anbehav.2012.05.001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.anbehav.2012.05.001 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title={
+          <>
+            Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus
+          </>
+        }
+        citation={
+          <>
+            Vonk, J., &amp; Beran, M. J. (2012).{" "}
+            <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
+          </>
+        }
+        href="https://doi.org/10.1016/j.anbehav.2012.05.001"
+        linkText="DOI: 10.1016/j.anbehav.2012.05.001 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             アメリカクロクマ <strong>3 頭</strong>にタッチスクリーンで「多い数を選ぶ」課題
-          </li>
-          <li>
+          </>,
+          <>
             正答率は <strong>サル並み（~75% 以上）</strong>。クマが数量を理解することを実証
-          </li>
-          <li>
+          </>,
+          <>
             クマの賢さが「<strong>学習する都市型クマ問題</strong>」の根本原因
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -377,45 +372,43 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Vonk, J., &amp; Beran, M. J. (2012).{" "}
-              <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.anbehav.2012.05.001"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.anbehav.2012.05.001 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Levels of abstraction in orangutan (Pongo pygmaeus) and human cognition
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Vonk, J., &amp; MacDonald, S. E. (2002).{" "}
-              <em className="not-italic">Animal Cognition</em> 5(4): 225–238.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Recent advances in bear behavior and cognition research
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Stirling, I., &amp; Derocher, A. E. (2020).{" "}
-              <em className="not-italic">Annual Review of Ecology, Evolution, and Systematics</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: (
+              <>
+                Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus（本号メイン）
+              </>
+            ),
+            citation: (
+              <>
+                Vonk, J., &amp; Beran, M. J. (2012).{" "}
+                <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.anbehav.2012.05.001",
+            linkText: "DOI: 10.1016/j.anbehav.2012.05.001 →",
+          },
+          {
+            title: "Levels of abstraction in orangutan (Pongo pygmaeus) and human cognition",
+            citation: (
+              <>
+                Vonk, J., &amp; MacDonald, S. E. (2002).{" "}
+                <em className="not-italic">Animal Cognition</em> 5(4): 225–238.
+              </>
+            ),
+          },
+          {
+            title: "Recent advances in bear behavior and cognition research",
+            citation: (
+              <>
+                Stirling, I., &amp; Derocher, A. E. (2020).{" "}
+                <em className="not-italic">Annual Review of Ecology, Evolution, and Systematics</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -423,16 +416,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.11
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの妊娠には『着床遅延』という奇跡がある」</strong> —
-          夏に交尾しても、受精卵が動き出すのは半年後の秋。母体の栄養状態次第で
-          妊娠そのものをキャンセルできるクマ独自の繁殖戦略を、Spady ら 2007 ほかで精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.11">
+        <strong>「クマの妊娠には『着床遅延』という奇跡がある」</strong> —
+        夏に交尾しても、受精卵が動き出すのは半年後の秋。母体の栄養状態次第で
+        妊娠そのものをキャンセルできるクマ独自の繁殖戦略を、Spady ら 2007 ほかで精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-015")!;
@@ -41,43 +42,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Population genomics reveal recent speciation and rapid evolutionary adaptation in polar bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Liu, S., Lorenzen, E. D., Fumagalli, M., et al. (2014).{" "}
-          <em className="not-italic">Cell</em> 157(4): 785–794.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.cell.2014.03.054"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.cell.2014.03.054 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Population genomics reveal recent speciation and rapid evolutionary adaptation in polar bears"
+        citation={
+          <>
+            Liu, S., Lorenzen, E. D., Fumagalli, M., et al. (2014).{" "}
+            <em className="not-italic">Cell</em> 157(4): 785–794.
+          </>
+        }
+        href="https://doi.org/10.1016/j.cell.2014.03.054"
+        linkText="DOI: 10.1016/j.cell.2014.03.054 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ホッキョクグマ <strong>89 頭</strong>とヒグマ <strong>10 頭</strong>の全ゲノムを解読
-          </li>
-          <li>
+          </>,
+          <>
             両者の分岐は <strong>35〜48 万年前</strong>。それまで予想されていた時期の 1/5 以下
-          </li>
-          <li>
+          </>,
+          <>
             脂肪代謝（特に <strong>APOB 遺伝子</strong>）が爆速進化、心血管系の毒性を回避
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -349,45 +340,39 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Population genomics reveal recent speciation and rapid evolutionary adaptation in polar bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Liu, S., Lorenzen, E. D., Fumagalli, M., et al. (2014).{" "}
-              <em className="not-italic">Cell</em> 157(4): 785–794.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.cell.2014.03.054"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.cell.2014.03.054 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Polar and brown bear genomes reveal ancient admixture and demographic footprints of past climate change
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Miller, W., et al. (2012).{" "}
-              <em className="not-italic">PNAS</em> 109(36): E2382–E2390.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The Genetic Architecture of Adaptation to Climate in Polar Bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Welch, A. J., et al. (2014).{" "}
-              <em className="not-italic">Molecular Biology and Evolution</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Population genomics reveal recent speciation and rapid evolutionary adaptation in polar bears（本号メイン）",
+            citation: (
+              <>
+                Liu, S., Lorenzen, E. D., Fumagalli, M., et al. (2014).{" "}
+                <em className="not-italic">Cell</em> 157(4): 785–794.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.cell.2014.03.054",
+            linkText: "DOI: 10.1016/j.cell.2014.03.054 →",
+          },
+          {
+            title: "Polar and brown bear genomes reveal ancient admixture and demographic footprints of past climate change",
+            citation: (
+              <>
+                Miller, W., et al. (2012).{" "}
+                <em className="not-italic">PNAS</em> 109(36): E2382–E2390.
+              </>
+            ),
+          },
+          {
+            title: "The Genetic Architecture of Adaptation to Climate in Polar Bears",
+            citation: (
+              <>
+                Welch, A. J., et al. (2014).{" "}
+                <em className="not-italic">Molecular Biology and Evolution</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -395,16 +380,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.16
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの腸内細菌が冬眠の鍵を握っていた」</strong> —
-          ヒグマの腸内細菌を無菌マウスに移植して代謝を直接実証した Sommer 2016 Cell Reports。
-          肥満・糖尿病研究への波及まで含めて解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.16">
+        <strong>「クマの腸内細菌が冬眠の鍵を握っていた」</strong> —
+        ヒグマの腸内細菌を無菌マウスに移植して代謝を直接実証した Sommer 2016 Cell Reports。
+        肥満・糖尿病研究への波及まで含めて解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

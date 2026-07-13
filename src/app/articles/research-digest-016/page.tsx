@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-016")!;
@@ -43,43 +44,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          The gut microbiota modulates energy metabolism in the hibernating brown bear Ursus arctos
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Sommer, F., Ståhlman, M., Ilkayeva, O., Arnemo, J. M., Kindberg, J., Josefsson, J., Newgard, C. B., Fröbert, O., &amp; Bäckhed, F. (2016).{" "}
-          <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.celrep.2016.01.026"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.celrep.2016.01.026 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="The gut microbiota modulates energy metabolism in the hibernating brown bear Ursus arctos"
+        citation={
+          <>
+            Sommer, F., Ståhlman, M., Ilkayeva, O., Arnemo, J. M., Kindberg, J., Josefsson, J., Newgard, C. B., Fröbert, O., &amp; Bäckhed, F. (2016).{" "}
+            <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
+          </>
+        }
+        href="https://doi.org/10.1016/j.celrep.2016.01.026"
+        linkText="DOI: 10.1016/j.celrep.2016.01.026 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             ヒグマの<strong>腸内細菌が冬眠中と活動期で大きく変化</strong>することを発見
-          </li>
-          <li>
+          </>,
+          <>
             クマの腸内細菌を <strong>無菌マウス</strong>に移植 → マウスの代謝も同じく変化
-          </li>
-          <li>
+          </>,
+          <>
             <strong>細菌が宿主の代謝を制御</strong>している直接的証拠 — 肥満・糖尿病研究にも示唆
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -407,45 +398,39 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The gut microbiota modulates energy metabolism in the hibernating brown bear（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Sommer, F., Ståhlman, M., et al. (2016).{" "}
-              <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.celrep.2016.01.026"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.celrep.2016.01.026 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Annual fluctuations in the gut microbiome of brown bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Stenvinkel, P., et al. (2018).{" "}
-              <em className="not-italic">Hibernation Reports</em>.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Hibernation and the gut microbiome: lessons for human health
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Carey, H. V., &amp; Assadi-Porter, F. M. (2017).{" "}
-              <em className="not-italic">Annual Review of Animal Biosciences</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "The gut microbiota modulates energy metabolism in the hibernating brown bear（本号メイン）",
+            citation: (
+              <>
+                Sommer, F., Ståhlman, M., et al. (2016).{" "}
+                <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.celrep.2016.01.026",
+            linkText: "DOI: 10.1016/j.celrep.2016.01.026 →",
+          },
+          {
+            title: "Annual fluctuations in the gut microbiome of brown bears",
+            citation: (
+              <>
+                Stenvinkel, P., et al. (2018).{" "}
+                <em className="not-italic">Hibernation Reports</em>.
+              </>
+            ),
+          },
+          {
+            title: "Hibernation and the gut microbiome: lessons for human health",
+            citation: (
+              <>
+                Carey, H. V., &amp; Assadi-Porter, F. M. (2017).{" "}
+                <em className="not-italic">Annual Review of Animal Biosciences</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -453,16 +438,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.17
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの『噛む力』はライオンの 2 倍だった」</strong> —
-          食肉目 50 種以上の咬合力を比較解析した Christiansen &amp; Wroe 2007 を精読。
-          クマがなぜそんなに強く噛めるのか、骨を砕けるのか、進化的な背景まで解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.17">
+        <strong>「クマの『噛む力』はライオンの 2 倍だった」</strong> —
+        食肉目 50 種以上の咬合力を比較解析した Christiansen &amp; Wroe 2007 を精読。
+        クマがなぜそんなに強く噛めるのか、骨を砕けるのか、進化的な背景まで解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

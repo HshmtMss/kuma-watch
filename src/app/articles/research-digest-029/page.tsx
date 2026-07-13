@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-029")!;
@@ -39,43 +40,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Trophic facilitation by introduced top predators: grey wolf subsidies to scavengers in Yellowstone National Park
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Wilmers, C. C., Crabtree, R. L., Smith, D. W., Murphy, K. M., &amp; Getz, W. M. (2003).{" "}
-          <em className="not-italic">Journal of Animal Ecology</em> 72(6): 909–916.
-        </div>
-        <a
-          href="https://doi.org/10.1046/j.1365-2656.2003.00766.x"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1046/j.1365-2656.2003.00766.x →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Trophic facilitation by introduced top predators: grey wolf subsidies to scavengers in Yellowstone National Park"
+        citation={
+          <>
+            Wilmers, C. C., Crabtree, R. L., Smith, D. W., Murphy, K. M., &amp; Getz, W. M. (2003).{" "}
+            <em className="not-italic">Journal of Animal Ecology</em> 72(6): 909–916.
+          </>
+        }
+        href="https://doi.org/10.1046/j.1365-2656.2003.00766.x"
+        linkText="DOI: 10.1046/j.1365-2656.2003.00766.x →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             オオカミが仕留めた獲物の <strong>30〜50%</strong>はクマ・ワシ・コヨーテが「片付け」る
-          </li>
-          <li>
+          </>,
+          <>
             イエローストーンのヒグマは、オオカミ再導入後に <strong>体重が増加</strong>傾向
-          </li>
-          <li>
+          </>,
+          <>
             クマは森の <strong>「重要な腐肉食動物」</strong>として生態系の物質循環に貢献
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -332,45 +323,39 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Trophic facilitation by introduced top predators: grey wolf subsidies to scavengers in Yellowstone National Park（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Wilmers, C. C., et al. (2003).{" "}
-              <em className="not-italic">Journal of Animal Ecology</em> 72(6): 909–916.
-            </div>
-            <a
-              href="https://doi.org/10.1046/j.1365-2656.2003.00766.x"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1046/j.1365-2656.2003.00766.x →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Bears as ecosystem engineers
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Helfield, J. M., &amp; Naiman, R. J. (2006).{" "}
-              <em className="not-italic">Ecosystems</em>.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The functional role of brown bear as scavenger
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Penteriani, V., et al. (2018).{" "}
-              <em className="not-italic">Mammal Review</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Trophic facilitation by introduced top predators: grey wolf subsidies to scavengers in Yellowstone National Park（本号メイン）",
+            citation: (
+              <>
+                Wilmers, C. C., et al. (2003).{" "}
+                <em className="not-italic">Journal of Animal Ecology</em> 72(6): 909–916.
+              </>
+            ),
+            href: "https://doi.org/10.1046/j.1365-2656.2003.00766.x",
+            linkText: "DOI: 10.1046/j.1365-2656.2003.00766.x →",
+          },
+          {
+            title: "Bears as ecosystem engineers",
+            citation: (
+              <>
+                Helfield, J. M., &amp; Naiman, R. J. (2006).{" "}
+                <em className="not-italic">Ecosystems</em>.
+              </>
+            ),
+          },
+          {
+            title: "The functional role of brown bear as scavenger",
+            citation: (
+              <>
+                Penteriani, V., et al. (2018).{" "}
+                <em className="not-italic">Mammal Review</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -378,16 +363,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.30 (シリーズ最終回)
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「人とクマの共進化が共存の鍵」</strong> —
-          シリーズの締めくくりとして、Carter &amp; Linnell 2016 TREE 誌の総説を精読。
-          30 本の知見を統合し、日本でのクマと人の未来を展望します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.30 (シリーズ最終回)">
+        <strong>「人とクマの共進化が共存の鍵」</strong> —
+        シリーズの締めくくりとして、Carter &amp; Linnell 2016 TREE 誌の総説を精読。
+        30 本の知見を統合し、日本でのクマと人の未来を展望します。
+      </NextIssue>
     </ArticleShell>
   );
 }

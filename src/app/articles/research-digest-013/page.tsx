@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-013")!;
@@ -39,43 +40,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          The function of strategic tree selectivity in the chemical signalling of brown bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
-          <em className="not-italic">Animal Behaviour</em> 87: 151–156.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.anbehav.2013.10.024"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.anbehav.2013.10.024 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="The function of strategic tree selectivity in the chemical signalling of brown bears"
+        citation={
+          <>
+            Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
+            <em className="not-italic">Animal Behaviour</em> 87: 151–156.
+          </>
+        }
+        href="https://doi.org/10.1016/j.anbehav.2013.10.024"
+        linkText="DOI: 10.1016/j.anbehav.2013.10.024 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             クマは森に無数にある木の中から <strong>特定の数本だけ</strong>を選んで擦りつける
-          </li>
-          <li>
+          </>,
+          <>
             選ばれる木は <strong>道沿い・直径 30cm 以上・樹皮の質感が独特</strong>
-          </li>
-          <li>
+          </>,
+          <>
             これは <strong>「化学メッセージ」</strong>を残す行動で、性別・繁殖状態などを通信
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -405,49 +396,36 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The function of strategic tree selectivity in the chemical signalling of brown bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
-              <em className="not-italic">Animal Behaviour</em> 87: 151–156.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.anbehav.2013.10.024"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.anbehav.2013.10.024 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Multi-modal scent communication in brown bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2012).{" "}
-              <em className="not-italic">PLOS ONE</em> 7(4): e35404.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              BearID Project — Clapham らの非営利開発プロジェクト
-            </div>
-            <a
-              href="https://bearid.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              bearid.org →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "The function of strategic tree selectivity in the chemical signalling of brown bears（本号メイン）",
+            citation: (
+              <>
+                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
+                <em className="not-italic">Animal Behaviour</em> 87: 151–156.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.anbehav.2013.10.024",
+            linkText: "DOI: 10.1016/j.anbehav.2013.10.024 →",
+          },
+          {
+            title: "Multi-modal scent communication in brown bears",
+            citation: (
+              <>
+                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2012).{" "}
+                <em className="not-italic">PLOS ONE</em> 7(4): e35404.
+              </>
+            ),
+          },
+          {
+            title: "BearID Project — Clapham らの非営利開発プロジェクト",
+            href: "https://bearid.org/",
+            linkText: "bearid.org →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -455,16 +433,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.14
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「世界 664 件のヒグマ襲撃メタ解析」</strong> —
-          18 ヶ国 15 年分のヒグマ襲撃事例を統合解析した Bombieri 2019 Scientific Reports を精読。
-          ロシア・東欧での襲撃の多さ、母グマ関与率の地域差、人間側のリスク要因まで網羅。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.14">
+        <strong>「世界 664 件のヒグマ襲撃メタ解析」</strong> —
+        18 ヶ国 15 年分のヒグマ襲撃事例を統合解析した Bombieri 2019 Scientific Reports を精読。
+        ロシア・東欧での襲撃の多さ、母グマ関与率の地域差、人間側のリスク要因まで網羅。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -9,16 +10,19 @@ type Props = {
   url: string;
 };
 
-/** 画面右下に固定のフローティングシェアバー。
- *  X / LINE / URL コピー / 先頭へ戻る の 4 ボタン。
- *  スクロール 400px 以上で表示、それ以下は隠れる。
- *  スマホでも親指で押せるサイズ感に。 */
+/** 画面右下に固定のフローティングナビ + シェアバー。
+ *  記事一覧へ戻る / X / LINE / URL コピー / 先頭へ戻る の 5 ボタン。
+ *  「戻る」「先頭へ」の画面遷移導線はスクロール位置に関わらず常設し、
+ *  長い記事の途中でも迷子にならないようにする。
+ *  「先頭へ」ボタンだけはページ上部にいる間は不要なので、
+ *  400px 以上スクロールしたときにフェードインさせる。
+ *  スマホでも親指で押せる 44px サイズ感に。 */
 export default function ArticleShare({ title, url }: Props) {
-  const [show, setShow] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 400);
+    const onScroll = () => setScrolled(window.scrollY > 400);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -44,12 +48,17 @@ export default function ArticleShare({ title, url }: Props) {
   };
 
   return (
-    <div
-      className={`fixed bottom-4 right-4 z-40 flex flex-col gap-2 transition-opacity duration-200 ${
-        show ? "opacity-100" : "pointer-events-none opacity-0"
-      }`}
-      aria-hidden={!show}
-    >
+    <div className="fixed bottom-4 right-4 z-40 flex flex-col gap-2">
+      <Link
+        href="/articles"
+        title="記事一覧へ戻る"
+        aria-label="記事一覧へ戻る"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-md hover:border-amber-400 hover:bg-amber-50"
+      >
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </Link>
       <a
         href={xUrl}
         target="_blank"
@@ -98,7 +107,11 @@ export default function ArticleShare({ title, url }: Props) {
         onClick={onTop}
         title="先頭へ戻る"
         aria-label="先頭へ戻る"
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-amber-500 text-white shadow-md hover:bg-amber-600"
+        className={`flex h-11 w-11 items-center justify-center rounded-full border border-stone-200 bg-amber-500 text-white shadow-md transition-opacity duration-200 hover:bg-amber-600 ${
+          scrolled ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!scrolled}
+        tabIndex={scrolled ? undefined : -1}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-011")!;
@@ -41,43 +42,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Evolution of reproductive seasonality in bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Spady, T. J., Lindburg, D. G., &amp; Durrant, B. S. (2007).{" "}
-          <em className="not-italic">Mammal Review</em> 37(1): 21–53.
-        </div>
-        <a
-          href="https://doi.org/10.1111/j.1365-2907.2007.00096.x"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1111/j.1365-2907.2007.00096.x →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Evolution of reproductive seasonality in bears"
+        citation={
+          <>
+            Spady, T. J., Lindburg, D. G., &amp; Durrant, B. S. (2007).{" "}
+            <em className="not-italic">Mammal Review</em> 37(1): 21–53.
+          </>
+        }
+        href="https://doi.org/10.1111/j.1365-2907.2007.00096.x"
+        linkText="DOI: 10.1111/j.1365-2907.2007.00096.x →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             クマは <strong>6 月に交尾し、12〜1 月に出産</strong>。胎児は <strong>5 ヶ月待機</strong>
-          </li>
-          <li>
+          </>,
+          <>
             母体の栄養が不十分なら <strong>受精卵が消える</strong>「妊娠キャンセル」が可能
-          </li>
-          <li>
+          </>,
+          <>
             新生児は <strong>体重わずか 200〜400g</strong>。母乳で 1 ヶ月で 10 倍に育つ
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -389,44 +380,38 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Evolution of reproductive seasonality in bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Spady, T. J., Lindburg, D. G., &amp; Durrant, B. S. (2007).{" "}
-              <em className="not-italic">Mammal Review</em> 37(1): 21–53.
-            </div>
-            <a
-              href="https://doi.org/10.1111/j.1365-2907.2007.00096.x"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1111/j.1365-2907.2007.00096.x →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Reproductive biology and endocrinology of the giant panda
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Lindburg, D. G., &amp; Baragona, K. (2004). University of California Press.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Embryonic diapause and its regulation
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Renfree, M. B., &amp; Shaw, G. (2000).{" "}
-              <em className="not-italic">Reproduction</em> 119: 1–15.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Evolution of reproductive seasonality in bears（本号メイン）",
+            citation: (
+              <>
+                Spady, T. J., Lindburg, D. G., &amp; Durrant, B. S. (2007).{" "}
+                <em className="not-italic">Mammal Review</em> 37(1): 21–53.
+              </>
+            ),
+            href: "https://doi.org/10.1111/j.1365-2907.2007.00096.x",
+            linkText: "DOI: 10.1111/j.1365-2907.2007.00096.x →",
+          },
+          {
+            title: "Reproductive biology and endocrinology of the giant panda",
+            citation: (
+              <>
+                Lindburg, D. G., &amp; Baragona, K. (2004). University of California Press.
+              </>
+            ),
+          },
+          {
+            title: "Embryonic diapause and its regulation",
+            citation: (
+              <>
+                Renfree, M. B., &amp; Shaw, G. (2000).{" "}
+                <em className="not-italic">Reproduction</em> 119: 1–15.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -434,16 +419,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.12
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クロクマに殺された 63 人の共通点」</strong> —
-          北米 110 年分の致命的クマ襲撃事例を統計解析した Herrero 2011 を精読。
-          「母グマが危険」「クマは群れで襲う」といった常識が覆ります。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.12">
+        <strong>「クロクマに殺された 63 人の共通点」</strong> —
+        北米 110 年分の致命的クマ襲撃事例を統計解析した Herrero 2011 を精読。
+        「母グマが危険」「クマは群れで襲う」といった常識が覆ります。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-019")!;
@@ -39,43 +40,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Social behavior of the Alaska brown bear
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Stonorov, D., &amp; Stokes, A. W. (1972).{" "}
-          <em className="not-italic">Bears: Their Biology and Management</em> 2: 232–242.
-        </div>
-        <a
-          href="https://doi.org/10.2307/3872586"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          JSTOR で見る →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="Social behavior of the Alaska brown bear"
+        citation={
+          <>
+            Stonorov, D., &amp; Stokes, A. W. (1972).{" "}
+            <em className="not-italic">Bears: Their Biology and Management</em> 2: 232–242.
+          </>
+        }
+        href="https://doi.org/10.2307/3872586"
+        linkText="JSTOR で見る →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             アラスカ・カルク湖のサケ漁場で <strong>40 頭以上のヒグマ</strong>を 1 夏観察
-          </li>
-          <li>
+          </>,
+          <>
             雄の体格・経験で決まる <strong>明確な序列社会</strong>を形成（直線的階層）
-          </li>
-          <li>
+          </>,
+          <>
             「単独行動」と「集まる時の社会性」の <strong>使い分け</strong>がクマの本質
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -324,36 +315,36 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Social behavior of the Alaska brown bear（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Stonorov, D., &amp; Stokes, A. W. (1972).{" "}
-              <em className="not-italic">Bears: Their Biology and Management</em> 2: 232–242.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              The social behaviour of brown bears on an Alaskan salmon stream
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Egbert, A. L., &amp; Stokes, A. W. (1976).{" "}
-              <em className="not-italic">Bears: Their Biology and Management</em> 3: 41–56.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Ecology and behavior of North American black bears
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Social behavior of the Alaska brown bear（本号メイン）",
+            citation: (
+              <>
+                Stonorov, D., &amp; Stokes, A. W. (1972).{" "}
+                <em className="not-italic">Bears: Their Biology and Management</em> 2: 232–242.
+              </>
+            ),
+          },
+          {
+            title: "The social behaviour of brown bears on an Alaskan salmon stream",
+            citation: (
+              <>
+                Egbert, A. L., &amp; Stokes, A. W. (1976).{" "}
+                <em className="not-italic">Bears: Their Biology and Management</em> 3: 41–56.
+              </>
+            ),
+          },
+          {
+            title: "Ecology and behavior of North American black bears",
+            citation: (
+              <>
+                Powell, R. A., Zimmerman, J. W., &amp; Seaman, D. E. (1997). Chapman &amp; Hall.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -361,16 +352,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.20
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマを『殺さず追い払う』科学」</strong> —
-          ベアドッグ・ゴム弾・大音響など非致死的手段の効果を 62 頭のクロクマで比較した
-          Beckmann 2004 の実証研究を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.20">
+        <strong>「クマを『殺さず追い払う』科学」</strong> —
+        ベアドッグ・ゴム弾・大音響など非致死的手段の効果を 62 頭のクロクマで比較した
+        Beckmann 2004 の実証研究を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

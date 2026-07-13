@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, Callout, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-030")!;
@@ -40,43 +41,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文（シリーズ最終回）
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Co-adaptation is key to coexisting with large carnivores
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Carter, N. H., &amp; Linnell, J. D. C. (2016).{" "}
-          <em className="not-italic">Trends in Ecology &amp; Evolution</em> 31(8): 575–578.
-        </div>
-        <a
-          href="https://doi.org/10.1016/j.tree.2016.05.006"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1016/j.tree.2016.05.006 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文（シリーズ最終回）"
+        title="Co-adaptation is key to coexisting with large carnivores"
+        citation={
+          <>
+            Carter, N. H., &amp; Linnell, J. D. C. (2016).{" "}
+            <em className="not-italic">Trends in Ecology &amp; Evolution</em> 31(8): 575–578.
+          </>
+        }
+        href="https://doi.org/10.1016/j.tree.2016.05.006"
+        linkText="DOI: 10.1016/j.tree.2016.05.006 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             人とクマの共存の鍵は <strong>「双方の適応」</strong> ＝ 共進化
-          </li>
-          <li>
+          </>,
+          <>
             動物だけ変えるのではなく、<strong>人間社会も意識・行動を変える</strong>必要がある
-          </li>
-          <li>
+          </>,
+          <>
             シリーズ 30 本の知見すべてが、この「<strong>共進化フレーム</strong>」に収まる
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -432,45 +423,39 @@ export default function Page() {
       </div>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Co-adaptation is key to coexisting with large carnivores（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Carter, N. H., &amp; Linnell, J. D. C. (2016).{" "}
-              <em className="not-italic">Trends in Ecology &amp; Evolution</em> 31(8): 575–578.
-            </div>
-            <a
-              href="https://doi.org/10.1016/j.tree.2016.05.006"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1016/j.tree.2016.05.006 →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Status and ecological effects of the world&apos;s largest carnivores
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Ripple, W. J., et al. (2014).{" "}
-              <em className="not-italic">Science</em> 343(6167): 1241484.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Recovery of large carnivores in Europe&apos;s modern human-dominated landscapes
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Chapron, G., et al. (2014).{" "}
-              <em className="not-italic">Science</em> 346(6216): 1517–1519.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "Co-adaptation is key to coexisting with large carnivores（本号メイン）",
+            citation: (
+              <>
+                Carter, N. H., &amp; Linnell, J. D. C. (2016).{" "}
+                <em className="not-italic">Trends in Ecology &amp; Evolution</em> 31(8): 575–578.
+              </>
+            ),
+            href: "https://doi.org/10.1016/j.tree.2016.05.006",
+            linkText: "DOI: 10.1016/j.tree.2016.05.006 →",
+          },
+          {
+            title: "Status and ecological effects of the world's largest carnivores",
+            citation: (
+              <>
+                Ripple, W. J., et al. (2014).{" "}
+                <em className="not-italic">Science</em> 343(6167): 1241484.
+              </>
+            ),
+          },
+          {
+            title: "Recovery of large carnivores in Europe's modern human-dominated landscapes",
+            citation: (
+              <>
+                Chapron, G., et al. (2014).{" "}
+                <em className="not-italic">Science</em> 346(6216): 1517–1519.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -478,20 +463,15 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-700">
-          シリーズ完結
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          全 30 本の研究ダイジェスト、お読みいただきありがとうございました。
-          世界の最前線研究を引き続きキャッチアップし、新シリーズ「Vol.31〜」も予定しています。
-          ご意見・取り上げてほしい論文は KumaWatch の{" "}
-          <Link href="/credits" className="text-amber-700 underline">
-            運営情報
-          </Link>
-          までお寄せください。
-        </div>
-      </div>
+      <Callout label="シリーズ完結" tone="amber">
+        全 30 本の研究ダイジェスト、お読みいただきありがとうございました。
+        世界の最前線研究を引き続きキャッチアップし、新シリーズ「Vol.31〜」も予定しています。
+        ご意見・取り上げてほしい論文は KumaWatch の{" "}
+        <Link href="/credits" className="text-amber-700 underline">
+          運営情報
+        </Link>
+        までお寄せください。
+      </Callout>
     </ArticleShell>
   );
 }

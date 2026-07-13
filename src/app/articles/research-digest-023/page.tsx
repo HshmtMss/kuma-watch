@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-023")!;
@@ -39,43 +40,37 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Temporal, spatial, and environmental influences on the demographics of grizzly bears in the Greater Yellowstone Ecosystem
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
-          <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
-        </div>
-        <a
-          href="https://doi.org/10.2193/0084-0173(2006)161%5B1:TSAEIO%5D2.0.CO;2"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI link →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title={
+          <>
+            Temporal, spatial, and environmental influences on the demographics of grizzly bears in the Greater Yellowstone Ecosystem
+          </>
+        }
+        citation={
+          <>
+            Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
+            <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
+          </>
+        }
+        href="https://doi.org/10.2193/0084-0173(2006)161%5B1:TSAEIO%5D2.0.CO;2"
+        linkText="DOI link →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             イエローストーンのヒグマ <strong>20+ 年・数百頭</strong>の繁殖を追跡
-          </li>
-          <li>
+          </>,
+          <>
             <strong>1 年目の仔グマ生存率は 60〜80%</strong>、母グマの生涯出産数は数頭のみ
-          </li>
-          <li>
+          </>,
+          <>
             人為要因（交通事故・密猟・自衛駆除）が <strong>仔の死亡要因の上位</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -401,41 +396,35 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Temporal, spatial, and environmental influences on the demographics of grizzly bears in the Greater Yellowstone Ecosystem（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
-              <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Interagency Grizzly Bear Study Team annual reports
-            </div>
-            <a
-              href="https://www.usgs.gov/centers/norock/science/interagency-grizzly-bear-study-team"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              USGS IGBST →
-            </a>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Estimating population vital rates and viability of an isolated brown bear population
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Mace, R. D., et al. (2012).{" "}
-              <em className="not-italic">Journal of Wildlife Management</em>.
-            </div>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title:
+              "Temporal, spatial, and environmental influences on the demographics of grizzly bears in the Greater Yellowstone Ecosystem（本号メイン）",
+            citation: (
+              <>
+                Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
+                <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
+              </>
+            ),
+          },
+          {
+            title: "Interagency Grizzly Bear Study Team annual reports",
+            href: "https://www.usgs.gov/centers/norock/science/interagency-grizzly-bear-study-team",
+            linkText: "USGS IGBST →",
+          },
+          {
+            title:
+              "Estimating population vital rates and viability of an isolated brown bear population",
+            citation: (
+              <>
+                Mace, R. D., et al. (2012).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em>.
+              </>
+            ),
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -443,16 +432,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.24
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの冬眠巣穴は『人がいない場所』で選ばれる」</strong> —
-          スウェーデンの 100 巣穴を測定し、人家・道路との距離を解析した Linnell 2000 を精読。
-          冬眠中のクマと仔の脆さを解説します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.24">
+        <strong>「クマの冬眠巣穴は『人がいない場所』で選ばれる」</strong> —
+        スウェーデンの 100 巣穴を測定し、人家・道路との距離を解析した Linnell 2000 を精読。
+        冬眠中のクマと仔の脆さを解説します。
+      </NextIssue>
     </ArticleShell>
   );
 }

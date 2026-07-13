@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-024")!;
@@ -40,43 +41,33 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          How vulnerable are denning bears to disturbance?
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Linnell, J. D. C., Swenson, J. E., Andersen, R., &amp; Barnes, B. (2000).{" "}
-          <em className="not-italic">Wildlife Society Bulletin</em> 28(2): 400–413.
-        </div>
-        <a
-          href="https://www.jstor.org/stable/3783698"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          JSTOR で見る →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title="How vulnerable are denning bears to disturbance?"
+        citation={
+          <>
+            Linnell, J. D. C., Swenson, J. E., Andersen, R., &amp; Barnes, B. (2000).{" "}
+            <em className="not-italic">Wildlife Society Bulletin</em> 28(2): 400–413.
+          </>
+        }
+        href="https://www.jstor.org/stable/3783698"
+        linkText="JSTOR で見る →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             北欧の <strong>100 か所超</strong>のヒグマ巣穴を測定し人家・道路との距離を分析
-          </li>
-          <li>
+          </>,
+          <>
             クマは <strong>人家から平均 2 km 以上、道路から 200m 以上</strong>離れた場所を選ぶ
-          </li>
-          <li>
+          </>,
+          <>
             撹乱で <strong>巣穴放棄</strong>すると母グマと仔が危険にさらされる
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -388,41 +379,33 @@ export default function Page() {
       </ol>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              How vulnerable are denning bears to disturbance?（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Linnell, J. D. C., et al. (2000).{" "}
-              <em className="not-italic">Wildlife Society Bulletin</em> 28(2): 400–413.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Variation in brown bear (Ursus arctos) den site characteristics
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Manchi, S., &amp; Swenson, J. E. (2005).{" "}
-              <em className="not-italic">Ursus</em> 16(2): 145–155.
-            </div>
-          </li>
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Scandinavian Brown Bear Research Project（プロジェクト公式）
-            </div>
-            <a
-              href="https://www.scandinavianbearproject.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              scandinavianbearproject.org →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: "How vulnerable are denning bears to disturbance?（本号メイン）",
+            citation: (
+              <>
+                Linnell, J. D. C., et al. (2000).{" "}
+                <em className="not-italic">Wildlife Society Bulletin</em> 28(2): 400–413.
+              </>
+            ),
+          },
+          {
+            title: "Variation in brown bear (Ursus arctos) den site characteristics",
+            citation: (
+              <>
+                Manchi, S., &amp; Swenson, J. E. (2005).{" "}
+                <em className="not-italic">Ursus</em> 16(2): 145–155.
+              </>
+            ),
+          },
+          {
+            title: "Scandinavian Brown Bear Research Project（プロジェクト公式）",
+            href: "https://www.scandinavianbearproject.org/",
+            linkText: "scandinavianbearproject.org →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
@@ -430,16 +413,11 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <div className="not-prose my-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">
-          次号予告 — Vol.25
-        </div>
-        <div className="mt-1 text-sm text-stone-800">
-          <strong>「クマの『鳴き声』を AI で識別する」</strong> —
-          クマの 12 種類以上の鳴き声・うなり声を機械学習で分類した
-          最新の音響識別研究を精読します。
-        </div>
-      </div>
+      <NextIssue label="次号予告 — Vol.25">
+        <strong>「クマの『鳴き声』を AI で識別する」</strong> —
+        クマの 12 種類以上の鳴き声・うなり声を機械学習で分類した
+        最新の音響識別研究を精読します。
+      </NextIssue>
     </ArticleShell>
   );
 }

@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
+import {
+  PaperCard,
+  KeyPoints,
+  Callout,
+  StatCallout,
+  References,
+} from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-033")!;
@@ -38,45 +45,39 @@ export default function Page() {
       </p>
 
       {/* 論文カード */}
-      <div className="not-prose my-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-blue-700">
-          今号で読み解く 1 本の論文
-        </div>
-        <div className="mt-2 text-sm font-semibold text-stone-900">
-          Maternal human habituation enhances sons&rsquo; risk of human-caused
-          mortality in a large carnivore, brown bears
-        </div>
-        <div className="mt-1 text-xs leading-relaxed text-stone-700">
-          Shimozuru, M., Shirane, Y., Yamanaka, M., et al. (2020).{" "}
-          <em className="not-italic">Scientific Reports</em> 10: 16498.
-          （北海道・知床国立公園のヒグマ）
-        </div>
-        <a
-          href="https://doi.org/10.1038/s41598-020-73057-5"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-        >
-          DOI: 10.1038/s41598-020-73057-5 →
-        </a>
-      </div>
+      <PaperCard
+        label="今号で読み解く 1 本の論文"
+        title={
+          <>
+            Maternal human habituation enhances sons&rsquo; risk of human-caused
+            mortality in a large carnivore, brown bears
+          </>
+        }
+        citation={
+          <>
+            Shimozuru, M., Shirane, Y., Yamanaka, M., et al. (2020).{" "}
+            <em className="not-italic">Scientific Reports</em> 10: 16498.
+            （北海道・知床国立公園のヒグマ）
+          </>
+        }
+        href="https://doi.org/10.1038/s41598-020-73057-5"
+        linkText="DOI: 10.1038/s41598-020-73057-5 →"
+      />
 
-      <div className="not-prose my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-800">
-          時間がない人向けの 3 行
-        </div>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed text-stone-800">
-          <li>
+      <KeyPoints
+        label="時間がない人向けの 3 行"
+        items={[
+          <>
             知床で、<strong>人に慣れた母グマの息子は 70% 超が人に殺されていた</strong>
-          </li>
-          <li>
+          </>,
+          <>
             子グマは母から<strong>「人を怖がらない」ことを学習</strong>して受け継ぐ
-          </li>
-          <li>
+          </>,
+          <>
             だから対策の本丸は<strong>「最初の 1 頭を人慣れさせないこと」＝餌付け・生ゴミの根絶</strong>
-          </li>
-        </ul>
-      </div>
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -120,17 +121,11 @@ export default function Page() {
         その<strong>70% 以上が人に殺されていた</strong>（駆除・事故等の人為的死亡）。
         これは、人馴れの度合いが低い母グマの息子に比べて<strong>明らかに高い</strong>割合でした。
       </p>
-      <div className="not-prose my-4 rounded-2xl border-2 border-red-300 bg-red-50 p-6 text-center">
-        <div className="text-xs font-semibold uppercase tracking-widest text-red-800">
-          人慣れした母グマの息子の人為的死亡率
-        </div>
-        <div className="mt-2 text-5xl font-bold text-red-700 tabular-nums">
-          70%+
-        </div>
-        <div className="mt-2 text-sm text-stone-700">
-          人慣れの弱い母グマの息子より明らかに高かった
-        </div>
-      </div>
+      <StatCallout
+        label="人慣れした母グマの息子の人為的死亡率"
+        value="70%+"
+        note="人慣れの弱い母グマの息子より明らかに高かった"
+      />
 
       <h2 id="why-sons">なぜ「息子」なのか</h2>
       <p>
@@ -162,17 +157,12 @@ export default function Page() {
         出てきたクマを駆除するのは「下流」の対症療法にすぎない。
         本当に効くのは<strong>「上流」——そもそも 1 頭目を人慣れさせないこと</strong>です。
       </p>
-      <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
-          要点
-        </div>
-        <p className="mt-2 text-sm leading-relaxed text-stone-800">
-          餌付け（意図的・非意図的を問わず）と生ゴミ・残飯・放置果樹は、
-          クマに「人＝食べ物」を学習させる入り口。
-          ここを断つことは、目の前の 1 頭だけでなく、
-          <strong>その子・孫の世代まで救う</strong>ことにつながります。
-        </p>
-      </div>
+      <Callout label="要点" tone="emerald">
+        餌付け（意図的・非意図的を問わず）と生ゴミ・残飯・放置果樹は、
+        クマに「人＝食べ物」を学習させる入り口。
+        ここを断つことは、目の前の 1 頭だけでなく、
+        <strong>その子・孫の世代まで救う</strong>ことにつながります。
+      </Callout>
 
       <h2 id="action">私たちにできること</h2>
       <ol className="my-4 list-decimal space-y-3 pl-5">
@@ -202,28 +192,26 @@ export default function Page() {
       </p>
 
       <h2 id="references">参考文献</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-xl border border-stone-200 bg-white">
-        <ol className="m-0 list-none divide-y divide-stone-100 p-0">
-          <li className="px-4 py-3 text-sm">
-            <div className="font-semibold text-stone-900">
-              Maternal human habituation enhances sons&rsquo; risk of
-              human-caused mortality in a large carnivore, brown bears（本号メイン）
-            </div>
-            <div className="mt-0.5 text-xs text-stone-600">
-              Shimozuru, M., Shirane, Y., Yamanaka, M., et al. (2020).{" "}
-              <em className="not-italic">Scientific Reports</em> 10: 16498.
-            </div>
-            <a
-              href="https://doi.org/10.1038/s41598-020-73057-5"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-xs text-amber-700 underline hover:text-amber-900"
-            >
-              DOI: 10.1038/s41598-020-73057-5 →
-            </a>
-          </li>
-        </ol>
-      </div>
+      <References
+        items={[
+          {
+            title: (
+              <>
+                Maternal human habituation enhances sons&rsquo; risk of
+                human-caused mortality in a large carnivore, brown bears（本号メイン）
+              </>
+            ),
+            citation: (
+              <>
+                Shimozuru, M., Shirane, Y., Yamanaka, M., et al. (2020).{" "}
+                <em className="not-italic">Scientific Reports</em> 10: 16498.
+              </>
+            ),
+            href: "https://doi.org/10.1038/s41598-020-73057-5",
+            linkText: "DOI: 10.1038/s41598-020-73057-5 →",
+          },
+        ]}
+      />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
