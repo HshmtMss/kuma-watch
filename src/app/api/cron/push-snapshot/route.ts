@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { recordPushSnapshot, isConfigured } from "@/lib/push-storage";
+import { recordLineSnapshot } from "@/lib/line-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,8 +26,14 @@ export async function GET(req: Request) {
       { status: 503 },
     );
   }
-  const snapshot = await recordPushSnapshot();
-  return NextResponse.json({ ok: true, snapshot });
+  // Web Push と LINE の両方を同じ日次スナップショットで記録する。
+  // 同一 Upstash を共用するため isConfigured は push 側の判定で足りる。
+  // LINE 側が失敗しても push のスナップショットは残すため catch で握る。
+  const [snapshot, lineSnapshot] = await Promise.all([
+    recordPushSnapshot(),
+    recordLineSnapshot().catch(() => null),
+  ]);
+  return NextResponse.json({ ok: true, snapshot, lineSnapshot });
 }
 
 // POST でも同じ（GitHub Actions からは POST で叩く）。

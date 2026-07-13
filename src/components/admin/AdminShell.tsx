@@ -8,6 +8,7 @@ import {
   EyeOff,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 
 /**
@@ -21,11 +22,12 @@ import {
 
 const SECRET_KEY = "kw.admin.secret";
 
-export type AdminTab = "home" | "push-stats" | "submissions";
+export type AdminTab = "home" | "push-stats" | "line-stats" | "submissions";
 
 const TABS: { key: AdminTab; label: string; href: string; Icon: typeof BarChart3 }[] = [
   { key: "home", label: "ダッシュボード", href: "/admin", Icon: LayoutDashboard },
   { key: "push-stats", label: "通知登録", href: "/admin/push-stats", Icon: BarChart3 },
+  { key: "line-stats", label: "LINE登録", href: "/admin/line-stats", Icon: MessageCircle },
   { key: "submissions", label: "投稿", href: "/admin/submissions", Icon: ClipboardList },
 ];
 

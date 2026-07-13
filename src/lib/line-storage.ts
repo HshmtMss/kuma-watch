@@ -28,6 +28,8 @@
  * が無いと isConfigured() が false を返し、API ルートは 503 で即終了する。
  */
 import { Redis } from "@upstash/redis";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { prefectureForLatLon } from "@/lib/prefecture-bbox";
 import type { GeoPoint } from "@/lib/push-storage";
 
 export type { GeoPoint };
@@ -416,4 +418,194 @@ export async function filterUndispatched(ids: string[]): Promise<string[]> {
   for (const id of ids) pipeline.sismember(`ldispatched:ids`, id);
   const results = (await pipeline.exec()) as number[];
   return ids.filter((_, i) => results[i] !== 1);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 集計 (管理画面 /admin/line-stats 用)。Web Push の getPushStats と同型で、
+// 自治体別・観光地別・任意地点(geo)別の LINE 登録数を出す。
+// ─────────────────────────────────────────────────────────────────────────
+
+export type LineStats = {
+  /** ユニーク登録者数 (= luser:{userId} 本体の件数。複数地域登録でも 1) */
+  totalUsers: number;
+  /** 登録者が 1 人以上いる市町村の数 */
+  activeMuniCount: number;
+  /** (登録者 × 地域) のペア総数。複数地域ユーザは重複計上 */
+  totalMuniSubscriptions: number;
+  /** 1 登録者あたりの平均登録地域数 */
+  avgMunisPerUser: number;
+  /** 登録者数の多い市町村ランキング (上位 topN) */
+  topMunis: { pref: string; city: string; count: number }[];
+  /** 登録者が 1 人以上いる観光地 (spot) の数 */
+  activeSpotCount: number;
+  /** (登録者 × 観光地) のペア総数 */
+  totalSpotSubscriptions: number;
+  /** 登録者数の多い観光地ランキング (上位 topN) */
+  topSpots: { slug: string; name: string; pref: string; count: number }[];
+  /** 任意地点(geo)登録の総数 */
+  totalGeoPoints: number;
+  /** geo 地点を都道府県にざっくり割り当てたランキング (上位 topN) */
+  topGeoPrefs: { pref: string; count: number }[];
+};
+
+/**
+ * LINE 登録状況の集計。getPushStats (Web Push) と同じ手順を LINE キー空間
+ * ("l" プレフィクス) に対して行う。
+ *   - ユニーク登録者数: luser:{userId} を SCAN (逆引き luser:munis:/luser:spots: は除外)
+ *   - 地域別: lmuni:active を起点に各 lmuni:{mk} を SCARD
+ *   - 観光地別: lspot:active を起点に各 lspot:{slug} を SCARD
+ *   - geo別: lgeo:active の各地点を BBox で都道府県へ割当
+ * unsubscribe は active セットを掃除するが、失効残りを避けるため SCARD 0 は除外する。
+ */
+export async function getLineStats(topN = 30): Promise<LineStats> {
+  const r = client();
+
+  // 1) ユニーク登録者数: luser:* を SCAN。逆引きキー luser:munis:* / luser:spots:*
+  //    も glob に一致するので除外し、luser:{userId} 本体だけを数える。
+  let cursor = "0";
+  let totalUsers = 0;
+  do {
+    const [next, keys] = await r.scan(cursor, { match: "luser:*", count: 1000 });
+    cursor = typeof next === "string" ? next : String(next);
+    for (const k of keys) {
+      if (!k.startsWith("luser:munis:") && !k.startsWith("luser:spots:")) {
+        totalUsers++;
+      }
+    }
+  } while (cursor !== "0");
+
+  // 2) 地域別登録者数: lmuni:active の各 muni を SCARD。
+  const muniKeys = (await r.smembers<string[]>(`lmuni:active`)) ?? [];
+  let totalMuniSubscriptions = 0;
+  let activeMuniCount = 0;
+  const perMuni: { pref: string; city: string; count: number }[] = [];
+  if (muniKeys.length > 0) {
+    const pipeline = r.pipeline();
+    for (const mk of muniKeys) pipeline.scard(`lmuni:${mk}`);
+    const counts = (await pipeline.exec()) as number[];
+    for (let i = 0; i < muniKeys.length; i++) {
+      const count = counts[i] ?? 0;
+      if (count <= 0) continue;
+      activeMuniCount++;
+      totalMuniSubscriptions += count;
+      const mk = muniKeys[i];
+      const idx = mk.indexOf("/");
+      const pref = idx < 0 ? mk : mk.slice(0, idx);
+      const city = idx < 0 ? "" : mk.slice(idx + 1);
+      perMuni.push({ pref, city, count });
+    }
+  }
+  perMuni.sort((a, b) => b.count - a.count);
+
+  // 3) 観光地別登録者数: lspot:active の各 slug を SCARD。
+  const spotSlugs = (await r.smembers<string[]>(`lspot:active`)) ?? [];
+  let totalSpotSubscriptions = 0;
+  let activeSpotCount = 0;
+  const perSpot: { slug: string; name: string; pref: string; count: number }[] =
+    [];
+  if (spotSlugs.length > 0) {
+    const pipeline = r.pipeline();
+    for (const slug of spotSlugs) pipeline.scard(`lspot:${slug}`);
+    const counts = (await pipeline.exec()) as number[];
+    for (let i = 0; i < spotSlugs.length; i++) {
+      const count = counts[i] ?? 0;
+      if (count <= 0) continue;
+      activeSpotCount++;
+      totalSpotSubscriptions += count;
+      const slug = spotSlugs[i];
+      const lm = JAPAN_LANDMARKS.find((l) => l.slug === slug);
+      perSpot.push({
+        slug,
+        name: lm?.name ?? slug,
+        pref: lm?.prefName ?? "",
+        count,
+      });
+    }
+  }
+  perSpot.sort((a, b) => b.count - a.count);
+
+  // 4) geo(任意地点)別: lgeo:active の各 userId の地点を都道府県へざっくり割当。
+  const geoUserIds = (await r.smembers<string[]>(`lgeo:active`)) ?? [];
+  let totalGeoPoints = 0;
+  const geoPrefCount = new Map<string, number>();
+  if (geoUserIds.length > 0) {
+    const pipeline = r.pipeline();
+    for (const u of geoUserIds) pipeline.get(`lgeo:pts:${u}`);
+    const rawList = (await pipeline.exec()) as (string | GeoPoint[] | null)[];
+    for (const raw of rawList) {
+      for (const pt of parseGeoPoints(raw ?? null)) {
+        const pref = prefectureForLatLon(pt.lat, pt.lon);
+        if (!pref) continue;
+        totalGeoPoints++;
+        geoPrefCount.set(pref, (geoPrefCount.get(pref) ?? 0) + 1);
+      }
+    }
+  }
+  const perGeoPref = [...geoPrefCount.entries()]
+    .map(([pref, count]) => ({ pref, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    totalUsers,
+    activeMuniCount,
+    totalMuniSubscriptions,
+    avgMunisPerUser: totalUsers > 0 ? totalMuniSubscriptions / totalUsers : 0,
+    topMunis: perMuni.slice(0, topN),
+    activeSpotCount,
+    totalSpotSubscriptions,
+    topSpots: perSpot.slice(0, topN),
+    totalGeoPoints,
+    topGeoPrefs: perGeoPref.slice(0, topN),
+  };
+}
+
+// ─── 登録数の時系列スナップショット (Web Push の push:hist と同型、キーは line:hist) ───
+
+export type LineSnapshot = {
+  date: string; // YYYY-MM-DD (JST)
+  totalUsers: number;
+  totalMuniSubscriptions: number;
+  activeMuniCount: number;
+  activeSpotCount: number;
+  totalGeoPoints: number;
+};
+
+const LINE_HIST_KEY = "line:hist";
+
+function lineJstDate(): string {
+  return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+}
+
+/** 現在の集計値を日次スナップショットとして保存する（cron から呼ぶ）。同日は上書き。 */
+export async function recordLineSnapshot(): Promise<LineSnapshot> {
+  const s = await getLineStats(0);
+  const snap: LineSnapshot = {
+    date: lineJstDate(),
+    totalUsers: s.totalUsers,
+    totalMuniSubscriptions: s.totalMuniSubscriptions,
+    activeMuniCount: s.activeMuniCount,
+    activeSpotCount: s.activeSpotCount,
+    totalGeoPoints: s.totalGeoPoints,
+  };
+  await client().hset(LINE_HIST_KEY, { [snap.date]: JSON.stringify(snap) });
+  return snap;
+}
+
+/** 直近 days 日の日次スナップショットを日付昇順で返す。 */
+export async function getLineHistory(days = 120): Promise<LineSnapshot[]> {
+  const all = await client().hgetall<Record<string, string | LineSnapshot>>(
+    LINE_HIST_KEY,
+  );
+  if (!all) return [];
+  const list: LineSnapshot[] = [];
+  for (const v of Object.values(all)) {
+    try {
+      const s = typeof v === "string" ? (JSON.parse(v) as LineSnapshot) : v;
+      if (s && typeof s.date === "string") list.push(s);
+    } catch {
+      // 壊れたエントリは無視
+    }
+  }
+  list.sort((a, b) => (a.date < b.date ? -1 : 1));
+  return list.slice(-days);
 }
