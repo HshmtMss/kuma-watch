@@ -17,6 +17,7 @@
 import { inJapanBounds, type UnifiedSighting } from "./types";
 import { geocodePlace, jitter } from "./geocode";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
+import { isNewsSuppressed } from "@/lib/news-suppression";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -453,6 +454,9 @@ export async function fetchNewsSightings(
     // getCachedSightings の filterMisgeocoded と同じ判定を取り込み段でも掛け、
     // 誤座標がスナップショット・件数集計・生ファイル参照に混入するのを防ぐ。
     if (!latLonMatchesPrefecture(prefName, lat, lon)) continue;
+    // 地域抑制: 事実無根の報道ピンで実害が出ている地域(news-suppression)は
+    // 取り込み段でも落とし、次回の news-flash で再出現しないようにする。
+    if (isNewsSuppressed("news", lat, lon)) continue;
 
     const id = `news-${article.source}-${s.index}-${i}`;
     const pos = precise ? { lat, lon } : jitter(lat, lon, id);

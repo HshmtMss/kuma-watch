@@ -4,11 +4,14 @@ import { fetchAllOfficialSightings } from "@/lib/sources/aggregate";
 import { getSharp9110Sightings } from "@/lib/sources/all-records";
 import { fetchNewsSightings } from "@/lib/sources/news";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
+import { isNewsSuppressed } from "@/lib/news-suppression";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
  * 元ソースのジオコーダー失敗で県名と座標が大きくズレているレコードを除外する。
  * 例: 「徳島県 那賀町」を主張しつつ座標が神奈川県内など。
+ * あわせて、地域抑制リスト(news-suppression)に該当する報道ピンも除外する
+ * (事実無根の報道由来ピンで実害が出ている地域を、読み取り段で即時に隠す)。
  */
 function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
   return records.filter((r) =>
@@ -16,7 +19,8 @@ function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
     typeof r.lon === "number" &&
     Number.isFinite(r.lat) &&
     Number.isFinite(r.lon) &&
-    latLonMatchesPrefecture(r.prefectureName, r.lat, r.lon),
+    latLonMatchesPrefecture(r.prefectureName, r.lat, r.lon) &&
+    !isNewsSuppressed(r.source, r.lat, r.lon),
   );
 }
 
