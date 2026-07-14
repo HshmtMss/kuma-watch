@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminSubmissionsMap, { type MapItem } from "./AdminSubmissionsMap";
 import AdminShell from "@/components/admin/AdminShell";
 
@@ -116,6 +116,20 @@ function SubmissionsContent({
   const [view, setView] = useState<"table" | "card" | "map">("table");
   // 一括操作の選択状態（リスト表示のチェックボックス）。
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  // 自由検索（地名・地区・コメント・連絡先）。ステータス絞り込みの内側で効く。
+  const [query, setQuery] = useState("");
+
+  const shown = useMemo(() => {
+    const t = query.trim().toLowerCase();
+    if (!t) return items;
+    return items.filter((s) =>
+      [s.prefectureName, s.cityName, s.sectionName, s.comment, s.contact]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(t),
+    );
+  }, [items, query]);
 
   const load = useCallback(
     async (st: string) => {
@@ -228,7 +242,7 @@ function SubmissionsContent({
     setSelected(new Set());
   };
 
-  const mapItems: MapItem[] = items.map((s) => ({
+  const mapItems: MapItem[] = shown.map((s) => ({
     id: s.id,
     lat: s.lat,
     lon: s.lon,
@@ -275,9 +289,25 @@ function SubmissionsContent({
         ))}
       </div>
 
+      {/* 自由検索（地名・地区・コメント・連絡先） */}
+      <div className="mb-3">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="地名・地区・コメント・連絡先で検索"
+          className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+        />
+      </div>
+
       {/* 表 / カード / 地図 切替 */}
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-stone-500">{items.length} 件</span>
+        <span className="text-sm text-stone-500">
+          {shown.length} 件
+          {query.trim() && (
+            <span className="text-stone-400">（全 {items.length} 件中）</span>
+          )}
+        </span>
         <div className="inline-flex overflow-hidden rounded-full border border-stone-300">
           {(["table", "card", "map"] as const).map((v) => (
             <button
@@ -302,32 +332,34 @@ function SubmissionsContent({
         </p>
       )}
 
-      {items.length === 0 && !loading && (
+      {shown.length === 0 && !loading && (
         <p className="rounded-xl border border-stone-200 bg-white px-4 py-6 text-center text-sm text-stone-500">
-          該当する投稿はありません。
+          {query.trim()
+            ? "検索に一致する投稿はありません。"
+            : "該当する投稿はありません。"}
         </p>
       )}
 
-      {view === "map" && items.length > 0 && (
+      {view === "map" && shown.length > 0 && (
         <AdminSubmissionsMap items={mapItems} onModerate={moderate} />
       )}
 
-      {(view === "table" || view === "card") && items.length > 0 && (
+      {(view === "table" || view === "card") && shown.length > 0 && (
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm">
               <label className="flex items-center gap-1.5 text-stone-600">
                 <input
                   type="checkbox"
                   className="h-4 w-4"
-                  checked={selected.size > 0 && selected.size === items.length}
+                  checked={selected.size > 0 && selected.size === shown.length}
                   ref={(el) => {
                     if (el)
                       el.indeterminate =
-                        selected.size > 0 && selected.size < items.length;
+                        selected.size > 0 && selected.size < shown.length;
                   }}
                   onChange={(e) =>
                     setSelected(
                       e.target.checked
-                        ? new Set(items.map((i) => i.id))
+                        ? new Set(shown.map((i) => i.id))
                         : new Set(),
                     )
                   }
@@ -369,9 +401,9 @@ function SubmissionsContent({
         </div>
       )}
 
-      {view === "table" && items.length > 0 && (
+      {view === "table" && shown.length > 0 && (
         <SubmissionTable
-          items={items}
+          items={shown}
           selected={selected}
           toggleSelect={toggleSelect}
           moderate={moderate}
@@ -381,7 +413,7 @@ function SubmissionsContent({
 
       {view === "card" && (
         <ul className="flex flex-col gap-4">
-            {items.map((s) => (
+            {shown.map((s) => (
             <li
               key={s.id}
               className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
