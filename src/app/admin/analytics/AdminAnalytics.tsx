@@ -516,25 +516,42 @@ function LineChart({
 function Bars({ data, color }: { data: Bucket[]; color: string }) {
   const max = Math.max(1, ...data.map((d) => d.count));
   return (
-    <div className="flex items-end gap-1" style={{ height: 140 }}>
-      {data.map((d) => (
-        <div key={d.label} className="flex flex-1 flex-col items-center gap-1">
-          <span className="text-[9px] tabular-nums text-stone-400">
-            {d.count.toLocaleString("ja-JP")}
-          </span>
-          <div className="flex w-full flex-1 items-end">
+    <div>
+      {/* 棒の行: 列を親の高さ(160px)いっぱいに伸ばし、下揃えで積む。
+          棒は列の高さに対する % で伸ばす(最大85%=上のラベル用に余白を残す)。 */}
+      <div className="flex gap-1" style={{ height: 160 }}>
+        {data.map((d) => (
+          <div
+            key={d.label}
+            className="flex h-full flex-1 flex-col items-center justify-end"
+          >
+            <span className="mb-1 text-[9px] tabular-nums text-stone-400">
+              {d.count.toLocaleString("ja-JP")}
+            </span>
             <div
               className="w-full rounded-t"
               style={{
-                height: `${(d.count / max) * 100}%`,
-                minHeight: d.count > 0 ? 2 : 0,
+                height: `${Math.max(
+                  (d.count / max) * 85,
+                  d.count > 0 ? 2 : 0,
+                )}%`,
                 background: color,
               }}
             />
           </div>
-          <span className="text-[9px] text-stone-500">{d.label}</span>
-        </div>
-      ))}
+        ))}
+      </div>
+      {/* 目盛りラベルの行(棒と同じ flex-1 で列に揃える) */}
+      <div className="mt-1 flex gap-1">
+        {data.map((d) => (
+          <div
+            key={d.label}
+            className="flex-1 text-center text-[9px] text-stone-500"
+          >
+            {d.label}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
