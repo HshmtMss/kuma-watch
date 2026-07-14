@@ -14,6 +14,9 @@ import { Redis } from "@upstash/redis";
 
 export type ContactKind = "gov" | "vendor";
 
+/** 対応状態。未設定(旧レコード)は "new" 扱い。 */
+export type ContactStatus = "new" | "handled";
+
 export type ContactMessage = {
   id: string;
   kind: ContactKind;
@@ -24,6 +27,8 @@ export type ContactMessage = {
   message: string;
   receivedAt: number; // epoch ms
   userAgent?: string;
+  status?: ContactStatus;
+  handledAt?: number; // epoch ms
 };
 
 const ALL_KEY = "cc:all";
@@ -70,6 +75,23 @@ export async function saveContact(msg: ContactMessage): Promise<void> {
 export async function deleteContact(id: string): Promise<void> {
   const r = client();
   await Promise.all([r.del(`cc:msg:${id}`), r.zrem(ALL_KEY, id)]);
+}
+
+/** 対応状態を更新する (新着 ↔ 対応済み)。 */
+export async function setContactStatus(
+  id: string,
+  status: ContactStatus,
+): Promise<ContactMessage | null> {
+  const r = client();
+  const cur = parse(await r.get<string | ContactMessage>(`cc:msg:${id}`));
+  if (!cur) return null;
+  const next: ContactMessage = {
+    ...cur,
+    status,
+    handledAt: status === "handled" ? Date.now() : undefined,
+  };
+  await r.set(`cc:msg:${id}`, JSON.stringify(next));
+  return next;
 }
 
 /** 全問い合わせを新しい順に返す。 */

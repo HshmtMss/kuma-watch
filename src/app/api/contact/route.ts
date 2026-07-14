@@ -111,6 +111,7 @@ export async function POST(req: Request) {
     phone: phone || undefined,
     message,
     receivedAt: Date.now(),
+    status: "new",
     userAgent: str(req.headers.get("user-agent")).slice(0, 300) || undefined,
   };
 

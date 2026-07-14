@@ -53,15 +53,17 @@ export default function AdminShell({
   const [error, setError] = useState("");
   // 合言葉の表示/非表示トグル。
   const [showSecret, setShowSecret] = useState(false);
-  // 投稿タブに出す承認待ち件数バッジ（全画面で共通表示）。
+  // タブに出す要対応バッジ（全画面で共通表示）。
   const [pendingBadge, setPendingBadge] = useState<number | null>(null);
+  const [contactsBadge, setContactsBadge] = useState<number | null>(null);
 
-  // 認証済みになったら承認待ち件数をベストエフォートで取得（バッジ用）。
+  // 認証済みになったら承認待ち投稿・新着問い合わせをベストエフォート取得（バッジ用）。
   useEffect(() => {
     if (!authed || !secret) return;
     let cancelled = false;
+    const auth = { Authorization: `Bearer ${secret}` };
     fetch(`/api/admin/submissions?status=pending`, {
-      headers: { Authorization: `Bearer ${secret}` },
+      headers: auth,
       cache: "no-store",
     })
       .then((r) => (r.ok ? r.json() : null))
@@ -70,10 +72,28 @@ export default function AdminShell({
           setPendingBadge(d.submissions.length);
       })
       .catch(() => {});
+    fetch(`/api/admin/contacts`, { headers: auth, cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && Array.isArray(d?.contacts))
+          setContactsBadge(
+            d.contacts.filter(
+              (c: { status?: string }) => (c.status ?? "new") !== "handled",
+            ).length,
+          );
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [authed, secret]);
+
+  const badgeFor = (key: AdminTab): number | null =>
+    key === "submissions"
+      ? pendingBadge
+      : key === "contacts"
+        ? contactsBadge
+        : null;
 
   const validate = useCallback(async (sec: string) => {
     setChecking(true);
@@ -191,13 +211,14 @@ export default function AdminShell({
                 >
                   <t.Icon size={15} strokeWidth={1.9} aria-hidden />
                   {t.label}
-                  {t.key === "submissions" &&
-                    pendingBadge != null &&
-                    pendingBadge > 0 && (
+                  {(() => {
+                    const b = badgeFor(t.key);
+                    return b != null && b > 0 ? (
                       <span className="ml-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                        {pendingBadge}
+                        {b}
                       </span>
-                    )}
+                    ) : null;
+                  })()}
                 </a>
               );
             })}
