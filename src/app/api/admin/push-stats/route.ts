@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   getPushStats,
   getPushHistory,
+  getPushDispatchLog,
   isConfigured,
 } from "@/lib/push-storage";
 
@@ -39,9 +40,10 @@ export async function GET(req: Request) {
   }
   const sp = new URL(req.url).searchParams;
   const topN = Math.min(Math.max(Number(sp.get("top")) || 30, 1), 200);
-  const [stats, history] = await Promise.all([
+  const [stats, history, dispatchLog] = await Promise.all([
     getPushStats(topN),
     getPushHistory(120),
+    getPushDispatchLog(100),
   ]);
-  return NextResponse.json({ ok: true, ...stats, history });
+  return NextResponse.json({ ok: true, ...stats, history, dispatchLog });
 }

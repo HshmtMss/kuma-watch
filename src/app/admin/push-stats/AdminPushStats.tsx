@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AdminShell from "@/components/admin/AdminShell";
+import DispatchLogTable, {
+  type DispatchRow,
+} from "@/components/admin/DispatchLogTable";
 
 /**
  * 通知登録状況ダッシュボード (合言葉でログイン)。
@@ -32,6 +35,7 @@ type PushStats = {
   totalGeoPoints: number;
   topGeoPrefs: GeoPrefRow[];
   history?: HistRow[];
+  dispatchLog?: DispatchRow[];
 };
 
 function downloadCsv(filename: string, rows: (string | number)[][]): void {
@@ -150,6 +154,13 @@ function PushStatsContent({
           </div>
 
           <HistoryChart history={stats.history ?? []} />
+
+          <div className="h-6" />
+
+          <DispatchLogTable
+            log={stats.dispatchLog ?? []}
+            channel="Web Push"
+          />
 
           <div className="h-6" />
 

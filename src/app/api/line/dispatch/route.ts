@@ -7,6 +7,7 @@ import {
   getSubscribersForSpot,
   isConfigured,
   markDispatched,
+  recordLineDispatch,
 } from "@/lib/line-storage";
 import {
   isLineConfigured,
@@ -242,6 +243,25 @@ export async function POST(req: Request) {
   // 3. 配信済みマーキング
   const dispatched = [...dispatchedIds];
   await markDispatched(dispatched);
+
+  // 4. 配信ログを永続化 (管理画面の稼働確認用)。記録失敗は配信結果に影響させない。
+  //    由来は ?source= で受け取る (news-flash / sharp9110)。未指定は unknown。
+  const source = (new URL(req.url).searchParams.get("source") ?? "unknown").slice(
+    0,
+    24,
+  );
+  try {
+    await recordLineDispatch({
+      ts: Date.now(),
+      source,
+      muniGroups: muniGroups.size,
+      recipients: recipientCount,
+      sent: sentCount,
+      dispatched: dispatched.length,
+    });
+  } catch (e) {
+    console.error("[line/dispatch] recordLineDispatch failed", e);
+  }
 
   return NextResponse.json({
     ok: true,

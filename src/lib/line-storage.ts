@@ -609,3 +609,60 @@ export async function getLineHistory(days = 120): Promise<LineSnapshot[]> {
   list.sort((a, b) => (a.date < b.date ? -1 : 1));
   return list.slice(-days);
 }
+
+// ─── 配信ログ (LINE dispatch。1配信=1レコードを line:dispatchlog の ZSET に追記) ───
+//
+// 目的: 「何通送ったか」を永続化し、管理画面で稼働確認できるようにする。
+// 注意: sent は LINE API が受理した「送信リクエスト数」であって到達・開封の保証
+//       ではない (multicast は 200 が返ればブロック済ユーザも 1 通に含む)。
+//       recipients=0 / sent=0 は異常ではなく「その回の新規目撃に該当する購読者が
+//       居なかった」正常ケース。
+
+export type LineDispatchRecord = {
+  ts: number; // epoch ms (送信時刻)
+  source: string; // "news-flash" | "sharp9110" | "unknown"（由来ワークフロー）
+  muniGroups: number;
+  recipients: number; // マッチした購読者数
+  sent: number; // 送信リクエスト数（到達保証ではない）
+  dispatched: number; // 新規にさばいた目撃 ID 数
+};
+
+const LINE_DISPATCH_KEY = "line:dispatchlog";
+const DISPATCH_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
+
+/** 1 配信の結果を追記する。配信可否には影響させない (呼び出し側で try/catch)。 */
+export async function recordLineDispatch(
+  rec: LineDispatchRecord,
+): Promise<void> {
+  const c = client();
+  await c.zadd(LINE_DISPATCH_KEY, {
+    score: rec.ts,
+    member: JSON.stringify(rec),
+  });
+  // 90 日より古いエントリを間引く (スナップショットの retention と揃える)。
+  await c.zremrangebyscore(LINE_DISPATCH_KEY, 0, rec.ts - DISPATCH_RETENTION_MS);
+}
+
+/** 直近の配信ログを新しい順に返す。 */
+export async function getLineDispatchLog(
+  limit = 100,
+): Promise<LineDispatchRecord[]> {
+  const c = client();
+  const raw = await c.zrange<(string | LineDispatchRecord)[]>(
+    LINE_DISPATCH_KEY,
+    0,
+    limit - 1,
+    { rev: true },
+  );
+  if (!raw) return [];
+  const out: LineDispatchRecord[] = [];
+  for (const v of raw) {
+    try {
+      const r = (typeof v === "string" ? JSON.parse(v) : v) as LineDispatchRecord;
+      if (r && typeof r.ts === "number") out.push(r);
+    } catch {
+      // 壊れたエントリは無視
+    }
+  }
+  return out;
+}

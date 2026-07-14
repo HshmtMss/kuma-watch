@@ -416,6 +416,62 @@ export async function getPushHistory(days = 120): Promise<PushSnapshot[]> {
   return list.slice(-days);
 }
 
+// ─── 配信ログ (Web Push dispatch。LINE の line:dispatchlog と同型、キー push:dispatchlog) ───
+// sent は「送信リクエスト数」であって到達保証ではない。recipients=0/sent=0 は
+// 「該当購読者なし」の正常ケース。
+
+export type PushDispatchRecord = {
+  ts: number; // epoch ms
+  source: string; // "news-flash" | "sharp9110" | "unknown"
+  muniGroups: number;
+  recipients: number;
+  sent: number;
+  dispatched: number;
+};
+
+const PUSH_DISPATCH_KEY = "push:dispatchlog";
+const PUSH_DISPATCH_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
+
+/** 1 配信の結果を追記する。配信可否には影響させない (呼び出し側で try/catch)。 */
+export async function recordPushDispatch(
+  rec: PushDispatchRecord,
+): Promise<void> {
+  const c = client();
+  await c.zadd(PUSH_DISPATCH_KEY, {
+    score: rec.ts,
+    member: JSON.stringify(rec),
+  });
+  await c.zremrangebyscore(
+    PUSH_DISPATCH_KEY,
+    0,
+    rec.ts - PUSH_DISPATCH_RETENTION_MS,
+  );
+}
+
+/** 直近の配信ログを新しい順に返す。 */
+export async function getPushDispatchLog(
+  limit = 100,
+): Promise<PushDispatchRecord[]> {
+  const c = client();
+  const raw = await c.zrange<(string | PushDispatchRecord)[]>(
+    PUSH_DISPATCH_KEY,
+    0,
+    limit - 1,
+    { rev: true },
+  );
+  if (!raw) return [];
+  const out: PushDispatchRecord[] = [];
+  for (const v of raw) {
+    try {
+      const r = (typeof v === "string" ? JSON.parse(v) : v) as PushDispatchRecord;
+      if (r && typeof r.ts === "number") out.push(r);
+    } catch {
+      /* skip broken entry */
+    }
+  }
+  return out;
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // 観光地 (spot) 購読。市町村 (muni) と完全に対になる構造。違いは「出没との
 // 紐付けを名前一致ではなく緯度経度の近傍 (dispatch 側で計算) で行う」点だけで、

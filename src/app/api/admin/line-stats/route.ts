@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getLineStats, getLineHistory, isConfigured } from "@/lib/line-storage";
+import {
+  getLineStats,
+  getLineHistory,
+  getLineDispatchLog,
+  isConfigured,
+} from "@/lib/line-storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,9 +40,10 @@ export async function GET(req: Request) {
   }
   const sp = new URL(req.url).searchParams;
   const topN = Math.min(Math.max(Number(sp.get("top")) || 30, 1), 200);
-  const [stats, history] = await Promise.all([
+  const [stats, history, dispatchLog] = await Promise.all([
     getLineStats(topN),
     getLineHistory(120),
+    getLineDispatchLog(100),
   ]);
-  return NextResponse.json({ ok: true, ...stats, history });
+  return NextResponse.json({ ok: true, ...stats, history, dispatchLog });
 }

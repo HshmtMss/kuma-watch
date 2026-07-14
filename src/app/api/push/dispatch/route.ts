@@ -9,6 +9,7 @@ import {
   isConfigured,
   markDispatched,
   purgeSubscription,
+  recordPushDispatch,
 } from "@/lib/push-storage";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { haversineKm } from "@/lib/nearby-sightings";
@@ -296,6 +297,24 @@ export async function POST(req: Request) {
   // 3. 配信済みマーキング
   const dispatched = [...dispatchedIds];
   await markDispatched(dispatched);
+
+  // 4. 配信ログを永続化 (管理画面の稼働確認用)。記録失敗は配信結果に影響させない。
+  const source = (new URL(req.url).searchParams.get("source") ?? "unknown").slice(
+    0,
+    24,
+  );
+  try {
+    await recordPushDispatch({
+      ts: Date.now(),
+      source,
+      muniGroups: muniGroups.size,
+      recipients: recipientCount,
+      sent: sentCount,
+      dispatched: dispatched.length,
+    });
+  } catch (e) {
+    console.error("[push/dispatch] recordPushDispatch failed", e);
+  }
 
   return NextResponse.json({
     ok: true,

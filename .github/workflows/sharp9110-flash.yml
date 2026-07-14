@@ -106,7 +106,7 @@ jobs:
           if [ "$COUNT" -eq 0 ]; then exit 0; fi
           # curl は最大 60 秒。Vercel が応答しない場合の保険。
           RESPONSE=$(curl -sS --max-time 60 -o /tmp/resp.json -w "%{http_code}" \
-            -X POST https://kuma-watch.jp/api/push/dispatch \
+            -X POST "https://kuma-watch.jp/api/push/dispatch?source=sharp9110" \
             -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
             -H "Content-Type: application/json" \
             --data-binary @/tmp/dispatch.json) || true
@@ -130,7 +130,7 @@ jobs:
             exit 0
           fi
           RESPONSE=$(curl -sS --max-time 60 -o /tmp/resp-line.json -w "%{http_code}" \
-            -X POST https://kuma-watch.jp/api/line/dispatch \
+            -X POST "https://kuma-watch.jp/api/line/dispatch?source=sharp9110" \
             -H "Authorization: Bearer ${PUSH_DISPATCH_SECRET}" \
             -H "Content-Type: application/json" \
             --data-binary @/tmp/dispatch.json) || true
