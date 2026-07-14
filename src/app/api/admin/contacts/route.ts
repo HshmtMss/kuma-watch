@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { contactStoreConfigured, listContacts } from "@/lib/contact-store";
+import {
+  contactStoreConfigured,
+  deleteContact,
+  listContacts,
+} from "@/lib/contact-store";
 
 /**
  * 問い合わせ一覧 (管理)。ADMIN_SECRET (合言葉) を Bearer で送って認証する
@@ -27,5 +31,22 @@ export async function GET(req: Request) {
   } catch (e) {
     console.error("[admin/contacts] list failed", e);
     return NextResponse.json({ error: "list_failed" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  if (!authorized(req)) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  const id = new URL(req.url).searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ error: "missing_id" }, { status: 400 });
+  }
+  try {
+    await deleteContact(id);
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("[admin/contacts] delete failed", e);
+    return NextResponse.json({ error: "delete_failed" }, { status: 500 });
   }
 }

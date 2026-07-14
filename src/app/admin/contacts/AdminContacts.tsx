@@ -20,6 +20,27 @@ function fmt(ms: number): string {
 function ContactList({ secret }: { secret: string }) {
   const [contacts, setContacts] = useState<ContactMessage[] | null>(null);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const remove = useCallback(
+    async (id: string) => {
+      if (!window.confirm("この問い合わせを削除しますか?")) return;
+      setDeleting(id);
+      try {
+        const res = await fetch(`/api/admin/contacts?id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${secret}` },
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        setContacts((prev) => (prev ? prev.filter((c) => c.id !== id) : prev));
+      } catch {
+        setError("削除に失敗しました。");
+      } finally {
+        setDeleting(null);
+      }
+    },
+    [secret],
+  );
 
   const load = useCallback(async () => {
     setError("");
@@ -64,6 +85,14 @@ function ContactList({ secret }: { secret: string }) {
               {KIND_LABEL[c.kind] ?? c.kind}
             </span>
             <span className="text-xs text-stone-500">{fmt(c.receivedAt)}</span>
+            <button
+              type="button"
+              onClick={() => remove(c.id)}
+              disabled={deleting === c.id}
+              className="ml-auto text-xs text-stone-400 hover:text-rose-600 disabled:opacity-50"
+            >
+              {deleting === c.id ? "削除中…" : "削除"}
+            </button>
           </div>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
             <dt className="text-stone-500">お名前</dt>

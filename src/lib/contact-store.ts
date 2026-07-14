@@ -66,6 +66,12 @@ export async function saveContact(msg: ContactMessage): Promise<void> {
   ]);
 }
 
+/** 問い合わせを1件削除する (テスト投稿・スパムの掃除用)。 */
+export async function deleteContact(id: string): Promise<void> {
+  const r = client();
+  await Promise.all([r.del(`cc:msg:${id}`), r.zrem(ALL_KEY, id)]);
+}
+
 /** 全問い合わせを新しい順に返す。 */
 export async function listContacts(opts?: {
   limit?: number;
