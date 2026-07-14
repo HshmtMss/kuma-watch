@@ -236,6 +236,21 @@ const RESPONSE_SCHEMA = {
 
 let memo: { at: number; data: UnifiedSighting[] } | null = null;
 
+// 安定・一意な id 生成用の FNV-1a ハッシュ (base36)。
+// 旧 id `news-{source}-{index}-{i}` は index/i がバッチ内連番で cron 実行ごとに
+// リセットされ、別記事どうしが同じ id になっていた (同一 id に 100件超のケースも)。
+// 地図は lite でピンを描き、クリック時に id で詳細取得するため、id 衝突により
+// 別地域の記事がポップアップに出る不具合の原因だった。記事 URL は記事ごとに一意で
+// cron を跨いでも安定なので、これを核にして衝突しない id を作る。
+function hash36(s: string): string {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h.toString(36);
+}
+
 function decodeXml(s: string): string {
   return s
     // [\s\S] = . と s フラグ等価。ES2017 ターゲットでも動く。
@@ -494,7 +509,9 @@ export async function fetchNewsSightings(
     // (県内での誤配置。県BBoxはすり抜けるため muni-geo-check で捕捉)。
     if (isNewsMisplaced(prefName, cityName, lat, lon)) continue;
 
-    const id = `news-${article.source}-${s.index}-${i}`;
+    // 一意 id: 記事 URL (記事ごとに一意・安定) + 記事内インデックス。同一記事に
+    // 複数事案がある場合は s.index / i で分離。これで cron 実行を跨いだ衝突を根絶。
+    const id = `news-${hash36(article.link)}-${s.index}-${i}`;
     const pos = precise ? { lat, lon } : jitter(lat, lon, id);
     // "HH:MM" (24時間) のみ採用。"9:5"→"09:05" に整える。範囲外は捨てる。
     const time = (() => {

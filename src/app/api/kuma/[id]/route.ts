@@ -13,6 +13,15 @@ export async function GET(
 ) {
   const { id } = await params;
   const targetId = decodeURIComponent(id);
+  // 座標ヒント。news の id は過去に一意でなく (news-{source}-{index}-{i} が
+  // cron 実行をまたいで重複)、同一 id に別地域のレコードが複数ぶら下がる。
+  // 単純な先頭一致だと、クリックしたピン (岡山) とは別のレコード (北海道等) の
+  // 詳細を返してしまう。ピンの lat/lon を受け取り、同一 id の中でその座標に
+  // 最も近いものを選んで曖昧さを解消する (既存データも即座に正しく表示)。
+  const sp = new URL(_req.url).searchParams;
+  const hintLat = Number(sp.get("lat"));
+  const hintLon = Number(sp.get("lon"));
+  const hasHint = Number.isFinite(hintLat) && Number.isFinite(hintLon);
   try {
     const unified = await getCachedSightings();
     const citizen =
@@ -21,12 +30,26 @@ export async function GET(
             () => [] as UnifiedSighting[],
           )
         : [];
-    const found = [...unified, ...citizen].find(
+    const matches = [...unified, ...citizen].filter(
       (s) => String(s.id) === targetId,
     );
-    if (!found) {
+    if (matches.length === 0) {
       return NextResponse.json({ error: "not found" }, { status: 404 });
     }
+    const found =
+      hasHint && matches.length > 1
+        ? matches.reduce((best, s) => {
+            const d = (lat: number, lon: number) =>
+              (lat - hintLat) ** 2 + (lon - hintLon) ** 2;
+            return typeof s.lat === "number" &&
+              typeof s.lon === "number" &&
+              typeof best.lat === "number" &&
+              typeof best.lon === "number" &&
+              d(s.lat, s.lon) < d(best.lat, best.lon)
+              ? s
+              : best;
+          })
+        : matches[0];
     return NextResponse.json(
       { record: unifiedToKumaRecord(found) },
       {

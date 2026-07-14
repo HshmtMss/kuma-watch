@@ -606,7 +606,12 @@ export default function KumaMap({
       <div style="color:#888;font-size:12px;margin-top:4px">詳細を読み込み中…</div>
     </div>`;
     popup.setLatLng([r.lat, r.lon]).setContent(loading).openOn(map);
-    fetch(`/api/kuma/${encodeURIComponent(key)}`)
+    // lat/lon をヒントとして渡す。news の id は過去に重複があり、同一 id に
+    // 別地域のレコードが複数ぶら下がるため、id だけだと別のピンの詳細が返る
+    // (岡山のピンに北海道の記事が出る等)。座標で同一 id 内を曖昧さ解消する。
+    fetch(
+      `/api/kuma/${encodeURIComponent(key)}?lat=${r.lat}&lon=${r.lon}`,
+    )
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { record?: KumaRecord } | null) => {
         const rec = data?.record;
