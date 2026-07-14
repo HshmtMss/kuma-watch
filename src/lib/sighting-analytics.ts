@@ -11,6 +11,9 @@ export type AnalyticsRecord = {
   comment?: string;
   sourceKind?: string;
   source?: string;
+  lat?: number;
+  lon?: number;
+  headCount?: number;
 };
 
 // ---- 日付ユーティリティ（UTC 深夜で単純計算。date は JST カレンダー日）----
@@ -186,6 +189,200 @@ export function hotspots(
   return out
     .sort((a, b) => b.ratio - a.ratio || b.recent - a.recent)
     .slice(0, limit);
+}
+
+// ============ E: 直近の勢い（前週比・前月比） ============
+export type Momentum = {
+  d7: number;
+  prev7: number;
+  d30: number;
+  prev30: number;
+  topMovers: { pref: string; recent: number; prev: number; delta: number }[];
+};
+
+function countBetween(
+  records: AnalyticsRecord[],
+  from: string,
+  toExclusive: string,
+): number {
+  let n = 0;
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (d && d >= from && d < toExclusive) n += 1;
+  }
+  return n;
+}
+
+/** 直近7日 vs 前7日、直近30日 vs 前30日、県別の増加上位。 */
+export function momentum(
+  records: AnalyticsRecord[],
+  today: string,
+): Momentum {
+  const tomorrow = shiftDays(today, -1); // today を含めるため翌日を排他上限に
+  const d7from = shiftDays(today, 6);
+  const p7from = shiftDays(today, 13);
+  const d30from = shiftDays(today, 29);
+  const p30from = shiftDays(today, 59);
+  // 県別 30日 vs 前30日
+  const rec = new Map<string, number>();
+  const prev = new Map<string, number>();
+  for (const r of records) {
+    const d = ymd(r.date);
+    const p = (r.prefectureName ?? "").trim();
+    if (!d || !p) continue;
+    if (d >= d30from && d < tomorrow) rec.set(p, (rec.get(p) ?? 0) + 1);
+    else if (d >= p30from && d < d30from) prev.set(p, (prev.get(p) ?? 0) + 1);
+  }
+  const movers = [...rec.entries()]
+    .map(([pref, recent]) => {
+      const pv = prev.get(pref) ?? 0;
+      return { pref, recent, prev: pv, delta: recent - pv };
+    })
+    .filter((m) => m.delta > 0)
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, 10);
+  return {
+    d7: countBetween(records, d7from, tomorrow),
+    prev7: countBetween(records, p7from, d7from),
+    d30: countBetween(records, d30from, tomorrow),
+    prev30: countBetween(records, p30from, d30from),
+    topMovers: movers,
+  };
+}
+
+// ============ F: 分布の重心移動（年別） ============
+export type CentroidPoint = { year: number; lat: number; lon: number; count: number };
+
+/** 年ごとの出没の重心（緯度経度平均）。南下・都市接近の把握。直近 years 年。 */
+export function yearlyCentroid(
+  records: AnalyticsRecord[],
+  today: string,
+  years: number,
+): CentroidPoint[] {
+  const thisYear = Number(today.slice(0, 4));
+  const agg = new Map<number, { la: number; lo: number; n: number }>();
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d || d > today) continue;
+    if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
+    if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
+    const y = Number(d.slice(0, 4));
+    if (y < thisYear - years + 1) continue;
+    const e = agg.get(y) ?? { la: 0, lo: 0, n: 0 };
+    e.la += r.lat;
+    e.lo += r.lon;
+    e.n += 1;
+    agg.set(y, e);
+  }
+  return [...agg.entries()]
+    .map(([year, e]) => ({
+      year,
+      lat: Math.round((e.la / e.n) * 1000) / 1000,
+      lon: Math.round((e.lo / e.n) * 1000) / 1000,
+      count: e.n,
+    }))
+    .sort((a, b) => a.year - b.year);
+}
+
+// ============ G: 親子連れ（複数頭）の割合 ============
+export type MultiBearPoint = { month: string; total: number; multi: number; share: number };
+
+/** 月次で headCount>=2 の割合（親子・群れのシグナル）。直近 months か月。 */
+export function multiBearShare(
+  records: AnalyticsRecord[],
+  today: string,
+  months: number,
+): MultiBearPoint[] {
+  const total = new Map<string, number>();
+  const multi = new Map<string, number>();
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d || d > today) continue;
+    const mo = d.slice(0, 7);
+    total.set(mo, (total.get(mo) ?? 0) + 1);
+    if (typeof r.headCount === "number" && r.headCount >= 2)
+      multi.set(mo, (multi.get(mo) ?? 0) + 1);
+  }
+  const [ty, tm] = today.slice(0, 7).split("-").map(Number);
+  const out: MultiBearPoint[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const t = ty * 12 + (tm - 1) - i;
+    const y = Math.floor(t / 12);
+    const m = (t % 12) + 1;
+    const key = `${y}-${String(m).padStart(2, "0")}`;
+    const tot = total.get(key) ?? 0;
+    const mul = multi.get(key) ?? 0;
+    out.push({
+      month: key,
+      total: tot,
+      multi: mul,
+      share: tot ? Math.round((mul / tot) * 1000) / 10 : 0,
+    });
+  }
+  return out;
+}
+
+// ============ H: 年次サマリー ============
+export type YearSummary = {
+  year: number;
+  total: number;
+  peakMonth: number; // 1-12（最多月）
+  topPref: string;
+  injuries: number;
+};
+
+/** 年別: 総件数・ピーク月・最多都道府県・人身被害数。直近 years 年。 */
+export function yearlySummary(
+  records: AnalyticsRecord[],
+  today: string,
+  years: number,
+): YearSummary[] {
+  const thisYear = Number(today.slice(0, 4));
+  type Acc = {
+    total: number;
+    byMonth: number[];
+    byPref: Map<string, number>;
+    injuries: number;
+  };
+  const agg = new Map<number, Acc>();
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d || d > today) continue;
+    const y = Number(d.slice(0, 4));
+    if (y < thisYear - years + 1) continue;
+    if (!agg.has(y))
+      agg.set(y, {
+        total: 0,
+        byMonth: new Array(13).fill(0),
+        byPref: new Map(),
+        injuries: 0,
+      });
+    const a = agg.get(y)!;
+    a.total += 1;
+    a.byMonth[Number(d.slice(5, 7))] += 1;
+    const p = (r.prefectureName ?? "").trim();
+    if (p) a.byPref.set(p, (a.byPref.get(p) ?? 0) + 1);
+    if (INJURY_RE.test(r.comment ?? "")) a.injuries += 1;
+  }
+  return [...agg.entries()]
+    .map(([year, a]) => {
+      let peakMonth = 0;
+      let peakN = -1;
+      for (let m = 1; m <= 12; m++)
+        if (a.byMonth[m] > peakN) {
+          peakN = a.byMonth[m];
+          peakMonth = m;
+        }
+      let topPref = "";
+      let topN = -1;
+      for (const [p, n] of a.byPref)
+        if (n > topN) {
+          topN = n;
+          topPref = p;
+        }
+      return { year, total: a.total, peakMonth, topPref, injuries: a.injuries };
+    })
+    .sort((a, b) => b.year - a.year);
 }
 
 // ============ B: 時間帯・曜日 ============

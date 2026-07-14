@@ -8,6 +8,10 @@ import {
   hourHistogram,
   dowHistogram,
   severity,
+  momentum,
+  yearlyCentroid,
+  multiBearShare,
+  yearlySummary,
   type AnalyticsRecord,
 } from "@/lib/sighting-analytics";
 
@@ -50,6 +54,11 @@ export async function GET(req: Request) {
         // A: 時系列
         monthly: monthlyCounts(scoped, today, 36),
         seasonality: seasonality(scoped, today, 5),
+        // E/F/G/H: 勢い・重心移動・親子連れ・年次サマリー
+        momentum: momentum(scoped, today),
+        centroid: yearlyCentroid(scoped, today, 12),
+        multiBear: multiBearShare(scoped, today, 24),
+        yearly: yearlySummary(scoped, today, 12),
         // C: 地域（全国固定。フィルタと無関係に全国のランキング/急増を出す）
         prefectures: prefectureCounts(all, today).slice(0, 20),
         hotspots: hotspots(all, today, { limit: 40 }),

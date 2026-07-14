@@ -17,12 +17,38 @@ type Bucket = { label: string; count: number };
 type SeverityPoint = { month: string; injury: number; cull: number };
 type IncidentRow = { date: string; pref: string; city: string; comment: string };
 
+type Momentum = {
+  d7: number;
+  prev7: number;
+  d30: number;
+  prev30: number;
+  topMovers: { pref: string; recent: number; prev: number; delta: number }[];
+};
+type CentroidPoint = { year: number; lat: number; lon: number; count: number };
+type MultiBearPoint = {
+  month: string;
+  total: number;
+  multi: number;
+  share: number;
+};
+type YearSummary = {
+  year: number;
+  total: number;
+  peakMonth: number;
+  topPref: string;
+  injuries: number;
+};
+
 type Data = {
   today: string;
   pref: string | null;
   total: number;
   monthly: MonthPoint[];
   seasonality: SeasonPoint[];
+  momentum: Momentum;
+  centroid: CentroidPoint[];
+  multiBear: MultiBearPoint[];
+  yearly: YearSummary[];
   prefectures: PrefRow[];
   hotspots: Hotspot[];
   hours: { buckets: Bucket[]; withTime: number };
@@ -109,6 +135,44 @@ function Content({
         </span>
       </div>
 
+      {/* E: 直近の勢い */}
+      <Section
+        title="E. 直近の勢い"
+        note={`${scope}・件数の前週比・前月比。急な立ち上がりを早く掴む。※直近数日は報道/公式の取り込み途中で少なめに出ることがあります。`}
+      >
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+          <MomentumStat
+            label="直近7日"
+            cur={data.momentum.d7}
+            prev={data.momentum.prev7}
+            prevLabel="前7日"
+          />
+          <MomentumStat
+            label="直近30日"
+            cur={data.momentum.d30}
+            prev={data.momentum.prev30}
+            prevLabel="前30日"
+          />
+        </div>
+        {data.momentum.topMovers.length > 0 && (
+          <div className="mt-3">
+            <p className="mb-1 text-xs text-stone-500">
+              増加が目立つ都道府県（30日 vs 前30日）
+            </p>
+            <Table
+              head={["都道府県", "直近30日", "前30日", "増減"]}
+              rows={data.momentum.topMovers.map((m) => [
+                m.pref,
+                String(m.recent),
+                String(m.prev),
+                `+${m.delta}`,
+              ])}
+              emphasizeCol={3}
+            />
+          </div>
+        )}
+      </Section>
+
       {/* A: 時系列トレンド */}
       <Section
         title="A. 時系列トレンド"
@@ -147,6 +211,61 @@ function Content({
             },
           ]}
           labelEvery={1}
+        />
+      </Section>
+
+      {/* G: 親子連れ率 */}
+      <Section
+        title="G. 親子連れ・群れの割合"
+        note={`${scope}・月次で複数頭(2頭以上)の出没が占める割合。子育て・群れのシグナル。`}
+      >
+        <LineChart
+          labels={data.multiBear.map((m) => m.month)}
+          series={[
+            {
+              name: "複数頭の割合(%)",
+              color: "#7c3aed",
+              values: data.multiBear.map((m) => m.share),
+            },
+          ]}
+          labelEvery={4}
+        />
+      </Section>
+
+      {/* F: 重心移動 */}
+      <Section
+        title="F. 分布の重心移動（年別）"
+        note={`${scope}・年ごとの出没の重心(緯度経度の平均)。緯度が下がる=南下、経度の変化=東西の移動。`}
+      >
+        {data.centroid.length < 2 ? (
+          <Empty>データ不足</Empty>
+        ) : (
+          <Table
+            head={["年", "重心 緯度", "重心 経度", "件数"]}
+            rows={data.centroid.map((c) => [
+              String(c.year),
+              c.lat.toFixed(3),
+              c.lon.toFixed(3),
+              c.count.toLocaleString("ja-JP"),
+            ])}
+          />
+        )}
+      </Section>
+
+      {/* H: 年次サマリー */}
+      <Section
+        title="H. 年次サマリー"
+        note={`${scope}・年別の総件数・ピーク月・最多地域・人身被害数。`}
+      >
+        <Table
+          head={["年", "総件数", "ピーク月", "最多地域", "人身被害"]}
+          rows={data.yearly.map((y) => [
+            String(y.year),
+            y.total.toLocaleString("ja-JP"),
+            `${y.peakMonth}月`,
+            y.topPref,
+            String(y.injuries),
+          ])}
         />
       </Section>
 
@@ -260,6 +379,42 @@ function Section({
 
 function Empty({ children }: { children: React.ReactNode }) {
   return <p className="py-6 text-center text-sm text-stone-400">{children}</p>;
+}
+
+function MomentumStat({
+  label,
+  cur,
+  prev,
+  prevLabel,
+}: {
+  label: string;
+  cur: number;
+  prev: number;
+  prevLabel: string;
+}) {
+  const delta = cur - prev;
+  const pct = prev > 0 ? Math.round((delta / prev) * 100) : null;
+  const up = delta > 0;
+  return (
+    <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+      <div className="text-[11px] text-stone-500">{label}</div>
+      <div className="mt-0.5 flex items-baseline gap-1">
+        <span className="text-2xl font-bold tabular-nums text-stone-900">
+          {cur.toLocaleString("ja-JP")}
+        </span>
+        <span className="text-xs text-stone-500">件</span>
+      </div>
+      <div
+        className={`mt-1 text-xs font-medium tabular-nums ${
+          delta === 0 ? "text-stone-400" : up ? "text-rose-600" : "text-emerald-600"
+        }`}
+      >
+        {prevLabel} {prev.toLocaleString("ja-JP")} 件 → {up ? "+" : ""}
+        {delta.toLocaleString("ja-JP")}
+        {pct !== null ? `（${up ? "+" : ""}${pct}%）` : ""}
+      </div>
+    </div>
+  );
 }
 
 // ---- 折れ線（複数系列・凡例つき） ----
