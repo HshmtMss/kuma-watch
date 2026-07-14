@@ -10,6 +10,7 @@ import {
   LogOut,
   Mail,
   MessageCircle,
+  TrendingUp,
 } from "lucide-react";
 
 /**
@@ -25,6 +26,7 @@ const SECRET_KEY = "kw.admin.secret";
 
 export type AdminTab =
   | "home"
+  | "analytics"
   | "push-stats"
   | "line-stats"
   | "submissions"
@@ -32,6 +34,7 @@ export type AdminTab =
 
 const TABS: { key: AdminTab; label: string; href: string; Icon: typeof BarChart3 }[] = [
   { key: "home", label: "ダッシュボード", href: "/admin", Icon: LayoutDashboard },
+  { key: "analytics", label: "分析", href: "/admin/analytics", Icon: TrendingUp },
   { key: "push-stats", label: "通知登録", href: "/admin/push-stats", Icon: BarChart3 },
   { key: "line-stats", label: "LINE登録", href: "/admin/line-stats", Icon: MessageCircle },
   { key: "submissions", label: "投稿", href: "/admin/submissions", Icon: ClipboardList },
