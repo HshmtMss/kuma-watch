@@ -19,6 +19,8 @@ import {
  * 管理画面「分析」タブ用の集計 API。ADMIN_SECRET (合言葉) を Bearer で認証。
  * getCachedSightings（全出没・クリーン済）から、時系列/地域/時間帯/重大事案を集計。
  * 公開アプリでは出さない内部向けの専門分析。
+ *
+ * モジュール: A時系列 / E勢い / F重心移動 / G親子連れ / H年次 / C急増 / B時間帯 / D重大事案。
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
