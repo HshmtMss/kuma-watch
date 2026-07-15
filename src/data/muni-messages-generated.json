@@ -108,6 +108,15 @@
   },
   {
     "prefName": "山形県",
+    "cityName": "最上郡金山町",
+    "message": "金山町内各地でクマの目撃情報が寄せられています。山菜採り、タケノコ採り、渓流釣りで入山する際はもちろん、農作業中も十分に注意し、笛やクマ鈴、ラジオなどで自分の存在を知らせてください。クマを誘引する果実や生ごみの放置はやめ、子グマを見ても近づかず、背を向けずにゆっくり後退するなどの対策をとりましょう。",
+    "targetArea": "金山町内各地",
+    "updatedAt": "2026-05-14",
+    "sourceUrl": "https://www.town.kaneyama.yamagata.jp/kurashi/anshin_anzen/kikenseibutsu/1898.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
     "cityName": "天童市",
     "message": "山形県内全域にクマ出没警報が発令されており、天童市内でも引き続き警戒が必要です。早朝や夜間の外出は控え、音が鳴る物で自分の存在をクマに知らせてください。また、自宅や倉庫には必ず鍵を掛け、果実や生ごみなどの誘引物を放置せず、クマを寄せ付けない対策を徹底してください。",
     "targetArea": "天童市",
@@ -153,12 +162,74 @@
   },
   {
     "prefName": "山形県",
+    "cityName": "東村山郡山辺町",
+    "message": "山形県全域でクマ出没警報が発令されています。山に入る際は、クマよけの鈴やラジオなどで音を出し、自分の存在を知らせてください。また、生ごみや廃棄する農作物を放置せず適切に処理し、家屋周辺の草やぶを刈り払い、クマを寄せ付けないようにしましょう。",
+    "targetArea": "山辺町",
+    "updatedAt": "2026-04-30",
+    "sourceUrl": "https://www.town.yamanobe.yamagata.jp/soshiki/9/kuma.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
     "cityName": "東根市",
     "message": "東根市内ではクマの目撃情報が多数発生しており、直近では7月8日に長瀞地区で足跡が、7月6日には東郷地区でクマが目撃されました。県内全域にクマ出没警報が発令されていますので、付近を通行する際は十分ご注意ください。",
     "targetArea": "東根市内",
     "updatedAt": "",
     "sourceUrl": "https://www.city.higashine.yamagata.jp/section_list/section011/kuma/",
     "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "東田川郡三川町",
+    "message": "三川町ではクマの目撃・痕跡情報があります。屋外で作業する際は周囲に十分注意してください。直近では2026年7月10日に蛾眉ニュータウン河川敷付近、横山蛾眉橋付近、押切中町河川敷付近で目撃されています。クマを目撃した際は警察または役場へ連絡しましょう。",
+    "targetArea": "三川町全域",
+    "updatedAt": "2026-07-10",
+    "sourceUrl": "https://www.town.mikawa.yamagata.jp/infomation/bear2025.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "東田川郡庄内町",
+    "message": "山菜採り等で山に入る方、市街地でもクマの目撃が相次いでいるため、十分ご注意ください。目撃情報があった場所ではラジオやクマ避けの鈴で音を出し、早朝・夜間の外出は特に注意してください。また、家の周辺の果実・野菜、生ごみは放置せず、農地周辺の藪の刈払いを行いましょう。最新の目撃は令和8年7月2日、狩川笠山地内風車村付近で1頭です。",
+    "updatedAt": "2026-07-02",
+    "sourceUrl": "https://www.town.shonai.lg.jp/kurashi/gomi/dog/kuma.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "東置賜郡川西町",
+    "message": "10月11日（日）に川西町上奥田地内でクマによる人身被害が発生しており、今年は昨年以上にクマの出没が多い状況です。山や林に入る際はラジオや鈴などで音を出し、クマに自分の存在を知らせてください。また、餌となる取り残し果樹や家の周囲のハチの巣は撤去し、誘引物を管理しましょう。",
+    "targetArea": "川西町全域、特に上奥田地内",
+    "updatedAt": "2020-10-12",
+    "sourceUrl": "https://www.town.kawanishi.yamagata.jp/sangyo/noringyo/2020-1012-1141-26.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "西村山郡朝日町",
+    "message": "令和8年5月7日午前6時35分頃、朝日町大字今平・大船木地内の山中でクマによる人身被害が発生しました。山菜採りなどで山に入る際は、クマ鈴やラジオを過信せず、複数人で行動し、周囲に十分注意してください。",
+    "targetArea": "朝日町大字今平・大船木地内および山間部",
+    "updatedAt": "2026-05-07",
+    "sourceUrl": "https://www.town.asahi.yamagata.jp/portal/soshikinogoannai/norinshinkoka/noseigakari/1/10645.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "西村山郡西川町",
+    "message": "山形県内では4月24日から30日の間に市街地でクマの目撃が11件あり、県内全域にクマ出没警報が発令中です。山や農作業時はラジオや鈴で音を出し、早朝・夕方の単独行動は避けましょう。生ごみや放置果実などの誘引物を適切に管理し、クマが採食できる物が置かれた収納庫は施錠してください。",
+    "targetArea": "西川町を含む山形県全域",
+    "updatedAt": "2026-04-30",
+    "sourceUrl": "https://www.town.nishikawa.yamagata.jp/soshiki/midori/3364.html",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "西置賜郡白鷹町",
+    "message": "8月13日午後、白鷹町山口地内の一般住宅敷地内でクマによる人身被害が発生しました。山形県内にクマ出没警報が発令されており、日没から朝方の目撃が多く、特に秋にはブドウ、リンゴなどの果樹や農作物残さへの注意が必要です。山林近くではラジオや鈴で音を出し、複数人で行動し、放棄果実や生ごみの除去、藪の刈り払いを徹底してください。",
+    "targetArea": "白鷹町",
+    "updatedAt": "",
+    "sourceUrl": "https://www.town.shirataka.lg.jp/1315.htm",
+    "crawledAt": "2026-07-15"
   },
   {
     "prefName": "山形県",
@@ -350,6 +421,15 @@
   },
   {
     "prefName": "岩手県",
+    "cityName": "紫波郡矢巾町",
+    "message": "矢巾町では7月15日に煙山第29地割と太田第11地割でクマの目撃情報がありました。ツキノワグマの出没に関する警報および注意報が発表されていますので、引き続き警戒が必要です。",
+    "targetArea": "矢巾町内、特に煙山第29地割、太田第11地割周辺",
+    "updatedAt": "",
+    "sourceUrl": "https://www.town.yahaba.iwate.jp/soshiki/sangyou/choujuu/",
+    "crawledAt": "2026-07-15"
+  },
+  {
+    "prefName": "岩手県",
     "cityName": "花巻市",
     "message": "花巻地域では令和8年6月28日に、石鳥谷地域では令和8年6月20日にツキノワグマの目撃情報がありました。さらに、東和地域では令和8年6月9日にツキノワグマによる人身被害が発生しています。",
     "targetArea": "花巻地域、石鳥谷地域、東和地域",
@@ -517,6 +597,15 @@
     "updatedAt": "2026-02-01",
     "sourceUrl": "https://www.town.misato.akita.jp/nourinseibi/4307",
     "crawledAt": "2026-07-01"
+  },
+  {
+    "prefName": "秋田県",
+    "cityName": "北秋田市",
+    "message": "北秋田市内でクマによる人身被害が発生し、目撃情報が増加しています。外出時は周囲の様子をよく確認し、携帯ラジオや鈴などで音を立てて複数人で行動し、クマとの遭遇を避けてください。生ゴミや栗・柿などの果樹を屋外に放置せず適切に管理し、藪の刈り払いや車庫・物置の扉を閉めることでクマを誘引しないようにしましょう。子グマを見かけた際は、近くに母グマがいる可能性が高いため、来た道を引き返してください。",
+    "targetArea": "北秋田市全域",
+    "updatedAt": "2025-08-01",
+    "sourceUrl": "https://www.city.kitaakita.akita.jp/news/p20250801151555",
+    "crawledAt": "2026-07-15"
   },
   {
     "prefName": "秋田県",
