@@ -329,10 +329,6 @@ export default async function SpotPage({ params }: Props) {
   const fcMax = Math.max(1, ...fcMonths.map((x) => x.count), fcForecastBar);
   const fcPhaseArrow =
     forecast?.phase === "rising" ? "↑" : forecast?.phase === "falling" ? "↓" : "→";
-  // ゲージのマーカー位置(%)。低め←→高めの帯のどこに針を置くか。
-  const fcMarkerPct = forecast
-    ? { low: 12, normal: 38, elevated: 63, high: 87 }[forecast.band]
-    : 38;
 
   // 危険度評価 (周辺 10km の count90 ベース)。色トークンは @/lib/risk、
   // カードのマークアップは /place/[pref]/[muni] と共通の RiskBanner に集約。
@@ -531,28 +527,9 @@ export default async function SpotPage({ params }: Props) {
             )}
           </div>
 
-          {/* ゲージ: 低め←→高め のどこかを針で一目に。 */}
-          <div className="mt-3">
-            <div
-              className="relative h-3 rounded-full"
-              style={{
-                background:
-                  "linear-gradient(to right,#34d399 0%,#a3e635 28%,#fbbf24 52%,#f59e0b 74%,#f97316 100%)",
-              }}
-            >
-              <div
-                className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-stone-800 shadow-md"
-                style={{ left: `${fcMarkerPct}%` }}
-                aria-hidden
-              />
-            </div>
-            <div className="mt-1 flex justify-between text-xs font-medium text-stone-500">
-              <span>低め</span>
-              <span>例年並み</span>
-              <span>やや高め</span>
-              <span>高め</span>
-            </div>
-          </div>
+          {/* ゲージ（低め←→高めの針）は撤去。バンド verdict（例:「やや高め +30%」）と
+              下の対比スタットが既に「程度」を示しており、針は同じ情報の重複表現で
+              カードの要素過多の一因だった。季節性は下の月別グラフが担う。 */}
 
           {/* 対比スタット: 「今」と「例年」の差を大きく見せる（インパクトの核）。 */}
           <div className="mt-3 flex items-stretch gap-2">
