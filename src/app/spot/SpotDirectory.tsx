@@ -102,6 +102,10 @@ const prefRank = (pref: string): number => {
 
 const CARD_PAGE_SIZE = 60;
 const PREF_COL_COUNT = 3;
+// 都道府県別一覧で 1 県あたりに出すピル(リンク)の上限。全国網羅で 1 県数百件に
+// なると DOM とHTML が肥大するため、俯瞰として上位のみ表示し残数はカードのページ送り
+// と sitemap 側でカバーする。curated 分(数件/県)ではこの上限に達しないので無影響。
+const PREF_PILL_CAP = 16;
 
 export default function SpotDirectory({ spots }: { spots: SpotLite[] }) {
   const [activeCat, setActiveCat] = useState<string>("all");
@@ -234,8 +238,8 @@ export default function SpotDirectory({ spots }: { spots: SpotLite[] }) {
                         {items.length}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {items.map((l) => (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {items.slice(0, PREF_PILL_CAP).map((l) => (
                         <Link
                           key={l.slug}
                           href={`/spot/${encodeURIComponent(l.slug)}`}
@@ -244,6 +248,11 @@ export default function SpotDirectory({ spots }: { spots: SpotLite[] }) {
                           {l.name}
                         </Link>
                       ))}
+                      {items.length > PREF_PILL_CAP && (
+                        <span className="text-xs font-medium text-stone-400">
+                          ほか {items.length - PREF_PILL_CAP} 件
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}

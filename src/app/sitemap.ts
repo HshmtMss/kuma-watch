@@ -5,7 +5,7 @@ import {
   RESEARCH_ENTRIES,
   researchRegionsWithCount,
 } from "@/lib/research-entries";
-import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -137,13 +137,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // ランドマーク (高尾山・上高地・知床 等) の /spot ページ。
-  // 全国的に高検索ボリュームの地名なので weekly→daily に上げる。
-  const spotEntries: MetadataRoute.Sitemap = JAPAN_LANDMARKS.map((l) => ({
-    url: `${SITE_URL}/spot/${encodeURIComponent(l.slug)}`,
-    lastModified: now,
-    changeFrequency: "daily" as const,
-    priority: 0.8,
-  }));
+  // 手キュレーション分は全国的に高検索ボリュームの主要地名なので daily/0.8。
+  // OSM 自動収集の生成スポットは数千件あり、全て daily/0.8 にするとホットな
+  // ニュース・市町村 URL のクロール優先度を薄めてしまうため weekly/0.5 に抑える。
+  const curatedSpotSlugs = new Set(PREBUILD_SPOT_SLUGS);
+  const spotEntries: MetadataRoute.Sitemap = JAPAN_LANDMARKS.map((l) => {
+    const curated = curatedSpotSlugs.has(l.slug);
+    return {
+      url: `${SITE_URL}/spot/${encodeURIComponent(l.slug)}`,
+      lastModified: now,
+      changeFrequency: curated ? ("daily" as const) : ("weekly" as const),
+      priority: curated ? 0.8 : 0.5,
+    };
+  });
 
   return [
     ...staticEntries,

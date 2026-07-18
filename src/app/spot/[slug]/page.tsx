@@ -18,7 +18,7 @@ import PushSubscribeButton from "@/components/PushSubscribeButton";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import NotifyCard from "@/components/NotifyCard";
 import { isLineEntryReleased } from "@/lib/line-flag";
-import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
@@ -27,9 +27,16 @@ import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { buildSeasonalModel, forecastArea, BAND_LABEL } from "@/lib/forecast";
 
-// dynamicParams=false: 登録済みランドマークのみ。それ以外は 404。
-// /spot/[slug] は「高尾山 くま」型の検索受け皿で、対象は手動キュレーション。
-export const dynamicParams = false;
+// dynamicParams=true: 手キュレーション分は下の generateStaticParams で事前生成(SSG)し、
+// OSM 自動収集の生成スポットは初回アクセス時にオンデマンド生成→ISR キャッシュする。
+// これにより生成スポットを全国数千〜数万件に増やしてもビルド時間が件数に比例して
+// 膨張しない(全件 SSG による build timeout を回避)。存在しない slug は
+// generateMetadata / ページ本体の landmark 照合で notFound() → 404 に落ちる。
+export const dynamicParams = true;
+
+// オンデマンド生成ページと事前生成ページの ISR 再検証間隔(秒)。周辺出没件数は
+// 1 日 2 回更新のため 6 時間で十分。リテラルでないと静的解析されない(21600 = 6h)。
+export const revalidate = 21600;
 
 const SITE_URL = "https://kuma-watch.jp";
 const NEAR_RADIUS_KM = 10;
@@ -39,7 +46,8 @@ const SUPERVISION = "獣医師監修";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  return JAPAN_LANDMARKS.map((l) => ({ slug: l.slug }));
+  // 手キュレーション分のみ事前生成。生成スポットは dynamicParams=true でオンデマンド ISR。
+  return PREBUILD_SPOT_SLUGS.map((slug) => ({ slug }));
 }
 
 function decode(v: string): string {

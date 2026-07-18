@@ -1582,3 +1582,10 @@ export const JAPAN_LANDMARKS: JapanLandmark[] = [
   ...CURATED_LANDMARKS,
   ..._generated,
 ];
+
+// ビルド時に事前生成(SSG)するスポットの slug 一覧。
+// 手キュレーション分(officialHub / areas 等の作り込みがあり SEO 重要)のみを
+// 事前生成し、OSM 自動収集分は /spot/[slug] を dynamicParams=true + revalidate で
+// オンデマンド ISR 生成する。これにより生成スポットを数千〜数万件に増やしても
+// ビルド時間が件数に比例して膨張しない(全件 SSG による build timeout を回避)。
+export const PREBUILD_SPOT_SLUGS: string[] = CURATED_LANDMARKS.map((l) => l.slug);

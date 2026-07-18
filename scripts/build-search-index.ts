@@ -231,26 +231,35 @@ type Landmark = {
 async function loadSpots(): Promise<SearchEntry[]> {
   const mod = await import("../src/data/japan-landmarks");
   const landmarks = mod.JAPAN_LANDMARKS as Landmark[];
-  return landmarks.map((l) => ({
-    type: "spot" as const,
-    title: l.name,
-    url: `/spot/${encodeURIComponent(l.slug)}`,
-    snippet:
-      l.blurb ??
-      `${l.prefName}${l.muniName ? l.muniName : ""} の観光地・登山口`,
-    tokens: [
-      l.name,
-      getReadings()[l.name] ?? "", // 読み仮名 (かな入力/読み検索用)
-      ...(l.altNames ?? []),
-      l.prefName,
-      l.muniName ?? "",
-      l.blurb ?? "",
-      l.category ?? "",
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase(),
-  }));
+  return landmarks.map((l) => {
+    // 全国網羅で spot が数千件になると blurb をそのまま index に含めるだけで
+    // search-index.json が数 MB 級に膨張し、/search 初回 fetch が重くなる。
+    // spot は名前・地名で引く用途が主なので、表示用 snippet は短く切り詰め、
+    // tokens には blurb を含めない(名前/読み/別名/都道府県/市町村/カテゴリで十分)。
+    const placeLabel = `${l.prefName}${l.muniName ?? ""}`;
+    const snippet = l.blurb
+      ? l.blurb.length > 70
+        ? `${l.blurb.slice(0, 70)}…`
+        : l.blurb
+      : `${placeLabel} の観光地・登山口`;
+    return {
+      type: "spot" as const,
+      title: l.name,
+      url: `/spot/${encodeURIComponent(l.slug)}`,
+      snippet,
+      tokens: [
+        l.name,
+        getReadings()[l.name] ?? "", // 読み仮名 (かな入力/読み検索用)
+        ...(l.altNames ?? []),
+        l.prefName,
+        l.muniName ?? "",
+        l.category ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase(),
+    };
+  });
 }
 
 // ── 6. 政府発表 ────────────────────────
