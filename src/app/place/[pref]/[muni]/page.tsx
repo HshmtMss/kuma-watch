@@ -1066,6 +1066,17 @@ export default async function MuniPage({ params }: Props) {
         ))}
       </div>
 
+      {/* ゾーン境界 — ここから下は「この街のコア情報」ではなく、関連記事・近隣・
+          周辺スポット・県内の他市町村への回遊導線。長いページで「本題は読み終えた」
+          区切りをユーザーに示すための視覚的グルーピング（h2 の階層・並び・SEO 本文は
+          変えず、見出しラベルと区切り線だけ加える）。 */}
+      <div className="not-prose mt-10 mb-4 flex items-center gap-3">
+        <span className="text-[13px] font-bold tracking-wide text-stone-500">
+          関連・周辺の情報
+        </span>
+        <span className="h-px flex-1 bg-stone-200" aria-hidden />
+      </div>
+
       <h2>あわせて読みたい</h2>
       {/* 4 枠のうち 1 枠は現在の季節に合わせて選定する。「春なのに秋の記事
           が出る」という指摘に対応。残り 3 枠は通年使える普遍的トピック
