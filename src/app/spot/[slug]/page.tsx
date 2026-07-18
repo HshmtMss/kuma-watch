@@ -9,15 +9,15 @@ import {
   Users,
   Map as MapIcon,
   ChartColumn,
-  Stethoscope,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
-import MiniSightingsMap from "@/components/MiniSightingsMap";
-import PushSubscribeButton from "@/components/PushSubscribeButton";
+import SightingsMapBlock from "@/components/SightingsMapBlock";
+import SeasonalAdvice from "@/components/SeasonalAdvice";
+import RiskBanner from "@/components/RiskBanner";
+import type { RiskTone } from "@/lib/risk";
+import NotifyBlock from "@/components/NotifyBlock";
 import { isSpotPushReleased } from "@/lib/push-flag";
-import NotifyCard from "@/components/NotifyCard";
-import { isLineEntryReleased } from "@/lib/line-flag";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getCachedSightings } from "@/lib/sightings-cache";
@@ -333,33 +333,37 @@ export default async function SpotPage({ params }: Props) {
     ? { low: 12, normal: 38, elevated: 63, high: 87 }[forecast.band]
     : 38;
 
-  // 危険度評価 (周辺 10km の count90 ベース)
+  // 危険度評価 (周辺 10km の count90 ベース)。色トークンは @/lib/risk、
+  // カードのマークアップは /place/[pref]/[muni] と共通の RiskBanner に集約。
+  // note の一言は muni ページと文言を揃え、両ページの体験を統一する。
   const risk =
     count90 >= 10
-      ? { tone: "red", label: "警戒", headline: `周辺 10 km で過去 90 日に ${count90} 件の出没` }
+      ? {
+          tone: "red",
+          label: "警戒",
+          headline: `周辺 10 km で過去 90 日に ${count90} 件の出没`,
+          note: "頻繁に出没しています。出発前に必ず周辺の最新情報を確認してください。",
+        }
       : count90 >= 1
-        ? { tone: "amber", label: "注意", headline: `周辺 10 km で過去 90 日に ${count90} 件の出没` }
+        ? {
+            tone: "amber",
+            label: "注意",
+            headline: `周辺 10 km で過去 90 日に ${count90} 件の出没`,
+            note: "直近で出没事案があります。早朝・夕方の単独行動は避けてください。",
+          }
         : count365 >= 1
-          ? { tone: "yellow", label: "観察", headline: `周辺 10 km で過去 1 年に ${count365} 件の出没履歴` }
-          : { tone: "emerald", label: "静穏", headline: "周辺 10 km で出没情報なし" };
-  const riskBg: Record<string, string> = {
-    red: "border-red-300 bg-red-50",
-    amber: "border-amber-300 bg-amber-50",
-    yellow: "border-yellow-300 bg-yellow-50",
-    emerald: "border-emerald-300 bg-emerald-50",
-  };
-  const riskText: Record<string, string> = {
-    red: "text-red-900",
-    amber: "text-amber-900",
-    yellow: "text-yellow-900",
-    emerald: "text-emerald-900",
-  };
-  const riskBadge: Record<string, string> = {
-    red: "bg-red-600 text-white",
-    amber: "bg-amber-500 text-white",
-    yellow: "bg-yellow-500 text-yellow-950",
-    emerald: "bg-emerald-600 text-white",
-  };
+          ? {
+              tone: "yellow",
+              label: "観察",
+              headline: `周辺 10 km で過去 1 年に ${count365} 件の出没履歴`,
+              note: "90 日以内の事案はありませんが、生息域なので油断せずご準備を。",
+            }
+          : {
+              tone: "emerald",
+              label: "静穏",
+              headline: "周辺 10 km で出没情報なし",
+              note: "目撃情報がない期間ですが、季節や天候で状況は変わります。",
+            };
 
   // 季節別アドバイス
   const month = new Date().getMonth() + 1;
@@ -480,29 +484,19 @@ export default async function SpotPage({ params }: Props) {
         </figure>
       )}
 
-      {/* 危険度ヒーローカード */}
-      <div className={`not-prose mb-6 rounded-xl border-2 p-5 ${riskBg[risk.tone]}`}>
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${riskBadge[risk.tone]}`}>
-            {risk.label}
-          </span>
-          <span className={`text-xs font-medium ${riskText[risk.tone]}`}>
-            {landmark.name} 周辺 10 km の状況
-          </span>
-        </div>
-        <div className={`mt-2 text-lg font-bold ${riskText[risk.tone]}`}>
-          {risk.headline}
-        </div>
-        {latestDate && (
-          <div className={`mt-0.5 text-xs ${riskText[risk.tone]}/80`}>
-            最新の目撃: {formatDate(latestDate)}
-          </div>
-        )}
-        {/* マップへの導線は (1) 「周辺の目撃マップ」直下のデスクトップ CTA と
-            (2) モバイルの Sticky CTA に集約済みなので、ヒーロー内ボタンは削除。
-            ボタンが 3 箇所あると同じ URL なのに違う案内に見える、という muni
-            ページと同様の指摘に対応。 */}
-      </div>
+      {/* 危険度ヒーローバナー — /place/[pref]/[muni] と共通の RiskBanner。
+          マップへの導線は (1)「周辺の目撃マップ」直下のデスクトップ CTA と
+          (2) モバイルの Sticky CTA に集約済みなので、ヒーロー内ボタンは持たない
+          （ボタンが 3 箇所あると同じ URL なのに違う案内に見える、という muni
+          ページと同様の指摘に対応）。 */}
+      <RiskBanner
+        tone={risk.tone as RiskTone}
+        label={risk.label}
+        headline={risk.headline}
+        contextLabel={`${landmark.name} 周辺 10 km の状況`}
+        latestDateText={latestDate ? formatDate(latestDate) : null}
+        note={risk.note}
+      />
 
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
@@ -665,25 +659,13 @@ export default async function SpotPage({ params }: Props) {
 
           {/* 通知を受け取る（購読）。来訪者がそのまま登録できる。
               セクションに見出しがあるので購読ボタン側の見出しは隠す（二重表示回避）。 */}
-          {isLineEntryReleased() ? (
-            <div className="mt-3">
-              <NotifyCard
-                target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-                hideHeading
-                surface="spot_visitor"
-              />
-            </div>
-          ) : (
-            isSpotPushReleased() && (
-              <div className="mt-3">
-                <PushSubscribeButton
-                  target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-                  hideHeading
-                  surface="spot_visitor"
-                />
-              </div>
-            )
-          )}
+          <NotifyBlock
+            target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+            surface="spot_visitor"
+            pushReleased={isSpotPushReleased()}
+            hideHeading
+            wrapperClassName="mt-3"
+          />
         </section>
       )}
 
@@ -798,49 +780,22 @@ export default async function SpotPage({ params }: Props) {
         </span>
       </p>
 
-      {/* 周辺マップ — /place/[pref]/[muni] と同じレイアウト規約に揃える。
-          凡例はアイコンピル形式、デスクトップは下にインライン CTA、モバイルは
-          末尾の Sticky CTA に集約。 */}
-      <h2>周辺の目撃マップ</h2>
-      <div className="not-prose mb-1.5">
-        <MiniSightingsMap
-          centerLat={landmark.lat}
-          centerLon={landmark.lon}
-          records={nearby.slice(0, 60).map((n) => ({
-            lat: n.lat,
-            lon: n.lon,
-            date: n.date,
-            sectionName: n.sectionName,
-          }))}
-          zoom={11}
-          showCenterMarker
-          radiusKm={NEAR_RADIUS_KM}
-        />
-      </div>
-      {/* 凡例 — プロット対象は半径 10 km 以内・過去 1 年以内のレコード。
-          そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
-          中央の黄色マーク (代表地点) は凡例から除外。 */}
-      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-xs text-stone-600">
-        <li className="flex items-center gap-1.5">
-          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
-          直近 90 日
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
-          1 年以内
-        </li>
-      </ul>
-      {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部 Sticky CTA
-          が同じ役割を担う。muni ページと同じスタイルに統一。 */}
-      <p className="not-prose mb-6 hidden sm:block">
-        <Link
-          href={mapUrl}
-          className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
-        >
-          <MapIcon size={16} aria-hidden />
-          {landmark.name} の警戒レベルマップを開く →
-        </Link>
-      </p>
+      {/* 周辺の目撃マップ — /place/[pref]/[muni] と共通の SightingsMapBlock。
+          観光地は代表地点マーク＋半径10km 円を表示（境界は無し）。 */}
+      <SightingsMapBlock
+        centerLat={landmark.lat}
+        centerLon={landmark.lon}
+        records={nearby.slice(0, 60).map((n) => ({
+          lat: n.lat,
+          lon: n.lon,
+          date: n.date,
+          sectionName: n.sectionName,
+        }))}
+        showCenterMarker
+        radiusKm={NEAR_RADIUS_KM}
+        mapUrl={mapUrl}
+        ctaLabel={`${landmark.name} の警戒レベルマップを開く →`}
+      />
 
       {/* 最近の出没事案 — 「最近何があったか」は来訪目的の核なので折りたたまず表示。 */}
       {nearby.length > 0 && (
@@ -957,14 +912,11 @@ export default async function SpotPage({ params }: Props) {
         </>
       )}
 
-      {/* 季節別アドバイス */}
-      <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
-          <Stethoscope size={15} aria-hidden />
-          <span>{seasonalAdvice.season} の注意点（獣医師監修）</span>
-        </div>
-        <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">{seasonalAdvice.point}</p>
-      </div>
+      {/* 季節別アドバイス — /place/[pref]/[muni] と共通の SeasonalAdvice。 */}
+      <SeasonalAdvice
+        season={seasonalAdvice.season}
+        point={seasonalAdvice.point}
+      />
 
       {/* 含まれる市町村 */}
       {topMunis.length > 0 && (
@@ -1054,20 +1006,13 @@ export default async function SpotPage({ params }: Props) {
       </details>
 
       {/* 通知購読 — フッター。高尾山(デモ)は上部「通知で受け取る」に置くため二重を避ける。 */}
-      {!landmark.officialHub &&
-        (isLineEntryReleased() ? (
-          <NotifyCard
-            target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-            surface="spot_footer"
-          />
-        ) : (
-          isSpotPushReleased() && (
-            <PushSubscribeButton
-              target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
-              surface="spot_footer"
-            />
-          )
-        ))}
+      {!landmark.officialHub && (
+        <NotifyBlock
+          target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+          surface="spot_footer"
+          pushReleased={isSpotPushReleased()}
+        />
+      )}
 
       {/* 戻り導線 — ユーザーが「観光地一覧に戻る」を見失わないよう、
           目立つピル状リンクで本文末尾に明示。 */}

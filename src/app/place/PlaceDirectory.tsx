@@ -6,6 +6,7 @@ import { LayoutGrid, MapPin } from "lucide-react";
 import CategoryTiles, {
   type CategoryTileItem,
 } from "@/components/CategoryTiles";
+import CountBadges from "@/components/CountBadges";
 import PlacePointClient from "@/app/place/PlacePointClient";
 
 /**
@@ -128,25 +129,12 @@ export default function PlaceDirectory({ regions }: { regions: RegionData[] }) {
                   <span className="whitespace-nowrap text-base font-semibold text-stone-900">
                     {c.pref}
                   </span>
-                  <span className="flex flex-wrap items-baseline gap-1 text-xs">
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
-                        c.count365 > 0
-                          ? "bg-amber-100 text-amber-900"
-                          : "bg-stone-100 text-stone-400"
-                      }`}
-                    >
-                      1年 {c.count365.toLocaleString()}
-                    </span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 font-semibold tabular-nums ${
-                        c.count90 > 0
-                          ? "bg-red-100 text-red-700"
-                          : "bg-stone-100 text-stone-400"
-                      }`}
-                    >
-                      90日 {c.count90.toLocaleString()}
-                    </span>
+                  <span className="flex flex-wrap items-baseline gap-1">
+                    <CountBadges
+                      count365={c.count365}
+                      count90={c.count90}
+                      size="sm"
+                    />
                   </span>
                 </Link>
               </li>

@@ -3,13 +3,15 @@ import Link from "next/link";
 import {
   Map as MapIcon,
   ChartColumn,
-  Stethoscope,
   PawPrint,
   Landmark,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
-import MiniSightingsMap from "@/components/MiniSightingsMap";
+import SightingsMapBlock from "@/components/SightingsMapBlock";
+import SeasonalAdvice from "@/components/SeasonalAdvice";
+import RiskBanner from "@/components/RiskBanner";
+import type { RiskTone } from "@/lib/risk";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
   getAllPlaceCells,
@@ -30,10 +32,8 @@ import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
-import PushSubscribeButton from "@/components/PushSubscribeButton";
+import NotifyBlock from "@/components/NotifyBlock";
 import { isPushReleased } from "@/lib/push-flag";
-import NotifyCard from "@/components/NotifyCard";
-import { isLineEntryReleased } from "@/lib/line-flag";
 
 // dynamicParams=false: 静的生成 (generateStaticParams) は「不変なマスター市区町村
 // ＋政令市の親」のみ。実在しない市町村 URL (ニュースの生地点名・番地付き・旧 URL 等) は
@@ -311,7 +311,7 @@ export default async function MuniPage({ params }: Props) {
     return 2 * R * Math.asin(Math.sqrt(a));
   };
 
-  // 県境を跨いだ全国セルから距離を計算。半径サマリーと近隣カードに使う。
+  // 県境を跨いだ全国セルから距離を計算。近隣市町村カードに使う。
   // self は除外（pref+city の組で同一）。
   const cellsWithDistance = allCells
     .filter((c) => !(c.prefectureName === pref && c.cityName === muni))
@@ -396,25 +396,6 @@ export default async function MuniPage({ params }: Props) {
               headline: "直近の出没情報なし",
               note: "目撃情報がない期間ですが、季節や天候で状況は変わります。",
             };
-  const riskBg: Record<string, string> = {
-    red: "border-red-300 bg-red-50",
-    amber: "border-amber-300 bg-amber-50",
-    yellow: "border-yellow-300 bg-yellow-50",
-    emerald: "border-emerald-300 bg-emerald-50",
-  };
-  const riskText: Record<string, string> = {
-    red: "text-red-900",
-    amber: "text-amber-900",
-    yellow: "text-yellow-900",
-    emerald: "text-emerald-900",
-  };
-  const riskBadge: Record<string, string> = {
-    red: "bg-red-600 text-white",
-    amber: "bg-amber-500 text-white",
-    yellow: "bg-yellow-500 text-yellow-950",
-    emerald: "bg-emerald-600 text-white",
-  };
-
   const mapUrl = `/?lat=${cell.latCentroid.toFixed(5)}&lon=${cell.lonCentroid.toFixed(5)}&z=12`;
 
   const breadcrumbSchema = {
@@ -636,41 +617,19 @@ export default async function MuniPage({ params }: Props) {
         <span className="font-semibold text-stone-700">{muni}</span>
       </nav>
 
-      {/* 危険度ヒーローカード — 検索流入したユーザーに「今、危険か？」を 1 秒で答える。
-          count90d を主軸に 4 段階で色分けし、最新事案日と一言コメントを併記。 */}
-      <div
-        className={`not-prose mb-6 rounded-2xl border-2 p-5 ${riskBg[risk.tone]}`}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold ${riskBadge[risk.tone]}`}
-              >
-                {risk.label}
-              </span>
-              <span className={`text-xs font-medium ${riskText[risk.tone]}`}>
-                {muni} 直近の状況
-              </span>
-            </div>
-            <div className={`mt-2 text-lg font-bold ${riskText[risk.tone]}`}>
-              {risk.headline}
-            </div>
-            {cell.latestDate && (
-              <div className={`mt-0.5 text-xs ${riskText[risk.tone]}/80`}>
-                最新の目撃: {formatDate(cell.latestDate)}
-              </div>
-            )}
-            <p className={`mt-2 text-xs leading-relaxed ${riskText[risk.tone]}`}>
-              {risk.note}
-            </p>
-          </div>
-        </div>
-        {/* ヒーローカード内に旧「🗺️ 地図で詳細を見る」ボタンがあったが、
-            概要セクション内の埋め込みマップ + Sticky CTA と動線が三重になり
-            複雑だったので削除。マップへの動線は (1) 埋め込みマップ下のリンク
-            と (2) Sticky CTA の 2 箇所に集約。 */}
-      </div>
+      {/* 危険度ヒーローバナー — 検索流入したユーザーに「今、危険か？」を 1 秒で答える。
+          count90d を主軸に 4 段階で色分けし、最新事案日と一言コメントを併記。
+          ヒーロー内の旧「地図で詳細を見る」ボタンは、埋め込みマップ + Sticky CTA と
+          動線が三重になり複雑だったので削除済み（マップ導線は埋め込みマップ下と
+          Sticky CTA の 2 箇所に集約）。マークアップは /spot と共通の RiskBanner。 */}
+      <RiskBanner
+        tone={risk.tone as RiskTone}
+        label={risk.label}
+        headline={risk.headline}
+        contextLabel={`${muni} 直近の状況`}
+        latestDateText={cell.latestDate ? formatDate(cell.latestDate) : null}
+        note={risk.note}
+      />
 
       {/* 出没 0 件ページの「安全確認」ブロック。「○○市 クマ 大丈夫?」という
           安全確認意図に本文で明確に応え、地域のクマ生息状況・季節の注意を添える。
@@ -740,17 +699,12 @@ export default async function MuniPage({ params }: Props) {
       {/* 通知購読 (ファーストビュー) — この街の状況を見た直後が最も登録動機が
           高い。地名+マップのスパイク流入は一度見て離脱しがちなので、末尾フッター
           だけでなく冒頭にも通知導線を置き、その場で登録できるようにする。
-          フッターの NotifyCard とは surface (place_hero / place_footer) で計測を分ける。 */}
-      {isLineEntryReleased() ? (
-        <NotifyCard target={{ kind: "muni", pref, city: muni }} surface="place_hero" />
-      ) : (
-        isPushReleased() && (
-          <PushSubscribeButton
-            target={{ kind: "muni", pref, city: muni }}
-            surface="place_hero"
-          />
-        )
-      )}
+          フッターの NotifyBlock とは surface (place_hero / place_footer) で計測を分ける。 */}
+      <NotifyBlock
+        target={{ kind: "muni", pref, city: muni }}
+        surface="place_hero"
+        pushReleased={isPushReleased()}
+      />
 
       {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
           「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。
@@ -801,55 +755,20 @@ export default async function MuniPage({ params }: Props) {
           ユーザーが「上部でサマリーとマップが見たい」という導線改善要望に対応。
           地図直下に「全国マップへ」リンクを設置し、埋め込み地図からも全国
           地図へ遷移できる構造にした。 */}
-      <h2>周辺の目撃マップ</h2>
-      <div className="not-prose mb-1.5">
-        <MiniSightingsMap
-          centerLat={cell.latCentroid}
-          centerLon={cell.lonCentroid}
-          records={mapRecordsForYear}
-          zoom={11}
-          boundaryUrl={
-            masterEntry ? `/data/boundaries/${masterEntry.prefCode}.json` : undefined
-          }
-          boundaryCode={masterEntry?.cityCode}
-        />
-      </div>
-      {/* 凡例 — プロット対象は「過去 1 年以内」のレコードのみ。
-          そのうち直近 90 日を赤、それ以前 (91 日〜1 年) をグレーで表示。
-          中央の黄色マーク（代表地点）はユーザーの関心と無関係なので凡例から除外。 */}
-      <ul className="not-prose mb-2 flex flex-wrap list-none gap-x-4 gap-y-1 text-[11px] text-stone-600">
-        <li className="flex items-center gap-1.5">
-          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
-          直近 90 日
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
-          1 年以内
-        </li>
-        <li className="flex items-center gap-1.5">
-          <span
-            aria-hidden
-            className="inline-block h-2.5 w-3 rounded-sm border-2 border-blue-600 bg-blue-500/10"
-          />
-          {muni}の境界
-        </li>
-      </ul>
-      <p className="not-prose mb-2 text-[10px] text-stone-400">
-        行政界データ: 「国土数値情報（行政区域データ）」（国土交通省）を加工して作成
-      </p>
-      {/* デスクトップ専用の「マップを開く」CTA — モバイルでは下部の Sticky CTA
-          が同じ役割を担うので hidden sm:inline-flex で重複排除。ラベルも
-          Sticky CTA と統一し、「内容は同じなのに 2 つあって紛らわしい」という
-          指摘に対応。 */}
-      <p className="not-prose mb-6 hidden sm:block">
-        <Link
-          href={mapUrl}
-          className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-amber-700"
-        >
-          <MapIcon size={16} aria-hidden />
-          {muni} の警戒レベルマップを開く →
-        </Link>
-      </p>
+      {/* 周辺の目撃マップ — /spot と共通の SightingsMapBlock。
+          市町村は行政界ポリゴンを強調（代表地点マーク・半径円は無し）。 */}
+      <SightingsMapBlock
+        centerLat={cell.latCentroid}
+        centerLon={cell.lonCentroid}
+        records={mapRecordsForYear}
+        boundaryUrl={
+          masterEntry ? `/data/boundaries/${masterEntry.prefCode}.json` : undefined
+        }
+        boundaryCode={masterEntry?.cityCode}
+        boundaryLabel={`${muni}の境界`}
+        mapUrl={mapUrl}
+        ctaLabel={`${muni} の警戒レベルマップを開く →`}
+      />
 
       {/* 概要と詳細の境界。次セクション (h2) の上余白で十分なので区切り線は
           置かない。以前は <hr> を挟んでいたが「凡例の下に薄い線が残っていて
@@ -860,12 +779,26 @@ export default async function MuniPage({ params }: Props) {
           全削除。同じ情報は「県内での位置づけ」と「近隣で出没している市町村」
           で十分に表現できている。 */}
 
-      {/* 詳しく見る — 分析系(傾向・月別・季節・県内での位置づけ)を折りたたみ、
+      {/* 季節別アドバイス — 安全に直結するため折りたたみに入れず常時表示する。
+          県（ヒグマ/ツキノワグマ/絶滅区分）×当月で文章が切り替わり、Google の
+          重複コンテンツ判定も回避する。0 件の市町村は上の「安全確認」ブロックで
+          季節の注意を出しているので、ここでは出没実績のある市町村にのみ表示する。 */}
+      {(cell.count365d > 0 || cell.count90d > 0) && (
+        <SeasonalAdvice
+          areaLabel={pref}
+          season={seasonalAdvice.season}
+          point={seasonalAdvice.point}
+          speciesLabel={seasonalAdvice.speciesLabel}
+        />
+      )}
+
+      {/* 詳しく見る — 分析系(傾向・月別・県内での位置づけ)を折りたたみ、
           来訪目的の核(最近の事案・公式情報)は下に見える形で残す。折りたたみでも
-          本文は HTML に残るので長尾 SEO は維持される（観光地ページと基本UXを統一）。 */}
+          本文は HTML に残るので長尾 SEO は維持される（観光地ページと基本UXを統一）。
+          季節の注意は安全に直結するので折りたたみの外に出した。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（傾向・月別件数・季節の注意・県内での位置づけ）</span>
+          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（傾向・月別件数・県内での位置づけ）</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -881,7 +814,7 @@ export default async function MuniPage({ params }: Props) {
       ) : (
         <p>
           {pref}{muni} には直近 1 年の公開された出没記録がありません。
-          ただし周辺市町村の状況や、季節・年による変動でリスクは大きく変わるため、上記の半径サマリーと自治体公式情報も併せてご確認ください。
+          ただし周辺市町村の状況や、季節・年による変動でリスクは大きく変わるため、上記の目撃マップや自治体公式情報も併せてご確認ください。
         </p>
       )}
 
@@ -935,25 +868,7 @@ export default async function MuniPage({ params }: Props) {
         </div>
       )}
 
-      {/* 季節別アドバイス — 県（ヒグマ/ツキノワグマ/絶滅区分）×当月で文章が切り替わる。
-          全市町村で同じ文章になるのを避け、Google の重複コンテンツ判定を回避する。 */}
-      <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-        <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-emerald-900">
-          <Stethoscope size={15} aria-hidden />
-          <span>
-            {pref} の {seasonalAdvice.season} の注意点
-          </span>
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
-            {seasonalAdvice.speciesLabel}
-          </span>
-          <span className="text-[10px] font-normal text-emerald-700">
-            獣医師監修
-          </span>
-        </div>
-        <p className="mt-1.5 text-xs leading-relaxed text-emerald-900">
-          {seasonalAdvice.point}
-        </p>
-      </div>
+      {/* 季節別アドバイスは折りたたみの外（下記の常時表示ブロック）へ移設した。 */}
 
       {/* 県内コンテキスト — 順位ではなく「県全体に占めるシェア・所属」の事実を提示。
           人身被害を伴う領域での順位表現は不適切なため、所属と割合のみで示す。
@@ -974,7 +889,7 @@ export default async function MuniPage({ params }: Props) {
               直近 1 年で {pref} 全体に {prefSummary.count365d.toLocaleString()} 件、
               直近 90 日で {prefSummary.count90d.toLocaleString()} 件の出没が記録されていますが、
               {muni} には直近 1 年の記録がありません。ただし周辺市町村の状況や季節・年による変動があるため、
-              安心の根拠とせず、上記の半径サマリーや自治体公式情報も併せてご確認ください。
+              安心の根拠とせず、上記の目撃マップや自治体公式情報も併せてご確認ください。
             </p>
           )}
         </>
@@ -1341,16 +1256,11 @@ export default async function MuniPage({ params }: Props) {
           LINE 導線が公開されていれば、入口を 1 枚のカードに束ねる
           (LINE 主役 + ブラウザ通知は「使っていない方へ」の開閉)。
           リリースフラグが OFF の間は従来どおりブラウザ通知のみ。 */}
-      {isLineEntryReleased() ? (
-        <NotifyCard target={{ kind: "muni", pref, city: muni }} surface="place_footer" />
-      ) : (
-        isPushReleased() && (
-          <PushSubscribeButton
-            target={{ kind: "muni", pref, city: muni }}
-            surface="place_footer"
-          />
-        )
-      )}
+      <NotifyBlock
+        target={{ kind: "muni", pref, city: muni }}
+        surface="place_footer"
+        pushReleased={isPushReleased()}
+      />
 
       {/* 戻り導線 — 市町村ページの末尾で「県のページに戻る」を必ず提供。
           パンくずより目立つピル状ボタンで一貫した「戻る」体験を担保。 */}

@@ -8,6 +8,7 @@ import DirectorySearch, {
 } from "@/components/DirectorySearch";
 import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
+import CountBadges from "@/components/CountBadges";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
   getMuniAggregatesByPref,
@@ -246,24 +247,7 @@ export default async function PrefPage({ params }: Props) {
                   {m.cityName}
                 </span>
                 <span className="flex shrink-0 items-baseline gap-1">
-                  <span
-                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                      m.count365d > 0
-                        ? "bg-amber-100 text-amber-900"
-                        : "bg-stone-100 text-stone-400"
-                    }`}
-                  >
-                    1年 {m.count365d.toLocaleString()}
-                  </span>
-                  <span
-                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
-                      m.count90d > 0
-                        ? "bg-red-100 text-red-700"
-                        : "bg-stone-100 text-stone-400"
-                    }`}
-                  >
-                    90日 {m.count90d.toLocaleString()}
-                  </span>
+                  <CountBadges count365={m.count365d} count90={m.count90d} />
                 </span>
               </Link>
             </li>
