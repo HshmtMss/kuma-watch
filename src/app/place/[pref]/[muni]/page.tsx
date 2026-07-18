@@ -706,50 +706,10 @@ export default async function MuniPage({ params }: Props) {
         pushReleased={isPushReleased()}
       />
 
-      {/* 表示カード — 累計は古い source の影響で意味が薄いため省き、
-          「過去1年 / 過去90日 / 最新目撃」 の 3 枚に集約。
-          1 年・90 日が両方 0 ならヒーローカードの「直近の出没情報なし」
-          で十分なので、カード列自体を非表示にする。 */}
-      {(cell.count365d > 0 || cell.count90d > 0) && (
-        <div className="not-prose mb-6 grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-            <div className="text-xs text-gray-500">過去1年</div>
-            <div className="mt-1 text-xl font-bold text-gray-900">{cell.count365d}</div>
-            <div className="text-[11px] text-gray-400">件</div>
-          </div>
-          <div
-            className={`rounded-xl border px-3 py-3 text-center ${
-              cell.count90d > 0 ? "border-red-200 bg-red-50" : "border-gray-200 bg-white"
-            }`}
-          >
-            <div
-              className={`text-xs ${cell.count90d > 0 ? "text-red-700" : "text-gray-500"}`}
-            >
-              過去90日
-            </div>
-            <div
-              className={`mt-1 text-xl font-bold ${
-                cell.count90d > 0 ? "text-red-900" : "text-gray-900"
-              }`}
-            >
-              {cell.count90d}
-            </div>
-            <div
-              className={`text-[11px] ${
-                cell.count90d > 0 ? "text-red-500" : "text-gray-400"
-              }`}
-            >
-              件
-            </div>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-3 text-center">
-            <div className="text-xs text-gray-500">最新目撃</div>
-            <div className="mt-1 text-sm font-semibold text-gray-900">
-              {cell.latestDate ? formatDate(cell.latestDate) : "記録なし"}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* かつてここに「過去1年 / 過去90日 / 最新目撃」の 3 枚スタッツカードがあったが、
+          過去90日・最新目撃は上の RiskBanner（と最新事案ハイライト）が既に前面に出し、
+          過去1年も下の「クマ出没の傾向」本文で述べているため、ファーストビューで件数が
+          3〜4 回反復していた。「ヒーローを唯一の答えに」する方針で撤去し、概要を軽くした。 */}
 
       {/* 周辺の目撃マップ — 旧位置（傾向セクションの下）から概要直下に昇格。
           ユーザーが「上部でサマリーとマップが見たい」という導線改善要望に対応。
