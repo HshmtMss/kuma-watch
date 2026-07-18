@@ -19,7 +19,7 @@ import RiskBanner from "@/components/RiskBanner";
 import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
 import { isSpotPushReleased } from "@/lib/push-flag";
-import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
@@ -28,15 +28,21 @@ import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { buildSeasonalModel, forecastArea, BAND_LABEL } from "@/lib/forecast";
 
-// dynamicParams=true: 手キュレーション分は下の generateStaticParams で事前生成(SSG)し、
-// OSM 自動収集の生成スポットは初回アクセス時にオンデマンド生成→ISR キャッシュする。
-// これにより生成スポットを全国数千〜数万件に増やしてもビルド時間が件数に比例して
-// 膨張しない(全件 SSG による build timeout を回避)。存在しない slug は
-// generateMetadata / ページ本体の landmark 照合で notFound() → 404 に落ちる。
-export const dynamicParams = true;
+// dynamicParams=false: 全スポット(手キュレーション + 生成)をビルド時に事前生成(SSG)する。
+//
+// 以前は生成スポットのみ dynamicParams=true でオンデマンド ISR にしていたが、これが
+// 本番で致命的だった: 日本語スラッグ(例 /spot/西湖)をオンデマンド生成すると、Vercel が
+// ISR レスポンスに付与する `x-next-cache-tags` ヘッダにデコード済みの日本語パスが入り、
+// Node の HTTP 層が「Invalid character in header content」で例外 → 生成スポット全4千件が
+// 500 になっていた(2026-07-19 発覚)。事前生成ページ(キュレーション・市町村)は同じ日本語
+// スラッグでも 200 のため、全件を事前生成することで本バグを回避する。
+// 未登録 slug は proxy.ts が /spot へ 308、通り抜けても generateMetadata/本体で notFound()。
+export const dynamicParams = false;
 
-// オンデマンド生成ページと事前生成ページの ISR 再検証間隔(秒)。周辺出没件数は
-// 1 日 2 回更新のため 6 時間で十分。リテラルでないと静的解析されない(21600 = 6h)。
+// ISR 再検証間隔(秒)。周辺出没件数は 1 日 2 回更新のため 6 時間で十分。
+// 事前生成ページの背景再検証で万一 x-next-cache-tags バグを踏んでも、Next は stale を返す
+// ためユーザーには 500 を露出しない(キュレーションページで実証済み)。
+// リテラルでないと静的解析されない(21600 = 6h)。
 export const revalidate = 21600;
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -47,8 +53,10 @@ const SUPERVISION = "獣医師監修";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  // 手キュレーション分のみ事前生成。生成スポットは dynamicParams=true でオンデマンド ISR。
-  return PREBUILD_SPOT_SLUGS.map((slug) => ({ slug }));
+  // 全スポット(手キュレーション + 生成)をビルド時に事前生成する。
+  // 生成スポットを日本語スラッグのままオンデマンド生成すると x-next-cache-tags バグで
+  // 500 になるため(冒頭コメント参照)、全件 SSG で回避する。
+  return JAPAN_LANDMARKS.map((l) => ({ slug: l.slug }));
 }
 
 function decode(v: string): string {
