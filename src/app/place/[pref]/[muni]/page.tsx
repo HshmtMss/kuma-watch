@@ -26,7 +26,7 @@ import {
   type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
-import { getSeasonalAdvice, getBearRegion } from "@/lib/place-content";
+import { getSeasonalAdvice, getBearRegion, getHabitatNote } from "@/lib/place-content";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
@@ -534,16 +534,8 @@ export default async function MuniPage({ params }: Props) {
 
   // 出没 0 件ページの「安全確認」ブロック用に、地域のクマ生息状況を一文で。
   // 県ごとに文面が変わるため 0 件ページの本文差別化 (thin/duplicate 回避) にも効く。
-  const habitatNote =
-    bearRegion === "hokkaido"
-      ? `${pref}はヒグマの生息域です。報告がなくても、山間部や市街地周辺での活動には注意してください。`
-      : bearRegion === "shikoku"
-        ? `四国のツキノワグマは剣山系にごく少数が生息するのみとされ、${pref}での出没はまれです。`
-        : bearRegion === "kyushu-okinawa"
-          ? pref === "沖縄県"
-            ? `沖縄県にクマは生息していません。「クマ」の情報は他の動物の誤認の可能性があります。`
-            : `九州のツキノワグマは絶滅したとされ、現在は生息が確認されていません。`
-          : `${pref}はツキノワグマの生息域です。報告がなくても、季節や年によってクマの行動は変わります。`;
+  // /spot と共通の getHabitatNote に集約。
+  const habitatNote = getHabitatNote(pref);
   const faqItems: { q: string; a: string }[] = [
     {
       q: `${muni}にクマ（熊）は出没しますか？`,

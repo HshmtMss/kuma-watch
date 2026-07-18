@@ -14,6 +14,7 @@ import { notFound } from "next/navigation";
 import PageShell from "@/components/PageShell";
 import SightingsMapBlock from "@/components/SightingsMapBlock";
 import SeasonalAdvice from "@/components/SeasonalAdvice";
+import { getHabitatNote } from "@/lib/place-content";
 import RiskBanner from "@/components/RiskBanner";
 import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
@@ -375,6 +376,10 @@ export default async function SpotPage({ params }: Props) {
         : month >= 3 && month <= 5
           ? { season: "春（3〜5月）", point: "冬眠明けで採食を求めて活動が活発化。山菜採り・タケノコ採りの時期は要注意。入山前に必ず周辺の出没履歴を確認してください。" }
           : { season: "冬（12〜2月）", point: "冬期は通常クマは冬眠していますが、暖冬の年は冬眠せず徘徊する個体（穴持たず）が報告されます。雪上の足跡・痕跡には注意。" };
+
+  // 出没 0 件スポットの「安全確認」ブロック用に、県のクマ生息状況を一文で。
+  // 市町村ページと共通の getHabitatNote（県ごとに文面が変わり thin/duplicate 回避）。
+  const habitatNote = getHabitatNote(landmark.prefName);
 
   // 地図に飛ぶときに地点名も渡す。トップの選択カードに「富士山」など名前が出るので、
   // どこから来たかが視覚的に保たれ「連続性」が出る。
@@ -797,8 +802,9 @@ export default async function SpotPage({ params }: Props) {
         ctaLabel={`${landmark.name} の警戒レベルマップを開く →`}
       />
 
-      {/* 最近の出没事案 — 「最近何があったか」は来訪目的の核なので折りたたまず表示。 */}
-      {nearby.length > 0 && (
+      {/* 最近の出没事案 — 「最近何があったか」は来訪目的の核なので折りたたまず表示。
+          出没が無いスポットは、代わりに「安全確認」ブロックを出して thin content を回避。 */}
+      {nearby.length > 0 ? (
         <>
           <h2>最近の出没事案</h2>
           <ul className="not-prose space-y-2">
@@ -839,13 +845,39 @@ export default async function SpotPage({ params }: Props) {
             })}
           </ul>
         </>
+      ) : (
+        /* 出没 0 件スポットの「安全確認」ブロック。「◯◯ クマ 大丈夫?」という
+           安全確認意図に本文で明確に応え、県のクマ生息状況を添えて thin content を回避。
+           calm トーン（emerald・危険/警戒の語を使わない）を維持し、市町村ページの
+           0 件ブロックと文体を揃える。 */
+        <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+          <h2 className="text-base font-bold text-emerald-900">
+            {landmark.name}周辺のクマ出没状況（安全確認）
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-stone-700">
+            {landmark.name}の周辺 10 km では、報道・自治体発表などをもとにした直近 1 年の
+            クマ（熊）の出没・目撃情報の報告は
+            <strong className="font-bold">ありません</strong>。{habitatNote}
+          </p>
+          <p className="mt-2 text-xs text-stone-500">
+            新たな出没・目撃が報告され次第、本ページと地図に反映します。登山・
+            山菜採り・お出かけ前の確認にご活用ください。
+          </p>
+        </div>
       )}
 
+      {/* 季節別アドバイス — 安全に直結するため折りたたみに入れず常時表示。
+          市町村ページと共通の SeasonalAdvice。出没が無いスポットでも季節の注意は必ず出す。 */}
+      <SeasonalAdvice
+        season={seasonalAdvice.season}
+        point={seasonalAdvice.point}
+      />
+
       {/* 詳しく見る — 二次情報はアコーディオンに畳み、情報過多を解消（IA 再設計）。
-          一目で要る「今の状況・予測・自治体情報・地図」を上に残し、深掘りは折りたたむ。 */}
+          一目で要る「今の状況・予測・自治体情報・地図・季節の注意」を上に残し、深掘りは折りたたむ。 */}
       <details className="group mt-2 mb-6 rounded-xl border border-stone-200 open:pb-1">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-stone-800 hover:bg-stone-50">
-          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（統計・コース別・季節の注意・周辺市町村）</span>
+          <span className="flex items-center gap-1.5"><ChartColumn size={15} aria-hidden />詳しく見る（統計・コース別・周辺市町村）</span>
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
@@ -912,11 +944,7 @@ export default async function SpotPage({ params }: Props) {
         </>
       )}
 
-      {/* 季節別アドバイス — /place/[pref]/[muni] と共通の SeasonalAdvice。 */}
-      <SeasonalAdvice
-        season={seasonalAdvice.season}
-        point={seasonalAdvice.point}
-      />
+      {/* 季節別アドバイスは折りたたみの外（下記の常時表示ブロック）へ移設した。 */}
 
       {/* 含まれる市町村 */}
       {topMunis.length > 0 && (

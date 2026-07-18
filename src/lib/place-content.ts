@@ -69,6 +69,27 @@ export function getBearRegion(prefName: string): BearRegion {
   return REGION_BY_PREF[prefName] ?? "tohoku-honshu";
 }
 
+/**
+ * 出没 0 件の「安全確認」ブロック用に、その都道府県のクマ生息状況を一文で返す。
+ * 県ごとに文面が変わるため、大量にある 0 件ページ（市町村・生成スポット）の
+ * thin/duplicate content 回避にも効く。/place/[pref]/[muni] と /spot/[slug] で共用。
+ */
+export function getHabitatNote(prefName: string): string {
+  const region = getBearRegion(prefName);
+  if (region === "hokkaido") {
+    return `${prefName}はヒグマの生息域です。報告がなくても、山間部や市街地周辺での活動には注意してください。`;
+  }
+  if (region === "shikoku") {
+    return `四国のツキノワグマは剣山系にごく少数が生息するのみとされ、${prefName}での出没はまれです。`;
+  }
+  if (region === "kyushu-okinawa") {
+    return prefName === "沖縄県"
+      ? `沖縄県にクマは生息していません。「クマ」の情報は他の動物の誤認の可能性があります。`
+      : `九州のツキノワグマは絶滅したとされ、現在は生息が確認されていません。`;
+  }
+  return `${prefName}はツキノワグマの生息域です。報告がなくても、季節や年によってクマの行動は変わります。`;
+}
+
 export type Season = "spring" | "summer" | "autumn" | "winter";
 
 export function getSeason(month: number): Season {
