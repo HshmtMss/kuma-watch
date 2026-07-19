@@ -6,6 +6,7 @@ import { fetchNewsSightings } from "@/lib/sources/news";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
 import { isNewsMisplaced, isPrefLevelCity } from "@/lib/muni-geo-check";
+import { jstToday } from "@/lib/jst-date";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
@@ -16,9 +17,35 @@ import type { UnifiedSighting } from "@/lib/sources/types";
  *   - 市町村レベルの座標整合(muni-geo-check)で誤配置と判定された報道ピン
  *     (県内での誤配置。県BBoxはすり抜けるので市町村重心で判定)。
  */
+/**
+ * 日付として成立しないレコードを落とす中央ガード。
+ *
+ * 未来日・暦に無い日 (2027-07-18 / 2025-09-38 / 2023-02-29) は上流のタイポ。
+ * ソース個別のガードは抜けが出る — 実際 kml.ts は「今年+1年まで許容」の
+ * 年単位ガードだったため 2027-07-18 が通り、スナップショットから消しても
+ * 次の取り込みで戻ってきた。sharp9110 (2万件超) 等そもそもガードが無い
+ * ソースもある。全ソースが必ず通るこの経路で最終的に締める。
+ */
+function hasSaneDate(r: UnifiedSighting): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((r.date ?? "").trim());
+  if (!m) return true; // 形式外は日付以外の理由で扱う (ここでは判断しない)
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const da = Number(m[3]);
+  const d = new Date(Date.UTC(y, mo - 1, da));
+  if (
+    d.getUTCFullYear() !== y ||
+    d.getUTCMonth() !== mo - 1 ||
+    d.getUTCDate() !== da
+  )
+    return false;
+  return r.date <= jstToday();
+}
+
 function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
   return records.filter(
     (r) =>
+      hasSaneDate(r) &&
       typeof r.lat === "number" &&
       typeof r.lon === "number" &&
       Number.isFinite(r.lat) &&

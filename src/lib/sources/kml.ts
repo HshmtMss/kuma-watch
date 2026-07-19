@@ -1,5 +1,7 @@
 import type { DataSourceEntry, KmlDateFormat, KmlSource } from "@/data/data-sources";
 import { inJapanBounds, type UnifiedSighting } from "./types";
+import { jstToday } from "@/lib/jst-date";
+import { isRealCalendarDate } from "./date-utils";
 
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const memo = new Map<string, { at: number; data: UnifiedSighting[] }>();
@@ -357,14 +359,20 @@ export async function fetchKmlSightings(
     const points = extractPointPlacemarks(kml);
     const prefName = entry.regionLabel.split(" ")[0] ?? entry.regionLabel;
 
-    const maxFutureYear = new Date().getFullYear() + 1;
+    // 未来日ガードは「日」単位で見る。以前は年単位 (今年+1年まで許容) だった
+    // ため 2027-07-18 のようなタイポが通り、除去しても次の取り込みで戻ってきた。
+    const todayIso = jstToday();
     const split = entry.kml.coordPrefectureSplit;
     const sightings: UnifiedSighting[] = [];
     for (let i = 0; i < points.length; i++) {
       const built = buildSighting(points[i], entry.kml);
       if (!built) continue;
-      const y = Number(built.date.slice(0, 4));
-      if (!Number.isFinite(y) || y < 1970 || y > maxFutureYear) continue;
+      const dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(built.date);
+      if (!dm) continue;
+      const y = Number(dm[1]);
+      if (y < 1970) continue;
+      if (!isRealCalendarDate(y, Number(dm[2]), Number(dm[3]))) continue;
+      if (built.date > todayIso) continue;
       let recordPref = prefName;
       if (split) {
         const v = split.axis === "lon" ? points[i].lon : points[i].lat;

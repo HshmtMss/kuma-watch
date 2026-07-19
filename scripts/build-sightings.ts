@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
+import { jstToday } from "../src/lib/jst-date";
 import {
   hasBoundaryData,
   isInsideMuni,
@@ -90,7 +91,22 @@ async function main(): Promise<void> {
       (r.sourceKind !== "news" || !isPrefLevelCity(r.prefectureName, r.cityName)),
   );
 
-  const records = [...fresh, ...carried];
+  const rawMerged = [...fresh, ...carried];
+
+  // 日付として成立しないレコードはスナップショットに残さない。
+  // 読み取り段 (sightings-cache) でも弾いているが、本体・件数・生ファイル
+  // 参照からも消しておかないと、除去しても次の取り込みで戻ってくる。
+  const todayIso = jstToday();
+  const records = rawMerged.filter((r) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((r.date ?? "").trim());
+    if (!m) return true;
+    const y = Number(m[1]), mo = Number(m[2]), da = Number(m[3]);
+    const d = new Date(Date.UTC(y, mo - 1, da));
+    if (d.getUTCFullYear() !== y || d.getUTCMonth() !== mo - 1 || d.getUTCDate() !== da)
+      return false;
+    return r.date <= todayIso;
+  });
+  const droppedBadDate = rawMerged.length - records.length;
 
   // 市町村ポリゴンによる最終補正。
   // news / llm-html (pdf-llm 含む) は市区町村名が本文で裏取りされている一方、
@@ -133,7 +149,7 @@ async function main(): Promise<void> {
   console.log(
     `[build-sightings] wrote ${records.length} records ` +
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
-      `newly stamped ${stamped}, snapped ${snapped} in ${elapsedSec}s`,
+      `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate} in ${elapsedSec}s`,
   );
 }
 
