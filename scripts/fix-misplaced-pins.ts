@@ -26,6 +26,7 @@ import {
   resolveMuni,
 } from "../src/lib/muni-boundary";
 import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
+import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 const GEOCODED_KINDS = new Set(["news", "llm-html"]);
@@ -50,6 +51,10 @@ function main(): void {
   let unresolved = 0;
   let snapped = 0;
   let officialMismatch = 0;
+  let officialMoved = 0;
+  let officialRelabeled = 0;
+  const officialMoves: string[] = [];
+  const officialRelabels: string[] = [];
   const moves: string[] = [];
   const labels: string[] = [];
 
@@ -79,12 +84,37 @@ function main(): void {
       }
       snapped++;
     } else {
-      officialMismatch++;
-      if (labels.length < 20)
-        labels.push(
-          `  ${r.prefectureName}${r.cityName} と表示 / 実際は ${actualName} ` +
-            `[${r.sourceKind}/${r.source}] (${r.date})`,
-        );
+      // 公式ソースは座標・名前のどちらが誤りか行ごとに違う。観察場所の
+      // 自由記述を第三の証拠にして判定する (muni-reconcile 参照)。
+      const rec = reconcileOfficialRecord(r);
+      if (rec.action === "move") {
+        const moved = haversineKm(r.lat, r.lon, rec.lat, rec.lon);
+        if (officialMoves.length < 20)
+          officialMoves.push(
+            `  ${r.prefectureName}${r.cityName} 観察場所="${r.sectionName ?? ""}" ` +
+              `の座標が ${actualName} にあった → ${moved.toFixed(1)}km 移動 [${r.source}] ${r.date}`,
+          );
+        if (apply) {
+          r.lat = rec.lat;
+          r.lon = rec.lon;
+        }
+        officialMoved++;
+      } else if (rec.action === "relabel") {
+        if (officialRelabels.length < 20)
+          officialRelabels.push(
+            `  ${r.prefectureName}${r.cityName} → ${rec.cityName} ` +
+              `(観察場所="${r.sectionName ?? ""}" が座標と一致) [${r.source}] ${r.date}`,
+          );
+        if (apply) r.cityName = rec.cityName;
+        officialRelabeled++;
+      } else {
+        officialMismatch++;
+        if (labels.length < 20)
+          labels.push(
+            `  ${r.prefectureName}${r.cityName} と表示 / 実際は ${actualName} ` +
+              `観察場所="${r.sectionName ?? ""}" [${r.sourceKind}/${r.source}] (${r.date})`,
+          );
+      }
     }
   }
 
@@ -94,7 +124,19 @@ function main(): void {
   for (const m of moves) console.log(m);
   if (snapped > moves.length) console.log(`  … 他 ${snapped - moves.length} 件`);
   console.log(
-    `\n■ 公式座標なので据え置き、名前だけ不一致 (csv / arcgis / sharp9110): ${officialMismatch} 件`,
+    `\n■ 公式ソース: 観察場所と市町村名が一致 → 座標が誤り。市域内へ移動: ${officialMoved} 件`,
+  );
+  for (const m of officialMoves) console.log(m);
+  if (officialMoved > officialMoves.length)
+    console.log(`  … 他 ${officialMoved - officialMoves.length} 件`);
+  console.log(
+    `\n■ 公式ソース: 観察場所と座標が一致 → 市町村名を修正: ${officialRelabeled} 件`,
+  );
+  for (const m of officialRelabels) console.log(m);
+  if (officialRelabeled > officialRelabels.length)
+    console.log(`  … 他 ${officialRelabeled - officialRelabels.length} 件`);
+  console.log(
+    `\n■ 公式ソース: 根拠不足で据え置き: ${officialMismatch} 件`,
   );
   for (const l of labels) console.log(l);
   if (officialMismatch > labels.length)

@@ -16,6 +16,7 @@ import { dirname, join } from "node:path";
 import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
 import { jstToday } from "../src/lib/jst-date";
+import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
 import {
   hasBoundaryData,
   isInsideMuni,
@@ -130,6 +131,24 @@ async function main(): Promise<void> {
     }
   }
 
+  // 公式ソース (座標が上流由来) の市町村名と座標の食い違いを突き合わせる。
+  // 観察場所の自由記述を第三の証拠にして、座標と名前のどちらが誤りかを
+  // 行ごとに判定する。根拠不足なら触らない。詳細は muni-reconcile 参照。
+  let officialMoved = 0;
+  let officialRelabeled = 0;
+  for (const r of records) {
+    if (GEOCODED_KINDS.has(r.sourceKind)) continue;
+    const rec = reconcileOfficialRecord(r);
+    if (rec.action === "move") {
+      r.lat = rec.lat;
+      r.lon = rec.lon;
+      officialMoved++;
+    } else if (rec.action === "relabel") {
+      r.cityName = rec.cityName;
+      officialRelabeled++;
+    }
+  }
+
   let stamped = 0;
   for (const r of records) {
     const prior = prevById.get(r.id);
@@ -149,7 +168,8 @@ async function main(): Promise<void> {
   console.log(
     `[build-sightings] wrote ${records.length} records ` +
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
-      `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate} in ${elapsedSec}s`,
+      `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate}, ` +
+      `officialMoved ${officialMoved}, officialRelabeled ${officialRelabeled} in ${elapsedSec}s`,
   );
 }
 

@@ -156,6 +156,29 @@ export function resolveMuni(
   return null;
 }
 
+/**
+ * 自由記述 (観察場所・備考) の中に現れる市町村名を拾う。
+ * 「舞鶴市桜が丘地内」→ 舞鶴市。県内の候補に限定し、最長一致を採る。
+ *
+ * 公式データで「市町村名の列」と「座標」が食い違うとき、どちらが誤りかの
+ * 判定材料になる。観察場所の地名が市町村名側と一致するなら座標が疑わしく、
+ * 座標の所属市町村と一致するなら市町村名の列が疑わしい。
+ */
+export function findMuniInText(
+  prefName: string | undefined,
+  text: string | undefined,
+): MuniRef | null {
+  const t = (text ?? "").normalize("NFKC").trim();
+  const pref = (prefName ?? "").trim();
+  if (!t || !pref) return null;
+  const norm = normalizeName(t);
+  for (const c of prefCandidates.get(pref) ?? []) {
+    if (c.name.length < 2) continue;
+    if (norm.includes(c.name)) return c.ref;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------- 境界読込
 
 let entriesByCode: Map<string, Entry> | null = null;
