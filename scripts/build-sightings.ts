@@ -15,6 +15,12 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
+import {
+  hasBoundaryData,
+  isInsideMuni,
+  pointInsideMuni,
+  resolveMuni,
+} from "../src/lib/muni-boundary";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 // 全体再集約 (aggregateAllSightings) が生成する公式ソースの種別。これらは
@@ -85,6 +91,29 @@ async function main(): Promise<void> {
   );
 
   const records = [...fresh, ...carried];
+
+  // 市町村ポリゴンによる最終補正。
+  // news / llm-html (pdf-llm 含む) は市区町村名が本文で裏取りされている一方、
+  // 座標は LLM 出力か Nominatim の当て推量で作った派生値。市域外へ落ちた
+  // ものは市町村内へ寄せる。重心距離ベースの muni-geo-check では隣接市への
+  // 数 km のズレ (毛呂山町の報道が坂戸市街に立つ等) を捕まえられない。
+  // 公式座標系 (csv / arcgis / sharp9110) は座標が一次情報なので触らない。
+  const GEOCODED_KINDS = new Set(["news", "llm-html"]);
+  let snapped = 0;
+  if (hasBoundaryData()) {
+    for (const r of records) {
+      if (!GEOCODED_KINDS.has(r.sourceKind)) continue;
+      if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
+      const muni = resolveMuni(r.prefectureName, r.cityName);
+      if (!muni) continue;
+      if (isInsideMuni(r.lat, r.lon, muni) !== false) continue;
+      const p = pointInsideMuni(muni, r.id);
+      r.lat = p.lat;
+      r.lon = p.lon;
+      snapped++;
+    }
+  }
+
   let stamped = 0;
   for (const r of records) {
     const prior = prevById.get(r.id);
@@ -104,7 +133,7 @@ async function main(): Promise<void> {
   console.log(
     `[build-sightings] wrote ${records.length} records ` +
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
-      `newly stamped ${stamped} in ${elapsedSec}s`,
+      `newly stamped ${stamped}, snapped ${snapped} in ${elapsedSec}s`,
   );
 }
 
