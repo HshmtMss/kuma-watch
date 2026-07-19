@@ -231,22 +231,29 @@ type Landmark = {
 async function loadSpots(): Promise<SearchEntry[]> {
   const mod = await import("../src/data/japan-landmarks");
   const landmarks = mod.JAPAN_LANDMARKS as Landmark[];
+  // 手キュレーション分(高尾山・富士山など SEO/UX 上重要)の slug。これらだけ
+  // 表示用 snippet を索引に含め、OSM 自動収集の生成スポット(数千件)は snippet を
+  // 省く。全国網羅で spot が 9千件超になると snippet(生成 blurb の抜粋)の総量だけで
+  // 索引が数 MB 膨張し /search 初回 fetch が重くなるため。生成スポットは名前・地名で
+  // 引く用途が主で、結果カードは title + URL で成立する(SearchUI は snippet 省略可)。
+  const curatedSlugs = new Set(mod.PREBUILD_SPOT_SLUGS as string[]);
   return landmarks.map((l) => {
-    // 全国網羅で spot が数千件になると blurb をそのまま index に含めるだけで
-    // search-index.json が数 MB 級に膨張し、/search 初回 fetch が重くなる。
-    // spot は名前・地名で引く用途が主なので、表示用 snippet は短く切り詰め、
-    // tokens には blurb を含めない(名前/読み/別名/都道府県/市町村/カテゴリで十分)。
-    const placeLabel = `${l.prefName}${l.muniName ?? ""}`;
-    const snippet = l.blurb
-      ? l.blurb.length > 70
-        ? `${l.blurb.slice(0, 70)}…`
-        : l.blurb
-      : `${placeLabel} の観光地・登山口`;
+    // snippet は curated のみ(短く切り詰め)。生成スポットは undefined→JSON から除外。
+    let snippet: string | undefined;
+    if (curatedSlugs.has(l.slug)) {
+      const placeLabel = `${l.prefName}${l.muniName ?? ""}`;
+      snippet = l.blurb
+        ? l.blurb.length > 70
+          ? `${l.blurb.slice(0, 70)}…`
+          : l.blurb
+        : `${placeLabel} の観光地・登山口`;
+    }
     return {
       type: "spot" as const,
       title: l.name,
       url: `/spot/${encodeURIComponent(l.slug)}`,
       snippet,
+      // tokens には blurb を含めない(名前/読み/別名/都道府県/市町村/カテゴリで十分)。
       tokens: [
         l.name,
         getReadings()[l.name] ?? "", // 読み仮名 (かな入力/読み検索用)
