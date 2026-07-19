@@ -1,6 +1,6 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import { inJapanBounds, type UnifiedSighting } from "./types";
-import { geocodePlace, jitter } from "./geocode";
+import { geocodePlace, jitterWithin } from "./geocode";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -243,7 +243,9 @@ export async function fetchLlmHtmlSightings(
     if (typeof lat !== "number" || typeof lon !== "number") continue;
     if (!inJapanBounds(lat, lon)) continue;
     const id = `${source.id}-${s.date}-${i}`;
-    const pos = precise ? { lat, lon } : jitter(lat, lon, id + (s.sectionName ?? ""));
+    const pos = precise
+      ? { lat, lon }
+      : jitterWithin(prefName, cityName, lat, lon, id + (s.sectionName ?? ""));
     out.push({
       id,
       source: source.id,

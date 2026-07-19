@@ -15,7 +15,8 @@
 // 同じ慣行 (GEMINI_API_KEY 必須・skip 可・cache TTL 24h)。
 
 import { inJapanBounds, type UnifiedSighting } from "./types";
-import { geocodePlace, jitter } from "./geocode";
+import { geocodePlace, jitterWithin } from "./geocode";
+import { hasBoundaryData, isInsideMuni, resolveMuni } from "@/lib/muni-boundary";
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
 import { isNewsMisplaced } from "@/lib/muni-geo-check";
@@ -512,7 +513,15 @@ export async function fetchNewsSightings(
     // 一意 id: 記事 URL (記事ごとに一意・安定) + 記事内インデックス。同一記事に
     // 複数事案がある場合は s.index / i で分離。これで cron 実行を跨いだ衝突を根絶。
     const id = `news-${hash36(article.link)}-${s.index}-${i}`;
-    const pos = precise ? { lat, lon } : jitter(lat, lon, id);
+
+    // 報道は「市町村名」が記事本文で裏取り済み(placeMentioned)なのに対し、座標は
+    // LLM 出力か Nominatim の当て推量で、隣の市街地に落ちることがある。市域外に
+    // なった座標は捨てて市町村内へ寄せる。事案自体は実在するので落とさない。
+    const claimed = resolveMuni(prefName, cityName);
+    if (claimed && hasBoundaryData() && isInsideMuni(lat, lon, claimed) === false) {
+      precise = false;
+    }
+    const pos = precise ? { lat, lon } : jitterWithin(prefName, cityName, lat, lon, id);
     // "HH:MM" (24時間) のみ採用。"9:5"→"09:05" に整える。範囲外は捨てる。
     const time = (() => {
       const m = /^(\d{1,2}):(\d{2})$/.exec((s.time ?? "").trim());
