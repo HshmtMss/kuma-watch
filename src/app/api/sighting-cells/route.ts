@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { latLonToMeshCode } from "@/lib/mesh";
+import { jstDaysAgo, jstToday } from "@/lib/jst-date";
 
 export const runtime = "nodejs";
 
@@ -24,12 +25,14 @@ export async function GET() {
   }
 
   const sightings = await getCachedSightings();
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - 365);
-  const isoCutoff = cutoff.toISOString().slice(0, 10);
+  // JST カレンダー日で切る。UTC 基準だと JST 00:00〜09:00 の間だけ境界が
+  // 1 日ずれ、同じ地点の件数が /place ページと食い違う。
+  const isoCutoff = jstDaysAgo(365);
 
+  const todayIso = jstToday();
   const counts: Record<string, number> = {};
   for (const s of sightings) {
+    if (s.date && s.date > todayIso) continue; // 未来日は区分に効かせない
     if (!s.date || s.date < isoCutoff) continue;
     if (
       typeof s.lat !== "number" ||

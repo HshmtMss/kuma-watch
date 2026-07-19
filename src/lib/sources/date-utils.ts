@@ -28,10 +28,23 @@ export function parseWarekiDate(raw: string): string | null {
   const da = Number(m[4]);
   const offset = ERA_OFFSETS[m[1]];
   if (offset == null || !Number.isFinite(year) || !Number.isFinite(mo) || !Number.isFinite(da)) return null;
-  if (mo < 1 || mo > 12 || da < 1 || da > 31) return null;
   const y = offset + year;
   if (y < 1900 || y > 2100) return null;
+  if (!isRealCalendarDate(y, mo, da)) return null;
   return `${y}-${pad2(mo)}-${pad2(da)}`;
+}
+
+/**
+ * 暦として実在する日付か。月ごとの日数・閏年を見る。
+ * `da <= 31` だけの検査は 2025-09-38 や 2023-02-29 を通してしまい、
+ * 下流の Date.UTC が翌月へ繰り上げて静かに日付をずらす
+ * (2025-09-38 -> 2025-10-08 で 20 日ズレ)。
+ */
+export function isRealCalendarDate(y: number, mo: number, da: number): boolean {
+  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(da)) return false;
+  if (mo < 1 || mo > 12 || da < 1) return false;
+  const d = new Date(Date.UTC(y, mo - 1, da));
+  return d.getUTCFullYear() === y && d.getUTCMonth() === mo - 1 && d.getUTCDate() === da;
 }
 
 export function parseIsoLike(raw: string): string | null {
@@ -41,7 +54,7 @@ export function parseIsoLike(raw: string): string | null {
   if (!m) return null;
   const mo = Number(m[2]);
   const da = Number(m[3]);
-  if (mo < 1 || mo > 12 || da < 1 || da > 31) return null;
+  if (!isRealCalendarDate(Number(m[1]), mo, da)) return null;
   return `${m[1]}-${pad2(mo)}-${pad2(da)}`;
 }
 

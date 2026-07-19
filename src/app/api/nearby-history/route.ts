@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { haversineKm } from "@/lib/nearby-sightings";
+import { jstDaysAgo, jstToday } from "@/lib/jst-date";
 
 export const runtime = "nodejs";
 
@@ -26,12 +27,9 @@ export async function GET(req: Request) {
 
   const sightings = await getCachedSightings();
   const now = new Date();
-  const cutoff365 = new Date(now);
-  cutoff365.setDate(cutoff365.getDate() - 365);
-  const cutoff90 = new Date(now);
-  cutoff90.setDate(cutoff90.getDate() - 90);
-  const iso365 = cutoff365.toISOString().slice(0, 10);
-  const iso90 = cutoff90.toISOString().slice(0, 10);
+  // JST カレンダー日で切る (UTC 基準だと早朝に境界が 1 日ずれる)
+  const iso365 = jstDaysAgo(365);
+  const iso90 = jstDaysAgo(90);
   // 昨年・今年の月別比較用。昨年1月1日まで遡って集計する。
   const thisYear = now.getFullYear();
   const lastYear = thisYear - 1;
@@ -63,8 +61,11 @@ export async function GET(req: Request) {
   // 昨年・今年の月別実測件数 (0=1月 .. 11=12月)。カードの月別出没チャート(昨年 vs 今年)用。
   const monthlyThisYear = new Array<number>(12).fill(0);
   const monthlyLastYear = new Array<number>(12).fill(0);
+  // 未来日は上流のタイポ。「直近90日」に混ざると、実在しない出没が
+  // 1年先まで件数と「最新の目撃日」に居座る (実測: 2027-07-18 の栃木レコード)。
+  const todayIso = jstToday();
   for (const s of sightings) {
-    if (!s.date || s.date < startISO) continue;
+    if (!s.date || s.date < startISO || s.date > todayIso) continue;
     if (s.lat < latMin || s.lat > latMax) continue;
     if (s.lon < lonMin || s.lon > lonMax) continue;
     const d = haversineKm(lat, lon, s.lat, s.lon);

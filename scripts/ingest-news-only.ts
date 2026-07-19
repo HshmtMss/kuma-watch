@@ -16,6 +16,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fetchNewsSightings } from "../src/lib/sources/news";
 import type { UnifiedSighting } from "../src/lib/sources/types";
+import { incidentKey } from "../src/lib/incident-key";
 
 type Snapshot = { generatedAt: number; records: UnifiedSighting[] };
 
@@ -68,7 +69,7 @@ async function main(): Promise<void> {
     cityName: string;
     sectionName: string;
   }) =>
-    `${r.date}|${r.prefectureName}|${r.cityName}|${(r.sectionName ?? "").trim()}`;
+    incidentKey(r.date, r.prefectureName, r.cityName, r.sectionName);
   const existingFingerprints = new Set<string>();
   for (const r of snapshot.records) {
     if (r.source === "news" || r.source === "sharp9110") {

@@ -32,6 +32,7 @@ import {
 } from "@/lib/score";
 import type { RiskLevel } from "@/lib/types";
 import type { GeocodeHit } from "@/app/api/geocode/route";
+import { jstToday } from "@/lib/jst-date";
 
 // 地図右下スタックの常設「通知」ボタン (①)。地点未選択でも押せる通知入口。
 // 既定オン。隠したいときだけ NEXT_PUBLIC_MAP_NOTIFY_FAB=false を設定する。
@@ -791,7 +792,7 @@ export default function KumaClient() {
   // 期間フィルタや件数表示は意図的に持たず、「いつ更新されたか」だけを伝える。
   const latestDate = useMemo(() => {
     if (!records.length) return null;
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayIso = jstToday();
     let latest: string | null = null;
     for (const r of records) {
       // 未来日付の上流バグレコードは除外。/api/kuma 側でも弾いているが二重防衛。

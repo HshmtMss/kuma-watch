@@ -167,26 +167,39 @@ export async function geocodePlace(
   const accepts = (lat: number, lon: number): boolean =>
     !canVerify || isInsideMuni(lat, lon, muni!) !== false;
 
+  // 先に市区町村単位の点を引いておく (市ごとにキャッシュされるので実質1回)。
+  // Nominatim は地区名を解決できないと黙って市の代表点を返すが、呼び出し側は
+  // それを「地区まで当たった precise な点」と誤認していた。結果、同じ市の
+  // 別々の事案が全部 1 ピクセルに積み上がる (会津若松市で 18 日分 27 件が
+  // 同一座標)。市の点と一致する結果は precise ではないと判定する。
+  const cityOnly = [prefName, city].join(" ").trim();
+  const cityHit = await geocodeQuery(cityOnly);
+  const isCityPoint = (lat: number, lon: number): boolean =>
+    cityHit !== null &&
+    Math.abs(lat - cityHit.lat) < 1e-4 &&
+    Math.abs(lon - cityHit.lon) < 1e-4;
+
   const full = [prefName, city, section].filter(Boolean).join(" ").trim();
-  if (full) {
+  // section が空 (元から無い / GENERIC_SECTION で落とした) なら full は
+  // 市区町村クエリそのものなので、precise を主張できない。
+  if (section && full !== cityOnly) {
     const r = await geocodeQuery(full);
-    if (r && accepts(r.lat, r.lon)) return { ...r, precise: true };
-  }
-  if (section) {
+    if (r && accepts(r.lat, r.lon) && !isCityPoint(r.lat, r.lon))
+      return { ...r, precise: true };
+
     const head = section.split(/[\s 　]/)[0];
     if (head && head !== section && !GENERIC_SECTION.test(head)) {
       const q = [prefName, city, head].filter(Boolean).join(" ").trim();
-      const r = await geocodeQuery(q);
-      if (r && accepts(r.lat, r.lon)) return { ...r, precise: true };
+      const r2 = await geocodeQuery(q);
+      if (r2 && accepts(r2.lat, r2.lon) && !isCityPoint(r2.lat, r2.lon))
+        return { ...r2, precise: true };
     }
   }
+
   // 市区町村までは特定できたが地区が拾えなかった場合の丸め。市中心点に
   // 落ちるので precise=false とし、呼び出し側で ~3km ジッターを掛ける。
-  const cityOnly = [prefName, city].join(" ").trim();
-  if (cityOnly !== full) {
-    const r = await geocodeQuery(cityOnly);
-    if (r && accepts(r.lat, r.lon)) return { ...r, precise: false };
-  }
+  if (cityHit && accepts(cityHit.lat, cityHit.lon))
+    return { ...cityHit, precise: false };
   // Nominatim が市区町村名すら解決できない/域外を返した場合でも、マスターに
   // ある市町村なら重心が使える。県代表点に落とすより遥かに正確。
   if (muni) return { lat: muni.lat, lon: muni.lon, precise: false };

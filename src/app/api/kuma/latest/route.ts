@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { getApprovedCitizenSightings } from "@/lib/submission-store";
 import type { UnifiedSighting } from "@/lib/sources/types";
+import { jstToday } from "@/lib/jst-date";
 
 /**
  * 出没データの「軽量サマリ」だけを返すポーリング用エンドポイント。
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
           )
         : [];
     const all = [...unified, ...citizen];
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayIso = jstToday();
 
     let matched = 0;
     let latestDate: string | null = null;

@@ -1,6 +1,7 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import { epochToIsoDate, parseIsoLike, parseWarekiDate } from "./date-utils";
 import { inJapanBounds, type UnifiedSighting } from "./types";
+import { jstToday } from "@/lib/jst-date";
 
 const PAGE_SIZE = 2000;
 const HARD_LIMIT = 20000;
@@ -103,7 +104,7 @@ export async function fetchArcGisSightings(
       const date = parseDateValue(dateVal, dateFormat);
       if (!date) continue;
       // 未来日付ガード: 自治体側 typo（例: 2025→2026）を弾く
-      if (date > new Date().toISOString().slice(0, 10)) continue;
+      if (date > jstToday()) continue;
 
       const objectId = attrs.objectid ?? attrs.OBJECTID ?? attrs.ObjectId;
       const city = mappings.city ? cleanString(attrs[mappings.city]) : "";

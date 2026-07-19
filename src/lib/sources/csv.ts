@@ -1,5 +1,6 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import { inJapanBounds, type UnifiedSighting } from "./types";
+import { jstToday } from "@/lib/jst-date";
 
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const MAX_ROWS = 20000;
@@ -105,7 +106,7 @@ export async function fetchCsvSightings(
     // 未来日付ガード: 自治体の typo（例: 2025 を 2026 と書き間違い）で
     // 「今日より先」の日付が入った record を防ぐ。生のクマ目撃データは
     // 過去・現在のみが現実的。当日まで許容、翌日以降は問答無用でスキップ。
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayIso = jstToday();
 
     const sightings: UnifiedSighting[] = [];
     let droppedFuture = 0;

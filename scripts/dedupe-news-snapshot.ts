@@ -18,11 +18,14 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { UnifiedSighting } from "../src/lib/sources/types";
+import { incidentKey } from "../src/lib/incident-key";
 
 type Snapshot = { generatedAt: number; records: UnifiedSighting[] };
 
+// 生文字列一致では Gemini の表記ゆれ (大只越町1丁目 / 大只越町１丁目、
+// 港町・只越 / 港町から只越) を束ねられない。正規化キーを共有する。
 function fingerprint(r: UnifiedSighting): string {
-  return `${r.date}|${r.prefectureName}|${r.cityName}|${(r.sectionName ?? "").trim()}`;
+  return incidentKey(r.date, r.prefectureName, r.cityName, r.sectionName);
 }
 
 function main(): void {

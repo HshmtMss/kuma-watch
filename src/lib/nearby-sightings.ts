@@ -1,5 +1,6 @@
 import { getCachedSightings } from "@/lib/sightings-cache";
 import type { UnifiedSighting } from "@/lib/sources/types";
+import { jstDaysAgo } from "@/lib/jst-date";
 
 export type NearbyOptions = {
   radiusKm?: number;
@@ -30,9 +31,9 @@ export async function findNearbySightings(
   const limit = opts.limit ?? 15;
 
   const all = await getCachedSightings();
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - withinDays);
-  const cutoffIso = cutoff.toISOString().split("T")[0];
+  // JST カレンダー日で切る (UTC 基準だと早朝に境界が 1 日ずれ、
+  // 「最近の目撃 N件」がページごとに食い違う)
+  const cutoffIso = jstDaysAgo(withinDays);
 
   const latDelta = radiusKm / 111;
   const lonDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));

@@ -50,6 +50,7 @@ import GeoNotifyTile, {
   isGeoNotifyAvailable,
 } from "@/components/GeoNotifyTile";
 import { isPushReleased } from "@/lib/push-flag";
+import { jstDaysAgo } from "@/lib/jst-date";
 
 export type LocationSource = "gps" | "tap" | "search" | "url";
 export type SelectedLocation = {
@@ -75,7 +76,9 @@ type NearbyRecent = Pick<
 
 function cutoffDate(days: number | null): string | null {
   if (days === null) return null;
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  // JST 基準。UTC でスライスすると早朝に境界が 1 日ずれ、地図の期間フィルタ
+  // (KumaClient の computeCutoff は JST) と集計が食い違う。
+  return jstDaysAgo(days);
 }
 
 type State =

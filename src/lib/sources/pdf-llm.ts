@@ -1,6 +1,7 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import { type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
+import { incidentKey } from "@/lib/incident-key";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -225,7 +226,13 @@ export async function fetchPdfLlmSightings(
     const id = `${source.id}-${s.date}-${i}`;
     const pos = g.precise
       ? g
-      : jitterWithin(prefName, cityName, g.lat, g.lon, id + (s.sectionName ?? ""));
+      : jitterWithin(
+          prefName,
+          cityName,
+          g.lat,
+          g.lon,
+          incidentKey(s.date, prefName, cityName, s.sectionName),
+        );
     out.push({
       id,
       source: source.id,

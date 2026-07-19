@@ -107,8 +107,11 @@ export async function loadDataStats(): Promise<DataStats> {
     }
     if (r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date)) {
       if (r.date < oldest) oldest = r.date;
-      if (r.date > newest) newest = r.date;
       if (r.date <= today) {
+        // newest は必ず未来日ガードの内側で更新する。外に置くと上流の
+        // タイポ (2027-07-18 等) がそのまま「収録期間の終わり」として
+        // /data ページに表示され、データの信頼性表示が壊れる。
+        if (r.date > newest) newest = r.date;
         if (r.date >= cutoff30) recent30++;
         if (r.date >= cutoff90) {
           recent90++;

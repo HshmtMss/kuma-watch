@@ -20,6 +20,9 @@ import { hasBoundaryData, isInsideMuni, resolveMuni } from "@/lib/muni-boundary"
 import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
 import { isNewsMisplaced } from "@/lib/muni-geo-check";
+import { jstToday } from "@/lib/jst-date";
+import { isRealCalendarDate } from "./date-utils";
+import { incidentKey } from "@/lib/incident-key";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -311,8 +314,54 @@ async function fetchFeed(feed: Feed): Promise<RssItem[]> {
   }
 }
 
+/**
+ * 抽出された出没日を検証・補正する。不正なら null (取り込まない)。
+ *
+ *  - 暦として存在しない日付 (2025-09-38 等) を弾く
+ *  - 記事の配信日 (pubDate) より未来の出没日は成立しないので弾く
+ *  - ただし「年が無い記事」を pubDate の年で補った結果だけは救済する。
+ *    1/5 配信の記事が「12月28日」と書いていると pubDate の年を採って
+ *    翌年12月 = 11ヶ月先になる。1年引いて pubDate 以前に収まるならそれを採る。
+ *    (現データは未発現。年末年始を跨いだ時点で必ず起きる)
+ */
+export function normalizeEventDate(
+  raw: string | undefined,
+  pubDate: string | undefined,
+): string | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((raw ?? "").trim());
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const da = Number(m[3]);
+  if (!isRealCalendarDate(y, mo, da)) return null;
+
+  let date = `${m[1]}-${m[2]}-${m[3]}`;
+  const pub = (pubDate ?? "").slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(pub) && date > pub) {
+    // 年跨ぎの繰り上がりだけ救済する。1年引いた日付が配信直前
+    // (ROLLOVER_SLACK_DAYS 以内) に収まる場合のみ = 12月の事案を1月に報じた形。
+    // 無条件に1年引くと、単なる月日取り違え (07-05 <-> 05-07) を
+    // 「1年前の事案」として救ってしまい、誤った日付で載せることになる。
+    const ROLLOVER_SLACK_DAYS = 60;
+    const back = `${y - 1}-${m[2]}-${m[3]}`;
+    const diffDays =
+      (Date.parse(`${pub}T00:00:00Z`) - Date.parse(`${back}T00:00:00Z`)) /
+      86_400_000;
+    if (
+      isRealCalendarDate(y - 1, mo, da) &&
+      diffDays >= 0 &&
+      diffDays <= ROLLOVER_SLACK_DAYS
+    )
+      date = back;
+    else return null; // 配信前に起きた事案は報じられない = 抽出誤り
+  }
+  // pubDate が壊れている場合の最終防衛
+  if (date > jstToday()) return null;
+  return date;
+}
+
 function buildPrompt(items: RssItem[]): string {
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const todayIso = jstToday();
   const articles = items
     .map(
       (it, i) =>
@@ -434,7 +483,12 @@ export async function fetchNewsSightings(
     const s = drafts[i];
     const article = items[s.index];
     if (!article) continue;
-    if (!s.date || !/^\d{4}-\d{2}-\d{2}/.test(s.date)) continue;
+    // 日付の検証。従来は形式しか見ておらず、Gemini が pubDate より未来の
+    // 出没日を返しても素通りしていた (実測: 取り込み時刻より後の出没日が
+    // news 431件。月日の取り違え 07-05 <-> 05-07 が主因)。
+    // 時刻側は既に範囲検査があるのに日付だけ抜けていた。
+    const eventDate = normalizeEventDate(s.date, article.pubDate);
+    if (!eventDate) continue;
     const prefName = (s.prefectureName ?? "").trim();
     // cityName に「市区町村」でなく都道府県名 (例: cityName="埼玉県") が入る
     // ことがある。この値を geocodePlace に渡すと `if (!city)` ガードをすり抜け、
@@ -521,7 +575,14 @@ export async function fetchNewsSightings(
     if (claimed && hasBoundaryData() && isInsideMuni(lat, lon, claimed) === false) {
       precise = false;
     }
-    const pos = precise ? { lat, lon } : jitterWithin(prefName, cityName, lat, lon, id);
+    // ジッターの種は「記録 id」ではなく「事案キー」。id で振ると、同じ出没を
+    // 報じた別記事が別々の座標へ散らばり、下流の近接 dedup (220m) が束ねられず
+    // 1件の出没が複数ピンとして残る (実測: 釜石市の1頭が最大4km離れた4点に)。
+    // 事案キーで振れば同じ出没は必ず同じ点に落ち、既存の dedup が効く。
+    const seed = incidentKey(eventDate, prefName, cityName, s.sectionName);
+    const pos = precise
+      ? { lat, lon }
+      : jitterWithin(prefName, cityName, lat, lon, seed);
     // "HH:MM" (24時間) のみ採用。"9:5"→"09:05" に整える。範囲外は捨てる。
     const time = (() => {
       const m = /^(\d{1,2}):(\d{2})$/.exec((s.time ?? "").trim());
@@ -537,7 +598,7 @@ export async function fetchNewsSightings(
       sourceKind: "news",
       lat: pos.lat,
       lon: pos.lon,
-      date: s.date,
+      date: eventDate,
       ...(time ? { time } : {}),
       prefectureName: prefName,
       cityName: cityName.slice(0, 40),

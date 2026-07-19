@@ -8,6 +8,7 @@ import type {
   SightingSourceKind,
   UnifiedSighting,
 } from "@/lib/sources/types";
+import { jstToday } from "@/lib/jst-date";
 
 export type KumaRecord = {
   id: number | string;
@@ -102,7 +103,7 @@ export async function GET(req: Request) {
     // 未来日付の不正レコードを除外する。上流の自治体サイトでまれに
     // タイポ等で未来日付が入ることがあり、「最新」表示を狂わせるため、
     // API 側でクリップして UI に到達させない。
-    const todayIso = new Date().toISOString().slice(0, 10);
+    const todayIso = jstToday();
     records = records.filter((r) => r.date <= todayIso);
 
     const sorted = [...records].sort((a, b) => (a.date > b.date ? -1 : 1));
