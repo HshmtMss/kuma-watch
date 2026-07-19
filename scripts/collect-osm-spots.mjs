@@ -12,7 +12,9 @@ const OVERPASS = "https://overpass-api.de/api/interpreter";
 const CACHE = ".cache";
 if (!existsSync(CACHE)) mkdirSync(CACHE);
 
-// クマ生息域: 北海道 + 本州34県（九州・四国・沖縄はクマ不在/絶滅のため除外）
+// 全国47都道府県。当初はクマ生息域(北海道+本州34県)に限定していたが、観光スポットの
+// 網羅拡張(アクセス数・周知目的)に方針転換し、クマ不在の九州・四国・沖縄も収録対象に
+// 加えた。出没0件スポットは「周辺に出没情報なし＝安心」ページとして成立する設計。
 const PREFS = [
   "北海道",
   "青森県","岩手県","宮城県","秋田県","山形県","福島県",
@@ -21,6 +23,10 @@ const PREFS = [
   "岐阜県","静岡県","愛知県","三重県",
   "滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
   "鳥取県","島根県","岡山県","広島県","山口県",
+  // 四国
+  "徳島県","香川県","愛媛県","高知県",
+  // 九州・沖縄
+  "福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県",
 ];
 
 // カテゴリ別の Overpass クエリ片（area.a 内）。
@@ -60,12 +66,18 @@ function selector(cat) {
         `relation["boundary"="protected_area"]["protect_class"="2"]["name"](area.a);`,
       ].join("");
     case "historic":
-      // 城・城跡・記念物・史跡などの主要タイプに限定 (wikipedia 付き=著名)。
-      // 神社仏閣 (place_of_worship) は数万件と膨大でノイズ源になるため除外し、
-      // 著名寺社は「検索→地図」(ジオコーディング) 側でカバーする。松本城・鎌倉大仏ほか。
+      // 城・城跡・記念物・史跡などの主要タイプに限定 (wikipedia 付き=著名)。松本城ほか。
       return [
         `node["historic"~"^(castle|monument|memorial|ruins|archaeological_site|fort|city_gate)$"]["name"]["wikipedia"](area.a);`,
         `way["historic"~"^(castle|monument|memorial|ruins|archaeological_site|fort|city_gate)$"]["name"]["wikipedia"](area.a);`,
+      ].join("");
+    case "worship":
+      // 神社仏閣・教会など。place_of_worship は無名の小社まで含めると数万件と膨大な
+      // ため、wikidata か wikipedia 付き(＝著名)に限定して収録。清水寺・伊勢神宮・
+      // 出雲大社ほか観光対象になる寺社を拾う。build 側で県あたり上限も掛ける。
+      return [
+        `node["amenity"="place_of_worship"]["name"]["wikidata"](area.a);way["amenity"="place_of_worship"]["name"]["wikidata"](area.a);`,
+        `node["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);way["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);`,
       ].join("");
     case "island":
       // 著名な島 (江の島・宮島…、wikidata 付き)。人工島・埠頭は name 側で除外。
