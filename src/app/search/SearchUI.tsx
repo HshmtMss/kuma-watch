@@ -26,6 +26,8 @@ type SearchEntry = {
   url: string;
   snippet?: string;
   tokens: string;
+  /** 著名度(Wikidata サイトリンク数)。spot のみ。同名重複時に著名スポットを上位に。 */
+  fame?: number;
 };
 
 // 地名ジオコーディング (前方一致) のヒット。サイト内インデックスに無い地名でも
@@ -94,7 +96,10 @@ function scoreEntry(entry: SearchEntry, tokens: string[]): number | null {
     if (titleLower.startsWith(t)) titleScore += 3;
     else if (titleLower.includes(t)) titleScore += 2;
   }
-  return titleScore + TYPE_META[entry.type].rank * 0.5;
+  // 著名度ブースト: 同名の観光地(清水寺・八幡神社…)が多数あるとき、Wikidata の
+  // サイトリンク数が多い著名スポットを上位に。対数で頭打ちにして過剰な支配を防ぐ。
+  const fameBoost = entry.fame ? Math.log2(entry.fame + 1) : 0;
+  return titleScore + TYPE_META[entry.type].rank * 0.5 + fameBoost;
 }
 
 export default function SearchUI({ hub }: { hub?: ReactNode }) {

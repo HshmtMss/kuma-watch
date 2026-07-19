@@ -74,10 +74,11 @@ function selector(cat) {
     case "worship":
       // 神社仏閣・教会など。place_of_worship は無名の小社まで含めると数万件と膨大な
       // ため、wikidata か wikipedia 付き(＝著名)に限定して収録。清水寺・伊勢神宮・
-      // 出雲大社ほか観光対象になる寺社を拾う。build 側で県あたり上限も掛ける。
+      // 出雲大社ほか観光対象になる寺社を拾う。醍醐寺・延暦寺のような大規模寺社は
+      // relation で表現されるため node/way に加え relation も収集する。
       return [
-        `node["amenity"="place_of_worship"]["name"]["wikidata"](area.a);way["amenity"="place_of_worship"]["name"]["wikidata"](area.a);`,
-        `node["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);way["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);`,
+        `node["amenity"="place_of_worship"]["name"]["wikidata"](area.a);way["amenity"="place_of_worship"]["name"]["wikidata"](area.a);relation["amenity"="place_of_worship"]["name"]["wikidata"](area.a);`,
+        `node["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);way["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);relation["amenity"="place_of_worship"]["name"]["wikipedia"](area.a);`,
       ].join("");
     case "island":
       // 著名な島 (江の島・宮島…、wikidata 付き)。人工島・埠頭は name 側で除外。

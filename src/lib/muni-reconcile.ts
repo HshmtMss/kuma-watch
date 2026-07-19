@@ -30,6 +30,7 @@ import {
   type MuniRef,
 } from "@/lib/muni-boundary";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
+import type { Gazetteer } from "@/lib/place-gazetteer";
 
 const muniByCode = new Map(JAPAN_MUNICIPALITIES.map((m) => [m.cityCode, m]));
 
@@ -53,7 +54,10 @@ type Rec = {
  * 公式ソース (座標が上流由来) 1件を突き合わせる。
  * 判定不能・境界データ無しなら "ok"/"unknown" を返し、データは変えない。
  */
-export function reconcileOfficialRecord(r: Rec): Reconciliation {
+export function reconcileOfficialRecord(
+  r: Rec,
+  gaz?: Gazetteer,
+): Reconciliation {
   if (!hasBoundaryData()) return { action: "ok" };
   if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) return { action: "ok" };
   const claimed = resolveMuni(r.prefectureName, r.cityName);
@@ -68,19 +72,38 @@ export function reconcileOfficialRecord(r: Rec): Reconciliation {
   const hint =
     findMuniInText(r.prefectureName, r.sectionName) ??
     findMuniInText(r.prefectureName, r.comment);
-  if (!hint) return { action: "unknown", claimed, actualName };
-
-  const sameAsClaimed = hint.cityCodes.join() === claimed.cityCodes.join();
-  const sameAsActual = actual ? hint.cityCodes.includes(actual.cityCode) : false;
-
-  if (sameAsClaimed && !sameAsActual) {
-    // 記述と市町村名が一致 → 座標が誤り。市域内へ寄せる。
-    const p = pointInsideMuni(claimed, r.id);
-    return { action: "move", lat: p.lat, lon: p.lon, claimed };
+  if (hint) {
+    const sameAsClaimed = hint.cityCodes.join() === claimed.cityCodes.join();
+    const sameAsActual = actual ? hint.cityCodes.includes(actual.cityCode) : false;
+    if (sameAsClaimed && !sameAsActual) {
+      const p = pointInsideMuni(claimed, r.id);
+      return { action: "move", lat: p.lat, lon: p.lon, claimed };
+    }
+    if (sameAsActual && !sameAsClaimed && actual) {
+      return { action: "relabel", cityName: actual.cityName, claimed };
+    }
   }
-  if (sameAsActual && !sameAsClaimed && actual) {
-    // 記述と座標が一致 → 市町村名の列が誤り。
-    return { action: "relabel", cityName: actual.cityName, claimed };
+
+  // 現市町村名で当たらない場合は、データ由来の地名辞書で旧町村名・大字を引く。
+  // (八尾町→富山市、驫木地区→深浦町 など。詳細は place-gazetteer)
+  if (gaz) {
+    // 循環回避: 主張市町村名は根拠語から除外し、cityName 側は市町村名を
+    // 取り除いた残り (青森県の "六戸町尾鮫地区" の "尾鮫地区" 部分) を見る。
+    const short = claimed.cityName.replace(/^[^\s]+?郡/, "");
+    const banned = new Set([claimed.cityName, short]);
+    const cityRest = (r.cityName ?? "").replace(short, "");
+    const g = gaz.lookup([r.sectionName, r.comment, cityRest], banned);
+    if (g) {
+      const isClaimed = claimed.cityCodes.includes(g.code);
+      const isActual = actual ? actual.cityCode === g.code : false;
+      if (isClaimed && !isActual) {
+        const p = pointInsideMuni(claimed, r.id);
+        return { action: "move", lat: p.lat, lon: p.lon, claimed };
+      }
+      if (isActual && !isClaimed && actual) {
+        return { action: "relabel", cityName: actual.cityName, claimed };
+      }
+    }
   }
   return { action: "unknown", claimed, actualName };
 }

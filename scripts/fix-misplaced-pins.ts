@@ -27,10 +27,24 @@ import {
 } from "../src/lib/muni-boundary";
 import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
 import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
+import { buildGazetteer } from "../src/lib/place-gazetteer";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 const GEOCODED_KINDS = new Set(["news", "llm-html"]);
 const apply = process.argv.includes("--apply");
+
+
+// データ由来の地名辞書を作る。教師は「市町村名と座標が整合しているレコード」。
+function makeGazetteer(records: UnifiedSighting[]) {
+  return buildGazetteer(
+    records,
+    (r) => {
+      const mu = resolveMuni(r.prefectureName, r.cityName);
+      return mu ? isInsideMuni(r.lat, r.lon, mu) === true : false;
+    },
+    (lat, lon) => containingCode(lat, lon),
+  );
+}
 
 function main(): void {
   if (!hasBoundaryData()) {
@@ -47,6 +61,7 @@ function main(): void {
     records: UnifiedSighting[];
   };
   const records = blob.records;
+  const gaz = makeGazetteer(records);
 
   let unresolved = 0;
   let snapped = 0;
@@ -86,7 +101,7 @@ function main(): void {
     } else {
       // 公式ソースは座標・名前のどちらが誤りか行ごとに違う。観察場所の
       // 自由記述を第三の証拠にして判定する (muni-reconcile 参照)。
-      const rec = reconcileOfficialRecord(r);
+      const rec = reconcileOfficialRecord(r, gaz);
       if (rec.action === "move") {
         const moved = haversineKm(r.lat, r.lon, rec.lat, rec.lon);
         if (officialMoves.length < 20)

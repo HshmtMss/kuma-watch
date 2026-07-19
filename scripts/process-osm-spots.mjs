@@ -4,8 +4,14 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const CAT = process.argv[2] || "camp";
-const CLUSTER_KM = 2.0;   // これ以内の同種POIは1スポットに統合
-const DUP_EXISTING_KM = 3.0; // 既存スポットにこれ以内なら重複フラグ
+// 神社仏閣(worship)・史跡(historic)は都市部で正当に密集する別々の目的地(例: 京都
+// 東山の清水寺/高台寺/八坂神社は徒歩圏)。2km クラスタリングだと京都 worship が
+// 511→115 に潰れ清水寺まで消えるため、これらはほぼ同一座標のみ統合する。
+const DENSE_POI = CAT === "worship" || CAT === "historic";
+const CLUSTER_KM = DENSE_POI ? 0.12 : 2.0;   // これ以内の同種POIは1スポットに統合
+// 既存(手キュレーション)スポット近傍の重複フラグ。worship は既存ランドマーク近くの
+// 別寺社を巻き込まないよう小さく。
+const DUP_EXISTING_KM = CAT === "worship" ? 0.5 : 3.0;
 const TODAY = Date.parse("2026-07-06");
 const DAY = 86_400_000;
 

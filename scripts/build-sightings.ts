@@ -17,7 +17,9 @@ import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
 import { jstToday } from "../src/lib/jst-date";
 import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
+import { buildGazetteer } from "../src/lib/place-gazetteer";
 import {
+  containingCode,
   hasBoundaryData,
   isInsideMuni,
   pointInsideMuni,
@@ -136,9 +138,17 @@ async function main(): Promise<void> {
   // 行ごとに判定する。根拠不足なら触らない。詳細は muni-reconcile 参照。
   let officialMoved = 0;
   let officialRelabeled = 0;
+  const gaz = buildGazetteer(
+    records,
+    (r) => {
+      const mu = resolveMuni(r.prefectureName, r.cityName);
+      return mu ? isInsideMuni(r.lat, r.lon, mu) === true : false;
+    },
+    (lat, lon) => containingCode(lat, lon),
+  );
   for (const r of records) {
     if (GEOCODED_KINDS.has(r.sourceKind)) continue;
-    const rec = reconcileOfficialRecord(r);
+    const rec = reconcileOfficialRecord(r, gaz);
     if (rec.action === "move") {
       r.lat = rec.lat;
       r.lon = rec.lon;

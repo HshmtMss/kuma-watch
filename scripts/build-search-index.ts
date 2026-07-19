@@ -31,6 +31,8 @@ type SearchEntry = {
   url: string;
   snippet?: string;
   tokens: string;
+  /** 著名度(Wikidata サイトリンク数)。spot のみ。同名重複時の順位付けに使う。 */
+  fame?: number;
 };
 
 // ── 1. 静的ページ (固定リスト) ─────────────────
@@ -226,6 +228,7 @@ type Landmark = {
   muniName?: string;
   blurb?: string;
   category?: string;
+  fame?: number;
 };
 
 async function loadSpots(): Promise<SearchEntry[]> {
@@ -253,6 +256,7 @@ async function loadSpots(): Promise<SearchEntry[]> {
       title: l.name,
       url: `/spot/${encodeURIComponent(l.slug)}`,
       snippet,
+      ...(l.fame ? { fame: l.fame } : {}),
       // tokens には blurb を含めない(名前/読み/別名/都道府県/市町村/カテゴリで十分)。
       tokens: [
         l.name,
