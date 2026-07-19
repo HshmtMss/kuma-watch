@@ -179,7 +179,10 @@ async function fetchNearbyHistory(
   lon: number,
   radiusKm: number,
 ): Promise<{
+  /** false = 取得失敗。呼び出し側でメッシュ集計にフォールバックする */
+  ok: boolean;
   count365d: number;
+  countLocal365: number;
   count90d: number;
   monthlyThisYear: number[];
   monthlyLastYear: number[];
@@ -189,7 +192,9 @@ async function fetchNearbyHistory(
 }> {
   const nowY = new Date().getFullYear();
   const empty = {
+    ok: false,
     count365d: 0,
+    countLocal365: 0,
     count90d: 0,
     monthlyThisYear: [],
     monthlyLastYear: [],
@@ -205,6 +210,7 @@ async function fetchNearbyHistory(
     const data = (await r.json()) as {
       count365d?: number;
       count90d?: number;
+      countLocal365?: number;
       monthlyThisYear?: number[];
       monthlyLastYear?: number[];
       thisYear?: number;
@@ -214,8 +220,11 @@ async function fetchNearbyHistory(
     const arr12 = (a?: number[]) =>
       Array.isArray(a) && a.length === 12 ? a : [];
     return {
+      ok: true,
       count365d: typeof data.count365d === "number" ? data.count365d : 0,
       count90d: typeof data.count90d === "number" ? data.count90d : 0,
+      countLocal365:
+        typeof data.countLocal365 === "number" ? data.countLocal365 : 0,
       monthlyThisYear: arr12(data.monthlyThisYear),
       monthlyLastYear: arr12(data.monthlyLastYear),
       thisYear: typeof data.thisYear === "number" ? data.thisYear : nowY,
@@ -541,7 +550,15 @@ export default function RiskPanel({
       // ヒートマップと完全一致させるため、メッシュ単位の目撃件数で同じ式で
       // 格上げする。sightingMapRef は KumaClient が /api/sighting-cells から
       // 取得した「過去 1 年・メッシュ別」の集計マップ。
-      const sCellCount = sightingMapRef.current?.get(meshCode) ?? 0;
+      // 区分はタップ地点を中心とした等面積円 (半径2.9km) の直近1年件数で出す。
+      // 以前はメッシュ1個の件数だったため、境界付近では隣のセルに出没が
+      // 固まっていても「情報なし」と表示されていた (実測で13.6%が過小表示、
+      // 過大表示は0%)。面積を揃えてあるのでしきい値の意味は変わらない。
+      // ヒートマップ自体は従来どおりメッシュ単位で塗る (面の粗い表現)。
+      // 取得できなかったときだけ従来のメッシュ集計に落とす (区分を空にしない)
+      const sCellCount = history.ok
+        ? history.countLocal365
+        : (sightingMapRef.current?.get(meshCode) ?? 0);
       const sightingLevel = sightingsToLevel(sCellCount);
       const displayedLevel = maxLevel(baseLevel, sightingLevel);
       breakdown.level = displayedLevel;

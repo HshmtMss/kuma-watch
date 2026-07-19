@@ -8,6 +8,21 @@ export const runtime = "nodejs";
 const TOP_RECORDS = 10;
 
 /**
+ * 「この地点の状況」区分に使う近傍半径 (km)。
+ *
+ * 従来は 3 次メッシュ 1 個 (約 4.6×5.7km = 26.4km²) の件数で区分を出していたが、
+ * 格子は地点と無関係に切られているため、すぐ隣に出没が固まっていても自分の
+ * セルに無ければ「情報なし」になっていた。実測 (全国 514 地点) では 64.8% が
+ * セル境界から 1km 以内にあり、19.8% は等面積の円で数え直すと区分が変わり、
+ * 13.6% は実態より低く出ていた (高く出るケースは 0%)。
+ *
+ * タップ地点を中心とした円で数えれば格子の当たり外れが消える。半径は
+ * メッシュと同じ面積 (πr² ≈ 26.4km² → r ≈ 2.9km) に揃えてあるので、
+ * しきい値 (3/7/15 件) の意味は従来のまま変わらない。
+ */
+const LOCAL_RADIUS_KM = 2.9;
+
+/**
  * 指定地点の周辺で「過去1年 (格上げ判定用)」と「過去3ヶ月 (カード表示用)」の
  * 目撃件数を返す。直近の目撃レコード一覧 (3ヶ月分) も含める。
  * UI フィルタには依存しないので、危険度判定は客観値となる。
@@ -56,6 +71,7 @@ export async function GET(req: Request) {
 
   let count365 = 0;
   let count90 = 0;
+  let countLocal365 = 0;
   let latest: string | null = null;
   const recent90: NearRecord[] = [];
   // 昨年・今年の月別実測件数 (0=1月 .. 11=12月)。カードの月別出没チャート(昨年 vs 今年)用。
@@ -76,7 +92,10 @@ export async function GET(req: Request) {
       if (yr === thisYear) monthlyThisYear[mo] += 1;
       else if (yr === lastYear) monthlyLastYear[mo] += 1;
     }
-    if (s.date >= iso365) count365 += 1;
+    if (s.date >= iso365) {
+      count365 += 1;
+      if (d <= LOCAL_RADIUS_KM) countLocal365 += 1;
+    }
     if (!latest || s.date > latest) latest = s.date;
     if (s.date >= iso90) {
       count90 += 1;
@@ -106,6 +125,8 @@ export async function GET(req: Request) {
     {
       count365d: count365,
       count90d: count90,
+      countLocal365,
+      localRadiusKm: LOCAL_RADIUS_KM,
       latestDate: latest,
       radiusKm,
       monthlyThisYear,
