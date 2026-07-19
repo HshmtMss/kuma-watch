@@ -8,6 +8,11 @@ import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
  *
  * この関数は短縮 cityName を「正式な郡付き表記」に正規化する。マスターに
  * 後ろ一致するエントリがあればその cityName を返し、なければ null。
+ *
+ * さらに、生地点名が「正式市町村名 + 字/施設名」の形（例:「石川郡浅川町◯◯地区」）
+ * の場合は前方一致で市町村へ寄せる（place-index の正規化と方向を揃える）。これにより
+ * /spot の周辺市町村リンクや proxy の 308 集約が、生地点名を県ページ止まりにせず
+ * 正しい市町村ページへ誘導できる。
  */
 export function resolveCanonicalMuniName(
   prefName: string,
@@ -19,12 +24,24 @@ export function resolveCanonicalMuniName(
     (m) => m.prefName === prefName && m.cityName === cityName,
   );
   if (exact) return exact.cityName;
-  // 2. 郡付き正式名で末尾一致 (例: 「浅川町」 → 「石川郡浅川町」)
+  // 2. 郡付き正式名で末尾一致 (短縮 → 正式: 「浅川町」 → 「石川郡浅川町」)
   const ends = JAPAN_MUNICIPALITIES.find(
     (m) => m.prefName === prefName && m.cityName.endsWith(cityName),
   );
   if (ends) return ends.cityName;
-  return null;
+  // 3. 生地点名が「正式市町村名 + 字/施設名」で始まる場合 (「石川郡浅川町◯◯」→「石川郡浅川町」)。
+  //    最長一致するマスターを選び、短い名前への過剰一致を避ける。
+  let startsBest: string | null = null;
+  for (const m of JAPAN_MUNICIPALITIES) {
+    if (m.prefName !== prefName) continue;
+    if (
+      cityName.startsWith(m.cityName) &&
+      (!startsBest || m.cityName.length > startsBest.length)
+    ) {
+      startsBest = m.cityName;
+    }
+  }
+  return startsBest;
 }
 
 /**

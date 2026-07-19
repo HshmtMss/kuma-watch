@@ -177,6 +177,7 @@ export default async function SpotPage({ params }: Props) {
   type NearSight = {
     id: string | number;
     date: string;
+    prefName: string;
     cityName: string;
     sectionName: string;
     comment: string;
@@ -203,6 +204,9 @@ export default async function SpotPage({ params }: Props) {
     nearby.push({
       id: s.id,
       date: s.date,
+      // 事案の実 prefName を使う。landmark.prefName 固定だと県境10km圏の
+      // 他県事案（例: 山中湖(山梨)周辺の御殿場市(静岡)）が誤った県URLになる。
+      prefName: s.prefectureName || landmark.prefName,
       cityName: s.cityName ?? "",
       sectionName: s.sectionName ?? "",
       comment: s.comment ?? "",
@@ -218,14 +222,22 @@ export default async function SpotPage({ params }: Props) {
   }
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.distanceKm - b.distanceKm));
 
-  // 含まれる市町村を抽出 (近隣 10km 内に出没のある市町村)
-  const involvedMunis = new Map<string, number>();
+  // 含まれる市町村を抽出 (近隣 10km 内に出没のある市町村)。
+  // 県境を跨ぐ 10km 圏では他県の市町村も入るため、pref+city の組で束ねて
+  // 各事案の実 prefName を保持する（リンク先の県違いを防ぐ）。
+  const involvedMunis = new Map<
+    string,
+    { prefName: string; cityName: string; count: number }
+  >();
   for (const n of nearby) {
     if (!n.cityName) continue;
-    involvedMunis.set(n.cityName, (involvedMunis.get(n.cityName) ?? 0) + 1);
+    const key = `${n.prefName} ${n.cityName}`;
+    const cur = involvedMunis.get(key);
+    if (cur) cur.count++;
+    else involvedMunis.set(key, { prefName: n.prefName, cityName: n.cityName, count: 1 });
   }
-  const topMunis = [...involvedMunis.entries()]
-    .sort((a, b) => b[1] - a[1])
+  const topMunis = [...involvedMunis.values()]
+    .sort((a, b) => b.count - a.count)
     .slice(0, 6);
 
   // コース・エリア別の集計。周辺 10km の各出没を最寄りの登録エリアに割り当て、
@@ -936,14 +948,16 @@ export default async function SpotPage({ params }: Props) {
         <>
           <h2>周辺で出没のあった市町村</h2>
           <div className="not-prose my-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {topMunis.map(([city, n]) => (
+            {topMunis.map((m) => (
               <Link
-                key={city}
-                href={`/place/${encodeURIComponent(landmark.prefName)}/${encodeURIComponent(city)}`}
+                key={`${m.prefName} ${m.cityName}`}
+                // 生地点名は placeHrefForSighting で正規化（正式市町村名 or 県ページ）。
+                // 実 prefName を使うので県境跨ぎでも正しい県URLになる。
+                href={placeHrefForSighting(m.prefName, m.cityName)}
                 className="block rounded-lg border border-stone-200 bg-white p-3 hover:border-stone-300 hover:bg-stone-50"
               >
-                <div className="text-sm font-semibold text-stone-900">{city}</div>
-                <div className="text-xs text-stone-500">{n} 件</div>
+                <div className="text-sm font-semibold text-stone-900">{m.cityName}</div>
+                <div className="text-xs text-stone-500">{m.count} 件</div>
               </Link>
             ))}
           </div>
