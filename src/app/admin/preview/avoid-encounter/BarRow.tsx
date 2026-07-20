@@ -85,3 +85,99 @@ export function MonthlyBars({
     </div>
   );
 }
+
+/**
+ * 時間帯ごとの偏り。基準線(1.0倍)を引いた単一系列。
+ *
+ * 時刻ごと(24本)にすると人身被害の母数が足りず、隣り合う棒が上下するだけの
+ * 図になる。4時間ずつの帯に束ねて、各帯の母数を確保している。
+ */
+export function HourBands({
+  bands,
+}: {
+  bands: { label: string; lift: number; injuries: number }[];
+}) {
+  const max = Math.max(...bands.map((b) => b.lift), 1.5);
+  return (
+    <div className="not-prose">
+      <div className="flex h-32 items-end gap-2">
+        {bands.map((b) => {
+          const hot = b.lift >= 1.3;
+          return (
+            <div key={b.label} className="flex flex-1 flex-col items-center gap-1">
+              <span
+                className={`text-[11px] font-bold tabular-nums ${hot ? "text-amber-800" : "text-stone-500"}`}
+              >
+                {b.lift.toFixed(1)}
+              </span>
+              <div className="relative flex w-full flex-1 items-end">
+                {/* 基準線 = 1.0倍（偏りなし） */}
+                <div
+                  className="absolute inset-x-0 border-t border-dashed border-stone-300"
+                  style={{ bottom: `${(1 / max) * 100}%` }}
+                />
+                <div
+                  className={`w-full rounded-t-sm ${hot ? "bg-amber-500" : "bg-stone-300"}`}
+                  style={{ height: `${Math.max(2, (b.lift / max) * 100)}%` }}
+                />
+              </div>
+              <span className="text-[10px] leading-tight text-stone-500">
+                {b.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-[12px] leading-relaxed text-stone-500">
+        破線が1.0倍（偏りなし）。上に出ている帯は、その時間帯の通報のうち
+        人身被害の占める割合が高いことを示します。
+      </p>
+    </div>
+  );
+}
+
+/**
+ * 2地域の年ごとの値を並べる小さな多面図。
+ * 同じ目盛りを共有するので、県をまたいで高さをそのまま比べられる。
+ */
+export function RegionCompare({
+  regions,
+  caption,
+}: {
+  regions: { region: string; note: string; series: { year: number; ratio: number }[] }[];
+  caption: string;
+}) {
+  const max = Math.max(
+    ...regions.flatMap((r) => r.series.map((s) => s.ratio)),
+    1,
+  );
+  return (
+    <div className="not-prose">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {regions.map((r) => (
+          <div key={r.region} className="rounded-xl border border-stone-200 p-3">
+            <div className="text-[13px] font-bold text-stone-800">{r.region}</div>
+            <div className="text-[11px] leading-tight text-stone-500">{r.note}</div>
+            <div className="mt-3 flex h-24 items-end gap-1.5">
+              {r.series.map((s) => {
+                const autumn = s.ratio >= 1;
+                return (
+                  <div key={s.year} className="flex flex-1 flex-col items-center gap-1">
+                    <div
+                      className={`w-full rounded-t-sm ${autumn ? "bg-amber-500" : "bg-stone-300"}`}
+                      style={{ height: `${Math.max(2, (s.ratio / max) * 100)}%` }}
+                    />
+                    <span className="text-[10px] tabular-nums text-stone-400">
+                      {String(s.year).slice(2)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-[12px] leading-relaxed text-stone-500">{caption}</p>
+    </div>
+  );
+}

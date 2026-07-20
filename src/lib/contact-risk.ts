@@ -165,6 +165,75 @@ export function attractantSeason(records: Rec[]): {
     .sort((a, b) => b.count - a.count);
 }
 
+export type HourRisk = {
+  hour: number;
+  /** 全記録に占める割合 */
+  allShare: number;
+  /** 人身被害に占める割合 */
+  injuryShare: number;
+  /** injuryShare / allShare。1超なら被害が偏る時間帯 */
+  lift: number;
+};
+
+/**
+ * 時間帯ごとの被害の偏り。
+ *
+ * 注意: 時刻が入っている記録は全体の26.5%で、その99.5%が警察#9110由来。
+ * さらに #9110 は秋田県が突出して多いため、実質「秋田県の通報の時間分布」に
+ * 近い。全国の傾向として断定しないこと。ただし分子(被害)と分母(全体)は
+ * 同じ偏った母集団から取っているので、**その中での相対的な偏り**は読める。
+ */
+export function injuryByHour(records: Rec[]): {
+  hours: HourRisk[];
+  allSample: number;
+  injurySample: number;
+} {
+  const withTime = records.filter((r) => /^\d{2}:\d{2}$/.test(r.time ?? ""));
+  const inj = withTime.filter(isInjuryRecord);
+  const count = (list: Rec[]) => {
+    const h = new Array(24).fill(0);
+    for (const r of list) h[Number((r.time ?? "").slice(0, 2))]++;
+    return h;
+  };
+  const a = count(withTime);
+  const i = count(inj);
+  const hours: HourRisk[] = [];
+  for (let h = 0; h < 24; h++) {
+    const allShare = withTime.length ? a[h] / withTime.length : 0;
+    const injuryShare = inj.length ? i[h] / inj.length : 0;
+    hours.push({
+      hour: h,
+      allShare,
+      injuryShare,
+      lift: allShare > 0 ? injuryShare / allShare : 0,
+    });
+  }
+  return { hours, allSample: withTime.length, injurySample: inj.length };
+}
+
+/**
+ * 月ごとの「複数頭（親子連れ）」の割合。
+ * 母グマは子を守るため攻撃的になりやすく、時期が偏るなら注意喚起に使える。
+ */
+export function cubShareByMonth(
+  records: (Rec & { headCount?: number })[],
+): { month: number; total: number; multi: number; share: number }[] {
+  const total = new Array(12).fill(0);
+  const multi = new Array(12).fill(0);
+  for (const r of records) {
+    const m = Number((r.date ?? "").slice(5, 7));
+    if (!(m >= 1 && m <= 12)) continue;
+    total[m - 1]++;
+    if ((r.headCount ?? 1) >= 2) multi[m - 1]++;
+  }
+  return total.map((t, i) => ({
+    month: i + 1,
+    total: t,
+    multi: multi[i],
+    share: t > 0 ? multi[i] / t : 0,
+  }));
+}
+
 export type ActivityRisk = {
   key: string;
   injuries: number;

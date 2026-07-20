@@ -1,12 +1,35 @@
 // spots-todo + blurbs + images を統合し、src/data/japan-landmarks-generated.json を書き出す。
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { kanaToRomaji, toAsciiSlug } from "./lib/romaji.mjs";
 
 const todo = JSON.parse(readFileSync(".cache/spots-todo.json", "utf8"));
 const blurbs = existsSync(".cache/spot-blurbs.json") ? JSON.parse(readFileSync(".cache/spot-blurbs.json", "utf8")) : {};
 const images = existsSync(".cache/spot-images.json") ? JSON.parse(readFileSync(".cache/spot-images.json", "utf8")) : {};
 const fame = existsSync(".cache/spot-fame.json") ? JSON.parse(readFileSync(".cache/spot-fame.json", "utf8")) : {};
+const enwiki = existsSync(".cache/spot-enwiki.json") ? JSON.parse(readFileSync(".cache/spot-enwiki.json", "utf8")) : {};
+const readings = existsSync("src/data/name-readings.json") ? JSON.parse(readFileSync("src/data/name-readings.json", "utf8")) : {};
+// 旧(現行)生成 JSON: 日本語 slug → ローマ字 slug のリダイレクト対応表を作るため、
+// 座標一致で旧 slug を引く。
+const oldGen = existsSync("src/data/japan-landmarks-generated.json")
+  ? JSON.parse(readFileSync("src/data/japan-landmarks-generated.json", "utf8"))
+  : [];
+const oldSlugByCoord = new Map(oldGen.map((r) => [`${r.lat},${r.lon}`, r.slug]));
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
 const fameOf = (r) => (r.wd && fame[r.wd] != null ? fame[r.wd] : 0);
+
+// ローマ字 slug の元文字列を決める: 英語Wikipedia名(最良) → かな読みのヘボン式 →
+// フォールバック(Q-id)。返り値は toAsciiSlug 前の素の文字列。
+function romajiBase(r, baseName) {
+  const en = r.wd && enwiki[r.wd];
+  if (en) { const s = toAsciiSlug(en); if (s.length >= 2) return s; }
+  const yomi = readings[baseName];
+  if (yomi) { const s = toAsciiSlug(kanaToRomaji(yomi)); if (s.length >= 2) return s; }
+  // 読みが無い場合でも名前がローマ字を含むことがある(例: 英語混じり)
+  const direct = toAsciiSlug(kanaToRomaji(baseName));
+  if (direct.length >= 2) return direct;
+  if (r.wd) return r.wd.toLowerCase(); // 最終手段: q12345
+  return "";
+}
 
 // 既存(手キュレーション)slug を集めて衝突回避
 const lm = readFileSync("src/data/japan-landmarks.ts", "utf8");
@@ -29,12 +52,9 @@ function cleanLoc(r) {
   return (r.pref || "").replace(/[都道府県]$/, "") || r.pref || "";
 }
 const FAME_CANONICAL = 4; // サイトリンク数がこれ以上なら「素の名前」を独占(著名代表)
-const FAME_KEEP = 3;      // 事前生成件数を抑えるための刈り込み閾値(これ未満は条件次第で除外)
-// 観光/安全情報として価値が高く常に残す主要カテゴリ(神社仏閣が集まる sightseeing は除外)。
-const MAJOR_KEEP = new Set(["mountain", "lake", "national_park", "onsen", "campground", "waterfall"]);
 
 // --- Pass 1: blurb のあるものを実体化(表示名候補・著名度) ---
-let noBlurb = 0, dropped = 0, trimmed = 0;
+let noBlurb = 0, dropped = 0;
 const cands = [];
 for (const r of todo) {
   const b = blurbs[keyOf(r)];
@@ -59,26 +79,28 @@ for (const [name, arr] of groups) {
   });
 }
 
-// --- Pass 3: slug 割当・エントリ生成 ---
+// --- Pass 3: ローマ字 slug 割当・エントリ生成・リダイレクト対応表 ---
+// 生成スポットの slug はローマ字(ASCII)。これにより /spot/[slug] を dynamicParams=true の
+// オンデマンド ISR にでき(日本語 slug の x-next-cache-tags 500 バグを回避)、事前生成は
+// 手キュレーション分のみ→ビルドが件数非依存に。これで件数上限が消えるため、以前の
+// 「事前生成件数を抑える刈り込み」は撤廃し全スポットを収録する。
 const out = [];
+const redirects = {}; // 旧日本語 slug → 新ローマ字 slug (proxy が 308 で転送)
+let qidFallback = 0;
 for (const c of cands) {
   const { r, b, display } = c;
   const img = images[keyOf(r)];
 
-  // 事前生成の件数制約(日本語 slug はオンデマンド ISR 不可のため /spot/[slug] を全件
-  // 事前生成する必要がある。件数が多すぎると Vercel のビルドが失敗する)。無名かつ
-  // 情報の薄いスポットの長い尾を刈り、ビルドが通る規模に抑える。以下のいずれかを
-  // 満たすものだけ残す: 画像あり / 著名(fame≥3) / 周辺にクマ出没あり / 主要カテゴリ
-  // (山・湖・国立公園・温泉・キャンプ場・滝)。残る=有名寺社+観光価値/安全情報のある所。
-  const hasImg = !!(img && img.imageUrl);
-  const isMajor = MAJOR_KEEP.has(r.cat);
-  if (!hasImg && c.fame < FAME_KEEP && (r.total || 0) === 0 && !isMajor) { trimmed++; continue; }
-
-  let base = toSlug(display) || toSlug(r.name);
+  let base = romajiBase(r, c.baseName);
   if (!base) { dropped++; continue; }
+  if (/^q\d+$/.test(base)) qidFallback++;
   let slug = base, i = 2;
   while (usedSlugs.has(slug)) slug = `${base}-${i++}`;
   usedSlugs.add(slug);
+
+  // 旧(現行)日本語 slug があり新 slug と違うならリダイレクト登録(URL 移行の受け皿)。
+  const oldSlug = oldSlugByCoord.get(`${r.lat},${r.lon}`);
+  if (oldSlug && oldSlug !== slug) redirects[oldSlug] = slug;
 
   const entry = {
     slug,
@@ -94,12 +116,13 @@ for (const c of cands) {
   if (c.fame > 0) entry.fame = c.fame;
   out.push(entry);
 }
-console.log(`同名区別: ${disamb} 件に地名付与`);
+writeFileSync("src/data/spot-slug-redirects.json", JSON.stringify(redirects));
+console.log(`同名区別: ${disamb} 件 / Q-idフォールバックslug: ${qidFallback} 件 / リダイレクト対応: ${Object.keys(redirects).length} 件`);
 
 writeFileSync("src/data/japan-landmarks-generated.json", JSON.stringify(out, null, 0));
 const byCat = {};
 for (const r of out) byCat[r.category] = (byCat[r.category] || 0) + 1;
-console.log(`生成 ${out.length} 件 (blurb未生成 ${noBlurb}, slug不能 ${dropped}, 長い尾を刈り込み ${trimmed})`);
+console.log(`生成 ${out.length} 件 (blurb未生成 ${noBlurb}, slug不能 ${dropped})`);
 console.log("カテゴリ内訳:", JSON.stringify(byCat));
 console.log("画像あり:", out.filter((r) => r.imageUrl).length);
 console.log("-> src/data/japan-landmarks-generated.json");

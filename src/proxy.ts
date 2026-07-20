@@ -3,6 +3,9 @@ import type { NextRequest } from "next/server";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { resolveCanonicalMuniName } from "@/lib/muni-name";
+// 生成スポットの slug を日本語→ローマ字に移行した際の、旧日本語 slug → 新ローマ字 slug の
+// 対応表。旧 URL/被リンク/インデックスを 308 で新 URL へ確実に引き継ぐ(SEO 目減り抑制)。
+import SPOT_SLUG_REDIRECTS from "@/data/spot-slug-redirects.json";
 
 /**
  * 実在しない URL を *ルート描画より前に* 308 で正規 URL へ集約するリダイレクト層。
@@ -43,7 +46,7 @@ export function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
   const parts = pathname.split("/").filter(Boolean);
 
-  // "/spot/{slug}" の 2 セグメント: 実在しない slug は観光地一覧へ 308。
+  // "/spot/{slug}" の 2 セグメント。
   if (parts[0] === "spot" && parts.length === 2) {
     let slug: string;
     try {
@@ -52,7 +55,12 @@ export function proxy(req: NextRequest): NextResponse {
       return NextResponse.next();
     }
     if (LANDMARK_SLUGS.has(slug)) return NextResponse.next();
-    // /spot は 1 セグメントで matcher に一致しないためループしない。
+    // 旧日本語 slug → 新ローマ字 slug へ 308(URL 移行の受け皿)。
+    const romaji = (SPOT_SLUG_REDIRECTS as Record<string, string>)[slug];
+    if (romaji) {
+      return NextResponse.redirect(new URL(`/spot/${encodeURIComponent(romaji)}`, req.url), 308);
+    }
+    // 実在しない slug は観光地一覧へ 308。/spot は 1 セグメントで matcher 非一致=ループしない。
     return NextResponse.redirect(new URL("/spot", req.url), 308);
   }
 
