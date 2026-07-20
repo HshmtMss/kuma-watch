@@ -58,6 +58,18 @@ type Contact = {
   attractants: Attractant[];
   activity: ActivityRisk[];
 };
+type ForestBand = {
+  label: string;
+  share: number;
+  landShare: number;
+  lift: number;
+  count: number;
+};
+type ForestData = {
+  bands: { bands: ForestBand[]; matched: number };
+  byYear: { year: number; count: number; avgForest: number; nearHumanShare: number }[];
+  stableSources: string[];
+} | null;
 type RegionProfile = {
   region: string;
   quality: {
@@ -126,6 +138,7 @@ type Data = {
   contact: Contact;
   recurrence: Recurrence;
   profile: RegionProfile;
+  forest: ForestData;
   prefOptions: string[];
 };
 
@@ -206,6 +219,93 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* M: 森林率 — 出没が起きる土地の性質。対策の投資先を決める材料 */}
+      {data.forest && (
+        <>
+          <Section
+            title="M. 出没は森林と人里の「境界」に集中する"
+            note={`${scope}・国土数値情報の土地利用メッシュ(約5km)と突き合わせ。「国土の割合」はその森林率帯が国土に占める面積割合で、これと比べて出没が多いか少ないかを見る。`}
+          >
+            <div className="flex flex-col gap-1.5">
+              {data.forest.bands.bands.map((b) => (
+                <div key={b.label} className="flex items-center gap-2">
+                  <div className="w-20 shrink-0 text-xs tabular-nums">森林率 {b.label}</div>
+                  <div className="h-4 flex-1 rounded bg-stone-100">
+                    <div
+                      className={`h-4 rounded ${b.lift >= 1.5 ? "bg-amber-500" : b.lift >= 1 ? "bg-stone-400" : "bg-stone-300"}`}
+                      style={{ width: `${Math.min(100, (b.lift / 2.5) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="w-14 shrink-0 text-right text-sm font-semibold tabular-nums">
+                    {b.lift.toFixed(2)}倍
+                  </div>
+                  <div className="w-28 shrink-0 text-right text-[11px] tabular-nums text-stone-500">
+                    出没{(b.share * 100).toFixed(0)}% / 国土{(b.landShare * 100).toFixed(0)}%
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-stone-600">
+              森林率40-60%のモザイク地帯が最も高く、森林率80%以上の奥山は面積の割に
+              少なくなります。守るべきは奥山でも市街地でもなく、その境界です。
+              緩衝帯の整備や藪の刈り払いをどこに投資するかの根拠になります。
+              （照合できた記録 {data.forest.bands.matched.toLocaleString()} 件）
+            </p>
+          </Section>
+
+          <Section
+            title="M-2. 秋型の年は「人里寄り」で起きる"
+            note={`観測条件を固定するため、全期間に存在するソース(${data.forest.stableSources.join("・") || "—"})だけで集計。全ソースで見ると単調に下がって見えるが、それは2023年以降に追加したソースが人里寄りのデータを多く含むためで、実態ではない。`}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px] text-sm">
+                <thead>
+                  <tr className="border-b border-stone-200 text-left text-xs text-stone-500">
+                    <th className="py-2 pr-3">年</th>
+                    <th className="py-2 pr-3 text-right">件数</th>
+                    <th className="py-2 pr-3 text-right">平均森林率</th>
+                    <th className="py-2 text-right">森林率40%未満での発生</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.forest.byYear.map((y) => {
+                    const t = data.regime.years.find((r) => r.year === y.year)?.type;
+                    return (
+                      <tr key={y.year} className="border-b border-stone-100">
+                        <td className="py-1.5 pr-3 tabular-nums">
+                          {y.year}
+                          {t === "autumn" && (
+                            <span className="ml-1 rounded bg-amber-100 px-1 text-[10px] font-bold text-amber-800">
+                              秋型
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-1.5 pr-3 text-right tabular-nums text-stone-500">
+                          {y.count.toLocaleString()}
+                        </td>
+                        <td className="py-1.5 pr-3 text-right tabular-nums">
+                          {(y.avgForest * 100).toFixed(1)}%
+                        </td>
+                        <td className="py-1.5 text-right font-semibold tabular-nums">
+                          {(y.nearHumanShare * 100).toFixed(1)}%
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-stone-600">
+              秋型の年（2019・2023・2025）は平均森林率が低く、人里寄りで起きています
+              （秋型 平均50.6% / 夏型 56.5%、秋÷初夏比との相関 −0.835）。
+              年の「型」は時期がずれるだけでなく、<strong>クマが人の生活圏に近づく</strong>
+              ことを意味します。秋型と判明した年は、件数だけでなく住宅地寄りの対策を
+              厚くする根拠になります。
+            </p>
+          </Section>
+        </>
+      )}
 
       {/* L: 地域カルテ — 他地域と比べず、その地域の姿だけを出す */}
       <Section

@@ -3,6 +3,12 @@ import { getCachedSightings } from "@/lib/sightings-cache";
 import { concentration, recurrence } from "@/lib/recurrence";
 import { regionProfile } from "@/lib/region-profile";
 import {
+  forestBands,
+  forestByYear,
+  hasLanduseData,
+  stableSources,
+} from "@/lib/forest-context";
+import {
   activityRisk,
   attractantSeason,
   placeRisk,
@@ -81,6 +87,19 @@ export async function GET(req: Request) {
         dow: dowHistogram(scoped, today),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
+        // M: 森林率との関係（境界域に集中するか / 年の型で人里寄りになるか）
+        forest: (() => {
+          if (!hasLanduseData()) return null;
+          const years = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
+          const stable = stableSources(all, years);
+          return {
+            bands: forestBands(scoped),
+            // 年次比較は観測条件を固定しないと、ソース追加の影響を実態と
+            // 取り違える (全ソースだと単調に下がって見える)
+            byYear: forestByYear(all, stable).filter((y) => y.year >= 2019),
+            stableSources: stable,
+          };
+        })(),
         // L: 地域カルテ（他地域と比べず、その地域の姿だけを出す）
         profile: regionProfile(
           scoped.filter((r) => (r.date ?? "") >= "2023-01-01"),
