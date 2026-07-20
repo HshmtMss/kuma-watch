@@ -56,12 +56,29 @@ type Rec = {
  * 公式ソース (座標が上流由来) 1件を突き合わせる。
  * 判定不能・境界データ無しなら "ok"/"unknown" を返し、データは変えない。
  */
+/**
+ * 緯度と経度の小数部が完全に一致する = 片方の欄をもう片方から複写した痕跡。
+ * 6桁一致が偶然起きる確率は1レコードあたり100万分の1で、8.5万件なら期待値
+ * 0.09件。実際には京都府データに5件あり、明らかに系統的な入力ミス。
+ * 行政界の内外にかかわらず座標として信用できない (偶然その市の域内に
+ * 落ちると境界判定をすり抜けるため、この署名で別途捕まえる)。
+ */
+export function hasCopiedCoordinate(lat: number, lon: number): boolean {
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return false;
+  return Math.abs(((lat % 1) + 1) % 1 - (((lon % 1) + 1) % 1)) < 1e-9;
+}
+
 export function reconcileOfficialRecord(
   r: Rec,
   gaz?: Gazetteer,
 ): Reconciliation {
   if (!hasBoundaryData()) return { action: "ok" };
   if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) return { action: "ok" };
+  // 座標の複写ミスは行政界の内外を問わず信用できない
+  if (hasCopiedCoordinate(r.lat, r.lon)) {
+    const c0 = resolveMuni(r.prefectureName, r.cityName);
+    if (c0) return { action: "unknown", claimed: c0, actualName: null };
+  }
   const claimed = resolveMuni(r.prefectureName, r.cityName);
   if (!claimed) return { action: "ok" };
   if (isInsideMuni(r.lat, r.lon, claimed) !== false) return { action: "ok" };

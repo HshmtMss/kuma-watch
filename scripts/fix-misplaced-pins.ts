@@ -26,7 +26,10 @@ import {
   resolveMuni,
 } from "../src/lib/muni-boundary";
 import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
-import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
+import {
+  hasCopiedCoordinate,
+  reconcileOfficialRecord,
+} from "../src/lib/muni-reconcile";
 import { buildGazetteer } from "../src/lib/place-gazetteer";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
@@ -66,6 +69,7 @@ function main(): void {
   let unresolved = 0;
   let snapped = 0;
   let officialMismatch = 0;
+  let copiedCoord = 0;
   let officialMoved = 0;
   let officialRelabeled = 0;
   const officialMoves: string[] = [];
@@ -78,6 +82,13 @@ function main(): void {
     const muni = resolveMuni(r.prefectureName, r.cityName);
     if (!muni) {
       unresolved++;
+      continue;
+    }
+    // 座標の複写ミス(緯度と経度の小数部が一致)は、偶然その市の域内に落ちると
+    // 行政界の判定をすり抜ける。域内でもこの署名だけは別途拾う。
+    if (!GEOCODED_KINDS.has(r.sourceKind) && hasCopiedCoordinate(r.lat, r.lon)) {
+      if (apply) r.geoInconsistent = true;
+      copiedCoord++;
       continue;
     }
     if (isInsideMuni(r.lat, r.lon, muni) !== false) continue;
@@ -157,6 +168,9 @@ function main(): void {
     console.log(`  … 他 ${officialRelabeled - officialRelabels.length} 件`);
   console.log(
     `\n■ 公式ソース: 正誤を確定できず非表示にした: ${officialMismatch} 件`,
+  );
+  console.log(
+    `■ 公式ソース: 緯度経度の複写ミスとして非表示にした: ${copiedCoord} 件`,
   );
   for (const l of labels) console.log(l);
   if (officialMismatch > labels.length)
