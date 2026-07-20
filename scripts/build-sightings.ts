@@ -17,6 +17,7 @@ import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
 import { jstToday } from "../src/lib/jst-date";
 import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
+import { loadSourceIssues } from "../src/lib/source-issues";
 import { buildGazetteer } from "../src/lib/place-gazetteer";
 import {
   containingCode,
@@ -136,6 +137,37 @@ async function main(): Promise<void> {
     }
   }
 
+  // 調査済みの不整合レコードに、台帳(data/source-issues.json)の補正を当てる。
+  // 国土地理院で1件ずつ確認した結果なので、下の自動突き合わせより優先する。
+  const ledger = loadSourceIssues();
+  let ledgerRelabel = 0;
+  let ledgerMove = 0;
+  let ledgerHide = 0;
+  for (const r of records) {
+    const issue = ledger.get(r.id);
+    if (!issue) continue;
+    if (issue.appliedAction === "relabel" && issue.correction?.muniCd) {
+      const mu = MUNI_BY_CODE.get(issue.correction.muniCd);
+      if (mu) {
+        r.cityName = mu.cityName.replace(/^[^\s]+?郡/, "");
+        delete r.geoInconsistent;
+        ledgerRelabel++;
+      }
+    } else if (
+      issue.appliedAction === "move" &&
+      Number.isFinite(issue.correction?.lat) &&
+      Number.isFinite(issue.correction?.lon)
+    ) {
+      r.lat = issue.correction!.lat!;
+      r.lon = issue.correction!.lon!;
+      delete r.geoInconsistent;
+      ledgerMove++;
+    } else if (issue.appliedAction === "hide") {
+      r.geoInconsistent = true;
+      ledgerHide++;
+    }
+  }
+
   // 公式ソース (座標が上流由来) の市町村名と座標の食い違いを突き合わせる。
   // 観察場所の自由記述を第三の証拠にして、座標と名前のどちらが誤りかを
   // 行ごとに判定する。根拠不足なら触らない。詳細は muni-reconcile 参照。
@@ -152,6 +184,7 @@ async function main(): Promise<void> {
   );
   for (const r of records) {
     if (GEOCODED_KINDS.has(r.sourceKind)) continue;
+    if (ledger.has(r.id)) continue; // 台帳の判断を上書きしない
     const rec = reconcileOfficialRecord(r, gaz);
     if (rec.action === "move") {
       r.lat = rec.lat;
@@ -208,7 +241,8 @@ async function main(): Promise<void> {
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
       `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate}, ` +
       `officialMoved ${officialMoved}, officialRelabeled ${officialRelabeled}, ` +
-      `officialHidden ${officialUnresolved}, cityFilled ${cityFilled} in ${elapsedSec}s`,
+      `officialHidden ${officialUnresolved}, cityFilled ${cityFilled}, ` +
+      `ledger(relabel ${ledgerRelabel}/move ${ledgerMove}/hide ${ledgerHide}) in ${elapsedSec}s`,
   );
 }
 

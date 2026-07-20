@@ -1,0 +1,1892 @@
+{
+  "generatedAt": "2026-07-20",
+  "summary": {
+    "total": 66,
+    "市町村名が誤り": 23,
+    "座標が誤り": 27,
+    "判定不能": 16
+  },
+  "method": [
+    "公開元の原本(CSV/KML/Shapefile/FeatureServer)を直接取得し、当サイトの取り込み値と逐語照合して当方起因の誤りを除外",
+    "座標が実際にどの市町村・大字にあるかは国土地理院リバースジオコーダ(mreversegeocoder.gsi.go.jp)で確認",
+    "記録が書いている地名が、記載の市町村に実在するかは国土地理院地名検索(msearch.gsi.go.jp)で確認",
+    "座標の大字が記録の地名と一致する場合は『座標は正しく市町村名の欄が誤り』、記録の地名が記載市町村に実在し座標が別の大字を指す場合は『座標が誤り』と判定",
+    "観察場所の先頭にある市町村名は市町村名欄と同じ入力に由来しうるため根拠に使用していない"
+  ],
+  "note": "自治体へのデータ修正依頼に使うための記録。originalValues は公開元の原本の値（当サイトでの補正前）。",
+  "issues": [
+    {
+      "recordId": "toyama-8716",
+      "publisher": {
+        "name": "富山県 自然保護課",
+        "dataset": "ツキノワグマ出没情報「クマっぷ」",
+        "url": "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        "format": "ArcGIS FeatureServer (Survey123)"
+      },
+      "sourceId": "toyama",
+      "sightingDate": "2025-12-03",
+      "originalValues": {
+        "cityName": "富山市",
+        "sectionName": "砺波市庄川町金屋",
+        "lat": 36.56586691800004,
+        "lon": 136.9804942840001,
+        "comment": "15:30　クマ１頭を目撃。クマによるカキの食痕を発見。"
+      },
+      "gsiLookup": {
+        "muniCode": "16208",
+        "oaza": "庄川町金屋"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「庄川町金屋」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "16208"
+      }
+    },
+    {
+      "recordId": "toyama-8963",
+      "publisher": {
+        "name": "富山県 自然保護課",
+        "dataset": "ツキノワグマ出没情報「クマっぷ」",
+        "url": "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        "format": "ArcGIS FeatureServer (Survey123)"
+      },
+      "sourceId": "toyama",
+      "sightingDate": "2025-11-05",
+      "originalValues": {
+        "cityName": "立山町",
+        "sectionName": "上市町野島",
+        "lat": 36.70132060000003,
+        "lon": 137.38621840000008,
+        "comment": "13:20　クマの糞及び柿の木に登った跡を確認"
+      },
+      "gsiLookup": {
+        "muniCode": "16322",
+        "oaza": "野島"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「野島」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "16322"
+      }
+    },
+    {
+      "recordId": "toyama-9098",
+      "publisher": {
+        "name": "富山県 自然保護課",
+        "dataset": "ツキノワグマ出没情報「クマっぷ」",
+        "url": "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        "format": "ArcGIS FeatureServer (Survey123)"
+      },
+      "sourceId": "toyama",
+      "sightingDate": "2025-10-29",
+      "originalValues": {
+        "cityName": "南砺市",
+        "sectionName": "砺波市芹谷",
+        "lat": 36.63666020000005,
+        "lon": 137.0329891,
+        "comment": "1:20　クマらしき動物を目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "16208",
+        "oaza": "芹谷"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「芹谷」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "16208"
+      }
+    },
+    {
+      "recordId": "toyama-12169",
+      "publisher": {
+        "name": "富山県 自然保護課",
+        "dataset": "ツキノワグマ出没情報「クマっぷ」",
+        "url": "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        "format": "ArcGIS FeatureServer (Survey123)"
+      },
+      "sourceId": "toyama",
+      "sightingDate": "2019-07-31",
+      "originalValues": {
+        "cityName": "魚津市",
+        "sectionName": "北鬼江",
+        "lat": 36.69282950000007,
+        "lon": 137.10031000000004,
+        "comment": "12:25　ありそドーム付近で成獣１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "16211",
+        "oaza": "黒河"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「富山県魚津市北鬼江」は実在し 36.83204,137.40366。記録の座標は別の大字「黒河」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 36.832039,
+        "lon": 137.403656,
+        "title": "富山県魚津市北鬼江"
+      }
+    },
+    {
+      "recordId": "toyama-12495",
+      "publisher": {
+        "name": "富山県 自然保護課",
+        "dataset": "ツキノワグマ出没情報「クマっぷ」",
+        "url": "https://www.pref.toyama.jp/1709/kurashi/kankyoushizen/shizen/yaseiseibutsu/kumap.html",
+        "format": "ArcGIS FeatureServer (Survey123)"
+      },
+      "sourceId": "toyama",
+      "sightingDate": "2021-10-13",
+      "originalValues": {
+        "cityName": "南砺市",
+        "sectionName": "瀬戸",
+        "lat": 36.571629200000075,
+        "lon": 137.27256050000005,
+        "comment": "16：00　西側の山へ向かうクマらしき動物１頭を目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "16201",
+        "oaza": "瀬戸"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「瀬戸」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "16201"
+      }
+    },
+    {
+      "recordId": "yamanashi-r7-68",
+      "publisher": {
+        "name": "山梨県",
+        "dataset": "令和7年度 クマ出没・目撃情報",
+        "url": "https://catalog.dataplatform-yamanashi.jp/dataset/kuma1",
+        "format": "CSV (CKAN)"
+      },
+      "sourceId": "yamanashi-r7",
+      "sightingDate": "2026-05-29",
+      "originalValues": {
+        "cityName": "忍野村",
+        "sectionName": "忍野村内野",
+        "lat": 35.272153,
+        "lon": 138.51528,
+        "comment": "内野原地区第１戦の交差点付近を歩いていた。"
+      },
+      "gsiLookup": {
+        "muniCode": "19366",
+        "oaza": "下佐野"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「山梨県忍野村内野」は実在し 35.46158,138.87039。記録の座標は別の大字「下佐野」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.461575,
+        "lon": 138.870392,
+        "title": "山梨県忍野村内野"
+      }
+    },
+    {
+      "recordId": "kyoto-50",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2009-06-03",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市桜が丘地内",
+        "lat": 35.315686,
+        "lon": 135.277004,
+        "comment": "通報者が農道を車で走行中、道路沿いの草むらにいる子グマを発見。クマは、そのまま草むらの奧に逃げていった。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "下八田町"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府舞鶴市桜が丘地内」は国土地理院で確認できず（返り値=京都府舞鶴市）。座標の大字は「下八田町」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-166",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2009-09-05",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市志高",
+        "lat": 35.352934,
+        "lon": 135.347924,
+        "comment": "山から谷川方向に、歩いていた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "十倉名畑町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市志高」は実在し 35.43344,135.24855。記録の座標は別の大字「十倉名畑町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.433441,
+        "lon": 135.24855,
+        "title": "京都府舞鶴市志高"
+      }
+    },
+    {
+      "recordId": "kyoto-236",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-03-28",
+      "originalValues": {
+        "cityName": "宮津市",
+        "sectionName": "宮津市香河",
+        "lat": 35.508088,
+        "lon": 135.120908,
+        "comment": "車で運転中に山へ入って行く熊を目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26465",
+        "oaza": "字明石"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府宮津市香河」は国土地理院で確認できず（返り値=京都府宮津市）。座標の大字は「字明石」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-427",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-07-02",
+      "originalValues": {
+        "cityName": "京都市",
+        "sectionName": "京都市",
+        "lat": 35.319181,
+        "lon": 135.155956,
+        "comment": "クマ1頭を目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "字川北"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-550",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-07-31",
+      "originalValues": {
+        "cityName": "京丹後市",
+        "sectionName": "京丹後市字喜多",
+        "lat": 35.516511,
+        "lon": 135.184392,
+        "comment": "ブドウ畑で熊を目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26205",
+        "oaza": "字喜多"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字喜多」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26205"
+      }
+    },
+    {
+      "recordId": "kyoto-935",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-09-14",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市瘤木",
+        "lat": 35.362231,
+        "lon": 135.101958,
+        "comment": "夜、家の外でガサガサと音がするので窓から外を見ると親子のクマがいた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "字瘤木"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字瘤木」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26201"
+      }
+    },
+    {
+      "recordId": "kyoto-1149",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-09-29",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市位田町浦壁",
+        "lat": 35.311742,
+        "lon": 135.253114,
+        "comment": "柿の木を折って実を食べている。畑に足跡あり。最近、周辺の畑にも出現し、柿の木を折られている。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "位田町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「位田町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26203"
+      }
+    },
+    {
+      "recordId": "kyoto-1445",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-15",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市字上根",
+        "lat": 35.423231,
+        "lon": 135.380739,
+        "comment": "空き家となっている家の庭の柿の木にクマが登っているのを発見。３日連続で出没。"
+      },
+      "gsiLookup": {
+        "muniCode": "26202",
+        "oaza": "字上根"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字上根」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26202"
+      }
+    },
+    {
+      "recordId": "kyoto-1483",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-17",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市向田町岬ヶ岐",
+        "lat": 35.365233,
+        "lon": 135.246058,
+        "comment": "クマ２頭を目撃。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "向田町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「向田町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26203"
+      }
+    },
+    {
+      "recordId": "kyoto-1619",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-20",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市淵垣",
+        "lat": 35.323014,
+        "lon": 135.291597,
+        "comment": "民家敷地内の柿の木に登っているクマ１頭を目撃。２回ほど大声や金属の打撃音で追い払ったが、戻って来るため、警察に通報。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "渕垣町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「渕垣町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26203"
+      }
+    },
+    {
+      "recordId": "kyoto-1639",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-21",
+      "originalValues": {
+        "cityName": "京丹後市",
+        "sectionName": "京丹後市宮津市字日置",
+        "lat": 35.614908,
+        "lon": 135.227994,
+        "comment": "浅田橋付近でクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26205",
+        "oaza": "字日置"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字日置」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26205"
+      }
+    },
+    {
+      "recordId": "kyoto-1640",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-21",
+      "originalValues": {
+        "cityName": "京丹後市",
+        "sectionName": "京丹後市宮津市字日置",
+        "lat": 35.613594,
+        "lon": 135.225939,
+        "comment": "日置浄水場下市道でクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26205",
+        "oaza": "字日置"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字日置」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26205"
+      }
+    },
+    {
+      "recordId": "kyoto-1734",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-25",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市八津合町",
+        "lat": 35.358156,
+        "lon": 135.406083,
+        "comment": "クマ1頭誤捕獲。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "八津合町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「八津合町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26203"
+      }
+    },
+    {
+      "recordId": "kyoto-1836",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-10-29",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市上八田町",
+        "lat": 35.354914,
+        "lon": 135.269086,
+        "comment": "自宅庭の柿の木に登っていた。音を出したら逃げた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "上八田町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「上八田町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26203"
+      }
+    },
+    {
+      "recordId": "kyoto-2023",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2010-11-08",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市字猪崎",
+        "lat": 35.301647,
+        "lon": 135.137403,
+        "comment": "柿の木が折られており、爪跡があった。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "字猪崎"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字猪崎」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26201"
+      }
+    },
+    {
+      "recordId": "kyoto-2365",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-06-17",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市堂奥",
+        "lat": 35.344361,
+        "lon": 135.031562,
+        "comment": "山へはいる。川を横断し山へ入るのを目撃。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "字宮垣"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市堂奥」は実在し 35.46133,135.42120。記録の座標は別の大字「字宮垣」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.461334,
+        "lon": 135.421204,
+        "title": "京都府舞鶴市堂奥"
+      }
+    },
+    {
+      "recordId": "kyoto-2416",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-07-08",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市字雲原",
+        "lat": 35.598846,
+        "lon": 135.059252,
+        "comment": "イノシシ・シカ用捕獲檻の近くに大きなクマがいた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26212",
+        "oaza": "峰山町長岡"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府福知山市雲原」は実在し 35.42486,135.06496。記録の座標は別の大字「峰山町長岡」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.424858,
+        "lon": 135.064957,
+        "title": "京都府福知山市雲原"
+      }
+    },
+    {
+      "recordId": "kyoto-2555",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-08-12",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市字下東",
+        "lat": 35.391227,
+        "lon": 135.120726,
+        "comment": "１２日の早朝、集落内の畑を横断したクマの痕跡があった。姿は見ていない。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "大江町小原田"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市下東」は実在し 35.45872,135.28966。記録の座標は別の大字「大江町小原田」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.458717,
+        "lon": 135.289658,
+        "title": "京都府舞鶴市下東"
+      }
+    },
+    {
+      "recordId": "kyoto-2691",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-10-08",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市字福来",
+        "lat": 35.450606,
+        "lon": 135.039324,
+        "comment": "家の中にクマが侵入した"
+      },
+      "gsiLookup": {
+        "muniCode": "28209",
+        "oaza": "但東町薬王寺"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市福来」は実在し 35.44353,135.35339。記録の座標は別の大字「但東町薬王寺」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.443535,
+        "lon": 135.353394,
+        "title": "京都府舞鶴市福来"
+      }
+    },
+    {
+      "recordId": "kyoto-2707",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-10-15",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市多田町",
+        "lat": 35.314664,
+        "lon": 135.10602,
+        "comment": "足跡あり。出現場所付近の木にミツバチの巣があり、寄りついた痕跡があった。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "字荒河"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市多田町」は実在し 35.32070,135.26916。記録の座標は別の大字「字荒河」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.320705,
+        "lon": 135.269165,
+        "title": "京都府綾部市多田町"
+      }
+    },
+    {
+      "recordId": "kyoto-2731",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-10-22",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市三和町千束",
+        "lat": 35.218669,
+        "lon": 135.236982,
+        "comment": "通行中にクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26201",
+        "oaza": "三和町千束"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「三和町千束」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26201"
+      }
+    },
+    {
+      "recordId": "kyoto-2737",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-10-25",
+      "originalValues": {
+        "cityName": "亀岡市",
+        "sectionName": "伊根町字峠",
+        "lat": 35.710306,
+        "lon": 135.262906,
+        "comment": "二ツ川付近の国道１７８号線で道路を横断して山へ向かうクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26463",
+        "oaza": "字本庄上"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府亀岡市伊根町字峠」は国土地理院で確認できず（返り値=京都府亀岡市）。座標の大字は「字本庄上」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-2760",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-11-04",
+      "originalValues": {
+        "cityName": "京丹後市",
+        "sectionName": "京丹後市字滝馬",
+        "lat": 35.528122,
+        "lon": 135.187194,
+        "comment": "家の横の柿の木で柿を食べているクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26205",
+        "oaza": "字滝馬"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字滝馬」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26205"
+      }
+    },
+    {
+      "recordId": "kyoto-2808",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2011-12-01",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市字大波上",
+        "lat": 35.506771,
+        "lon": 135.421897,
+        "comment": "誤ってわなにかかった"
+      },
+      "gsiLookup": {
+        "muniCode": "26202",
+        "oaza": "字大波上"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字大波上」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26202"
+      }
+    },
+    {
+      "recordId": "kyoto-3095",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2012-08-02",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市於与岐町細迫",
+        "lat": 35.215081,
+        "lon": 135.326281,
+        "comment": "路上を横切り、山の方へ移動した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26407",
+        "oaza": "三ノ宮"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府綾部市於与岐町細迫」は国土地理院で確認できず（返り値=京都府綾部市於与岐町）。座標の大字は「三ノ宮」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-3130",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2012-08-16",
+      "originalValues": {
+        "cityName": "与謝野町",
+        "sectionName": "与謝野町石川",
+        "lat": 35.579315,
+        "lon": 135.118648,
+        "comment": "田に足跡があった。２頭分(平行に２頭並んで山の方へ)"
+      },
+      "gsiLookup": {
+        "muniCode": "26212",
+        "oaza": "大宮町森本"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府与謝野町石川」は実在し 35.52934,135.13896。記録の座標は別の大字「大宮町森本」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.529335,
+        "lon": 135.138962,
+        "title": "京都府与謝野町石川"
+      }
+    },
+    {
+      "recordId": "kyoto-3872",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2013-08-22",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市味方町",
+        "lat": 35.300897,
+        "lon": 135.485556,
+        "comment": "パトロール中に目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26213",
+        "oaza": "美山町三埜"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市味方町」は実在し 35.29964,135.27525。記録の座標は別の大字「美山町三埜」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.299644,
+        "lon": 135.275253,
+        "title": "京都府綾部市味方町"
+      }
+    },
+    {
+      "recordId": "kyoto-3926",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2013-09-01",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市一ノ宮",
+        "lat": 35.460683,
+        "lon": 135.460683,
+        "comment": "消防団で巡回中、道路を横断し山へ入って行くクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26202",
+        "oaza": "字多門院"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府福知山市一ノ宮」は実在し 35.36605,135.04700。記録の座標は別の大字「字多門院」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.366047,
+        "lon": 135.046997,
+        "title": "京都府福知山市一ノ宮"
+      }
+    },
+    {
+      "recordId": "kyoto-3952",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2013-09-05",
+      "originalValues": {
+        "cityName": "京都市",
+        "sectionName": "与謝野町字幾地",
+        "lat": 35.533333,
+        "lon": 135.091944,
+        "comment": "平地峠を通行中、道路を横切るクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26465",
+        "oaza": "字幾地"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「字幾地」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "26465"
+      }
+    },
+    {
+      "recordId": "kyoto-3961",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2013-09-09",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市上杉町",
+        "lat": 35.346606,
+        "lon": 135.346606,
+        "comment": "愛宕住宅の市民が、住宅の西側の山沿いでクマの足跡を発見し自治会長に報告。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "十倉名畑町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市上杉町」は実在し 35.36464,135.32286。記録の座標は別の大字「十倉名畑町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.364643,
+        "lon": 135.322861,
+        "title": "京都府綾部市上杉町"
+      }
+    },
+    {
+      "recordId": "kyoto-5906",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2015-07-21",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市桜ヶ丘（市道高津旭線）",
+        "lat": 35.315881,
+        "lon": 135.315881,
+        "comment": "市道の南側方面を登っていった。"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "旭町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市桜ヶ丘（市道高津旭線）」は実在し 35.31854,135.27565。記録の座標は別の大字「旭町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.318539,
+        "lon": 135.27565,
+        "title": "京都府綾部市桜が丘"
+      }
+    },
+    {
+      "recordId": "kyoto-5911",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2015-07-22",
+      "originalValues": {
+        "cityName": "宮津市",
+        "sectionName": "宮津市成相寺",
+        "lat": 35.595556,
+        "lon": 135.020556,
+        "comment": "成相寺付近で観光客がクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26212",
+        "oaza": "峰山町久次"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府宮津市成相寺」は実在し 35.59576,135.18805。記録の座標は別の大字「峰山町久次」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.59576,
+        "lon": 135.188049,
+        "title": "京都府宮津市成相寺"
+      }
+    },
+    {
+      "recordId": "kyoto-5981",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2015-08-04",
+      "originalValues": {
+        "cityName": "京丹波町",
+        "sectionName": "京丹波町井尻",
+        "lat": 35.176125,
+        "lon": 135.176125,
+        "comment": "クマが道路を渡り山へ入っていった。"
+      },
+      "gsiLookup": {
+        "muniCode": "28223",
+        "oaza": "市島町多利"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府京丹波町井尻」は実在し 35.17780,135.35234。記録の座標は別の大字「市島町多利」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.177803,
+        "lon": 135.352341,
+        "title": "京都府京丹波町井尻"
+      }
+    },
+    {
+      "recordId": "kyoto-6022",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2015-08-14",
+      "originalValues": {
+        "cityName": "宮津市",
+        "sectionName": "宮津市畑",
+        "lat": 35.604167,
+        "lon": 135.029444,
+        "comment": "有害の捕獲許可をうけている箱わなにクマが誤捕獲された。"
+      },
+      "gsiLookup": {
+        "muniCode": "26212",
+        "oaza": "峰山町新治"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-7435",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2016-08-28",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市田野町",
+        "lat": 35.280778,
+        "lon": 135.388011,
+        "comment": "くくりわなによる誤捕獲"
+      },
+      "gsiLookup": {
+        "muniCode": "26407",
+        "oaza": "中"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市田野町」は実在し 35.27943,135.25330。記録の座標は別の大字「中」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.27943,
+        "lon": 135.253296,
+        "title": "京都府綾部市田野町"
+      }
+    },
+    {
+      "recordId": "kyoto-7444",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2016-08-31",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市下佐々木",
+        "lat": 35.373383,
+        "lon": 135.401961,
+        "comment": "くくりわなによる誤捕獲。職員が到着前に逃走"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "八津合町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府福知山市下佐々木」は実在し 35.37611,135.04556。記録の座標は別の大字「八津合町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.376114,
+        "lon": 135.045563,
+        "title": "京都府福知山市下佐々木"
+      }
+    },
+    {
+      "recordId": "kyoto-8159",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2016-11-17",
+      "originalValues": {
+        "cityName": "伊根町",
+        "sectionName": "伊根町本庄上",
+        "lat": 35.573056,
+        "lon": 135.253611,
+        "comment": "家のそばでクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": null,
+        "oaza": null
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府伊根町本庄上」は実在し 35.71826,135.25389。記録の座標は別の大字「?」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.718258,
+        "lon": 135.253891,
+        "title": "京都府伊根町本庄上"
+      }
+    },
+    {
+      "recordId": "kyoto-8233",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2016-11-30",
+      "originalValues": {
+        "cityName": "福知山市",
+        "sectionName": "福知山市筈巻",
+        "lat": 35.348231,
+        "lon": 135.348231,
+        "comment": "新聞配達中に筈巻地内で目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "十倉名畑町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府福知山市筈巻」は実在し 35.35217,135.11926。記録の座標は別の大字「十倉名畑町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.352173,
+        "lon": 135.119263,
+        "title": "京都府福知山市筈巻"
+      }
+    },
+    {
+      "recordId": "kyoto-8287",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2016-12-21",
+      "originalValues": {
+        "cityName": "伊根町",
+        "sectionName": "伊根町塩谷",
+        "lat": 35.266111,
+        "lon": 135.448889,
+        "comment": "町営バスが町道を走行中、とび出してきたクマと接触。クマは山の方へ逃げた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26407",
+        "oaza": "長瀬"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府伊根町塩谷」は国土地理院で確認できず（返り値=京都府伊根町）。座標の大字は「長瀬」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-8370",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2017-05-13",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市別所",
+        "lat": 35.357594,
+        "lon": 135.410011,
+        "comment": "予察捕獲（箱わな）"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "八津合町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市別所」は実在し 35.41169,135.36331。記録の座標は別の大字「八津合町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.411694,
+        "lon": 135.363312,
+        "title": "京都府舞鶴市別所"
+      }
+    },
+    {
+      "recordId": "kyoto-8393",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2017-05-17",
+      "originalValues": {
+        "cityName": "綾部市",
+        "sectionName": "綾部市とよさか町",
+        "lat": 35.559444,
+        "lon": 135.468456,
+        "comment": "工業団地の従業員が帰宅中に目撃。"
+      },
+      "gsiLookup": {
+        "muniCode": "26202",
+        "oaza": "字田井"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府綾部市とよさか町」は実在し 35.33021,135.28734。記録の座標は別の大字「字田井」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.330208,
+        "lon": 135.287338,
+        "title": "京都府綾部市とよさか町"
+      }
+    },
+    {
+      "recordId": "kyoto-8936",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2017-09-12",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市下漆原",
+        "lat": 35.5315,
+        "lon": 135.242653,
+        "comment": "下漆原公民館から北へ７００ｍ地点の府道を横断するのを目撃。西の山へ移動した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26205",
+        "oaza": "字脇"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市下漆原」は実在し 35.47187,135.24486。記録の座標は別の大字「字脇」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.47187,
+        "lon": 135.244858,
+        "title": "京都府舞鶴市下漆原"
+      }
+    },
+    {
+      "recordId": "kyoto-9625",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2018-07-05",
+      "originalValues": {
+        "cityName": "京丹後市",
+        "sectionName": "京丹後市与謝野町滝",
+        "lat": 35.479167,
+        "lon": 135.086667,
+        "comment": "山へ逃げるクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26465",
+        "oaza": "字滝"
+      },
+      "verdict": "判定不能",
+      "evidence": "「京都府京丹後市与謝野町滝」は国土地理院で確認できず（返り値=京都府京丹後市）。座標の大字は「字滝」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "kyoto-9746",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2018-07-26",
+      "originalValues": {
+        "cityName": "与謝野町",
+        "sectionName": "与謝野町石川",
+        "lat": 35.661389,
+        "lon": 135.1225,
+        "comment": "小学校のあじさいが咲いているところでクマを目撃した。"
+      },
+      "gsiLookup": {
+        "muniCode": "26212",
+        "oaza": "弥栄町溝谷"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府与謝野町石川」は実在し 35.52934,135.13896。記録の座標は別の大字「弥栄町溝谷」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.529335,
+        "lon": 135.138962,
+        "title": "京都府与謝野町石川"
+      }
+    },
+    {
+      "recordId": "kyoto-9802",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2018-08-04",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市佐波賀",
+        "lat": 35.350556,
+        "lon": 135.367114,
+        "comment": "佐波賀渡船前道路を西へ走り去るクマ１頭を目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "26203",
+        "oaza": "睦合町"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市佐波賀」は実在し 35.50814,135.36592。記録の座標は別の大字「睦合町」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.508137,
+        "lon": 135.365921,
+        "title": "京都府舞鶴市佐波賀"
+      }
+    },
+    {
+      "recordId": "kyoto-9994",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2018-09-21",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市西方寺",
+        "lat": 35.218261,
+        "lon": 135.447897,
+        "comment": "庭の柿の木付近でクマ1頭幼獣を目撃。目が合うと東側の山へ逃げた。"
+      },
+      "gsiLookup": {
+        "muniCode": "26407",
+        "oaza": "下山"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市西方寺」は実在し 35.46498,135.21492。記録の座標は別の大字「下山」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.464985,
+        "lon": 135.21492,
+        "title": "京都府舞鶴市西方寺"
+      }
+    },
+    {
+      "recordId": "kyoto-9997",
+      "publisher": {
+        "name": "京都府",
+        "dataset": "ツキノワグマ目撃情報（オープンデータ）",
+        "url": "https://data.bodik.jp/dataset/260002_bear",
+        "format": "CSV (BODIK CKAN)"
+      },
+      "sourceId": "kyoto",
+      "sightingDate": "2018-09-21",
+      "originalValues": {
+        "cityName": "舞鶴市",
+        "sectionName": "舞鶴市瀬崎",
+        "lat": 35.538814,
+        "lon": 135.140344,
+        "comment": "被害防止捕獲により捕獲"
+      },
+      "gsiLookup": {
+        "muniCode": "26465",
+        "oaza": "字石川"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「京都府舞鶴市瀬崎」は実在し 35.54285,135.36200。記録の座標は別の大字「字石川」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 35.542847,
+        "lon": 135.362,
+        "title": "京都府舞鶴市瀬崎"
+      }
+    },
+    {
+      "recordId": "sapporo-2025-210",
+      "publisher": {
+        "name": "札幌市",
+        "dataset": "札幌市ヒグマ出没情報 2025年度",
+        "url": "https://ckan.pf-sapporo.jp/dataset/sapporo_bear_appearance",
+        "format": "CSV (CKAN)"
+      },
+      "sourceId": "sapporo-2025",
+      "sightingDate": "2025-10-04",
+      "originalValues": {
+        "cityName": "西区",
+        "sectionName": "西区西野8条10丁目8番付近の西野都市環境林内(西野すみれ公園から北西に約100mの地点)",
+        "lat": 42.970083,
+        "lon": 141.292197,
+        "comment": "カメラでヒグマを確認(親子)"
+      },
+      "gsiLookup": {
+        "muniCode": "01106",
+        "oaza": "白川"
+      },
+      "verdict": "判定不能",
+      "evidence": "「北海道西区西野8条10丁目8番付近の西野都市環境林内(西野すみれ公園から北西に約100mの地点)」は国土地理院で確認できず（返り値=北海道西興部）。座標の大字は「白川」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "aomori-919",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2019-06-15",
+      "originalValues": {
+        "cityName": "深浦町",
+        "sectionName": "一ツ森地区",
+        "lat": 40.6683802,
+        "lon": 140.1490241,
+        "comment": "山中、１頭"
+      },
+      "gsiLookup": {
+        "muniCode": "02321",
+        "oaza": "大字一ツ森町"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「大字一ツ森町」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "02321"
+      }
+    },
+    {
+      "recordId": "aomori-2160",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2022-07-16",
+      "originalValues": {
+        "cityName": "佐井村長後地区",
+        "sectionName": "",
+        "lat": 41.2655383,
+        "lon": 140.867826,
+        "comment": "1頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02208",
+        "oaza": "川内町"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "aomori-2323",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2022-05-26",
+      "originalValues": {
+        "cityName": "階上町鳥屋部下平地区",
+        "sectionName": "",
+        "lat": 40.378191,
+        "lon": 141.3597924,
+        "comment": "１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02445",
+        "oaza": "大字鳥舌内"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "aomori-3763",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2024-06-21",
+      "originalValues": {
+        "cityName": "六戸町尾鮫地区",
+        "sectionName": "",
+        "lat": 40.9750451,
+        "lon": 141.3632951,
+        "comment": "１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02411",
+        "oaza": "大字尾駮"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "aomori-4513",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2025-06-08",
+      "originalValues": {
+        "cityName": "八戸市赤保内地区",
+        "sectionName": "",
+        "lat": 40.4350637,
+        "lon": 141.6307821,
+        "comment": "１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02446",
+        "oaza": "大字赤保内"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「大字赤保内」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "02446"
+      }
+    },
+    {
+      "recordId": "aomori-4641",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2025-06-24",
+      "originalValues": {
+        "cityName": "むつ市城ケ沢地区",
+        "sectionName": "",
+        "lat": 41.2480204,
+        "lon": 141.1535757,
+        "comment": "１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02208",
+        "oaza": "大字城ヶ沢"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「大字城ヶ沢」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "02208"
+      }
+    },
+    {
+      "recordId": "aomori-5372",
+      "publisher": {
+        "name": "青森県 自然保護課",
+        "dataset": "クマ出没情報",
+        "url": "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kuma_cyuui.html",
+        "format": "Google マイマップ (KML)"
+      },
+      "sourceId": "aomori",
+      "sightingDate": "2025-08-14",
+      "originalValues": {
+        "cityName": "六ヶ所村出戸地区",
+        "sectionName": "",
+        "lat": 40.8458734,
+        "lon": 141.3961234,
+        "comment": "１頭目撃"
+      },
+      "gsiLookup": {
+        "muniCode": "02207",
+        "oaza": "大字三沢"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "ishikawa-r7-mymap-70",
+      "publisher": {
+        "name": "石川県 自然環境課",
+        "dataset": "令和7年度 ツキノワグマ目撃・痕跡情報",
+        "url": "https://www.pref.ishikawa.lg.jp/sizen/kuma/navi01.html",
+        "format": "Google マイマップ (KML)",
+        "caveat": "県が「出没地点は目撃者から聞き取りしたおおよその位置」と明記"
+      },
+      "sourceId": "ishikawa-r7-mymap",
+      "sightingDate": "2025-06-01",
+      "originalValues": {
+        "cityName": "津幡町",
+        "sectionName": "九折地内",
+        "lat": 36.40201,
+        "lon": 136.48462,
+        "comment": "県道を倶利伽羅方面から九折方面に歩いているクマ１頭（約1.5m）を目撃。"
+      },
+      "gsiLookup": {
+        "muniCode": "17203",
+        "oaza": "八幡"
+      },
+      "verdict": "座標が誤り",
+      "evidence": "「石川県津幡町九折地内」は実在し 36.67668,136.81462。記録の座標は別の大字「八幡」を指しており座標が誤り",
+      "appliedAction": "move",
+      "correction": {
+        "lat": 36.676678,
+        "lon": 136.814621,
+        "title": "石川県津幡町九折"
+      }
+    },
+    {
+      "recordId": "ishikawa-r7-mymap-160",
+      "publisher": {
+        "name": "石川県 自然環境課",
+        "dataset": "令和7年度 ツキノワグマ目撃・痕跡情報",
+        "url": "https://www.pref.ishikawa.lg.jp/sizen/kuma/navi01.html",
+        "format": "Google マイマップ (KML)",
+        "caveat": "県が「出没地点は目撃者から聞き取りしたおおよその位置」と明記"
+      },
+      "sourceId": "ishikawa-r7-mymap",
+      "sightingDate": "2025-06-28",
+      "originalValues": {
+        "cityName": "能美市",
+        "sectionName": "松が岡1丁目",
+        "lat": 36.40357,
+        "lon": 136.529962,
+        "comment": "松が岡１丁目地内にて、北の方面に向かうクマ１頭の目撃情報"
+      },
+      "gsiLookup": {
+        "muniCode": "17203",
+        "oaza": "鵜川町"
+      },
+      "verdict": "判定不能",
+      "evidence": "「石川県能美市松が岡1丁目」は国土地理院で確認できず（返り値=石川県能美市松が岡一丁目）。座標の大字は「鵜川町」で記録と一致せず、どちらが誤りか確定できない",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "hokkaido-11205",
+      "publisher": {
+        "name": "ひぐまっぷ（ダッピスタジオ合同会社）／入力は参加市町村",
+        "dataset": "ヒグマ出没情報",
+        "url": "https://higumap.info/",
+        "format": "民間プラットフォーム API",
+        "caveat": "北海道庁のオープンデータではない。照会先は入力元の市町村"
+      },
+      "sourceId": "hokkaido",
+      "sightingDate": "2024-10-02",
+      "originalValues": {
+        "cityName": "北見市",
+        "sectionName": "",
+        "lat": 43.62658574652106,
+        "lon": 143.64057540893558,
+        "comment": "目撃情報"
+      },
+      "gsiLookup": {
+        "muniCode": "01648",
+        "oaza": "字小利別"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "gifu-2023-40",
+      "publisher": {
+        "name": "岐阜県（入力は各市町村）",
+        "dataset": "ツキノワグマ情報マップ",
+        "url": "https://gifu-opendata.pref.gifu.lg.jp/dataset/c11265-010",
+        "format": "Shapefile (年度別)"
+      },
+      "sourceId": "gifu",
+      "sightingDate": "2023-06-05",
+      "originalValues": {
+        "cityName": "白川村",
+        "sectionName": "",
+        "lat": 36.36016846154769,
+        "lon": 136.87267400288883,
+        "comment": ""
+      },
+      "gsiLookup": {
+        "muniCode": "21604",
+        "oaza": "大字小白川"
+      },
+      "verdict": "判定不能",
+      "evidence": "地名の手掛かりが不足",
+      "appliedAction": "hide",
+      "correction": null
+    },
+    {
+      "recordId": "gifu-2021-136",
+      "publisher": {
+        "name": "岐阜県（入力は各市町村）",
+        "dataset": "ツキノワグマ情報マップ",
+        "url": "https://gifu-opendata.pref.gifu.lg.jp/dataset/c11265-010",
+        "format": "Shapefile (年度別)"
+      },
+      "sourceId": "gifu",
+      "sightingDate": "2021-07-15",
+      "originalValues": {
+        "cityName": "岐阜市",
+        "sectionName": "関市板取岩本",
+        "lat": 35.71875728601418,
+        "lon": 136.80420327858945,
+        "comment": ""
+      },
+      "gsiLookup": {
+        "muniCode": "21205",
+        "oaza": "板取"
+      },
+      "verdict": "市町村名が誤り",
+      "evidence": "座標の実際の大字「板取」が記録の地名と一致。座標は記録どおりの場所を指しており、市町村名の欄のみ誤り",
+      "appliedAction": "relabel",
+      "correction": {
+        "muniCd": "21205"
+      }
+    }
+  ]
+}

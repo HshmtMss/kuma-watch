@@ -119,6 +119,9 @@ const kept = [];
 for (const r of merged) {
   let dup = false;
   for (const k of kept) {
+    // 両方が wikidata を持つ = 別々の著名地点(清水寺/地主神社など)。近接しても
+    // 重複扱いにせず両方残す(process 側と同じ方針)。
+    if (k.wd && r.wd) continue;
     if (Math.abs(k.lat - r.lat) < 0.025 && Math.abs(k.lon - r.lon) < 0.025 &&
         hav(k.lat, k.lon, r.lat, r.lon) <= CLUSTER_KM) { dup = true; break; }
   }

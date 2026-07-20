@@ -47,6 +47,10 @@ const clusters = [];
 for (const c of cand) {
   let merged = false;
   for (const cl of clusters) {
+    // 両方が wikidata を持つ = それぞれ独立した著名地点(例: 清水寺 と隣接の地主神社は
+    // 0.094km だが別の寺社)。近接しても統合せず両方残す。無名の重複(wd 無し)のみ
+    // 著名な代表(wd 付き)へ畳み込む。
+    if (cl.wd && c.wd) continue;
     if (Math.abs(cl.lat - c.lat) < 0.03 && Math.abs(cl.lon - c.lon) < 0.03 &&
         hav(cl.lat, cl.lon, c.lat, c.lon) <= CLUSTER_KM) {
       cl.members++;
