@@ -57,6 +57,7 @@ type Contact = {
   place: { buckets: PlaceBucket[]; classified: number; total: number };
   attractants: Attractant[];
   activity: ActivityRisk[];
+  severity: { death: number; severe: number; light: number; unspecified: number };
 };
 type ForestBand = {
   label: string;
@@ -563,6 +564,26 @@ function Content({
       </Section>
 
       <Section
+        title="J-0. 人身被害の程度"
+        note="死亡はクマ側の死亡と区別している。「クマは死亡した」「飼い犬死亡」を人の死亡として数えると実データでは大半が誤りになる（59件と出るが、人が亡くなったのは3件）。"
+      >
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <SeverityTile label="死亡" value={data.contact.severity.death} tone="red" />
+          <SeverityTile label="重傷" value={data.contact.severity.severe} tone="amber" />
+          <SeverityTile label="軽傷" value={data.contact.severity.light} tone="stone" />
+          <SeverityTile
+            label="程度の記載なし"
+            value={data.contact.severity.unspecified}
+            tone="stone"
+          />
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-stone-600">
+          大半は程度が書かれていません。公開元が「軽傷/重傷」を記載するかは
+          自治体ごとに違うため、程度別の件数は地域間で比較できません。
+        </p>
+      </Section>
+
+      <Section
         title="J-2. 何をしているときに襲われているか"
         note="人身被害での出現率 ÷ 全記録での出現率。順位は妥当だが、倍率は報告バイアスで大きめに出る（下記注意）。"
       >
@@ -965,6 +986,29 @@ function Content({
           />
         )}
       </Section>
+    </div>
+  );
+}
+
+function SeverityTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "red" | "amber" | "stone";
+}) {
+  const cls =
+    tone === "red"
+      ? "border-red-200 bg-red-50 text-red-800"
+      : tone === "amber"
+        ? "border-amber-200 bg-amber-50 text-amber-800"
+        : "border-stone-200 bg-white text-stone-900";
+  return (
+    <div className={`rounded-xl border p-3 ${cls}`}>
+      <div className="text-xs font-semibold opacity-80">{label}</div>
+      <div className="mt-1 text-2xl font-bold tabular-nums">{value.toLocaleString()}</div>
     </div>
   );
 }

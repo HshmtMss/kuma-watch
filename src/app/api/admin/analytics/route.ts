@@ -12,6 +12,7 @@ import {
   activityRisk,
   attractantSeason,
   placeRisk,
+  severityBreakdown,
 } from "@/lib/contact-risk";
 import {
   backtestOctober,
@@ -117,6 +118,7 @@ export async function GET(req: Request) {
           place: placeRisk(scoped),
           attractants: attractantSeason(scoped),
           activity: activityRisk(scoped),
+          severity: severityBreakdown(scoped),
         },
         // I: 年の型と予測（出没予測の中核）
         regime: (() => {

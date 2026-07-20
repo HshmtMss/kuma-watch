@@ -52,12 +52,63 @@ const ACTIVITY_RULES: [string, RegExp][] = [
   ["車両運転中", /(走行中|運転中|車で)/],
 ];
 
-const INJURY_RE = /(襲われ|負傷|重傷|軽傷|けが|ケガ|噛まれ|かまれ|引っかか)/;
+/**
+ * 人が被害に遭ったことを示す語。「けがを」「けが人」のように人が主語だと
+ * 分かる形に寄せる。単に「けが」だけだとクマの負傷も拾う。
+ */
+const INJURY_RE =
+  /(襲われ|噛まれ|かまれ|引っかか|負傷|重傷|軽傷|けがを|ケガを|けが人|被害に遭)/;
+
+/**
+ * 死亡の主語がクマや動物側であることを示す語。
+ * 「死亡」を人身被害として数えると、実データでは大半が誤りになる。実例:
+ *   「走行中の車が体長約1mのクマと衝突。クマは死亡した。」
+ *   「線路上で列車とクマ1頭が衝突し…死亡が確認されました。」
+ *   「被害：飼い犬(柴犬)死亡。」
+ * 59件を人の死亡として数えていたが、実際に人が亡くなったのは3件だった。
+ */
+const ANIMAL_DEATH_RE =
+  /((クマ|熊|個体|子|親|子グマ|子熊|飼い犬|犬|猫|鹿|イノシシ)(は|が|も|を|の)?\s*死亡|死体|轢かれ|衝突.{0,12}死亡|駆除)/;
+
+/** 人が亡くなったことを示す語 */
+const HUMAN_DEATH_RE =
+  /((男性|女性|人|住民|男|女)\D{0,10}死亡|死亡した(男性|女性)|襲われ.{0,20}死亡|心肺停止)/;
 /**
  * 「けが人はいませんでした」のような否定文を人身被害として数えないための除外。
  * これが無いと実測で11件を誤カウントしていた。
  */
 const INJURY_NEGATION_RE = /(被害はな|けが人はいな|けがはな|負傷者はいな|人的被害はな|けが人な)/;
+
+export type Severity = "death" | "severe" | "light" | "unspecified";
+
+/**
+ * 人身被害の程度。死亡はクマ側の死亡と厳密に区別する。
+ * 被害でなければ null。
+ */
+export function injurySeverity(r: Rec): Severity | null {
+  if (!isInjuryRecord(r)) return null;
+  const c = r.comment ?? "";
+  if (/死亡|亡くな/.test(c) && HUMAN_DEATH_RE.test(c) && !ANIMAL_DEATH_RE.test(c))
+    return "death";
+  if (/(重傷|重体|意識不明|骨折|大けが)/.test(c)) return "severe";
+  if (/(軽傷|軽い(けが|ケガ))/.test(c)) return "light";
+  return "unspecified";
+}
+
+/** 程度別の件数 */
+export function severityBreakdown(records: Rec[]): Record<Severity, number> {
+  const out: Record<Severity, number> = {
+    death: 0,
+    severe: 0,
+    light: 0,
+    unspecified: 0,
+  };
+  for (const r of records) {
+    const s = injurySeverity(r);
+    if (s) out[s]++;
+  }
+  return out;
+}
 
 export function isInjuryRecord(r: Rec): boolean {
   const c = r.comment ?? "";
