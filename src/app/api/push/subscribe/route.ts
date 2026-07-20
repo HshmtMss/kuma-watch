@@ -24,6 +24,12 @@ type SubscribeBody = {
   city?: string;
   slug?: string;
   geo?: { lat: number; lon: number; radiusKm: number; label?: string };
+  /**
+   * どの導線から登録したか (map_card / place_hero / landing 等)。
+   * GA4 にしか無いと「どの導線が効いたか」を実登録データから追えないため、
+   * サーバ側にも残す。無くても購読は成立させる (任意項目)。
+   */
+  surface?: string;
 };
 
 export async function POST(req: Request) {
@@ -46,7 +52,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
-  const { subscription, pref, city, slug, geo } = body;
+  const { subscription, pref, city, slug, geo, surface } = body;
   if (
     !subscription?.endpoint ||
     !subscription.keys?.p256dh ||
@@ -117,6 +123,7 @@ export async function POST(req: Request) {
     auth: subscription.keys.auth,
     pref,
     city,
+    ...(typeof surface === "string" && surface ? { surface } : {}),
   });
   return NextResponse.json({ ok: true });
 }

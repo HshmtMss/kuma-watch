@@ -21,6 +21,7 @@ import { Redis } from "@upstash/redis";
 import { createHash, randomUUID } from "node:crypto";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { prefectureForLatLon } from "@/lib/prefecture-bbox";
+import { recordChurn } from "@/lib/churn-log";
 
 type StoredSubscription = {
   endpoint: string;
@@ -28,6 +29,13 @@ type StoredSubscription = {
   auth: string;
   createdAt: number;
   lastSeen: number;
+  /**
+   * どの導線から登録したか (地図FAB / place先頭CTA / 獲得LP 等)。
+   * GA4 には notify_click として送っているが、GA4 と Upstash は繋がって
+   * いないため、ここに残さないと「どの導線が効いたか」をサーバ側の
+   * 実登録データからは永久に復元できない。導線改修の効果測定に必須。
+   */
+  surface?: string;
 };
 
 /** 任意地点 + 半径の通知購読 (地図で選んだ「自宅周辺」など) の 1 点。 */
@@ -116,6 +124,7 @@ export async function subscribe(input: {
   auth: string;
   pref: string;
   city: string;
+  surface?: string;
 }): Promise<{ hash: string }> {
   const r = client();
   const hash = hashEndpoint(input.endpoint);
@@ -126,6 +135,7 @@ export async function subscribe(input: {
     auth: input.auth,
     createdAt: now,
     lastSeen: now,
+    ...(input.surface ? { surface: input.surface } : {}),
   };
   const mk = muniKey(input.pref, input.city);
   await Promise.all([
@@ -733,6 +743,25 @@ export async function purgeSubscription(hash: string): Promise<void> {
     r.smembers<string[]>(`sub:munis:${hash}`),
     r.smembers<string[]>(`sub:spots:${hash}`),
   ]);
+  // 削除する前に解約の記録を残す。ここで残さないと継続率が算出できなくなる。
+  try {
+    const raw = await r.get<StoredSubscription | string>(`sub:${hash}`);
+    const prev =
+      typeof raw === "string" ? (JSON.parse(raw) as StoredSubscription) : raw;
+    const now = Date.now();
+    await recordChurn({
+      channel: "push",
+      at: now,
+      lifetimeDays:
+        typeof prev?.createdAt === "number"
+          ? Math.round((now - prev.createdAt) / 86_400_000)
+          : null,
+      areaCount: (mks?.length ?? 0) + (slugs?.length ?? 0),
+      ...(prev?.surface ? { surface: prev.surface } : {}),
+    });
+  } catch {
+    // 記録に失敗しても失効処理は続行する
+  }
   const pipeline = r.pipeline();
   for (const mk of mks ?? []) {
     pipeline.srem(`muni:${mk}`, hash);

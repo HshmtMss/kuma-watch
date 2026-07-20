@@ -31,6 +31,7 @@ import { Redis } from "@upstash/redis";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { prefectureForLatLon } from "@/lib/prefecture-bbox";
 import type { GeoPoint } from "@/lib/push-storage";
+import { recordChurn } from "@/lib/churn-log";
 
 export type { GeoPoint };
 
@@ -375,6 +376,23 @@ export async function purgeUser(userId: string): Promise<void> {
     r.smembers<string[]>(`luser:munis:${userId}`),
     r.smembers<string[]>(`luser:spots:${userId}`),
   ]);
+  // 削除する前に解約の記録を残す。ここで残さないと継続率が算出できなくなる
+  // (このレコードは以後どこにも存在しなくなるため)。
+  try {
+    const prof = await r.get<{ createdAt?: number } | string>(`luser:${userId}`);
+    const p =
+      typeof prof === "string" ? (JSON.parse(prof) as { createdAt?: number }) : prof;
+    const created = typeof p?.createdAt === "number" ? p.createdAt : null;
+    const now = Date.now();
+    await recordChurn({
+      channel: "line",
+      at: now,
+      lifetimeDays: created ? Math.round((now - created) / 86_400_000) : null,
+      areaCount: (mks?.length ?? 0) + (slugs?.length ?? 0),
+    });
+  } catch {
+    // 記録に失敗しても解約処理は続行する
+  }
   const pipeline = r.pipeline();
   for (const mk of mks ?? []) pipeline.srem(`lmuni:${mk}`, userId);
   for (const slug of slugs ?? []) pipeline.srem(`lspot:${slug}`, userId);

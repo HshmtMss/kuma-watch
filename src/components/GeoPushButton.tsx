@@ -106,6 +106,8 @@ export default function GeoPushButton({
         body: JSON.stringify({
           subscription: { endpoint: json.endpoint, keys: json.keys },
           geo: { lat, lon, radiusKm, label },
+          // どの導線から登録したかをサーバにも残す
+          surface,
         }),
       });
       if (!res.ok) throw new Error(`subscribe failed: ${res.status}`);

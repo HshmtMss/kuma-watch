@@ -186,6 +186,9 @@ export default function PushSubscribeButton({
             keys: json.keys,
           },
           ...targetBody(target),
+          // どの導線から登録したかをサーバにも残す (GA4 だけだと実登録と
+          // 突き合わせられず、面別の効果測定ができないため)
+          surface,
         }),
       });
       if (!res.ok) {
