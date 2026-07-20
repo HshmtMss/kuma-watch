@@ -44,9 +44,13 @@ const CATPRIO = {
 const asciiOnly = (s) => /^[\x00-\x7F\s]+$/.test(s);
 const nonDest = /(公民館|集会所|体育館|支所|役場|市役所|小学校|中学校|グラウンド|運動公園|駐車場|バス停|交番|人工島|埠頭|ふ頭|物揚場|下水|浄化|変電)/;
 const genericOnly = /^((ファミリー|オート)?キャンプ場|公園|広場|温泉|滝)$/;
+// 主要島は place=island で拾えてしまうが観光「スポット」ではない(本州は全県に跨り
+// centroid が県ごとに拾われ大量の重複を生む)。名前完全一致で除外。
+const MAIN_ISLANDS = new Set(["本州", "四国", "九州", "北海道", "沖縄本島"]);
 function nameOk(r) {
   const t = r.name.trim();
   if (t.length <= 1) return false;
+  if (MAIN_ISLANDS.has(t)) return false;
   // 短い名前(≤3)は原則除外だが、wikidata/wikipedia 付き(著名)なら残す。
   // 浜名湖・諏訪湖・松本城 など 3 文字の有名地名を落とさないため。
   if (t.length <= 3 && !r.wd && !r.wp) return false;
