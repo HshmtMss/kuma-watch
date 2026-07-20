@@ -25,7 +25,10 @@ import {
   pointInsideMuni,
   resolveMuni,
 } from "../src/lib/muni-boundary";
+import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
 import type { UnifiedSighting } from "../src/lib/sources/types";
+
+const MUNI_BY_CODE = new Map(JAPAN_MUNICIPALITIES.map((m) => [m.cityCode, m]));
 
 // 全体再集約 (aggregateAllSightings) が生成する公式ソースの種別。これらは
 // 毎回 fresh で置き換える。これ以外 (news 等) は news-flash が別途 append する
@@ -166,6 +169,24 @@ async function main(): Promise<void> {
     }
   }
 
+  // 市町村欄が空のレコードに、座標から市町村名を補う。
+  // 群馬・福島のように上流に市町村の列が無い(あるいはコード値で解読できない)
+  // ソースがある。空のままだと place-index が「最寄り重心」で解決するが、
+  // これは実測で16.5%が実際の所属と食い違う。ポリゴン包含のほうが正確。
+  let cityFilled = 0;
+  if (hasBoundaryData()) {
+    for (const r of records) {
+      if ((r.cityName ?? "").trim()) continue;
+      if (!Number.isFinite(r.lat) || !Number.isFinite(r.lon)) continue;
+      const code = containingCode(r.lat, r.lon);
+      const mu = code ? MUNI_BY_CODE.get(code) : undefined;
+      if (!mu) continue;
+      if (mu.prefName !== r.prefectureName) continue; // 県が食い違うものは触らない
+      r.cityName = mu.cityName.replace(/^[^\s]+?郡/, "");
+      cityFilled++;
+    }
+  }
+
   let stamped = 0;
   for (const r of records) {
     const prior = prevById.get(r.id);
@@ -187,7 +208,7 @@ async function main(): Promise<void> {
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
       `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate}, ` +
       `officialMoved ${officialMoved}, officialRelabeled ${officialRelabeled}, ` +
-      `officialHidden ${officialUnresolved} in ${elapsedSec}s`,
+      `officialHidden ${officialUnresolved}, cityFilled ${cityFilled} in ${elapsedSec}s`,
   );
 }
 

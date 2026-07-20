@@ -361,25 +361,33 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     id: "fukushima",
     kind: "prefecture",
     prefCode: "07",
-    regionLabel: "福島県 ツキノワグマ目撃情報（Google My Map）",
+    regionLabel: "福島県 クマ目撃マップ（ArcGIS Dashboard）",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.fukushima.lg.jp/sec/16035b/tukinowaguma-mokugeki.html", role: "map", hint: "県ツキノワグマ目撃情報マップ（県警データ）" },
-      { url: "https://www.google.com/maps/d/viewer?mid=10gR9gJgiEA_Tso2E0jM-Q2sI41A3n_w", role: "map", hint: "福島県 Google My Map（県警データ）" },
+      { url: "https://www.pref.fukushima.lg.jp/sec/16035b/tukinowaguma-mokugeki.html", role: "map", hint: "県公式「福島県クマ目撃マップ」ページ" },
+      { url: "https://fuku-wildlifemap.maps.arcgis.com/apps/dashboards/031c907fe92a4a0a8311a228ff4ca404", role: "arcgis", hint: "県公式 ArcGIS Dashboard（2026-06-26 移行先）" },
+      // 旧公開先。2026-03-31 で更新停止（参考として保持）。
+      { url: "https://www.google.com/maps/d/viewer?mid=10gR9gJgiEA_Tso2E0jM-Q2sI41A3n_w", role: "map", hint: "旧 Google My Map（2026-03-31 で更新停止）" },
     ],
-    extractor: "direct-kml",
-    kml: {
-      kmlUrl: "https://www.google.com/maps/d/kml?mid=10gR9gJgiEA_Tso2E0jM-Q2sI41A3n_w&forcekml=1",
-      nameFormat: "extended-data",
-      dateField: "日付",
-      dateFormat: "us-slash",
-      cityField: "市町村",
-      sectionField: "住所",
-      commentField: "状況",
-      headCountField: "頭数",
+    extractor: "arcgis-dashboard",
+    arcgis: {
+      featureServerUrl:
+        "https://services6.arcgis.com/M9nrgnB1gu8YnLFM/arcgis/rest/services/福島県クマ目撃ポイントレイヤー_202606_view/FeatureServer/0",
+      dateFormat: "epoch-ms",
+      mappings: {
+        date: "kuma_date",
+        // city は coded domain で生値が JIS コード ("07543" 等)。抽出器は
+        // ドメイン解決をしないため割り当てない。gunma と同様、city 無しなら
+        // place-index が座標から市町村を解決する (resolveCanonicalForIndex)。
+        section: "address_public",
+        // sighting は coded ("1_クマ個体")。自由記述の詳細を採用。
+        situation: "detail_sighting_public",
+        // headcount も coded ("1_1頭") かつ充足率 45% のため未割当 (既定 1 頭)。
+      },
     },
-    notes: "県警から提供された目撃情報。ExtendedData に市町村・住所・日付・頭数・状況が全て構造化されている 2,046 件",
-    verifiedAt: "2026-04-20",
+    notes:
+      "2026-06-26 に Google My Map から ArcGIS Dashboard へ移行。Survey123 ベースの公開ビュー 4,337 件（2022-04-03〜2026-07-19）。wkid 4326。kuma_date は UTC epoch ms のため JST 00-09 時台の目撃は ISO 日付が 1 日前にずれる既知の制約あり",
+    verifiedAt: "2026-07-20",
   },
   {
     id: "ibaraki",

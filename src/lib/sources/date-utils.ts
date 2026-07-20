@@ -58,9 +58,18 @@ export function parseIsoLike(raw: string): string | null {
   return `${m[1]}-${pad2(mo)}-${pad2(da)}`;
 }
 
+/**
+ * epoch ms → 出没日 (JST カレンダー日)。
+ *
+ * `toISOString()` は UTC 日付を返すので、JST 00:00〜08:59 に起きた出没が
+ * 前日として記録される。福島県の新データ(ArcGIS)では実測でサンプルの約23%が
+ * この時間帯に該当した。epoch を使う全ソース(富山・群馬・福島 等)共通の問題。
+ * 出没日は JST のカレンダー日なので、JST に直してから切り出す。
+ */
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 export function epochToIsoDate(v: unknown): string {
   if (typeof v !== "number" || !Number.isFinite(v)) return "";
-  const d = new Date(v);
+  const d = new Date(v + JST_OFFSET_MS);
   if (Number.isNaN(d.getTime())) return "";
   return d.toISOString().split("T")[0];
 }

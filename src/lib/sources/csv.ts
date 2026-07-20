@@ -46,7 +46,8 @@ function parseDate(value: string, format: string | undefined): string | null {
   if (format === "epoch-ms") {
     const n = Number(s);
     if (!Number.isFinite(n)) return null;
-    const d = new Date(n);
+    // 出没日は JST のカレンダー日。UTC で切ると JST 00:00〜08:59 が前日になる。
+    const d = new Date(n + 9 * 60 * 60 * 1000);
     return Number.isNaN(d.getTime()) ? null : d.toISOString().split("T")[0];
   }
   if (format === "ja-slash") {
