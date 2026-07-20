@@ -45,6 +45,7 @@ export async function GET(req: Request) {
   // JST カレンダー日で切る (UTC 基準だと早朝に境界が 1 日ずれる)
   const iso365 = jstDaysAgo(365);
   const iso90 = jstDaysAgo(90);
+  const iso7 = jstDaysAgo(7);
   // 昨年・今年の月別比較用。昨年1月1日まで遡って集計する。
   const thisYear = now.getFullYear();
   const lastYear = thisYear - 1;
@@ -72,6 +73,7 @@ export async function GET(req: Request) {
   let count365 = 0;
   let count90 = 0;
   let countLocal365 = 0;
+  let countLocal7 = 0;
   let latest: string | null = null;
   const recent90: NearRecord[] = [];
   // 昨年・今年の月別実測件数 (0=1月 .. 11=12月)。カードの月別出没チャート(昨年 vs 今年)用。
@@ -94,7 +96,10 @@ export async function GET(req: Request) {
     }
     if (s.date >= iso365) {
       count365 += 1;
-      if (d <= LOCAL_RADIUS_KM) countLocal365 += 1;
+      if (d <= LOCAL_RADIUS_KM) {
+        countLocal365 += 1;
+        if (s.date >= iso7) countLocal7 += 1;
+      }
     }
     if (!latest || s.date > latest) latest = s.date;
     if (s.date >= iso90) {
@@ -126,6 +131,7 @@ export async function GET(req: Request) {
       count365d: count365,
       count90d: count90,
       countLocal365,
+      countLocal7,
       localRadiusKm: LOCAL_RADIUS_KM,
       latestDate: latest,
       radiusKm,

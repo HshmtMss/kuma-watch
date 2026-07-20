@@ -31,6 +31,13 @@ type Props = {
   nearbyRadiusKm?: number;
   /** 当該メッシュの直近1年の目撃件数 (マップのセル色と同入力)。判定の主軸。 */
   recentSightingCount?: number;
+  /**
+   * 直近7日・周辺約3kmの出没件数。
+   * 年間件数がしきい値(3件)未満でも、直近に出没があれば「情報なし」とは
+   * 表示しない。4日前にクマが出た地点で「記録は見つかりませんでした」と
+   * 出ていたため。
+   */
+  lastWeekCount?: number;
   /** 「最近の目撃」の隣に 2 列で並べる通知タイル (GeoPushButton compact 等)。無ければ 1 列。 */
   notification?: ReactNode;
 };
@@ -40,12 +47,13 @@ export default function RiskHero({
   count90d = 0,
   nearbyRadiusKm = 10,
   recentSightingCount = 0,
+  lastWeekCount = 0,
   notification,
 }: Props) {
   // マップのセル色と同じ二軸 (生息域 / 直近の出没) で「この地点の状況」を判定する。
   // 生息域だけでは赤い「危険」にせず、直近の出没件数で 注意→警戒→危険 を出す。
   const habitatLevel = baseLevel ?? "unknown";
-  const cat = displayCategory(habitatLevel, recentSightingCount);
+  const cat = displayCategory(habitatLevel, recentSightingCount, lastWeekCount);
   const style = DISPLAY_CATEGORY_STYLE[cat];
   const hasRecent = count90d > 0;
 
@@ -62,7 +70,9 @@ export default function RiskHero({
   // 選ばれる。1〜2 件でも「ありません」と断言してしまい、さらに真下の
   // 「最近の目撃 N件」(90日・10km) と正面から矛盾していた。
   const records =
-    recentSightingCount > 0
+    lastWeekCount > 0
+      ? "直近1週間に、この付近で出没が確認されています。"
+      : recentSightingCount > 0
       ? "この付近では直近1年にわずかながら出没が確認されています。"
       : hasRecent
         ? "この地点の記録はありませんが、周辺では出没が確認されています。"

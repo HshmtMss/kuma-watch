@@ -555,14 +555,28 @@ export type DisplayCategory =
   | "caution"
   | "warning"
   | "danger";
+/**
+ * 直近この日数以内に出没があれば、年間件数がしきい値未満でも「出没あり」以上に
+ * する。出没から7日間は、その場所の平常時に対して約2.8倍の頻度で再び出没する
+ * (14日で2.19倍、30日で1.59倍と減衰) という実測に基づく。
+ */
+export const RECENT_ALERT_DAYS = 7;
+
 export function displayCategory(
   habitatLevel: RiskLevel,
   recentSightingCount: number,
+  /** 直近 RECENT_ALERT_DAYS 日以内の周辺出没件数。省略時は加味しない */
+  lastWeekCount = 0,
 ): DisplayCategory {
   // 直近の出没を主軸に。煽る語は使わず「出没あり/やや多い/多い」で表現する。
   if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.red) return "danger";
   if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.orange) return "warning";
   if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.amber) return "caution";
+  // 年間件数がしきい値未満でも、直近に出没があれば「情報なし」にはしない。
+  // 従来は「周囲2.9km・過去1年で3件未満」だけを見ていたため、4日前に
+  // クマが出た地点で「記録は見つかりませんでした」と表示されていた
+  // (実測で直近7日の出没1,111件のうち128件がこの状態)。
+  if (lastWeekCount > 0) return "caution";
   // 出没が無ければ生息域の濃淡で 2 段階 (生息域 / 主要生息域)。
   if (habitatLevel === "high" || habitatLevel === "elevated")
     return "habitatCore";

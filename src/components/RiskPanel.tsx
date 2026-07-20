@@ -120,6 +120,8 @@ type State =
       baseLevel: import("@/lib/types").RiskLevel;
       /** 当該メッシュの直近1年の目撃件数 (ヒートマップのセル色と同入力)。カード判定の主軸。 */
       sCellCount: number;
+      /** 直近7日・周辺約3kmの出没件数（区分を「情報なし」にしないため） */
+      lastWeekCount: number;
       /** 最近の目撃で格上げされたか */
       levelEscalated: boolean;
       elevationM: number | null;
@@ -183,6 +185,7 @@ async function fetchNearbyHistory(
   ok: boolean;
   count365d: number;
   countLocal365: number;
+  countLocal7: number;
   count90d: number;
   monthlyThisYear: number[];
   monthlyLastYear: number[];
@@ -195,6 +198,7 @@ async function fetchNearbyHistory(
     ok: false,
     count365d: 0,
     countLocal365: 0,
+    countLocal7: 0,
     count90d: 0,
     monthlyThisYear: [],
     monthlyLastYear: [],
@@ -211,6 +215,7 @@ async function fetchNearbyHistory(
       count365d?: number;
       count90d?: number;
       countLocal365?: number;
+      countLocal7?: number;
       monthlyThisYear?: number[];
       monthlyLastYear?: number[];
       thisYear?: number;
@@ -225,6 +230,7 @@ async function fetchNearbyHistory(
       count90d: typeof data.count90d === "number" ? data.count90d : 0,
       countLocal365:
         typeof data.countLocal365 === "number" ? data.countLocal365 : 0,
+      countLocal7: typeof data.countLocal7 === "number" ? data.countLocal7 : 0,
       monthlyThisYear: arr12(data.monthlyThisYear),
       monthlyLastYear: arr12(data.monthlyLastYear),
       thisYear: typeof data.thisYear === "number" ? data.thisYear : nowY,
@@ -559,6 +565,8 @@ export default function RiskPanel({
       const sCellCount = history.ok
         ? history.countLocal365
         : (sightingMapRef.current?.get(meshCode) ?? 0);
+      // 直近7日の周辺出没。年間件数がしきい値未満でも「情報なし」にしないために使う
+      const lastWeekCount = history.ok ? history.countLocal7 : 0;
       const sightingLevel = sightingsToLevel(sCellCount);
       const displayedLevel = maxLevel(baseLevel, sightingLevel);
       breakdown.level = displayedLevel;
@@ -606,6 +614,7 @@ export default function RiskPanel({
         histLastYear: history.lastYear,
         baseLevel,
         sCellCount,
+        lastWeekCount,
         levelEscalated,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
@@ -991,6 +1000,7 @@ function RiskDetails({
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
         recentSightingCount={state.sCellCount}
+        lastWeekCount={state.lastWeekCount}
         notification={
           isGeoNotifyAvailable() && location ? (
             <GeoNotifyTile
