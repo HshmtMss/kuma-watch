@@ -159,7 +159,10 @@ function main(): void {
 
   if (apply) {
     writeFileSync(file, JSON.stringify(blob));
-    console.log(`\n[fix-pins] ${snapped} 件を補正して書き戻した`);
+    console.log(
+      `\n[fix-pins] 計 ${snapped + officialMoved + officialRelabeled} 件を補正して書き戻した ` +
+        `(報道等の座標 ${snapped} / 公式の座標 ${officialMoved} / 公式の市町村名 ${officialRelabeled})`,
+    );
   } else {
     console.log("\n[fix-pins] dry-run (--apply で書き戻す)");
   }
