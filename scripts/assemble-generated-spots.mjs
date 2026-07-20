@@ -17,7 +17,6 @@ const oldGen = existsSync(".cache/old-japanese-gen.json")
   : existsSync("src/data/japan-landmarks-generated.json")
     ? JSON.parse(readFileSync("src/data/japan-landmarks-generated.json", "utf8"))
     : [];
-const oldSlugByCoord = new Map(oldGen.map((r) => [`${r.lat},${r.lon}`, r.slug]));
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
 const fameOf = (r) => (r.wd && fame[r.wd] != null ? fame[r.wd] : 0);
 
@@ -107,10 +106,6 @@ for (const c of cands) {
   while (usedSlugs.has(slug)) slug = `${base}-${i++}`;
   usedSlugs.add(slug);
 
-  // 旧(現行)日本語 slug があり新 slug と違うならリダイレクト登録(URL 移行の受け皿)。
-  const oldSlug = oldSlugByCoord.get(`${r.lat},${r.lon}`);
-  if (oldSlug && oldSlug !== slug) redirects[oldSlug] = slug;
-
   const entry = {
     slug,
     name: display,
@@ -124,6 +119,18 @@ for (const c of cands) {
   if (img && img.imageUrl) { entry.imageUrl = img.imageUrl; entry.imageCredit = img.imageCredit || ""; }
   if (c.fame > 0) entry.fame = c.fame;
   out.push(entry);
+}
+// リダイレクト対応表: 旧日本語 slug すべてを、同座標の新ローマ字 slug へ 308 で転送。
+// 同一座標に複数スポット(way+relation 等)がある場合も旧 slug を漏れなく拾えるよう、
+// 座標→新slug の索引を作ってから旧 slug 全件を走査する(Map 後勝ちの取りこぼし防止)。
+const coordToNew = new Map();
+for (const e of out) {
+  const k = `${e.lat},${e.lon}`;
+  if (!coordToNew.has(k)) coordToNew.set(k, e.slug);
+}
+for (const o of oldGen) {
+  const ns = coordToNew.get(`${o.lat},${o.lon}`);
+  if (ns && ns !== o.slug) redirects[o.slug] = ns;
 }
 writeFileSync("src/data/spot-slug-redirects.json", JSON.stringify(redirects));
 console.log(`同名区別: ${disamb} 件 / Q-idフォールバックslug: ${qidFallback} 件 / リダイレクト対応: ${Object.keys(redirects).length} 件`);
