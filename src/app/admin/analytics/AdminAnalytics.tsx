@@ -58,6 +58,25 @@ type Contact = {
   attractants: Attractant[];
   activity: ActivityRisk[];
 };
+type RegionProfile = {
+  region: string;
+  quality: {
+    records: number;
+    avgCommentLength: number;
+    placeClassifiedRate: number;
+    monthsCovered: number;
+    allCalendarMonths: boolean;
+    seasonComparable: boolean;
+    textReliable: boolean;
+  };
+  monthly: number[];
+  peakMonth: number;
+  autumnRatio: number | null;
+  places: { key: string; count: number; share: number }[];
+  attractants: { key: string; count: number; share: number }[];
+  hours: { key: string; count: number; share: number }[];
+  hoursSampleSize: number;
+};
 type RecurrenceWindow = {
   windowDays: number;
   afterSighting: number;
@@ -106,6 +125,7 @@ type Data = {
   regime: Regime;
   contact: Contact;
   recurrence: Recurrence;
+  profile: RegionProfile;
   prefOptions: string[];
 };
 
@@ -186,6 +206,149 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* L: 地域カルテ — 他地域と比べず、その地域の姿だけを出す */}
+      <Section
+        title={`L. 地域カルテ（${data.profile.region}）`}
+        note="対策立案用。他地域との比較ではなく、この地域の中での構成を出す。県をまたいで比べると実態ではなく『記録の詳しさ』を比べることになるため（コメント平均文字数は宮城県1字・青森県5字に対し福島県30字）。2023年以降。"
+      >
+        {/* データの確からしさを先に出す。これを見ずに下の内訳を読むと誤る */}
+        <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+          <div className="text-xs font-bold text-stone-700">この地域のデータの詳しさ</div>
+          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
+            <QualityItem label="記録件数" value={data.profile.quality.records.toLocaleString()} />
+            <QualityItem
+              label="コメント平均"
+              value={`${data.profile.quality.avgCommentLength.toFixed(0)}字`}
+            />
+            <QualityItem
+              label="場所の分類率"
+              value={`${(data.profile.quality.placeClassifiedRate * 100).toFixed(0)}%`}
+            />
+            <QualityItem
+              label="データのある月"
+              value={`${data.profile.quality.monthsCovered}ヶ月`}
+            />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Judgement ok={data.profile.quality.seasonComparable} label="季節性を語れる" />
+            <Judgement ok={data.profile.quality.textReliable} label="場所・誘引物が当てになる" />
+          </div>
+          {!data.profile.quality.textReliable && (
+            <p className="mt-2 text-xs leading-relaxed text-amber-800">
+              ⚠ この地域は記録が短く、下の「出没場所」「誘引物」の内訳は当てになりません。
+              クマの生態ではなく記録の書き方を反映している可能性が高いので、対策の根拠には
+              使わないでください。
+            </p>
+          )}
+          {!data.profile.quality.seasonComparable && (
+            <p className="mt-1 text-xs leading-relaxed text-amber-800">
+              ⚠ 一部の月しかデータがないため、ピーク月や季節の傾向は欠測を反映している
+              可能性があります。
+            </p>
+          )}
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <div className="text-xs font-bold text-stone-600">季節（月別件数）</div>
+            <div className="mt-2 flex h-24 items-end gap-1">
+              {data.profile.monthly.map((v, i) => {
+                const max = Math.max(...data.profile.monthly, 1);
+                return (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <div
+                      className={`w-full rounded-t ${i + 1 === data.profile.peakMonth ? "bg-amber-500" : "bg-stone-300"}`}
+                      style={{ height: `${(v / max) * 100}%` }}
+                    />
+                    <span className="text-[9px] text-stone-400">{i + 1}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-1 text-xs text-stone-600">
+              ピーク {data.profile.peakMonth}月
+              {data.profile.autumnRatio !== null && (
+                <> ／ 秋÷初夏 {data.profile.autumnRatio.toFixed(2)}
+                  {data.profile.autumnRatio >= 1.5 ? "（秋に備える地域）" : "（初夏に備える地域）"}
+                </>
+              )}
+            </p>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-stone-600">
+              出没場所の構成{!data.profile.quality.textReliable && "（参考値）"}
+            </div>
+            <div className="mt-2 flex flex-col gap-1">
+              {data.profile.places.map((p) => (
+                <div key={p.key} className="flex items-center gap-2">
+                  <div className="w-24 shrink-0 text-xs">{p.key}</div>
+                  <div className="h-3.5 flex-1 rounded bg-stone-100">
+                    <div
+                      className="h-3.5 rounded bg-stone-400"
+                      style={{ width: `${p.share * 100}%` }}
+                    />
+                  </div>
+                  <div className="w-10 shrink-0 text-right text-xs tabular-nums">
+                    {(p.share * 100).toFixed(0)}%
+                  </div>
+                </div>
+              ))}
+              {data.profile.places.length === 0 && (
+                <p className="text-xs text-stone-400">分類できる記録がありません</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <div className="text-xs font-bold text-stone-600">
+              誘引物{!data.profile.quality.textReliable && "（参考値）"}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {data.profile.attractants.map((a) => (
+                <span
+                  key={a.key}
+                  className="rounded bg-stone-100 px-2 py-1 text-xs tabular-nums"
+                >
+                  {a.key} {a.count.toLocaleString()}件
+                </span>
+              ))}
+              {data.profile.attractants.length === 0 && (
+                <span className="text-xs text-stone-400">言及なし</span>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs font-bold text-stone-600">時間帯</div>
+            {data.profile.hoursSampleSize >= 100 ? (
+              <div className="mt-2 flex flex-col gap-1">
+                {data.profile.hours.map((h) => (
+                  <div key={h.key} className="flex items-center gap-2">
+                    <div className="w-24 shrink-0 text-xs">{h.key}</div>
+                    <div className="h-3.5 flex-1 rounded bg-stone-100">
+                      <div
+                        className="h-3.5 rounded bg-stone-400"
+                        style={{ width: `${h.share * 100}%` }}
+                      />
+                    </div>
+                    <div className="w-10 shrink-0 text-right text-xs tabular-nums">
+                      {(h.share * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs leading-relaxed text-stone-500">
+                時刻の分かる記録が {data.profile.hoursSampleSize} 件しかないため出しません。
+                時刻は主に警察#9110のデータに付いており、秋田県以外はほとんど空欄です。
+              </p>
+            )}
+          </div>
+        </div>
+      </Section>
 
       {/* K: 再発性 — 予測モデル無しで明日から使える対策の根拠 */}
       <Section
@@ -703,6 +866,25 @@ function Content({
         )}
       </Section>
     </div>
+  );
+}
+
+function QualityItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span className="text-stone-500">{label}</span>{" "}
+      <span className="font-bold tabular-nums text-stone-900">{value}</span>
+    </div>
+  );
+}
+
+function Judgement({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <span
+      className={`rounded px-2 py-0.5 text-xs font-bold ${ok ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}
+    >
+      {ok ? "○" : "×"} {label}
+    </span>
   );
 }
 

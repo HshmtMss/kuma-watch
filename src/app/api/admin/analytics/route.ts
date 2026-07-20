@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { concentration, recurrence } from "@/lib/recurrence";
+import { regionProfile } from "@/lib/region-profile";
 import {
   activityRisk,
   attractantSeason,
@@ -80,6 +81,11 @@ export async function GET(req: Request) {
         dow: dowHistogram(scoped, today),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
+        // L: 地域カルテ（他地域と比べず、その地域の姿だけを出す）
+        profile: regionProfile(
+          scoped.filter((r) => (r.date ?? "") >= "2023-01-01"),
+          pref || "全国",
+        ),
         // K: 再発性（一度出た場所にどれだけ近づかないべきか）
         recurrence: {
           windows: [7, 14, 30].map((w) =>
