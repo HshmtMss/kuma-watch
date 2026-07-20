@@ -1,3 +1,27 @@
+/**
+ * クマの主要食料（ブナ等）の豊凶。危険度スコアの季節係数を補正するのに使う。
+ *
+ * === 2026-07-20 に推測値から実データへ差し替えた ===
+ * 以前はテンプレートのまま全18件が note:"要検証" / "参考値" の推測値で、
+ * 実際の豊凶調査を反映していなかった。実データが無い県まで level:"normal"
+ * と書いてあり、「調べた結果 平年並み」なのか「調べていない」のか区別が
+ * つかない状態だった。安全に関わる指標なので、根拠のあるものだけを持ち、
+ * 無い県は undefined を返して補正を掛けない方針に改めた。
+ *
+ * 現在の裏付けは東北森林管理局のブナ開花・結実調査（src/data/buna-index.ts）。
+ * 対象は青森・岩手・宮城・秋田・山形の5県のみ。他県は判定しない。
+ *
+ * 開花指数(7月公表)から level への対応:
+ *   〜1.0  poor       … 出没が秋に集中し、人里寄りで起きる年
+ *   〜2.0  fair
+ *   〜3.0  normal
+ *   〜4.0  good
+ *   4.0〜  excellent
+ * この対応は、開花指数と当年の 秋/初夏 出没比の順位相関 -0.821 (n=7)、
+ * および指数1.0未満の年(2019/2023/2025)がすべて秋型だった実測に基づく。
+ */
+import { BUNA_INDEX, BUNA_SOURCE_URL, type BunaEntry } from "@/data/buna-index";
+
 export type NutCropLevel = "poor" | "fair" | "normal" | "good" | "excellent";
 
 export type NutCropEntry = {
@@ -10,53 +34,43 @@ export type NutCropEntry = {
   verifiedAt: string;
 };
 
-/**
- * クマにとっての主要食料（ブナ・ミズナラ・コナラ・クリ）の豊凶状況。
- * 各都道府県の林業課・林野庁地方局が毎年 7〜9 月頃に調査結果を公表する。
- *
- * level:
- *   poor      = 並凶作〜大凶作（クマの人里出没が顕著に増える）
- *   fair      = 並凶作〜並作に近い（注意）
- *   normal    = 平年並み
- *   good      = 並作〜並豊作
- *   excellent = 豊作（人里出没は減る傾向）
- *
- * 注意: 以下はテンプレートの初期値。各自治体の公式発表を基に
- * verifiedAt と sourceUrl を更新すること。
- * 本番運用では年 1 回（8〜10 月）に各都道府県の情報で更新する運用を想定。
- */
-export const NUT_CROP_DATA: NutCropEntry[] = [
-  { prefCode: "01", year: 2025, level: "normal", species: ["mizunara", "konara"], verifiedAt: "2026-04-18", note: "ヒグマは堅果以外の食物源も多く、補正影響は限定的（要検証）" },
-  { prefCode: "02", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証 / 青森県ブナ結実調査を参照" },
-  { prefCode: "03", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証 / 岩手県森林整備部調査を参照" },
-  { prefCode: "04", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "05", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証 / 秋田県林業研究研修センター調査を参照" },
-  { prefCode: "06", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証 / 山形県森林研究研修センター調査を参照" },
-  { prefCode: "07", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "15", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証 / 新潟県森林研究所調査を参照" },
-  { prefCode: "16", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "17", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "18", year: 2025, level: "normal", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "19", year: 2025, level: "normal", species: ["buna", "mizunara", "konara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "20", year: 2025, level: "normal", species: ["buna", "mizunara", "konara"], verifiedAt: "2026-04-18", note: "要検証 / 長野県林業総合センター調査を参照" },
-  { prefCode: "21", year: 2025, level: "normal", species: ["buna", "mizunara", "konara"], verifiedAt: "2026-04-18", note: "要検証" },
-  { prefCode: "26", year: 2025, level: "normal", species: ["mizunara", "konara"], verifiedAt: "2026-04-18", note: "要検証" },
-  // 2023 年（参考: ブナ・ナラが全国的に大凶作でクマ出没過去最多）
-  { prefCode: "02", year: 2023, level: "poor", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "参考値: 全国的な大凶作年" },
-  { prefCode: "05", year: 2023, level: "poor", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "参考値: 全国的な大凶作年" },
-  { prefCode: "03", year: 2023, level: "poor", species: ["buna", "mizunara"], verifiedAt: "2026-04-18", note: "参考値: 全国的な大凶作年" },
-];
+function levelOf(flowerIndex: number): NutCropLevel {
+  if (flowerIndex < 1.0) return "poor";
+  if (flowerIndex < 2.0) return "fair";
+  if (flowerIndex < 3.0) return "normal";
+  if (flowerIndex < 4.0) return "good";
+  return "excellent";
+}
 
+function toEntry(e: BunaEntry): NutCropEntry {
+  return {
+    prefCode: e.prefCode,
+    year: e.year,
+    level: levelOf(e.flowerIndex),
+    species: ["buna"],
+    sourceUrl: BUNA_SOURCE_URL,
+    note: `東北森林管理局 ブナ開花調査 開花豊凶指数 ${e.flowerIndex}（${e.flowerClass}）`,
+    verifiedAt: "2026-07-20",
+  };
+}
+
+/** 実データに裏付けのある豊凶。東北5県のみ。 */
+export const NUT_CROP_DATA: NutCropEntry[] = BUNA_INDEX.map(toEntry);
+
+/**
+ * その県・その年の豊凶。**根拠が無ければ undefined**（補正を掛けない）。
+ *
+ * 以前は前年へのフォールバックを持っていたが、ブナは隔年結実の性質が強く
+ * 前年の豊凶は当年の代理にならない（2024年 豊作3.30 → 2025年 大凶作0.44）。
+ * 当年の調査結果が無ければ判定しない。
+ */
 export function findNutCropEntry(
   prefCode: string | undefined,
   referenceDate: Date,
 ): NutCropEntry | undefined {
   if (!prefCode) return undefined;
   const year = referenceDate.getFullYear();
-  return (
-    NUT_CROP_DATA.find((e) => e.prefCode === prefCode && e.year === year) ??
-    NUT_CROP_DATA.find((e) => e.prefCode === prefCode && e.year === year - 1)
-  );
+  return NUT_CROP_DATA.find((e) => e.prefCode === prefCode && e.year === year);
 }
 
 export const NUT_CROP_LABEL: Record<NutCropLevel, string> = {
