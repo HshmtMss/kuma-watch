@@ -234,6 +234,32 @@ export function cubShareByMonth(
   }));
 }
 
+/**
+ * 人身被害の記録が、どのソースから来ているか。
+ *
+ * 行動別・場所別の集計を読む前に必ず見ること。被害の記録は「詳しい本文を
+ * 書くソース」に強く偏る。実測(2026-07)では 581件のうち iwate が 180件(31%)
+ * を占め、しかも iwate は出没一般ではなく**人身被害専用のデータセット**
+ * (198件中180件が被害)である。
+ *
+ * 影響の実例: 「山菜・きのこ採り」の被害80件のうち51件が iwate 由来で、
+ * 除くと29件まで落ちて順位が変わる。全国の傾向として読むと誤る。
+ */
+export function injurySources(
+  records: (Rec & { source?: string })[],
+): { source: string; count: number; share: number }[] {
+  const inj = records.filter(isInjuryRecord);
+  const m = new Map<string, number>();
+  for (const r of inj) m.set(r.source ?? "?", (m.get(r.source ?? "?") ?? 0) + 1);
+  return [...m.entries()]
+    .map(([source, count]) => ({
+      source,
+      count,
+      share: inj.length > 0 ? count / inj.length : 0,
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
 export type ActivityRisk = {
   key: string;
   injuries: number;

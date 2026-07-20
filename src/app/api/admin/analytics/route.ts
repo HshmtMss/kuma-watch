@@ -15,6 +15,7 @@ import {
   severityBreakdown,
   injuryByHour,
   cubShareByMonth,
+  injurySources,
 } from "@/lib/contact-risk";
 import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
 import { forecastAccuracy, loadForecastLog } from "@/lib/forecast-log";
@@ -124,6 +125,13 @@ export async function GET(req: Request) {
           attractants: attractantSeason(scoped),
           activity: activityRisk(scoped),
           severity: severityBreakdown(scoped),
+          // 被害記録がどのソースに偏っているか。行動別(J-2)を読む前提条件。
+          injurySources: injurySources(scoped).slice(0, 8),
+          // iwate は人身被害専用のデータセットなので、これを除いた場合の
+          // 行動別も併記して、順位がソース構成に依存しないか確かめられるようにする。
+          activityExIwate: activityRisk(
+            scoped.filter((r) => r.source !== "iwate"),
+          ),
           // 時間帯 × 被害。B(出没の時間帯)は全通報の分布だが、こちらは
           // 「その時間の通報のうち人身被害がどれだけ多いか」を見る。
           // 4時間ずつの帯に束ねる(時刻ごとだと被害の母数が足りない)。

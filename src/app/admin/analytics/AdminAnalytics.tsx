@@ -94,6 +94,10 @@ type Contact = {
   };
   /** 暦月で集約した複数頭(親子連れ)の割合(%) */
   cubMonthly: { month: number; total: number; multi: number; share: number }[];
+  /** 被害記録のソース内訳（行動別を読む前提条件） */
+  injurySources: { source: string; count: number; share: number }[];
+  /** iwate(人身被害専用データ)を除いた行動別。順位の頑健性を見る */
+  activityExIwate: ActivityRisk[];
 };
 type ForestBand = {
   label: string;
@@ -695,6 +699,83 @@ function Content({
           倍率そのものではなく順位で読んでください。車両運転中だけは1倍を下回り、
           車内が安全であることと整合します。
         </p>
+
+        {/* 順位の頑健性チェック。被害記録は特定ソースに強く偏るため、
+            その1つを抜いて順位が入れ替わらないかを必ず確かめる。 */}
+        <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3">
+          <p className="text-xs font-bold text-amber-900">
+            この順位は、どのソースが混ざっているかに強く依存します
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-amber-900">
+            被害記録{" "}
+            {data.contact.injurySources
+              .reduce((a, b) => a + b.count, 0)
+              .toLocaleString("ja-JP")}
+            件の内訳は下表のとおりで、上位ソースに集中しています。とくに{" "}
+            <code>iwate</code> は出没一般ではなく
+            <strong>人身被害専用のデータセット</strong>です。これを除くと件数が
+            大きく動きます（下表右列）。全国の傾向として読む前に必ず確認すること。
+          </p>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[360px] text-xs">
+              <thead>
+                <tr className="border-b border-amber-300 text-left text-[11px] text-amber-800">
+                  <th className="py-1 pr-3">ソース</th>
+                  <th className="py-1 pr-3 text-right">被害</th>
+                  <th className="py-1 text-right">占有率</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.contact.injurySources.map((s2) => (
+                  <tr key={s2.source} className="border-b border-amber-200/60">
+                    <td className="py-1 pr-3 font-mono">{s2.source}</td>
+                    <td className="py-1 pr-3 text-right tabular-nums">
+                      {s2.count}
+                    </td>
+                    <td className="py-1 text-right tabular-nums">
+                      {(s2.share * 100).toFixed(0)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-[360px] text-xs">
+              <thead>
+                <tr className="border-b border-amber-300 text-left text-[11px] text-amber-800">
+                  <th className="py-1 pr-3">行動</th>
+                  <th className="py-1 pr-3 text-right">被害件数</th>
+                  <th className="py-1 text-right">iwate を除くと</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...data.contact.activity]
+                  .sort((a, b) => b.injuries - a.injuries)
+                  .map((a) => {
+                    const ex =
+                      data.contact.activityExIwate.find((x) => x.key === a.key)
+                        ?.injuries ?? 0;
+                    const drop = a.injuries > 0 ? 1 - ex / a.injuries : 0;
+                    return (
+                      <tr key={a.key} className="border-b border-amber-200/60">
+                        <td className="py-1 pr-3">{a.key}</td>
+                        <td className="py-1 pr-3 text-right tabular-nums">
+                          {a.injuries}
+                        </td>
+                        <td
+                          className={`py-1 text-right tabular-nums ${drop >= 0.4 ? "font-bold text-red-700" : ""}`}
+                        >
+                          {ex}
+                          {drop >= 0.4 && ` (−${(drop * 100).toFixed(0)}%)`}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </Section>
 
       <Section
