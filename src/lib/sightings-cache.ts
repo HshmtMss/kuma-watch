@@ -225,19 +225,25 @@ function dedupeNearbySightings(records: UnifiedSighting[]): UnifiedSighting[] {
   return passthrough.concat([...groups.values()]);
 }
 
-// 報道(news)↔一次側(公式/Sharp9110/市民) のソース横断 dedup (dedup B)。
+// 報道(news)の重複 dedup (dedup B) — 報道↔一次側 と 報道↔報道 の両方。
 //
-// 報道は座標がジオコーディング由来で粗く(地名重心 + ジッター)、公式の精密 GPS と
-// 同一事案でも上の 220m グリッド dedup(dedup A)をすり抜けて二重計上されやすい。
-// 実データ検証では現行 dedup が拾える報道重複は 1.9% のみ。そこで「日付 ±1 日 +
-// 同一市町村(接尾一致で郡付き揺れを吸収) + 5km 以内」に一次側レコードがあれば、
-// その報道を重複とみなして落とす(一次側を採用)。
+// 報道は座標がジオコーディング由来で粗く(地名重心 + ジッター)、同一事案でも上の
+// 220m グリッド dedup(dedup A)をすり抜けて二重計上される。特に一つの出没事案を
+// 複数メディアが報じると、地名の解像度違い(町中心 / 大字 / 施設名)で 3〜20 個の
+// 別ピンに散らばる(例: 埼玉県毛呂山町 2026-06-27 は報道10件→地図で3ピン)。
+//
+// そこで「日付 ±1 日 + 同一市町村(接尾一致で郡付き揺れを吸収) + 5km 以内」を
+// 同一事案とみなし、貪欲クラスタリングで 1 件に束ねる:
+//  1. 近傍に一次側(公式/Sharp9110/市民)があれば報道を落として一次側を採用。
+//  2. 一次側が無ければ、クラスタごとに報道 1 件(最も具体的な代表)だけ残す。
+// 代表は「地区名が具体的 > 本文が長い > 取り込みが古い」順で選ぶ。
 //  - 頭数は 98% が「1」で弁別力が無いため条件にしない。
-//  - 5km の距離ゲートは粗いジオコーディングを許容しつつ、大きな市の別事案どうしの
-//    誤統合を防ぐための緩めの安全弁(安全マップなので「消しすぎ < 残しすぎ」で保守的)。
+//  - 5km ゲートは粗いジオコーディングの散らばりを束ねつつ、5km 超離れた別地区は
+//    別ピンとして残す(検証: 仙台市33件→2ピン=宮城野区/太白区、秋田市26→3、
+//    毛呂山10→1、智頭19→1)。安全マップなので誤統合は最小限に。
 //  - 座標や市町村が欠ける報道は照合できないので落とさず残す。
-// 検証: 直近1年で約 910/7,551 件(12%)の報道重複を統合(現行 144 件から大幅増)、
-//       一次側が空白の県(兵庫・福井 等)の報道 only は残る。
+// 検証: 直近1年で報道 7,551 → 2,492 件(重複5,059件=67%を統合。内訳 公式重複1,058 +
+//       報道どうし4,001)。一次側が空白の県(兵庫・福井 等)の報道 only は残る。
 const NEWS_DUP_DAY_WINDOW = 1;
 const NEWS_DUP_KM = 5;
 
@@ -270,67 +276,94 @@ function cityLooseMatch(a: string, b: string): boolean {
   return a === b || a.endsWith(b) || b.endsWith(a);
 }
 
-function dedupeNewsAgainstPrimary(
-  records: UnifiedSighting[],
-): UnifiedSighting[] {
-  // 一次側(非 news) を prefectureName -> date -> records で索引。
-  const idx = new Map<string, Map<string, UnifiedSighting[]>>();
-  for (const r of records) {
-    if (r.sourceKind === "news") continue;
-    if (!r.date || !r.prefectureName) continue;
-    if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
-    let dm = idx.get(r.prefectureName);
-    if (!dm) {
-      dm = new Map();
-      idx.set(r.prefectureName, dm);
-    }
-    const list = dm.get(r.date);
-    if (list) list.push(r);
-    else dm.set(r.date, [r]);
-  }
+type PrefDateIndex = Map<string, Map<string, UnifiedSighting[]>>;
 
-  const out: UnifiedSighting[] = [];
-  for (const r of records) {
-    if (r.sourceKind !== "news") {
-      out.push(r);
-      continue;
+function addToIndex(idx: PrefDateIndex, r: UnifiedSighting): void {
+  let dm = idx.get(r.prefectureName);
+  if (!dm) {
+    dm = new Map();
+    idx.set(r.prefectureName, dm);
+  }
+  const list = dm.get(r.date);
+  if (list) list.push(r);
+  else dm.set(r.date, [r]);
+}
+
+// 索引内に「日付 ±window + 同一市町村 + 5km 以内」のレコードがあるか。
+function hasNearMatch(idx: PrefDateIndex, n: UnifiedSighting): boolean {
+  const dm = idx.get(n.prefectureName);
+  if (!dm) return false;
+  for (let d = -NEWS_DUP_DAY_WINDOW; d <= NEWS_DUP_DAY_WINDOW; d++) {
+    const list = dm.get(shiftDateStr(n.date, d));
+    if (!list) continue;
+    for (const p of list) {
+      if (!cityLooseMatch(n.cityName, p.cityName)) continue;
+      if (
+        haversineKmLocal(n.lat, n.lon, p.lat as number, p.lon as number) <=
+        NEWS_DUP_KM
+      ) {
+        return true;
+      }
     }
-    const hasGeo =
+  }
+  return false;
+}
+
+// 地区名が具体的か (空 / 「不明」 / 市町村名と同一 は非具体)。代表選定に使う。
+function isSpecificSection(r: UnifiedSighting): boolean {
+  const s = (r.sectionName ?? "").trim();
+  return Boolean(s) && s !== "不明" && s !== r.cityName;
+}
+
+function dedupeNews(records: UnifiedSighting[]): UnifiedSighting[] {
+  // 一次側(非 news・座標あり) を索引。
+  const primaryIdx: PrefDateIndex = new Map();
+  const geoNews: UnifiedSighting[] = [];
+  for (const r of records) {
+    const geo =
       typeof r.lat === "number" &&
       typeof r.lon === "number" &&
       Boolean(r.date) &&
       Boolean(r.prefectureName) &&
       Boolean(r.cityName);
-    if (hasGeo) {
-      const dm = idx.get(r.prefectureName);
-      let dup = false;
-      if (dm) {
-        for (let d = -NEWS_DUP_DAY_WINDOW; d <= NEWS_DUP_DAY_WINDOW && !dup; d++) {
-          const list = dm.get(shiftDateStr(r.date, d));
-          if (!list) continue;
-          for (const p of list) {
-            if (!cityLooseMatch(r.cityName, p.cityName)) continue;
-            if (
-              haversineKmLocal(r.lat, r.lon, p.lat as number, p.lon as number) <=
-              NEWS_DUP_KM
-            ) {
-              dup = true;
-              break;
-            }
-          }
-        }
-      }
-      if (dup) continue; // 報道は落とし、一次側を採用
+    if (r.sourceKind === "news") {
+      if (geo) geoNews.push(r);
+      continue;
     }
-    out.push(r);
+    if (geo) addToIndex(primaryIdx, r);
   }
-  return out;
+
+  // 代表を「具体的な地区名 > 本文が長い > 取り込みが古い」順で優先。
+  geoNews.sort((a, b) => {
+    const s = Number(isSpecificSection(b)) - Number(isSpecificSection(a));
+    if (s !== 0) return s;
+    const c = (b.comment ?? "").length - (a.comment ?? "").length;
+    if (c !== 0) return c;
+    return (a.ingestedAt ?? 0) - (b.ingestedAt ?? 0);
+  });
+
+  // 貪欲クラスタリング: 一次側 or 既に残した報道代表と近ければ落とす。
+  const anchorIdx: PrefDateIndex = new Map();
+  const dropped = new Set<UnifiedSighting>();
+  for (const n of geoNews) {
+    if (hasNearMatch(primaryIdx, n)) {
+      dropped.add(n); // 一次側を採用
+      continue;
+    }
+    if (hasNearMatch(anchorIdx, n)) {
+      dropped.add(n); // 同一事案の報道は既存代表に集約
+      continue;
+    }
+    addToIndex(anchorIdx, n); // このクラスタの代表として残す
+  }
+
+  return dropped.size === 0
+    ? records
+    : records.filter((r) => !dropped.has(r));
 }
 
 function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
-  return dedupeNearbySightings(
-    dedupeNewsAgainstPrimary(filterMisgeocoded(records)),
-  );
+  return dedupeNearbySightings(dedupeNews(filterMisgeocoded(records)));
 }
 
 export async function getCachedSightings(): Promise<UnifiedSighting[]> {
