@@ -8,8 +8,12 @@
  * つかない状態だった。安全に関わる指標なので、根拠のあるものだけを持ち、
  * 無い県は undefined を返して補正を掛けない方針に改めた。
  *
- * 現在の裏付けは東北森林管理局のブナ開花・結実調査（src/data/buna-index.ts）。
- * 対象は青森・岩手・宮城・秋田・山形の5県のみ。他県は判定しない。
+ * 現在の裏付け:
+ *   青森・岩手・宮城・秋田・山形 … 東北森林管理局のブナ開花・結実調査
+ *                                  (src/data/buna-index.ts、数値の豊凶指数)
+ *   福島                        … 福島県の堅果類豊凶調査
+ *                                  (src/data/mast-fukushima.ts、区分のみ)
+ * この6県以外は判定しない。
  *
  * 開花指数(7月公表)から level への対応:
  *   〜1.0  poor       … 出没が秋に集中し、人里寄りで起きる年
@@ -21,6 +25,11 @@
  * および指数1.0未満の年(2019/2023/2025)がすべて秋型だった実測に基づく。
  */
 import { BUNA_INDEX, BUNA_SOURCE_URL, type BunaEntry } from "@/data/buna-index";
+import {
+  FUKUSHIMA_MAST,
+  FUKUSHIMA_MAST_SOURCE_URL,
+  type MastClass,
+} from "@/data/mast-fukushima";
 
 export type NutCropLevel = "poor" | "fair" | "normal" | "good" | "excellent";
 
@@ -54,8 +63,34 @@ function toEntry(e: BunaEntry): NutCropEntry {
   };
 }
 
-/** 実データに裏付けのある豊凶。東北5県のみ。 */
-export const NUT_CROP_DATA: NutCropEntry[] = BUNA_INDEX.map(toEntry);
+/**
+ * 福島県は数値指数が無く区分のみなので、区分から level へ直接対応させる。
+ * 「凶作」は東北の指数 1.0〜2.0 (fair) に相当する水準として扱う。
+ */
+const CLASS_TO_LEVEL: Record<MastClass, NutCropLevel> = {
+  大凶作: "poor",
+  凶作: "fair",
+  並作: "normal",
+  豊作: "good",
+};
+
+function fukushimaEntries(): NutCropEntry[] {
+  return FUKUSHIMA_MAST.filter((e) => e.species === "buna").map((e) => ({
+    prefCode: "07",
+    year: e.year,
+    level: CLASS_TO_LEVEL[e.flowerClass],
+    species: ["buna"] as NutCropEntry["species"],
+    sourceUrl: FUKUSHIMA_MAST_SOURCE_URL,
+    note: `福島県 堅果類豊凶調査 ブナ開花調査「${e.flowerClass}」`,
+    verifiedAt: "2026-07-20",
+  }));
+}
+
+/** 実データに裏付けのある豊凶。東北5県 + 福島。 */
+export const NUT_CROP_DATA: NutCropEntry[] = [
+  ...BUNA_INDEX.map(toEntry),
+  ...fukushimaEntries(),
+];
 
 /**
  * その県・その年の豊凶。**根拠が無ければ undefined**（補正を掛けない）。
