@@ -31,6 +31,11 @@ export type Gazetteer = {
 
 /** 一致率がこれ未満なら地名が複数市町村にまたがるとみなし採用しない */
 const MIN_AGREEMENT = 0.8;
+/**
+ * 最低支持件数。1件だけの一致は偶然や、その1件自体が誤りである可能性が
+ * 拭えないため採用しない。公式記録を書き換える判断の根拠にするので厳しめ。
+ */
+const MIN_SUPPORT = 3;
 
 /** 「○○地区」「○○町」等の地名らしい語を切り出す */
 export function placeTokens(text: string | undefined): string[] {
@@ -97,7 +102,7 @@ export function buildGazetteer(
               code = c;
             }
           }
-          if (total > 0 && n / total >= MIN_AGREEMENT)
+          if (n >= MIN_SUPPORT && n / total >= MIN_AGREEMENT)
             return { code, token: tk, n, total };
         }
       }
