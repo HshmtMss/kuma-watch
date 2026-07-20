@@ -181,3 +181,59 @@ export function RegionCompare({
     </div>
   );
 }
+
+/**
+ * 2地域の月別分布を並べる。縦軸(割合)を共有するので高さをそのまま比べられる。
+ *
+ * 件数ではなく「その地域の中での割合」にしてある。件数だと収録件数の多い県が
+ * 一方的に高くなるだけで、「いつ厚くすべきか」という問いに答えられない。
+ */
+export function MonthlyCompare({
+  regions,
+  caption,
+}: {
+  regions: { region: string; note: string; monthly: number[] }[];
+  caption: string;
+}) {
+  const shares = regions.map((r) => {
+    const t = r.monthly.reduce((a, b) => a + b, 0) || 1;
+    return { ...r, share: r.monthly.map((v) => v / t) };
+  });
+  const max = Math.max(...shares.flatMap((r) => r.share), 0.01);
+  return (
+    <div className="not-prose">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {shares.map((r) => {
+          const peak = r.share.indexOf(Math.max(...r.share));
+          return (
+            <div key={r.region} className="rounded-xl border border-stone-200 p-3">
+              <div className="text-[13px] font-bold text-stone-800">{r.region}</div>
+              <div className="text-[11px] leading-tight text-stone-500">{r.note}</div>
+              <div className="mt-3 flex h-24 items-end gap-0.5">
+                {r.share.map((v, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <div
+                      className={`w-full rounded-t-sm ${i === peak ? "bg-amber-500" : "bg-stone-300"}`}
+                      style={{ height: `${Math.max(2, (v / max) * 100)}%` }}
+                    />
+                    <span
+                      className={`text-[9px] tabular-nums ${i === peak ? "font-bold text-amber-800" : "text-stone-400"}`}
+                    >
+                      {i + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-1 text-[11px] text-stone-600">
+                最も多いのは{" "}
+                <strong className="text-amber-800">{peak + 1}月</strong>（
+                {(r.share[peak] * 100).toFixed(0)}%）
+              </p>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-[12px] leading-relaxed text-stone-500">{caption}</p>
+    </div>
+  );
+}

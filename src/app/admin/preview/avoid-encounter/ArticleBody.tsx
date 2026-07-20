@@ -14,7 +14,13 @@ import { bunaSummary, BUNA_SOURCE_URL } from "@/data/buna-index";
 import { loadForecastLog, forecastAccuracy } from "@/lib/forecast-log";
 import { jstToday } from "@/lib/jst-date";
 import { KeyPoints, Callout, References } from "@/components/ArticleCards";
-import { BarRow, MonthlyBars, HourBands, RegionCompare } from "./BarRow";
+import {
+  BarRow,
+  MonthlyBars,
+  HourBands,
+  RegionCompare,
+  MonthlyCompare,
+} from "./BarRow";
 
 /** 時刻を4時間ずつの帯に束ねる（時刻ごとだと被害の母数が足りない） */
 const HOUR_BANDS: [number, number, string][] = [
@@ -59,6 +65,9 @@ export default async function ArticleBody() {
   const singleShare =
     conc.totalCells > 0 ? conc.singleCells / conc.totalCells : 0;
   const placedShare = place.total > 0 ? place.classified / place.total : 0;
+  const injuryTotal =
+    severity.death + severity.severe + severity.light + severity.unspecified;
+  const severityStated = severity.death + severity.severe + severity.light;
 
   // 行動は「被害の件数」を主にする。倍率は報告のクセで膨らむので従に置く。
   const byInjuries = [...activity].sort((a, b) => b.injuries - a.injuries);
@@ -509,17 +518,19 @@ export default async function ArticleBody() {
         </p>
       </div>
 
-      <Callout label="人身被害の記録について" tone="red">
-        分析対象のうち、人が被害に遭ったと読める記録は{" "}
-        {(
-          severity.death +
-          severity.severe +
-          severity.light +
-          severity.unspecified
-        ).toLocaleString()}
-        件でした（うち程度が明記されているのは{" "}
-        {(severity.death + severity.severe + severity.light).toLocaleString()}件）。
-        程度を書くかどうかは自治体ごとに運用が違うため、地域間の比較には使えません。
+      <Callout label="被害の重さは、ほとんど分かりません" tone="red">
+        人が被害に遭ったと読める記録は{" "}
+        <strong>{injuryTotal.toLocaleString()}件</strong>ありましたが、
+        けがの程度まで書かれていたのは{" "}
+        <strong>
+          {severityStated.toLocaleString()}件（
+          {((severityStated / Math.max(injuryTotal, 1)) * 100).toFixed(0)}%）
+        </strong>
+        だけです。残りは「クマに襲われた」までしか記録がありません。
+        これは読み取りに失敗しているのではなく、
+        <strong>公表資料にもともと書かれていない</strong>ためです。
+        したがって「どの地域の被害が重いか」は、現在の公開データでは分かりません。
+        本記事でも比較していません。
       </Callout>
 
       {/* B2B 導線 */}
@@ -553,8 +564,40 @@ export default async function ArticleBody() {
             </div>
           )}
         <p className="mt-3 text-[15px] leading-relaxed text-stone-700">
-          富山では「凶作の年の秋」に集中して備える意味がありますが、
-          岐阜で同じ運用をしても空振りします。逆に岐阜は初夏に厚くすべきです。
+          では、それぞれ<strong>いつ</strong>厚くすべきか。
+          同じ2県を月別で並べると、備える時期がはっきり分かれます。
+        </p>
+        <div className="my-5">
+          <MonthlyCompare
+            regions={[
+              {
+                region: "富山県",
+                note: `全${toyama.monthly.reduce((a, b) => a + b, 0).toLocaleString()}件`,
+                monthly: toyama.monthly,
+              },
+              {
+                region: "岐阜県",
+                note: `全${gifu.monthly.reduce((a, b) => a + b, 0).toLocaleString()}件`,
+                monthly: gifu.monthly,
+              },
+            ]}
+            caption="縦軸は共通（その県の出没に占める割合）。富山は秋に山ができるのに対し、岐阜は初夏に山があり、秋にはむしろ下がります。"
+          />
+        </div>
+        <p className="mt-3 text-[15px] leading-relaxed text-stone-700">
+          富山は<strong>10〜11月に{(
+            ((toyama.monthly[9] + toyama.monthly[10]) /
+              (toyama.monthly.reduce((a, b) => a + b, 0) || 1)) *
+            100
+          ).toFixed(0)}%</strong>が集中し、
+          しかもその強さが年によって入れ替わるので、
+          「凶作の年の秋」に絞って備える意味があります。
+          一方の岐阜は<strong>6〜7月に{(
+            ((gifu.monthly[5] + gifu.monthly[6]) /
+              (gifu.monthly.reduce((a, b) => a + b, 0) || 1)) *
+            100
+          ).toFixed(0)}%</strong>が集まり、
+          どの年も同じ形です。<strong>岐阜で秋に広報を厚くしても空振りします。</strong>
           出没する場所の構成（住宅地が多いのか、農地が多いのか）も地域で違います。
         </p>
         <ul className="mt-4 space-y-2 text-[14px] leading-relaxed text-stone-700">
