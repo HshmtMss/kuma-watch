@@ -53,6 +53,17 @@ type Regime = {
     sourceUrl: string;
   } | null;
   mastHistory?: { year: number; avgFlower: number; poorPrefs: number; totalPrefs: number }[];
+  forecastLog?: {
+    records: {
+      year: number;
+      flowerIndex: number;
+      predictedAutumn: boolean;
+      actualRatio?: number;
+      actualAutumn?: boolean;
+      correct?: boolean;
+    }[];
+    accuracy: { verified: number; correct: number; rate: number | null };
+  };
   forecastOct: {
     month: number;
     predicted: number;
@@ -721,6 +732,62 @@ function Content({
               >
                 東北森林管理局
               </a>
+            </p>
+          </div>
+        )}
+
+        {data.regime.forecastLog && data.regime.forecastLog.records.length > 0 && (
+          <div className="mt-3 rounded-lg border border-stone-200 bg-white p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-xs font-bold text-stone-700">
+                予測の答え合わせ（外れも残す）
+              </div>
+              <div className="text-sm font-bold tabular-nums text-stone-900">
+                的中 {data.regime.forecastLog.accuracy.correct}/
+                {data.regime.forecastLog.accuracy.verified}
+                {data.regime.forecastLog.accuracy.rate !== null &&
+                  `（${(data.regime.forecastLog.accuracy.rate * 100).toFixed(0)}%）`}
+              </div>
+            </div>
+            <div className="mt-2 overflow-x-auto">
+              <table className="w-full min-w-[440px] text-xs">
+                <thead>
+                  <tr className="border-b border-stone-200 text-left text-stone-500">
+                    <th className="py-1 pr-3">年</th>
+                    <th className="py-1 pr-3 text-right">開花指数</th>
+                    <th className="py-1 pr-3">予測</th>
+                    <th className="py-1 pr-3 text-right">実績(秋/初夏)</th>
+                    <th className="py-1">結果</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.regime.forecastLog.records.map((r) => (
+                    <tr key={r.year} className="border-b border-stone-100 last:border-0">
+                      <td className="py-1 pr-3 tabular-nums">{r.year}</td>
+                      <td className="py-1 pr-3 text-right tabular-nums">
+                        {r.flowerIndex.toFixed(2)}
+                      </td>
+                      <td className="py-1 pr-3">{r.predictedAutumn ? "秋型" : "秋型でない"}</td>
+                      <td className="py-1 pr-3 text-right tabular-nums">
+                        {r.actualRatio?.toFixed(2) ?? "—"}
+                      </td>
+                      <td className="py-1">
+                        {r.correct === undefined ? (
+                          <span className="text-stone-400">実績待ち</span>
+                        ) : r.correct ? (
+                          <span className="font-bold text-emerald-700">的中</span>
+                        ) : (
+                          <span className="font-bold text-red-700">外れ</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-stone-600">
+              予測は一度記録したら上書きしません（後から都合よく書き換えられないように）。
+              2020年は開花指数2.04（並作）ながら実績1.46とやや秋寄りで、唯一の外れです。
             </p>
           </div>
         )}

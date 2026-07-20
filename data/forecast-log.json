@@ -1,0 +1,98 @@
+{
+  "note": "ブナ開花指数(7月公表)による秋型予測と、その答え合わせ。予測は年1回。実績は11月末に確定する 秋(9-11月)/初夏(6-7月) 出没比。",
+  "updatedAt": "2026-07-20",
+  "records": [
+    {
+      "year": 2019,
+      "forecastedAt": "2019-07-31",
+      "flowerIndex": 0.68,
+      "poorPrefs": 4,
+      "totalPrefs": 5,
+      "predictedAutumn": true,
+      "actualRatio": 3.32,
+      "actualAutumn": true,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2020,
+      "forecastedAt": "2020-07-31",
+      "flowerIndex": 2.04,
+      "poorPrefs": 1,
+      "totalPrefs": 5,
+      "predictedAutumn": false,
+      "actualRatio": 1.46,
+      "actualAutumn": true,
+      "correct": false,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2021,
+      "forecastedAt": "2021-07-31",
+      "flowerIndex": 1.98,
+      "poorPrefs": 0,
+      "totalPrefs": 5,
+      "predictedAutumn": false,
+      "actualRatio": 0.52,
+      "actualAutumn": false,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2022,
+      "forecastedAt": "2022-07-31",
+      "flowerIndex": 3.64,
+      "poorPrefs": 0,
+      "totalPrefs": 5,
+      "predictedAutumn": false,
+      "actualRatio": 0.34,
+      "actualAutumn": false,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2023,
+      "forecastedAt": "2023-07-31",
+      "flowerIndex": 0.54,
+      "poorPrefs": 5,
+      "totalPrefs": 5,
+      "predictedAutumn": true,
+      "actualRatio": 2.42,
+      "actualAutumn": true,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2024,
+      "forecastedAt": "2024-07-31",
+      "flowerIndex": 3.3,
+      "poorPrefs": 0,
+      "totalPrefs": 5,
+      "predictedAutumn": false,
+      "actualRatio": 0.39,
+      "actualAutumn": false,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2025,
+      "forecastedAt": "2025-07-31",
+      "flowerIndex": 0.44,
+      "poorPrefs": 5,
+      "totalPrefs": 5,
+      "predictedAutumn": true,
+      "actualRatio": 2.28,
+      "actualAutumn": true,
+      "correct": true,
+      "verifiedAt": "2026-07-20"
+    },
+    {
+      "year": 2026,
+      "forecastedAt": "2026-07-20",
+      "flowerIndex": 3.9,
+      "poorPrefs": 0,
+      "totalPrefs": 5,
+      "predictedAutumn": false
+    }
+  ]
+}

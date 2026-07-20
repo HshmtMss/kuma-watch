@@ -15,6 +15,7 @@ import {
   severityBreakdown,
 } from "@/lib/contact-risk";
 import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
+import { forecastAccuracy, loadForecastLog } from "@/lib/forecast-log";
 import {
   backtestOctober,
   mastOutlook,
@@ -161,6 +162,11 @@ export async function GET(req: Request) {
               bunaSummary(Number(today.slice(0, 4))),
               BUNA_SOURCE_URL,
             ),
+            // 予測の記録と答え合わせ（外れも残す）
+            forecastLog: (() => {
+              const log = loadForecastLog();
+              return { records: log, accuracy: forecastAccuracy(log) };
+            })(),
             mastHistory: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
               .map((y) => ({ year: y, ...(bunaSummary(y) ?? {}) }))
               .filter((m) => "avgFlower" in m),
