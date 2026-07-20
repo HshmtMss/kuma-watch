@@ -45,6 +45,10 @@ function hasSaneDate(r: UnifiedSighting): boolean {
 function filterMisgeocoded(records: UnifiedSighting[]): UnifiedSighting[] {
   return records.filter(
     (r) =>
+      // 市町村名と座標が矛盾し、正誤を確定できていないものは出さない。
+      // 判定はビルド時に済ませてフラグ化してある (本番では public/ の境界
+      // データを読めない可能性があるため、読み取り段では再判定しない)。
+      !r.geoInconsistent &&
       hasSaneDate(r) &&
       typeof r.lat === "number" &&
       typeof r.lon === "number" &&

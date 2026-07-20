@@ -112,6 +112,7 @@ function main(): void {
         if (apply) {
           r.lat = rec.lat;
           r.lon = rec.lon;
+          delete r.geoInconsistent;
         }
         officialMoved++;
       } else if (rec.action === "relabel") {
@@ -120,9 +121,13 @@ function main(): void {
             `  ${r.prefectureName}${r.cityName} → ${rec.cityName} ` +
               `(観察場所="${r.sectionName ?? ""}" が座標と一致) [${r.source}] ${r.date}`,
           );
-        if (apply) r.cityName = rec.cityName;
+        if (apply) {
+          r.cityName = rec.cityName;
+          delete r.geoInconsistent;
+        }
         officialRelabeled++;
       } else {
+        if (apply) r.geoInconsistent = true;
         officialMismatch++;
         if (labels.length < 20)
           labels.push(
@@ -151,7 +156,7 @@ function main(): void {
   if (officialRelabeled > officialRelabels.length)
     console.log(`  … 他 ${officialRelabeled - officialRelabels.length} 件`);
   console.log(
-    `\n■ 公式ソース: 根拠不足で据え置き: ${officialMismatch} 件`,
+    `\n■ 公式ソース: 正誤を確定できず非表示にした: ${officialMismatch} 件`,
   );
   for (const l of labels) console.log(l);
   if (officialMismatch > labels.length)

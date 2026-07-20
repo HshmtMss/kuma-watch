@@ -27,6 +27,11 @@ export type UnifiedSighting = {
   isOfficial?: boolean;
   // 元記事 / 元情報のリンク (news 等で記事 URL を保持)
   sourceUrl?: string;
+  // 公式ソース内で「市町村名」と「緯度経度」が矛盾しており、どちらが正しいか
+  // 確定できないレコード。座標を動かすと実在の出没を誤った場所へ動かしかねず、
+  // 名前を直すと公式記録の書き換えになるため、原本を確認できるまで表示しない。
+  // データ自体は保持する (調査・自治体への照会に使うため)。
+  geoInconsistent?: boolean;
   // 投稿写真などの画像 URL (citizen 投稿で地図ポップアップに表示)
   photoUrl?: string;
   // 当社が初めて取り込んだ epoch ms。news-flash の高頻度取り込みで

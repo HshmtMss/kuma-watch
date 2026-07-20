@@ -138,6 +138,7 @@ async function main(): Promise<void> {
   // 行ごとに判定する。根拠不足なら触らない。詳細は muni-reconcile 参照。
   let officialMoved = 0;
   let officialRelabeled = 0;
+  let officialUnresolved = 0;
   const gaz = buildGazetteer(
     records,
     (r) => {
@@ -153,9 +154,15 @@ async function main(): Promise<void> {
       r.lat = rec.lat;
       r.lon = rec.lon;
       officialMoved++;
+      delete r.geoInconsistent;
     } else if (rec.action === "relabel") {
       r.cityName = rec.cityName;
       officialRelabeled++;
+      delete r.geoInconsistent;
+    } else if (rec.action === "unknown") {
+      // 正誤を確定できない矛盾レコード。原本を確認するまで表示しない。
+      r.geoInconsistent = true;
+      officialUnresolved++;
     }
   }
 
@@ -179,7 +186,8 @@ async function main(): Promise<void> {
     `[build-sightings] wrote ${records.length} records ` +
       `(fresh ${fresh.length} + carried ${carried.length}, news ${carriedNews}) ` +
       `newly stamped ${stamped}, snapped ${snapped}, badDate ${droppedBadDate}, ` +
-      `officialMoved ${officialMoved}, officialRelabeled ${officialRelabeled} in ${elapsedSec}s`,
+      `officialMoved ${officialMoved}, officialRelabeled ${officialRelabeled}, ` +
+      `officialHidden ${officialUnresolved} in ${elapsedSec}s`,
   );
 }
 
