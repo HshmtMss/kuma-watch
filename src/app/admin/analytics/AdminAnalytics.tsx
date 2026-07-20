@@ -79,6 +79,21 @@ type Contact = {
   attractants: Attractant[];
   activity: ActivityRisk[];
   severity: { death: number; severe: number; light: number; unspecified: number };
+  /** 時間帯 × 被害の偏り（4時間ずつの帯） */
+  hourInjury: {
+    allSample: number;
+    injurySample: number;
+    bands: {
+      label: string;
+      /** 被害の占める割合 ÷ 全通報の占める割合。1.0=偏りなし */
+      lift: number;
+      /** 全通報に占めるこの帯の割合(%) */
+      allShare: number;
+      injuries: number;
+    }[];
+  };
+  /** 暦月で集約した複数頭(親子連れ)の割合(%) */
+  cubMonthly: { month: number; total: number; multi: number; share: number }[];
 };
 type ForestBand = {
   label: string;
@@ -1056,6 +1071,22 @@ function Content({
         />
       </Section>
 
+      {/* G-2: 暦月で集約した複数頭の割合。G は直近24か月の時系列なので、
+          「毎年10月に上がる」という季節性が読み取りにくい。 */}
+      <Section
+        title="G-2. 複数頭（親子連れ）の季節性"
+        note={`${scope}・暦月で集約した複数頭(2頭以上)の割合。母数500件未満の月は割合が跳ねるため伏せている。母グマは子を守るため攻撃的になりやすく、時期が偏るなら注意喚起に使える。`}
+      >
+        <RatioBars
+          rows={data.contact.cubMonthly.map((c) => ({
+            label: `${c.month}月`,
+            value: c.total >= 500 ? c.share : 0,
+            display: c.total >= 500 ? `${c.share.toFixed(1)}%` : "—",
+            note: c.total >= 500 ? `${c.multi}/${c.total}件` : "母数不足",
+          }))}
+        />
+      </Section>
+
       {/* F: 重心移動 */}
       <Section
         title="F. 分布の重心移動（年別）"
@@ -1135,6 +1166,25 @@ function Content({
       >
         <Bars data={data.hours.buckets} color="#0369a1" />
       </Section>
+
+      {/* B-2: 時間帯 × 被害。B は「いつ通報が多いか」、こちらは「いつ危ないか」。
+          両者は一致しない（日中は通報が多いが被害の割合はむしろ下がる）。 */}
+      {data.contact.hourInjury.injurySample >= 50 && (
+        <Section
+          title="B-2. 時間帯別の被害の偏り"
+          note={`${scope}・時刻が判明した ${data.contact.hourInjury.allSample.toLocaleString("ja-JP")} 件（うち人身被害 ${data.contact.hourInjury.injurySample} 件）。1.0倍=偏りなし。時刻ありの記録は警察#9110由来が大半で秋田県に偏るため、全国の傾向とは断定できないが、同じ母集団の中での偏りは読める。`}
+        >
+          <RatioBars
+            rows={data.contact.hourInjury.bands.map((b) => ({
+              label: b.label,
+              value: b.lift,
+              display: `${b.lift.toFixed(1)}倍`,
+              note: `被害${b.injuries}件 / 通報の${b.allShare}%`,
+            }))}
+            baseline={1}
+          />
+        </Section>
+      )}
 
       <Section title="曜日別" note={`${scope}・全記録の曜日分布。`}>
         <Bars data={data.dow} color="#0369a1" />
@@ -1423,6 +1473,56 @@ function Bars({ data, color }: { data: Bucket[]; color: string }) {
 }
 
 // ---- 表 ----
+/**
+ * 比率の横棒。件数(Bars)と違い、小数や「倍」「%」をそのまま出せる。
+ * baseline を渡すとその位置に破線を引く（1.0倍=偏りなし、など）。
+ */
+function RatioBars({
+  rows,
+  baseline,
+}: {
+  rows: { label: string; value: number; display: string; note?: string }[];
+  baseline?: number;
+}) {
+  const max = Math.max(...rows.map((r) => r.value), baseline ?? 0, 0.01);
+  return (
+    <div>
+      {rows.map((r) => {
+        const hot = baseline !== undefined && r.value >= baseline * 1.3;
+        return (
+          <div key={r.label} className="flex items-center gap-2 py-1">
+            <div className="w-16 shrink-0 text-xs font-semibold text-stone-700">
+              {r.label}
+            </div>
+            <div className="relative h-4 flex-1 rounded-sm bg-stone-100">
+              {baseline !== undefined && (
+                <div
+                  className="absolute inset-y-0 border-l border-dashed border-stone-400"
+                  style={{ left: `${(baseline / max) * 100}%` }}
+                />
+              )}
+              <div
+                className={`h-4 rounded-sm ${hot ? "bg-amber-500" : "bg-sky-700"}`}
+                style={{ width: `${Math.max(1, (r.value / max) * 100)}%` }}
+              />
+            </div>
+            <div
+              className={`w-14 shrink-0 text-right text-xs font-bold tabular-nums ${
+                hot ? "text-amber-700" : "text-stone-700"
+              }`}
+            >
+              {r.display}
+            </div>
+            <div className="w-28 shrink-0 text-[10px] text-stone-400">
+              {r.note}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Table({
   head,
   rows,

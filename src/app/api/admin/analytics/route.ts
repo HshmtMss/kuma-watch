@@ -13,6 +13,8 @@ import {
   attractantSeason,
   placeRisk,
   severityBreakdown,
+  injuryByHour,
+  cubShareByMonth,
 } from "@/lib/contact-risk";
 import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
 import { forecastAccuracy, loadForecastLog } from "@/lib/forecast-log";
@@ -122,6 +124,43 @@ export async function GET(req: Request) {
           attractants: attractantSeason(scoped),
           activity: activityRisk(scoped),
           severity: severityBreakdown(scoped),
+          // 時間帯 × 被害。B(出没の時間帯)は全通報の分布だが、こちらは
+          // 「その時間の通報のうち人身被害がどれだけ多いか」を見る。
+          // 4時間ずつの帯に束ねる(時刻ごとだと被害の母数が足りない)。
+          hourInjury: (() => {
+            const h = injuryByHour(scoped);
+            const BANDS: [number, number, string][] = [
+              [0, 3, "0-3時"],
+              [4, 7, "4-7時"],
+              [8, 11, "8-11時"],
+              [12, 15, "12-15時"],
+              [16, 19, "16-19時"],
+              [20, 23, "20-23時"],
+            ];
+            return {
+              allSample: h.allSample,
+              injurySample: h.injurySample,
+              bands: BANDS.map(([s2, e2, label]) => {
+                const sl = h.hours.slice(s2, e2 + 1);
+                const a = sl.reduce((x, y) => x + y.allShare, 0);
+                const i = sl.reduce((x, y) => x + y.injuryShare, 0);
+                return {
+                  label,
+                  lift: a > 0 ? Number((i / a).toFixed(2)) : 0,
+                  allShare: Number((a * 100).toFixed(1)),
+                  injuries: Math.round(i * h.injurySample),
+                };
+              }),
+            };
+          })(),
+          // 暦月で集約した複数頭(親子連れ)の割合。G は直近24か月の時系列で、
+          // 「毎年10月に上がる」という季節性はそちらでは読み取りにくい。
+          cubMonthly: cubShareByMonth(scoped).map((c) => ({
+            month: c.month,
+            total: c.total,
+            multi: c.multi,
+            share: Number((c.share * 100).toFixed(1)),
+          })),
         },
         // I: 年の型と予測（出没予測の中核）
         regime: (() => {

@@ -8,21 +8,27 @@ const images = existsSync(".cache/spot-images.json") ? JSON.parse(readFileSync("
 const fame = existsSync(".cache/spot-fame.json") ? JSON.parse(readFileSync(".cache/spot-fame.json", "utf8")) : {};
 const enwiki = existsSync(".cache/spot-enwiki.json") ? JSON.parse(readFileSync(".cache/spot-enwiki.json", "utf8")) : {};
 const readings = existsSync("src/data/name-readings.json") ? JSON.parse(readFileSync("src/data/name-readings.json", "utf8")) : {};
-// 旧(現行)生成 JSON: 日本語 slug → ローマ字 slug のリダイレクト対応表を作るため、
-// 座標一致で旧 slug を引く。
-const oldGen = existsSync("src/data/japan-landmarks-generated.json")
-  ? JSON.parse(readFileSync("src/data/japan-landmarks-generated.json", "utf8"))
-  : [];
+// 旧(デプロイ済み)日本語 slug の生成 JSON: 日本語 slug → ローマ字 slug のリダイレクト
+// 対応表を作るため座標一致で旧 slug を引く。※assemble を複数回回すと出力(ローマ字版)を
+// 誤って「旧」に読んでしまうので、移行前の日本語版スナップショット(.cache/old-japanese-gen.json
+// = git HEAD の生成JSON)を使う。無ければ現行ファイルにフォールバック。
+const oldGen = existsSync(".cache/old-japanese-gen.json")
+  ? JSON.parse(readFileSync(".cache/old-japanese-gen.json", "utf8"))
+  : existsSync("src/data/japan-landmarks-generated.json")
+    ? JSON.parse(readFileSync("src/data/japan-landmarks-generated.json", "utf8"))
+    : [];
 const oldSlugByCoord = new Map(oldGen.map((r) => [`${r.lat},${r.lon}`, r.slug]));
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
 const fameOf = (r) => (r.wd && fame[r.wd] != null ? fame[r.wd] : 0);
 
 // ローマ字 slug の元文字列を決める: 英語Wikipedia名(最良) → かな読みのヘボン式 →
 // フォールバック(Q-id)。返り値は toAsciiSlug 前の素の文字列。
-function romajiBase(r, baseName) {
+function romajiBase(r, baseName, display) {
   const en = r.wd && enwiki[r.wd];
   if (en) { const s = toAsciiSlug(en); if (s.length >= 2) return s; }
-  const yomi = readings[baseName];
+  // 読みは表示名(例「惣岳山（青梅市）」)キーで保存され、値は基本名の読み(「そうがくさん」)。
+  // 表示名→基本名の順で引く。
+  const yomi = readings[display] || readings[baseName];
   if (yomi) { const s = toAsciiSlug(kanaToRomaji(yomi)); if (s.length >= 2) return s; }
   // 読みが無い場合でも名前がローマ字を含むことがある(例: 英語混じり)
   const direct = toAsciiSlug(kanaToRomaji(baseName));
@@ -84,6 +90,9 @@ for (const [name, arr] of groups) {
 // オンデマンド ISR にでき(日本語 slug の x-next-cache-tags 500 バグを回避)、事前生成は
 // 手キュレーション分のみ→ビルドが件数非依存に。これで件数上限が消えるため、以前の
 // 「事前生成件数を抑える刈り込み」は撤廃し全スポットを収録する。
+// slug は fame 降順で割り当てる。同じローマ字に落ちる同名スポットが複数あるとき、
+// 著名な方に素の slug を、無名な方に -2/-3 を付けるため(例: daigo-ji を著名寺に)。
+cands.sort((a, b) => b.fame - a.fame || (b.r.total || 0) - (a.r.total || 0));
 const out = [];
 const redirects = {}; // 旧日本語 slug → 新ローマ字 slug (proxy が 308 で転送)
 let qidFallback = 0;
@@ -91,7 +100,7 @@ for (const c of cands) {
   const { r, b, display } = c;
   const img = images[keyOf(r)];
 
-  let base = romajiBase(r, c.baseName);
+  let base = romajiBase(r, c.baseName, display);
   if (!base) { dropped++; continue; }
   if (/^q\d+$/.test(base)) qidFallback++;
   let slug = base, i = 2;
