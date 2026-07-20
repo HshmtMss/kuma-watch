@@ -83,7 +83,7 @@ function cutoffDate(days: number | null): string | null {
 
 type State =
   | { kind: "idle" }
-  | { kind: "loading"; stage: string }
+  | { kind: "loading"; stage: string; source?: LocationSource }
   | { kind: "error"; message: string }
   | {
       kind: "ready";
@@ -460,7 +460,7 @@ export default function RiskPanel({
   const evaluate = useCallback(
     async (loc: SelectedLocation) => {
       try {
-        setState({ kind: "loading", stage: "メッシュを特定中" });
+        setState({ kind: "loading", stage: "メッシュを特定中", source: loc.source });
         const meshCode = latLonToMeshCode(loc.lat, loc.lon);
         if (!meshCode) {
           setOpen(true);
@@ -471,7 +471,7 @@ export default function RiskPanel({
           return;
         }
 
-        setState({ kind: "loading", stage: "データを取得中" });
+        setState({ kind: "loading", stage: "データを取得中", source: loc.source });
         const [meshes, landUse, weather, rev, elevation, forest, history] =
           await Promise.all([
             loadMeshes(),
@@ -667,7 +667,7 @@ export default function RiskPanel({
   }, [state.kind === "ready" ? state.lat : null, state.kind === "ready" ? state.lon : null, state.kind === "ready" ? state.breakdown.level : null]);
 
   const onUseGps = useCallback(async () => {
-    setState({ kind: "loading", stage: "位置情報を取得中" });
+    setState({ kind: "loading", stage: "位置情報を取得中", source: "gps" });
     try {
       const pos = await getPosition();
       onPickGps({
@@ -859,7 +859,12 @@ export default function RiskPanel({
                   ? "地図をタップして警戒レベルを見る"
                   : state.kind === "ready" && state.placeName
                     ? state.placeName
-                    : state.kind === "ready" && state.source === "tap"
+                    : // 取得中(loading)・完了(ready)とも source で出し分ける。
+                      // GPS 以外(タップ/検索/URL指定)は「選択地点」。取得中に
+                      // 「現在地」と誤表示されるのを防ぐ。
+                      (state.kind === "loading" || state.kind === "ready") &&
+                        state.source &&
+                        state.source !== "gps"
                       ? "選択地点の警戒レベル"
                       : "現在地の警戒レベル"}
               </div>

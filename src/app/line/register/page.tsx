@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isLineReleased } from "@/lib/line-flag";
 import LineRegisterClient from "@/components/LineRegisterClient";
+import HeaderNav from "@/components/HeaderNav";
 
 export const dynamic = "force-dynamic";
 
@@ -52,5 +54,33 @@ export default async function LineRegisterPage({
     }
   }
 
-  return <LineRegisterClient target={target} />;
+  // 登録後に「地図や他の画面へどう戻るか分からない」を解消するため、サイト共通の
+  // ヘッダー(ロゴ=地図へ + メニュー)を常設する。LIFF/Web どちらで開いても、上部の
+  // ロゴやメニューから地図・探す・対策などへ移動できる。
+  return (
+    <div className="flex min-h-screen flex-col bg-stone-50">
+      <header className="flex items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 py-2.5 shadow-sm sm:px-5 sm:py-3">
+        <Link
+          href="/"
+          className="flex min-w-0 shrink items-center gap-2"
+          aria-label="くまウォッチ ホーム（地図）"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="KumaWatch"
+            className="block h-8 w-auto sm:h-9"
+          />
+          <span className="relative top-[2px] truncate text-base font-bold tracking-tight text-stone-900 sm:text-lg">
+            くまウォッチ
+          </span>
+          <span className="relative top-[2px] shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-900">
+            BETA
+          </span>
+        </Link>
+        <HeaderNav />
+      </header>
+      <LineRegisterClient target={target} />
+    </div>
+  );
 }
