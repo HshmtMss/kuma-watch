@@ -449,7 +449,10 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         "https://services7.arcgis.com/DkC6f6v0YUQX0rke/arcgis/rest/services/survey123_a77f33a9b9f649cfada5c7983c67874b_results/FeatureServer/0",
       mappings: {
         date: "field_18",
-        city: "field_11",
+        // field_11 は「場所」の自由記述 (例 "渋川市渋川　明保野交差点西側700m付近")。
+        // 市町村の列ではないので city には割り当てない。住所列 field_14 は
+        // 全1,575件が null で使えない。city 無しなら place-index が座標から
+        // 市町村を解決する (resolveCanonicalForIndex のフォールバック)。
         section: "field_11",
         situation: "field10",
         headCount: "field_8",

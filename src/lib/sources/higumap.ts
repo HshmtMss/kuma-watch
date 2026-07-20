@@ -57,9 +57,17 @@ async function runBatched<T, U>(items: T[], limit: number, fn: (t: T) => Promise
   return results;
 }
 
+/**
+ * ひぐまっぷの foundDt は「JST 深夜0時」のエポック ms。
+ * 例: 1727794800000 = UTC 2024-10-01 15:00 = JST 2024-10-02 00:00
+ * これを toISOString() (UTC基準) で切ると **常に1日前** になる。
+ * 北海道ソース 4,842 件すべてに効いていた系統的な off-by-one。
+ * JST に直してから日付を取る。
+ */
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 function epochToIsoDate(ms: number): string | null {
   if (!Number.isFinite(ms)) return null;
-  const d = new Date(ms);
+  const d = new Date(ms + JST_OFFSET_MS);
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString().split("T")[0];
 }

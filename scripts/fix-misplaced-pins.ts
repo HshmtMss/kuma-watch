@@ -31,6 +31,7 @@ import {
   reconcileOfficialRecord,
 } from "../src/lib/muni-reconcile";
 import { buildGazetteer } from "../src/lib/place-gazetteer";
+import { gsiMuniCode } from "../src/lib/gsi-verify";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 const GEOCODED_KINDS = new Set(["news", "llm-html"]);
@@ -49,7 +50,7 @@ function makeGazetteer(records: UnifiedSighting[]) {
   );
 }
 
-function main(): void {
+async function main(): Promise<void> {
   if (!hasBoundaryData()) {
     console.error("[fix-pins] public/data/boundaries が読めない — 中止");
     process.exit(1);
@@ -149,7 +150,31 @@ function main(): void {
     }
   }
 
+  // 「矛盾あり」と判定した候補を、権威ある GSI で最終確認する。
+  // 簡略化ポリゴンは境界付近で外すため、これをやらないと正しいデータを隠す。
+  let cleared = 0;
+  const clearedEx: string[] = [];
+  for (const r of records) {
+    if (!r.geoInconsistent) continue;
+    const claimed = resolveMuni(r.prefectureName, r.cityName);
+    if (!claimed) continue;
+    const code = await gsiMuniCode(r.lat, r.lon);
+    if (!code) continue; // 取得失敗時はポリゴンの判定を維持
+    if (claimed.cityCodes.includes(code)) {
+      if (apply) delete r.geoInconsistent;
+      cleared++;
+      if (clearedEx.length < 10)
+        clearedEx.push(
+          `  ${r.prefectureName}${r.cityName} ${r.date} [${r.source}] — GSI では記載どおりの市町村内`,
+        );
+    }
+  }
+
   console.log(`総レコード: ${records.length}`);
+  console.log(
+    `\n■ 国土地理院で確認し、矛盾なしと判明したため表示に戻した: ${cleared} 件`,
+  );
+  for (const c of clearedEx) console.log(c);
   console.log(`市町村を照合できず判定スキップ: ${unresolved}`);
   console.log(`\n■ 座標を補正 (news / llm-html): ${snapped} 件`);
   for (const m of moves) console.log(m);
@@ -187,4 +212,7 @@ function main(): void {
   }
 }
 
-main();
+main().catch((e) => {
+  console.error("[fix-pins] failed:", e);
+  process.exit(1);
+});
