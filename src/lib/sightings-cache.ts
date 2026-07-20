@@ -225,8 +225,112 @@ function dedupeNearbySightings(records: UnifiedSighting[]): UnifiedSighting[] {
   return passthrough.concat([...groups.values()]);
 }
 
+// 報道(news)↔一次側(公式/Sharp9110/市民) のソース横断 dedup (dedup B)。
+//
+// 報道は座標がジオコーディング由来で粗く(地名重心 + ジッター)、公式の精密 GPS と
+// 同一事案でも上の 220m グリッド dedup(dedup A)をすり抜けて二重計上されやすい。
+// 実データ検証では現行 dedup が拾える報道重複は 1.9% のみ。そこで「日付 ±1 日 +
+// 同一市町村(接尾一致で郡付き揺れを吸収) + 5km 以内」に一次側レコードがあれば、
+// その報道を重複とみなして落とす(一次側を採用)。
+//  - 頭数は 98% が「1」で弁別力が無いため条件にしない。
+//  - 5km の距離ゲートは粗いジオコーディングを許容しつつ、大きな市の別事案どうしの
+//    誤統合を防ぐための緩めの安全弁(安全マップなので「消しすぎ < 残しすぎ」で保守的)。
+//  - 座標や市町村が欠ける報道は照合できないので落とさず残す。
+// 検証: 直近1年で約 910/7,551 件(12%)の報道重複を統合(現行 144 件から大幅増)、
+//       一次側が空白の県(兵庫・福井 等)の報道 only は残る。
+const NEWS_DUP_DAY_WINDOW = 1;
+const NEWS_DUP_KM = 5;
+
+function haversineKmLocal(
+  aLat: number,
+  aLon: number,
+  bLat: number,
+  bLon: number,
+): number {
+  const Rk = 6371;
+  const t = Math.PI / 180;
+  const dLat = (bLat - aLat) * t;
+  const dLon = (bLon - aLon) * t;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(aLat * t) * Math.cos(bLat * t) * Math.sin(dLon / 2) ** 2;
+  return 2 * Rk * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+
+function shiftDateStr(iso: string, n: number): string {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+// 市町村名のゆるい一致(郡付き揺れを吸収): 完全一致 or 片方が他方で終わる
+// (「浅川町」⊂「石川郡浅川町」)。同一県内での比較を前提。
+function cityLooseMatch(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  return a === b || a.endsWith(b) || b.endsWith(a);
+}
+
+function dedupeNewsAgainstPrimary(
+  records: UnifiedSighting[],
+): UnifiedSighting[] {
+  // 一次側(非 news) を prefectureName -> date -> records で索引。
+  const idx = new Map<string, Map<string, UnifiedSighting[]>>();
+  for (const r of records) {
+    if (r.sourceKind === "news") continue;
+    if (!r.date || !r.prefectureName) continue;
+    if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
+    let dm = idx.get(r.prefectureName);
+    if (!dm) {
+      dm = new Map();
+      idx.set(r.prefectureName, dm);
+    }
+    const list = dm.get(r.date);
+    if (list) list.push(r);
+    else dm.set(r.date, [r]);
+  }
+
+  const out: UnifiedSighting[] = [];
+  for (const r of records) {
+    if (r.sourceKind !== "news") {
+      out.push(r);
+      continue;
+    }
+    const hasGeo =
+      typeof r.lat === "number" &&
+      typeof r.lon === "number" &&
+      Boolean(r.date) &&
+      Boolean(r.prefectureName) &&
+      Boolean(r.cityName);
+    if (hasGeo) {
+      const dm = idx.get(r.prefectureName);
+      let dup = false;
+      if (dm) {
+        for (let d = -NEWS_DUP_DAY_WINDOW; d <= NEWS_DUP_DAY_WINDOW && !dup; d++) {
+          const list = dm.get(shiftDateStr(r.date, d));
+          if (!list) continue;
+          for (const p of list) {
+            if (!cityLooseMatch(r.cityName, p.cityName)) continue;
+            if (
+              haversineKmLocal(r.lat, r.lon, p.lat as number, p.lon as number) <=
+              NEWS_DUP_KM
+            ) {
+              dup = true;
+              break;
+            }
+          }
+        }
+      }
+      if (dup) continue; // 報道は落とし、一次側を採用
+    }
+    out.push(r);
+  }
+  return out;
+}
+
 function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
-  return dedupeNearbySightings(filterMisgeocoded(records));
+  return dedupeNearbySightings(
+    dedupeNewsAgainstPrimary(filterMisgeocoded(records)),
+  );
 }
 
 export async function getCachedSightings(): Promise<UnifiedSighting[]> {
