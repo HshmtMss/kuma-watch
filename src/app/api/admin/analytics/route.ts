@@ -14,8 +14,10 @@ import {
   placeRisk,
   severityBreakdown,
 } from "@/lib/contact-risk";
+import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
 import {
   backtestOctober,
+  mastOutlook,
   buildYearProfiles,
   forecastMonth,
 } from "@/lib/bear-regime";
@@ -153,6 +155,15 @@ export async function GET(req: Request) {
             })),
             backtest: backtestOctober(profiles),
             typeSources: stable,
+            // ブナの開花指数による事前予測(7月公表なので秋のピークに間に合う)
+            mast: mastOutlook(
+              Number(today.slice(0, 4)),
+              bunaSummary(Number(today.slice(0, 4))),
+              BUNA_SOURCE_URL,
+            ),
+            mastHistory: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+              .map((y) => ({ year: y, ...(bunaSummary(y) ?? {}) }))
+              .filter((m) => "avgFlower" in m),
             forecastOct: forecastMonth(profiles, curYear, 10, Math.max(1, curMonth - 1)),
           };
         })(),

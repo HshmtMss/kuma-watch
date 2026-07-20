@@ -44,6 +44,15 @@ type Regime = {
   years: RegimeYear[];
   backtest: BacktestRow[];
   typeSources?: string[];
+  mast?: {
+    year: number;
+    avgFlowerIndex: number;
+    poorPrefs: number;
+    totalPrefs: number;
+    predictsAutumn: boolean;
+    sourceUrl: string;
+  } | null;
+  mastHistory?: { year: number; avgFlower: number; poorPrefs: number; totalPrefs: number }[];
   forecastOct: {
     month: number;
     predicted: number;
@@ -685,21 +694,47 @@ function Content({
           </table>
         </div>
 
+        {data.regime.mast && (
+          <div
+            className={`mt-3 rounded-lg border p-3 ${data.regime.mast.predictsAutumn ? "border-amber-300 bg-amber-50" : "border-sky-200 bg-sky-50"}`}
+          >
+            <div className="text-xs font-bold text-stone-700">
+              今年の事前予測（ブナ開花調査・7月上旬公表）
+            </div>
+            <div className="mt-1 text-lg font-bold text-stone-900">
+              {data.regime.mast.predictsAutumn
+                ? "秋型になる見込み（凶作）"
+                : "秋型にはならない見込み（豊作〜並作）"}
+            </div>
+            <p className="mt-1 text-xs tabular-nums text-stone-600">
+              5県平均の開花指数 {data.regime.mast.avgFlowerIndex.toFixed(2)} ／ 指数1.0未満の県{" "}
+              {data.regime.mast.poorPrefs}/{data.regime.mast.totalPrefs}
+            </p>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-stone-600">
+              開花指数が1.0を切った年（2019・2023・2025）はすべて秋型でした。
+              公表が7月上旬なので、秋のピークの2〜3ヶ月前に判断できます。
+              対象は東北5県のブナのみで、中部・西日本やミズナラは含みません。{" "}
+              <a
+                href={data.regime.mast.sourceUrl}
+                rel="noopener"
+                className="underline"
+              >
+                東北森林管理局
+              </a>
+            </p>
+          </div>
+        )}
+
         <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
           <div className="text-xs font-bold text-emerald-900">
-            堅果類の豊凶記録との対応（検証済み）
+            ブナ開花指数と出没の型の対応（検証済み・順位相関 −0.821）
           </div>
           <div className="mt-1.5 overflow-x-auto">
             <table className="w-full min-w-[380px] text-xs">
               <tbody>
-                {[
-                  [2020, "大凶作"],
-                  [2021, "豊作"],
-                  [2022, "並作〜やや凶作"],
-                  [2023, "記録的大凶作"],
-                  [2024, "並作"],
-                  [2025, "並凶作〜やや凶作"],
-                ].map(([y, mast]) => {
+                {(data.regime.mastHistory ?? []).map((mh) => {
+                  const y = mh.year;
+                  const mast = `開花指数 ${mh.avgFlower.toFixed(2)}（凶作 ${mh.poorPrefs}/${mh.totalPrefs}県）`;
                   const row = data.regime.years.find((r) => r.year === y);
                   return (
                     <tr key={String(y)} className="border-b border-emerald-100 last:border-0">

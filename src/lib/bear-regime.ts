@@ -37,6 +37,50 @@
 export type RegimeType = "autumn" | "summer" | "unknown";
 
 /**
+ * ブナの開花指数から、その年が秋型になるかを7月時点で予測する。
+ *
+ * 出没データからは型を事前に判別できない(初夏と秋の絶対件数の相関は +0.884)
+ * ため、外部の先行指標が要る。東北森林管理局の開花調査は**7月上旬公表**で、
+ * 秋のピークの2〜3ヶ月前に出る。
+ *
+ * 判定は「5県平均の開花指数が 1.0 未満」。実測:
+ *   2019 0.68 → 秋型(3.32)   2023 0.54 → 秋型(2.42)   2025 0.44 → 秋型(2.28)
+ *   2020 2.04 → 1.46         2021 1.98 → 0.52
+ *   2022 3.64 → 0.34         2024 3.30 → 0.39
+ * 開花指数が1.0を切った3年はすべて秋型で、外れは無い。
+ * 2020年だけは指数2.04(並作)ながら比1.46とやや秋寄りで、この規則では
+ * 拾えない。ただし3.32/2.42/2.28 という強い秋型とは水準が違う。
+ *
+ * 対象は東北5県のブナのみ。他地域・他樹種(ミズナラ等)は含まないので、
+ * 中部・西日本にそのまま当てはめないこと。
+ */
+export type MastOutlook = {
+  year: number;
+  avgFlowerIndex: number;
+  poorPrefs: number;
+  totalPrefs: number;
+  /** 秋型になると予測されるか */
+  predictsAutumn: boolean;
+  sourceUrl: string;
+};
+
+export function mastOutlook(
+  year: number,
+  summary: { avgFlower: number; poorPrefs: number; totalPrefs: number } | null,
+  sourceUrl: string,
+): MastOutlook | null {
+  if (!summary) return null;
+  return {
+    year,
+    avgFlowerIndex: summary.avgFlower,
+    poorPrefs: summary.poorPrefs,
+    totalPrefs: summary.totalPrefs,
+    predictsAutumn: summary.avgFlower < 1.0,
+    sourceUrl,
+  };
+}
+
+/**
  * 秋型と判定する 秋/初夏 比のしきい値。
  *
  * 観測条件を固定した(全期間に存在するソースだけの)比を、環境省統計に基づく
