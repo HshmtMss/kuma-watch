@@ -110,6 +110,8 @@ type RegionProfile = {
   attractants: { key: string; count: number; share: number }[];
   hours: { key: string; count: number; share: number }[];
   hoursSampleSize: number;
+  yearlyAutumnRatio: { year: number; ratio: number }[];
+  relative: { level: "high" | "normal" | "low" | "unknown"; vsMedian: number | null };
 };
 type RecurrenceWindow = {
   windowDays: number;
@@ -370,6 +372,51 @@ function Content({
             </p>
           )}
         </div>
+
+        {data.profile.yearlyAutumnRatio.length >= 2 && (
+          <div className="mt-4 rounded-lg border border-stone-200 p-3">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-xs font-bold text-stone-700">
+                秋への偏り（この地域自身の過去と比べる）
+              </div>
+              {data.profile.relative.level !== "unknown" && (
+                <span
+                  className={`rounded px-2 py-0.5 text-xs font-bold ${
+                    data.profile.relative.level === "high"
+                      ? "bg-amber-100 text-amber-800"
+                      : data.profile.relative.level === "low"
+                        ? "bg-sky-100 text-sky-800"
+                        : "bg-stone-100 text-stone-700"
+                  }`}
+                >
+                  {data.profile.relative.level === "high"
+                    ? "この地域としては高い"
+                    : data.profile.relative.level === "low"
+                      ? "低い"
+                      : "平年並み"}
+                  {data.profile.relative.vsMedian !== null &&
+                    `（中央値の${data.profile.relative.vsMedian.toFixed(2)}倍）`}
+                </span>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {data.profile.yearlyAutumnRatio.map((y) => (
+                <span
+                  key={y.year}
+                  className="rounded bg-stone-100 px-2 py-0.5 text-xs tabular-nums text-stone-700"
+                >
+                  {y.year} {y.ratio.toFixed(2)}
+                </span>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] leading-relaxed text-stone-600">
+              秋に偏る度合いは地域差が大きく（富山 0.59〜9.88 に対し 岐阜 0.36〜0.88）、
+              全国共通のしきい値では判定できません。岐阜のように元から秋に偏らない県は、
+              凶作年でも 1.0 を超えないためです。この地域自身の過去の中央値と比べています。
+              比は活動期(4〜11月)のデータが揃っている年だけで計算しています。
+            </p>
+          </div>
+        )}
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>

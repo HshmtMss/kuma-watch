@@ -19,6 +19,8 @@
  * 当てにならない、と読み手が分かるようにするため。
  */
 
+import { regionRelativeLevel } from "@/lib/bear-regime";
+
 export type RegionQuality = {
   /** 記録件数 */
   records: number;
@@ -52,6 +54,17 @@ export type RegionProfile = {
   hours: { key: string; count: number; share: number }[];
   /** 時間帯の母数。100未満なら内訳を出さない方がよい */
   hoursSampleSize: number;
+  /**
+   * 年ごとの 秋(9-11月)/初夏(6-7月) 比。
+   * 全12ヶ月にデータがある年だけを入れる（欠測があると比が歪むため）。
+   */
+  yearlyAutumnRatio: { year: number; ratio: number }[];
+  /**
+   * 直近年が、この地域自身の過去と比べてどの水準か。
+   * 秋に偏る度合いは地域差が大きく（富山 0.59〜9.88 / 岐阜 0.36〜0.88）、
+   * 全国共通のしきい値では判定できないので自地域比で見る。
+   */
+  relative: { level: "high" | "normal" | "low" | "unknown"; vsMedian: number | null };
 };
 
 type Rec = {
@@ -122,6 +135,38 @@ export function regionProfile(records: Rec[], region: string): RegionProfile {
   const autumn = monthly[8] + monthly[9] + monthly[10];
   const early = monthly[5] + monthly[6];
 
+  // 年ごとの 秋/初夏 比。
+  // 完全性は「活動期(4〜11月)にデータがあるか」で見る。12ヶ月そろうことを
+  // 求めると、冬季は本当に出没が0件なので大半の年が落ちてしまう。
+  const perYear = new Map<number, { m: number[]; months: Set<string> }>();
+  for (const r of records) {
+    const d = (r.date ?? "").trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) continue;
+    const y = Number(d.slice(0, 4));
+    const cur = perYear.get(y) ?? { m: new Array(12).fill(0), months: new Set<string>() };
+    cur.m[Number(d.slice(5, 7)) - 1]++;
+    const mm = Number(d.slice(5, 7));
+    if (mm >= 4 && mm <= 11) cur.months.add(d.slice(5, 7));
+    perYear.set(y, cur);
+  }
+  const yearlyAutumnRatio = [...perYear.entries()]
+    .filter(
+      ([, v]) =>
+        v.months.size >= 8 && // 活動期の8ヶ月すべてにデータがある
+        v.m[5] + v.m[6] > 0 &&
+        v.m.reduce((a, b) => a + b, 0) >= 50,
+    )
+    .map(([year, v]) => ({
+      year,
+      ratio: (v.m[8] + v.m[9] + v.m[10]) / (v.m[5] + v.m[6]),
+    }))
+    .sort((a, b) => a.year - b.year);
+  const latest = yearlyAutumnRatio[yearlyAutumnRatio.length - 1];
+  const relative = regionRelativeLevel(
+    latest?.ratio ?? null,
+    yearlyAutumnRatio.slice(0, -1).map((y) => y.ratio),
+  );
+
   const withTime = records.filter((r) => /^\d{2}:\d{2}$/.test(r.time ?? ""));
   const hours = HOUR_BANDS.map(([key, test]) => {
     const c = withTime.filter((r) => test(Number((r.time ?? "").slice(0, 2)))).length;
@@ -158,5 +203,7 @@ export function regionProfile(records: Rec[], region: string): RegionProfile {
       .sort((a, b) => b.count - a.count),
     hours,
     hoursSampleSize: withTime.length,
+    yearlyAutumnRatio,
+    relative,
   };
 }
