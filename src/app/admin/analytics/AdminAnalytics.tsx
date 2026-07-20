@@ -58,6 +58,21 @@ type Contact = {
   attractants: Attractant[];
   activity: ActivityRisk[];
 };
+type RecurrenceWindow = {
+  windowDays: number;
+  afterSighting: number;
+  baseline: number;
+  lift: number;
+  sampleSize: number;
+};
+type Recurrence = {
+  windows: RecurrenceWindow[];
+  concentration: {
+    rows: { topPercent: number; shareOfSightings: number; cells: number }[];
+    totalCells: number;
+    singleCells: number;
+  };
+};
 type CentroidPoint = { year: number; lat: number; lon: number; count: number };
 type MultiBearPoint = {
   month: string;
@@ -90,6 +105,7 @@ type Data = {
   severity: { series: SeverityPoint[]; recentInjuries: IncidentRow[] };
   regime: Regime;
   contact: Contact;
+  recurrence: Recurrence;
   prefOptions: string[];
 };
 
@@ -170,6 +186,79 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* K: 再発性 — 予測モデル無しで明日から使える対策の根拠 */}
+      <Section
+        title="K. 一度出た場所は、その後どれだけ危ないか"
+        note={`${scope}・2023年以降。同じ約1kmメッシュの「活動期(4〜11月)の任意の日」を対照にした倍率。場所そのものの危険度とは別に、直近の出没が短期リスクをどれだけ押し上げるかを見る。`}
+      >
+        <div className="flex flex-col gap-2">
+          {data.recurrence.windows.map((w) => (
+            <div
+              key={w.windowDays}
+              className="flex items-center justify-between rounded-lg border border-stone-200 px-3 py-2"
+            >
+              <div className="text-sm font-semibold text-stone-900">
+                出没から {w.windowDays} 日以内
+              </div>
+              <div className="flex items-center gap-4 text-sm tabular-nums">
+                <span className="text-stone-600">
+                  直後 {(w.afterSighting * 100).toFixed(1)}%
+                </span>
+                <span className="text-stone-400">
+                  平常 {(w.baseline * 100).toFixed(1)}%
+                </span>
+                <span
+                  className={`rounded px-2 py-0.5 font-bold ${w.lift >= 2 ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-800"}`}
+                >
+                  {w.lift.toFixed(2)}倍
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-stone-600">
+          窓が短いほど倍率が高く、時間とともに減衰します。予測モデルが無くても
+          「出没があった場所には、少なくとも1週間は近づかない」と言える根拠になります。
+          対照の取り方で数字は変わります（観測期間だけを枠にすると平常時を過大評価して
+          1倍を割り、暦年全体だと冬眠期を含んで過大に出ます。ここでは活動期を枠にしています）。
+        </p>
+      </Section>
+
+      <Section
+        title="K-2. 出没はどれだけ特定の場所に集中しているか"
+        note={`${scope}・2023年以降・約1kmメッシュ。「危険な場所を覚えて避ける」がどこまで有効かの目安。`}
+      >
+        <div className="flex flex-col gap-1.5">
+          {data.recurrence.concentration.rows.map((r) => (
+            <div key={r.topPercent} className="flex items-center gap-3">
+              <div className="w-28 shrink-0 text-sm tabular-nums">
+                上位 {r.topPercent}%
+              </div>
+              <div className="h-4 flex-1 rounded bg-stone-100">
+                <div
+                  className="h-4 rounded bg-stone-400"
+                  style={{ width: `${r.shareOfSightings * 100}%` }}
+                />
+              </div>
+              <div className="w-16 shrink-0 text-right text-sm tabular-nums">
+                {(r.shareOfSightings * 100).toFixed(1)}%
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-stone-600">
+          メッシュ {data.recurrence.concentration.totalCells.toLocaleString()} 地点のうち{" "}
+          {data.recurrence.concentration.singleCells.toLocaleString()} 地点（
+          {(
+            (data.recurrence.concentration.singleCells /
+              Math.max(1, data.recurrence.concentration.totalCells)) *
+            100
+          ).toFixed(0)}
+          %）は1件のみです。集中は中程度で、「よく出る場所を避ける」だけでは
+          半分近くの遭遇を防げません。初めての場所での遭遇も想定した対策が要ります。
+        </p>
+      </Section>
 
       {/* J: 接触回避 — 「会わない」ための指標。件数の多さと危険度は一致しない */}
       <Section

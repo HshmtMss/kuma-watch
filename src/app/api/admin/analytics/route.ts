@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
+import { concentration, recurrence } from "@/lib/recurrence";
 import {
   activityRisk,
   attractantSeason,
@@ -79,6 +80,13 @@ export async function GET(req: Request) {
         dow: dowHistogram(scoped, today),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
+        // K: 再発性（一度出た場所にどれだけ近づかないべきか）
+        recurrence: {
+          windows: [7, 14, 30].map((w) =>
+            recurrence(scoped, w, { since: "2023-01-01" }),
+          ),
+          concentration: concentration(scoped, { since: "2023-01-01" }),
+        },
         // J: 接触回避（どこで・何をしているときに危ないか）
         contact: {
           place: placeRisk(scoped),
