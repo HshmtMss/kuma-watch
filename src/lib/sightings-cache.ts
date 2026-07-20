@@ -86,6 +86,21 @@ const REVALIDATE_SECONDS = 5 * 60;
 
 type CacheBlob = { generatedAt: number; records: UnifiedSighting[] };
 
+/**
+ * ローカル永続キャッシュを無効とみなす古さ。
+ *
+ * このキャッシュは dev で毎回 67 ソースを再集約しないためのもので、有効期限が
+ * 無かった。そのため一度作られると何ヶ月でも使われ続け、開発中ずっと古い
+ * データを見ることになる。実際 3ヶ月前(4月30日)のキャッシュが残っていて、
+ * 管理画面の予測値が 6,380件 のはずが 454件 と出た。2026年のレコードが
+ * 746件しか入っていなかったため (実際は14,203件)。
+ *
+ * 本番は .cache/ を配布しない (gitignore) ので影響しないが、ローカルでの
+ * 検証結果が黙って古くなるのは危険なので期限を設ける。切れたら同梱
+ * スナップショット (public/data/sightings.json) にフォールバックする。
+ */
+const MAX_DISK_CACHE_AGE_MS = 24 * 60 * 60 * 1000;
+
 function readDiskCache(): CacheBlob | null {
   try {
     if (!existsSync(CACHE_FILE)) return null;
@@ -93,6 +108,14 @@ function readDiskCache(): CacheBlob | null {
     const blob = JSON.parse(raw) as CacheBlob;
     if (!Array.isArray(blob.records) || typeof blob.generatedAt !== "number")
       return null;
+    const age = Date.now() - blob.generatedAt;
+    if (age > MAX_DISK_CACHE_AGE_MS) {
+      console.warn(
+        `[sightings-cache] .cache/sightings-v2.json が ${Math.round(age / 86_400_000)} 日前のため使いません。` +
+          ` public/data/sightings.json を読みます (再生成: npm run build:sightings)`,
+      );
+      return null;
+    }
     return blob;
   } catch {
     return null;
