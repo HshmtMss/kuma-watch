@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import {
@@ -14,19 +13,15 @@ import { jstToday } from "@/lib/jst-date";
 import { KeyPoints, Callout, References } from "@/components/ArticleCards";
 import { BarRow, MonthlyBars } from "./BarRow";
 
-const SLUG = "avoid-encounter";
-
-export const metadata: Metadata = {
-  title: "データが示す、クマに会わないための5つのこと｜Kuma Watch",
-  description:
-    "全国の出没記録8.7万件を分析すると、出没が多い場所と危ない場所は違う、被害は特定の行動に偏る、一度出た場所は1週間危ない、といった傾向が見えます。今年の秋の見通しと、明日から取れる対策をまとめました。",
-  alternates: { canonical: `/research/${SLUG}` },
-  robots: { index: true, follow: true },
-};
-
-export const revalidate = 21600; // 6h
-
-export default async function AvoidEncounterPage() {
+/**
+ * 一般公開向け記事の下書き。まだ公開しない（内容を詰めている段階）。
+ * 公開するときは:
+ *   1. このファイルを src/app/research/avoid-encounter/page.tsx へ戻す
+ *   2. metadata と revalidate を付ける
+ *   3. src/lib/research-entries.ts にエントリを追加して一覧に載せる
+ * 数字はすべて実データから計算しているので、置き場所を変えるだけでよい。
+ */
+export default async function ArticleBody() {
   const all = await getCachedSightings();
   const today = jstToday();
   const year = Number(today.slice(0, 4));
