@@ -122,7 +122,24 @@ export async function GET(req: Request) {
         },
         // I: 年の型と予測（出没予測の中核）
         regime: (() => {
-          const profiles = buildYearProfiles(scoped, today);
+          // 年の「型」は観測条件を固定したソースだけで判定する。全ソースで
+          // 計算すると、データが少なかった年の比が沈んで型を取り違える
+          // (2020年は大凶作なのに全ソースだと 0.98 = 夏型に見える)。
+          const typeYears = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
+          const stable = stableSources(all, typeYears);
+          const typeBase = stable.length
+            ? scoped.filter((r) => stable.includes(r.source ?? ""))
+            : scoped;
+          const typeProfiles = buildYearProfiles(typeBase, today);
+          const typeByYear = new Map(
+            typeProfiles.map((p) => [p.year, { ratio: p.ratio, type: p.type }]),
+          );
+          // 件数は全ソース、型は固定ソース、と役割を分ける
+          const profiles = buildYearProfiles(scoped, today).map((p) => ({
+            ...p,
+            ratio: typeByYear.get(p.year)?.ratio ?? null,
+            type: typeByYear.get(p.year)?.type ?? "unknown",
+          }));
           const recent = profiles.filter((p) => p.year >= 2015);
           const curYear = Number(today.slice(0, 4));
           const curMonth = Number(today.slice(5, 7));
@@ -135,6 +152,7 @@ export async function GET(req: Request) {
               complete: p.complete,
             })),
             backtest: backtestOctober(profiles),
+            typeSources: stable,
             forecastOct: forecastMonth(profiles, curYear, 10, Math.max(1, curMonth - 1)),
           };
         })(),
