@@ -51,8 +51,17 @@ export type RegimeType = "autumn" | "summer" | "unknown";
  * 2020年だけは指数2.04(並作)ながら比1.46とやや秋寄りで、この規則では
  * 拾えない。ただし3.32/2.42/2.28 という強い秋型とは水準が違う。
  *
- * 対象は東北5県のブナのみ。他地域・他樹種(ミズナラ等)は含まないので、
- * 中部・西日本にそのまま当てはめないこと。
+ * 対象は東北5県のブナのみ。他地域・他樹種(ミズナラ等)は含まない。
+ *
+ * === 他地域への当てはめ ===
+ * 東北の指数は他地域の「方向」は当てるが、**しきい値はそのまま使えない**。
+ *   富山県: 秋/初夏比の範囲 0.59〜9.88、東北指数との順位相関 -0.857 (n=7)
+ *           → しきい値1.0でうまく分かれる
+ *   岐阜県: 範囲 0.36〜0.88、相関 -0.900 (n=5)
+ *           → 凶作年(2023)でも0.88で、1.0を一度も超えない
+ * 岐阜のように元から秋に偏らない県では、絶対値のしきい値は意味を持たない。
+ * 地域ごとの判定は、その地域自身の過去の範囲と比べること
+ * (regionRelativeLevel を使う)。
  */
 export type MastOutlook = {
   year: number;
@@ -63,6 +72,29 @@ export type MastOutlook = {
   predictsAutumn: boolean;
   sourceUrl: string;
 };
+
+/**
+ * その年の比を、その地域自身の過去と比べて水準を出す。
+ *
+ * 秋に偏る度合いは地域差が大きい(富山 0.59〜9.88 / 岐阜 0.36〜0.88)ため、
+ * 全国共通のしきい値では判定できない。自地域の過去の中央値に対する倍率で
+ * 「その地域としては高いか」を見る。
+ */
+export function regionRelativeLevel(
+  currentRatio: number | null,
+  pastRatios: number[],
+): { level: "high" | "normal" | "low" | "unknown"; vsMedian: number | null } {
+  const past = pastRatios.filter((r) => Number.isFinite(r)).sort((a, b) => a - b);
+  if (currentRatio === null || past.length < 3)
+    return { level: "unknown", vsMedian: null };
+  const median = past[Math.floor(past.length / 2)];
+  if (median <= 0) return { level: "unknown", vsMedian: null };
+  const vs = currentRatio / median;
+  return {
+    level: vs >= 1.8 ? "high" : vs <= 0.6 ? "low" : "normal",
+    vsMedian: vs,
+  };
+}
 
 export function mastOutlook(
   year: number,
