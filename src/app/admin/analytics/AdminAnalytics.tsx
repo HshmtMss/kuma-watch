@@ -50,6 +50,14 @@ type Regime = {
     caveat: string | null;
   } | null;
 };
+type PlaceBucket = { key: string; count: number; injuries: number; rate: number };
+type Attractant = { key: string; count: number; monthly: number[]; peakMonth: number };
+type ActivityRisk = { key: string; injuries: number; allMentions: number; lift: number };
+type Contact = {
+  place: { buckets: PlaceBucket[]; classified: number; total: number };
+  attractants: Attractant[];
+  activity: ActivityRisk[];
+};
 type CentroidPoint = { year: number; lat: number; lon: number; count: number };
 type MultiBearPoint = {
   month: string;
@@ -81,6 +89,7 @@ type Data = {
   dow: Bucket[];
   severity: { series: SeverityPoint[]; recentInjuries: IncidentRow[] };
   regime: Regime;
+  contact: Contact;
   prefOptions: string[];
 };
 
@@ -161,6 +170,102 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* J: 接触回避 — 「会わない」ための指標。件数の多さと危険度は一致しない */}
+      <Section
+        title="J. どこで危ないか（出没の多さ ≠ 危険度）"
+        note={`${scope}・コメント本文から場所を分類。分類できるのは全体の約4割で、割合は分類できた中での値。`}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs text-stone-500">
+                <th className="py-2 pr-3">場所</th>
+                <th className="py-2 pr-3 text-right">出没件数</th>
+                <th className="py-2 pr-3 text-right">人身被害</th>
+                <th className="py-2 text-right">被害率</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.contact.place.buckets.map((b) => (
+                <tr key={b.key} className="border-b border-stone-100">
+                  <td className="py-1.5 pr-3">{b.key}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-stone-600">
+                    {b.count.toLocaleString()}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-stone-600">
+                    {b.injuries}
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums font-semibold text-stone-900">
+                    {(b.rate * 100).toFixed(2)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-stone-600">
+          出没件数が最も多いのは道路ですが、被害率は最も低くなります（多くが車内からの
+          目撃のため）。件数の多い場所を避けても、危険を避けたことにはなりません。
+        </p>
+      </Section>
+
+      <Section
+        title="J-2. 何をしているときに襲われているか"
+        note="人身被害での出現率 ÷ 全記録での出現率。順位は妥当だが、倍率は報告バイアスで大きめに出る（下記注意）。"
+      >
+        <div className="flex flex-col gap-2">
+          {data.contact.activity.map((a) => (
+            <div key={a.key} className="flex items-center gap-3">
+              <div className="w-32 shrink-0 text-sm">{a.key}</div>
+              <div className="h-5 flex-1 rounded bg-stone-100">
+                <div
+                  className={`h-5 rounded ${a.lift >= 5 ? "bg-red-400" : a.lift >= 1.5 ? "bg-amber-400" : "bg-stone-300"}`}
+                  style={{ width: `${Math.min(100, (a.lift / 90) * 100)}%` }}
+                />
+              </div>
+              <div className="w-24 shrink-0 text-right text-sm tabular-nums">
+                {a.lift.toFixed(1)}倍
+              </div>
+              <div className="w-14 shrink-0 text-right text-xs tabular-nums text-stone-500">
+                {a.injuries}件
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-stone-600">
+          人身被害の記録は「人が何をしていたか」を書きますが、通常の目撃記録はクマの
+          様子だけを書くことが多いため、分母が過小になり倍率は実際より大きく出ます。
+          倍率そのものではなく順位で読んでください。車両運転中だけは1倍を下回り、
+          車内が安全であることと整合します。
+        </p>
+      </Section>
+
+      <Section
+        title="J-3. 誘引物と時期（接触機会そのものを減らす）"
+        note="コメントに現れる誘引物の言及件数と、その月別分布。"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[420px] text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs text-stone-500">
+                <th className="py-2 pr-3">誘引物</th>
+                <th className="py-2 pr-3 text-right">言及</th>
+                <th className="py-2">ピーク</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.contact.attractants.map((a) => (
+                <tr key={a.key} className="border-b border-stone-100">
+                  <td className="py-1.5 pr-3">{a.key}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{a.count.toLocaleString()}</td>
+                  <td className="py-1.5 tabular-nums text-stone-600">{a.peakMonth}月</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
 
       {/* I: 年の型と予測 — 出没予測の中核なので最上部に置く */}
       <Section

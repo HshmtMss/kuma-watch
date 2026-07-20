@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import {
+  activityRisk,
+  attractantSeason,
+  placeRisk,
+} from "@/lib/contact-risk";
+import {
   backtestOctober,
   buildYearProfiles,
   forecastMonth,
@@ -74,6 +79,12 @@ export async function GET(req: Request) {
         dow: dowHistogram(scoped, today),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
+        // J: 接触回避（どこで・何をしているときに危ないか）
+        contact: {
+          place: placeRisk(scoped),
+          attractants: attractantSeason(scoped),
+          activity: activityRisk(scoped),
+        },
         // I: 年の型と予測（出没予測の中核）
         regime: (() => {
           const profiles = buildYearProfiles(scoped, today);

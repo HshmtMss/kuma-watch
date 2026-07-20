@@ -362,7 +362,7 @@ export function yearlySummary(
     a.byMonth[Number(d.slice(5, 7))] += 1;
     const p = (r.prefectureName ?? "").trim();
     if (p) a.byPref.set(p, (a.byPref.get(p) ?? 0) + 1);
-    if (INJURY_RE.test(r.comment ?? "")) a.injuries += 1;
+    if (isInjuryComment(r.comment ?? "")) a.injuries += 1;
   }
   return [...agg.entries()]
     .map(([year, a]) => {
@@ -431,6 +431,19 @@ export function dowHistogram(
 // ============ D: 重大事案 ============
 const INJURY_RE =
   /(襲わ|襲撃|けが|ケガ|負傷|死亡|重傷|軽傷|人身|噛ま|かま|引っか|ひっか|被害に遭)/;
+/**
+ * 「けが人はいませんでした」「人的被害はありません」のような否定文を
+ * 人身被害として数えないための除外。実測でこれが無いと11件を誤カウント
+ * していた。安全に関わる指標なので、過大に出す方向の誤りは避ける。
+ */
+const INJURY_NEGATION_RE =
+  /(被害はな|被害はあり|けが人はいな|けが人はな|けがはな|けがはあり|負傷者はいな|負傷者はな|人的被害はな|人身被害はな)/;
+
+/** 人身被害らしき記録か（否定文を除く） */
+function isInjuryComment(comment: string): boolean {
+  return INJURY_RE.test(comment) && !INJURY_NEGATION_RE.test(comment);
+}
+
 const CULL_RE = /(駆除|捕獲|射殺|わな|罠|箱わな|くくりわな)/;
 
 export type SeverityPoint = { month: string; injury: number; cull: number };
@@ -456,7 +469,7 @@ export function severity(
     if (!d || d > today) continue;
     const cm = r.comment ?? "";
     const mo = d.slice(0, 7);
-    if (INJURY_RE.test(cm)) {
+    if (isInjuryComment(cm)) {
       inj.set(mo, (inj.get(mo) ?? 0) + 1);
       injuries.push({
         date: d,

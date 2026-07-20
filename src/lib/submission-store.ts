@@ -99,16 +99,28 @@ export async function listSubmissions(opts?: {
 }): Promise<StoredSubmission[]> {
   const r = client();
   const limit = opts?.limit ?? 300;
-  const ids = await r.zrange<string[]>(ALL_KEY, 0, limit - 1, { rev: true });
+  // status で絞る場合、先に limit 件だけ取ってから絞ると「未承認だが古い」
+  // 投稿が画面から消える (実際 pending が301件目より古いと管理画面に
+  // 現れなかった)。承認待ちを取りこぼすのは運用上いちばん困るので、
+  // 絞り込みがあるときは多めに読んでから絞る。
+  const scanLimit = opts?.status ? Math.max(limit * 10, 2000) : limit;
+  const ids = await r.zrange<string[]>(ALL_KEY, 0, scanLimit - 1, { rev: true });
   if (!ids || ids.length === 0) return [];
-  const raw = await r.mget<(string | StoredSubmission)[]>(
-    ...ids.map((id) => `cs:sub:${id}`),
-  );
+  // mget は引数が多すぎると失敗しうるので分割して読む
+  const CHUNK = 500;
+  const raw: (string | StoredSubmission | null)[] = [];
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const part = ids.slice(i, i + CHUNK);
+    const got = await r.mget<(string | StoredSubmission)[]>(
+      ...part.map((id) => `cs:sub:${id}`),
+    );
+    raw.push(...(got ?? []));
+  }
   let out = raw
     .map((v) => parse(v as string | StoredSubmission | null))
     .filter((s): s is StoredSubmission => s !== null);
   if (opts?.status) out = out.filter((s) => s.status === opts.status);
-  return out;
+  return out.slice(0, limit);
 }
 
 /** 承認 / 却下。あとから何度でも切り替え可能 (status を上書き)。 */
