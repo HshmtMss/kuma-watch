@@ -24,6 +24,32 @@ type Momentum = {
   prev30: number;
   topMovers: { pref: string; recent: number; prev: number; delta: number }[];
 };
+type RegimeYear = {
+  year: number;
+  total: number;
+  ratio: number | null;
+  type: "autumn" | "summer" | "unknown";
+  complete: boolean;
+};
+type BacktestRow = {
+  year: number;
+  actual: number;
+  predictedAllYears: number;
+  predictedSameType: number;
+  errorAllYears: number;
+  errorSameType: number;
+  type: string;
+};
+type Regime = {
+  years: RegimeYear[];
+  backtest: BacktestRow[];
+  forecastOct: {
+    month: number;
+    predicted: number;
+    basisYears: number[];
+    caveat: string | null;
+  } | null;
+};
 type CentroidPoint = { year: number; lat: number; lon: number; count: number };
 type MultiBearPoint = {
   month: string;
@@ -54,6 +80,7 @@ type Data = {
   hours: { buckets: Bucket[]; withTime: number };
   dow: Bucket[];
   severity: { series: SeverityPoint[]; recentInjuries: IncidentRow[] };
+  regime: Regime;
   prefOptions: string[];
 };
 
@@ -134,6 +161,134 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* I: 年の型と予測 — 出没予測の中核なので最上部に置く */}
+      <Section
+        title="I. 年の「型」と10月の予測"
+        note="秋(9-11月)/初夏(6-7月)の比。同一年内の比なので、年ごとに変わる観測条件(ソース数)が相殺される。2.5以上と1.0以下に分かれ中間値が無く、連続的なばらつきではなく2状態の切り替わりとして扱える。堅果類の豊凶が背景にある可能性。"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs text-stone-500">
+                <th className="py-2 pr-3">年</th>
+                <th className="py-2 pr-3 text-right">総件数</th>
+                <th className="py-2 pr-3 text-right">秋/初夏</th>
+                <th className="py-2">型</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.regime.years.map((y) => (
+                <tr key={y.year} className="border-b border-stone-100">
+                  <td className="py-1.5 pr-3 tabular-nums">{y.year}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {y.total.toLocaleString()}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {y.ratio === null ? "—" : y.ratio.toFixed(2)}
+                  </td>
+                  <td className="py-1.5">
+                    {y.type === "autumn" ? (
+                      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
+                        秋型
+                      </span>
+                    ) : y.type === "summer" ? (
+                      <span className="rounded bg-sky-100 px-2 py-0.5 text-xs font-bold text-sky-800">
+                        夏型
+                      </span>
+                    ) : (
+                      <span className="text-xs text-stone-400">未確定（年途中）</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {data.regime.forecastOct && (
+          <div className="mt-4 rounded-lg border border-stone-200 bg-stone-50 p-3">
+            <div className="text-xs font-semibold text-stone-500">今年の10月の予測</div>
+            <div className="mt-1 text-2xl font-bold tabular-nums text-stone-900">
+              {data.regime.forecastOct.predicted.toLocaleString()} 件
+            </div>
+            {data.regime.forecastOct.caveat && (
+              <p className="mt-1 text-xs leading-relaxed text-amber-800">
+                ⚠ {data.regime.forecastOct.caveat}
+              </p>
+            )}
+            <p className="mt-1 text-[11px] leading-relaxed text-stone-500">
+              型は年内の出方からは判別できません（初夏と秋の絶対件数の相関は +0.884 で、
+              「初夏が少ない年は秋が荒れる」は成立しない）。事前に型を当てるには
+              堅果類の豊凶調査のような外部の先行指標が必要です。
+            </p>
+          </div>
+        )}
+      </Section>
+
+      {/* I-2: 予測の答え合わせ */}
+      <Section
+        title="I-2. 予測の答え合わせ（10月・バックテスト）"
+        note="各年の1〜8月実績から10月を予測し、実績と比べたもの。予測を出す以上、当たったかどうかも併記する。"
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs text-stone-500">
+                <th className="py-2 pr-3">年</th>
+                <th className="py-2 pr-3 text-right">実績</th>
+                <th className="py-2 pr-3 text-right">全年平均</th>
+                <th className="py-2 pr-3 text-right">同じ型のみ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.regime.backtest.slice(-8).map((b) => (
+                <tr key={b.year} className="border-b border-stone-100">
+                  <td className="py-1.5 pr-3 tabular-nums">{b.year}</td>
+                  <td className="py-1.5 pr-3 text-right font-semibold tabular-nums">
+                    {b.actual.toLocaleString()}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-stone-500">
+                    {b.predictedAllYears.toLocaleString()}
+                    <span className="ml-1 text-[11px]">
+                      ({(b.errorAllYears * 100).toFixed(0)}%)
+                    </span>
+                  </td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums text-stone-900">
+                    {b.predictedSameType.toLocaleString()}
+                    <span className="ml-1 text-[11px]">
+                      ({(b.errorSameType * 100).toFixed(0)}%)
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {data.regime.backtest.length > 0 && (
+          <p className="mt-2 text-xs text-stone-600">
+            平均誤差 — 全年平均{" "}
+            <strong>
+              {(
+                (data.regime.backtest.reduce((a, b) => a + b.errorAllYears, 0) /
+                  data.regime.backtest.length) *
+                100
+              ).toFixed(0)}
+              %
+            </strong>{" "}
+            / 同じ型のみ{" "}
+            <strong className="text-stone-900">
+              {(
+                (data.regime.backtest.reduce((a, b) => a + b.errorSameType, 0) /
+                  data.regime.backtest.length) *
+                100
+              ).toFixed(0)}
+              %
+            </strong>
+            。過去数年を平均する方式は性質の違う2つの型を混ぜるため原理的に外します。
+          </p>
+        )}
+      </Section>
 
       {/* E: 直近の勢い */}
       <Section

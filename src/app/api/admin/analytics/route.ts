@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import {
+  backtestOctober,
+  buildYearProfiles,
+  forecastMonth,
+} from "@/lib/bear-regime";
+import {
   monthlyCounts,
   seasonality,
   prefectureCounts,
@@ -69,6 +74,24 @@ export async function GET(req: Request) {
         dow: dowHistogram(scoped, today),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
+        // I: 年の型と予測（出没予測の中核）
+        regime: (() => {
+          const profiles = buildYearProfiles(scoped, today);
+          const recent = profiles.filter((p) => p.year >= 2015);
+          const curYear = Number(today.slice(0, 4));
+          const curMonth = Number(today.slice(5, 7));
+          return {
+            years: recent.map((p) => ({
+              year: p.year,
+              total: p.total,
+              ratio: p.ratio,
+              type: p.type,
+              complete: p.complete,
+            })),
+            backtest: backtestOctober(profiles),
+            forecastOct: forecastMonth(profiles, curYear, 10, Math.max(1, curMonth - 1)),
+          };
+        })(),
         prefOptions: [...new Set(all.map((r) => r.prefectureName).filter(Boolean))].sort(),
       },
       {

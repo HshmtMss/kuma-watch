@@ -5,7 +5,19 @@ const CACHE_TTL_MS = 60 * 60 * 1000;
 const CITY_LIST_URL = "https://higumap.info/public/json/getTopPageCityList";
 const REPORTS_URL = "https://higumap.info/map/reportsJson";
 const CONCURRENCY = 6;
-const FISCAL_YEARS = [2024, 2025];
+/**
+ * 取得する年度。ハードコードすると年度が替わった瞬間に新年度のデータを
+ * 取りに行かなくなる (実際 [2024,2025] 固定のまま 2026年度に入り、
+ * 4月以降の北海道分が丸ごと欠落していた)。現在の年度から遡って算出する。
+ * 日本の年度は4月始まりなので、1〜3月は前年が当年度。
+ */
+function fiscalYears(span = 3): number[] {
+  const now = new Date(Date.now() + 9 * 60 * 60 * 1000); // JST
+  const y = now.getUTCFullYear();
+  const cur = now.getUTCMonth() + 1 >= 4 ? y : y - 1;
+  return Array.from({ length: span }, (_, i) => cur - i).reverse();
+}
+const FISCAL_YEARS = fiscalYears();
 
 type CityEntry = { id: number; name: string };
 type ReportEntry = {

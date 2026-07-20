@@ -11,6 +11,7 @@ import {
   Mail,
   MessageCircle,
   TrendingUp,
+  Activity,
 } from "lucide-react";
 
 /**
@@ -27,6 +28,7 @@ const SECRET_KEY = "kw.admin.secret";
 export type AdminTab =
   | "home"
   | "analytics"
+  | "ops"
   | "push-stats"
   | "line-stats"
   | "submissions"
@@ -34,7 +36,10 @@ export type AdminTab =
 
 const TABS: { key: AdminTab; label: string; href: string; Icon: typeof BarChart3 }[] = [
   { key: "home", label: "ダッシュボード", href: "/admin", Icon: LayoutDashboard },
-  { key: "analytics", label: "分析", href: "/admin/analytics", Icon: TrendingUp },
+  // 「分析」= クマ出没そのもの(予測が目的)、「運用」= データ基盤とユーザー。
+  // 目的が違うので画面を分ける。
+  { key: "analytics", label: "クマ分析", href: "/admin/analytics", Icon: TrendingUp },
+  { key: "ops", label: "運用", href: "/admin/ops", Icon: Activity },
   { key: "push-stats", label: "通知登録", href: "/admin/push-stats", Icon: BarChart3 },
   { key: "line-stats", label: "LINE登録", href: "/admin/line-stats", Icon: MessageCircle },
   { key: "submissions", label: "投稿", href: "/admin/submissions", Icon: ClipboardList },
