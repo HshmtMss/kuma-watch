@@ -7,7 +7,6 @@ import DirectorySearch, {
   type DirectoryItem,
 } from "@/components/DirectorySearch";
 import { isDirectorySearchReleased } from "@/lib/directory-search-flag";
-import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import CountBadges from "@/components/CountBadges";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import {
@@ -291,8 +290,8 @@ export default async function PrefPage({ params }: Props) {
         );
       })()}
 
-      {/* 国の最新発表 — 都道府県ページから政府方針への導線 */}
-      <LatestGovAnnouncements limit={3} />
+      {/* 国の最新発表は一般来訪者向けの内容ではないため県ページには出さない
+          (政府発表は /gov-announcements 側に集約)。 */}
 
       {/* 使い方・注意事項は読まれにくいので折り畳みに */}
       <details className="not-prose group my-6 overflow-hidden rounded-xl border border-stone-200 bg-white">
