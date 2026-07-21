@@ -28,12 +28,21 @@ const CATMAP = {
   historic: "sightseeing",
   island: "sightseeing",
   worship: "sightseeing", // 神社仏閣・教会も観光名所カテゴリに寄せる
+  // 夏休みシーズン拡張 (2026-07)
+  riverplay: "gorge",     // 川遊び・水遊びは「渓谷・川遊び」カテゴリへ
+  fruit: "sightseeing",   // 観光農園・フルーツ狩り
+  michinoeki: "sightseeing", // 道の駅
+  highland: "resort",     // 高原・避暑地
+  ranch: "resort",        // 観光牧場
+  cave: "sightseeing",    // 鍾乳洞・洞窟
 };
 // 横断重複時にどのカテゴリを残すか（数値大が優先）。国立公園・山・湖・名所を優先。
 const CATPRIO = {
   national_park: 7,
   mountain: 6,
   lake: 6,
+  resort: 5,
+  gorge: 5,
   sightseeing: 4,
   onsen: 3,
   waterfall: 2,
@@ -72,6 +81,12 @@ for (const cat of [
   "historic",
   "island",
   "worship",
+  "riverplay",
+  "fruit",
+  "michinoeki",
+  "highland",
+  "ranch",
+  "cave",
 ]) {
   const p = `.cache/cand-${cat}.json`;
   if (!existsSync(p)) { console.error(`skip ${cat} (no ${p})`); continue; }

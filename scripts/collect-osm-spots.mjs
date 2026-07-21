@@ -86,6 +86,48 @@ function selector(cat) {
         `way["place"="island"]["name"]["wikidata"](area.a);relation["place"="island"]["name"]["wikidata"](area.a);node["place"="island"]["name"]["wikidata"](area.a);`,
         `way["place"="islet"]["name"]["wikidata"](area.a);node["place"="islet"]["name"]["wikidata"](area.a);`,
       ].join("");
+    // --- 夏休みシーズン拡張 (2026-07) ---
+    case "riverplay":
+      // 川遊び・水遊びスポット。指定水泳場・親水公園・ウォーターパーク。山の川は
+      // クマの水場で子連れの遭遇リスクがあり安全情報の価値が高い。
+      return [
+        `node["leisure"="swimming_area"]["name"](area.a);way["leisure"="swimming_area"]["name"](area.a);`,
+        `node["leisure"="water_park"]["name"](area.a);way["leisure"="water_park"]["name"](area.a);`,
+        `node["name"~"親水|水遊び|川遊び"]["name"](area.a);way["name"~"親水|水遊び|川遊び"](area.a);`,
+      ].join("");
+    case "fruit":
+      // 観光農園・フルーツ狩り。果樹はクマの好物で農園被害も多く安全情報の価値が高い。
+      return [
+        `node["shop"="farm"]["name"](area.a);way["shop"="farm"]["name"](area.a);`,
+        `node["name"~"観光農園|果樹園|フルーツ|ベリー狩り|さくらんぼ|ぶどう狩り|りんご狩り|いちご狩り|もも狩り"](area.a);way["name"~"観光農園|果樹園|フルーツ|ベリー狩り|さくらんぼ|ぶどう狩り|りんご狩り|いちご狩り|もも狩り"](area.a);`,
+      ].join("");
+    case "michinoeki":
+      // 道の駅。山間の旅の拠点で検索需要が高い。名前先頭一致で拾う。
+      return [
+        `node["name"~"^道の駅"](area.a);way["name"~"^道の駅"](area.a);`,
+        `node["amenity"="marketplace"]["name"~"道の駅"](area.a);`,
+      ].join("");
+    case "highland":
+      // 高原・避暑地。家族連れの避暑先がそのままクマ生息域。名前に「高原」を含む地物。
+      return [
+        `node["name"~"高原$|高原[ 　]"]["place"](area.a);node["natural"~"^(grassland|heath|fell)$"]["name"~"高原"](area.a);`,
+        `node["name"~"高原"]["tourism"](area.a);way["name"~"高原"]["tourism"](area.a);`,
+        `node["place"~"^(locality|hamlet|village)$"]["name"~"高原$"](area.a);`,
+      ].join("");
+    case "ranch":
+      // 観光牧場。高原の家族向け目的地でクマ生息域と重なる。
+      return [
+        `node["name"~"牧場$|牧場[ 　]"]["tourism"](area.a);way["name"~"牧場$|牧場[ 　]"]["tourism"](area.a);`,
+        `node["tourism"="attraction"]["name"~"牧場"](area.a);way["tourism"="attraction"]["name"~"牧場"](area.a);`,
+        `node["name"~"^マザー牧場|^六甲山牧場|^神津牧場"](area.a);`,
+      ].join("");
+    case "cave":
+      // 鍾乳洞・洞窟。夏の涼スポットで山間部に多い。
+      return [
+        `node["natural"="cave_entrance"]["name"](area.a);`,
+        `node["name"~"鍾乳洞|風穴|氷穴|洞窟|洞$"]["tourism"](area.a);way["name"~"鍾乳洞|風穴|氷穴|洞窟"]["tourism"](area.a);`,
+        `node["tourism"="attraction"]["name"~"鍾乳洞|風穴|氷穴|洞窟"](area.a);`,
+      ].join("");
     default:
       throw new Error("unknown cat " + cat);
   }

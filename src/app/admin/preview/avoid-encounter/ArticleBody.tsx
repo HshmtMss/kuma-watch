@@ -47,6 +47,10 @@ export default async function ArticleBody() {
 
   const place = placeRisk(all);
   const activity = activityRisk(all);
+  // 被害記録は「詳しい本文を書くソース」に偏る。とくに iwate は出没一般では
+  // なく人身被害専用のデータセットで、全国の被害記録の3分の1を占める。
+  // これを除いた集計を並べて、結論がソース構成に依存しないかを示す。
+  const activityExIwate = activityRisk(all.filter((r) => r.source !== "iwate"));
   const attractants = attractantSeason(all);
   const severity = severityBreakdown(all);
   const hourly = injuryByHour(all);
@@ -134,7 +138,7 @@ export default async function ArticleBody() {
         label="この記事の要点"
         items={[
           `出没が最も多いのは${mostCommon?.key ?? "道路"}だが、被害率は最も低い。件数の多さは危険度ではない`,
-          `被害は「何をしていたか」に偏る。${byInjuries[0]?.key ?? "山菜・きのこ採り"}と${byInjuries[1]?.key ?? "農作業中"}で大半を占める`,
+          `被害が最も多いのは山に入る行動ではなく、日常の${byInjuries[0]?.key ?? "歩行・散歩"}`,
           `${worstBand?.label ?? "4-7時"}に被害が偏る。行動の時間をずらすだけでも効く`,
           `秋の誘引物は柿が圧倒的で、${kaki?.peakMonth ?? 10}月に集中する。10月は親子連れも増える`,
           `一度出没があった場所は、その後1週間は平常時の約${rec7.lift.toFixed(1)}倍`,
@@ -217,8 +221,53 @@ export default async function ArticleBody() {
         <strong>山に入る行動ではなく、日常の{byInjuries[0]?.key}</strong>
         だということです。山菜採りや農作業は「危ないと分かっている行動」ですが、
         散歩は身構えずに出ます。<strong>特別な場所に行かなくても被害に遭う</strong>
-        のが実態です。
+        のが実態です。ただし、この順位はデータの集め方に左右されます（次項）。
       </p>
+      <Callout label="この順位は、どのデータが入っているかで動きます" tone="red">
+        被害の記録は「本文を詳しく書く公開元」に偏ります。とくに岩手県の
+        データは<strong>出没全般ではなく人身被害だけを集めたもの</strong>で、
+        全国の被害記録の約3分の1を占めます。これを除くと件数はこう変わります。
+        <div className="not-prose mt-3 overflow-x-auto">
+          <table className="w-full min-w-[320px] text-[13px]">
+            <thead>
+              <tr className="border-b border-stone-300 text-left text-[12px] text-stone-500">
+                <th className="py-1 pr-3">行動</th>
+                <th className="py-1 pr-3 text-right">被害件数</th>
+                <th className="py-1 text-right">岩手を除くと</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byInjuries.map((a) => {
+                const ex =
+                  activityExIwate.find((x) => x.key === a.key)?.injuries ?? 0;
+                const drop = a.injuries > 0 ? 1 - ex / a.injuries : 0;
+                return (
+                  <tr key={a.key} className="border-b border-stone-200">
+                    <td className="py-1 pr-3">{a.key}</td>
+                    <td className="py-1 pr-3 text-right tabular-nums">
+                      {a.injuries}
+                    </td>
+                    <td
+                      className={`py-1 text-right tabular-nums ${drop >= 0.4 ? "font-bold text-red-700" : ""}`}
+                    >
+                      {ex}
+                      {drop >= 0.4 && `（−${(drop * 100).toFixed(0)}%）`}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3">
+          <strong>{byInjuries[0]?.key}が最多である点は、岩手を除いても変わりません。</strong>
+          この記事で「日常の{byInjuries[0]?.key}に被害が多い」と言えるのはそのためです。
+          一方、山菜・きのこ採りの件数は岩手のデータに大きく依存しており、
+          <strong>全国で突出しているとまでは言えません</strong>
+          （岩手は山菜採りが盛んな地域で、その地域性を映している面があります）。
+          順位そのものより、<strong>どの行動でも起きうる</strong>と読むのが安全です。
+        </p>
+      </Callout>
       <Callout label="倍率で語らないことにしました" tone="stone">
         当初は「通常の目撃記録と比べて何倍現れるか」を出していました（
         {topLift?.key}で{topLift?.lift.toFixed(0)}倍）。しかしこれは
@@ -479,8 +528,8 @@ export default async function ArticleBody() {
               d: `被害は${worstBand?.label}に集中し、他の時間の${worstBand?.lift.toFixed(1)}倍。見回りや散歩を少し遅らせるだけで効く。`,
             },
             {
-              t: "散歩・山菜採り・農作業",
-              d: `被害の多くはこの3つ。最多は特別な行動ではなく日常の散歩で、出没件数の多い「道路」より危ない。`,
+              t: "日常の散歩こそ警戒",
+              d: `被害が最も多いのは山菜採りや農作業ではなく、日常の散歩。特別な場所に行かなくても起きる。`,
             },
             {
               t: "音を出し、単独を避ける",
