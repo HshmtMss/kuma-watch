@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1783589411723,
+  "generatedAt": 1784621530747,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080724.html",
+      "ministry": "env",
+      "date": "2026-07-24",
+      "title": "麻酔によるクマの捕獲体制構築　～人の日常生活圏における麻酔（麻酔銃、吹き矢）を用いたクマの捕獲体制の構築等に関する参考資料～",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080724.html",
+      "tag": "クマ被害対策",
+      "category": "guidance",
+      "summary": "人の日常生活圏におけるクマ被害対策として、麻酔（麻酔銃、吹き矢）を用いたクマの捕獲体制を構築するための参考資料が公開された。クマの安全かつ効果的な捕獲体制の確立を目指す。",
+      "ingestedAt": 1784621530747
+    },
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080703.html",
       "ministry": "env",
