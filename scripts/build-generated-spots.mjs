@@ -2,6 +2,7 @@
 // カテゴリ横断の空間重複排除を行い、生成対象リスト .cache/spots-todo.json を作る。
 // blurb/画像/slug は後段(gen-spot-blurbs, assemble)で付与する。
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { strictPrefCode, prefContainsWithTol, PREF_NAME, NAME_TO_CODE } from "./lib/pref-boundary.mjs";
 
 // カテゴリ横断でこれ以内は「同一POIが複数タグ付けされた重複」とみなし1つに統合する。
 // 以前は 1.5km と広く、例えばムーミンバレーパーク(テーマパーク)が 0.34km 隣の宮沢湖(湖)に
@@ -145,6 +146,51 @@ for (const r of merged) {
         hav(k.lat, k.lon, r.lat, r.lon) <= CLUSTER_KM) { dup = true; break; }
   }
   if (!dup) kept.push(r);
+}
+
+// --- prefName 補正 (市区町村境界ポリゴン包含による厳密判定) ---
+// pref は collect の Overpass area クエリ(行政境界)由来で概ね正しいが、県境スポットは
+// 隣接2県の area 両方で収集され「同一座標で県違いの重複」ができ、片方が誤県になる。
+// A: 同一スポット(同 wikidata / 同座標)の県矛盾は strict ポリゴンで正しい方を残す。
+// B: 残った単独スポットは、strict が別県かつ現県ポリゴンから 2km 超離れている(=明白な誤り)
+//    ときだけ補正。川/海境界のポリゴンの粗さ(例: 犬山城=愛知が正だが strict=岐阜)や
+//    多県park・admin代表の県は現県が 2km 以内に入るので保持する。離島(strict=null)も保持。
+{
+  const TOL_KM = 2;
+  for (const r of kept) r._strict = strictPrefCode(r.lat, r.lon); // 県コード or null
+  // A: 同一 wikidata または同一座標を「同一スポット」とみなしグループ化し重複を解消
+  const groups = new Map();
+  for (const r of kept) {
+    const key = r.wd || `${r.lat.toFixed(5)},${r.lon.toFixed(5)}`;
+    (groups.get(key) ?? groups.set(key, []).get(key)).push(r);
+  }
+  let dupResolved = 0;
+  const survivors = [];
+  for (const [, arr] of groups) {
+    if (arr.length === 1) { survivors.push(arr[0]); continue; }
+    // strict が解決でき、自分の pref と一致する個体を優先して1つ残す。
+    const keep =
+      arr.find((r) => r._strict && PREF_NAME[r._strict] === r.pref) || arr[0];
+    dupResolved += arr.length - 1;
+    survivors.push(keep);
+  }
+  // B: 生き残りに対し、ガード付きで pref をポリゴン厳密判定へ補正
+  let prefFixed = 0;
+  for (const r of survivors) {
+    const sc = r._strict;
+    if (!sc) continue; // 離島・境界外は admin(現状)据え置き
+    const strictName = PREF_NAME[sc];
+    if (!strictName || strictName === r.pref) continue;
+    const curCode = NAME_TO_CODE[r.pref];
+    if (curCode && prefContainsWithTol(curCode, r.lat, r.lon, TOL_KM)) continue; // 境界許容内=保持
+    r.pref = strictName;
+    prefFixed++;
+  }
+  for (const r of survivors) delete r._strict;
+  const before = kept.length;
+  kept.length = 0;
+  kept.push(...survivors);
+  console.error(`prefName 補正: 同一スポット重複解消 ${dupResolved} 件, ポリゴン補正 ${prefFixed} 件 (${before} → ${kept.length})`);
 }
 
 writeFileSync(".cache/spots-todo.json", JSON.stringify(kept));

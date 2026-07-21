@@ -12,11 +12,14 @@ const readings = existsSync("src/data/name-readings.json") ? JSON.parse(readFile
 // 対応表を作るため座標一致で旧 slug を引く。※assemble を複数回回すと出力(ローマ字版)を
 // 誤って「旧」に読んでしまうので、移行前の日本語版スナップショット(.cache/old-japanese-gen.json
 // = git HEAD の生成JSON)を使う。無ければ現行ファイルにフォールバック。
-const oldGen = existsSync(".cache/old-japanese-gen.json")
-  ? JSON.parse(readFileSync(".cache/old-japanese-gen.json", "utf8"))
-  : existsSync("src/data/japan-landmarks-generated.json")
-    ? JSON.parse(readFileSync("src/data/japan-landmarks-generated.json", "utf8"))
-    : [];
+// リダイレクト元となる過去バージョンの生成 JSON(複数可)。
+// - old-japanese-gen.json: ローマ字化前の日本語 slug 版(初回移行の受け皿)
+// - old-romaji-gen.json: 直前デプロイのローマ字版(重複除去・県補正での slug 変化の受け皿)
+// 座標一致で現行 slug へ 308 転送するため、slug が変わった/消えた旧 URL を漏れなく拾う。
+const oldGen = [];
+for (const f of [".cache/old-japanese-gen.json", ".cache/old-romaji-gen.json"]) {
+  if (existsSync(f)) oldGen.push(...JSON.parse(readFileSync(f, "utf8")));
+}
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
 const fameOf = (r) => (r.wd && fame[r.wd] != null ? fame[r.wd] : 0);
 
@@ -124,12 +127,33 @@ for (const c of cands) {
 // 同一座標に複数スポット(way+relation 等)がある場合も旧 slug を漏れなく拾えるよう、
 // 座標→新slug の索引を作ってから旧 slug 全件を走査する(Map 後勝ちの取りこぼし防止)。
 const coordToNew = new Map();
+const roundIdx = new Map(); // "latR,lonR"(小数3桁≒100m) → [entry]
+const rkey = (la, lo) => `${Math.round(la * 1000)},${Math.round(lo * 1000)}`;
 for (const e of out) {
   const k = `${e.lat},${e.lon}`;
   if (!coordToNew.has(k)) coordToNew.set(k, e.slug);
+  const rk = rkey(e.lat, e.lon);
+  (roundIdx.get(rk) ?? roundIdx.set(rk, []).get(rk)).push(e);
+}
+// 旧座標に対応する現行 slug。完全一致優先、無ければ近傍(~0.5km)の生存スポットへ
+// (way/relation で重心が僅かに違う重複が除去された場合の受け皿)。
+function newSlugFor(la, lo) {
+  const ex = coordToNew.get(`${la},${lo}`);
+  if (ex) return ex;
+  let best = null, bestD = Infinity;
+  const rla = Math.round(la * 1000), rlo = Math.round(lo * 1000);
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+    const cell = roundIdx.get(`${rla + dy},${rlo + dx}`);
+    if (!cell) continue;
+    for (const e of cell) {
+      const d = (e.lat - la) ** 2 + (e.lon - lo) ** 2;
+      if (d < bestD) { bestD = d; best = e; }
+    }
+  }
+  return best && bestD < 4e-5 ? best.slug : null; // ~0.5km 以内のみ
 }
 for (const o of oldGen) {
-  const ns = coordToNew.get(`${o.lat},${o.lon}`);
+  const ns = newSlugFor(o.lat, o.lon);
   if (ns && ns !== o.slug) redirects[o.slug] = ns;
 }
 writeFileSync("src/data/spot-slug-redirects.json", JSON.stringify(redirects));

@@ -40,6 +40,16 @@ const names = new Set<string>();
     names.add(x.name);
   }
 }
+// 生成候補(.cache/spots-todo.json)の名前も対象にする。assemble は「読みが無いと
+// ローマ字 slug を作れず脱落」するため、まだ JSON に載っていない新スポット(親水公園・
+// 海水浴場など)も先に読みを用意しておく(鶏卵問題の回避)。
+{
+  const { existsSync, readFileSync } = await import("node:fs");
+  if (existsSync(".cache/spots-todo.json")) {
+    const todo = JSON.parse(readFileSync(".cache/spots-todo.json", "utf8")) as Array<{ name: string }>;
+    for (const x of todo) if (x.name) names.add(x.name.trim());
+  }
+}
 const pending = [...names].filter((n) => !done[n]);
 console.error(`対象 ${names.size} 件 / 未生成 ${pending.length} 件`);
 

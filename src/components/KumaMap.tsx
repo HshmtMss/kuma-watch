@@ -21,7 +21,7 @@ import {
   ALERT_SIGHTING_THRESHOLDS,
   type LevelThresholds,
 } from "@/lib/score";
-import { meshCodeToCenter } from "@/lib/mesh";
+import { haversineKm, meshCodeToCenter } from "@/lib/mesh";
 import { isRecentSighting, recentSightingLabel } from "@/lib/freshness";
 import { loadLandUse, loadMeshes, type LandUseMap, type MeshEntry } from "@/lib/mesh-data";
 import { smoothMeshes, type SmoothedCell } from "@/lib/smooth";
@@ -568,6 +568,28 @@ export default function KumaMap({
       ? `<a href="${escapeHtml(r.photoUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(r.photoUrl)}" alt="投稿写真" loading="lazy" style="margin-top:6px;width:100%;max-height:160px;object-fit:cover;border-radius:6px;display:block" /></a>`
       : "";
     const place = [r.prefectureName, r.cityName].filter(Boolean).join(" ");
+    // 選択地からの距離。地図には「選択地(赤ピン)のカード」と「タップした出没の
+    // ポップアップ」が同時に出るが、両者が別の場所を指していることが分かりにくく、
+    // 離れた出没を見ているのにカードが「情報なし」に見える、という誤読があった。
+    // 2つの関係を一行で示す。カードの「最近の目撃」は10km圏なので、この距離が
+    // その件数に含まれるかどうかの判断にも使える。
+    const sel = selectedLocationLatestRef.current;
+    const distanceLine = sel
+      ? (() => {
+          const km = haversineKm(sel.lat, sel.lon, r.lat, r.lon);
+          // 1km未満は50m刻み、10km未満は小数1桁、それ以上は整数。
+          // 先に丸めてから桁を選ばないと 9.96km が「約10.0km」になり、
+          // 隣の「約12km」と表記が揃わない。
+          const rounded = Number(km.toFixed(1));
+          const text =
+            km < 1
+              ? `約${Math.max(50, Math.round((km * 1000) / 50) * 50)}m`
+              : rounded < 10
+                ? `約${rounded.toFixed(1)}km`
+                : `約${Math.round(km)}km`;
+          return `<div style="margin-top:2px;font-size:11px;color:#78716c">選択地から ${text}</div>`;
+        })()
+      : "";
     const headCount =
       typeof r.headCount === "number" && r.headCount > 0
         ? `<div>${r.headCount}頭</div>`
@@ -576,6 +598,7 @@ export default function KumaMap({
       <b>${escapeHtml(place)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
       <div>${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div>${headCount}
+      ${distanceLine}
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
       ${photoBlock}
       ${sourceLink}
