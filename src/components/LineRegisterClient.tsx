@@ -567,8 +567,6 @@ export default function LineRegisterClient({
                   {/* 通知と同じ /place ページへ。地域の状況をまとめて見られる。 */}
                   <a
                     href={placeUrlForMuni(m)}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
                   >
                     ページを見る
@@ -603,8 +601,6 @@ export default function LineRegisterClient({
                   {/* 通知と同じ /spot ページへ。 */}
                   <a
                     href={pageUrlForSpot(s)}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
                   >
                     ページを見る
@@ -635,8 +631,6 @@ export default function LineRegisterClient({
                   {/* 任意地点は名前だけでは思い出せないことがある。地図へ戻す。 */}
                   <a
                     href={mapUrlForGeo(g)}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="mt-0.5 block text-xs font-medium text-emerald-700 underline decoration-dotted underline-offset-2"
                   >
                     地図で見る

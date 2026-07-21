@@ -31,7 +31,6 @@ import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
-import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import NotifyBlock from "@/components/NotifyBlock";
 import { isPushReleased } from "@/lib/push-flag";
 
@@ -342,12 +341,20 @@ export default async function MuniPage({ params }: Props) {
   // 検索クエリで「○○山 クマ」「○○温泉 クマ」が拾えるよう /spot を別系統で
   // 持っているため、距離が近い場合は誘導する。
   const NEARBY_LANDMARK_RADIUS_KM = 30;
+  // 同名のランドマークが二重表示される問題（キュレーション + 生成で重複する
+  // 「三吉神社総本宮」等）を防ぐため、距離順にした上で name で重複排除（最寄りを残す）。
+  const seenLandmarkNames = new Set<string>();
   const nearbyLandmarks = JAPAN_LANDMARKS.map((l) => ({
     ...l,
     distanceKm: haversineKm(cell.latCentroid, cell.lonCentroid, l.lat, l.lon),
   }))
     .filter((l) => l.distanceKm <= NEARBY_LANDMARK_RADIUS_KM)
     .sort((a, b) => a.distanceKm - b.distanceKm)
+    .filter((l) => {
+      if (seenLandmarkNames.has(l.name)) return false;
+      seenLandmarkNames.add(l.name);
+      return true;
+    })
     .slice(0, 6);
 
   // 近隣カード: 県跨ぎで距離順に 4 件。県境の市町村でも妥当な隣接を表示できる。
@@ -784,16 +791,22 @@ export default async function MuniPage({ params }: Props) {
       ) : (
         <div className="not-prose my-3 rounded-xl border border-stone-200 bg-white p-4">
           <div className="flex h-32 items-end gap-1.5">
-            {monthly.map((b) => {
+            {monthly.map((b, i) => {
               const h = monthlyMax > 0 ? (b.count / monthlyMax) * 100 : 0;
               // 0 件は薄い灰色で 4% 高、件あれば最低 8% 確保して視認できるように。
               const heightPct = b.count > 0 ? Math.max(h, 8) : 4;
+              // 右端 (i が最後) が今月。濃いオレンジ＋枠で「現在」を明示する。
+              const isCurrent = i === monthly.length - 1;
               return (
                 <div
                   key={b.key}
-                  title={`${b.key}: ${b.count}件`}
+                  title={`${b.key}: ${b.count}件${isCurrent ? "（今月）" : ""}`}
                   className={`flex-1 rounded-t-sm ${
-                    b.count > 0 ? "bg-amber-500" : "bg-stone-100"
+                    isCurrent
+                      ? "bg-amber-600 ring-1 ring-amber-700 ring-inset"
+                      : b.count > 0
+                        ? "bg-amber-500"
+                        : "bg-stone-100"
                   }`}
                   style={{ height: `${heightPct}%` }}
                 />
@@ -801,11 +814,25 @@ export default async function MuniPage({ params }: Props) {
             })}
           </div>
           <div className="mt-1 flex gap-1.5 text-[10px] text-stone-500">
-            {monthly.map((b) => (
-              <div key={b.key} className="flex-1 text-center">
-                {b.label}
-              </div>
-            ))}
+            {monthly.map((b, i) => {
+              const isCurrent = i === monthly.length - 1;
+              return (
+                <div
+                  key={b.key}
+                  className={`flex-1 text-center ${isCurrent ? "font-bold text-amber-700" : ""}`}
+                >
+                  {b.label}
+                </div>
+              );
+            })}
+          </div>
+          {/* 過去→現在の向きと「今月」を明示（どこが現在か分かりにくい指摘に対応）。 */}
+          <div className="mt-1.5 flex items-center justify-between text-[10px] text-stone-400">
+            <span>← 1 年前</span>
+            <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+              <span className="inline-block h-2 w-2 rounded-sm bg-amber-600" />
+              右端が今月
+            </span>
           </div>
           <div className="mt-3 flex items-baseline justify-between border-t border-stone-100 pt-2 text-[11px] text-stone-500">
             <span>過去 12 ヶ月</span>
@@ -1046,8 +1073,8 @@ export default async function MuniPage({ params }: Props) {
         </li>
       </ul>
 
-      {/* 国の最新発表 — 市町村ページから政府方針への導線 (全市町村共通の国の動き) */}
-      <LatestGovAnnouncements limit={2} />
+      {/* 国の最新発表は一般来訪者向けの内容ではないため市町村ページには出さない
+          (政府発表は /gov-announcements 側に集約)。 */}
 
       {/* よくある質問 — 質問形クエリの受け皿 + 表記ゆれ吸収。可視テキストは
           上で組んだ faqItems と完全一致させ、FAQPage 構造化データと整合させる。 */}

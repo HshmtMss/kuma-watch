@@ -17,6 +17,10 @@ const CATEGORY_BAR: { key: DisplayCategory; label: string; color: string }[] = [
   { key: "none", label: "情報なし", color: "#e5e7eb" },
   { key: "habitat", label: "生息域", color: HABITAT_DISPLAY_COLOR.moderate },
   { key: "habitatCore", label: "主要生息域", color: HABITAT_DISPLAY_COLOR.high },
+  // 出没の系統の一番手前。「この地点には記録が無いが周辺にはある」状態。
+  // 生息域より上に置くのは、生息域が土地利用からの推定なのに対し、
+  // こちらは実際の出没という直接の手がかりだから。
+  { key: "nearby", label: "周辺で出没", color: "#fde68a" },
   { key: "caution", label: "出没あり", color: ALERT_DISPLAY_COLOR.moderate },
   { key: "warning", label: "やや多い", color: ALERT_DISPLAY_COLOR.elevated },
   { key: "danger", label: "多い", color: ALERT_DISPLAY_COLOR.high },
@@ -53,7 +57,12 @@ export default function RiskHero({
   // マップのセル色と同じ二軸 (生息域 / 直近の出没) で「この地点の状況」を判定する。
   // 生息域だけでは赤い「危険」にせず、直近の出没件数で 注意→警戒→危険 を出す。
   const habitatLevel = baseLevel ?? "unknown";
-  const cat = displayCategory(habitatLevel, recentSightingCount, lastWeekCount);
+  const cat = displayCategory(
+    habitatLevel,
+    recentSightingCount,
+    lastWeekCount,
+    count90d,
+  );
   const style = DISPLAY_CATEGORY_STYLE[cat];
   const hasRecent = count90d > 0;
 
@@ -79,7 +88,9 @@ export default function RiskHero({
         : "直近1年の出没情報はありません。";
 
   const blurb =
-    cat === "danger"
+    cat === "nearby"
+      ? "この地点の記録はありませんが、周辺で出没が確認されています。近くで出た後は、しばらく同じ範囲で出やすくなります。"
+      : cat === "danger"
       ? "クマの出没が多い地域です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。"
       : cat === "warning"
         ? "クマの出没が確認されています。早朝・夕方は特に注意してください。"
