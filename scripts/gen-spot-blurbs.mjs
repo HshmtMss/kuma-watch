@@ -29,6 +29,9 @@ const CATJP = {
   lake: "湖・湖畔",
   mountain: "山・登山口",
   national_park: "国立公園",
+  // 夏休みシーズン拡張 (2026-07)
+  gorge: "渓谷・川遊びスポット",
+  resort: "高原・観光リゾート",
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const keyOf = (r) => `${r.name}@${r.lat},${r.lon}`;
