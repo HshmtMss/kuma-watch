@@ -27,6 +27,69 @@
     "crawledAt": "2026-06-25"
   },
   {
+    "prefName": "宮城県",
+    "cityName": "仙台市太白区",
+    "message": "宮城野区内でツキノワグマの目撃情報が相次いでおり、特に7月1日以降、扇町、平成、原町地区で目撃されています。生ごみの管理徹底や果実・野菜の早期収穫などでクマを人里に引き寄せないようにし、早朝・夕方の外出は控え、川沿いや樹林帯、ヤブの近くでは鈴やラジオで音を出すなど自分の存在を知らせてください。クマを見かけても近づかず、安全確保を最優先とし、最寄りの警察署または区役所・総合支所へ連絡しましょう。",
+    "targetArea": "宮城野区（扇町、平成、原町地区）",
+    "updatedAt": "2026-07-21",
+    "sourceUrl": "https://www.city.sendai.jp/kankyochose/kurashi/shizen/petto/yase/higai/tsukinowaguma.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "仙台市宮城野区",
+    "message": "クマ出没の可能性がある地域では、生ごみ等の屋外放置や夜間の家庭ごみ出しをやめ、誘引物を管理してください。山菜採りやハイキングなどで山に入る際は、熊よけ鈴やラジオなどで音を出し、クマとの遭遇を避けるよう注意し、食べ残しは必ず持ち帰りましょう。クマを目撃した場合は慌てずに静かにその場を離れてください。",
+    "targetArea": "宮城野区",
+    "updatedAt": "2022-03-02",
+    "sourceUrl": "https://www.city.sendai.jp/miyagino-kocho/miyaginoku/yaseityoju/bear.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "仙台市泉区",
+    "message": "宮城野区扇町、平成、原町地区などで7月1日からツキノワグマの目撃情報が相次いでいます。クマを人里に引き寄せないため、生ごみや果実・野菜の管理を徹底し、早朝・夕方の外出は控えてください。山やヤブの近くでは鈴やラジオで音を出し、自分の存在を知らせましょう。",
+    "targetArea": "宮城野区（扇町、平成、原町地区）",
+    "updatedAt": "2026-07-21",
+    "sourceUrl": "https://www.city.sendai.jp/kankyochose/kurashi/shizen/petto/yase/higai/tsukinowaguma.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "仙台市若林区",
+    "message": "宮城野区の扇町、平成、原町地区などでツキノワグマの目撃情報が7月1日から相次いでいます。早朝や夕方の薄暗い時間帯の外出を控え、川沿いや樹林帯、ヤブの近くでは鈴やラジオなどで音を出し自分の存在を知らせましょう。生ごみや果実の管理を徹底し、クマを人里に引き寄せない対策をお願いします。",
+    "targetArea": "宮城野区（扇町、平成、原町地区など）",
+    "updatedAt": "2026-07-21",
+    "sourceUrl": "https://www.city.sendai.jp/kankyochose/kurashi/shizen/petto/yase/higai/tsukinowaguma.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "仙台市青葉区",
+    "message": "仙台市宮城野区の扇町、平成、原町地区などで7月1日からツキノワグマの目撃情報が相次いでいます。クマを人里に引き寄せないため、生ごみの管理徹底や果実・野菜の早期収穫を心がけましょう。早朝・夕方の薄暗い時間帯の外出は控え、山林等に近づく際は鈴やラジオで音を出し、自分の存在を知らせてください。",
+    "targetArea": "仙台市",
+    "updatedAt": "2026-07-21",
+    "sourceUrl": "https://www.city.sendai.jp/kankyochose/kurashi/shizen/petto/yase/higai/tsukinowaguma.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "白石市",
+    "message": "クマは早朝・夕方の薄暗い時間帯に活発なため、この時間の不要不急の外出は避け、特に川沿いや森林の近くでは注意してください。農作物や生ごみの適切な管理でクマを人里に近づかせないようにし、鈴やラジオなどで音を出し自分の存在を知らせてください。クマのフンや足跡などの痕跡を見つけたらすぐにその場を離れ、目撃情報は市役所や警察署へ連絡しましょう。",
+    "targetArea": "白石市",
+    "updatedAt": "2025-11-01",
+    "sourceUrl": "https://www.city.shiroishi.miyagi.jp/soshiki/25/37585.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
+    "prefName": "宮城県",
+    "cityName": "石巻市",
+    "message": "石巻市内でクマの目撃情報が多数寄せられており、特に7月8日には成田字小姓前で子グマが、7月3日には小船越字沢田山でクマらしき動物が目撃されています。クマの活動が活発な早朝や夕方の外出は控え、鈴やラジオで音を出し自分の存在を知らせてください。また、生ごみや柿の木の管理、藪の刈払いなど、クマを誘引しない対策を徹底しましょう。",
+    "targetArea": "石巻市",
+    "updatedAt": "2026-07-08",
+    "sourceUrl": "https://www.city.ishinomaki.lg.jp/cont/10454500/1000/20141219100812.html",
+    "crawledAt": "2026-07-22"
+  },
+  {
     "prefName": "富山県",
     "cityName": "下新川郡入善町",
     "message": "ツキノワグマに遭遇した際は、子グマを見てもそっと立ち去り、親グマが近くにいる可能性があるため特に注意してください。落ち着いて、クマから目を離さずにゆっくり後退し、大声を出したり走って逃げたりせず、クマに逃げる機会を与えてください。人家周辺でも出没があり得るため、常に周囲に細心の注意を払ってください。",
@@ -105,6 +168,15 @@
     "updatedAt": "2026-04-28",
     "sourceUrl": "https://www.city.kaminoyama.yamagata.jp/soshiki/11/bearmap-2025.html",
     "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "最上郡大蔵村",
+    "message": "大蔵村は、村内で目撃されたツキノワグマを含む鳥獣情報をまとめた「大蔵村鳥獣目撃マップ」を公開しており、人身被害の未然防止に活用するよう呼びかけています。クマ等野生動物の目撃情報は大蔵村役場産業振興課までお知らせください。",
+    "targetArea": "大蔵村",
+    "updatedAt": "2024-10-18",
+    "sourceUrl": "https://www.vill.ohkura.yamagata.jp/soshikikarasagasu/sangyoshinkoka/gyomuannai/5/1/choujuu/1801.html",
+    "crawledAt": "2026-07-22"
   },
   {
     "prefName": "山形県",
@@ -239,6 +311,15 @@
     "updatedAt": "2026-06-03",
     "sourceUrl": "https://www.city.sakata.lg.jp/kurashi/doubutsu/yasei/kankyo03202.html",
     "crawledAt": "2026-07-08"
+  },
+  {
+    "prefName": "山形県",
+    "cityName": "飽海郡遊佐町",
+    "message": "遊佐町内ではクマの目撃情報が多数寄せられており、特に令和8年2月22日午前5時頃には上蕨岡字唐戸岩地内で子グマ1頭が目撃されました。付近にお住まいの方や外出される方は十分ご注意ください。クマを目撃した際や農作物への被害があった場合は、役場産業課農業振興係までご連絡ください。",
+    "targetArea": "遊佐町内各地",
+    "updatedAt": "2026-02-22",
+    "sourceUrl": "https://www.town.yuza.yamagata.jp/archive/p20250502131605",
+    "crawledAt": "2026-07-22"
   },
   {
     "prefName": "山形県",
