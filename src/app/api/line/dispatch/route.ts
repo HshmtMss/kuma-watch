@@ -17,6 +17,8 @@ import {
 } from "@/lib/line-client";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { haversineKm } from "@/lib/nearby-sightings";
+import { jstToday } from "@/lib/jst-date";
+import { isFreshForNotify, notifyMapUrl } from "@/lib/notify-freshness";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -92,6 +94,7 @@ function snippet(top: NewRecord, fallback: string): string {
     : fallback;
 }
 
+
 export async function POST(req: Request) {
   if (!isConfigured()) {
     return NextResponse.json(
@@ -123,9 +126,26 @@ export async function POST(req: Request) {
   // 1. 重複送信を弾く (LINE 独自セット)
   const newIds = await filterUndispatched(records.map((r) => r.id));
   const newSet = new Set(newIds);
-  const filtered = records.filter((r) => newSet.has(r.id));
-  if (filtered.length === 0) {
+  const unsent = records.filter((r) => newSet.has(r.id));
+  if (unsent.length === 0) {
     return NextResponse.json({ ok: true, sent: 0, reason: "all duplicate" });
+  }
+
+  // 「今まさに出た」ものだけ通知する。出没日が古い記録(報道が数日前の出没に
+  // 触れたもの等)は送らない。地図には従来どおり載る。
+  const today = jstToday();
+  const filtered = unsent.filter((r) => isFreshForNotify(r.date, today));
+  // 鮮度で外した記録も、以後もう評価しないよう重複防止セットに入れる
+  // (古い出没日は今後も鮮度を満たさないので、次回以降も送らない)。
+  const staleIds = unsent.filter((r) => !isFreshForNotify(r.date, today)).map((r) => r.id);
+  if (filtered.length === 0) {
+    if (staleIds.length > 0) await markDispatched(staleIds);
+    return NextResponse.json({
+      ok: true,
+      sent: 0,
+      reason: "no fresh records",
+      stale: staleIds.length,
+    });
   }
 
   const base = siteUrl();
@@ -162,7 +182,13 @@ export async function POST(req: Request) {
         : `${g.city}で新しいクマ出没（${n}件）`;
     const top = g.records[0];
     const line = snippet(top, `${top.date ?? ""} ${g.pref}${g.city}`.trim());
-    const url = `${base}/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`;
+    const url = notifyMapUrl(
+      base,
+      top.lat,
+      top.lon,
+      `${g.pref}${g.city}`,
+      `/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`,
+    );
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
     const { sent, error } = await multicast(userIds, [msg]);
     sentCount += sent;
@@ -233,13 +259,8 @@ export async function POST(req: Request) {
         top,
         `${top.date ?? ""} ${place}周辺（半径${pt.radiusKm}km）`.trim(),
       );
-      const params = new URLSearchParams({
-        lat: pt.lat.toFixed(5),
-        lon: pt.lon.toFixed(5),
-        z: "12",
-      });
-      if (pt.label) params.set("label", pt.label);
-      const url = `${base}/?${params.toString()}`;
+      // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
+      const url = notifyMapUrl(base, top.lat, top.lon, place, "/");
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
       const { ok, error } = await pushMessage(gsub.userId, [msg]);
       if (ok) sentCount += 1;
@@ -247,7 +268,8 @@ export async function POST(req: Request) {
     }
   }
 
-  // 3. 配信済みマーキング
+  // 3. 配信済みマーキング (送った分 + 鮮度で外した古い分)
+  for (const id of staleIds) dispatchedIds.add(id);
   const dispatched = [...dispatchedIds];
   await markDispatched(dispatched);
 

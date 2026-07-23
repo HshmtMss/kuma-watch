@@ -141,6 +141,8 @@ type Props = {
     lat: number;
     lon: number;
     source: "gps" | "tap" | "search" | "url";
+    /** URL の z= 由来の初期ズーム。指定時はこの近さで開く (通知リンク用) */
+    zoom?: number;
   } | null;
   /** GPS で測定された現在地 (青丸で常時表示) */
   currentLocation?: { lat: number; lon: number } | null;
@@ -785,7 +787,13 @@ export default function KumaMap({
     const map = mapRef.current;
     if (!map || !selectedLocation) return;
     const { lat, lon } = selectedLocation;
-    const targetZoom = Math.max(map.getZoom(), 10);
+    // 通知リンク等が z= を指定していれば、その近さで開く (出没地点が画面に
+    // 大きく出て、手で拡大しなくても場所が分かる)。無ければ従来どおり
+    // 「今のズームか最低10」で寄る。
+    const targetZoom =
+      typeof selectedLocation.zoom === "number"
+        ? selectedLocation.zoom
+        : Math.max(map.getZoom(), 10);
     // シートで隠れないように地図中心を上に寄せる (シートは下 30-70vh を占める)
     const isMobile =
       typeof window !== "undefined" ? window.innerWidth < 640 : false;
@@ -850,7 +858,9 @@ export default function KumaMap({
       if (initSel) {
         const isMobile =
           typeof window !== "undefined" ? window.innerWidth < 640 : false;
-        const targetZoom = 12;
+        // 通知リンクが z= を指定していれば、その近さで初期表示する。
+        const targetZoom =
+          typeof initSel.zoom === "number" ? initSel.zoom : 12;
         const offsetX = isMobile ? 0 : 180;
         const offsetY = isMobile
           ? -Math.round(

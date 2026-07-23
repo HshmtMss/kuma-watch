@@ -520,6 +520,12 @@ export default function KumaClient() {
       const qLon =
         lonParam !== null && lonParam !== "" ? Number(lonParam) : NaN;
       const qLabel = params.get("label") ?? undefined;
+      // z= 初期ズーム (通知リンクが出没地点に近づけて開く)。5〜18 にクランプ。
+      const zParam = params.get("z");
+      const qZoomRaw = zParam !== null && zParam !== "" ? Number(zParam) : NaN;
+      const qZoom = Number.isFinite(qZoomRaw)
+        ? Math.min(18, Math.max(5, qZoomRaw))
+        : undefined;
       // 内部ページ (/place・/spot) の「地図で見る」だけが付ける戻り先パス。
       const qFrom = params.get("from") ?? undefined;
       const fromUrl =
@@ -535,6 +541,7 @@ export default function KumaClient() {
           lon: qLon,
           source: "url",
           label: qLabel,
+          zoom: qZoom,
         });
         // from=<内部パス> があるときだけ「戻る」を出す。通知・共有リンクは
         // label だけで from が無いので出さない (戻り先が無いのに「戻る」は誤り)。

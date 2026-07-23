@@ -59,6 +59,8 @@ export type SelectedLocation = {
   source: LocationSource;
   /** 検索結果や URL から渡された地名 (シェア時に利用) */
   label?: string;
+  /** URL の z= 由来の初期ズーム。通知リンクが出没地点に近づけて開くのに使う */
+  zoom?: number;
 };
 
 type NearbyRecent = Pick<
