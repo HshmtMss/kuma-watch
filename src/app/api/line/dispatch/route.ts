@@ -286,5 +286,8 @@ export async function POST(req: Request) {
     recipients: recipientCount,
     sent: sentCount,
     dispatched: dispatched.length,
+    // 送信0だったときの失敗理由。ワークフローの実行ログにそのまま出るので、
+    // 管理画面を開かなくても原因(権限・上限・トークン)を追える。
+    ...(failReason ? { error: failReason } : {}),
   });
 }
