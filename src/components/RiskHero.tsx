@@ -17,10 +17,6 @@ const CATEGORY_BAR: { key: DisplayCategory; label: string; color: string }[] = [
   { key: "none", label: "情報なし", color: "#e5e7eb" },
   { key: "habitat", label: "生息域", color: HABITAT_DISPLAY_COLOR.moderate },
   { key: "habitatCore", label: "主要生息域", color: HABITAT_DISPLAY_COLOR.high },
-  // 出没の系統の一番手前。「この地点には記録が無いが周辺にはある」状態。
-  // 生息域より上に置くのは、生息域が土地利用からの推定なのに対し、
-  // こちらは実際の出没という直接の手がかりだから。
-  { key: "nearby", label: "周辺で出没", color: "#fde68a" },
   { key: "caution", label: "出没あり", color: ALERT_DISPLAY_COLOR.moderate },
   { key: "warning", label: "やや多い", color: ALERT_DISPLAY_COLOR.elevated },
   { key: "danger", label: "多い", color: ALERT_DISPLAY_COLOR.high },
@@ -87,15 +83,23 @@ export default function RiskHero({
         ? "この地点の記録はありませんが、周辺では出没が確認されています。"
         : "直近1年の出没情報はありません。";
 
+  // 「出没あり」(caution) は 2 つの状況を束ねる:
+  //   足元 … この地点(2.9km)自体に記録がある (年3件以上 or 直近7日)
+  //   数km先 … 足元には無いが周辺(10km・90日)に出没がある
+  // バッジは同じ「出没あり」に統一し (語が似た区分を並べると混乱するため)、
+  // 足元か数km先かはこの説明文で伝え分ける。
+  const cautionBlurb =
+    recentSightingCount > 0 || lastWeekCount > 0
+      ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
+      : "この地点の記録はありませんが、数km以内で出没が確認されています。近くで出た後は、しばらく同じ範囲で出やすくなります。";
+
   const blurb =
-    cat === "nearby"
-      ? "この地点の記録はありませんが、周辺で出没が確認されています。近くで出た後は、しばらく同じ範囲で出やすくなります。"
-      : cat === "danger"
+    cat === "danger"
       ? "クマの出没が多い地域です。早朝・夕方は特に注意し、外出時は周囲の最新情報を確認してください。"
       : cat === "warning"
         ? "クマの出没が確認されています。早朝・夕方は特に注意してください。"
         : cat === "caution"
-          ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
+          ? cautionBlurb
           : cat === "habitatCore"
             ? `クマが多くすんでいる地域です。${records}季節により状況は変わります。`
             : cat === "habitat"

@@ -554,15 +554,7 @@ export type DisplayCategory =
   | "habitatCore"
   | "caution"
   | "warning"
-  | "danger"
-  /**
-   * この地点自体に記録は無いが、周辺(10km・90日)に出没がある状態。
-   * 「情報なし」と表示していたが、実測ではこの状態は無情報どころか強い予兆で、
-   * 次の30日に 2.9km 圏で出没が起きる確率が 7.46%（周辺にも無い地点は 1.72%）
-   * = 4.3倍あった（基準日5点・のべ約18万地点で計測）。
-   * 参考: 出没から7日以内の同一地点の再発は 2.6倍なので、それより強い。
-   */
-  | "nearby";
+  | "danger";
 /**
  * 直近この日数以内に出没があれば、年間件数がしきい値未満でも「出没あり」以上に
  * する。出没から7日間は、その場所の平常時に対して約2.8倍の頻度で再び出没する
@@ -591,21 +583,24 @@ export function displayCategory(
   if (habitatLevel === "high" || habitatLevel === "elevated")
     return "habitatCore";
   if (habitatLevel === "moderate" || habitatLevel === "low") return "habitat";
-  // 生息域にも当たらない地点でも、周辺に出没があれば「情報なし」とは言わない。
-  // 「情報なし」は文字どおり手がかりが無いという意味だが、周辺10km・90日に
-  // 出没があるならそれは手がかりであり、実測で4.3倍の予兆でもある。
+  // 生息域にも当たらない地点でも、周辺(10km・90日)に出没があれば「情報なし」
+  // とは言わず「出没あり」にする。「情報なし」は手がかりが無いという意味だが、
+  // 周辺に出没があるならそれは手がかりであり、実測で4.3倍の予兆でもある
+  // (次の30日に2.9km圏で出没する確率 7.46% vs 周辺にも無い地点 1.72%)。
   // 実際、平野部(宮城県美里町など)では生息域の判定が付かないため、数km先に
   // 出没があってもグレーの「情報なし」が出ていた。
   //
+  // 当初は独立した区分「周辺で出没」を設けたが、「出没あり」と語が似ていて
+  // 一般の利用者が違いを読み取れず混乱するため、「出没あり」に統合した。
+  // 足元か数km先かの別は、この下の説明文と、ピンまでの距離表示で伝える。
   // なお生息域(habitat/habitatCore)側はこの格上げの対象にしていない。
   // 周辺の出没と生息域のどちらが強い手がかりかを測っていないため、
   // 測らずに順序を決めない。「情報なし」の是正だけに絞る。
-  if (nearbyCount > 0) return "nearby";
+  if (nearbyCount > 0) return "caution";
   return "none";
 }
 export const DISPLAY_CATEGORY_LABEL: Record<DisplayCategory, string> = {
   none: "情報なし",
-  nearby: "周辺で出没",
   habitat: "生息域",
   habitatCore: "主要生息域",
   caution: "出没あり",
@@ -619,9 +614,6 @@ export const DISPLAY_CATEGORY_STYLE: Record<
   { bg: string; fg: string }
 > = {
   none: { bg: "#9ca3af", fg: "#ffffff" },
-  // 出没の系統(黄→橙→赤)の一番手前。生息域のベージュとも情報なしのグレーとも
-  // 区別が付き、かつ「出没あり」より弱く見える淡い黄。
-  nearby: { bg: "#fde68a", fg: "#3f2d00" },
   habitat: { bg: "#d8cba3", fg: "#41391f" },
   habitatCore: { bg: "#c2a86b", fg: "#352c12" },
   caution: { bg: "#f59e0b", fg: "#ffffff" },
