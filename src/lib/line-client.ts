@@ -109,10 +109,27 @@ export async function verifyIdToken(
 // ─────────────────────────────────────────────────────────────────────────
 
 /** 1 ユーザへ push。webhook の返信以外の任意送信に使う。 */
+/**
+ * LINE API の失敗内容を短く要約した文字列。
+ * 例: "403 The account is not allowed to send messages" / "429 ..."。
+ * 送信0が続く原因(権限・上限・トークン)を管理画面から特定できるようにする。
+ * 課金・個人情報に関わらない範囲(status とエラーメッセージ)だけを拾う。
+ */
+async function summarizeError(res: Response): Promise<string> {
+  let detail = "";
+  try {
+    const body = (await res.json()) as { message?: string };
+    if (body?.message) detail = ` ${body.message}`;
+  } catch {
+    // JSON でなければ本文は捨てる (status だけで足りる)
+  }
+  return `${res.status}${detail}`.slice(0, 200);
+}
+
 export async function pushMessage(
   to: string,
   messages: LineMessage[],
-): Promise<{ ok: boolean; status: number }> {
+): Promise<{ ok: boolean; status: number; error?: string }> {
   const res = await fetch(`${MESSAGING_API}/message/push`, {
     method: "POST",
     headers: {
@@ -121,7 +138,11 @@ export async function pushMessage(
     },
     body: JSON.stringify({ to, messages }),
   });
-  return { ok: res.ok, status: res.status };
+  return {
+    ok: res.ok,
+    status: res.status,
+    error: res.ok ? undefined : await summarizeError(res),
+  };
 }
 
 /** replyToken で友だち追加/メッセージへ返信する (無料枠・課金対象外)。 */
@@ -149,9 +170,10 @@ export async function replyMessage(
 export async function multicast(
   userIds: string[],
   messages: LineMessage[],
-): Promise<{ sent: number; failedChunks: number }> {
+): Promise<{ sent: number; failedChunks: number; error?: string }> {
   let sent = 0;
   let failedChunks = 0;
+  let error: string | undefined;
   for (let i = 0; i < userIds.length; i += MULTICAST_CHUNK) {
     const chunk = userIds.slice(i, i + MULTICAST_CHUNK);
     const res = await fetch(`${MESSAGING_API}/message/multicast`, {
@@ -166,9 +188,11 @@ export async function multicast(
       sent += chunk.length;
     } else {
       failedChunks++;
+      // 最初の失敗理由だけ残す (全チャンク同じ理由で落ちるのが普通なので)。
+      if (!error) error = await summarizeError(res);
     }
   }
-  return { sent, failedChunks };
+  return { sent, failedChunks, error };
 }
 
 /** テキストメッセージを組み立てる小ヘルパ。 */

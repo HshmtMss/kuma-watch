@@ -643,6 +643,10 @@ export type LineDispatchRecord = {
   recipients: number; // マッチした購読者数
   sent: number; // 送信リクエスト数（到達保証ではない）
   dispatched: number; // 新規にさばいた目撃 ID 数
+  // recipients>0 なのに sent=0 のとき、LINE API が返した失敗理由の要約
+  // (例 "403 ...")。原因(権限・上限・トークン)を管理画面から特定するため。
+  // 送信が成功した回・そもそも対象者が居なかった回は付かない。
+  error?: string;
 };
 
 const LINE_DISPATCH_KEY = "line:dispatchlog";

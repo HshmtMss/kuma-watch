@@ -132,6 +132,10 @@ export async function POST(req: Request) {
   let sentCount = 0;
   let recipientCount = 0;
   const dispatchedIds = new Set<string>();
+  // 送信失敗の理由(最初の1件)。recipients>0 なのに sent=0 のとき、原因を
+  // 管理画面から特定するために配信ログへ残す。全チャンク同じ理由で落ちるのが
+  // 普通なので、最初に掴んだ理由だけ保持する。
+  let sendError: string | undefined;
 
   // ── 2a. muni 単位 ──────────────────────────────────────────────────────
   type MuniGroup = { pref: string; city: string; records: NewRecord[] };
@@ -160,8 +164,9 @@ export async function POST(req: Request) {
     const line = snippet(top, `${top.date ?? ""} ${g.pref}${g.city}`.trim());
     const url = `${base}/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`;
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
-    const { sent } = await multicast(userIds, [msg]);
+    const { sent, error } = await multicast(userIds, [msg]);
     sentCount += sent;
+    if (error && !sendError) sendError = error;
   }
 
   // ── 2b. spot 単位 (近傍 10km) ──────────────────────────────────────────
@@ -197,8 +202,9 @@ export async function POST(req: Request) {
       const line = snippet(top, `${top.date ?? ""} ${g.name}周辺`.trim());
       const url = `${base}/spot/${pathSegment(g.slug)}`;
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
-      const { sent } = await multicast(userIds, [msg]);
+      const { sent, error } = await multicast(userIds, [msg]);
       sentCount += sent;
+      if (error && !sendError) sendError = error;
     }
   }
 
@@ -235,8 +241,9 @@ export async function POST(req: Request) {
       if (pt.label) params.set("label", pt.label);
       const url = `${base}/?${params.toString()}`;
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
-      const { ok } = await pushMessage(gsub.userId, [msg]);
+      const { ok, error } = await pushMessage(gsub.userId, [msg]);
       if (ok) sentCount += 1;
+      else if (error && !sendError) sendError = error;
     }
   }
 
@@ -250,6 +257,15 @@ export async function POST(req: Request) {
     0,
     24,
   );
+  // 送信すべき相手が居た(recipients>0)のに1通も送れなかった場合は、その理由を
+  // ログに残し、サーバログにも出す。届いていない状態を管理画面から気づけるように。
+  const failReason =
+    recipientCount > 0 && sentCount === 0 ? (sendError ?? "unknown") : undefined;
+  if (failReason) {
+    console.error(
+      `[line/dispatch] matched ${recipientCount} but sent 0. reason: ${failReason}`,
+    );
+  }
   try {
     await recordLineDispatch({
       ts: Date.now(),
@@ -258,6 +274,7 @@ export async function POST(req: Request) {
       recipients: recipientCount,
       sent: sentCount,
       dispatched: dispatched.length,
+      ...(failReason ? { error: failReason } : {}),
     });
   } catch (e) {
     console.error("[line/dispatch] recordLineDispatch failed", e);
