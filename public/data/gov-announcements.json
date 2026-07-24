@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1784621530747,
+  "generatedAt": 1784858331092,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_05326.html",
+      "ministry": "env",
+      "date": "2026-07-24",
+      "title": "麻酔によるクマの捕獲体制構築に関する参考資料の公表について",
+      "url": "https://www.env.go.jp/press/press_05326.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "麻酔を用いたクマの捕獲体制を構築するための参考資料が公表された。これにより、クマの適切な管理と被害対策の強化が期待される。",
+      "ingestedAt": 1784858331092
+    },
     {
       "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080724.html",
       "ministry": "env",
