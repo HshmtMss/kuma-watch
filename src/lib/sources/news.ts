@@ -195,7 +195,7 @@ const RESPONSE_SCHEMA = {
           date: {
             type: "string",
             description:
-              "出没日 YYYY-MM-DD。記事内に明示されていなければ pubDate を採用。年が無いときは pubDate の年を採用",
+              "出没日 YYYY-MM-DD。記事(見出し・本文)に日付が書かれていれば必ずそれを採用する(例「◯◯でクマ出没 7月25日」→ 2026-07-25、「23日夜」→ その日)。年が無いときは pubDate の年を補う。記事に日付が全く書かれていない場合のみ空文字にする(pubDate で埋めない)。",
           },
           time: {
             type: "string",
@@ -383,6 +383,7 @@ function buildPrompt(items: RssItem[]): string {
 - 統計記事 (「○○県のクマ出没件数が増加」「シーズン別の捕獲頭数」等) は対象外。
 - 各フィールドは responseSchema の description を厳守。推測しないこと。
 - 記事に出没時刻が書かれていれば time (HH:MM) に入れる (「午後3時半ごろ」→ 15:30)。書かれていなければ空文字。配信時刻(pubDate)は time に使わない。
+- date は見出し・本文の日付を必ず拾う (例「クマ出没 7月25日」「23日夜」)。日付が全く書かれていない記事だけ date を空文字にする。pubDate で date を埋めないこと。
 - pubDate より未来の日付は NG。
 - 海外のニュース (アメリカ・ロシア等) は対象外。
 - 駆除・捕獲のニュースで「○○市で 1 頭駆除」など具体地点・日付があれば対象。
@@ -487,7 +488,18 @@ export async function fetchNewsSightings(
     // 出没日を返しても素通りしていた (実測: 取り込み時刻より後の出没日が
     // news 431件。月日の取り違え 07-05 <-> 05-07 が主因)。
     // 時刻側は既に範囲検査があるのに日付だけ抜けていた。
-    const eventDate = normalizeEventDate(s.date, article.pubDate);
+    // 日付は記事から取れたものを最優先。取れない(空)ときだけ配信日で埋め、
+    // 「推定日」の印を付ける。地図には載せるが、通知はしない(古い情報の遮断)。
+    const explicitDate = (s.date ?? "").trim();
+    let eventDate: string | null;
+    let dateEstimated = false;
+    if (explicitDate) {
+      eventDate = normalizeEventDate(explicitDate, article.pubDate);
+    } else {
+      const pub = (article.pubDate || "").slice(0, 10);
+      eventDate = /^\d{4}-\d{2}-\d{2}$/.test(pub) && pub <= jstToday() ? pub : null;
+      dateEstimated = true;
+    }
     if (!eventDate) continue;
     const prefName = (s.prefectureName ?? "").trim();
     // cityName に「市区町村」でなく都道府県名 (例: cityName="埼玉県") が入る
@@ -600,6 +612,7 @@ export async function fetchNewsSightings(
       lon: pos.lon,
       date: eventDate,
       ...(time ? { time } : {}),
+      ...(dateEstimated ? { dateEstimated: true } : {}),
       prefectureName: prefName,
       cityName: cityName.slice(0, 40),
       sectionName: (s.sectionName ?? "").slice(0, 40),

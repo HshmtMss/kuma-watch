@@ -18,11 +18,7 @@ import {
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday } from "@/lib/jst-date";
-import {
-  isFreshForNotify,
-  isFreshNewsForNotify,
-  notifyMapUrl,
-} from "@/lib/notify-freshness";
+import { isNotifiable, notifyMapUrl } from "@/lib/notify-freshness";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -57,6 +53,7 @@ type NewRecord = {
   lon?: number;
   date?: string;
   time?: string;
+  dateEstimated?: boolean;
   comment?: string;
   sourceUrl?: string;
 };
@@ -136,23 +133,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, sent: 0, reason: "all duplicate" });
   }
 
-  // 「今まさに出た」ものだけ通知する。地図には従来どおり載る。
-  //  - ニュース(報道)は、出没日が今日 かつ 時刻が明記されているものだけ。
-  //    報道の日付は記事に日付が無いと配信日(=今日)が入るため、日付だけでは
-  //    「昨日のクマを今日の記事で読んだ」古い情報がすり抜ける。時刻付き=記事が
-  //    具体的に報じた新しい出没、を鮮度の裏付けにする。
-  //  - それ以外(警察通報 sharp9110 等・当日性が高い)は出没日が今日なら通知。
+  // 「今の出没」だけ通知する。出没日が今日 かつ 実日付(推定でない)のものだけ。
+  // 報道で日付が書かれておらず配信日で埋めた記録(dateEstimated)は、実際は
+  // 昨日以前かもしれないので送らない。地図には従来どおり載る。警察通報など
+  // dateEstimated を持たないソースは当日なら通知。ソース共通の1ルール。
   const source = (new URL(req.url).searchParams.get("source") ?? "unknown").slice(0, 24);
-  const isNews = source === "news-flash";
   const today = jstToday();
-  const passes = (r: NewRecord) =>
-    isNews
-      ? isFreshNewsForNotify(r.date, r.time, today)
-      : isFreshForNotify(r.date, today);
-  const filtered = unsent.filter(passes);
+  const filtered = unsent.filter((r) => isNotifiable(r, today));
   // 通知しない記録も、以後もう評価しないよう重複防止セットに入れる
-  // (古い/時刻無しは今後も条件を満たさないので、次回以降も送らない)。
-  const staleIds = unsent.filter((r) => !passes(r)).map((r) => r.id);
+  // (古い/推定日は今後も条件を満たさないので、次回以降も送らない)。
+  const staleIds = unsent.filter((r) => !isNotifiable(r, today)).map((r) => r.id);
   if (filtered.length === 0) {
     if (staleIds.length > 0) await markDispatched(staleIds);
     return NextResponse.json({
