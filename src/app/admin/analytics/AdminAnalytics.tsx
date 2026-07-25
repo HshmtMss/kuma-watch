@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AdminShell from "@/components/admin/AdminShell";
+import AnalyticsSeasonMap, {
+  type SeasonFrame,
+} from "@/components/admin/AnalyticsSeasonMap";
 
 type MonthPoint = { month: string; count: number };
 type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
@@ -168,6 +171,7 @@ type Data = {
   total: number;
   monthly: MonthPoint[];
   seasonality: SeasonPoint[];
+  spatialSeasonal: SeasonFrame[];
   momentum: Momentum;
   centroid: CentroidPoint[];
   multiBear: MultiBearPoint[];
@@ -262,6 +266,17 @@ function Content({
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* 時空間マップ — 「季節でどこに出没が広がるか」を地図アニメーションで。
+          最初に見せる"つかみ"として先頭に置く。 */}
+      {data.spatialSeasonal && data.spatialSeasonal.some((f) => f.total > 0) && (
+        <Section
+          title="季節でどこに広がるか（時空間マップ）"
+          note={`${scope}・全年をその暦月に畳み込んだ出没密度（約22kmメッシュ）。再生ボタンで1月→12月の年間リズムが見える。10月前後に一気に濃くなり、人里側へ広がるのが分かる。`}
+        >
+          <AnalyticsSeasonMap frames={data.spatialSeasonal} />
+        </Section>
+      )}
 
       {/* M: 森林率 — 出没が起きる土地の性質。対策の投資先を決める材料 */}
       {data.forest && (

@@ -56,6 +56,41 @@ function authorized(req: Request): boolean {
   return (req.headers.get("authorization") ?? "") === `Bearer ${secret}`;
 }
 
+// 暦月(1-12)ごとに、約22kmメッシュで出没件数を集約する。地図の時空間
+// アニメーション用。全年をその月に畳み込む（季節の年間リズムを見せる）。
+export type SeasonCell = { lat: number; lon: number; count: number };
+export type SeasonFrame = { month: number; total: number; cells: SeasonCell[] };
+function spatialSeasonal(records: AnalyticsRecord[]): SeasonFrame[] {
+  const CELL = 0.2; // 緯度で約 22km
+  const months: Map<string, SeasonCell>[] = Array.from(
+    { length: 12 },
+    () => new Map<string, SeasonCell>(),
+  );
+  const totals = new Array<number>(12).fill(0);
+  for (const r of records) {
+    if (typeof r.lat !== "number" || typeof r.lon !== "number" || !r.date)
+      continue;
+    const m = Number(r.date.slice(5, 7)) - 1;
+    if (m < 0 || m > 11) continue;
+    const gy = Math.round(r.lat / CELL);
+    const gx = Math.round(r.lon / CELL);
+    const key = `${gy}|${gx}`;
+    const cur = months[m].get(key);
+    if (cur) cur.count++;
+    else months[m].set(key, { lat: gy * CELL, lon: gx * CELL, count: 1 });
+    totals[m]++;
+  }
+  return months.map((mp, i) => ({
+    month: i + 1,
+    total: totals[i],
+    cells: [...mp.values()].map((c) => ({
+      lat: Number(c.lat.toFixed(3)),
+      lon: Number(c.lon.toFixed(3)),
+      count: c.count,
+    })),
+  }));
+}
+
 export async function GET(req: Request) {
   if (!authorized(req)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -81,6 +116,9 @@ export async function GET(req: Request) {
         // A: 時系列
         monthly: monthlyCounts(scoped, today, 36),
         seasonality: seasonality(scoped, today, 5),
+        // 時空間: 暦月ごとの出没密度（約22kmメッシュ）。地図アニメーションで
+        // 「季節で出没が人里へ広がる」様子を見せる。
+        spatialSeasonal: spatialSeasonal(scoped),
         // E/F/G/H: 勢い・重心移動・親子連れ・年次サマリー
         momentum: momentum(scoped, today),
         centroid: yearlyCentroid(scoped, today, 12),
