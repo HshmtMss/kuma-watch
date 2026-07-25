@@ -754,3 +754,77 @@ export function municipalityBoard(
     rows: rows.slice(0, topN),
   };
 }
+
+// 単一市町村のカルテ用ベンチマーク。県内順位・県平均比・直近の動きを出す。
+// records は県で絞った前提（prefScoped）。
+export type MuniProfile = {
+  pref: string;
+  muni: string;
+  total12mo: number;
+  share: number; // 県内シェア(%)
+  rank: number; // 県内順位（12mo件数の降順、1始まり。0=1年で出没なし）
+  muniCount: number; // 県内で出没のあった市町村数
+  prefAvg12mo: number; // 県内1市町村あたりの平均(12mo)
+  vsAvg: number | null; // 県平均の何倍
+  recent: number;
+  prev: number;
+  ratio: number | null;
+  level: SurgeLevel;
+  recentLabel: string;
+  prevLabel: string;
+};
+export function municipalityProfile(
+  records: AnalyticsRecord[], // 県で絞った前提
+  today: string,
+  pref: string,
+  muni: string,
+  windowDays = 30,
+): MuniProfile {
+  const tomorrow = shiftDays(today, -1);
+  const rFrom = shiftDays(today, windowDays - 1);
+  const pFrom = shiftDays(today, windowDays * 2 - 1);
+  const yFrom = shiftDays(today, 364);
+
+  const y12 = new Map<string, number>();
+  let prefTotal12mo = 0;
+  let recent = 0,
+    prev = 0;
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d) continue;
+    const c = (r.cityName ?? "").trim();
+    if (d >= yFrom && d < tomorrow) {
+      prefTotal12mo++;
+      if (c) y12.set(c, (y12.get(c) ?? 0) + 1);
+    }
+    if (c !== muni) continue;
+    if (d >= rFrom && d < tomorrow) recent++;
+    else if (d >= pFrom && d < rFrom) prev++;
+  }
+
+  const total12mo = y12.get(muni) ?? 0;
+  const sorted = [...y12.values()].sort((a, b) => b - a);
+  const rank = total12mo > 0 ? sorted.filter((v) => v > total12mo).length + 1 : 0;
+  const muniCount = y12.size;
+  const prefAvg12mo = muniCount > 0 ? prefTotal12mo / muniCount : 0;
+
+  return {
+    pref,
+    muni,
+    total12mo,
+    share:
+      prefTotal12mo > 0
+        ? Number(((total12mo / prefTotal12mo) * 100).toFixed(1))
+        : 0,
+    rank,
+    muniCount,
+    prefAvg12mo: Number(prefAvg12mo.toFixed(1)),
+    vsAvg: prefAvg12mo > 0 ? Number((total12mo / prefAvg12mo).toFixed(1)) : null,
+    recent,
+    prev,
+    ratio: prev > 0 ? Number((recent / prev).toFixed(2)) : null,
+    level: surgeLevel(recent, prev),
+    recentLabel: `${mdLabel(rFrom)}〜${mdLabel(today)}`,
+    prevLabel: `${mdLabel(pFrom)}〜${mdLabel(shiftDays(rFrom, 1))}`,
+  };
+}

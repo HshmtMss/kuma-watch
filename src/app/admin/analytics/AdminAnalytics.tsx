@@ -15,6 +15,9 @@ import AnalyticsSummary from "@/components/admin/AnalyticsSummary";
 import AnalyticsHourSeason, {
   type HourSeasonHeatmap,
 } from "@/components/admin/AnalyticsHourSeason";
+import AnalyticsMuniProfile, {
+  type MuniProfile,
+} from "@/components/admin/AnalyticsMuniProfile";
 
 type MonthPoint = { month: string; count: number };
 type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
@@ -184,6 +187,8 @@ type Data = {
   spatialSeasonal: SeasonFrame[];
   surge: SurgeBoard | null;
   muni: MunicipalityBoard | null;
+  muniOptions: string[];
+  muniProfile: MuniProfile | null;
   momentum: Momentum;
   centroid: CentroidPoint[];
   multiBear: MultiBearPoint[];
@@ -220,18 +225,25 @@ function Content({
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
   const [pref, setPref] = useState("");
+  const [muni, setMuni] = useState("");
   const [loading, setLoading] = useState(false);
 
   const load = useCallback(
-    async (p: string) => {
+    async (p: string, m: string) => {
       setLoading(true);
       setError("");
       try {
-        const q = p ? `?pref=${encodeURIComponent(p)}` : "";
-        const res = await fetch(`/api/admin/analytics${q}`, {
-          headers: { Authorization: `Bearer ${secret}` },
-          cache: "no-store",
-        });
+        const params = new URLSearchParams();
+        if (p) params.set("pref", p);
+        if (p && m) params.set("muni", m);
+        const q = params.toString();
+        const res = await fetch(
+          `/api/admin/analytics${q ? `?${q}` : ""}`,
+          {
+            headers: { Authorization: `Bearer ${secret}` },
+            cache: "no-store",
+          },
+        );
         if (res.status === 401) {
           deauth();
           return;
@@ -248,15 +260,15 @@ function Content({
   );
 
   useEffect(() => {
-    load(pref);
-  }, [load, pref]);
+    load(pref, muni);
+  }, [load, pref, muni]);
 
   if (error && !data)
     return <p className="text-sm text-rose-700">{error}</p>;
   if (!data)
     return <p className="text-sm text-stone-500">集計中…（初回は数秒）</p>;
 
-  const scope = pref || "全国";
+  const scope = muni ? `${pref} ${muni}` : pref || "全国";
 
   return (
     <div className="space-y-8">
@@ -264,7 +276,10 @@ function Content({
         <label className="text-sm text-stone-600">対象地域</label>
         <select
           value={pref}
-          onChange={(e) => setPref(e.target.value)}
+          onChange={(e) => {
+            setPref(e.target.value);
+            setMuni(""); // 県を変えたら市町村選択はリセット
+          }}
           className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
         >
           <option value="">全国</option>
@@ -274,11 +289,28 @@ function Content({
             </option>
           ))}
         </select>
+        {pref && data.muniOptions.length > 0 && (
+          <select
+            value={muni}
+            onChange={(e) => setMuni(e.target.value)}
+            className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+          >
+            <option value="">県内すべて</option>
+            {data.muniOptions.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        )}
         {loading && <span className="text-xs text-stone-400">更新中…</span>}
         <span className="ml-auto text-xs text-stone-400">
           基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
         </span>
       </div>
+
+      {/* 一市町村カルテ — 市町村を選んだときの見出し（県内順位・県平均比） */}
+      {data.muniProfile && <AnalyticsMuniProfile data={data.muniProfile} />}
 
       {/* エグゼクティブ要約 — 開いた瞬間に要点。既存データの合成のみ */}
       <AnalyticsSummary
