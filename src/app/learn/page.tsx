@@ -42,7 +42,7 @@ export default function LearnHub() {
               <ChevronRight size={22} strokeWidth={2} />
             </span>
           </Link>
-          <Link className="door d2" href="/articles">
+          <Link className="door d2" href="/learn/know">
             <span className="dic" aria-hidden>
               <BookOpen size={26} />
             </span>
