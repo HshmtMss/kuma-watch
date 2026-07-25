@@ -110,6 +110,27 @@
 .lrn .row-item .d{font-size:12px;color:var(--soft);margin-top:2px;line-height:1.5}
 .lrn .row-item .chev{margin-left:auto;color:var(--faint)}
 
+/* 最新を追う（速報・研究・政策フィード） */
+.lrn .feeds{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.lrn .feed{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:16px}
+.lrn .feed .fh{display:flex;align-items:center;gap:11px}
+.lrn .feed .fic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none}
+.lrn .feed.news .fic{background:var(--high-bg);color:var(--high)}
+.lrn .feed.res .fic{background:var(--cedar-bg);color:var(--cedar)}
+.lrn .feed.gov .fic{background:var(--honey-bg);color:var(--honey-d)}
+.lrn .feed .ft{font-weight:800;font-size:14.5px}
+.lrn .feed .fs{font-size:11px;color:var(--faint)}
+.lrn .feed ul{list-style:none;margin:8px 0 0;padding:0}
+.lrn .feed li{padding:11px 0;border-top:1px solid var(--line2)}
+.lrn .feed li a{display:block}
+.lrn .feed li .meta{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:7px}
+.lrn .feed li .l{font-size:13.5px;line-height:1.55;margin-top:3px;display:block}
+.lrn .feed li:hover .l{color:var(--honey-d)}
+.lrn .feed .all{margin-top:12px;padding-top:12px;border-top:1px solid var(--line2);font-size:12.5px;font-weight:800;color:var(--honey-d);display:flex;align-items:center;gap:5px}
+.lrn .pin{font-size:10px;font-weight:800;padding:1px 7px;border-radius:20px;background:var(--honey-bg);color:var(--honey-d);white-space:nowrap}
+.lrn .pin.new{background:var(--high-bg);color:var(--high)}
+@media (min-width:680px){.lrn .feeds{flex-direction:row}.lrn .feed{flex:1;display:flex;flex-direction:column}.lrn .feed ul{flex:1}}
+
 .lrn .foot{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 44px;color:var(--faint);font-size:11px;text-align:center;line-height:1.7}
 
 @media (prefers-reduced-motion:reduce){.lrn *{transition:none!important}}

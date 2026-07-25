@@ -51,7 +51,7 @@ export default function LearnHub() {
               <ChevronRight size={22} strokeWidth={2} />
             </span>
           </Link>
-          <Link className="door d3" href="/news">
+          <Link className="door d3" href="/learn/latest">
             <span className="dic" aria-hidden>
               <Radio size={26} />
             </span>
