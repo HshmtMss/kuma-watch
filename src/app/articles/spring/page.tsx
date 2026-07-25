@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         雪解け直後の山菜採り・新緑登山では、薮を見通せず母子グマの存在に気づかないまま接近する事故が多発します。
         単独行を避け、音を出して歩き、子グマを見たら即離脱が鉄則です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>4〜6月は冬眠明けで飢え</strong>、子連れの母グマが年間で最も攻撃的。
+          </>,
+          <>
+            雪解け直後の<strong>山菜採り・新緑登山</strong>は薮で見通せず、母子グマに気づかず接近しやすい。
+          </>,
+          <>
+            <strong>単独行を避け、音を出して歩く</strong>。子グマを見たら即座に離脱する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>捕食目的の襲撃</strong>では逆効果で、抵抗の方が生存率が高くなります。
         ツキノワグマでは「両手で頭と首を守る」が基本で、完全に脱力せず防御姿勢を取り続けるのが現実的な助言です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            「死んだふり」は<strong>条件付きで有効</strong>。ヒグマの防衛攻撃には生存戦略になるが、捕食目的では逆効果。
+          </>,
+          <>
+            <strong>攻撃が防衛型か捕食型か</strong>で対応が真逆。捕食型は抵抗する方が生存率が高い。
+          </>,
+          <>
+            ツキノワグマは<strong>「両手で頭と首を守る」</strong>が基本。完全に脱力せず防御姿勢を保つ。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

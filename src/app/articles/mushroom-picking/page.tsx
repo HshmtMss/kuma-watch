@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         鈴・ホイッスル・スプレーの携行と、複数人・短時間・午前中という基本ルールで
         遭遇率は大きく下げられます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            秋のクマ人身事故で<strong>最多のシーンが「きのこ狩り中」</strong>。
+          </>,
+          <>
+            前傾で地面を見続け林床に分け入るため、<strong>クマに最も接近しやすい状況</strong>が揃う。
+          </>,
+          <>
+            <strong>鈴・ホイッスル・スプレー携行＋複数人・短時間・午前中</strong>で遭遇率を下げる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

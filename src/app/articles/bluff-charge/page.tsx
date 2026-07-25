@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         威嚇に対して<strong>背を向けて走る</strong>と本気の攻撃を誘発するので、
         正面を向いたまま動かない・スプレーを構えるのが鉄則です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            突進の多くは<strong>威嚇（ブラフチャージ）</strong>で、5〜10m手前で急停止する。
+          </>,
+          <>
+            <strong>耳の動き・後肢の構え・口の様子</strong>で本気の攻撃と見分けられる。
+          </>,
+          <>
+            背を向けて走ると本気の攻撃を誘発。<strong>正面のまま動かず、スプレーを構える</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

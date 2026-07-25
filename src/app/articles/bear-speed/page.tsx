@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         坂・斜面・障害物でもクマの方が速い。だから「逃げる」は対策ではなく、
         「逃げない」が最初の選択肢になります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            最高速度はツキノワグマ<strong>約40km/h</strong>、ヒグマ<strong>約50km/h</strong>。陸上選手でも逃げ切れない。
+          </>,
+          <>
+            <strong>坂・斜面・水中・木登り</strong>でもクマの方が速い。逃げ場はない。
+          </>,
+          <>
+            だから「逃げる」は対策にならない。<strong>「逃げない」が最初の選択肢</strong>になる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

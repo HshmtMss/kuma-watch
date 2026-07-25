@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         テント内に食料を持ち込まない、BBQ の油を持ち帰る、就寝時はヘッドライトを枕元に。
         基本ルールを守るだけで、夢のような夜のキャンプが事故にならずに済みます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            キャンプ場の遭遇は<strong>食料の匂い管理と夜間の警戒</strong>でほぼ防げる。
+          </>,
+          <>
+            <strong>テント内に食料を持ち込まない</strong>・BBQの油は持ち帰る・就寝時はライトを枕元に。
+          </>,
+          <>
+            目撃したら食料を片づけ、<strong>静かに管理者へ連絡</strong>する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         柿・栗・果樹園・生ゴミ・コンポスト・ペットフード — 匂いの強い食料を放置すると、クマの目当てになります。
         家庭でできる対策は意外とシンプルで、5 つの習慣を変えるだけで集落全体のリスクが大きく下がります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマを呼ぶ最大の要因は人里の<strong>「餌場」</strong>。柿・栗・生ゴミ・ペットフードの放置が招く。
+          </>,
+          <>
+            対策は<strong>匂いの強い食料を残さない5つの習慣</strong>に集約できる。
+          </>,
+          <>
+            <strong>電気柵で隔離し、集落全体で取り組む</strong>とリスクが大きく下がる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

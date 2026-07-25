@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         ドングリ凶作年は市街地まで降りてきます。
         早朝・夕方を避け、音を出して歩き、出発前に出没情報を確認することが必須です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>9〜11月は目撃が年間最多</strong>。冬眠前の食欲増加（ハイパーフェイジア）で行動範囲が広がる。
+          </>,
+          <>
+            <strong>ドングリ凶作の年は市街地まで</strong>降りてくる。2024年以降は過去最悪レベルの出没。
+          </>,
+          <>
+            <strong>早朝・夕方を避け、音を出して歩く</strong>。出発前に必ず出没情報を確認する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
