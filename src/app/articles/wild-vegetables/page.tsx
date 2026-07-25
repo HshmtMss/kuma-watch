@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         屈み込んで地面に集中する人間の組み合わせは、年間で最も危険な状況の 1 つです。
         4〜6 月は装備・場所・時間帯のすべてを「クマ前提」で組んでください。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>春の人身事故で最多のシーンが「山菜採り中」</strong>。
+          </>,
+          <>
+            冬眠明けで飢えた個体・子連れ母グマと、<strong>屈んで地面に集中する人間</strong>は最も危険な組合せ。
+          </>,
+          <>
+            4〜6月は<strong>装備・場所・時間帯をすべて「クマ前提」</strong>で組む。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

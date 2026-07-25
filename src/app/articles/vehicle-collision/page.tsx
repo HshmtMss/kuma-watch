@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         さらに衝突後に <strong>クマが車外で生きていて運転者を襲う事例</strong>もあり、
         対応を誤ると二次被害に発展します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマとの車衝突は<strong>シカ衝突より危険</strong>。100〜300kgの塊が高速で衝突する。
+          </>,
+          <>
+            衝突後に<strong>クマが車外で生きていて運転者を襲う</strong>二次被害もある。
+          </>,
+          <>
+            夜間運転は特に注意。<strong>回避運転と、衝突後は車内で待機して通報</strong>を徹底。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

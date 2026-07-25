@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         川遊び・キャンプ・避暑地での活動は、夏特有のクマ対策が必要。
         食料の匂いや夜間の備えを軽視すると、夏休みの楽しみが事故に変わりかねません。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            7〜8月は<strong>涼を求めて沢筋・中腹部に集中</strong>する。
+          </>,
+          <>
+            <strong>川遊び・キャンプ・避暑地</strong>は夏特有のクマ対策が必要。
+          </>,
+          <>
+            食料の匂いと夜間の備えを軽視しない。<strong>夕涼みの時間帯が要注意</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

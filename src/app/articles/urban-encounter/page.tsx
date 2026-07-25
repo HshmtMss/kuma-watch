@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         山中とは違い、自分で追い払おうとせず、警察・自治体・猟友会の対処を待ちます。
         子供・高齢者・通学路の場面では特に「動かない・建物に入る」を最優先に。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            市街地の遭遇は<strong>屋内退避→110番→自治体通報</strong>の順が基本。
+          </>,
+          <>
+            山中と違い<strong>自分で追い払わず</strong>、警察・自治体・猟友会の対処を待つ。
+          </>,
+          <>
+            子供・高齢者は<strong>「動かない・建物に入る」</strong>を最優先に。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

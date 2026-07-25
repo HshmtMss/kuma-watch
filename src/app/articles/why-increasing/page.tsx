@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         ブナ凶作・里山の崩壊・人口減少・気候変動が複合的に作用しています。
         単純な駆除では解決せず、餌場を作らない長期的な対策が必要です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「急に増えた」のではなく「クマと人の生活圏が重なった」</strong>が正解。
+          </>,
+          <>
+            <strong>ブナ凶作・里山崩壊・人口減少・気候変動</strong>が複合的に作用している。
+          </>,
+          <>
+            単純な駆除では解決せず、<strong>餌場を作らない長期的な対策</strong>が必要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

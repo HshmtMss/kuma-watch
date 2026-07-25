@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         さらに早朝・薄暮の時間帯と単独行動が重なるため、登山者より遭遇事故率が高い活動。
         装備・ルート計画・複数人走で予防できます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            トレイルランは<strong>「速さ」がリスク</strong>。クマが回避する時間を奪う。
+          </>,
+          <>
+            <strong>早朝・薄暮＋単独行動</strong>が重なり、登山者より遭遇事故率が高い。
+          </>,
+          <>
+            <strong>装備・ルート計画・複数人走</strong>で予防できる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

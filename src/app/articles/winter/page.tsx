@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -33,6 +34,21 @@ export default function Page() {
         <strong>結論</strong>: 「冬はクマがいない」は誤解です。<strong>冬眠せずに活動する個体 (穴持たず)</strong> が確実に存在し、暖冬や食料不足の年は数が増えます。
         スキー場・冬山登山・スノーシューでも油断せず、雪上の足跡や食痕に注意してください。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「冬はクマがいない」は誤解</strong>。冬眠しない個体（穴持たず）が確実にいる。
+          </>,
+          <>
+            <strong>暖冬・食料不足の年</strong>は活動する数が増える。
+          </>,
+          <>
+            スキー場・冬山でも油断せず、<strong>雪上の足跡・食痕</strong>に注意する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

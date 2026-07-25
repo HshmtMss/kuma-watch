@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>アーバン・ベア</strong>現象は、もはや一過性の話題ではなく構造的な変化です。
         住民・通勤者・自治体それぞれが取れる備えを整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「クマは山にいる」前提は2025年以降崩れた</strong>。市街地に出るアーバンベアは構造的変化。
+          </>,
+          <>
+            県庁所在地クラスの<strong>住宅街・通勤路・商店街</strong>にも出る。
+          </>,
+          <>
+            <strong>住民・通勤者・自治体</strong>それぞれの備えが必要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
