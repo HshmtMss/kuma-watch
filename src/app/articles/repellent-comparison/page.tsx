@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         本記事はスプレー・鈴・ホーン・ラジオ・ライト・電気柵・忌避剤を横断比較し、
         「何にいくら投資するか」の判断材料を提供します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマよけグッズは<strong>有効性・エビデンス・コスト・誤用リスクの4軸</strong>で選ぶ。
+          </>,
+          <>
+            <strong>遭遇直前はスプレーが最強</strong>。接近防止は鈴・ホーン、農地・家屋は電気柵。
+          </>,
+          <>
+            万能な1つはない。<strong>用途別に「何にいくら投資するか」</strong>を判断する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -35,6 +36,21 @@ export default function Page() {
         装備の核は <strong>メイン 300〜500 ルーメンのヘッドライト + サブライト + 反射材 + 腰スプレー</strong>。
         夕方の下山遅れは「装備不十分の夜山行」を強いるため、装備で安全マージンを取っておきましょう。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>早朝・夕方の山行は遭遇率が日中の数倍</strong>。薄明薄暮が活動ピーク。
+          </>,
+          <>
+            装備の核は<strong>メイン300〜500lmヘッドライト＋サブライト＋反射材＋腰スプレー</strong>。
+          </>,
+          <>
+            夕方の下山遅れは夜山行を強いる。<strong>装備で安全マージン</strong>を取っておく。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

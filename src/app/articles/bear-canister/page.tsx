@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -38,6 +39,21 @@ export default function Page() {
         テント内に食料を置かない・匂いを残さない・調理場所と就寝場所を 100m 離す、の 3 点で
         遭遇率は劇的に下がります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマを引き寄せる最大要因は<strong>食料・調理器具・歯磨き粉などの匂い</strong>。
+          </>,
+          <>
+            核は<strong>ベアキャニスター（フードコンテナ）かフードハング</strong>。テント内に食料を置かない。
+          </>,
+          <>
+            <strong>調理場所と就寝場所を100m離す</strong>。この3点で遭遇率が激減する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

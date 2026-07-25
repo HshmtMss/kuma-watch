@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         母グマは子を守るため最も攻撃的になる個体で、人身事故の代表的なパターン。
         子グマを見たら 0.5 秒で「立ち去る」判断を。撫でる・写真を撮るは絶対 NG。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            山中で<strong>子グマを単独で見ることはない</strong>。必ず近くに母グマがいる。
+          </>,
+          <>
+            <strong>母グマは子を守るため最も攻撃的</strong>。人身事故の代表的なパターン。
+          </>,
+          <>
+            子グマを見たら<strong>0.5秒で「立ち去る」</strong>。撫でる・写真を撮るは絶対NG。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

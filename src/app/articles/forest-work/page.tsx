@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         シーン別のリスクと、現場で使えるスプレー・無線連絡・複数人作業ルールで
         労災・人身事故を防ぐ枠組みを整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            林業・農業・狩猟の業務従事者は<strong>遭遇頻度がレジャー登山者の数十倍</strong>。
+          </>,
+          <>
+            <strong>チェーンソー音・伐採跡地・果樹園作業</strong>などシーン別にリスクが異なる。
+          </>,
+          <>
+            <strong>スプレー・無線連絡・複数人作業ルール</strong>で労災・人身事故を防ぐ。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

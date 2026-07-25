@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -33,6 +34,21 @@ export default function Page() {
         <strong>結論</strong>: 通学路でのクマ遭遇は、<strong>家庭・学校・地域</strong>の三方向の連携で大きく減らせます。
         集団登下校、装備の携帯、目撃情報の即時共有、緩衝帯の整備 — 子供を守るための具体的な行動を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            通学路の遭遇は<strong>家庭・学校・地域の三方連携</strong>で大きく減らせる。
+          </>,
+          <>
+            柱は<strong>集団登下校・装備携帯・目撃情報の即時共有・緩衝帯の整備</strong>。
+          </>,
+          <>
+            子供には<strong>「走らない・大人にすぐ知らせる」</strong>を事前に教えておく。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

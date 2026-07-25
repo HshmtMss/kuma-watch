@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         遠征時は<strong>現地のアウトドアショップ・登山口で購入</strong>するか、
         <strong>陸送 (宅配便) で事前送付</strong>するのが現実的です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマよけスプレーは<strong>飛行機は持ち込み・預け入れとも原則禁止</strong>（圧縮ガス扱い）。
+          </>,
+          <>
+            <strong>新幹線・JR在来線は持ち込み可</strong>だが、容量・噴射圧の規定超で断られることも。
+          </>,
+          <>
+            遠征は<strong>現地購入か宅配便で事前送付</strong>が現実的。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

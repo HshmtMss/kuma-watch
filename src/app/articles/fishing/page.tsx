@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -33,6 +34,21 @@ export default function Page() {
         <strong>結論</strong>: 渓流釣りはクマ遭遇率が高い活動です。<strong>沢音で鈴の音が消え</strong>、視界が悪く、クマも沢を利用するため。
         ホイッスル・複数人での行動・餌の匂い管理を徹底し、ベテラン釣り師でも油断は禁物です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            渓流釣りは遭遇率が高い。<strong>沢音で鈴が消え、視界が悪く、クマも沢を使う</strong>ため。
+          </>,
+          <>
+            <strong>ホイッスル・複数人での行動・餌の匂い管理</strong>を徹底する。
+          </>,
+          <>
+            ベテランでも油断は禁物。<strong>沢では鈴よりホイッスルが主役</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
