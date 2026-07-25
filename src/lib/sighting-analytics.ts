@@ -498,3 +498,218 @@ export function severity(
     .slice(0, recentInjuryLimit);
   return { series, recentInjuries };
 }
+
+// ---- 急増アラートボード（早期警戒）------------------------------------------
+// 「今どこが急に増えているか」を信号色で出す。直近 windowDays 日と、その直前の
+// 同じ長さの窓を県別に比べる。同一ソース内・短期の比較なので、ソースが年々増える
+// 影響（年次の平年比を狂わせる罠）を受けにくく、当年の取り込みラグにも強い。
+export type SurgeLevel =
+  | "surge" // 急増（倍増級 or 新規多発）
+  | "rising" // 増加傾向
+  | "steady" // 横ばい/母数不足
+  | "quiet"; // 目立って減少
+export type SurgeRow = {
+  pref: string;
+  recent: number;
+  prev: number;
+  delta: number;
+  ratio: number | null; // recent / prev（prev=0 は null=「新規」）
+  level: SurgeLevel;
+};
+export type SurgeBoard = {
+  windowDays: number;
+  recentLabel: string; // 例 "6/26〜7/25"
+  prevLabel: string; // 例 "5/27〜6/25"
+  national: {
+    recent: number;
+    prev: number;
+    delta: number;
+    ratio: number | null;
+    level: SurgeLevel;
+    recent7: number;
+    prev7: number;
+  };
+  rising: SurgeRow[]; // 急増・増加を強い順
+  quiet: SurgeRow[]; // 目立って減った県（参考）
+};
+
+function mdLabel(d: string): string {
+  const [, mo, da] = d.split("-");
+  return `${Number(mo)}/${Number(da)}`;
+}
+
+function surgeLevel(recent: number, prev: number): SurgeLevel {
+  const ratio = prev > 0 ? recent / prev : null;
+  if (prev === 0 && recent >= 8) return "surge"; // 以前ゼロ→多発は新規急増
+  if (ratio != null && ratio >= 2 && recent >= 10) return "surge";
+  if (ratio != null && ratio >= 1.4 && recent >= 8) return "rising";
+  if (ratio != null && ratio <= 0.5 && prev >= 12) return "quiet";
+  return "steady";
+}
+
+export function surgeBoard(
+  records: AnalyticsRecord[],
+  today: string,
+  windowDays = 30,
+): SurgeBoard {
+  const tomorrow = shiftDays(today, -1); // today を含める排他上限
+  const rFrom = shiftDays(today, windowDays - 1); // 直近窓の始点
+  const pFrom = shiftDays(today, windowDays * 2 - 1); // 前窓の始点
+  const r7From = shiftDays(today, 6);
+  const p7From = shiftDays(today, 13);
+
+  const recent = new Map<string, number>();
+  const prev = new Map<string, number>();
+  let nR = 0,
+    nP = 0,
+    nR7 = 0,
+    nP7 = 0;
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d) continue;
+    const p = (r.prefectureName ?? "").trim();
+    if (d >= rFrom && d < tomorrow) {
+      nR++;
+      if (p) recent.set(p, (recent.get(p) ?? 0) + 1);
+      if (d >= r7From) nR7++;
+    } else if (d >= pFrom && d < rFrom) {
+      nP++;
+      if (p) prev.set(p, (prev.get(p) ?? 0) + 1);
+    }
+    if (d >= p7From && d < r7From) nP7++;
+  }
+
+  const prefs = new Set([...recent.keys(), ...prev.keys()]);
+  const rows: SurgeRow[] = [];
+  for (const p of prefs) {
+    const rc = recent.get(p) ?? 0;
+    const pv = prev.get(p) ?? 0;
+    rows.push({
+      pref: p,
+      recent: rc,
+      prev: pv,
+      delta: rc - pv,
+      ratio: pv > 0 ? Number((rc / pv).toFixed(2)) : null,
+      level: surgeLevel(rc, pv),
+    });
+  }
+  const rank = (l: SurgeLevel) => (l === "surge" ? 2 : l === "rising" ? 1 : 0);
+  const rising = rows
+    .filter((r) => r.level === "surge" || r.level === "rising")
+    .sort((a, b) => {
+      if (rank(b.level) !== rank(a.level)) return rank(b.level) - rank(a.level);
+      return b.delta - a.delta;
+    });
+  const quiet = rows
+    .filter((r) => r.level === "quiet")
+    .sort((a, b) => a.delta - b.delta)
+    .slice(0, 6);
+
+  return {
+    windowDays,
+    recentLabel: `${mdLabel(rFrom)}〜${mdLabel(today)}`,
+    prevLabel: `${mdLabel(pFrom)}〜${mdLabel(shiftDays(rFrom, 1))}`,
+    national: {
+      recent: nR,
+      prev: nP,
+      delta: nR - nP,
+      ratio: nP > 0 ? Number((nR / nP).toFixed(2)) : null,
+      level: surgeLevel(nR, nP),
+      recent7: nR7,
+      prev7: nP7,
+    },
+    rising,
+    quiet,
+  };
+}
+
+// ---- 自治体カルテ（県内の市町村ベンチマーク）--------------------------------
+// 「自分の県のどの市町村で起きているか／自分の市町村は増えているか」を出す。
+// 直近1年の件数で県内の位置づけ（シェア）を、直近30日 vs 直前30日で今の動きを
+// 見せる。県を選んだときだけ意味を持つので records は県で絞った前提。
+export type MuniRow = {
+  muni: string;
+  recent: number; // 直近30日
+  prev: number; // 直前30日
+  delta: number;
+  ratio: number | null;
+  level: SurgeLevel;
+  total12mo: number; // 直近1年
+  share: number; // 県内シェア(%)
+};
+export type MunicipalityBoard = {
+  pref: string;
+  recentLabel: string;
+  prevLabel: string;
+  prefTotal12mo: number;
+  prefRecent: number;
+  prefPrev: number;
+  muniCount: number; // 直近1年に出没があった市町村数
+  rows: MuniRow[]; // 県内で多い順(上位)
+};
+
+export function municipalityBoard(
+  records: AnalyticsRecord[], // 県で絞った前提
+  today: string,
+  pref: string,
+  windowDays = 30,
+  topN = 24,
+): MunicipalityBoard {
+  const tomorrow = shiftDays(today, -1);
+  const rFrom = shiftDays(today, windowDays - 1);
+  const pFrom = shiftDays(today, windowDays * 2 - 1);
+  const yFrom = shiftDays(today, 364); // 直近1年
+
+  const recent = new Map<string, number>();
+  const prev = new Map<string, number>();
+  const y12 = new Map<string, number>();
+  let prefRecent = 0,
+    prefPrev = 0,
+    prefTotal12mo = 0;
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d) continue;
+    const c = (r.cityName ?? "").trim();
+    if (d >= yFrom && d < tomorrow) {
+      prefTotal12mo++;
+      if (c) y12.set(c, (y12.get(c) ?? 0) + 1);
+    }
+    if (d >= rFrom && d < tomorrow) {
+      prefRecent++;
+      if (c) recent.set(c, (recent.get(c) ?? 0) + 1);
+    } else if (d >= pFrom && d < rFrom) {
+      prefPrev++;
+      if (c) prev.set(c, (prev.get(c) ?? 0) + 1);
+    }
+  }
+
+  const munis = new Set([...y12.keys(), ...recent.keys()]);
+  const rows: MuniRow[] = [];
+  for (const m of munis) {
+    const rc = recent.get(m) ?? 0;
+    const pv = prev.get(m) ?? 0;
+    const t12 = y12.get(m) ?? 0;
+    rows.push({
+      muni: m,
+      recent: rc,
+      prev: pv,
+      delta: rc - pv,
+      ratio: pv > 0 ? Number((rc / pv).toFixed(2)) : null,
+      level: surgeLevel(rc, pv),
+      total12mo: t12,
+      share: prefTotal12mo > 0 ? Number(((t12 / prefTotal12mo) * 100).toFixed(1)) : 0,
+    });
+  }
+  rows.sort((a, b) => b.total12mo - a.total12mo || b.recent - a.recent);
+
+  return {
+    pref,
+    recentLabel: `${mdLabel(rFrom)}〜${mdLabel(today)}`,
+    prevLabel: `${mdLabel(pFrom)}〜${mdLabel(shiftDays(rFrom, 1))}`,
+    prefTotal12mo,
+    prefRecent,
+    prefPrev,
+    muniCount: y12.size,
+    rows: rows.slice(0, topN),
+  };
+}

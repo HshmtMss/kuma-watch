@@ -5,6 +5,13 @@ import AdminShell from "@/components/admin/AdminShell";
 import AnalyticsSeasonMap, {
   type SeasonFrame,
 } from "@/components/admin/AnalyticsSeasonMap";
+import AnalyticsSurgeBoard, {
+  type SurgeBoard,
+} from "@/components/admin/AnalyticsSurgeBoard";
+import AnalyticsMuniBoard, {
+  type MunicipalityBoard,
+} from "@/components/admin/AnalyticsMuniBoard";
+import AnalyticsSummary from "@/components/admin/AnalyticsSummary";
 
 type MonthPoint = { month: string; count: number };
 type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
@@ -172,6 +179,8 @@ type Data = {
   monthly: MonthPoint[];
   seasonality: SeasonPoint[];
   spatialSeasonal: SeasonFrame[];
+  surge: SurgeBoard | null;
+  muni: MunicipalityBoard | null;
   momentum: Momentum;
   centroid: CentroidPoint[];
   multiBear: MultiBearPoint[];
@@ -267,6 +276,15 @@ function Content({
         </span>
       </div>
 
+      {/* エグゼクティブ要約 — 開いた瞬間に要点。既存データの合成のみ */}
+      <AnalyticsSummary
+        surge={data.surge}
+        spatialSeasonal={data.spatialSeasonal}
+        total={data.total}
+        today={data.today}
+        scope={scope}
+      />
+
       {/* 時空間マップ — 「季節でどこに出没が広がるか」を地図アニメーションで。
           最初に見せる"つかみ"として先頭に置く。 */}
       {data.spatialSeasonal && data.spatialSeasonal.some((f) => f.total > 0) && (
@@ -275,6 +293,26 @@ function Content({
           note={`${scope}・全年をその暦月に畳み込んだ出没密度（約22kmメッシュ）。再生ボタンで1月→12月の年間リズムが見える。10月前後に一気に濃くなり、人里側へ広がるのが分かる。`}
         >
           <AnalyticsSeasonMap frames={data.spatialSeasonal} />
+        </Section>
+      )}
+
+      {/* 早期警戒 — 今どこで急に増えているか。地図の次に見せる実務ボード */}
+      {data.surge && (
+        <Section
+          title="早期警戒：今どこで急に増えているか"
+          note="直近30日と直前30日の県別件数を比較した急増アラート。同一情報源どうしの短期比較なので、情報源増加や当年の取り込みラグの影響を受けにくい。"
+        >
+          <AnalyticsSurgeBoard data={data.surge} />
+        </Section>
+      )}
+
+      {/* 自治体カルテ — 県を選んだときだけ。県内の市町村ベンチマーク */}
+      {data.muni && (
+        <Section
+          title={`自治体カルテ：${data.muni.pref}の市町村`}
+          note="県内のどの市町村で起きているか（直近1年のシェア）と、いまの動き（直近30日 vs 直前30日）。自治体が自地域の位置づけを掴むための表。"
+        >
+          <AnalyticsMuniBoard data={data.muni} />
         </Section>
       )}
 

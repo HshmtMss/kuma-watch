@@ -37,6 +37,8 @@ import {
   yearlyCentroid,
   multiBearShare,
   yearlySummary,
+  surgeBoard,
+  municipalityBoard,
   type AnalyticsRecord,
 } from "@/lib/sighting-analytics";
 
@@ -119,6 +121,12 @@ export async function GET(req: Request) {
         // 時空間: 暦月ごとの出没密度（約22kmメッシュ）。地図アニメーションで
         // 「季節で出没が人里へ広がる」様子を見せる。
         spatialSeasonal: spatialSeasonal(scoped),
+        // 早期警戒: 「今どこが急増しているか」を信号色で。直近30日 vs その前30日を
+        // 県別に比べる。同一ソース内・短期の比較なので、ソース増加や当年ラグの影響を
+        // 受けにくく honest（年次の平年比は継続ソースが乏しく誤報になるため不採用）。
+        surge: surgeBoard(all, today),
+        // 自治体カルテ: 県を選んだときだけ、県内の市町村ベンチマーク（シェア＋動き）
+        muni: pref ? municipalityBoard(scoped, today, pref) : null,
         // E/F/G/H: 勢い・重心移動・親子連れ・年次サマリー
         momentum: momentum(scoped, today),
         centroid: yearlyCentroid(scoped, today, 12),
