@@ -24,6 +24,22 @@ export const NOTIFY_MAX_AGE_DAYS = 0;
 export const NOTIFY_MAP_ZOOM = 15;
 
 /**
+ * 夜間ミュート帯 (JST)。この時間は通知を送らない。
+ * 20:00〜翌 08:00。夜間は自治体・報道の新規がほぼ無く、まれに出る深夜の
+ * 情報(誤報・古い情報を含む)で就寝中に起こしてしまうのを避けるため。
+ * 地図には従来どおり載る。夜間ぶんは翌朝まとめては送らない(=その回は見送り。
+ * 「今日の出没だけ」方針とも整合し、朝には昨日扱いになるため)。
+ */
+export const QUIET_START_HOUR = 20;
+export const QUIET_END_HOUR = 8;
+
+/** 今が夜間ミュート帯(JST 20:00〜翌8:00)か。 */
+export function isQuietHours(now: Date = new Date()): boolean {
+  const jstHour = (now.getUTCHours() + 9) % 24;
+  return jstHour >= QUIET_START_HOUR || jstHour < QUIET_END_HOUR;
+}
+
+/**
  * 通知の「地図で見る」リンク。出没地点の座標に直接ズームして開く。
  *
  * 従来は市町村ページ(/place/...)に飛ばしていたため、地図が遠すぎてどこに

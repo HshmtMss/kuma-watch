@@ -14,7 +14,11 @@ import {
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday } from "@/lib/jst-date";
-import { isNotifiable, notifyMapUrl } from "@/lib/notify-freshness";
+import {
+  isNotifiable,
+  isQuietHours,
+  notifyMapUrl,
+} from "@/lib/notify-freshness";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -137,6 +141,11 @@ export async function POST(req: Request) {
   const records = body.newRecords ?? [];
   if (records.length === 0) {
     return NextResponse.json({ ok: true, sent: 0, reason: "no records" });
+  }
+
+  // 夜間(JST 20:00〜翌8:00)はミュート。LINE 側と揃える。何も送らず・マークしない。
+  if (isQuietHours()) {
+    return NextResponse.json({ ok: true, sent: 0, reason: "quiet hours" });
   }
 
   // 1. 重複送信を弾く
