@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         音は「人間の話し声を一定して出す」、後退は「来た道へ・走らない」が基本です。
         夜間は捕食型攻撃の確率が日中より高いため、対応の優先順位が変わります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            活動ピークは<strong>薄明薄暮（夕方〜夜明け）</strong>。夜間は捕食型攻撃の確率が上がる。
+          </>,
+          <>
+            ライトは<strong>「広角で広く＋遠射で確認」</strong>の二段構え。音は人の話し声を一定して出す。
+          </>,
+          <>
+            後退は<strong>来た道へ・走らない</strong>。テント・小屋では食料のにおいを残さない。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

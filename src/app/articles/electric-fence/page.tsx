@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         確実なアース、定期的な草刈りの 4 点が揃えば撃退率は飛躍的に上がります。
         ホームセンターで揃う機材で、果樹園 1 反 (10a) 規模なら 5〜10 万円から始められます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            家・畑・果樹園のクマ対策で<strong>最も実効性が高い物理障壁</strong>。
+          </>,
+          <>
+            必須は 4 点：<strong>電圧 5,000V 以上／5 段以上／確実なアース／定期の草刈り</strong>。
+          </>,
+          <>
+            果樹園 1 反（10a）で <strong>5〜10 万円</strong>から。補助金も活用できる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

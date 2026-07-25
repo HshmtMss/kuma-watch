@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         10m 以下ならスプレー噴射 — もしくは伏せて頭を守る。
         絶対にやってはいけないのは「背中を見せて走る」こと。クマの走力は時速 40km で、人間は逃げ切れません。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            まず<strong>距離を測る</strong>。50m 以上→ゆっくり後退／20m 前後→正面のまま静かに離れる／10m 以下→スプレー、または伏せて頭を守る。
+          </>,
+          <>
+            絶対に<strong>背を見せて走らない</strong>。クマは時速 40km で逃げ切れない。
+          </>,
+          <>
+            ヒグマは別ルール（より攻撃的）。<strong>遭遇前の準備</strong>（音・スプレー・出没情報の確認）が命を分ける。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
