@@ -282,7 +282,12 @@ function dedupeNearbySightings(records: UnifiedSighting[]): UnifiedSighting[] {
 // 検証: 直近1年で報道 7,551 → 2,492 件(重複5,059件=67%を統合。内訳 公式重複1,058 +
 //       報道どうし4,001)。一次側が空白の県(兵庫・福井 等)の報道 only は残る。
 const NEWS_DUP_DAY_WINDOW = 1;
-const NEWS_DUP_KM = 5;
+// 同一事案の複数報道はジオコーディング揺れで散らばるが、通常は同一地区内
+// (〜2km)。5km は広すぎて別地区(例: 仙台市内で原町と 5km 先)を 1 つに束ね、
+// 代表が別所になって「その地区の最新出没が地図から消える」不具合の原因だった。
+// 2km に絞り、別地区は別ピンとして残す。同一地区内の日またぎ重複は
+// collapseSameNeighborhood 側で最新1件へ集約する。
+const NEWS_DUP_KM = 2;
 
 function haversineKmLocal(
   aLat: number,
@@ -370,13 +375,17 @@ function dedupeNews(records: UnifiedSighting[]): UnifiedSighting[] {
     if (geo) addToIndex(primaryIdx, r);
   }
 
-  // 代表を「具体的な地区名 > 本文が長い > 取り込みが古い」順で優先。
+  // 代表を「出没日が新しい > 具体的な地区名 > 本文が長い > 取り込みが新しい」順で
+  // 優先。この順が貪欲クラスタリングの anchor 採用順になるので、同一事案の
+  // クラスタでは最新の出没が代表として残る(以前は取り込みが古い方を残しており、
+  // 同じ場所で新しい駆除より古い目撃が表示される不具合の原因だった)。
   geoNews.sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
     const s = Number(isSpecificSection(b)) - Number(isSpecificSection(a));
     if (s !== 0) return s;
     const c = (b.comment ?? "").length - (a.comment ?? "").length;
     if (c !== 0) return c;
-    return (a.ingestedAt ?? 0) - (b.ingestedAt ?? 0);
+    return (b.ingestedAt ?? 0) - (a.ingestedAt ?? 0);
   });
 
   // 貪欲クラスタリング: 一次側 or 既に残した報道代表と近ければ落とす。
@@ -399,8 +408,83 @@ function dedupeNews(records: UnifiedSighting[]): UnifiedSighting[] {
     : records.filter((r) => !dropped.has(r));
 }
 
+// 同一地区の集約 (collapse) — dedup B(同一事案の複数報道)をすり抜けた、
+// 「同じ地区にクマが繰り返し出た / 同一事案が日をまたいで報じられた」ものが
+// 日付違い・少しずれた座標で複数ピンになり水増しに見える問題への対処。
+// 実測(2026-07)で同一地区に別日で複数ピンのクラスタ195件・余分ピン266件。
+// クレーム「同じ情報が別日に複数表記され、本当に出没したのか騙された」の核心。
+//
+// 方針(ユーザー決定): 同一地区(県・市・地区名の正規化)は最新1件へ集約し、
+// 束ねた件数を mergedCount に持たせて「この付近で直近◯件」と示す。安全マップは
+// 「今どこが危ないか」が最重要なので最新を代表にする。過去の個別ピンは畳むが、
+// 件数と地図の色の濃さ(メッシュ)で繰り返し出没は伝わる。
+//
+// 一次側(公式/警察/市民)は畳まない(記録の信頼性が高く、水増し源は報道の
+// ジオコーディング揺れのため)。座標・地区名が無い報道も畳まない(照合不能)。
+// 「同じ地区」とみなす距離。同一市内でこの距離以内の報道出没は最新1件へ集約。
+// 地区名の文字列ではなく距離で判定する(「原町」「宮城野区」「宮城野区住宅地」の
+// ように同じ一帯でも表記が割れるため、文字列一致では畳めない)。1.5km は徒歩圏の
+// 「その付近」の目安。これより離れた別地区は別ピンとして残す(近所の出没を
+// 遠くのピンに畳んで見落とさせない)。
+const COLLAPSE_KM = 1.5;
+
+function collapseSameNeighborhood(
+  records: UnifiedSighting[],
+): UnifiedSighting[] {
+  // 報道(座標・市あり)を市ごとにまとめ、市内で距離クラスタリングする。
+  // 一次側(公式/警察/市民)は畳まない(信頼性が高く、水増し源は報道側)。
+  const groups = new Map<string, UnifiedSighting[]>();
+  const passthrough: UnifiedSighting[] = [];
+  for (const r of records) {
+    const geo =
+      typeof r.lat === "number" && typeof r.lon === "number" && Boolean(r.date);
+    if (r.sourceKind === "news" && geo && r.cityName) {
+      const key = `${r.prefectureName}/${r.cityName}`;
+      const list = groups.get(key);
+      if (list) list.push(r);
+      else groups.set(key, [r]);
+    } else {
+      passthrough.push(r);
+    }
+  }
+
+  const out = [...passthrough];
+  for (const list of groups.values()) {
+    // 出没日の新しい順(同日は取り込みが新しい順)。代表から貪欲に COLLAPSE_KM
+    // 圏内を束ね、最新を代表・束ねた数を mergedCount にする。
+    const sorted = [...list].sort((a, b) => {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return (b.ingestedAt ?? 0) - (a.ingestedAt ?? 0);
+    });
+    const used = new Set<UnifiedSighting>();
+    for (const rep of sorted) {
+      if (used.has(rep)) continue;
+      used.add(rep);
+      let count = 1;
+      for (const other of sorted) {
+        if (used.has(other)) continue;
+        if (
+          haversineKmLocal(
+            rep.lat as number,
+            rep.lon as number,
+            other.lat as number,
+            other.lon as number,
+          ) <= COLLAPSE_KM
+        ) {
+          used.add(other);
+          count++;
+        }
+      }
+      out.push(count > 1 ? { ...rep, mergedCount: count } : rep);
+    }
+  }
+  return out;
+}
+
 function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
-  return dedupeNearbySightings(dedupeNews(filterMisgeocoded(records)));
+  return collapseSameNeighborhood(
+    dedupeNearbySightings(dedupeNews(filterMisgeocoded(records))),
+  );
 }
 
 export async function getCachedSightings(): Promise<UnifiedSighting[]> {

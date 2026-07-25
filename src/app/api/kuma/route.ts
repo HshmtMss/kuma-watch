@@ -34,6 +34,8 @@ export type KumaRecord = {
   photoUrl?: string;
   // 当社が初めて取り込んだ epoch ms。「新着 ○分前」表示用。
   ingestedAt?: number;
+  // 同一地区の複数出没を最新1件に集約したときの束ねた件数 (2以上で表示)。
+  mergedCount?: number;
 };
 
 const DEFAULT_LIMIT = 8000;
@@ -57,6 +59,7 @@ export function unifiedToKumaRecord(s: UnifiedSighting): KumaRecord {
     sourceUrl: s.sourceUrl,
     photoUrl: s.photoUrl,
     ingestedAt: s.ingestedAt,
+    mergedCount: s.mergedCount,
   };
 }
 

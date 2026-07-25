@@ -605,10 +605,17 @@ export default function KumaMap({
       typeof r.headCount === "number" && r.headCount > 0
         ? `<div>${r.headCount}頭</div>`
         : "";
+    // 同一地区を最新1件に集約したときの件数。「(最新)」であることと合わせて示し、
+    // 「別日に複数ピンで水増し」の誤解を防ぐ。
+    const mergedLine =
+      typeof r.mergedCount === "number" && r.mergedCount > 1
+        ? `<div style="margin-top:2px;font-size:11px;color:#b45309">この付近で直近 ${r.mergedCount} 件（最新を表示）</div>`
+        : "";
     return `<div style="min-width:180px;font-size:13px;line-height:1.7">
       <b>${escapeHtml(place)}</b>${freshBadge}${sourceBadge}
       ${r.sectionName ? `<div style="color:#555;font-size:12px">${escapeHtml(r.sectionName)}</div>` : ""}
       <div>${escapeHtml(r.date)}${r.time ? ` ${escapeHtml(r.time)}頃` : ""}</div>${headCount}
+      ${mergedLine}
       ${distanceLine}
       ${r.comment ? `<div style="margin-top:4px;font-size:12px;border-top:1px solid #eee;padding-top:4px">${escapeHtml(r.comment)}</div>` : ""}
       ${photoBlock}
