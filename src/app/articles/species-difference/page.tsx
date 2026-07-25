@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         ツキノワグマは「動かないフリ」が有効、ヒグマでは捕食襲撃の場合反撃必須。
         訪れる地域に応じて装備と知識を変える必要があります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>本州・四国はツキノワグマ、北海道はヒグマ</strong>。体重差は3〜4倍。
+          </>,
+          <>
+            対処が真逆。<strong>ツキノワは「動かないフリ」有効、ヒグマは捕食襲撃なら反撃必須</strong>。
+          </>,
+          <>
+            訪れる地域に応じて<strong>装備と知識を変える</strong>必要がある。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

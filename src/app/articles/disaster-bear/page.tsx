@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         本記事は地震・水害・停電・避難所運営それぞれのリスクと備えを、
         過去事例を踏まえて整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>災害時はクマ遭遇リスクが増える</strong>。生息環境の変化・避難所の食物集中・夜間照明の停止が重なる。
+          </>,
+          <>
+            <strong>地震・水害・停電・避難所運営</strong>それぞれに固有のリスクがある。
+          </>,
+          <>
+            平時以上に<strong>食料・ゴミ管理と夜間の警戒</strong>を徹底する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

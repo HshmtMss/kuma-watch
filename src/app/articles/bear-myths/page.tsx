@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         条件付きで効くものです。本当に効くのは「<strong>食料を残さない・複数人で動く・スプレー</strong>」など、
         別記事で詳述している基本対策です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「唐辛子」「髪の毛」「牛糞で結界」</strong>など俗信の多くは科学的根拠が薄い。
+          </>,
+          <>
+            条件付きで効くものもあるが<strong>過信は禁物</strong>。
+          </>,
+          <>
+            本当に効くのは<strong>「食料を残さない・複数人で動く・スプレー」</strong>の基本対策。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
