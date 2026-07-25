@@ -3,6 +3,7 @@ import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
+import { KeyPoints, Callout } from "@/components/ArticleCards";
 import { getArticle } from "@/lib/articles-meta";
 
 const meta = getArticle("bear-spray")!;
@@ -34,6 +35,21 @@ export default function Page() {
         容量 230g 以上、射程 5m 以上、ホルスター付きで腰に固定するのが基本。
         本番で確実に動けるよう、練習用 Inert で抜き出し → 安全ピン解除 → 噴射の流れを 5 秒以内にできるようにしておくこと。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            撃退率<strong>90%以上</strong>。容量 230g・射程 5m 以上・ホルスターで腰に固定が基本。
+          </>,
+          <>
+            「抜く → 安全ピン解除 → 噴射」を<strong>5 秒以内</strong>で。練習用 Inert で体に覚えさせる。
+          </>,
+          <>
+            至近（2〜5m）で相手の<strong>顔をねらって</strong>数秒噴射。風向きと残量に注意。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
@@ -106,6 +122,13 @@ export default function Page() {
       </ol>
 
       <h2 id="caveats">使うときに注意するポイント</h2>
+
+      <Callout label="ここだけは外さない" tone="red">
+        <strong>室内・テント内では使わない</strong>（ガスが充満して自分も動けなくなる）。
+        <strong>風下に噴射しない</strong>。子グマを見ただけ・威嚇だけで慌てて噴射せず、
+        本当に距離を詰められた時の「最後の手段」として温存する。
+      </Callout>
+
       <ul>
         <li>
           <strong>風向き</strong>:
