@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -33,6 +34,21 @@ export default function Page() {
         出血と感染症が最大のリスクで、適切な処置で予後が大きく変わります。
         山中では救急隊到着まで 30〜90 分かかるケースが多く、その間の自己・仲間処置が生死を分けます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            襲われた直後は<strong>止血と通報</strong>が最優先。出血と感染症が最大のリスク。
+          </>,
+          <>
+            山中は救急到着まで <strong>30〜90 分</strong>。その間の自己・仲間の処置が生死を分ける。
+          </>,
+          <>
+            順番は<strong>安全確保 → 止血 → 通報</strong>。応急処置キットを携行しておく。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

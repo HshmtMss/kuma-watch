@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>クマ鈴 + ホイッスル + (必要に応じて)ラジオ</strong> の組み合わせで、
         さらにクマよけスプレーで遭遇後の備えも忘れずに。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ鈴は<strong>「過信せず、しかし携行する」</strong>。遭遇自体を減らす効果は確実にある。
+          </>,
+          <>
+            ただし<strong>慣れたクマ・近距離・風下</strong>では効果が下がる。万能ではない。
+          </>,
+          <>
+            <strong>鈴＋ホイッスル＋（必要に応じ）ラジオ＋スプレー</strong>の組み合わせで守る。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
