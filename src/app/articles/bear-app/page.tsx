@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         <strong>(3) 民間アプリ・SNS</strong>の組み合わせが最強。
         それぞれ強みが違うので、自分の活動エリアと頻度に合わせて 2〜3 個並行運用するのが現実的です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            出没情報源は1つではない。<strong>市町村防災メール＋都道府県マップ＋民間アプリ/SNS</strong>の組合せが最強。
+          </>,
+          <>
+            それぞれ<strong>強みが違い、単独では穴がある</strong>。
+          </>,
+          <>
+            活動エリアと頻度に合わせて<strong>2〜3個を並行運用</strong>する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

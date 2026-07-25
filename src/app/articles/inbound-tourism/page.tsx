@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         本記事は観光業・宿泊施設・ガイド事業者・自治体が提供すべき情報を整理し、
         日本人向けに「外国人客にどう伝えるか」をまとめます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            訪日客の遭遇リスクは<strong>増加傾向</strong>。高尾山・上高地・知床など人気観光地にもクマは生息する。
+          </>,
+          <>
+            <strong>多言語の注意喚起・装備案内・遭遇時対応</strong>の情報提供が追いついていない。
+          </>,
+          <>
+            観光業・宿泊・ガイド・自治体が<strong>「外国人客にどう伝えるか」</strong>が課題。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

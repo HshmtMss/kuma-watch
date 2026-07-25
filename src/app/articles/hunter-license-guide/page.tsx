@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         クマを実際に捕獲・駆除したい場合は <strong>第一種銃猟免許 + 銃所持許可 + 猟友会加入</strong>
         という長い道のりが必要です。本記事は取得手順・費用・期間を実務目線で整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            狩猟免許は<strong>4種類</strong>（第一種／第二種銃猟・わな猟・網猟）。
+          </>,
+          <>
+            クマの捕獲・駆除には<strong>第一種銃猟免許＋銃所持許可＋猟友会加入</strong>が必要。
+          </>,
+          <>
+            取得は<strong>費用と時間がかかる長い道のり</strong>。自治体の支援制度も要確認。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

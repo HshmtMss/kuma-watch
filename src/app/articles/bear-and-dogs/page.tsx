@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>ベアドッグ</strong>は「追払い専門」。
         家庭飼育で安全に効果を得たいなら、犬を「攻撃手段」ではなく「早期警報装置」として扱うのが現実解です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            犬の役割は3種類。<strong>家庭犬=警報装置／猟犬=狩猟補助／ベアドッグ=追払い専門</strong>。
+          </>,
+          <>
+            <strong>「犬を飼えばクマよけ」は誤解</strong>。攻撃手段にはならない。
+          </>,
+          <>
+            家庭では犬を<strong>「早期警報装置」</strong>として扱うのが現実解。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

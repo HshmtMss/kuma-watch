@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         中速 (一般道) では事前情報と回避ルート、
         高速 (下り) では「気付かれている前提」で速度制御がポイント。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            自転車は速度が高く<strong>鈴の警告効果が薄れ、急ブレーキ転倒で至近距離</strong>になる特有リスク。
+          </>,
+          <>
+            <strong>低速=音と視認／中速=事前情報と回避ルート／高速(下り)=速度制御</strong>。
+          </>,
+          <>
+            下りは<strong>「気付かれている前提」</strong>で速度をコントロールする。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
