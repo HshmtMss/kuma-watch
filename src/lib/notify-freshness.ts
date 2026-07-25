@@ -40,6 +40,8 @@ export function notifyMapUrl(
   lon: number | undefined,
   label: string,
   fallbackPath: string,
+  /** 出没ピンの id。渡すと地図がその出没の吹き出しを直接開く。 */
+  sightingId?: string,
 ): string {
   if (typeof lat === "number" && typeof lon === "number") {
     const p = new URLSearchParams({
@@ -48,6 +50,9 @@ export function notifyMapUrl(
       z: String(NOTIFY_MAP_ZOOM),
       label,
     });
+    // s=<id> があれば、地図は座標に寄せるだけでなく、その出没ピンの吹き出し
+    // (いつ・どこで・何が出たか) を自動で開く。「どれ？」を無くすため。
+    if (sightingId) p.set("s", sightingId);
     return `${base}/?${p.toString()}`;
   }
   return `${base}${fallbackPath}`;
@@ -65,4 +70,29 @@ export function isFreshForNotify(
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const floor = jstDaysAgo(maxAgeDays); // maxAgeDays 日前(JST)
   return date >= floor && date <= today;
+}
+
+/**
+ * ニュース(報道)由来の記録を通知してよいか。鮮度に加えて「時刻が明記されて
+ * いること」を要求する。
+ *
+ * 背景: 報道の出没日は、記事に日付が無ければ配信日(=今日)が入る。そのため
+ * 「昨日のクマを今日の記事で読んだ」ものが date=今日 で当日フィルタを
+ * すり抜け、古い情報が通知されていた。
+ *
+ * 時刻(time)は、記事が「◯時ごろ」と具体的に報じたときだけ抽出される
+ * (配信時刻は使わない)。時刻があるものは "その日に具体的に起きた出没" と
+ * 読めるので、これを鮮度の裏付けに使う。時刻の無い曖昧な記事は通知しない
+ * (地図には従来どおり載る)。
+ *
+ * 警察通報(sharp9110)など当日性が高いソースには使わない(そちらは日付だけで
+ * 判定)。呼び出し側がバッチの由来(?source=)で使い分ける。
+ */
+export function isFreshNewsForNotify(
+  date: string | undefined,
+  time: string | undefined,
+  today: string = jstToday(),
+): boolean {
+  if (!isFreshForNotify(date, today)) return false;
+  return typeof time === "string" && /^\d{1,2}:\d{2}$/.test(time.trim());
 }

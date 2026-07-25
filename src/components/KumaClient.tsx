@@ -119,6 +119,8 @@ export default function KumaClient() {
   const [showPins, setShowPins] = useState(true);
   const [selectedLocation, setSelectedLocation] =
     useState<SelectedLocation | null>(null);
+  // 通知リンク (?s=<id>) で来たときに吹き出しを開く出没ピンの id。
+  const [focusSightingId, setFocusSightingId] = useState<string | null>(null);
   // 現在地 (GPS) は青丸で別表示。選択地点 (tap/search) とは独立に保持する。
   const [currentLocation, setCurrentLocation] = useState<{
     lat: number;
@@ -526,6 +528,8 @@ export default function KumaClient() {
       const qZoom = Number.isFinite(qZoomRaw)
         ? Math.min(18, Math.max(5, qZoomRaw))
         : undefined;
+      // s= 出没ピン id。通知リンクがその出没の吹き出しを開くのに使う。
+      const qSighting = params.get("s") ?? undefined;
       // 内部ページ (/place・/spot) の「地図で見る」だけが付ける戻り先パス。
       const qFrom = params.get("from") ?? undefined;
       const fromUrl =
@@ -543,6 +547,7 @@ export default function KumaClient() {
           label: qLabel,
           zoom: qZoom,
         });
+        if (qSighting) setFocusSightingId(qSighting);
         // from=<内部パス> があるときだけ「戻る」を出す。通知・共有リンクは
         // label だけで from が無いので出さない (戻り先が無いのに「戻る」は誤り)。
         if (qFrom && qFrom.startsWith("/")) {
@@ -1010,6 +1015,7 @@ export default function KumaClient() {
           tileStyle={tileStyle}
           selectedLocation={isPicking ? null : selectedLocation}
           currentLocation={currentLocation}
+          focusSightingId={isPicking ? null : focusSightingId}
           onMapClick={handleMapClick}
           onMapReady={handleMapReady}
         />

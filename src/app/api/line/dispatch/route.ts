@@ -18,7 +18,11 @@ import {
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday } from "@/lib/jst-date";
-import { isFreshForNotify, notifyMapUrl } from "@/lib/notify-freshness";
+import {
+  isFreshForNotify,
+  isFreshNewsForNotify,
+  notifyMapUrl,
+} from "@/lib/notify-freshness";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -52,6 +56,7 @@ type NewRecord = {
   lat?: number;
   lon?: number;
   date?: string;
+  time?: string;
   comment?: string;
   sourceUrl?: string;
 };
@@ -131,13 +136,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, sent: 0, reason: "all duplicate" });
   }
 
-  // 「今まさに出た」ものだけ通知する。出没日が古い記録(報道が数日前の出没に
-  // 触れたもの等)は送らない。地図には従来どおり載る。
+  // 「今まさに出た」ものだけ通知する。地図には従来どおり載る。
+  //  - ニュース(報道)は、出没日が今日 かつ 時刻が明記されているものだけ。
+  //    報道の日付は記事に日付が無いと配信日(=今日)が入るため、日付だけでは
+  //    「昨日のクマを今日の記事で読んだ」古い情報がすり抜ける。時刻付き=記事が
+  //    具体的に報じた新しい出没、を鮮度の裏付けにする。
+  //  - それ以外(警察通報 sharp9110 等・当日性が高い)は出没日が今日なら通知。
+  const source = (new URL(req.url).searchParams.get("source") ?? "unknown").slice(0, 24);
+  const isNews = source === "news-flash";
   const today = jstToday();
-  const filtered = unsent.filter((r) => isFreshForNotify(r.date, today));
-  // 鮮度で外した記録も、以後もう評価しないよう重複防止セットに入れる
-  // (古い出没日は今後も鮮度を満たさないので、次回以降も送らない)。
-  const staleIds = unsent.filter((r) => !isFreshForNotify(r.date, today)).map((r) => r.id);
+  const passes = (r: NewRecord) =>
+    isNews
+      ? isFreshNewsForNotify(r.date, r.time, today)
+      : isFreshForNotify(r.date, today);
+  const filtered = unsent.filter(passes);
+  // 通知しない記録も、以後もう評価しないよう重複防止セットに入れる
+  // (古い/時刻無しは今後も条件を満たさないので、次回以降も送らない)。
+  const staleIds = unsent.filter((r) => !passes(r)).map((r) => r.id);
   if (filtered.length === 0) {
     if (staleIds.length > 0) await markDispatched(staleIds);
     return NextResponse.json({
@@ -188,6 +203,7 @@ export async function POST(req: Request) {
       top.lon,
       `${g.pref}${g.city}`,
       `/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`,
+      top.id,
     );
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
     const { sent, error } = await multicast(userIds, [msg]);
@@ -260,7 +276,7 @@ export async function POST(req: Request) {
         `${top.date ?? ""} ${place}周辺（半径${pt.radiusKm}km）`.trim(),
       );
       // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
-      const url = notifyMapUrl(base, top.lat, top.lon, place, "/");
+      const url = notifyMapUrl(base, top.lat, top.lon, place, "/", top.id);
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
       const { ok, error } = await pushMessage(gsub.userId, [msg]);
       if (ok) sentCount += 1;
@@ -274,11 +290,7 @@ export async function POST(req: Request) {
   await markDispatched(dispatched);
 
   // 4. 配信ログを永続化 (管理画面の稼働確認用)。記録失敗は配信結果に影響させない。
-  //    由来は ?source= で受け取る (news-flash / sharp9110)。未指定は unknown。
-  const source = (new URL(req.url).searchParams.get("source") ?? "unknown").slice(
-    0,
-    24,
-  );
+  //    由来(source)は上で ?source= から読んでいる (news-flash / sharp9110 / unknown)。
   // 送信すべき相手が居た(recipients>0)のに1通も送れなかった場合は、その理由を
   // ログに残し、サーバログにも出す。届いていない状態を管理画面から気づけるように。
   const failReason =

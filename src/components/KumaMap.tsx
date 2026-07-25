@@ -146,6 +146,11 @@ type Props = {
   } | null;
   /** GPS で測定された現在地 (青丸で常時表示) */
   currentLocation?: { lat: number; lon: number } | null;
+  /**
+   * 開いた直後に吹き出しを出す出没ピンの id (通知リンクの s= 由来)。
+   * その出没が records に居れば、いつ・どこで・何が出たかの吹き出しを自動で開く。
+   */
+  focusSightingId?: string | null;
   onMapClick?: (lat: number, lon: number) => void;
   /** map handle を親に引き渡すための ref 代替。Leaflet インスタンス提供時に呼ばれる。 */
   onMapReady?: (map: LeafletMap) => void;
@@ -164,6 +169,7 @@ export default function KumaMap({
   tileStyle = "standard",
   selectedLocation = null,
   currentLocation = null,
+  focusSightingId = null,
   onMapClick,
   onMapReady,
 }: Props) {
@@ -713,6 +719,22 @@ export default function KumaMap({
     renderPinLayer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [records]);
+
+  // 通知リンク (s=<id>) で来たとき、その出没ピンの吹き出しを一度だけ開く。
+  // records は非同期で入るので records と focusSightingId の両方に依存させ、
+  // 対象が現れたら開いて、以後は開かない (同じ id では二度開かない)。
+  const focusedOnceRef = useRef<string | null>(null);
+  useEffect(() => {
+    const id = focusSightingId;
+    if (!id || focusedOnceRef.current === id) return;
+    const map = mapRef.current;
+    if (!map) return;
+    const rec = records.find((r) => String(r.id) === String(id));
+    if (!rec) return; // まだ届いていない/期間フィルタ外。座標寄せ(赤ピン)は効いている
+    focusedOnceRef.current = id;
+    import("leaflet").then((L) => showRecordPopup(L, rec));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusSightingId, records]);
 
   useEffect(() => {
     showHeatmapRef.current = showHeatmap;
