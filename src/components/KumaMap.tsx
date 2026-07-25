@@ -448,7 +448,6 @@ export default function KumaMap({
     const map = mapRef.current;
     const layer = pinLayerRef.current;
     const recs = recordsRef.current;
-    console.log("[focus] renderPinLayer", { recs: recs.length, popupInDom: !!document.querySelector(".leaflet-popup") });
     if (!map || !layer) return;
 
     import("leaflet").then((L) => {
@@ -765,59 +764,72 @@ export default function KumaMap({
   //      /api/kuma/[id] で1件だけ取得して開く。座標ヒントを付けて同一 id の
   //      取り違えを防ぐ。
   // map 準備前は mapReady=false で待ち、準備後に確実に走らせる。
-  const focusedOnceRef = useRef<string | null>(null);
+  const focusExactRef = useRef<string | null>(null); // 正確な記録を開いたか
+  const focusNearRef = useRef<string | null>(null); // 近傍で仮表示したか
+  const focusFetchRef = useRef<string | null>(null); // フェッチ開始済みか
   useEffect(() => {
     const id = focusSightingId;
-    console.log("[focus] effect run", { id, mapReady, hasMap: !!mapRef.current });
-    if (!id || focusedOnceRef.current === id) return;
+    if (!id || focusExactRef.current === id) return;
     if (!mapReady || !mapRef.current) return;
-    focusedOnceRef.current = id;
     const map = mapRef.current;
-    let cancelled = false;
-    // 吹き出しを確実に開く。到着時は flyTo(0.8s)が動いており、その最中に開くと
-    // 中心がずれて閉じたように見える回がある(レース)。開いた上で、地図が落ち
-    // 着いた後(moveend)にもう一度開いて取りこぼしを無くす。保険で 2 秒後に解除。
-    const openReliably = (rec: KumaRecord) => {
-      console.log("[focus] openReliably", { id: rec?.id, lat: rec?.lat, cancelled });
-      if (cancelled) return;
+    // flyTo(0.8s)の最中に開くと中心がずれて閉じたように見える回があるので、
+    // 開いた上で地図が落ち着いた後(moveend)にもう一度開く(保険で2秒後に解除)。
+    const open = (rec: KumaRecord, isExact: boolean) => {
+      if (isExact) focusExactRef.current = id;
       import("leaflet").then((L) => {
-        if (cancelled) return;
-        console.log("[focus] showRecordPopup call");
+        if (focusExactRef.current === id && !isExact) return; // 既に正確版を表示済み
         showRecordPopup(L, rec);
-        setTimeout(() => console.log("[focus] popup in dom?", !!document.querySelector(".leaflet-popup")), 300);
         const reopen = () => showRecordPopup(L, rec);
         map.once("moveend", reopen);
         window.setTimeout(() => map.off("moveend", reopen), 2000);
       });
     };
-    // records は ref から読む(依存に入れない)。records は非同期で何度も更新され、
-    // 依存に入れると effect が再実行→cleanup が cancelled=true にして、開く処理を
-    // 途中で潰していた(吹き出しが開かない回の原因)。この effect は
-    // focusSightingId / mapReady が変わったときだけ走ればよい。
-    const local = recordsRef.current.find((r) => String(r.id) === String(id));
-    if (local) {
-      openReliably(local);
-      return () => {
-        cancelled = true;
-      };
+
+    const recs = recordsRef.current;
+    // 1. 正確な記録が地図の表示セットに居れば、それを開いて確定。
+    const exact = recs.find((r) => String(r.id) === String(id));
+    if (exact) {
+      open(exact, true);
+      return;
     }
+    // 2. まだ表示セットに無い(重複排除で消えた/未ロード)。正確版の取得は
+    //    生データ読み込みで数秒かかるため、待たせないよう、まずロード済みの
+    //    中から選択地点に一番近い記録を即座に開く(その地区の最新ピン)。
     const sel = selectedLocationLatestRef.current;
-    const hint = sel
-      ? `?lat=${sel.lat.toFixed(5)}&lon=${sel.lon.toFixed(5)}`
-      : "";
-    fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        const rec = j?.record as KumaRecord | undefined;
-        if (cancelled || !rec || typeof rec.lat !== "number") return;
-        openReliably(rec);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
+    if (sel && recs.length > 0 && focusNearRef.current !== id) {
+      let best: KumaRecord | null = null;
+      let bestD = Infinity;
+      for (const r of recs) {
+        if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
+        const d = haversineKm(sel.lat, sel.lon, r.lat, r.lon);
+        if (d < bestD) {
+          bestD = d;
+          best = r;
+        }
+      }
+      // 2km 以内に近傍ピンがあれば仮表示 (遠すぎる別地区は出さない)。
+      if (best && bestD <= 2) {
+        focusNearRef.current = id;
+        open(best, false);
+      }
+    }
+    // 3. 正確な記録を id で取得し、取れたら差し替える(近傍表示より優先)。
+    if (focusFetchRef.current !== id) {
+      focusFetchRef.current = id;
+      const hint = sel
+        ? `?lat=${sel.lat.toFixed(5)}&lon=${sel.lon.toFixed(5)}`
+        : "";
+      fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => {
+          const rec = j?.record as KumaRecord | undefined;
+          if (!rec || typeof rec.lat !== "number") return;
+          open(rec, true);
+        })
+        .catch(() => {});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusSightingId, mapReady]);
+  }, [focusSightingId, mapReady, records]);
 
   useEffect(() => {
     showHeatmapRef.current = showHeatmap;
@@ -960,9 +972,6 @@ export default function KumaMap({
         attributionControl: true,
       });
       mapRef.current = map;
-      map.on("popupclose", () =>
-        console.log("[focus] POPUPCLOSE @", Date.now(), new Error().stack?.slice(0, 300)),
-      );
       if (onMapReady) onMapReady(map);
       setMapReady(true);
 
