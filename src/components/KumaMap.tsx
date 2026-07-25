@@ -698,20 +698,24 @@ export default function KumaMap({
         }).addTo(layer);
       }
 
-      // 選択地点 (teardrop の赤ピン)
-      if (selectedLocation) {
-        const isGps = selectedLocation.source === "gps";
+      // 選択地点 (teardrop の赤ピン)。
+      // ★ closure の selectedLocation ではなく ref の最新値を読む。GPS 更新で
+      //   この関数が別 effect から呼ばれるとき、closure 側が古い(null)ままだと
+      //   赤ピンが消える回があった(モバイルで「赤ピンが出ない」の原因)。
+      const selForPin = selectedLocationLatestRef.current;
+      if (selForPin) {
+        const isGps = selForPin.source === "gps";
         // GPS と currentLocation が同じ位置なら赤ピンは省略 (二重表示を避ける)
         const sameAsCurrent =
           isGps &&
           currentLocation &&
-          Math.abs(currentLocation.lat - selectedLocation.lat) < 1e-6 &&
-          Math.abs(currentLocation.lon - selectedLocation.lon) < 1e-6;
+          Math.abs(currentLocation.lat - selForPin.lat) < 1e-6 &&
+          Math.abs(currentLocation.lon - selForPin.lon) < 1e-6;
         if (!sameAsCurrent) {
           // 通知/共有リンク由来(url)は、同じ場所に出没ピンが重なっても必ず目立つ
           // よう、赤ピンを一回り大きく + 白フチ太め + 足元にパルスの輪を出す。
           // これが「今アクセスした地点」の目印。
-          const fromLink = selectedLocation.source === "url";
+          const fromLink = selForPin.source === "url";
           const w = fromLink ? 36 : 28;
           const h = fromLink ? 46 : 36;
           const pinIcon = L.divIcon({
@@ -722,7 +726,7 @@ export default function KumaMap({
           });
           if (fromLink) {
             // 足元に脈打つ輪 (重なった出没ピンの中でも位置が一目で分かる)
-            L.circleMarker([selectedLocation.lat, selectedLocation.lon], {
+            L.circleMarker([selForPin.lat, selForPin.lon], {
               radius: 16,
               color: "#dc2626",
               weight: 2,
@@ -732,7 +736,7 @@ export default function KumaMap({
               interactive: false,
             }).addTo(layer);
           }
-          L.marker([selectedLocation.lat, selectedLocation.lon], {
+          L.marker([selForPin.lat, selForPin.lon], {
             icon: pinIcon,
             interactive: false,
             keyboard: false,
@@ -766,22 +770,38 @@ export default function KumaMap({
     if (!id || focusedOnceRef.current === id) return;
     if (!mapReady || !mapRef.current) return;
     focusedOnceRef.current = id;
+    const map = mapRef.current;
+    let cancelled = false;
+    // 吹き出しを確実に開く。到着時は flyTo(0.8s)が動いており、その最中に開くと
+    // 中心がずれて閉じたように見える回がある(レース)。開いた上で、地図が落ち
+    // 着いた後(moveend)にもう一度開いて取りこぼしを無くす。保険で 2 秒後に解除。
+    const openReliably = (rec: KumaRecord) => {
+      if (cancelled) return;
+      import("leaflet").then((L) => {
+        if (cancelled) return;
+        showRecordPopup(L, rec);
+        const reopen = () => showRecordPopup(L, rec);
+        map.once("moveend", reopen);
+        window.setTimeout(() => map.off("moveend", reopen), 2000);
+      });
+    };
     const local = records.find((r) => String(r.id) === String(id));
     if (local) {
-      import("leaflet").then((L) => showRecordPopup(L, local));
-      return;
+      openReliably(local);
+      return () => {
+        cancelled = true;
+      };
     }
     const sel = selectedLocationLatestRef.current;
     const hint = sel
       ? `?lat=${sel.lat.toFixed(5)}&lon=${sel.lon.toFixed(5)}`
       : "";
-    let cancelled = false;
     fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         const rec = j?.record as KumaRecord | undefined;
         if (cancelled || !rec || typeof rec.lat !== "number") return;
-        import("leaflet").then((L) => showRecordPopup(L, rec));
+        openReliably(rec);
       })
       .catch(() => {});
     return () => {
