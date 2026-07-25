@@ -767,6 +767,7 @@ export default function KumaMap({
   const focusedOnceRef = useRef<string | null>(null);
   useEffect(() => {
     const id = focusSightingId;
+    console.log("[focus] effect run", { id, mapReady, hasMap: !!mapRef.current });
     if (!id || focusedOnceRef.current === id) return;
     if (!mapReady || !mapRef.current) return;
     focusedOnceRef.current = id;
@@ -776,10 +777,13 @@ export default function KumaMap({
     // 中心がずれて閉じたように見える回がある(レース)。開いた上で、地図が落ち
     // 着いた後(moveend)にもう一度開いて取りこぼしを無くす。保険で 2 秒後に解除。
     const openReliably = (rec: KumaRecord) => {
+      console.log("[focus] openReliably", { id: rec?.id, lat: rec?.lat, cancelled });
       if (cancelled) return;
       import("leaflet").then((L) => {
         if (cancelled) return;
+        console.log("[focus] showRecordPopup call");
         showRecordPopup(L, rec);
+        setTimeout(() => console.log("[focus] popup in dom?", !!document.querySelector(".leaflet-popup")), 300);
         const reopen = () => showRecordPopup(L, rec);
         map.once("moveend", reopen);
         window.setTimeout(() => map.off("moveend", reopen), 2000);
