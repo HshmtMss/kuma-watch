@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         スプレー以外にもホーン・ホイッスル・ナイフ・銃器などの選択肢はありますが、日本の法的制約と現実的な使い勝手を踏まえると、結局スプレーに勝るものは少ない。
         ただし「スプレーが買えない・持参できない」場面に備える意味で、他の装備も知っておく価値があります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ撃退の<strong>第一選択肢はクマよけスプレー</strong>。
+          </>,
+          <>
+            ホーン・ホイッスル・ナイフ・銃器もあるが、<strong>日本の法制約と使い勝手でスプレーに勝るものは少ない</strong>。
+          </>,
+          <>
+            「買えない・持参できない」場面に備え、<strong>他の装備も知っておく</strong>価値がある。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

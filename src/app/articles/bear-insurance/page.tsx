@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         一方、<strong>農作物・家屋・自動車のクマ被害は除外されることが多い</strong>ので、
         農業共済・自治体補助・特約の有無を事前に確認しておくのが安全です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>人身被害は通常の医療・傷害保険でカバー可能</strong>。登山中は山岳保険で救助費用も。
+          </>,
+          <>
+            <strong>農作物・家屋・自動車の被害は除外されることが多い</strong>。
+          </>,
+          <>
+            <strong>農業共済・自治体補助・特約の有無</strong>を事前に確認する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

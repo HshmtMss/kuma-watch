@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         刺激があれば数分で完全に活動できます。期間は地域差があり 11 月下旬〜4 月中旬。
         暖冬や食料不足の年には冬眠せず活動する「<strong>穴持たず</strong>」も発生し、冬山での遭遇リスクは無視できません。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマの冬眠は深い眠りでなく<strong>体温・心拍を落とした軽い覚醒状態</strong>。刺激で数分で活動できる。
+          </>,
+          <>
+            期間は地域差があり<strong>11月下旬〜4月中旬</strong>。
+          </>,
+          <>
+            暖冬・食料不足の年は冬眠しない<strong>「穴持たず」</strong>も。冬山の遭遇リスクは無視できない。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -33,6 +34,21 @@ export default function Page() {
         <strong>結論</strong>: クマの<strong>嗅覚は犬の数倍</strong>、聴覚は人間以上、視覚は人間と同程度。
         この感覚特性を理解すると、なぜ匂い管理が重要か・なぜ風下が危険か・なぜ静かに動くべきかが論理的に分かります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマの<strong>嗅覚は犬の数倍、聴覚は人間以上、視覚は人間と同程度</strong>。
+          </>,
+          <>
+            だから<strong>匂い管理が重要で、風下が危険</strong>。
+          </>,
+          <>
+            感覚特性を知ると<strong>「なぜ静かに動くべきか」</strong>が論理的に分かる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

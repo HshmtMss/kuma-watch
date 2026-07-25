@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         春は若芽・タケノコ、夏は昆虫・果実、秋はドングリ・栗、と<strong>食性カレンダーが行動エリアを決める</strong>。
         これを知っておくと「いつ・どこ」で遭遇しやすいかの予測精度が上がります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは雑食だが<strong>季節ごとに食べ物がガラッと変わる</strong>。
+          </>,
+          <>
+            <strong>春=若芽・タケノコ／夏=昆虫・果実／秋=ドングリ・栗</strong>。
+          </>,
+          <>
+            食性カレンダーを知ると<strong>「いつ・どこ」で遭遇しやすいか</strong>の予測精度が上がる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

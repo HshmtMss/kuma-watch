@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -37,6 +38,21 @@ export default function Page() {
         重要なルール: <strong>個人がクマを「捕まえる」「殺す」ことは原則違法</strong>。
         防衛のための撃退と、許可を得た駆除は別物です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは<strong>鳥獣保護管理法で保護対象</strong>でありながら、有害駆除・狩猟も認められる。
+          </>,
+          <>
+            <strong>個人がクマを「捕まえる・殺す」ことは原則違法</strong>。
+          </>,
+          <>
+            <strong>防衛のための撃退と、許可を得た駆除は別物</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

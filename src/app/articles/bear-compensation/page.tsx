@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         被害の種類（人身・農作物・家屋・自動車）と地域によって適用される制度が異なるため、
         被害が出たら<strong>すぐに市町村役場に連絡</strong>するのが最初の一歩です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ被害の救済制度は<strong>4層</strong>（自治体独自・国の交付金・民間保険・損害賠償）。
+          </>,
+          <>
+            <strong>被害の種類と地域で適用制度が異なる</strong>。
+          </>,
+          <>
+            被害が出たら、<strong>まず市町村役場に連絡</strong>するのが最初の一歩。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

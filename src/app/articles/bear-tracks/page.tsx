@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         足跡・糞・木の爪痕・食痕の見分け方を覚えると、遭遇前に進路変更できる確率が上がります。
         新しい痕跡を見たら、その日はそのエリアを避けるのが基本です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            痕跡を読めると<strong>クマの存在に「事前に」気づける</strong>。
+          </>,
+          <>
+            <strong>足跡・糞・木の爪痕・食痕</strong>の見分けで遭遇前に進路変更できる。
+          </>,
+          <>
+            <strong>新しい痕跡を見たら、その日はそのエリアを避ける</strong>のが基本。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
