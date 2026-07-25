@@ -448,6 +448,7 @@ export default function KumaMap({
     const map = mapRef.current;
     const layer = pinLayerRef.current;
     const recs = recordsRef.current;
+    console.log("[focus] renderPinLayer", { recs: recs.length, popupInDom: !!document.querySelector(".leaflet-popup") });
     if (!map || !layer) return;
 
     import("leaflet").then((L) => {
@@ -959,6 +960,9 @@ export default function KumaMap({
         attributionControl: true,
       });
       mapRef.current = map;
+      map.on("popupclose", () =>
+        console.log("[focus] POPUPCLOSE @", Date.now(), new Error().stack?.slice(0, 300)),
+      );
       if (onMapReady) onMapReady(map);
       setMapReady(true);
 
