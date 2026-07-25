@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         熊胆そのものを医療目的で使う必然性は薄れています。
         本記事では獣医薬理学・保全生物学の視点で、熊胆の科学・歴史・密漁問題を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマの胆嚢から取れる<strong>「熊胆」は伝統医学で2000年以上使われた高価な生薬</strong>。
+          </>,
+          <>
+            有効成分<strong>UDCAは現代医療で合成可能</strong>。熊胆を使う必然性は薄れている。
+          </>,
+          <>
+            <strong>密漁・違法取引</strong>が保全上の問題として残る。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

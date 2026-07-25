@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -37,6 +38,21 @@ export default function Page() {
         本記事では比較認知科学の知見をベースに、クマの脳構造と認知能力の現在地、
         そしてそれが人クマ軋轢 (human-bear conflict) にどう影響するかを解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは<strong>「ただ大きいだけ」ではなく高い認知能力</strong>を持つ。
+          </>,
+          <>
+            <strong>数概念の理解・餌場の地図化・電気柵やゴミ箱の解除</strong>など問題解決能力がある。
+          </>,
+          <>
+            この賢さが<strong>人クマ軋轢（アーバンベア化）に直結</strong>する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

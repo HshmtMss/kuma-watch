@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         硬い堅果類・骨・甲虫の外殻まで噛み砕けます。本記事では獣医解剖学・口腔生理学の視点で、
         クマの歯と顎の構造、咬合力の生体力学、そして遭遇時のリスクを整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            ヒグマの咬合力は推定<strong>500〜750 PSI、人間の約5〜10倍</strong>。
+          </>,
+          <>
+            雑食性ゆえ<strong>犬歯と臼歯が両方発達した「万能型」</strong>の歯列。
+          </>,
+          <>
+            硬い<strong>堅果・骨・甲虫の外殻まで噛み砕く</strong>。遭遇時のリスクは大きい。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         体温管理・覚醒監視・拮抗薬まで、自治体担当者・獣医師・救護施設従事者の参考になる実践ガイドです。
         ※ 実際の投与は必ず獣医師の監督下で行ってください。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            野生クマの<strong>捕獲・調査・治療・放獣には適切な麻酔が不可欠</strong>。
+          </>,
+          <>
+            誤った薬剤・用量は<strong>クマの命も施術者も危険</strong>にさらす。
+          </>,
+          <>
+            体重別用量・体温管理・拮抗薬まで要管理。<strong>投与は必ず獣医師の監督下で</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

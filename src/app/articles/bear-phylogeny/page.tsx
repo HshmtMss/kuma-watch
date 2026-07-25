@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         ホッキョクグマはヒグマからわずか 25 万年で分岐した「最も若いクマ」。
         本記事では分子系統学・古生物学の知見から、クマ科 8 種の関係と進化の物語を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            現生のクマ科は<strong>世界に8種</strong>。パンダも最も古く1,800万年前に分岐したクマ科。
+          </>,
+          <>
+            <strong>ホッキョクグマはヒグマからわずか25万年で分岐</strong>した「最も若いクマ」。
+          </>,
+          <>
+            <strong>分子系統学・古生物学</strong>が8種の進化の物語を明かす。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

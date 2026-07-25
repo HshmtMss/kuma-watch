@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         <strong>ハイパーフェイジア (hyperphagia)</strong>と呼ばれる状態です。
         本記事では獣医生理学の視点で、クマの脂肪蓄積メカニズムと、人里への出没リスクとの関係を解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            秋の「異常な食欲」は<strong>ハイパーフェイジア</strong>という生理現象。1日2万kcal超を摂取。
+          </>,
+          <>
+            <strong>レプチン抵抗性で満腹中枢が一時停止</strong>し「食べ続けるモード」に入る。
+          </>,
+          <>
+            体重を<strong>25〜35%増やす</strong>ため、人里への出没リスクが高まる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         本記事では動物園・救護施設での老齢ケアの実際と、野生の老齢個体が市街地に出やすくなる傾向まで、
         比較老年医学の視点で解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            野生の平均寿命は<strong>15〜25年</strong>、飼育下では<strong>40年超</strong>も。
+          </>,
+          <>
+            老齢個体に多い疾患は<strong>人・犬と共通</strong>（関節炎・白内障・歯磨耗・腎臓病）。
+          </>,
+          <>
+            <strong>老齢個体は市街地に出やすくなる</strong>傾向がある。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

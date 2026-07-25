@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -38,6 +39,21 @@ export default function Page() {
         本記事では獣医生理学の視点で、クマの腎機能の特殊性と、それが慢性腎不全治療・
         宇宙飛行士の筋骨格維持研究にどう波及しているかを解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            ヒグマは<strong>冬眠の5か月、飲まず食わず排尿もしないのに尿毒症にならない</strong>。
+          </>,
+          <>
+            腎臓・腸・肝臓を巻き込んだ<strong>独自の窒素リサイクル代謝</strong>を持つ。
+          </>,
+          <>
+            この仕組みは<strong>慢性腎不全治療や宇宙飛行士の筋維持研究</strong>にも波及する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
