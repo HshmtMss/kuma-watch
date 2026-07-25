@@ -122,11 +122,8 @@ function readDiskCache(): CacheBlob | null {
   }
 }
 
-async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
-  // 1. fs 経由で読む (build 時の SSG 生成では public/data/sightings.json
-  //    が参照可能なので、ビルド中はこちら)。
-  //    Vercel の serverless 関数 runtime では bundle に同梱しないため
-  //    existsSync が false になり、fetch fallback (2.) に流れる。
+/** 同梱ファイル (public/data/sightings.json) を fs で読む。 */
+function readSnapshotFromFs(): UnifiedSighting[] | null {
   try {
     if (existsSync(SNAPSHOT_FILE)) {
       const raw = readFileSync(SNAPSHOT_FILE, "utf8");
@@ -136,17 +133,13 @@ async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
       }
     }
   } catch {
-    // 続けて HTTP フォールバック
+    // 呼び出し側でネット取得へ
   }
-  // 2. Vercel runtime: serverless bundle に sightings.json は無いのでネット取得。
-  //    取得元は優先順:
-  //      a) GitHub raw (main の最新コミット) — cron が sightings.json のみを
-  //         commit すると should-deploy.sh がビルドをスキップするため、
-  //         デプロイ済み静的ファイルは最大1日 stale。raw なら各 commit が
-  //         ~数分で反映される (public repo なので認証不要)。
-  //      b) 同一オリジンの静的ファイル — raw 取得失敗時のフォールバック。
-  //    どちらも memCache (5分TTL) があるのでフェッチ頻度はインスタンス当り低い。
-  //    22MB と大きいので Data Cache (2MB上限) には載らない → cache:"no-store"。
+  return null;
+}
+
+/** GitHub raw (main の最新コミット) → 同一オリジン静的ファイルの順に取得。 */
+async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const RAW_URL =
     "https://raw.githubusercontent.com/HshmtMss/kuma-watch/main/public/data/sightings.json";
   const baseUrl = process.env.VERCEL_URL
@@ -166,6 +159,27 @@ async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
     }
   }
   return null;
+}
+
+async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
+  // 本番の serverless runtime では、同梱の public/data/sightings.json は
+  // デプロイ時点で固まっており、cron が sightings.json だけを commit しても
+  // should-deploy.sh がビルドをスキップするため最大1日 stale になる。
+  // (以前は「runtime では fs に無い」前提だったが実際は読めてしまい、stale な
+  //  同梱ファイルを返して新規出没が地図・通知リンクに反映されなかった。)
+  //
+  // そこで:
+  //   - ビルド中(SSG) / ローカル開発 … 同梱ファイルが最新なので fs を優先。
+  //   - 本番 runtime            … GitHub raw を優先し、各 commit を ~数分で反映。
+  // どちらも memCache (5分TTL) 経由なのでフェッチ頻度はインスタンス当り低い。
+  // 22MB と大きく Data Cache(2MB上限) に載らないため cache:"no-store"。
+  const preferFs =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.NODE_ENV === "development";
+  if (preferFs) {
+    return readSnapshotFromFs() ?? (await readSnapshotFromNet());
+  }
+  return (await readSnapshotFromNet()) ?? readSnapshotFromFs();
 }
 
 function writeDiskCache(records: UnifiedSighting[]): void {
