@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-02-daily-report";
@@ -219,6 +220,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":12},{"pref":"福島県","count":4},{"pref":"新潟県","count":4},{"pref":"北海道","count":4},{"pref":"山口県","count":2},{"pref":"富山県","count":2},{"pref":"岩手県","count":2},{"pref":"鳥取県","count":1},{"pref":"群馬県","count":1},{"pref":"山梨県","count":1},{"pref":"島根県","count":1}]}
+        total={34}
+        periodLabel={"2026年5月2日"}
+      />
 
       <p>2026年5月2日は、日本の大型連休（ゴールデンウィーク）の中盤にあたり、行楽客や山菜採り、農作業従事者の山野への立ち入りが年間で最も活発化する時期の一つである。この時期は、冬眠から覚醒した熊が極度の飢餓状態（ハイパーファジー：過食期）にあり、採餌行動を広域化させる生態的特性と、人間側の活動圏拡大が重なることで、人獣衝突のリスクが極大化する。本報告書は、同日に発生した全国の熊出没、人身被害、および社会的インフラへの影響について、提供された各種データおよび報道資料に基づき、専門的な知見から詳細に分析・記録したものである。</p>
       <h2>2026年春季における熊出没のマクロ動態</h2>

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-10-daily-report";
@@ -206,6 +207,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":18},{"pref":"北海道","count":6},{"pref":"福島県","count":4},{"pref":"新潟県","count":4},{"pref":"岩手県","count":3},{"pref":"石川県","count":2},{"pref":"鳥取県","count":2},{"pref":"三重県","count":2},{"pref":"島根県","count":2},{"pref":"岡山県","count":2},{"pref":"山口県","count":1},{"pref":"埼玉県","count":1},{"pref":"富山県","count":1},{"pref":"滋賀県","count":1},{"pref":"長野県","count":1}]}
+        total={50}
+        periodLabel={"2026年5月10日"}
+      />
 
       <h2>序論：2026年度における熊出没の全国的趨勢</h2>
       <p>2026年5月10日は、日本全土において野生の熊（ヒグマおよびツキノワグマ）の活動が極めて活発化した一日として、日本の野生動物管理史に記録されるべき特異な日となった。この時期は、冬眠から目覚めた熊が春の餌資源を求めて行動圏を拡大させる「春季活動期」の最盛期にあたり、人里や都市部近郊への進出が過去例を見ない規模で確認されている。2025年度の全国の熊出没件数が、環境省の速報値で5万776件という歴史的な過去最多を記録した背景を受け、2026年度の初動期もその勢いが衰えていないことが明白となった（※1）。</p>

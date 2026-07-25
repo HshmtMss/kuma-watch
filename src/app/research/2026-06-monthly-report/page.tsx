@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-monthly-report";
@@ -182,6 +183,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":1102},{"pref":"福島県","count":858},{"pref":"北海道","count":768},{"pref":"新潟県","count":452},{"pref":"岩手県","count":442},{"pref":"長野県","count":314},{"pref":"群馬県","count":279},{"pref":"兵庫県","count":272},{"pref":"京都府","count":259},{"pref":"青森県","count":224},{"pref":"石川県","count":220},{"pref":"富山県","count":216},{"pref":"島根県","count":209},{"pref":"山形県","count":200},{"pref":"宮城県","count":189},{"pref":"栃木県","count":182},{"pref":"山口県","count":121},{"pref":"埼玉県","count":78},{"pref":"山梨県","count":72},{"pref":"鳥取県","count":65},{"pref":"福井県","count":62},{"pref":"岐阜県","count":49},{"pref":"広島県","count":44},{"pref":"和歌山県","count":43},{"pref":"滋賀県","count":36},{"pref":"静岡県","count":32},{"pref":"東京都","count":18},{"pref":"三重県","count":18},{"pref":"岡山県","count":16},{"pref":"大阪府","count":15},{"pref":"奈良県","count":8},{"pref":"神奈川県","count":4}]}
+        total={6867}
+        periodLabel={"2026年6月"}
+      />
 
       <h2>月次サマリー</h2>
       <p>2026年6月の一ヶ月間にKumaWatchが収集した国内のクマ出没関連情報は、総計5209件に上った。情報源の内訳は、報道由来のものが4378件と大半を占め、次いで新潟県（207件）、群馬県（135件）、島根県（120件）など各自治体や関連機関からの情報が続く。なお、本期間中に公式情報として分類された事案は0件であった。</p>

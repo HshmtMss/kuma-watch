@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-08-daily-report";
@@ -247,6 +248,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":29},{"pref":"北海道","count":7},{"pref":"鳥取県","count":3},{"pref":"島根県","count":3},{"pref":"福島県","count":2},{"pref":"新潟県","count":2},{"pref":"岩手県","count":2},{"pref":"栃木県","count":2},{"pref":"山口県","count":1},{"pref":"群馬県","count":1},{"pref":"埼玉県","count":1}]}
+        total={53}
+        periodLabel={"2026年5月8日"}
+      />
 
       <p>2026年5月8日は、日本の野生動物管理史上、極めて特異かつ重大な転換点として記録されるべき一日となった。この日、北海道から中部地方にかけての広範囲でクマの目撃、人身被害、そして深刻な死亡事案の確認が相次ぎ、従来の「山林境界部での遭遇」という枠組みでは捉えきれない、新たな局面が顕在化した。特に、秋田県や北海道で見られた市街地への深い浸透、岩手県での警察官襲撃を含む人身被害の連鎖、そして環境省が発表した過去最悪レベルの被害統計は、人間社会と野生動物の境界線が物理的にも心理的にも崩壊しつつある現状を浮き彫りにしている。本報告では、同日に発生した事案を網羅的に分析し、その背景にある生態学的変容と社会的なリスク要因を多角的に検証する。</p>
       <h2>北海道：オホーツク圏における市街地徘徊と教育現場への波及</h2>

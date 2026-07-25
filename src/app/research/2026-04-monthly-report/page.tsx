@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-04-monthly-report";
@@ -229,6 +230,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":392},{"pref":"北海道","count":128},{"pref":"福島県","count":112},{"pref":"新潟県","count":67},{"pref":"島根県","count":28},{"pref":"岩手県","count":24},{"pref":"富山県","count":23},{"pref":"栃木県","count":22},{"pref":"山口県","count":21},{"pref":"石川県","count":20},{"pref":"岡山県","count":18},{"pref":"群馬県","count":16},{"pref":"山梨県","count":14},{"pref":"東京都","count":13},{"pref":"静岡県","count":8},{"pref":"鳥取県","count":7},{"pref":"埼玉県","count":7},{"pref":"滋賀県","count":3},{"pref":"長野県","count":2},{"pref":"三重県","count":1}]}
+        total={926}
+        periodLabel={"2026年4月"}
+      />
 
       <p>2026年4月、日本列島は野生のヒグマおよびツキノワグマの活動がかつてない水準で活発化し、人身被害と市街地浸食が同時多発的に発生する深刻な事態に直面した。前年度にあたる2025年度が、統計開始以来最悪の被害をもたらした「熊害の年」であったことを踏まえ、2026年の春季は冬眠明け直後から極めて高い警戒態勢の中で幕を開けることとなった。しかし、4月に入ってからの状況は、行政や専門家の予測を上回るペースで推移しており、本報告書では、全国のニュースおよび調査データを網羅的に統合し、この一ヶ月間に日本で発生した事象の背後にある構造的な変化を分析する。</p>
       <p>2026年4月の特筆すべき点は、単に出没件数が増加しただけでなく、クマの行動特性に変容が見られることである。山間部の餌不足に起因する一時的な里降りではなく、市街地を恒常的な生活圏として利用する「アーバンベア」の完全な定着と、冬眠明け直後から高い身体能力を維持した巨大個体の出現が各地で報告されている。これらの事象は、日本の野生動物管理政策が歴史的な転換点にあることを示唆しており、特に2026年4月1日に施行された「指定管理鳥獣」へのクマの追加に伴う政策的影響も含め、詳述する必要がある。</p>

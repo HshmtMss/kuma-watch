@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-27-daily-report";
@@ -117,6 +118,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"岩手県","count":32},{"pref":"秋田県","count":28},{"pref":"北海道","count":28},{"pref":"福島県","count":27},{"pref":"長野県","count":20},{"pref":"栃木県","count":19},{"pref":"新潟県","count":16},{"pref":"山形県","count":15},{"pref":"富山県","count":14},{"pref":"群馬県","count":11},{"pref":"島根県","count":11},{"pref":"山口県","count":10},{"pref":"兵庫県","count":10},{"pref":"埼玉県","count":10},{"pref":"石川県","count":5},{"pref":"青森県","count":5},{"pref":"和歌山県","count":4},{"pref":"京都府","count":4},{"pref":"宮城県","count":4},{"pref":"福井県","count":3},{"pref":"三重県","count":1},{"pref":"岡山県","count":1},{"pref":"岐阜県","count":1}]}
+        total={279}
+        periodLabel={"2026年6月27日"}
+      />
 
       <p>2026年6月27日、KumaWatchが収集した国内のクマ出没情報は213件に達した。これらの情報の大部分（206件）は報道機関からのものであり、自治体等による公式情報は含まれていない。この日は富山県で人身被害が1件発生したほか、都市部や住宅地での目撃が11件確認されるなど、人とクマの遭遇リスクが顕在化した一日であった。地域別では、岩手県（30件）、福島県（23件）、長野県（20件）など、本州の東北から中部地方にかけて出没が集中する傾向が見られた。</p>
       <h2>主要事案：人身被害と都市部への接近</h2>

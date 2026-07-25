@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-03-monthly-report";
@@ -121,6 +122,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"福島県","count":33},{"pref":"秋田県","count":29},{"pref":"北海道","count":27},{"pref":"宮城県","count":25},{"pref":"岩手県","count":16},{"pref":"新潟県","count":15},{"pref":"青森県","count":12},{"pref":"静岡県","count":10},{"pref":"富山県","count":7},{"pref":"栃木県","count":7},{"pref":"島根県","count":7},{"pref":"山形県","count":6},{"pref":"奈良県","count":5},{"pref":"埼玉県","count":4},{"pref":"群馬県","count":4},{"pref":"山梨県","count":4},{"pref":"三重県","count":3},{"pref":"鳥取県","count":2},{"pref":"東京都","count":2},{"pref":"山口県","count":1},{"pref":"岡山県","count":1}]}
+        total={220}
+        periodLabel={"2026年3月"}
+      />
 
       <p>2026年3月の日本における熊の出没状況は、気候変動に伴う冬眠サイクルの変容と、過去数年にわたる個体数急増が重なり、統計開始以来極めて異例かつ危機的な局面を迎えた。前年度にあたる2025年度（令和7年度）は、熊による人身被害が死亡者14人、負傷者230人超を記録し、社会情勢を反映する「今年の漢字」に「熊」が選出されるなど、国民的な脅威として認識された年であった（※1）。この未曾有の被害状況を引き継ぐ形で始まった2026年3月は、例年であれば冬眠中、あるいは覚醒直後の活動停滞期にあたる時期であるにもかかわらず、全国各地で市街地への侵入や人身被害、さらには大規模な政策転換が相次いだ。本報告書では、2026年3月の出没状況を詳細に分析し、その背後にある環境的要因、社会的な影響、および政府による抜本的な管理方針の策定について、専門的な見地から総括する。</p>
       <h2>2026年春季における早期覚醒の生態学的背景と気象要因</h2>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-monthly-report";
@@ -193,6 +194,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":831},{"pref":"北海道","count":264},{"pref":"福島県","count":192},{"pref":"新潟県","count":159},{"pref":"石川県","count":134},{"pref":"島根県","count":113},{"pref":"群馬県","count":65},{"pref":"岩手県","count":58},{"pref":"山口県","count":54},{"pref":"富山県","count":40},{"pref":"栃木県","count":35},{"pref":"鳥取県","count":33},{"pref":"静岡県","count":28},{"pref":"山梨県","count":22},{"pref":"埼玉県","count":17},{"pref":"東京都","count":16},{"pref":"滋賀県","count":14},{"pref":"岡山県","count":12},{"pref":"三重県","count":8},{"pref":"長野県","count":8}]}
+        total={2103}
+        periodLabel={"2026年5月"}
+      />
 
       <h2>月次サマリー</h2>
       <p>2026年5月における国内のクマ出没総件数は581件であった。都道府県別では新潟県が145件と最も多く、次いで島根県が102件、岩手県が60件と続き、これらの上位3県で総件数の半数以上を占める結果となった。情報源の内訳は、自治体等からの情報が大部分を占める一方、報道由来の情報も56件確認された。特筆すべき点として、期間中に福島県、新潟県、長野県で計3件の人身被害が報告されたほか、都市部やその周辺での目撃も42件に上り、人の生活圏への接近が顕著であった。また、捕獲や銃猟に関連する事案も5件報告されている。</p>

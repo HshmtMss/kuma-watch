@@ -464,6 +464,7 @@ function renderPage(
   period: Period,
   payload: ResearchPayload,
   publishedAt: string,
+  agg: Aggregated,
 ): string {
   const categoryLabel =
     period.category === "daily-report"
@@ -474,6 +475,10 @@ function renderPage(
   const titleJs = JSON.stringify(payload.title);
   const leadJs = JSON.stringify(payload.lead);
   const bodyJsx = payload.body.map(renderBlock).join("\n");
+  // 県別件数チャート（全県分を埋め込み、表示側で上位 N + 残りを集計）
+  const chartDataJs = JSON.stringify(
+    agg.byPref.map((p) => ({ pref: p.pref, count: p.count })),
+  );
   const refsJs = JSON.stringify(payload.references, null, 2)
     .split("\n")
     .map((l, i) => (i === 0 ? l : `  ${l}`))
@@ -485,6 +490,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = ${JSON.stringify(period.slug)};
@@ -532,6 +538,8 @@ const SCHEMA = {
 
 const REFERENCES: { title: string; url: string; site?: string }[] = ${refsJs};
 
+const CHART_DATA: { pref: string; count: number }[] = ${chartDataJs};
+
 export default function ResearchPage() {
   return (
     <PageShell title={TITLE}>
@@ -552,6 +560,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={CHART_DATA}
+        total={${agg.total}}
+        periodLabel={${JSON.stringify(period.rangeLabel)}}
+      />
 
 ${bodyJsx}
 
@@ -727,7 +741,7 @@ async function main() {
   );
 
   const publishedAt = isoDate(new Date());
-  const pageJs = renderPage(period, payload, publishedAt);
+  const pageJs = renderPage(period, payload, publishedAt, agg);
 
   if (!existsSync(pageDir)) mkdirSync(pageDir, { recursive: true });
   writeFileSync(pagePath, pageJs);

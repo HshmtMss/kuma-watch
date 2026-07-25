@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-17-daily-report";
@@ -258,6 +259,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":41},{"pref":"北海道","count":10},{"pref":"福島県","count":5},{"pref":"石川県","count":4},{"pref":"新潟県","count":4},{"pref":"島根県","count":4},{"pref":"山口県","count":3},{"pref":"東京都","count":3},{"pref":"群馬県","count":3},{"pref":"富山県","count":3},{"pref":"栃木県","count":3},{"pref":"三重県","count":2},{"pref":"埼玉県","count":1},{"pref":"岩手県","count":1}]}
+        total={87}
+        periodLabel={"2026年5月17日"}
+      />
 
       <h2>1. イントロダクションおよび全国的な出没傾向</h2>
       <p>2026年5月17日は、日本国内における野生の熊類（ツキノワグマおよびヒグマ）の活動活性が極めて高まり、複数の重大な人身遭遇事案や、居住地域・公共インフラへの深刻な侵入ニュースが全国から相次いで報告された一日として記録される。本報告書は、同日に公表・確認された出没情報を網羅的に収集・整理し、野生動物管理（ワイルドライフ・マネジメント）および地域防災の観点からその動向を多角的に分析・評価したものである。</p>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-21-weekly-report";
@@ -176,6 +177,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"福島県","count":275},{"pref":"北海道","count":209},{"pref":"秋田県","count":205},{"pref":"岩手県","count":141},{"pref":"新潟県","count":125},{"pref":"長野県","count":109},{"pref":"京都府","count":102},{"pref":"兵庫県","count":100},{"pref":"富山県","count":90},{"pref":"山形県","count":81},{"pref":"石川県","count":79},{"pref":"群馬県","count":65},{"pref":"島根県","count":62},{"pref":"青森県","count":60},{"pref":"宮城県","count":57},{"pref":"福井県","count":40},{"pref":"山梨県","count":35},{"pref":"山口県","count":31},{"pref":"広島県","count":28},{"pref":"埼玉県","count":27},{"pref":"栃木県","count":27},{"pref":"鳥取県","count":25},{"pref":"岐阜県","count":16},{"pref":"滋賀県","count":11},{"pref":"和歌山県","count":10},{"pref":"奈良県","count":8},{"pref":"東京都","count":8},{"pref":"岡山県","count":6},{"pref":"静岡県","count":5},{"pref":"大阪府","count":3},{"pref":"三重県","count":1}]}
+        total={2041}
+        periodLabel={"2026年6月15日〜2026年6月21日"}
+      />
 
       <p>本レポートは、2026年6月14日から6月21日までの7日間にKumaWatchが収集した国内のクマ出没事案を分析・総括するものである。期間中の総件数は1907件に上り、活動は依然として活発な水準にある。都道府県別では、福島県（238件）、岩手県（158件）、北海道（154件）、新潟県（137件）、長野県（123件）の順で多く、東北地方や甲信越地方、北海道で出没が集中する傾向が見られた。報告された事案のうち1689件は報道機関を情報源としており、公式発表は0件であった。</p>
       <h2>主要トピック</h2>

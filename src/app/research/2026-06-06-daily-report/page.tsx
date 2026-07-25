@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-06-daily-report";
@@ -98,6 +99,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":42},{"pref":"北海道","count":10},{"pref":"福島県","count":8},{"pref":"栃木県","count":7},{"pref":"新潟県","count":5},{"pref":"富山県","count":5},{"pref":"岩手県","count":3},{"pref":"石川県","count":2},{"pref":"群馬県","count":2},{"pref":"山口県","count":1},{"pref":"鳥取県","count":1},{"pref":"島根県","count":1}]}
+        total={87}
+        periodLabel={"2026年6月6日"}
+      />
 
       <p>2026年6月6日、KumaWatchが収集したデータによると、日本国内で合計10件のクマ関連事案が確認された。これらの事案は栃木県、新潟県、富山県の3県に集中しており、いずれも人身被害や市街地中心部への出没、捕獲・銃猟といった特異事案には至っていない。しかし、目撃や痕跡の情報から、クマが人間の生活圏に近接して活動している実態が明らかとなった。本レポートでは、当日の出没データを地域別に分析し、季節的背景や環境要因を考慮したリスク評価を行う。</p>
       <h2>全体概況</h2>

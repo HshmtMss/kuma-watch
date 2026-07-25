@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-31-weekly-report";
@@ -88,6 +89,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":220},{"pref":"北海道","count":58},{"pref":"福島県","count":48},{"pref":"新潟県","count":48},{"pref":"石川県","count":42},{"pref":"島根県","count":31},{"pref":"群馬県","count":23},{"pref":"富山県","count":14},{"pref":"山口県","count":13},{"pref":"栃木県","count":13},{"pref":"鳥取県","count":10},{"pref":"岩手県","count":10},{"pref":"山梨県","count":9},{"pref":"静岡県","count":7},{"pref":"滋賀県","count":7},{"pref":"埼玉県","count":5},{"pref":"東京都","count":4},{"pref":"岡山県","count":2},{"pref":"長野県","count":1}]}
+        total={565}
+        periodLabel={"2026年5月25日〜2026年5月31日"}
+      />
 
       <p>2026年5月24日から5月31日までの期間、KumaWatchが収集したクマの出没情報は全国で159件にのぼった。都道府県別では新潟県が45件と最も多く、次いで島根県が34件、富山県と栃木県が各15件、群馬県が14件と続いた。これら上位5県で総件数の約78%（123件）を占めており、特定の地域への集中傾向が見られる。本期間において、人身被害が疑われるキーワードとの一致は0件であった。しかし、岩手県で住宅にクマが侵入する事案が発生したほか、島根県では小中学校の敷地内で目撃されるなど、市民の安全を直接脅かす可能性のある危険な事案が複数報告されており、極めて高い緊張状態が続いている。</p>
       <h2>主要トピック</h2>

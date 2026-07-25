@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-05-daily-report";
@@ -177,6 +178,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":34},{"pref":"北海道","count":16},{"pref":"福島県","count":14},{"pref":"島根県","count":6},{"pref":"富山県","count":5},{"pref":"石川県","count":4},{"pref":"新潟県","count":4},{"pref":"群馬県","count":3},{"pref":"岩手県","count":3},{"pref":"鳥取県","count":2},{"pref":"山梨県","count":2},{"pref":"三重県","count":1},{"pref":"栃木県","count":1},{"pref":"岡山県","count":1},{"pref":"長野県","count":1}]}
+        total={97}
+        periodLabel={"2026年6月5日"}
+      />
 
       <p>2026年6月5日、KumaWatchが収集したデータによると、日本国内で確認されたクマの出没事案は合計50件に上った。幸いにも人身被害に関連するキーワードに一致する報告はなかった。情報の内訳は、報道機関からの情報（URL付き）が38件と大半を占め、その他は自治体等の情報源によるものであった。本レポートでは、これらのデータに基づき、当日の出没状況を地域別に分析し、リスク評価を行う。</p>
       <h2>主要事案の分析</h2>

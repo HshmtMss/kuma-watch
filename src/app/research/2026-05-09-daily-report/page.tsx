@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-09-daily-report";
@@ -181,6 +182,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":16},{"pref":"北海道","count":6},{"pref":"島根県","count":5},{"pref":"福島県","count":4},{"pref":"群馬県","count":2},{"pref":"富山県","count":2},{"pref":"岩手県","count":2},{"pref":"鳥取県","count":1},{"pref":"新潟県","count":1},{"pref":"栃木県","count":1}]}
+        total={40}
+        periodLabel={"2026年5月9日"}
+      />
 
       <h2>序論：2026年春における鳥獣被害の深刻化と5月9日の特異性</h2>
       <p>2026年の春、日本列島はかつてない規模での熊類の出没と、それに伴う人身被害の増大に直面している。特に2026年5月9日は、週末の行楽シーズンと重なったこともあり、北は北海道から南は中国地方に至るまで、極めて広範囲かつ高頻度な目撃・被害報告がなされた日として記録されるべきである。本報告書は、同日に発生した全国の熊出没ニュースを詳細に集約し、野生動物管理学および環境社会学の専門的見地から、その背後にある生態学的メカニズムと、現代社会が抱える防犯上の課題について分析を行うものである。</p>

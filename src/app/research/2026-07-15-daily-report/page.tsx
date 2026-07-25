@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-15-daily-report";
@@ -158,6 +159,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"岩手県","count":34},{"pref":"秋田県","count":32},{"pref":"北海道","count":23},{"pref":"福島県","count":17},{"pref":"新潟県","count":12},{"pref":"島根県","count":12},{"pref":"青森県","count":9},{"pref":"栃木県","count":7},{"pref":"長野県","count":7},{"pref":"宮城県","count":7},{"pref":"山口県","count":7},{"pref":"京都府","count":6},{"pref":"群馬県","count":5},{"pref":"山形県","count":5},{"pref":"石川県","count":3},{"pref":"兵庫県","count":3},{"pref":"静岡県","count":3},{"pref":"富山県","count":2},{"pref":"福井県","count":2},{"pref":"鳥取県","count":1},{"pref":"埼玉県","count":1},{"pref":"滋賀県","count":1},{"pref":"愛知県","count":1},{"pref":"和歌山県","count":1},{"pref":"岐阜県","count":1}]}
+        total={202}
+        periodLabel={"2026年7月15日"}
+      />
 
       <p>2026年7月15日、KumaWatchが収集した国内のクマ出没関連情報は181件に達した。人身被害に関するキーワードを含む報告は0件であった。地域別では、秋田県(32件)、岩手県(31件)をはじめとする東北地方に出没が集中する一方、全国的に人口集中地区への接近が顕著となった。本レポートでは、当日の出没状況を分析し、リスク評価を行う。</p>
       <h2>主要事案：捕獲および都市部への出没</h2>

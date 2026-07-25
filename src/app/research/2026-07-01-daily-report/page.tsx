@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-01-daily-report";
@@ -158,6 +159,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":54},{"pref":"北海道","count":36},{"pref":"福島県","count":31},{"pref":"新潟県","count":27},{"pref":"岩手県","count":27},{"pref":"宮城県","count":22},{"pref":"長野県","count":22},{"pref":"京都府","count":17},{"pref":"栃木県","count":14},{"pref":"群馬県","count":13},{"pref":"青森県","count":13},{"pref":"島根県","count":10},{"pref":"岐阜県","count":7},{"pref":"奈良県","count":7},{"pref":"山口県","count":6},{"pref":"山形県","count":5},{"pref":"富山県","count":4},{"pref":"岡山県","count":4},{"pref":"滋賀県","count":4},{"pref":"埼玉県","count":3},{"pref":"神奈川県","count":3},{"pref":"兵庫県","count":2},{"pref":"福井県","count":2},{"pref":"三重県","count":1},{"pref":"静岡県","count":1},{"pref":"山梨県","count":1},{"pref":"鳥取県","count":1}]}
+        total={337}
+        periodLabel={"2026年7月1日"}
+      />
 
       <h2>主要事案の概観</h2>
       <p>2026年7月1日、国内で報告されたクマ関連事案は314件に達した。このうち、京都府で人身被害が1件発生したほか、宮城県仙台市の住宅街や北海道の学校敷地内など、都市部や人口集中地区での目撃が16件確認された。また、奈良県では過去の襲撃事案に関連する個体が捕獲・殺処分されるなど、自治体による対応も続いている。</p>

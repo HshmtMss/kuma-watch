@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-05-daily-report";
@@ -142,6 +143,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":48},{"pref":"秋田県","count":37},{"pref":"岩手県","count":25},{"pref":"新潟県","count":20},{"pref":"宮城県","count":19},{"pref":"青森県","count":18},{"pref":"群馬県","count":16},{"pref":"京都府","count":13},{"pref":"福島県","count":6},{"pref":"山口県","count":6},{"pref":"山形県","count":6},{"pref":"石川県","count":5},{"pref":"島根県","count":5},{"pref":"兵庫県","count":4},{"pref":"岐阜県","count":4},{"pref":"富山県","count":3},{"pref":"静岡県","count":3},{"pref":"長野県","count":3},{"pref":"埼玉県","count":2},{"pref":"岡山県","count":2},{"pref":"和歌山県","count":1}]}
+        total={246}
+        periodLabel={"2026年7月5日"}
+      />
 
       <p>2026年7月5日、KumaWatchが収集した国内のクマ出没関連情報は217件にのぼった。これらのうち206件は報道機関のURL付き情報であり、情報の信頼性は高い水準にある。都道府県別では秋田県（37件）、北海道（33件）、岩手県（24件）が上位を占め、東北地方と北海道での出没が依然として多い傾向を示している。当日は人身被害につながる事案が1件発生したほか、都市部や住宅地での目撃も14件確認されており、人とクマの遭遇リスクが多様な環境で高まっていることが示唆される。</p>
       <h2>主要事案の動向</h2>

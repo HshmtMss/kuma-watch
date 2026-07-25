@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-16-daily-report";
@@ -301,6 +302,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":25},{"pref":"福島県","count":10},{"pref":"新潟県","count":7},{"pref":"北海道","count":7},{"pref":"石川県","count":6},{"pref":"群馬県","count":5},{"pref":"山口県","count":3},{"pref":"岩手県","count":3},{"pref":"島根県","count":3},{"pref":"静岡県","count":2},{"pref":"鳥取県","count":1},{"pref":"埼玉県","count":1},{"pref":"山梨県","count":1},{"pref":"栃木県","count":1},{"pref":"滋賀県","count":1}]}
+        total={76}
+        periodLabel={"2026年5月16日"}
+      />
 
       <h2>1. 総括的分析</h2>
       <p>2026年5月16日は、冬眠から目覚めた野生のクマ（ヒグマおよびツキノワグマ）が本格的な活動期に移行する中、日本全国の広範な地域において出没、目撃、さらには人身被害や深刻な物損被害が同時多発した極めて警戒すべき1日となった（※1）。</p>

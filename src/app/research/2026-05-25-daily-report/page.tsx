@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-25-daily-report";
@@ -143,6 +144,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":43},{"pref":"福島県","count":8},{"pref":"富山県","count":5},{"pref":"島根県","count":5},{"pref":"石川県","count":4},{"pref":"新潟県","count":4},{"pref":"北海道","count":4},{"pref":"静岡県","count":3},{"pref":"山梨県","count":2},{"pref":"岩手県","count":2},{"pref":"栃木県","count":2},{"pref":"山口県","count":1},{"pref":"東京都","count":1},{"pref":"鳥取県","count":1},{"pref":"群馬県","count":1},{"pref":"滋賀県","count":1},{"pref":"長野県","count":1}]}
+        total={88}
+        periodLabel={"2026年5月25日"}
+      />
 
       <p>KumaWatch（獣医工学ラボ）が収集したデータによると、2026年5月25日には国内で31件のクマ出没情報が確認された。情報源の内訳は、報道機関から14件、自治体等が公開する情報から17件であった。本データが収集した範囲において、この日に人身被害が発生したという報告はなかった。また、捕獲や銃猟が行われたという情報も確認されていない。</p>
       <h2>主要事案の分析</h2>

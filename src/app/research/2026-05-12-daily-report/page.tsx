@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-12-daily-report";
@@ -197,6 +198,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":17},{"pref":"福島県","count":11},{"pref":"北海道","count":9},{"pref":"新潟県","count":6},{"pref":"山口県","count":2},{"pref":"群馬県","count":1},{"pref":"岩手県","count":1},{"pref":"静岡県","count":1},{"pref":"岡山県","count":1}]}
+        total={49}
+        periodLabel={"2026年5月12日"}
+      />
 
       <h2>環境省速報値が示すマクロ的危機と出没件数の指数関数的推移</h2>
       <p>環境省が2026年5月11日および12日までに公表した2025年度（令和7年度）のツキノワグマ出没件数および捕獲数の速報値は、日本国内における野生動物管理が歴史的な限界点に達している事実を突きつけている 1。年間の総出没件数は5万776件を記録し、それまで過去最多であった2023年度の2万4348件の2倍を超え、2024年度の2万513件と比較しても約2.5倍という驚異的な急増を示した 1。この急激な上昇について、環境省は主食となるドングリなどの堅果類が広範な凶作に見舞われたことが直接的な引き金になった可能性を指摘しているが、生態学的変容はより深刻な構造変化を示唆している 3。すなわち、人里に降りて人間の生活圏由来の食物の味を学習した個体が、翌年以降も継続して居住区へと降りてくる行動の定着化である 3。</p>

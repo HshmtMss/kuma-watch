@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-07-daily-report";
@@ -187,6 +188,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":26},{"pref":"北海道","count":7},{"pref":"福島県","count":6},{"pref":"新潟県","count":3},{"pref":"鳥取県","count":2},{"pref":"群馬県","count":2},{"pref":"山梨県","count":2},{"pref":"東京都","count":1},{"pref":"岩手県","count":1},{"pref":"島根県","count":1},{"pref":"岡山県","count":1}]}
+        total={52}
+        periodLabel={"2026年5月7日"}
+      />
 
       <p>2026年5月7日は、日本の野生動物管理史において、気候変動と社会構造の変容がもたらす「人間とクマの衝突」が極めて先鋭化した一日として記録されるべき日である。ゴールデンウィークの連休が明け、人々の社会活動が日常に戻る一方で、山間部から都市近郊に至るまで、クマ（ヒグマおよびツキノワグマ）の活動が爆発的な広がりを見せた（※1）。特にこの日は、山形県での深刻な人身被害や北海道での規格外の巨大個体の目撃、さらには本州各地の住宅街や公共施設近辺への進出が同時多発的に報告されており、その空間的な広がりと個体の行動特性は、従来の生態学的知見を揺るがす事態となっている（※2）。</p>
       <p>本報告では、2026年5月7日に発生した全国の出没事例を詳細に検証し、その背景にある生理学的・環境学的要因、さらには自治体および警察による対応の現状と課題について、専門的な見地から包括的な分析を行う。2025年秋の堅果類（ドングリ等）の大凶作や、2026年冬の暖冬傾向といった前兆現象が、いかにしてこの日の危機的状況を形作ったのかを明らかにすることが、本報告の主眼である（※6）。</p>

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-04-daily-report";
@@ -175,6 +176,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":9},{"pref":"北海道","count":6},{"pref":"福島県","count":4},{"pref":"群馬県","count":2},{"pref":"新潟県","count":2},{"pref":"栃木県","count":2},{"pref":"東京都","count":1},{"pref":"岩手県","count":1},{"pref":"島根県","count":1}]}
+        total={28}
+        periodLabel={"2026年5月4日"}
+      />
 
       <h2>2026年春季における生態学的転換点と5月4日の概況</h2>
       <p>2026年の大型連休（ゴールデンウィーク）中盤にあたる5月4日は、日本の野生動物管理史において極めて象徴的な一日となった。この日、北は北海道から南は近畿地方に至るまで、ツキノワグマおよびヒグマの出没、捕獲、そして深刻な人身被害に関するニュースが全国を駆け巡った。例年、5月は冬眠から目覚めた熊が餌を求めて活発に移動を開始する時期であるが、2026年は特に暖冬の影響により、熊の生活リズムに劇的な変容が生じていることが専門家から指摘されている（※1）。</p>

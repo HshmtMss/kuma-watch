@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-21-daily-report";
@@ -78,6 +79,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":40},{"pref":"北海道","count":13},{"pref":"福島県","count":5},{"pref":"島根県","count":5},{"pref":"新潟県","count":4},{"pref":"石川県","count":2},{"pref":"富山県","count":2},{"pref":"山梨県","count":2},{"pref":"静岡県","count":2},{"pref":"山口県","count":1},{"pref":"東京都","count":1},{"pref":"岡山県","count":1},{"pref":"長野県","count":1}]}
+        total={79}
+        periodLabel={"2026年5月21日"}
+      />
 
       <p>本稿は、2026年5月21日にKumaWatchが収集した国内のクマ出没事案に関する日次分析レポートである。当日は全国で14件の出没情報が確認された。これらのデータに基づき、主要事案の概況、地域別の傾向、そしてリスク評価を分析的に報告する。</p>
       <h2>主要事案の概況</h2>

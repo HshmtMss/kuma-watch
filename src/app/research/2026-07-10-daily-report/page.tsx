@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-10-daily-report";
@@ -163,6 +164,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":26},{"pref":"岩手県","count":21},{"pref":"福島県","count":19},{"pref":"秋田県","count":14},{"pref":"群馬県","count":13},{"pref":"島根県","count":13},{"pref":"長野県","count":13},{"pref":"山形県","count":9},{"pref":"青森県","count":8},{"pref":"埼玉県","count":6},{"pref":"宮城県","count":6},{"pref":"鳥取県","count":5},{"pref":"石川県","count":5},{"pref":"京都府","count":5},{"pref":"栃木県","count":4},{"pref":"山梨県","count":4},{"pref":"新潟県","count":3},{"pref":"富山県","count":2},{"pref":"静岡県","count":2},{"pref":"和歌山県","count":1},{"pref":"福井県","count":1},{"pref":"兵庫県","count":1}]}
+        total={181}
+        periodLabel={"2026年7月10日"}
+      />
 
       <h2>主要事案の概況</h2>
       <p>2026年7月10日、KumaWatchが覚知した国内のクマ出没関連情報は158件にのぼった。このうち、最も深刻な事案として島根県益田市の山中で男性がクマに襲われ負傷する人身被害が1件発生した（※1、※2）。現場は山中であり、作業中の突発的な遭遇であったとみられる。人身被害につながる事案は、人とクマの活動域が重複するエリアにおける潜在的リスクを改めて示すものである。</p>

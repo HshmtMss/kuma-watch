@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-10-daily-report";
@@ -189,6 +190,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":37},{"pref":"石川県","count":20},{"pref":"北海道","count":19},{"pref":"福島県","count":14},{"pref":"京都府","count":14},{"pref":"新潟県","count":13},{"pref":"群馬県","count":10},{"pref":"岩手県","count":9},{"pref":"栃木県","count":9},{"pref":"大阪府","count":9},{"pref":"島根県","count":8},{"pref":"富山県","count":6},{"pref":"長野県","count":4},{"pref":"和歌山県","count":4},{"pref":"山口県","count":3},{"pref":"鳥取県","count":2},{"pref":"埼玉県","count":1},{"pref":"福井県","count":1},{"pref":"青森県","count":1}]}
+        total={184}
+        periodLabel={"2026年6月10日"}
+      />
 
       <p>獣医工学ラボ（KumaWatch）が収集したデータによると、2026年6月10日の国内におけるクマの出没件数は、報道および自治体からの情報を合わせて計82件に達した。このうち、人身被害に関する報告は確認されなかった。しかし、岩手県遠野市では、遠野運動公園に出没したクマ1頭が緊急銃猟により駆除されるという重大事案が発生した（※1、※2）。また、全国で3件の「都市部キーワード一致」が記録されており、新潟県妙高市では交番付近、富山県黒部市では公民館付近で目撃されるなど、クマが人間の生活圏へ深く侵入している実態が浮き彫りとなった。本レポートでは、当日の出没事案を地域別に分析し、リスク評価を行う。</p>
       <h2>地域別動向と分析</h2>

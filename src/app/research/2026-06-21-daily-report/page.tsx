@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-21-daily-report";
@@ -143,6 +144,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":38},{"pref":"岩手県","count":32},{"pref":"新潟県","count":27},{"pref":"北海道","count":27},{"pref":"兵庫県","count":23},{"pref":"長野県","count":19},{"pref":"群馬県","count":17},{"pref":"福島県","count":16},{"pref":"京都府","count":15},{"pref":"富山県","count":8},{"pref":"青森県","count":8},{"pref":"山形県","count":8},{"pref":"山口県","count":6},{"pref":"島根県","count":6},{"pref":"岐阜県","count":4},{"pref":"福井県","count":4},{"pref":"栃木県","count":4},{"pref":"岡山県","count":3},{"pref":"鳥取県","count":2}]}
+        total={267}
+        periodLabel={"2026年6月21日"}
+      />
 
       <p>2026年6月21日、KumaWatchが収集した国内のクマ出没情報は総計230件に達した。都道府県別では岩手県（31件）、新潟県（24件）、兵庫県（23件）、長野県（21件）、秋田県（21件）、福島県（21件）などが上位を占め、広範囲にわたる出没が確認された。人身被害や銃猟による捕獲に関する報告はなかった。しかし、「都市部」キーワードに一致する事案が10件確認されており、人の生活圏への接近が顕著な一日であった。情報源の大部分は報道由来（211件）であり、自治体等からの公式情報は限定的であった。</p>
       <h2>主要事案：都市部および生活圏近隣への出没</h2>

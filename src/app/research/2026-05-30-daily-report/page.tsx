@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-30-daily-report";
@@ -153,6 +154,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":34},{"pref":"福島県","count":9},{"pref":"新潟県","count":9},{"pref":"石川県","count":6},{"pref":"北海道","count":6},{"pref":"山口県","count":3},{"pref":"島根県","count":3},{"pref":"鳥取県","count":2},{"pref":"群馬県","count":2},{"pref":"東京都","count":1},{"pref":"富山県","count":1},{"pref":"山梨県","count":1},{"pref":"栃木県","count":1},{"pref":"静岡県","count":1},{"pref":"滋賀県","count":1},{"pref":"岡山県","count":1}]}
+        total={81}
+        periodLabel={"2026年5月30日"}
+      />
 
       <p>2026年5月30日、KumaWatchが収集した国内のクマ出没情報は総計57件に達した。情報源の内訳は、報道由来が45件、自治体や地域情報提供者からのものが12件であった。都道府県別では新潟県の12件が最も多く、次いで北海道が10件、島根県が6件、秋田県が5件と続く。本レポートでは、これらのデータに基づき、当日の出没事案の傾向とリスクについて分析する。</p>
       <h2>主要事案の概観</h2>

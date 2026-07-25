@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-03-daily-report";
@@ -167,6 +168,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":19},{"pref":"新潟県","count":8},{"pref":"福島県","count":3},{"pref":"北海道","count":3},{"pref":"東京都","count":1},{"pref":"岩手県","count":1},{"pref":"島根県","count":1}]}
+        total={36}
+        periodLabel={"2026年5月3日"}
+      />
 
       <p>2026年の春、日本列島はかつてない規模での野生動物、特にクマ類の出没と人身被害の危機に直面している。5月3日は憲法記念日であり、ゴールデンウィークの後半戦が開始される行楽シーズンのピークにあたるが、この日一日だけで全国各地から報告されたクマの目撃、衝突事故、人身被害、そして行政による捕獲・駆除の記録は、現代日本における野生動物管理の限界を露呈させるものとなった。本報告書では、2026年5月3日に発生した事案を詳細に記述し、その背後にある生態学的、社会学的要因を分析するとともに、今後の野生動物管理における課題を考察する。</p>
       <h2>北部日本における交通インフラと大型哺乳類の衝突</h2>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-12-daily-report";
@@ -178,6 +179,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"岩手県","count":33},{"pref":"福島県","count":31},{"pref":"秋田県","count":29},{"pref":"北海道","count":28},{"pref":"兵庫県","count":28},{"pref":"新潟県","count":25},{"pref":"宮城県","count":20},{"pref":"長野県","count":16},{"pref":"富山県","count":14},{"pref":"京都府","count":14},{"pref":"島根県","count":13},{"pref":"栃木県","count":12},{"pref":"山形県","count":12},{"pref":"石川県","count":10},{"pref":"山口県","count":6},{"pref":"福井県","count":6},{"pref":"埼玉県","count":4},{"pref":"岐阜県","count":3},{"pref":"鳥取県","count":2},{"pref":"三重県","count":2},{"pref":"青森県","count":2},{"pref":"群馬県","count":1},{"pref":"山梨県","count":1},{"pref":"静岡県","count":1},{"pref":"岡山県","count":1},{"pref":"広島県","count":1},{"pref":"和歌山県","count":1}]}
+        total={316}
+        periodLabel={"2026年6月12日"}
+      />
 
       <p>2026年6月12日、KumaWatchが収集した国内のクマ出没情報は総計244件に上った。情報源の内訳は報道由来（URLあり）が218件を占め、自治体等からの公式情報は0件であった。この日、人身被害につながる事案が1件確認されたほか、「都市部」キーワードに一致するものが30件、「捕獲・銃猟」に一致するものが4件と、人間の生活圏における深刻な事案が複数発生した。本稿ではこれらの事案を概観し、地域別の傾向とリスク要因を分析する。</p>
       <h2>主要事案の概観</h2>

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-11-daily-report";
@@ -154,6 +155,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":18},{"pref":"北海道","count":15},{"pref":"島根県","count":7},{"pref":"岩手県","count":4},{"pref":"福島県","count":3},{"pref":"群馬県","count":3},{"pref":"新潟県","count":2},{"pref":"富山県","count":2},{"pref":"山口県","count":1},{"pref":"鳥取県","count":1},{"pref":"三重県","count":1},{"pref":"栃木県","count":1},{"pref":"長野県","count":1}]}
+        total={59}
+        periodLabel={"2026年5月11日"}
+      />
 
       <p>2026年5月11日は、現代日本における野生動物管理と公共安全の境界線が極めて危機的な状況に達した一日として記録されるべき日である。日本列島各地で報告されたクマの出没情報は、単なる季節的な偶発事象の域を大きく逸脱し、深刻な人獣衝突のフェーズへと移行していることを示唆している。特に2026年度は、統計開始以来、死傷者数が過去最多を更新し続けており、同日時点での犠牲者は名、負傷者は名を超えている（※1）。</p>
       <p>本報告書では、2026年5月11日に確認された全国のクマ出没に関するニュース、公式報告、およびコミュニティ情報を網羅的に収集・分析し、その生態学的背景、社会的影響、そして先端技術を用いた対抗策の現状を詳述する。</p>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-12-daily-report";
@@ -138,6 +139,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":30},{"pref":"秋田県","count":9},{"pref":"新潟県","count":8},{"pref":"岩手県","count":8},{"pref":"福島県","count":7},{"pref":"埼玉県","count":4},{"pref":"富山県","count":4},{"pref":"長野県","count":4},{"pref":"宮城県","count":4},{"pref":"山口県","count":4},{"pref":"栃木県","count":3},{"pref":"島根県","count":3},{"pref":"鳥取県","count":2},{"pref":"山形県","count":2},{"pref":"群馬県","count":2},{"pref":"京都府","count":2},{"pref":"神奈川県","count":1},{"pref":"岐阜県","count":1},{"pref":"青森県","count":1},{"pref":"兵庫県","count":1},{"pref":"東京都","count":1},{"pref":"奈良県","count":1}]}
+        total={102}
+        periodLabel={"2026年7月12日"}
+      />
 
       <p>2026年7月12日、KumaWatchが収集したデータによると、日本全国で84件のクマ関連事案が報告された。人身被害に関するキーワードを含む報告は0件であったが、奈良県で住宅敷地内に侵入した個体が駆除されるなど、人とクマの深刻な軋轢（あつれき）につながる事案が発生した。また、都市部での目撃も5件確認されており、引き続き広範な地域で警戒が必要な状況である。本稿では、当日の出没事案を分析し、その傾向とリスクについて報告する。</p>
       <h2>主要事案の概観</h2>

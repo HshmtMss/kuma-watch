@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-04-30-daily-report";
@@ -195,6 +196,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":15},{"pref":"北海道","count":10},{"pref":"福島県","count":6},{"pref":"新潟県","count":4},{"pref":"富山県","count":4},{"pref":"群馬県","count":2},{"pref":"東京都","count":1},{"pref":"滋賀県","count":1},{"pref":"島根県","count":1}]}
+        total={44}
+        periodLabel={"2026年4月30日"}
+      />
 
       <p>2026年4月30日、日本列島はゴールデンウィーク序盤の平穏な連休ムードの中にあったが、野生動物管理の観点からは極めて危機的な一日として記録されることとなった。北海道から中国地方に至る広範囲で、ヒグマおよびツキノワグマの出没が相次ぎ、特に富山県富山市で発生した人身被害個体の「緊急銃猟」による駆除は、都市部における鳥獣被害対策の新たなフェーズを象徴する出来事となった。本報告書は、同日に発生した全国の出没事案を詳細に記述するとともに、その背景にある生態学的要因、行政的対応、および最新の技術動向について、専門的知見に基づき分析を行うものである。</p>
       <h2>都市部浸入の深刻化：富山市における人身被害と緊急銃猟の検証</h2>

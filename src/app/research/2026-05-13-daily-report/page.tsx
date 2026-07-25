@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-13-daily-report";
@@ -234,6 +235,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":23},{"pref":"北海道","count":12},{"pref":"岩手県","count":10},{"pref":"新潟県","count":7},{"pref":"福島県","count":5},{"pref":"石川県","count":4},{"pref":"群馬県","count":3},{"pref":"山口県","count":2},{"pref":"島根県","count":2},{"pref":"東京都","count":1},{"pref":"鳥取県","count":1},{"pref":"富山県","count":1},{"pref":"栃木県","count":1}]}
+        total={72}
+        periodLabel={"2026年5月13日"}
+      />
 
       <h2>全国的な出没急増の背景とマクロ統計</h2>
       <p>日本国内における野生の熊（ヒグマおよびツキノワグマ）の出没は、生態系の変容、里山の過疎化に伴う緩衝地帯の消滅、そして個体数の拡大を背景に、深刻な治安・産業上の危機をもたらしている。環境省が2026年5月中旬までにまとめた2025年度の速報値によると、全国の熊出没件数は5万776件に達し、現在の集計方法となった2009年以降で過去最高を記録した 1。この数値は前年度と比較しておよそ2.5倍、深刻な社会問題となった2023年度の同時期と比べても2倍を超える急増ぶりである 3。</p>

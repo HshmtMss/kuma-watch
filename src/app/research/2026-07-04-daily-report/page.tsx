@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-04-daily-report";
@@ -181,6 +182,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":34},{"pref":"福島県","count":32},{"pref":"新潟県","count":31},{"pref":"岩手県","count":29},{"pref":"兵庫県","count":15},{"pref":"秋田県","count":14},{"pref":"長野県","count":13},{"pref":"石川県","count":12},{"pref":"群馬県","count":11},{"pref":"富山県","count":11},{"pref":"岐阜県","count":11},{"pref":"埼玉県","count":10},{"pref":"宮城県","count":10},{"pref":"栃木県","count":9},{"pref":"島根県","count":9},{"pref":"福井県","count":7},{"pref":"京都府","count":6},{"pref":"青森県","count":4},{"pref":"鳥取県","count":2},{"pref":"滋賀県","count":2},{"pref":"山形県","count":2}]}
+        total={274}
+        periodLabel={"2026年7月4日"}
+      />
 
       <p>2026年7月4日、KumaWatchが収集したデータによると、日本国内におけるクマの出没報告は総計248件に達した。ソース内訳は報道由来の情報が239件と大半を占め、自治体等の公式情報は含まれていない。出没は全国的に広範囲で見られ、特に岩手県（35件）、北海道（25件）、新潟県（24件）、福島県（24件）で多数報告された。当日は、駆除活動に関連する人身被害が2件発生したほか、市街地への出没も確認されており、人とクマの遭遇リスクが極めて高い状況にあることが示唆される。</p>
       <h2>主要事案：人身被害と都市部出没</h2>

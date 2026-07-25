@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-14-daily-report";
@@ -190,6 +191,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":38},{"pref":"北海道","count":11},{"pref":"福島県","count":10},{"pref":"島根県","count":7},{"pref":"富山県","count":4},{"pref":"山口県","count":3},{"pref":"石川県","count":2},{"pref":"新潟県","count":2},{"pref":"岩手県","count":2},{"pref":"群馬県","count":1},{"pref":"埼玉県","count":1}]}
+        total={81}
+        periodLabel={"2026年5月14日"}
+      />
 
       <p>2026年5月14日は、日本の野生動物管理史上、極めて特異な一日として記録されることとなった。北海道から中国地方に至る広範囲において、ツキノワグマおよびヒグマの出没、人身被害、都市機能の麻痺が同時多発的に発生したためである。本報告書では、提供された詳細なニュースデータに基づき、この日に発生した事案を地域別に精査し、その背後にある生態学的要因、社会公共機関の対応、および将来的なリスク管理の在り方について、専門的な見地から分析を行う。</p>
       <h2>東北地方における都市型出没の激化と教育機関への影響</h2>

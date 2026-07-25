@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-02-daily-report";
@@ -223,6 +224,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":51},{"pref":"北海道","count":9},{"pref":"新潟県","count":6},{"pref":"福島県","count":5},{"pref":"石川県","count":4},{"pref":"群馬県","count":4},{"pref":"富山県","count":3},{"pref":"山梨県","count":3},{"pref":"岩手県","count":2},{"pref":"埼玉県","count":1},{"pref":"島根県","count":1},{"pref":"岡山県","count":1}]}
+        total={90}
+        periodLabel={"2026年6月2日"}
+      />
 
       <p>2026年6月2日、KumaWatchが収集したデータによると、日本国内で確認されたクマの出没事案は42件に上った。このうち、福島県福島市では工場内にクマが侵入し、従業員4名が負傷する深刻な人身被害が発生した。出没件数は秋田県が12件と最も多く、次いで新潟県が6件、岩手県が5件と、東北地方および隣接する中部地方に集中する傾向が見られた。しかし、北海道から中国地方まで広範囲で出没が報告されており、クマの活動が全国的に活発化していることが示唆される。</p>
       <h2>主要事案：福島市工場における人身被害</h2>

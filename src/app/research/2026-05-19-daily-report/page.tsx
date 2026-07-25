@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-19-daily-report";
@@ -195,6 +196,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":43},{"pref":"福島県","count":15},{"pref":"石川県","count":10},{"pref":"新潟県","count":9},{"pref":"北海道","count":8},{"pref":"島根県","count":4},{"pref":"群馬県","count":3},{"pref":"埼玉県","count":2},{"pref":"山口県","count":1},{"pref":"鳥取県","count":1},{"pref":"岩手県","count":1},{"pref":"栃木県","count":1},{"pref":"静岡県","count":1}]}
+        total={99}
+        periodLabel={"2026年5月19日"}
+      />
 
       <h2>1. 序論：空間的棲み分けの完全な崩壊と新たな人獣対立のフェーズ</h2>
       <p>2026年5月19日は、日本列島における人間と野生動物（特にツキノワグマおよびヒグマ）の空間的・時間的な棲み分けが、かつてない規模と深刻さで崩壊していることを決定的に知らしめる特異日となった。本稿は、同日に全国各地で報告された異常な頻度のクマ出没、農作業中の重大人身被害、山岳地帯における凄惨な遺体発見、さらには市街地深部への白昼堂々の侵入事例を網羅的に抽出し、その背後にある生態学的要因、社会構造的脆弱性、そして行政の危機管理体制の実態を詳細に分析するものである。</p>

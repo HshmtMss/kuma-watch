@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-07-daily-report";
@@ -93,6 +94,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":33},{"pref":"北海道","count":14},{"pref":"福島県","count":12},{"pref":"新潟県","count":8},{"pref":"栃木県","count":8},{"pref":"群馬県","count":5},{"pref":"島根県","count":4},{"pref":"富山県","count":2},{"pref":"山口県","count":1},{"pref":"東京都","count":1},{"pref":"鳥取県","count":1},{"pref":"山梨県","count":1},{"pref":"岩手県","count":1},{"pref":"静岡県","count":1},{"pref":"岡山県","count":1},{"pref":"長野県","count":1}]}
+        total={94}
+        periodLabel={"2026年6月7日"}
+      />
 
       <p>2026年6月7日、KumaWatchが収集したデータによると、国内で少なくとも26件のツキノワグマの出没事案が確認された。出没件数が特に多かったのは新潟県と栃木県の各8件で、次いで群馬県と富山県の各3件、島根県の2件と続く。幸いにも人身被害の報告はなかったが、秋田市では市街地の民家敷地内や公園で目撃されるなど、2件が都市部での出没と判定された。本レポートでは、これらの事案を地域別に分析し、潜在的なリスクについて考察する。</p>
       <h2>主要事案：秋田市における都市部への接近</h2>

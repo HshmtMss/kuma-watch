@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-15-daily-report";
@@ -273,6 +274,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":20},{"pref":"北海道","count":13},{"pref":"福島県","count":12},{"pref":"石川県","count":6},{"pref":"島根県","count":6},{"pref":"山口県","count":3},{"pref":"新潟県","count":2},{"pref":"長野県","count":2},{"pref":"東京都","count":1},{"pref":"鳥取県","count":1},{"pref":"群馬県","count":1},{"pref":"富山県","count":1},{"pref":"山梨県","count":1},{"pref":"岩手県","count":1},{"pref":"滋賀県","count":1},{"pref":"岡山県","count":1}]}
+        total={72}
+        periodLabel={"2026年5月15日"}
+      />
 
       <h2>2026年春期における熊被害の巨視的趨勢と社会的背景</h2>
       <p>日本国内における野生鳥獣の生息域拡大と人間社会への軋轢は、2026年春期において極めて深刻な局面に達している。前年度（2025年度）の全国における熊の捕獲数は約1万4,000頭に上り、そのうち99%以上が殺処分（駆除）されるという異常事態を記録した（※1）。この巨視的な個体群管理のひっ迫を背景に、2026年も初春から出没圧力が衰える兆候は見られず、同年4月1日から5月14日午後7時までの約1か月半という極めて短い期間に、全国で既に12人の人身被害（うち2人が死亡）が報告されていた（※2）。富山県富山市の住宅街における女性負傷事案や、東京都八王子市における体長 超の個体の住宅地接近（※2）、さらには群馬県内での倉庫侵入事案の増加傾向（※3）、広島県広島市佐伯区でのツキノワグマ連続目撃に伴う小中学校・高校10校の臨時休校や福祉施設の防護措置 4 など、全国の生活圏は5月中旬を前にして既に限界近くまで警戒レベルが引き上げられていた。</p>

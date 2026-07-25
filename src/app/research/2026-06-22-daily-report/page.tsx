@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-22-daily-report";
@@ -153,6 +154,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"長野県","count":29},{"pref":"秋田県","count":24},{"pref":"北海道","count":22},{"pref":"福島県","count":19},{"pref":"群馬県","count":18},{"pref":"青森県","count":18},{"pref":"新潟県","count":15},{"pref":"島根県","count":15},{"pref":"京都府","count":12},{"pref":"岩手県","count":11},{"pref":"山口県","count":10},{"pref":"富山県","count":8},{"pref":"宮城県","count":6},{"pref":"山形県","count":6},{"pref":"山梨県","count":5},{"pref":"栃木県","count":5},{"pref":"和歌山県","count":5},{"pref":"埼玉県","count":3},{"pref":"岐阜県","count":3},{"pref":"石川県","count":2},{"pref":"静岡県","count":1},{"pref":"岡山県","count":1},{"pref":"兵庫県","count":1},{"pref":"滋賀県","count":1}]}
+        total={240}
+        periodLabel={"2026年6月22日"}
+      />
 
       <h2>概況</h2>
       <p>2026年6月22日、KumaWatchが収集した国内のクマ出没関連情報は総計207件であった。情報の内訳は報道由来が186件と大半を占め、自治体等の公式情報は0件であった。人身被害を示唆するキーワードを含む事案が4件、都市部での出没が16件、捕獲または銃猟に関する事案が4件確認されている。都道府県別では長野県が31件と最も多く、次いで青森県（18件）、群馬県（17件）、福島県（17件）と続いている。</p>

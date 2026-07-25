@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-01-daily-report";
@@ -191,6 +192,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":22},{"pref":"新潟県","count":5},{"pref":"北海道","count":4},{"pref":"富山県","count":3},{"pref":"岩手県","count":3},{"pref":"山口県","count":2},{"pref":"福島県","count":2},{"pref":"群馬県","count":2},{"pref":"鳥取県","count":1},{"pref":"静岡県","count":1},{"pref":"島根県","count":1}]}
+        total={46}
+        periodLabel={"2026年5月1日"}
+      />
 
       <p>2026年5月1日は、日本の野生動物管理史において、人間と熊の境界線が劇的に再定義された一日として記憶される。例年、冬眠明けの熊が活動を活発化させる時期ではあるが、この日は全国各地で極めて特異な事象が同時多発的に発生した。北海道における規格外の巨大ヒグマによる人身被害、東北地方での過去10年で最多ペースとなる出没を受けた「警報」の発令、そして北陸地方での海辺に至るまでの市街地深部への侵入など、事態は従来の「偶発的な遭遇」の域を完全に超脱している。本報告書では、2026年5月1日に収集された実測データおよび報道記録に基づき、現下の人獣衝突の様態を構造的に分析し、行政、生態、社会の三側面からその深刻さを検証する。</p>
       <h2>全国的な行政対応と関係省庁会議の政治的意義</h2>

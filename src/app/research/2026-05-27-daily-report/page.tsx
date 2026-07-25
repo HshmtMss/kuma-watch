@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-27-daily-report";
@@ -93,6 +94,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":26},{"pref":"北海道","count":11},{"pref":"新潟県","count":10},{"pref":"群馬県","count":7},{"pref":"福島県","count":5},{"pref":"石川県","count":4},{"pref":"島根県","count":4},{"pref":"滋賀県","count":3},{"pref":"埼玉県","count":2},{"pref":"富山県","count":2},{"pref":"栃木県","count":2},{"pref":"山口県","count":1},{"pref":"東京都","count":1},{"pref":"静岡県","count":1},{"pref":"岡山県","count":1}]}
+        total={80}
+        periodLabel={"2026年5月27日"}
+      />
 
       <p>本稿は、2026年5月27日にKumaWatchが収集した国内のクマ出没事案に関する分析レポートである。当日に確認された出没総件数は26件に上り、そのうち報道機関から5件の情報が得られたが、自治体等からの公式情報は0件であった。幸いにも人身被害の報告はなかった。本レポートでは、これらの事案を地域別に分析し、特に顕著であった人口圏への接近事例を考察するとともに、季節的要因を踏まえたリスク評価を行う。</p>
       <h2>主要事案：生活圏への接近</h2>

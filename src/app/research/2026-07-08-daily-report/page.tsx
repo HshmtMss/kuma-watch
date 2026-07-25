@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-08-daily-report";
@@ -149,6 +150,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":38},{"pref":"宮城県","count":24},{"pref":"福島県","count":19},{"pref":"群馬県","count":17},{"pref":"秋田県","count":17},{"pref":"青森県","count":13},{"pref":"新潟県","count":12},{"pref":"岩手県","count":12},{"pref":"山形県","count":9},{"pref":"石川県","count":7},{"pref":"埼玉県","count":6},{"pref":"島根県","count":6},{"pref":"京都府","count":6},{"pref":"長野県","count":6},{"pref":"富山県","count":4},{"pref":"栃木県","count":3},{"pref":"山梨県","count":3},{"pref":"岐阜県","count":3},{"pref":"兵庫県","count":3},{"pref":"鳥取県","count":2},{"pref":"三重県","count":1},{"pref":"岡山県","count":1},{"pref":"山口県","count":1},{"pref":"福井県","count":1},{"pref":"広島県","count":1}]}
+        total={215}
+        periodLabel={"2026年7月8日"}
+      />
 
       <p>2026年7月8日、KumaWatchが収集したデータによると、国内で確認されたクマの出没情報は182件に上った。ソースの内訳は報道由来が166件と大半を占め、公式情報は0件であった。本レポートでは、これらの情報を時空間的に分析し、当日の出没傾向とリスクについて報告する。</p>
       <h2>主要事案の概観：都市部への接近と被害の可能性</h2>

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-22-daily-report";
@@ -113,6 +114,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":21},{"pref":"石川県","count":10},{"pref":"北海道","count":10},{"pref":"福島県","count":8},{"pref":"島根県","count":7},{"pref":"新潟県","count":5},{"pref":"静岡県","count":3},{"pref":"山口県","count":2},{"pref":"富山県","count":2},{"pref":"栃木県","count":2},{"pref":"群馬県","count":1},{"pref":"滋賀県","count":1}]}
+        total={72}
+        periodLabel={"2026年5月22日"}
+      />
 
       <p>2026年5月22日、KumaWatchが収集したデータによると、国内で少なくとも24件のツキノワグマおよびヒグマの出没事案が確認された。都道府県別では島根県が7件と最も多く、次いで新潟県が5件、群馬県、富山県、栃木県が各2件と続いた。幸いにも、人身被害の報告は確認されなかった。しかし、出没地点を詳細に分析すると、住宅地や学校施設に近接する事例が散見され、市民生活への潜在的リスクが浮き彫りとなった。本レポートでは、当日の出没状況を概観し、地域別の傾向とリスクについて分析する。</p>
       <h2>主要事案と特記事項</h2>

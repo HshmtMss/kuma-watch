@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-09-daily-report";
@@ -177,6 +178,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"岩手県","count":31},{"pref":"北海道","count":26},{"pref":"青森県","count":18},{"pref":"秋田県","count":18},{"pref":"福島県","count":14},{"pref":"新潟県","count":13},{"pref":"栃木県","count":11},{"pref":"富山県","count":8},{"pref":"島根県","count":8},{"pref":"宮城県","count":7},{"pref":"京都府","count":6},{"pref":"兵庫県","count":6},{"pref":"石川県","count":5},{"pref":"山形県","count":5},{"pref":"埼玉県","count":4},{"pref":"長野県","count":4},{"pref":"山梨県","count":4},{"pref":"群馬県","count":3},{"pref":"鳥取県","count":2},{"pref":"東京都","count":2},{"pref":"滋賀県","count":1},{"pref":"山口県","count":1},{"pref":"神奈川県","count":1},{"pref":"静岡県","count":1},{"pref":"福井県","count":1}]}
+        total={200}
+        periodLabel={"2026年7月9日"}
+      />
 
       <h2>総括：都市部への接近と潜在的リスク</h2>
       <p>2026年7月9日に集計されたクマの出没情報は全国で181件に達した。人身被害や、対応としての捕獲・銃猟の報告はなかったものの、都市部での目撃が14件確認されたことは、この日の動向を象徴する重要な点である。特に、岩手県盛岡市の住宅地や学校給食センター敷地内（※2, ※3）、北上市の住宅街（※1）、宮城県仙台市の複数の区の住宅地（※5, ※6, ※7）など、人口密集地での出没が相次いだ。これらの事案は、クマの生息域と人間の生活圏の境界が曖昧になっている現状を強く示唆しており、市民の安全確保に向けた対策の重要性を改めて浮き彫りにしている。当日は報道機関からの情報が148件と大半を占め、市民の関心の高さも伺えるが、自治体等からの公式情報は0件であり、情報発信体制の課題も残されている。</p>

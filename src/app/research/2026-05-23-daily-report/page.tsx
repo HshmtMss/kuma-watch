@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-23-daily-report";
@@ -118,6 +119,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":23},{"pref":"石川県","count":14},{"pref":"北海道","count":9},{"pref":"福島県","count":7},{"pref":"新潟県","count":7},{"pref":"栃木県","count":5},{"pref":"群馬県","count":4},{"pref":"静岡県","count":4},{"pref":"山口県","count":2},{"pref":"埼玉県","count":2},{"pref":"島根県","count":2},{"pref":"東京都","count":1},{"pref":"滋賀県","count":1}]}
+        total={81}
+        periodLabel={"2026年5月23日"}
+      />
 
       <h2>概要</h2>
       <p>2026年5月23日にKumaWatchが収集した国内のクマ出没情報は、総計16件であった。都道府県別では新潟県と栃木県が各5件と最も多く、次いで島根県と秋田県が各2件、岩手県と滋賀県が各1件と続く。これらの情報は、東北、関東、中部、関西、中国の5地方にわたり、広域でクマの活動が確認されたことを示している。情報源の内訳は、自治体のマイマップ由来が5件（すべて栃木県）、新潟県の公式情報が4件、報道が4件、その他自治体からの情報が3件であった。当日は人身被害や捕獲・銃猟に至る事案は報告されていない。</p>

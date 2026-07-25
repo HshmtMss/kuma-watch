@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-06-daily-report";
@@ -233,6 +234,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":24},{"pref":"石川県","count":6},{"pref":"北海道","count":5},{"pref":"群馬県","count":2},{"pref":"新潟県","count":2},{"pref":"岩手県","count":2},{"pref":"島根県","count":2},{"pref":"山口県","count":1},{"pref":"鳥取県","count":1},{"pref":"福島県","count":1},{"pref":"三重県","count":1}]}
+        total={47}
+        periodLabel={"2026年5月6日"}
+      />
 
       <h2>1. 2026年度春季における熊出没の総体的概況と統計的解析</h2>
       <p>2026年の大型連休（ゴールデンウィーク）は、4月29日から5月6日までという期間設定において、行楽客の急増と冬眠明けの熊の活動ピークが完全に重複した時期であった（※1）。2026年5月6日、日本全国で報告された熊の出没および目撃情報は、前日の人身被害の衝撃が冷めやらぬ中、特に北日本から中部地方にかけて極めて高い頻度で推移した。</p>

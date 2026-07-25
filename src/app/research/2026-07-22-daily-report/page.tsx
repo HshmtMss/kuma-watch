@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-22-daily-report";
@@ -161,6 +162,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":25},{"pref":"北海道","count":19},{"pref":"栃木県","count":13},{"pref":"福島県","count":9},{"pref":"新潟県","count":8},{"pref":"岩手県","count":8},{"pref":"青森県","count":7},{"pref":"山形県","count":6},{"pref":"長野県","count":5},{"pref":"埼玉県","count":4},{"pref":"宮城県","count":4},{"pref":"群馬県","count":3},{"pref":"富山県","count":2},{"pref":"石川県","count":2},{"pref":"島根県","count":2},{"pref":"京都府","count":2},{"pref":"奈良県","count":2},{"pref":"兵庫県","count":2},{"pref":"東京都","count":1},{"pref":"福井県","count":1},{"pref":"岐阜県","count":1},{"pref":"滋賀県","count":1}]}
+        total={127}
+        periodLabel={"2026年7月22日"}
+      />
 
       <p>2026年7月22日、KumaWatchが収集したデータによると、日本全国で123件のクマ関連事案が確認された。都道府県別では秋田県が25件と最も多く、次いで北海道17件、栃木県13件、福島県9件、新潟県8件と続く。この日は、人身被害、都市部への出没、自治体による捕獲・殺処分など、市民の安全を脅かす深刻な事案が複数発生しており、極めて警戒が必要な一日であった。</p>
       <h2>主要事案の概要</h2>

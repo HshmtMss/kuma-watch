@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-01-daily-report";
@@ -88,6 +89,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":26},{"pref":"北海道","count":20},{"pref":"新潟県","count":8},{"pref":"石川県","count":6},{"pref":"山梨県","count":4},{"pref":"山口県","count":3},{"pref":"福島県","count":3},{"pref":"岩手県","count":3},{"pref":"栃木県","count":3},{"pref":"島根県","count":3},{"pref":"群馬県","count":2},{"pref":"東京都","count":1},{"pref":"鳥取県","count":1},{"pref":"埼玉県","count":1},{"pref":"富山県","count":1},{"pref":"三重県","count":1},{"pref":"静岡県","count":1},{"pref":"滋賀県","count":1}]}
+        total={88}
+        periodLabel={"2026年6月1日"}
+      />
 
       <p>2026年6月1日、KumaWatchが収集したデータによると、日本国内で合計19件のクマ出没が確認された。都道府県別では新潟県が7件と最も多く、次いで栃木県が3件、群馬県、三重県、島根県が各2件、埼玉県、富山県、滋賀県が各1件と続く。幸いにも人身被害の報告はなかったが、滋賀県で錯誤捕獲が1件発生した。本レポートでは、これらの事案を地理的・状況的に分析し、今後のリスクについて考察する。</p>
       <h2>主要事案の概要</h2>

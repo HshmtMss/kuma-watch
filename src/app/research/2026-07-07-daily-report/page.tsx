@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-07-daily-report";
@@ -171,6 +172,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"北海道","count":36},{"pref":"秋田県","count":32},{"pref":"福島県","count":29},{"pref":"岩手県","count":22},{"pref":"新潟県","count":20},{"pref":"山口県","count":13},{"pref":"宮城県","count":10},{"pref":"群馬県","count":9},{"pref":"青森県","count":9},{"pref":"長野県","count":8},{"pref":"島根県","count":6},{"pref":"東京都","count":5},{"pref":"京都府","count":5},{"pref":"石川県","count":4},{"pref":"富山県","count":4},{"pref":"山形県","count":4},{"pref":"岡山県","count":3},{"pref":"栃木県","count":2},{"pref":"静岡県","count":2},{"pref":"兵庫県","count":2},{"pref":"埼玉県","count":1},{"pref":"三重県","count":1},{"pref":"和歌山県","count":1}]}
+        total={228}
+        periodLabel={"2026年7月7日"}
+      />
 
       <p>2026年7月7日、KumaWatchが収集した国内のクマ出没関連情報は総計200件に上った。このうち、報道機関から得られた情報が178件と大半を占め、自治体などからの公式情報は0件であった。当日は東京都で人身被害が1件（キーワード一致2件）発生したほか、都市部での出没が15件、捕獲や銃猟に関連する事案が2件確認されており、全国的にクマと人間との距離が縮まっている状況が浮き彫りとなった。本稿では、これらの事案を分析し、今後のリスクについて考察する。</p>
       <h2>主要事案の概要</h2>

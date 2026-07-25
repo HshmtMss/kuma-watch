@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-18-daily-report";
@@ -211,6 +212,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":51},{"pref":"北海道","count":12},{"pref":"石川県","count":10},{"pref":"福島県","count":8},{"pref":"新潟県","count":7},{"pref":"群馬県","count":3},{"pref":"島根県","count":3},{"pref":"埼玉県","count":2},{"pref":"岩手県","count":2},{"pref":"山口県","count":1},{"pref":"鳥取県","count":1},{"pref":"富山県","count":1},{"pref":"三重県","count":1},{"pref":"静岡県","count":1},{"pref":"滋賀県","count":1},{"pref":"岡山県","count":1}]}
+        total={105}
+        periodLabel={"2026年5月18日"}
+      />
 
       <p>2026年5月18日は、日本国内における大型食肉目動物（ツキノワグマおよびヒグマ）の出没・遭遇の報告、ならびにこれらに対応する行政機関の警戒措置が極めて高密度に重なった一日となった。長年にわたり維持されてきた「奥山（野生動物の棲息地）」と「人里（人間の生活圏）」の境界線は、中山間地域の過疎化、耕作放棄地の増加、そして動物側の環境適応能力の向上に伴って急速に曖昧化している。本報告書では、2026年5月18日に国内各地で確認された具体的なクマの出没情報と行政対応、最新の研究動向を総括し、野生動物管理（ワイルドライフ・マネジメント）の観点から今後の空間制御のあり方を検証する。</p>
       <h2>地方自治体および研究機関による防除・管理施策の新展開</h2>

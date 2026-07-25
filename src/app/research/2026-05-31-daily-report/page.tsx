@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-31-daily-report";
@@ -93,6 +94,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":30},{"pref":"石川県","count":12},{"pref":"福島県","count":7},{"pref":"新潟県","count":6},{"pref":"北海道","count":6},{"pref":"鳥取県","count":2},{"pref":"群馬県","count":2},{"pref":"埼玉県","count":2},{"pref":"岩手県","count":2},{"pref":"東京都","count":1},{"pref":"山梨県","count":1},{"pref":"栃木県","count":1},{"pref":"滋賀県","count":1},{"pref":"島根県","count":1}]}
+        total={74}
+        periodLabel={"2026年5月31日"}
+      />
 
       <p>本レポートは、2026年5月31日にKumaWatchが収集した国内のクマ出没情報13件について、その地理的分布、事案の性質、および潜在的リスクを分析するものである。当日は、人身被害の報告はなかったものの、クマの活動が全国的に活発化しており、特に岩手県では人家への侵入事案も発生した。本稿では、これらの事案を地域別に整理し、季節的要因と合わせて今後のリスクを評価する。</p>
       <h2>主要事案：岩手県釜石市における住宅侵入</h2>

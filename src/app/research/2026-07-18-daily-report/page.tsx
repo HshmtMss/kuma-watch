@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-07-18-daily-report";
@@ -173,6 +174,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":31},{"pref":"福島県","count":12},{"pref":"岩手県","count":12},{"pref":"兵庫県","count":11},{"pref":"北海道","count":11},{"pref":"山口県","count":10},{"pref":"滋賀県","count":9},{"pref":"新潟県","count":6},{"pref":"宮城県","count":6},{"pref":"長野県","count":5},{"pref":"富山県","count":4},{"pref":"青森県","count":4},{"pref":"島根県","count":3},{"pref":"和歌山県","count":3},{"pref":"山形県","count":2},{"pref":"岐阜県","count":2},{"pref":"栃木県","count":2},{"pref":"群馬県","count":2},{"pref":"三重県","count":1},{"pref":"京都府","count":1}]}
+        total={137}
+        periodLabel={"2026年7月18日"}
+      />
 
       <p>2026年7月18日、KumaWatchが収集したデータによると、国内におけるクマの出没件数は128件に達した。これらの情報は、主に報道機関からの122件の情報を基に集計されたものであり、自治体などからの公式情報は6件含まれる。当日、人身被害や銃による捕獲に至った事案は報告されていない。しかし、都市部やその周辺での目撃が8件確認されており、人間とクマの活動域が重複している状況が浮き彫りとなった。</p>
       <h2>主要事案：都市部・生活圏への出没</h2>

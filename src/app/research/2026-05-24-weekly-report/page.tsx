@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-24-weekly-report";
@@ -93,6 +94,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":232},{"pref":"北海道","count":73},{"pref":"石川県","count":60},{"pref":"福島県","count":52},{"pref":"新潟県","count":46},{"pref":"島根県","count":30},{"pref":"静岡県","count":17},{"pref":"山口県","count":16},{"pref":"群馬県","count":13},{"pref":"栃木県","count":11},{"pref":"山梨県","count":8},{"pref":"埼玉県","count":7},{"pref":"岩手県","count":7},{"pref":"富山県","count":6},{"pref":"鳥取県","count":5},{"pref":"東京都","count":4},{"pref":"滋賀県","count":4},{"pref":"岡山県","count":4},{"pref":"長野県","count":3},{"pref":"三重県","count":2}]}
+        total={600}
+        periodLabel={"2026年5月18日〜2026年5月24日"}
+      />
 
       <p>2026年5月17日から5月24日の期間に、KumaWatchが収集した国内のクマ出没関連情報は161件に上った。これは、春の活動期に入り、全国的にクマの行動が活発化していることを示すものである。本レポートでは、この期間の出没動向をデータに基づき分析し、主要な傾向、地域別の特徴、注目すべき事案、および今後の警戒点について報告する。</p>
       <h2>主要トピック</h2>

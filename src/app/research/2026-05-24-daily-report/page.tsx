@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-24-daily-report";
@@ -98,6 +99,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":18},{"pref":"北海道","count":11},{"pref":"福島県","count":5},{"pref":"新潟県","count":5},{"pref":"島根県","count":5},{"pref":"山口県","count":2},{"pref":"東京都","count":2},{"pref":"岩手県","count":2},{"pref":"栃木県","count":2},{"pref":"静岡県","count":2},{"pref":"富山県","count":1},{"pref":"山梨県","count":1},{"pref":"岡山県","count":1},{"pref":"長野県","count":1}]}
+        total={58}
+        periodLabel={"2026年5月24日"}
+      />
 
       <p>2026年5月24日、KumaWatchが収集した国内のクマ出没情報は総計15件であった。人的被害や捕獲・銃猟に至る事案は確認されず、目撃および痕跡の発見が主であった。出没は島根県（5件）、新潟県（4件）を中心に、東北から中国地方にかけての広域で確認された。本稿では、当日の出没事案を地域別に分析し、リスク評価を行う。</p>
       <h2>主要事案の概観</h2>

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-05-05-daily-report";
@@ -202,6 +203,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"秋田県","count":22},{"pref":"北海道","count":8},{"pref":"福島県","count":6},{"pref":"島根県","count":6},{"pref":"新潟県","count":4},{"pref":"鳥取県","count":3},{"pref":"石川県","count":2},{"pref":"岩手県","count":2},{"pref":"山口県","count":1},{"pref":"富山県","count":1},{"pref":"岡山県","count":1}]}
+        total={56}
+        periodLabel={"2026年5月5日"}
+      />
 
       <h2>2026年5月5日の概況と調査背景</h2>
       <p>2026年5月5日、日本列島は大型連休（ゴールデンウィーク）の終盤を迎え、行楽地や山間部における人間活動が最大化する中で、全国各地で熊の目撃および人身被害が相次いで報告された。本報告書は、同日に発生した出没事例を詳細に分析し、その生態学的背景、地理的特徴、および社会的な対応状況を包括的に検証するものである。</p>

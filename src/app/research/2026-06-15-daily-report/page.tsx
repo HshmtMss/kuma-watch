@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-15-daily-report";
@@ -153,6 +154,12 @@ export default function ResearchPage() {
           研究・知見トップへ
         </Link>
       </div>
+
+      <ResearchPrefChart
+        data={[{"pref":"福島県","count":34},{"pref":"兵庫県","count":26},{"pref":"北海道","count":25},{"pref":"京都府","count":18},{"pref":"秋田県","count":17},{"pref":"群馬県","count":17},{"pref":"石川県","count":15},{"pref":"山形県","count":11},{"pref":"富山県","count":10},{"pref":"長野県","count":10},{"pref":"山口県","count":9},{"pref":"青森県","count":9},{"pref":"島根県","count":8},{"pref":"広島県","count":8},{"pref":"福井県","count":7},{"pref":"埼玉県","count":6},{"pref":"山梨県","count":6},{"pref":"栃木県","count":5},{"pref":"岩手県","count":4},{"pref":"新潟県","count":3},{"pref":"宮城県","count":2},{"pref":"滋賀県","count":1},{"pref":"岡山県","count":1},{"pref":"岐阜県","count":1}]}
+        total={253}
+        periodLabel={"2026年6月15日"}
+      />
 
       <p>2026年6月15日、KumaWatchが収集したデータによると、日本国内におけるクマの出没総件数は209件に達した。都道府県別では兵庫県と福島県がそれぞれ25件で最も多く、次いで京都府が18件、群馬県が15件、北海道が14件と続いた。情報源の内訳は報道由来のものが188件と大半を占め、公式情報は0件であった。当日は人身被害につながる事案が1件確認されたほか、市街地や住宅地など都市部での目撃が16件、捕獲や銃猟といった対応事案が9件報告されており、人間とクマの生息域が近接している現状を強く示唆している。</p>
       <h2>主要事案の概観</h2>
