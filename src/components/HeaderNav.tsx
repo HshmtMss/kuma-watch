@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { isLearnHubReleased } from "@/lib/learn-flag";
 
 /**
  * 全ページ共通ヘッダーナビ。探し方を「探す」▼に一本化:
@@ -27,6 +28,10 @@ const EXPLORE_LINKS: NavLink[] = [
 ];
 
 const LEARN_LINKS: NavLink[] = [
+  // 「学ぶ」刷新ハブ。公開フラグ ON のときだけ先頭に出す（段階公開）。
+  ...(isLearnHubReleased()
+    ? [{ href: "/learn", label: "学ぶトップ（新）", desc: "合言葉・身を守る・知る・最新" }]
+    : []),
   { href: "/measures", label: "クマ対策の総合ガイド", desc: "獣医師監修の対策まとめ" },
   { href: "/articles", label: "記事一覧", desc: "遭遇時の対処・装備・生態" },
   { href: "/research", label: "研究レポート", desc: "日次・月次の時空間分析" },
