@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         対策は東北・北海道のような撃退中心ではなく、<strong>「出会わない」「保護を尊重する」</strong>
         がベース。九州では既に絶滅したと考えられており、復活の可能性も議論されています。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            西日本のツキノワグマは<strong>個体数が少なく、絶滅危惧II類の地域個体群が複数</strong>。
+          </>,
+          <>
+            対策は撃退中心でなく<strong>「出会わない・保護を尊重する」</strong>がベース。
+          </>,
+          <>
+            <strong>九州では既に絶滅</strong>と考えられている。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

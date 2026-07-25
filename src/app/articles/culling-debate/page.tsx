@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         判断基準を整理します。SNS では極端な意見が目立ちますが、現場は常に
         「人を守ること」と「個体群を守ること」のトレードオフで動いています。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ駆除は<strong>「人身被害の抑止」と「命の倫理」が衝突</strong>する論点。
+          </>,
+          <>
+            <strong>放獣か殺処分か</strong>は、自治体・猟友会・保護団体・住民で立場が分かれる。
+          </>,
+          <>
+            現場は常に<strong>「人を守る」と「個体群を守る」のトレードオフ</strong>で動く。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         市街地での猟銃使用も一部容認されるなど、現場の運用が大きく変わります。
         本記事は改正の経緯・具体的な変化・残された議論を、自治体担当者・一般読者の双方に向けて整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>2026年4月、環境省がクマを「指定管理鳥獣」に追加</strong>。
+          </>,
+          <>
+            <strong>国の交付金で集中管理が可能に</strong>。市街地での猟銃使用も一部容認。
+          </>,
+          <>
+            改正で<strong>現場運用が大きく変わる</strong>一方、保護派の懸念も残る。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

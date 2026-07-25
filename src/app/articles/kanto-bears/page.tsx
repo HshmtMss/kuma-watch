@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         <strong>高尾山</strong>でも目撃情報があります。
         首都圏ハイカーがアクセスしやすい山ほど、自然と遭遇確率も上がるという認識が必要。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「関東はクマがいない」は誤解</strong>。奥多摩・丹沢・秩父・日光などに常時生息。
+          </>,
+          <>
+            <strong>高尾山でも目撃情報</strong>がある。
+          </>,
+          <>
+            <strong>首都圏からアクセスしやすい山ほど遭遇確率も上がる</strong>という認識が必要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -37,6 +38,21 @@ export default function Page() {
         過疎化で里山が放置されている社会条件が重なった結果です。
         県別の事情・最新の傾向・地域固有のリスクを整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            東北6県は<strong>本州ツキノワグマの主要生息地</strong>。
+          </>,
+          <>
+            <strong>秋田の人身事故が全国最多を更新</strong>、岩手・山形でも市街地出没が常態化。
+          </>,
+          <>
+            <strong>大面積の山林＋過疎で里山放置</strong>という社会条件が重なった結果。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

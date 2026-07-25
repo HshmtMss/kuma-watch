@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -35,6 +36,21 @@ export default function Page() {
         登山シーズンの遭遇は決して珍しくなく、<strong>長野・岐阜・富山・新潟</strong>では
         毎年のように人身事故が報告されています。山小屋や登山道のクマ情報を入山前に確認することが必須です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>北ア・南ア・八ヶ岳など中部山岳一帯</strong>はツキノワグマの主要生息域。
+          </>,
+          <>
+            <strong>長野・岐阜・富山・新潟</strong>で毎年のように人身事故が報告される。
+          </>,
+          <>
+            入山前に<strong>山小屋・登山道のクマ情報を確認</strong>する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

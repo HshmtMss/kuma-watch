@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         本州のツキノワグマと比べて<strong>体格が 3〜4 倍</strong>、攻撃性も高く、対処法も異なります。
         近年は札幌・旭川など都市近郊への出没も増えており、通勤・通学・観光のいずれでも基本知識が必要です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            北海道のヒグマは<strong>個体数1.2万頭、全道に分布</strong>。
+          </>,
+          <>
+            本州のツキノワグマより<strong>体格3〜4倍・攻撃性も高く</strong>、対処法も異なる。
+          </>,
+          <>
+            <strong>札幌・旭川など都市近郊への出没も増加</strong>。通勤・観光でも基本知識が必要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

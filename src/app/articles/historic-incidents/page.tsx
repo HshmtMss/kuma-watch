@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -34,6 +35,21 @@ export default function Page() {
         三毛別・福岡大ワンゲル・十和利山の三大事件から学べる教訓は、現代のアウトドアでもそのまま生きます。
         歴史を振り返ることで「自分には起こらない」という油断を打ち消し、適切な備えにつなげましょう。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            過去の重大事故には<strong>共通パターン</strong>がある。
+          </>,
+          <>
+            <strong>三毛別・福岡大ワンゲル・十和利山</strong>の三大事件から学べる教訓は今も生きる。
+          </>,
+          <>
+            歴史を知り<strong>「自分には起こらない」という油断</strong>を打ち消す。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
