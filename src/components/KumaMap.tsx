@@ -609,7 +609,7 @@ export default function KumaMap({
     // 「別日に複数ピンで水増し」の誤解を防ぐ。
     const mergedLine =
       typeof r.mergedCount === "number" && r.mergedCount > 1
-        ? `<div style="margin-top:2px;font-size:11px;color:#b45309">この付近で直近 ${r.mergedCount} 件（最新を表示）</div>`
+        ? `<div style="margin-top:2px;font-size:11px;color:#b45309">この付近で ${r.mergedCount} 日 出没あり（最新を表示）</div>`
         : "";
     return `<div style="min-width:180px;font-size:13px;line-height:1.7">
       <b>${escapeHtml(place)}</b>${freshBadge}${sourceBadge}

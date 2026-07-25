@@ -421,18 +421,38 @@ function dedupeNews(records: UnifiedSighting[]): UnifiedSighting[] {
 //
 // 一次側(公式/警察/市民)は畳まない(記録の信頼性が高く、水増し源は報道の
 // ジオコーディング揺れのため)。座標・地区名が無い報道も畳まない(照合不能)。
-// 「同じ地区」とみなす距離。同一市内でこの距離以内の報道出没は最新1件へ集約。
-// 地区名の文字列ではなく距離で判定する(「原町」「宮城野区」「宮城野区住宅地」の
-// ように同じ一帯でも表記が割れるため、文字列一致では畳めない)。1.5km は徒歩圏の
-// 「その付近」の目安。これより離れた別地区は別ピンとして残す(近所の出没を
-// 遠くのピンに畳んで見落とさせない)。
+//
+// 「同じ地区」の判定は 距離 と 地名 の両方で行う:
+//  - 距離: 同一市内で COLLAPSE_KM 以内。
+//  - 地名: 同一市内で正規化した地名トークンが一致(例「梅田川周辺」「宮城野区
+//    梅田川」「梅田川沿い」→ すべて "梅田川")。同じ実在地点でも表記で座標が
+//    大きく散る(仙台の梅田川は 15件が12座標・最大8.8km に散らばる)のを、距離
+//    だけでは束ねられないため。同一市内で同じ地名なら座標に関係なく同一地区とみなす。
+// これらを連結成分でまとめ(A~B が距離, B~C が地名 なら A/B/C を1つに)、最新を
+// 代表・束ねた数を mergedCount にする。
 const COLLAPSE_KM = 1.5;
+// 地名一致で束ねる上限距離。梅田川のような表記ゆれ由来の座標散り(最大8.8km)は
+// 束ねたいが、これを超える同名は別地点(または異常座標)の可能性が高く束ねない。
+const TOKEN_MAX_KM = 10;
+
+/** 地区名から距離に依らず束ねるための正規化トークン。市名/区名/丁目/接尾を除く。 */
+function placeToken(r: UnifiedSighting): string | null {
+  let s = (r.sectionName ?? "").trim();
+  if (!s || s === "不明" || s === r.cityName) return null;
+  s = s.replace(/^.{1,4}?[区]/, ""); // 先頭の「◯◯区」を落とす
+  s = s.replace(
+    /[0-9０-９一二三四五六七八九十][0-9０-９一二三四五六七八九十]*(丁目|番地?|号|区画|地割)?.*$/,
+    "",
+  );
+  s = s.replace(/(周辺|沿い|付近|地内|地区|河川敷|川沿い|住宅街|住宅地)$/g, "");
+  s = s.trim();
+  return s.length >= 2 ? s : null;
+}
 
 function collapseSameNeighborhood(
   records: UnifiedSighting[],
 ): UnifiedSighting[] {
-  // 報道(座標・市あり)を市ごとにまとめ、市内で距離クラスタリングする。
-  // 一次側(公式/警察/市民)は畳まない(信頼性が高く、水増し源は報道側)。
+  // 報道(座標・市あり)を市ごとにまとめる。一次側は畳まない。
   const groups = new Map<string, UnifiedSighting[]>();
   const passthrough: UnifiedSighting[] = [];
   for (const r of records) {
@@ -450,32 +470,54 @@ function collapseSameNeighborhood(
 
   const out = [...passthrough];
   for (const list of groups.values()) {
-    // 出没日の新しい順(同日は取り込みが新しい順)。代表から貪欲に COLLAPSE_KM
-    // 圏内を束ね、最新を代表・束ねた数を mergedCount にする。
-    const sorted = [...list].sort((a, b) => {
-      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
-      return (b.ingestedAt ?? 0) - (a.ingestedAt ?? 0);
-    });
-    const used = new Set<UnifiedSighting>();
-    for (const rep of sorted) {
-      if (used.has(rep)) continue;
-      used.add(rep);
-      let count = 1;
-      for (const other of sorted) {
-        if (used.has(other)) continue;
-        if (
-          haversineKmLocal(
-            rep.lat as number,
-            rep.lon as number,
-            other.lat as number,
-            other.lon as number,
-          ) <= COLLAPSE_KM
-        ) {
-          used.add(other);
-          count++;
-        }
+    const n = list.length;
+    // Union-Find で「距離が近い or 地名トークンが一致」を同一クラスタに束ねる。
+    const parent = Array.from({ length: n }, (_, i) => i);
+    const find = (x: number): number => {
+      while (parent[x] !== x) {
+        parent[x] = parent[parent[x]];
+        x = parent[x];
       }
-      out.push(count > 1 ? { ...rep, mergedCount: count } : rep);
+      return x;
+    };
+    const tokens = list.map(placeToken);
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const dist = haversineKmLocal(
+          list[i].lat as number,
+          list[i].lon as number,
+          list[j].lat as number,
+          list[j].lon as number,
+        );
+        const sameToken =
+          tokens[i] !== null && tokens[i] === tokens[j] && dist <= TOKEN_MAX_KM;
+        const near = dist <= COLLAPSE_KM;
+        if (sameToken || near) parent[find(i)] = find(j);
+      }
+    }
+    // クラスタごとに、最新の出没を代表にする。
+    // 件数は「記録数」ではなく「出没した日数(distinct date)」。同じ事案を複数
+    // メディアが報じた分を数えて水増しに見えるのを避け、"この付近で◯日出没" と
+    // 実態(何日出たか)で示すため。
+    const clusters = new Map<number, number[]>();
+    for (let i = 0; i < n; i++) {
+      const root = find(i);
+      (clusters.get(root) ?? clusters.set(root, []).get(root)!).push(i);
+    }
+    for (const idxs of clusters.values()) {
+      let repI = idxs[0];
+      for (const i of idxs) {
+        const a = list[i];
+        const b = list[repI];
+        if (
+          a.date > b.date ||
+          (a.date === b.date && (a.ingestedAt ?? 0) > (b.ingestedAt ?? 0))
+        )
+          repI = i;
+      }
+      const rep = list[repI];
+      const days = new Set(idxs.map((i) => list[i].date)).size;
+      out.push(days > 1 ? { ...rep, mergedCount: days } : rep);
     }
   }
   return out;
