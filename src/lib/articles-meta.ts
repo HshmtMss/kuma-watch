@@ -2001,6 +2001,13 @@ export function tagToSlug(tag: string): string {
 }
 
 /** 全タグ (重複除去) を出現頻度順に返す。/articles/tag の一覧で使う想定。 */
+/**
+ * タグページを検索インデックス対象にする最小記事数。341タグ中270(79%)が1記事だけで、
+ * 薄いタグページが大量に生成・sitemap 掲載されていた。これ未満のタグは noindex にし
+ * sitemap からも外す(ページ自体はサイト内回遊のため残す)。/place の 0件noindex剪定と同方針。
+ */
+export const TAG_MIN_INDEX = 2;
+
 export function getAllTags(): { tag: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const a of ARTICLES) {

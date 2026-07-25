@@ -9,6 +9,7 @@ import {
   getArticlesByTag,
   getCategory,
   tagToSlug,
+  TAG_MIN_INDEX,
   type ArticleMeta,
 } from "@/lib/articles-meta";
 
@@ -55,6 +56,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: url },
+    // 記事数が少ない薄いタグページは noindex(リンクは辿る)。sitemap からも外す。
+    robots:
+      articles.length >= TAG_MIN_INDEX
+        ? undefined
+        : { index: false, follow: true },
     openGraph: {
       title,
       description,

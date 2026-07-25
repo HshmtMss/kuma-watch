@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { ARTICLES, CATEGORIES, getAllTags, tagToSlug } from "@/lib/articles-meta";
+import { ARTICLES, CATEGORIES, getAllTags, tagToSlug, TAG_MIN_INDEX } from "@/lib/articles-meta";
 import { getAllPrefSummaries, getStaticPlaceKeys } from "@/lib/place-index";
 import {
   RESEARCH_ENTRIES,
@@ -76,12 +76,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const tagEntries: MetadataRoute.Sitemap = getAllTags().map((t) => ({
-    url: `${SITE_URL}/articles/tag/${encodeURIComponent(tagToSlug(t.tag))}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.5,
-  }));
+  // 記事数の少ない薄いタグページ(1記事のみ等)は sitemap から除外(noindex と一致)。
+  const tagEntries: MetadataRoute.Sitemap = getAllTags()
+    .filter((t) => t.count >= TAG_MIN_INDEX)
+    .map((t) => ({
+      url: `${SITE_URL}/articles/tag/${encodeURIComponent(tagToSlug(t.tag))}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
+    }));
 
   let prefEntries: MetadataRoute.Sitemap = [];
   let muniEntries: MetadataRoute.Sitemap = [];
