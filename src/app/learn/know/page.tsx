@@ -39,12 +39,24 @@ const ICON: Record<string, LucideIcon> = {
   science: Microscope,
 };
 
+// 行の説明は長い lead ではなく短い一言に（文字を減らす）。
+const HINT: Record<string, string> = {
+  encounter: "距離別の対処・応急処置",
+  gear: "スプレー・鈴・撃退道具",
+  season: "春夏秋冬の行動と注意",
+  ecology: "食性・感覚・痕跡・種別",
+  scene: "山菜・釣り・通学路ほか",
+  region: "北海道・東北ほか地域事情",
+  background: "増加の背景・法律・統計",
+  science: "世界の研究をやさしく",
+};
+
 export default function KnowPage() {
   const counts: Record<string, number> = {};
   for (const a of ARTICLES as Array<{ category: string }>) {
     counts[a.category] = (counts[a.category] ?? 0) + 1;
   }
-  const cats = [...(CATEGORIES as Array<{ id: string; slug: string; name: string; lead: string; order: number }>)].sort(
+  const cats = [...(CATEGORIES as Array<{ id: string; slug: string; name: string; order: number }>)].sort(
     (a, b) => a.order - b.order,
   );
 
@@ -88,7 +100,7 @@ export default function KnowPage() {
                   <span style={{ flex: 1 }}>
                     <span className="t">{c.name}</span>
                     <span className="d" style={{ display: "block" }}>
-                      {c.lead}
+                      {HINT[c.id] ?? ""} ・ {counts[c.id] ?? 0}本
                     </span>
                   </span>
                   <span className="chev" aria-hidden>
