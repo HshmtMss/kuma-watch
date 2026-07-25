@@ -880,8 +880,17 @@ export default function KumaMap({
     } else {
       map.flyTo([lat, lon], targetZoom, { duration: 0.8 });
     }
+    // mapReady を依存に含めるのが重要: URL 由来の selectedLocation は地図の
+    // 初期化(import leaflet)より前に入ることがあり、その回は map/レイヤ未準備で
+    // renderSelectionLayer(赤ピン) も flyTo も空振りする。初期化完了(mapReady)で
+    // もう一度走らせ、赤ピンを確実に描く。
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedLocation?.lat, selectedLocation?.lon, selectedLocation?.source]);
+  }, [
+    selectedLocation?.lat,
+    selectedLocation?.lon,
+    selectedLocation?.source,
+    mapReady,
+  ]);
 
   // 現在地 (青丸) の位置だけ変わったときはカメラは動かさず、マーカーだけ更新
   useEffect(() => {
