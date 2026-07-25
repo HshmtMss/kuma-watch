@@ -217,3 +217,40 @@ body[data-map-onscreen] .map-cta-sticky {
   list-style: none;
 }
 } /* end @layer components */
+
+/* ---- 分析レポートの印刷（PDF保存）------------------------------------------
+   全部出力 = ダッシュボード全体、要約出力 = 要約レポートのみ。
+   AdminAnalytics が親要素に pm-full / pm-summary を付けて切替える。 */
+.analytics-report {
+  display: none;
+} /* 画面では常に隠す。印刷(要約)時のみ表示 */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  /* 背景色や色を紙にも出す（信号色・ヒートマップの意味を保つ） */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* 地図の操作系は印刷しない */
+  .leaflet-control,
+  .leaflet-control-container {
+    display: none !important;
+  }
+  /* 要約出力: コンテナ直下を全部隠し、要約レポートだけ出す
+     （ダッシュボード全体を1つずつ包まずに済む） */
+  .pm-summary > * {
+    display: none !important;
+  }
+  .pm-summary > .analytics-report {
+    display: block !important;
+  }
+  /* 全部出力: 要約レポートは既定(display:none)のまま隠れる。他はそのまま印刷 */
+  /* セクションの途中改ページをできるだけ避ける */
+  .print-section {
+    break-inside: avoid;
+  }
+}

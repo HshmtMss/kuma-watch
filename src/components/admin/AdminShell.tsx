@@ -199,7 +199,7 @@ export default function AdminShell({
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-stone-200 bg-white/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-2.5">
           <span className="shrink-0 text-sm font-bold text-stone-900">
             🐻 管理

@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { FileText, Printer } from "lucide-react";
 import AdminShell from "@/components/admin/AdminShell";
+import AnalyticsReport from "@/components/admin/AnalyticsReport";
 import AnalyticsSeasonMap, {
   type SeasonFrame,
 } from "@/components/admin/AnalyticsSeasonMap";
@@ -227,6 +229,8 @@ function Content({
   const [pref, setPref] = useState("");
   const [muni, setMuni] = useState("");
   const [loading, setLoading] = useState(false);
+  // PDF出力（ブラウザ印刷）。full=ダッシュボード全体 / summary=要約レポートのみ。
+  const [printMode, setPrintMode] = useState<null | "full" | "summary">(null);
 
   const load = useCallback(
     async (p: string, m: string) => {
@@ -263,6 +267,20 @@ function Content({
     load(pref, muni);
   }, [load, pref, muni]);
 
+  // 印刷ダイアログを閉じたらモードを戻す（クラスを外す）。
+  useEffect(() => {
+    const handler = () => setPrintMode(null);
+    window.addEventListener("afterprint", handler);
+    return () => window.removeEventListener("afterprint", handler);
+  }, []);
+
+  // モードが立ったら次フレームで印刷（クラス適用後に呼ぶ）。
+  useEffect(() => {
+    if (!printMode) return;
+    const id = requestAnimationFrame(() => window.print());
+    return () => cancelAnimationFrame(id);
+  }, [printMode]);
+
   if (error && !data)
     return <p className="text-sm text-rose-700">{error}</p>;
   if (!data)
@@ -271,8 +289,21 @@ function Content({
   const scope = muni ? `${pref} ${muni}` : pref || "全国";
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-center gap-2">
+    <div
+      className={`space-y-8 ${printMode === "summary" ? "pm-summary" : printMode === "full" ? "pm-full" : ""}`}
+    >
+      {/* 要約レポート（画面では非表示・要約PDF時のみ印刷）。コンテナ直下に置く */}
+      <AnalyticsReport
+        scope={scope}
+        today={data.today}
+        total={data.total}
+        surge={data.surge}
+        spatialSeasonal={data.spatialSeasonal}
+        muni={data.muni}
+        muniProfile={data.muniProfile}
+      />
+
+      <div className="flex flex-wrap items-center gap-2 print:hidden">
         <label className="text-sm text-stone-600">対象地域</label>
         <select
           value={pref}
@@ -304,10 +335,30 @@ function Content({
           </select>
         )}
         {loading && <span className="text-xs text-stone-400">更新中…</span>}
-        <span className="ml-auto text-xs text-stone-400">
-          基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
-        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPrintMode("summary")}
+            className="flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
+            title="要約を1〜2枚のPDFに（印刷ダイアログで「PDFで保存」）"
+          >
+            <FileText size={15} aria-hidden />
+            要約をPDF
+          </button>
+          <button
+            type="button"
+            onClick={() => setPrintMode("full")}
+            className="flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
+            title="ダッシュボード全体をPDFに（印刷ダイアログで「PDFで保存」）"
+          >
+            <Printer size={15} aria-hidden />
+            全体をPDF
+          </button>
+        </div>
       </div>
+      <span className="block text-xs text-stone-400 print:hidden">
+        基準日 {data.today} / 全 {data.total.toLocaleString("ja-JP")} 件
+      </span>
 
       {/* 一市町村カルテ — 市町村を選んだときの見出し（県内順位・県平均比） */}
       {data.muniProfile && <AnalyticsMuniProfile data={data.muniProfile} />}
