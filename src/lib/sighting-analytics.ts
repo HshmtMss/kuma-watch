@@ -412,6 +412,47 @@ export function hourHistogram(records: AnalyticsRecord[]): {
   };
 }
 
+// 暦月 × 時間帯(2時間バケット)の件数。「何時に出るか」が季節でどう動くかを
+// ヒートマップで見せる。時刻のある記録のみ集計（withTime/totalで網羅率を出す）。
+export type HourSeasonRow = { month: number; total: number; buckets: number[] };
+export type HourSeasonHeatmap = {
+  rows: HourSeasonRow[]; // 12か月ぶん。buckets は長さ12(00-02,...,22-24)
+  withTime: number;
+  totalRecords: number;
+  peak: { month: number; bucket: number; count: number };
+};
+export function seasonHourHeatmap(
+  records: AnalyticsRecord[],
+): HourSeasonHeatmap {
+  const rows: HourSeasonRow[] = Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    total: 0,
+    buckets: new Array(12).fill(0),
+  }));
+  let withTime = 0;
+  let totalRecords = 0;
+  for (const r of records) {
+    const d = ymd(r.date);
+    if (!d) continue;
+    totalRecords += 1;
+    const mo = Number(d.slice(5, 7)) - 1;
+    if (mo < 0 || mo > 11) continue;
+    const tm = /^(\d{1,2}):(\d{2})$/.exec((r.time ?? "").trim());
+    if (!tm) continue;
+    const h = Number(tm[1]);
+    if (h < 0 || h > 23) continue;
+    withTime += 1;
+    rows[mo].buckets[Math.floor(h / 2)] += 1;
+    rows[mo].total += 1;
+  }
+  let peak = { month: 1, bucket: 0, count: 0 };
+  for (const row of rows)
+    for (let b = 0; b < 12; b++)
+      if (row.buckets[b] > peak.count)
+        peak = { month: row.month, bucket: b, count: row.buckets[b] };
+  return { rows, withTime, totalRecords, peak };
+}
+
 /** 曜日別件数（日〜土）。全記録の date から算出。 */
 export function dowHistogram(
   records: AnalyticsRecord[],

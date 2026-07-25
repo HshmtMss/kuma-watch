@@ -12,6 +12,9 @@ import AnalyticsMuniBoard, {
   type MunicipalityBoard,
 } from "@/components/admin/AnalyticsMuniBoard";
 import AnalyticsSummary from "@/components/admin/AnalyticsSummary";
+import AnalyticsHourSeason, {
+  type HourSeasonHeatmap,
+} from "@/components/admin/AnalyticsHourSeason";
 
 type MonthPoint = { month: string; count: number };
 type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
@@ -188,6 +191,7 @@ type Data = {
   prefectures: PrefRow[];
   hotspots: Hotspot[];
   hours: { buckets: Bucket[]; withTime: number };
+  hourSeason: HourSeasonHeatmap;
   dow: Bucket[];
   severity: { series: SeverityPoint[]; recentInjuries: IncidentRow[] };
   regime: Regime;
@@ -1300,6 +1304,16 @@ function Content({
       >
         <Bars data={data.hours.buckets} color="#0369a1" />
       </Section>
+
+      {/* B-1.5: 時間帯 × 季節。「何時に出るか」が季節でどう動くか */}
+      {data.hourSeason && data.hourSeason.withTime >= 100 && (
+        <Section
+          title="B-1.5. 時間帯は季節で動く（時間帯 × 月）"
+          note={`${scope}・時刻が判明した記録で、暦月ごとに「何時台が多いか」を色で示す。夕方中心か早朝中心かが月で移る。`}
+        >
+          <AnalyticsHourSeason data={data.hourSeason} />
+        </Section>
+      )}
 
       {/* B-2: 時間帯 × 被害。B は「いつ通報が多いか」、こちらは「いつ危ないか」。
           両者は一致しない（日中は通報が多いが被害の割合はむしろ下がる）。 */}

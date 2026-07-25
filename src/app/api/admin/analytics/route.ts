@@ -39,6 +39,7 @@ import {
   yearlySummary,
   surgeBoard,
   municipalityBoard,
+  seasonHourHeatmap,
   type AnalyticsRecord,
 } from "@/lib/sighting-analytics";
 
@@ -138,6 +139,8 @@ export async function GET(req: Request) {
         // B: 時間帯・曜日
         hours: hourHistogram(scoped),
         dow: dowHistogram(scoped, today),
+        // 時間帯 × 季節: 「何時に出るか」が季節でどう動くか
+        hourSeason: seasonHourHeatmap(scoped),
         // D: 重大事案
         severity: severity(scoped, today, 24, 30),
         // M: 森林率との関係（境界域に集中するか / 年の型で人里寄りになるか）
