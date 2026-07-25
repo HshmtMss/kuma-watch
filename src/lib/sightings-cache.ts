@@ -413,4 +413,61 @@ export async function getCachedSightings(): Promise<UnifiedSighting[]> {
 /** Cron 等でキャッシュを破棄する用 */
 export function invalidateSightingsCache(): void {
   memCache = null;
+  rawMemCache = null;
+}
+
+// 重複排除「前」の記録キャッシュ (getRawSightingById 用)。
+let rawMemCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
+
+/** 読み込み元(disk→bundled→集約)から、filterMisgeocoded のみ掛けた記録を返す。 */
+async function loadRawForLookup(): Promise<UnifiedSighting[]> {
+  if (rawMemCache && Date.now() - rawMemCache.loadedAt < MEM_CACHE_TTL_MS)
+    return rawMemCache.records;
+  const disk = readDiskCache();
+  let recs: UnifiedSighting[] | null =
+    disk && disk.records.length > 0 ? disk.records : null;
+  if (!recs) recs = await readBundledSnapshot();
+  if (!recs) recs = await aggregateAllSightings();
+  const filtered = filterMisgeocoded(recs ?? []);
+  rawMemCache = { records: filtered, loadedAt: Date.now() };
+  return filtered;
+}
+
+/**
+ * 出没を id で 1 件返す。重複排除「前」の記録から探す。
+ *
+ * 通知(GitHub Actions)は重複排除前の生データの id で送るが、地図が出す
+ * getCachedSightings は近接・報道の重複排除で一部レコードを代表へ集約して
+ * 落とす。そのため通知された id が getCachedSightings に無く、通知リンクが
+ * その出没を開けない事があった(原町・梅田川で13件が2件に集約される等)。
+ * ここでは重複排除を掛けずに探すので、通知された当の記録を確実に開ける。
+ * hint 座標は同一 id が複数ある場合の取り違え防止。
+ */
+export async function getRawSightingById(
+  id: string,
+  hintLat?: number,
+  hintLon?: number,
+): Promise<UnifiedSighting | null> {
+  const recs = await loadRawForLookup();
+  const matches = recs.filter((s) => String(s.id) === id);
+  if (matches.length === 0) return null;
+  if (
+    matches.length === 1 ||
+    hintLat === undefined ||
+    hintLon === undefined ||
+    !Number.isFinite(hintLat) ||
+    !Number.isFinite(hintLon)
+  )
+    return matches[0];
+  return matches.reduce((best, s) => {
+    const d = (la: number, lo: number) =>
+      (la - hintLat) ** 2 + (lo - hintLon) ** 2;
+    return typeof s.lat === "number" &&
+      typeof s.lon === "number" &&
+      typeof best.lat === "number" &&
+      typeof best.lon === "number" &&
+      d(s.lat, s.lon) < d(best.lat, best.lon)
+      ? s
+      : best;
+  });
 }

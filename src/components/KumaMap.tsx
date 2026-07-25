@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Map as LeafletMap,
   LayerGroup,
@@ -180,6 +180,9 @@ export default function KumaMap({
   const pinLayerRef = useRef<LayerGroup | null>(null);
   const selectionLayerRef = useRef<LayerGroup | null>(null);
   const popupRef = useRef<Popup | null>(null);
+  // map 初期化完了フラグ。通知リンク(focusSightingId)の吹き出しを開く処理を、
+  // map 準備前に取りこぼさず、準備後に確実に走らせるために state で持つ。
+  const [mapReady, setMapReady] = useState(false);
   // 地図は lite (最小フィールド) で読み込むため、ポップアップに必要な詳細は id で
   // 都度取得する。一度取ったものはここにキャッシュして再取得を避ける。
   const detailCacheRef = useRef<Map<string, KumaRecord>>(new Map());
@@ -698,16 +701,36 @@ export default function KumaMap({
           Math.abs(currentLocation.lat - selectedLocation.lat) < 1e-6 &&
           Math.abs(currentLocation.lon - selectedLocation.lon) < 1e-6;
         if (!sameAsCurrent) {
+          // 通知/共有リンク由来(url)は、同じ場所に出没ピンが重なっても必ず目立つ
+          // よう、赤ピンを一回り大きく + 白フチ太め + 足元にパルスの輪を出す。
+          // これが「今アクセスした地点」の目印。
+          const fromLink = selectedLocation.source === "url";
+          const w = fromLink ? 36 : 28;
+          const h = fromLink ? 46 : 36;
           const pinIcon = L.divIcon({
             className: "kuma-pin",
-            html: `<svg width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0z" fill="#dc2626" stroke="white" stroke-width="2"/><circle cx="14" cy="13" r="4.5" fill="white"/></svg>`,
-            iconSize: [28, 36],
-            iconAnchor: [14, 36],
+            html: `<svg width="${w}" height="${h}" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 22 14 22s14-11.5 14-22C28 6.3 21.7 0 14 0z" fill="#dc2626" stroke="white" stroke-width="${fromLink ? 3 : 2}"/><circle cx="14" cy="13" r="4.5" fill="white"/></svg>`,
+            iconSize: [w, h],
+            iconAnchor: [w / 2, h],
           });
+          if (fromLink) {
+            // 足元に脈打つ輪 (重なった出没ピンの中でも位置が一目で分かる)
+            L.circleMarker([selectedLocation.lat, selectedLocation.lon], {
+              radius: 16,
+              color: "#dc2626",
+              weight: 2,
+              opacity: 0.7,
+              fillColor: "#dc2626",
+              fillOpacity: 0.12,
+              interactive: false,
+            }).addTo(layer);
+          }
           L.marker([selectedLocation.lat, selectedLocation.lon], {
             icon: pinIcon,
             interactive: false,
             keyboard: false,
+            // 出没ピン(既定 pane)より必ず上に描く
+            zIndexOffset: 1000,
           }).addTo(layer);
         }
       }
@@ -721,20 +744,44 @@ export default function KumaMap({
   }, [records]);
 
   // 通知リンク (s=<id>) で来たとき、その出没ピンの吹き出しを一度だけ開く。
-  // records は非同期で入るので records と focusSightingId の両方に依存させ、
-  // 対象が現れたら開いて、以後は開かない (同じ id では二度開かない)。
+  //
+  // 同じ場所に複数の出没が重なる(原町・梅田川で13件が同一座標 等)ため、地図に
+  // 描かれた代表ピンをタップすると別の(古い)出没が開いてしまう。そこで「通知
+  // された当の記録」を id で確実に開く:
+  //   1. 地図の表示セット(records)に居ればそれを開く。
+  //   2. 居ない(取り込み直後でまだ載っていない/期間フィルタ外)ときは
+  //      /api/kuma/[id] で1件だけ取得して開く。座標ヒントを付けて同一 id の
+  //      取り違えを防ぐ。
+  // map 準備前は mapReady=false で待ち、準備後に確実に走らせる。
   const focusedOnceRef = useRef<string | null>(null);
   useEffect(() => {
     const id = focusSightingId;
     if (!id || focusedOnceRef.current === id) return;
-    const map = mapRef.current;
-    if (!map) return;
-    const rec = records.find((r) => String(r.id) === String(id));
-    if (!rec) return; // まだ届いていない/期間フィルタ外。座標寄せ(赤ピン)は効いている
+    if (!mapReady || !mapRef.current) return;
     focusedOnceRef.current = id;
-    import("leaflet").then((L) => showRecordPopup(L, rec));
+    const local = records.find((r) => String(r.id) === String(id));
+    if (local) {
+      import("leaflet").then((L) => showRecordPopup(L, local));
+      return;
+    }
+    const sel = selectedLocationLatestRef.current;
+    const hint = sel
+      ? `?lat=${sel.lat.toFixed(5)}&lon=${sel.lon.toFixed(5)}`
+      : "";
+    let cancelled = false;
+    fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        const rec = j?.record as KumaRecord | undefined;
+        if (cancelled || !rec || typeof rec.lat !== "number") return;
+        import("leaflet").then((L) => showRecordPopup(L, rec));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusSightingId, records]);
+  }, [focusSightingId, records, mapReady]);
 
   useEffect(() => {
     showHeatmapRef.current = showHeatmap;
@@ -869,6 +916,7 @@ export default function KumaMap({
       });
       mapRef.current = map;
       if (onMapReady) onMapReady(map);
+      setMapReady(true);
 
       // map 生成時点で既に selectedLocation がある (URL ?lat=&lon= 由来 / GPS 即解決 /
       // sessionStorage 復元 など) 場合、selectedLocation の useEffect は map 未初期化の

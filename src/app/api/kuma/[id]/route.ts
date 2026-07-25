@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { getCachedSightings } from "@/lib/sightings-cache";
+import {
+  getCachedSightings,
+  getRawSightingById,
+} from "@/lib/sightings-cache";
 import { getApprovedCitizenSightings } from "@/lib/submission-store";
 import type { UnifiedSighting } from "@/lib/sources/types";
 import { unifiedToKumaRecord } from "../route";
@@ -34,6 +37,24 @@ export async function GET(
       (s) => String(s.id) === targetId,
     );
     if (matches.length === 0) {
+      // 重複排除で getCachedSightings から落ちた記録 (通知リンクの s=<id> は
+      // 排除前の生 id で来る) を、排除前データから引き当てて返す。
+      const raw = await getRawSightingById(
+        targetId,
+        hasHint ? hintLat : undefined,
+        hasHint ? hintLon : undefined,
+      );
+      if (raw) {
+        return NextResponse.json(
+          { record: unifiedToKumaRecord(raw) },
+          {
+            headers: {
+              "Cache-Control":
+                "public, max-age=300, s-maxage=300, stale-while-revalidate=600",
+            },
+          },
+        );
+      }
       return NextResponse.json({ error: "not found" }, { status: 404 });
     }
     const found =
