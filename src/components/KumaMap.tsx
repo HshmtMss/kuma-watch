@@ -785,7 +785,11 @@ export default function KumaMap({
         window.setTimeout(() => map.off("moveend", reopen), 2000);
       });
     };
-    const local = records.find((r) => String(r.id) === String(id));
+    // records は ref から読む(依存に入れない)。records は非同期で何度も更新され、
+    // 依存に入れると effect が再実行→cleanup が cancelled=true にして、開く処理を
+    // 途中で潰していた(吹き出しが開かない回の原因)。この effect は
+    // focusSightingId / mapReady が変わったときだけ走ればよい。
+    const local = recordsRef.current.find((r) => String(r.id) === String(id));
     if (local) {
       openReliably(local);
       return () => {
@@ -808,7 +812,7 @@ export default function KumaMap({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusSightingId, records, mapReady]);
+  }, [focusSightingId, mapReady]);
 
   useEffect(() => {
     showHeatmapRef.current = showHeatmap;
