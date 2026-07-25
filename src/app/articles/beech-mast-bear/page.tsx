@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         凶作年は数県のクマがいっせいに人里に下りるという仕組みです。
         2026 年の秋を見るうえでも、夏のブナ結実予測が最重要のシグナルになります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマの大量出没年は、ほぼ例外なく<strong>ブナ・ミズナラの堅果不作</strong>と重なる。
+          </>,
+          <>
+            ブナは<strong>数年に1度しか豊作にならず、広域で同調</strong>して凶作になる。
+          </>,
+          <>
+            <strong>夏のブナ結実予測</strong>が、秋の出没を読む最重要シグナル。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

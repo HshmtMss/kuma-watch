@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>「人慣れ (habituation)」と「餌付け学習 (food conditioning)」</strong>という
         獣医行動学のメカニズムによります。本記事ではクマの学習能力と、アーバンベア化を防ぐ知見を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは<strong>犬・霊長類に匹敵する学習能力</strong>を持ち、覚えたことを数年忘れない。
+          </>,
+          <>
+            <strong>「人慣れ」と「餌付け学習」</strong>でゴミ・果樹に成功したクマは何度も来る。
+          </>,
+          <>
+            アーバンベア化を防ぐ鍵は<strong>餌場を作らず学習させないこと</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

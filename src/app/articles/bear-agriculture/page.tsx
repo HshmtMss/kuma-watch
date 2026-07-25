@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         どの装備が効くのかを実務目線で整理します。
         電気柵の設計、誘引物管理、自治体補助金の活用までを含めて解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            農業被害は<strong>品目ごとに対策が異なる</strong>（果樹園・養蜂・水田・畜産）。
+          </>,
+          <>
+            クマの<strong>狙い・誘引源・効く装備</strong>を品目別に見極める。
+          </>,
+          <>
+            <strong>電気柵設計・誘引物管理・自治体補助金</strong>の活用が柱。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

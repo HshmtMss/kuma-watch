@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         本記事では、クマと人間の間で起こりうる人獣共通感染症 (ズーノーシス) を獣医学の視点で整理し、
         被害発生後 24 時間以内に何をすべきかをまとめます。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマに襲われた際、<strong>出血より危険なのが感染症</strong>。
+          </>,
+          <>
+            口腔・爪に多数の細菌が常在し、<strong>縫合より細菌・ウイルス対策が優先</strong>されることも。
+          </>,
+          <>
+            <strong>被害後24時間以内の対応</strong>（洗浄・受診・破傷風）が重要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

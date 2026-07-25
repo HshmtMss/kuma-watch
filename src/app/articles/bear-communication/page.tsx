@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         本記事では獣医行動学の視点でクマのコミュニケーションを解説します。
         遭遇時に「クマが何を伝えているか」を読み取れるようになることが、安全行動の第一歩です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは<strong>鳴き声・匂い・姿勢・接触の4チャネル</strong>で複雑に意思疎通する。
+          </>,
+          <>
+            <strong>立ち上がりは威嚇でなく「確認」</strong>など、行動には意味がある。
+          </>,
+          <>
+            <strong>「何を伝えているか」を読める</strong>ことが安全行動の第一歩。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

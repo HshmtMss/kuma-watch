@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         さらに「動くもの」への感度は高く、20m 先の人の動きは確実に捉えています。
         本記事では獣医眼科学の視点で、クマの視覚機能と、遭遇時の行動への応用を解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>「クマは目が悪い」は半分正解</strong>。視力は人間の0.3〜0.5だが色覚は良好。
+          </>,
+          <>
+            <strong>夜間の感度は人間の数倍</strong>。動体視力が高く、20m先の人の動きは捉える。
+          </>,
+          <>
+            だから遭遇時は<strong>「急な動きをしない」</strong>ことが重要。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

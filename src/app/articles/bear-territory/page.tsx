@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         その中に他個体の行動圏が部分的に重なります。本記事では獣医行動学・野生動物学の視点で、
         クマの空間利用とマーキング行動を解説します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマは厳密な<strong>「縄張り」を持たず、重なり合う「行動圏」</strong>を持つ。
+          </>,
+          <>
+            <strong>雄ヒグマの行動圏は500〜2,000km²</strong>と広大。
+          </>,
+          <>
+            <strong>マーキング行動（爪痕・背こすり等）</strong>で存在を示し合う。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

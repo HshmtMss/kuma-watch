@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         <strong>「着床遅延 (delayed implantation)」</strong>という仕組みを持っています。
         さらに、出産は冬眠の真っ最中、巣穴の中で行われる — クマの繁殖生理は獣医学的にも生物学的にもきわめて興味深いテーマです。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            交尾は<strong>初夏（6〜7月）</strong>、出産は<strong>翌年1〜2月の冬眠中</strong>。
+          </>,
+          <>
+            受精卵が半年待機する<strong>「着床遅延」</strong>で、母の栄養状態しだいで着床が決まる。
+          </>,
+          <>
+            新生児は<strong>約200gから急成長</strong>。母子関係と子別れも独特。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
