@@ -7,7 +7,7 @@ import { isLearnHubReleased } from "@/lib/learn-flag";
 /**
  * 全ページ共通ヘッダーナビ。探し方を「探す」▼に一本化:
  *  - 「探す」▼: 地図で探す / 市町村で探す / 観光地で探す / キーワードで探す / 出没ニュース
- *  - 「学ぶ」▼: クマ対策 / 記事 / 研究レポート / 政府発表
+ *  - 「学ぶ」▼: 統一ハブ /learn に集約（学ぶトップ / 身を守る / クマを知る / 最新を追う）
  *  - 「法人」▼ (塗りつぶし CTA): 自治体・観光協会 / 製品掲載 (事業者)
  *  - 地図(トップ)へはロゴで1タップ。モバイルは 🔍 アイコンで検索ハブへクイックアクセス。
  *
@@ -27,16 +27,22 @@ const EXPLORE_LINKS: NavLink[] = [
   { href: "/news", label: "出没ニュース・速報", desc: "全国の最新クマ出没情報" },
 ];
 
-const LEARN_LINKS: NavLink[] = [
-  // 「学ぶ」刷新ハブ。公開フラグ ON のときだけ先頭に出す（段階公開）。
-  ...(isLearnHubReleased()
-    ? [{ href: "/learn", label: "学ぶトップ（新）", desc: "合言葉・身を守る・知る・最新" }]
-    : []),
-  { href: "/measures", label: "クマ対策の総合ガイド", desc: "獣医師監修の対策まとめ" },
-  { href: "/articles", label: "記事一覧", desc: "遭遇時の対処・装備・生態" },
-  { href: "/research", label: "研究レポート", desc: "日次・月次の時空間分析" },
-  { href: "/policy", label: "政府発表・政策動向", desc: "環境省・農水省・林野庁" },
-];
+// 「学ぶ」= 統一ハブ /learn とその3ドアに集約。公開フラグ ON のあいだは
+// 寄せ集めの旧リンク（対策/記事/研究/政策）ではなく、ハブの構造そのものを見せる。
+// フラグ OFF 時は従来の平坦リストにフォールバック。
+const LEARN_LINKS: NavLink[] = isLearnHubReleased()
+  ? [
+      { href: "/learn", label: "学ぶトップ", desc: "合言葉・身を守る・知る・最新" },
+      { href: "/learn/safety", label: "身を守る", desc: "遭遇時の対処・装備・通報" },
+      { href: "/learn/know", label: "クマを知る", desc: "生態・季節・地域の解説記事" },
+      { href: "/learn/latest", label: "最新を追う", desc: "出没速報・研究・政策の動き" },
+    ]
+  : [
+      { href: "/measures", label: "クマ対策の総合ガイド", desc: "獣医師監修の対策まとめ" },
+      { href: "/articles", label: "記事一覧", desc: "遭遇時の対処・装備・生態" },
+      { href: "/research", label: "研究レポート", desc: "日次・月次の時空間分析" },
+      { href: "/policy", label: "政府発表・政策動向", desc: "環境省・農水省・林野庁" },
+    ];
 
 const BUSINESS_LINKS: NavLink[] = [
   {
