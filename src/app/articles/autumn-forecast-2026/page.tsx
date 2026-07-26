@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         2026 年秋がどう転ぶかは <strong>ブナ・ミズナラの結実</strong> で決まりますが、
         春の進行を見るかぎり「平年並み〜やや高め」の備えを推奨します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            秋（9〜11月）は<strong>年間出没の6割が集中</strong>する季節。
+          </>,
+          <>
+            2025年秋は全国<strong>24,609件と歴史的大量年</strong>だった。
+          </>,
+          <>
+            2026年秋は<strong>ブナ・ミズナラの結実しだい</strong>。現時点は「平年並み〜やや高め」の備えを推奨。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

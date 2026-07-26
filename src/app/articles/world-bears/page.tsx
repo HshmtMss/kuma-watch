@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import ArticleSummary from "@/components/ArticleSummary";
@@ -36,6 +37,21 @@ export default function Page() {
         アラスカ・イエローストーンの装備標準化、ルーマニアの市街地侵入対策、
         スカンジナビアの研究知見 — 各国の対応を整理して、日本の対策に活かす視点を提示します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            海外のクマ事故事例には<strong>日本でも応用できる教訓</strong>が多い。
+          </>,
+          <>
+            <strong>アラスカ・イエローストーンの装備標準化、ルーマニアの市街地対策</strong>など。
+          </>,
+          <>
+            各国の対応を<strong>日本の対策に活かす視点</strong>を提示する。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

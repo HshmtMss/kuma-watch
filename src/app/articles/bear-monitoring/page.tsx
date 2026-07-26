@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         ④標識再捕獲法。それぞれ得意な情報・コスト・限界が異なり、目的に応じて
         組み合わせるのが現代の野生動物管理の標準です。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            野生クマの個体数推定・行動研究には<strong>4技術を組み合わせる</strong>。
+          </>,
+          <>
+            <strong>カメラトラップ・GPS首輪・ヘアトラップ(毛DNA)・標識再捕獲法</strong>。
+          </>,
+          <>
+            それぞれ<strong>得意な情報とコストが異なり、目的に応じ組み合わせる</strong>のが標準。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

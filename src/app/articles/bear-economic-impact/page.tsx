@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         加えて、観光業の機会損失・自治体の対策費・救急医療コストを含めた間接コストはその数倍。
         本記事では、農業・観光・自治体財政の 3 つの視点でクマ被害の経済影響を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ被害の直接損失は農作物・林産物・人身で<strong>年間100億円規模</strong>と推計。
+          </>,
+          <>
+            観光機会損失・対策費・医療コストなど<strong>間接コストはその数倍</strong>。
+          </>,
+          <>
+            <strong>農業・観光・自治体財政</strong>の3視点で経済影響は広がる。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         現在も自治体・観光地・農家向けに改良を続けています。
         KumaWatch（くまウォッチ）の予報基盤にも、同社が培った検知技術と行動分析の知見が反映されています。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマ検知AIは<strong>監視カメラ・ドローン映像からクマを自動識別</strong>する技術。
+          </>,
+          <>
+            獣医工学ラボは<strong>2021年から開発</strong>、自治体・観光地・農家向けに改良中。
+          </>,
+          <>
+            KumaWatchの予報基盤にも<strong>同社の検知技術と行動分析</strong>が反映されている。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

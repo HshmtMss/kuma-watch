@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         人身被害がある or 市街地で目撃 → 110 番。山中での目撃 → 市町村の鳥獣担当または専用フォーム。
         痕跡だけ → 市町村に翌日でも OK。本ガイドで通報の判断基準と伝えるべき情報を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            クマを見たら緊急度で<strong>110番／119番／市町村役場を使い分ける</strong>。
+          </>,
+          <>
+            <strong>人身被害・市街地目撃→110番</strong>、山中の目撃→市町村の鳥獣担当。
+          </>,
+          <>
+            痕跡だけなら<strong>市町村に翌日でもOK</strong>。通報時に伝える情報を整理。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

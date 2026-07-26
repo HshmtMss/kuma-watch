@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -35,6 +36,21 @@ export default function Page() {
         <strong>約 5 倍</strong>。秋田県だけで 13,552 件、10 月 30 日は 1 日で 665 件と、
         過去最悪規模の年に何が起きたかを KumaWatch のデータで振り返ります。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            2025年は全国<strong>39,801件と近年で突出した大量年</strong>（平年の約5倍）。
+          </>,
+          <>
+            <strong>秋田県だけで13,552件</strong>、10月30日は1日665件。
+          </>,
+          <>
+            過去最悪規模の年に<strong>何が起きたかをデータで振り返る</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[

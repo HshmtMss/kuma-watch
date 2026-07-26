@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
+import { KeyPoints } from "@/components/ArticleCards";
 import ArticleToc from "@/components/ArticleToc";
 import ArticleFaq from "@/components/ArticleFaq";
 import { getArticle } from "@/lib/articles-meta";
@@ -36,6 +37,21 @@ export default function Page() {
         ヒグマは最終氷期 (約 5 万年前) にサハリン経由で北海道へ — 別々の経路と時代で渡来した結果が、
         現在の日本のクマ分布です。本記事では遺伝学・古生物学の知見をもとに、日本のクマ 10 万年の進化史を整理します。
       </p>
+
+      <KeyPoints
+        label="3行でわかる"
+        items={[
+          <>
+            <strong>ツキノワグマは本州・四国、ヒグマは北海道</strong>と分布が分かれる。
+          </>,
+          <>
+            <strong>氷河期の海面変動</strong>で、別々の経路・時代に渡来した結果。
+          </>,
+          <>
+            ツキノワは<strong>朝鮮半島経由</strong>、ヒグマは<strong>サハリン経由</strong>。
+          </>,
+        ]}
+      />
 
       <ArticleToc
         items={[
