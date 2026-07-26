@@ -155,7 +155,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://higumap.info/recent", role: "map", hint: "ひぐまっぷ 全道直近 3 ヶ月ヒグマ出没マップ" },
       { url: "https://higumap.info/", role: "map", hint: "ひぐまっぷ トップ" },
-      { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/kihon.html", role: "list", hint: "道庁ヒグマ基本情報" },
+      { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma1/caution/", role: "list", hint: "道庁ヒグマ基本情報（旧 /higuma/kihon.html は改編で404）" },
       { url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/joho.html", role: "list", hint: "市町村ヒグマ関連情報リンク集" },
     ],
     extractor: "higumap-api",

@@ -28,7 +28,8 @@ export const MUNICIPALITIES: MunicipalEntry[] = [
     links: [
       {
         label: "北海道 ヒグマに注意（基本情報）",
-        url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma/kihon.html",
+        // 道庁サイト改編で /higuma/kihon.html が 404 化 → 新「ヒグマに注意」ページへ
+        url: "https://www.pref.hokkaido.lg.jp/ks/skn/higuma1/caution/",
         kind: "official_info",
       },
       {
