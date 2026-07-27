@@ -23,6 +23,7 @@ import { isNewsMisplaced } from "@/lib/muni-geo-check";
 import { jstToday } from "@/lib/jst-date";
 import { isRealCalendarDate } from "./date-utils";
 import { incidentKey } from "@/lib/incident-key";
+import { snapToRiver } from "@/lib/river-snap";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -360,6 +361,31 @@ export function normalizeEventDate(
   return date;
 }
 
+/**
+ * 記事本文(タイトル+説明)に、その出没日の「日」が日付として明記されているか。
+ * 例: date=2026-07-27 なら本文に「27日」または全角「２７日」があるか。
+ *
+ * 背景: プロンプトで「pubDate を date に使うな」と指示しても、LLM は配信日を
+ * イベント日として echo することがある(実測: 寺内蛭根の集約記事で、1ヶ月前の
+ * 公式事案が「今日付け」で取り込まれ通知された)。本文に日付が無い「今日付け」
+ * news は実際は過去/集約事案の可能性が高いので、これで裏取りできないものは
+ * 通知から外す(推定日扱い)。地図には従来どおり載る。
+ */
+export function eventDateStatedInText(
+  dateIso: string,
+  title: string | undefined,
+  description: string | undefined,
+): boolean {
+  const day = Number(dateIso.slice(8, 10));
+  if (!day) return false;
+  const z = String(day).replace(
+    /[0-9]/g,
+    (c) => "０１２３４５６７８９"[Number(c)],
+  );
+  const text = `${title ?? ""} ${description ?? ""}`;
+  return text.includes(`${day}日`) || text.includes(`${z}日`);
+}
+
 function buildPrompt(items: RssItem[]): string {
   const todayIso = jstToday();
   const articles = items
@@ -495,6 +521,16 @@ export async function fetchNewsSightings(
     let dateEstimated = false;
     if (explicitDate) {
       eventDate = normalizeEventDate(explicitDate, article.pubDate);
+      // 「今日付け」なのに本文にその日付が無い news は、LLM が pubDate を
+      // イベント日として echo した疑いが濃い(古い/集約事案を今日扱い)。裏取り
+      // できないものは推定日にして通知しない。当日以外は鮮度判定で弾かれるので
+      // 対象は「今日付け」だけに絞る。
+      if (
+        eventDate === jstToday() &&
+        !eventDateStatedInText(eventDate, article.title, article.description)
+      ) {
+        dateEstimated = true;
+      }
     } else {
       const pub = (article.pubDate || "").slice(0, 10);
       eventDate = /^\d{4}-\d{2}-\d{2}$/.test(pub) && pub <= jstToday() ? pub : null;
@@ -586,6 +622,23 @@ export async function fetchNewsSightings(
     const claimed = resolveMuni(prefName, cityName);
     if (claimed && hasBoundaryData() && isInsideMuni(lat, lon, claimed) === false) {
       precise = false;
+    }
+    // 「河川敷/川沿い」と明記された出没は、認識地名に寄った座標を実際の川へ
+    // スナップする(#4: 河川敷とあるのに街中にピンが立つ の対策)。寄せた点は
+    // 既に正確なので precise=true とし、ジッターを掛けない。安全条件を満たさ
+    // ない場合 snapToRiver は null を返し、元座標をそのまま使う。
+    const snapped = snapToRiver(
+      prefName,
+      cityName,
+      s.sectionName ?? "",
+      s.comment ?? "",
+      lat,
+      lon,
+    );
+    if (snapped) {
+      lat = snapped.lat;
+      lon = snapped.lon;
+      precise = true;
     }
     // ジッターの種は「記録 id」ではなく「事案キー」。id で振ると、同じ出没を
     // 報じた別記事が別々の座標へ散らばり、下流の近接 dedup (220m) が束ねられず
