@@ -765,7 +765,6 @@ export default function KumaMap({
   //      取り違えを防ぐ。
   // map 準備前は mapReady=false で待ち、準備後に確実に走らせる。
   const focusExactRef = useRef<string | null>(null); // 正確な記録を開いたか
-  const focusNearRef = useRef<string | null>(null); // 近傍で仮表示したか
   const focusFetchRef = useRef<string | null>(null); // フェッチ開始済みか
   useEffect(() => {
     const id = focusSightingId;
@@ -792,41 +791,39 @@ export default function KumaMap({
       open(exact, true);
       return;
     }
-    // 2. まだ表示セットに無い(重複排除で消えた/未ロード)。正確版の取得は
-    //    生データ読み込みで数秒かかるため、待たせないよう、まずロード済みの
-    //    中から選択地点に一番近い記録を即座に開く(その地区の最新ピン)。
+    // 2. 表示セットに無い(取り込み直後で未ロード/重複排除で代表から外れた)。
+    //    ここで「近傍で一番近いピン」を仮表示してはいけない:
+    //    通知された当の記録がまだ未ロードなとき、"一番近い" は必然的に別の
+    //    (多くは古い公式)記録になり、通知を開くと 1〜2km 離れた 1ヶ月前の
+    //    出没が開く不具合になっていた(秋田市 下浜羽川で 1.4km 先の 6/2 公式、
+    //    寺内蛭根で 200m 先の 6/26 公式)。別の出没を「通知された記録」の
+    //    ように見せるのは誤りなので、代替表示はせず、必ず id 一致で取得する。
+    //    取得できるまで吹き出しは出さない(赤ピンで地点だけ示す)。
     const sel = selectedLocationLatestRef.current;
-    if (sel && recs.length > 0 && focusNearRef.current !== id) {
-      let best: KumaRecord | null = null;
-      let bestD = Infinity;
-      for (const r of recs) {
-        if (typeof r.lat !== "number" || typeof r.lon !== "number") continue;
-        const d = haversineKm(sel.lat, sel.lon, r.lat, r.lon);
-        if (d < bestD) {
-          bestD = d;
-          best = r;
-        }
-      }
-      // 2km 以内に近傍ピンがあれば仮表示 (遠すぎる別地区は出さない)。
-      if (best && bestD <= 2) {
-        focusNearRef.current = id;
-        open(best, false);
-      }
-    }
-    // 3. 正確な記録を id で取得し、取れたら差し替える(近傍表示より優先)。
     if (focusFetchRef.current !== id) {
       focusFetchRef.current = id;
       const hint = sel
         ? `?lat=${sel.lat.toFixed(5)}&lon=${sel.lon.toFixed(5)}`
         : "";
-      fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((j) => {
-          const rec = j?.record as KumaRecord | undefined;
-          if (!rec || typeof rec.lat !== "number") return;
-          open(rec, true);
-        })
-        .catch(() => {});
+      // 取り込み直後は生データのキャッシュ反映が遅れ 1 回では取れないことが
+      // あるので、数回リトライして正確な記録を待つ(別記録は出さない)。
+      const tryFetch = (attempt: number) => {
+        if (focusExactRef.current === id) return;
+        fetch(`/api/kuma/${encodeURIComponent(id)}${hint}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((j) => {
+            const rec = j?.record as KumaRecord | undefined;
+            if (rec && typeof rec.lat === "number") {
+              open(rec, true);
+            } else if (attempt < 4) {
+              window.setTimeout(() => tryFetch(attempt + 1), 2500);
+            }
+          })
+          .catch(() => {
+            if (attempt < 4) window.setTimeout(() => tryFetch(attempt + 1), 2500);
+          });
+      };
+      tryFetch(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusSightingId, mapReady, records]);
