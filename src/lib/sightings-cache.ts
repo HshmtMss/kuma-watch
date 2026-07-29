@@ -142,8 +142,11 @@ function readSnapshotFromFs(): UnifiedSighting[] | null {
 async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const RAW_URL =
     "https://raw.githubusercontent.com/HshmtMss/kuma-watch/main/public/data/sightings.json";
+  // 同一オリジンのスナップショットは proxy.ts で ?k=<SIGHTINGS_KEY> ゲートしている
+  // (ボットの直 DL 遮断)。サーバ自身の取得はキーを付けて通す。未設定なら素通り。
+  const key = process.env.SIGHTINGS_KEY;
   const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/data/sightings.json`
+    ? `https://${process.env.VERCEL_URL}/data/sightings.json${key ? `?k=${encodeURIComponent(key)}` : ""}`
     : null;
   const candidates = [RAW_URL, baseUrl].filter((u): u is string => Boolean(u));
   for (const url of candidates) {

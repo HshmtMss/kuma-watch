@@ -44,6 +44,22 @@ const LANDMARK_SLUGS = new Set(JAPAN_LANDMARKS.map((l) => l.slug));
 
 export function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
+
+  // 30MB の出没スナップショット (/data/sightings.json) への直アクセスを絞る。
+  // 地図クライアントはこれを使わず (/api/kuma 経由) UI からも辿れないため、直接
+  // 叩いてくるのはボット/スクレイパー。1 リクエストで最大 30MB 転送し Fast Data
+  // Transfer を食い潰すので遮断する。
+  //   - サーバの runtime フォールバック (sightings-cache.ts) は ?k=<SIGHTINGS_KEY>
+  //     を付けて取得するので通す。ボットはキーを持たないので 404。
+  //   - SIGHTINGS_KEY 未設定なら素通り (段階導入・フェイルオープン。壊さない)。
+  if (pathname === "/data/sightings.json") {
+    const key = process.env.SIGHTINGS_KEY;
+    if (key && req.nextUrl.searchParams.get("k") !== key) {
+      return new NextResponse(null, { status: 404 });
+    }
+    return NextResponse.next();
+  }
+
   const parts = pathname.split("/").filter(Boolean);
 
   // "/spot/{slug}" の 2 セグメント。
@@ -94,5 +110,5 @@ export function proxy(req: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/place/:pref/:muni", "/spot/:slug"],
+  matcher: ["/place/:pref/:muni", "/spot/:slug", "/data/sightings.json"],
 };
