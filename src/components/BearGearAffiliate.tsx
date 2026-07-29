@@ -10,10 +10,50 @@ import { affiliateEnabled, amazonSearchUrl, BEAR_GEAR } from "@/lib/affiliate";
  */
 export default function BearGearAffiliate({
   className = "",
+  compact = false,
 }: {
   className?: string;
+  /** 控えめな1行表示（トップ地図カードなど、主張しすぎたくない場所向け）。 */
+  compact?: boolean;
 }) {
   if (!affiliateEnabled()) return null;
+
+  if (compact) {
+    return (
+      <div
+        className={`text-[11px] leading-relaxed text-stone-400 ${className}`}
+        aria-label="クマ対策グッズ（広告）"
+      >
+        <span className="font-medium text-stone-500">クマ対策グッズ</span>
+        <span
+          className="ml-1 rounded-sm bg-stone-100 px-1 py-px text-[9px] font-semibold tracking-wider text-stone-500"
+          aria-label="広告（アフィリエイトリンク）"
+          title="広告（アフィリエイトリンク）"
+        >
+          PR
+        </span>
+        <span className="ml-1.5">
+          {BEAR_GEAR.map((g, i) => (
+            <span key={g.key}>
+              {i > 0 && <span className="text-stone-300"> ・ </span>}
+              <a
+                href={amazonSearchUrl(g.keyword)}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                className="text-amber-700 hover:underline"
+              >
+                {g.label}
+              </a>
+            </span>
+          ))}
+          <span className="text-stone-300"> — Amazonで探す</span>
+        </span>
+        <div className="mt-0.5 text-[9px] text-stone-300">
+          Amazon アソシエイトとして適格販売により収入を得ています
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section
