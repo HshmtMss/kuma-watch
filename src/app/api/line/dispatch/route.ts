@@ -23,6 +23,7 @@ import {
   isQuietHours,
   notifyMapUrl,
 } from "@/lib/notify-freshness";
+import { lineProductCtaSuffix } from "@/lib/line-product-cta";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -205,7 +206,9 @@ export async function POST(req: Request) {
       `/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`,
       top.id,
     );
-    const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
+    const msg = text(
+      `${head}\n${line}\n\n▼ 地図で見る\n${url}${lineProductCtaSuffix(base)}`,
+    );
     const { sent, error } = await multicast(userIds, [msg]);
     sentCount += sent;
     if (error && !sendError) sendError = error;
@@ -243,7 +246,9 @@ export async function POST(req: Request) {
       const top = g.records[0];
       const line = snippet(top, `${top.date ?? ""} ${g.name}周辺`.trim());
       const url = `${base}/spot/${pathSegment(g.slug)}`;
-      const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
+      const msg = text(
+      `${head}\n${line}\n\n▼ 地図で見る\n${url}${lineProductCtaSuffix(base)}`,
+    );
       const { sent, error } = await multicast(userIds, [msg]);
       sentCount += sent;
       if (error && !sendError) sendError = error;
@@ -277,7 +282,9 @@ export async function POST(req: Request) {
       );
       // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
       const url = notifyMapUrl(base, top.lat, top.lon, place, "/", top.id);
-      const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}`);
+      const msg = text(
+      `${head}\n${line}\n\n▼ 地図で見る\n${url}${lineProductCtaSuffix(base)}`,
+    );
       const { ok, error } = await pushMessage(gsub.userId, [msg]);
       if (ok) sentCount += 1;
       else if (error && !sendError) sendError = error;
