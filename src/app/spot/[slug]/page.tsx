@@ -18,6 +18,7 @@ import { getHabitatNote } from "@/lib/place-content";
 import RiskBanner from "@/components/RiskBanner";
 import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -870,6 +871,9 @@ export default async function SpotPage({ params }: Props) {
         season={seasonalAdvice.season}
         point={seasonalAdvice.point}
       />
+
+      {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
+      <BearGearAffiliate className="mt-4" />
 
       {/* 詳しく見る — 二次情報はアコーディオンに畳み、情報過多を解消（IA 再設計）。
           一目で要る「今の状況・予測・自治体情報・地図・季節の注意」を上に残し、深掘りは折りたたむ。 */}

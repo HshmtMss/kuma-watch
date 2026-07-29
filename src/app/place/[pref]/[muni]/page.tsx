@@ -32,6 +32,7 @@ import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import NotifyBlock from "@/components/NotifyBlock";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 import { isPushReleased } from "@/lib/push-flag";
 
 // dynamicParams=false: 静的生成 (generateStaticParams) は「不変なマスター市区町村
@@ -750,6 +751,9 @@ export default async function MuniPage({ params }: Props) {
           speciesLabel={seasonalAdvice.speciesLabel}
         />
       )}
+
+      {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
+      <BearGearAffiliate className="mt-4" />
 
       {/* 詳しく見る — 分析系(傾向・月別・県内での位置づけ)を折りたたみ、
           来訪目的の核(最近の事案・公式情報)は下に見える形で残す。折りたたみでも
