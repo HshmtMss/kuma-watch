@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 import CategoryGlyph from "@/components/CategoryGlyph";
 import LatestGovAnnouncements from "@/components/LatestGovAnnouncements";
 import { ARTICLES, CATEGORIES } from "@/lib/articles-meta";
@@ -164,6 +165,8 @@ export default function MeasuresPage() {
       {/* 国の最新発表サイドカード — 対策ハブから政策動向への導線を作る */}
       <LatestGovAnnouncements />
 
+      {/* 定番の対策グッズ（Amazon検索リンク・アフィリエイト、フラグ裏） */}
+      <BearGearAffiliate className="not-prose mt-6" />
     </PageShell>
   );
 }

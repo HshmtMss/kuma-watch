@@ -6,6 +6,7 @@ import ArticleProgressBar from "@/components/ArticleProgressBar";
 import ArticleShare from "@/components/ArticleShare";
 import PageShell from "@/components/PageShell";
 import RelatedProducts from "@/components/RelatedProducts";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 import {
   getCategory,
   getReadingTime,
@@ -187,6 +188,9 @@ export default function ArticleShell({ meta, children }: Props) {
       {children}
 
       <RelatedProducts slug={meta.slug} />
+
+      {/* 定番の対策グッズ（Amazon検索リンク・アフィリエイト、フラグ裏）。全記事末尾 */}
+      <BearGearAffiliate className="not-prose mt-6" />
 
       <ArticlePrevNext current={meta} />
 

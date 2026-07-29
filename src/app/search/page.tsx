@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import PageShell from "@/components/PageShell";
 import SearchUI from "./SearchUI";
 import DiscoverHub from "./DiscoverHub";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 
 const SITE_URL = "https://kuma-watch.jp";
 
@@ -26,6 +27,9 @@ export default function SearchPage() {
       <Suspense fallback={<p className="text-sm text-stone-500">読み込み中…</p>}>
         <SearchUI hub={<DiscoverHub />} />
       </Suspense>
+
+      {/* 定番の対策グッズ（Amazon検索リンク・アフィリエイト、フラグ裏） */}
+      <BearGearAffiliate className="not-prose mt-8" />
     </PageShell>
   );
 }
