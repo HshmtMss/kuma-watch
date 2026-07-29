@@ -15,6 +15,7 @@ import {
   Bell,
   Zap,
   PhoneCall,
+  ShoppingBag,
 } from "lucide-react";
 import HoneyButton from "../HoneyButton";
 import { isLearnHubReleased } from "@/lib/learn-flag";
@@ -44,6 +45,7 @@ const TOOLS: Row[] = [
   { icon: <Bell size={22} />, t: "鈴・ラジオで音を出す", d: "「人がいる」と知らせて遭遇を防ぐ", href: "/articles/bear-bell", g: true },
   { icon: <Zap size={22} />, t: "電気柵で囲う", d: "畑・家まわりを守る設置のコツ", href: "/articles/electric-fence", g: true },
   { icon: <PhoneCall size={22} />, t: "見かけたら通報する", d: "自治体・110番への連絡と共有", href: "/measures", g: true },
+  { icon: <ShoppingBag size={22} />, t: "対策グッズ・製品を見る", d: "スプレー・鈴・電気柵・忌避剤ほか", href: "/products", g: true },
 ];
 
 function RowItem({ row }: { row: Row }) {

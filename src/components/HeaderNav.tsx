@@ -36,6 +36,7 @@ const LEARN_LINKS: NavLink[] = isLearnHubReleased()
       { href: "/learn/safety", label: "身を守る", desc: "遭遇時の対処・装備・通報" },
       { href: "/learn/know", label: "クマを知る", desc: "生態・季節・地域の解説記事" },
       { href: "/learn/latest", label: "最新を追う", desc: "出没速報・研究・政策の動き" },
+      { href: "/products", label: "対策グッズ・製品", desc: "スプレー・鈴・電気柵ほか（獣医師監修）" },
     ]
   : [
       { href: "/measures", label: "クマ対策の総合ガイド", desc: "獣医師監修の対策まとめ" },
