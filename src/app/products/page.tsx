@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ProductCard from "@/components/ProductCard";
+import BearGearAffiliate from "@/components/BearGearAffiliate";
 import {
   CATEGORY_DESC,
   CATEGORY_ID,
@@ -147,6 +148,10 @@ export default async function ProductsPage({
           })),
         ]}
       />
+
+      {/* 定番の対策グッズをAmazonで探す（アフィリエイト・フラグ裏）。
+          下のキュレーション製品とは別に、まず手早く探せる導線として上部に置く */}
+      <BearGearAffiliate className="not-prose mt-6" />
 
       {grouped.length === 0 && (
         <p className="not-prose text-base text-stone-500">該当する製品がありません。</p>
