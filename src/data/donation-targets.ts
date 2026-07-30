@@ -1,44 +1,60 @@
 /**
- * 応援カード / LINE の「応援」導線が着地する、ふるさと納税の寄付先。
+ * 出没市町村 → その市町村のふるさと納税（楽天）への対応表。
  *
- * ねらい: 肉・米などの一般返礼品ではなく、**クマ・野生動物・自然環境の保全**という
- * テーマに直接アプローチできる寄付に着地させる。
+ * コンセプト（不変）: 「クマが出た"その市町村"を応援」。だから市町村に対応させる。
  *
- * 採用: 楽天ふるさと納税の **「自然環境保護」用途カテゴリ**
- *   https://event.rakuten.co.jp/furusato/purpose/environment/
- *   = 寄付金の使い道が「自然環境保護」（野生動物保護・森林・自然保全 等）に指定された
- *     寄付の一覧。ここに直着地するので、テーマがぶれない。
- *
- * ※ 楽天は「地域 × 用途」を1つのURLで絞れない（用途カテゴリは全国横断）。そのため
- *   v1 は **テーマ（自然環境保護）を優先**し、地域指定は落とす。地域 × テーマの細分
- *   （例: ○○県のクマ対策 GCF）を出したい場合は、ふるさとチョイス（クローズドASP）や
- *   看板プロジェクトの手キュレーションが必要 → 今後の拡張。
+ * 楽天の制約: 楽天は「地域 × 用途（テーマ）」を1つのURLで絞れない。用途カテゴリは
+ * 全国横断で、地域と両立できない。そこで —
+ *   - **着地は市町村**（楽天ふるさと納税の市町村検索）＝コンセプト（市町村対応）を守る
+ *   - **テーマ（鳥獣対策・自然環境）は寄付時の「使い道」選択で担保**（カードに明記）
+ * とする。テーマだけに絞った着地はふるさとチョイスでしかできないが、紹介料の提携が
+ * クローズド審査で困難なため、収益（楽天アフィリ）を取る本方針では楽天に寄せる。
  *
  * 実際のアフィリ変換は呼び出し側（/oen/go）で rakutenAffiliateUrl() を通す。
  */
 
-export type DonationTheme = "自然環境" | "クマ対策" | "地域応援";
-
 export type DonationTarget = {
-  /** CTA に出すラベル（「▼ / 応援する」等は呼び出し側で付与）。着地テーマと一致させる。 */
+  /** CTA に出すラベル（「▼ / 応援する」等は呼び出し側で付与）。 */
   label: string;
   /** 楽天ふるさと納税の着地 URL（アフィリ未変換の素の URL）。 */
   targetUrl: string;
-  theme: DonationTheme;
 };
 
-/** 楽天ふるさと納税「自然環境保護」用途カテゴリ。 */
-const RAKUTEN_ENV_PURPOSE =
-  "https://event.rakuten.co.jp/furusato/purpose/environment/";
+const RSEARCH = "https://search.rakuten.co.jp/search/mall";
+
+/** 楽天市場の検索 URL（ふるさと納税の返礼品/寄付が対象）。 */
+function rakutenSearch(query: string): string {
+  return `${RSEARCH}/${encodeURIComponent(query)}/`;
+}
+
+/** 都道府県名を短くする（ラベル用）。北海道は道を残す。 */
+function shortPref(pref: string): string {
+  return pref.replace(/(県|府|都)$/, "");
+}
 
 /**
- * 応援の着地先を返す。v1 は全国の「自然環境保護」テーマに直着地（地域指定なし）。
- * 引数は将来の地域×テーマ拡張／計測用に受けるが、v1 では未使用。
+ * 出没の pref/city から、その市町村のふるさと納税（楽天）への着地先を返す。
+ * city があれば市町村単位、無ければ県単位、どちらも無ければ全国。
  */
-export function resolveDonationTarget(): DonationTarget {
+export function resolveDonationTarget(
+  pref?: string,
+  city?: string,
+): DonationTarget {
+  if (pref && city) {
+    return {
+      label: `${city}を応援`,
+      // 県名も入れて市町村を一意化（例: 府中市の重複回避）。
+      targetUrl: rakutenSearch(`ふるさと納税 ${pref} ${city}`),
+    };
+  }
+  if (pref) {
+    return {
+      label: `${shortPref(pref)}を応援`,
+      targetUrl: rakutenSearch(`ふるさと納税 ${pref}`),
+    };
+  }
   return {
-    label: "野生動物と自然環境を応援",
-    targetUrl: RAKUTEN_ENV_PURPOSE,
-    theme: "自然環境",
+    label: "地域を応援",
+    targetUrl: rakutenSearch("ふるさと納税"),
   };
 }
