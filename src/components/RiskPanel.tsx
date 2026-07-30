@@ -1124,7 +1124,7 @@ function RiskDetails({
       </section>
 
       {/* 控えめなクマ対策グッズ（アフィリエイト・フラグ裏）。カード最下部・フッターの上 */}
-      <BearGearAffiliate compact className="px-4 pb-1" />
+      <BearGearAffiliate compact className="mx-4 mb-3" />
 
       {/* カード末尾の控えめな運営・補足リンク行。1 行目: 運営 + お問合せ、2 行目: 補足。 */}
       <footer className="border-t border-gray-100 px-4 py-3 text-center text-[11px] leading-relaxed text-gray-400">

@@ -21,18 +21,22 @@ export default function BearGearAffiliate({
   if (compact) {
     return (
       <div
-        className={`text-[11px] leading-relaxed text-stone-400 ${className}`}
+        className={`rounded-xl border border-stone-200 bg-stone-50/70 px-3 py-2.5 ${className}`}
         aria-label="クマ対策グッズ（広告）"
       >
-        <span className="font-medium text-stone-500">クマ対策グッズ</span>
-        <span
-          className="ml-1 rounded-sm bg-stone-100 px-1 py-px text-[9px] font-semibold tracking-wider text-stone-500"
-          aria-label="広告（アフィリエイトリンク）"
-          title="広告（アフィリエイトリンク）"
-        >
-          PR
-        </span>
-        <span className="ml-1.5">
+        <div className="flex items-center gap-1.5">
+          <span className="text-[13px] font-bold text-stone-700">
+            クマ対策グッズ
+          </span>
+          <span
+            className="rounded-sm bg-stone-200/80 px-1 py-px text-[10px] font-semibold tracking-wider text-stone-500"
+            aria-label="広告（アフィリエイトリンク）"
+            title="広告（アフィリエイトリンク）"
+          >
+            PR
+          </span>
+        </div>
+        <div className="mt-1 text-xs leading-relaxed text-stone-500">
           {BEAR_GEAR.map((g, i) => (
             <span key={g.key}>
               {i > 0 && <span className="text-stone-300"> ・ </span>}
@@ -40,15 +44,15 @@ export default function BearGearAffiliate({
                 href={amazonSearchUrl(g.keyword)}
                 target="_blank"
                 rel="sponsored nofollow noopener noreferrer"
-                className="text-amber-700 hover:underline"
+                className="font-medium text-amber-700 hover:underline"
               >
                 {g.label}
               </a>
             </span>
           ))}
-          <span className="text-stone-300"> — Amazonで探す</span>
-        </span>
-        <div className="mt-0.5 text-[9px] text-stone-300">
+          <span className="text-stone-400"> — Amazonで探す →</span>
+        </div>
+        <div className="mt-1 text-[9px] text-stone-400">
           Amazon アソシエイトとして適格販売により収入を得ています
         </div>
       </div>
