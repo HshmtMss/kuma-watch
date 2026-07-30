@@ -1,60 +1,85 @@
 /**
- * 出没市町村 → その市町村のふるさと納税（楽天）への対応表。
+ * 出没市町村 → ふるさと納税(楽天)の応援先を返す対応表。
  *
- * コンセプト（不変）: 「クマが出た"その市町村"を応援」。だから市町村に対応させる。
+ * コンセプト:「クマが出た"その市町村"を応援」。全出没自治体をカバーする。
+ * 楽天の全件調査(scripts参照)で作った専用寄付枠リスト(oen-donations.json)を軸に、
+ * 3段で解決する。**着地とラベルを一致させ、Tier3では使い道をしっかり説明する**。
  *
- * 楽天の制約: 楽天は「地域 × 用途（テーマ）」を1つのURLで絞れない。用途カテゴリは
- * 全国横断で、地域と両立できない。そこで —
- *   - **着地は市町村**（楽天ふるさと納税の市町村検索）＝コンセプト（市町村対応）を守る
- *   - **テーマ（鳥獣対策・自然環境）は寄付時の「使い道」選択で担保**（カードに明記）
- * とする。テーマだけに絞った着地はふるさとチョイスでしかできないが、紹介料の提携が
- * クローズド審査で困難なため、収益（楽天アフィリ）を取る本方針では楽天に寄せる。
+ *   Tier1: その市町村の「クマ被害対策支援」専用枠(返礼品なし)。着地が即クマ対策。
+ *   Tier2: 「自然環境・野生動物・里山」等の純粋な寄付枠(返礼品なし)。共生の土台。
+ *   Tier3: 専用枠が無い自治体 → その市町村の一般ふるさと納税へ。
+ *          寄付時に「使い道」で鳥獣/クマ・自然環境・観光/産業を選べる旨を明記。
  *
- * 実際のアフィリ変換は呼び出し側（/oen/go）で rakutenAffiliateUrl() を通す。
+ * 実アフィリ変換は呼び出し側(/oen/go)で rakutenAffiliateUrl() を通す。
  */
+import DONATIONS from "@/data/oen-donations.json";
+
+type Entry = { tier: number; theme: string; itemName: string; url: string };
+const MAP = DONATIONS as Record<string, Entry>;
 
 export type DonationTarget = {
-  /** CTA に出すラベル（「▼ / 応援する」等は呼び出し側で付与）。 */
+  /** カード見出し（着地テーマと一致）。 */
   label: string;
-  /** 楽天ふるさと納税の着地 URL（アフィリ未変換の素の URL）。 */
+  /** しっかりした説明（何の寄付か＋クマとの関係）。 */
+  note: string;
+  /** 楽天の着地 URL（アフィリ未変換）。 */
   targetUrl: string;
+  tier: 1 | 2 | 3;
 };
 
-const RSEARCH = "https://search.rakuten.co.jp/search/mall";
+const THEME_LABEL: Record<string, string> = {
+  自然環境: "自然環境",
+  鳥獣: "鳥獣被害対策",
+  野生動物: "野生動物の保護",
+  森林里山: "里山・森林の保全",
+};
 
-/** 楽天市場の検索 URL（ふるさと納税の返礼品/寄付が対象）。 */
 function rakutenSearch(query: string): string {
-  return `${RSEARCH}/${encodeURIComponent(query)}/`;
+  return `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(query)}/`;
 }
 
-/** 都道府県名を短くする（ラベル用）。北海道は道を残す。 */
-function shortPref(pref: string): string {
-  return pref.replace(/(県|府|都)$/, "");
-}
-
-/**
- * 出没の pref/city から、その市町村のふるさと納税（楽天）への着地先を返す。
- * city があれば市町村単位、無ければ県単位、どちらも無ければ全国。
- */
 export function resolveDonationTarget(
   pref?: string,
   city?: string,
 ): DonationTarget {
+  const e = pref && city ? MAP[`${pref}/${city}`] : undefined;
+
+  // Tier1: クマ対策の専用寄付枠（返礼品なし）
+  if (e && e.tier === 1 && city) {
+    return {
+      label: `${city}のクマ対策を応援`,
+      note: `${city}の「クマ被害対策支援」への寄付です（返礼品なし）。捕獲・見回り・電気柵・人身被害の防止などに使われます。`,
+      targetUrl: e.url,
+      tier: 1,
+    };
+  }
+
+  // Tier2: 自然環境・野生動物・里山などの純粋な寄付枠（返礼品なし）
+  if (e && e.tier === 2 && city) {
+    const tl = THEME_LABEL[e.theme] ?? "自然環境";
+    return {
+      label: `${city}の${tl}を応援`,
+      note: `${city}の${tl}への寄付です（返礼品なし）。野生動物や自然環境の保全は、人とクマが共生していく土台になります。`,
+      targetUrl: e.url,
+      tier: 2,
+    };
+  }
+
+  // Tier3: 専用枠なし → その市町村の一般ふるさと納税＋使い道の説明
   if (pref && city) {
     return {
       label: `${city}を応援`,
-      // 県名も入れて市町村を一意化（例: 府中市の重複回避）。
+      note: `${city}のふるさと納税です。この地域には現在クマ専用の寄付枠がありませんが、寄付時に「使い道」で鳥獣・クマ対策／自然環境の保全／観光・産業の振興などを選べます。クマ被害は農業・観光・里山の自然にも及ぶため、この地域を支えることがクマとの共生にもつながります（返礼品も受け取れます）。`,
       targetUrl: rakutenSearch(`ふるさと納税 ${pref} ${city}`),
+      tier: 3,
     };
   }
-  if (pref) {
-    return {
-      label: `${shortPref(pref)}を応援`,
-      targetUrl: rakutenSearch(`ふるさと納税 ${pref}`),
-    };
-  }
+
+  // 全国フォールバック（pref 不明時）
   return {
-    label: "地域を応援",
-    targetUrl: rakutenSearch("ふるさと納税"),
+    label: "獣害に向き合う地域を応援",
+    note: "クマ・獣害に向き合う地域を、ふるさと納税で応援できます。",
+    targetUrl: rakutenSearch("ふるさと納税 鳥獣被害対策"),
+    tier: 3,
   };
 }

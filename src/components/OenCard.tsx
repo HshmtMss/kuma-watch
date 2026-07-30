@@ -36,8 +36,8 @@ export default function OenCard({
         この地域を応援
       </div>
       <h3 className="mt-2 text-base font-bold text-stone-900">{target.label}</h3>
-      <p className="mt-1 text-xs leading-relaxed text-stone-600">
-        この地域のふるさと納税で。寄付の使い道は<b className="font-semibold text-stone-700">鳥獣被害対策・自然環境</b>などを選べます。税の控除も。
+      <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
+        {target.note}
       </p>
 
       <a
