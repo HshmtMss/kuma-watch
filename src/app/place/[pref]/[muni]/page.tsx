@@ -756,8 +756,8 @@ export default async function MuniPage({ params }: Props) {
       {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
       <BearGearAffiliate className="mt-4" />
 
-      {/* この地域を応援（ふるさと納税へ送客、フラグ裏）。地域支援の導線 */}
-      <OenCard pref={pref} city={muni} className="mt-4" />
+      {/* 野生動物と自然環境を応援（ふるさと納税へ送客、フラグ裏）。地域支援の導線 */}
+      <OenCard className="mt-4" />
 
       {/* 詳しく見る — 分析系(傾向・月別・県内での位置づけ)を折りたたみ、
           来訪目的の核(最近の事案・公式情報)は下に見える形で残す。折りたたみでも

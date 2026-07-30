@@ -3,30 +3,16 @@ import { resolveDonationTarget } from "@/data/donation-targets";
 import { isOenReleased } from "@/lib/oen-flag";
 
 /**
- * 「この地域を応援」カード。市町村ページ・観光地ページに置き、その地域の
- * テーマに沿ったふるさと納税（楽天）へ /oen/go 経由で送客する。
+ * 「野生動物と自然環境を応援」カード。市町村ページ・観光地ページに置き、楽天ふるさと
+ * 納税の「自然環境保護」用途カテゴリへ /oen/go 経由で送客する（テーマに直着地）。
  *
  * サーバーコンポーネント。公開フラグ isOenReleased() が OFF の間は null（非表示）。
- * 着地とラベルは対応表(resolveDonationTarget)がテーマ一致で返す（景表法配慮）。
  * リンクは自社の /oen/go を見せて楽天へ転送（信頼感・計測・差し替え自由）。
  */
-export default function OenCard({
-  pref,
-  city,
-  className = "",
-}: {
-  pref?: string;
-  city?: string;
-  className?: string;
-}) {
+export default function OenCard({ className = "" }: { className?: string }) {
   if (!isOenReleased()) return null;
 
-  const target = resolveDonationTarget(pref);
-  const params = new URLSearchParams();
-  if (pref) params.set("pref", pref);
-  if (city) params.set("city", city);
-  const q = params.toString();
-  const href = q ? `/oen/go?${q}` : "/oen/go";
+  const target = resolveDonationTarget();
 
   return (
     <section
@@ -38,11 +24,11 @@ export default function OenCard({
       </div>
       <h3 className="mt-2 text-base font-bold text-stone-900">{target.label}</h3>
       <p className="mt-1 text-xs leading-relaxed text-stone-600">
-        ふるさと納税で。鳥獣被害対策・自然環境など、寄付時に使い道を選べます。税の控除も。
+        ふるさと納税の「自然環境保護」から。野生動物保護・鳥獣被害対策・里山の保全などに使われます。税の控除も。
       </p>
 
       <a
-        href={href}
+        href="/oen/go"
         target="_blank"
         rel="sponsored noopener noreferrer"
         className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"

@@ -15,11 +15,11 @@ export const dynamic = "force-dynamic";
  * ここから楽天へ飛ばす（信頼感・計測・差し替え自由のため）。pref 省略で全国。
  */
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const pref = searchParams.get("pref") ?? undefined;
-  // city は将来 FEATURED（市町村ピンポイントの看板プロジェクト）で使う。v1 は pref 基準。
+  // pref/city はクエリに残せるが、v1 は全国「自然環境保護」テーマに直着地するため未使用
+  // （将来の地域×テーマ拡張・計測用）。
+  void req;
 
-  const target = resolveDonationTarget(pref);
+  const target = resolveDonationTarget();
   const dest = rakutenAffiliateUrl(target.targetUrl);
 
   return NextResponse.redirect(dest, 307);
