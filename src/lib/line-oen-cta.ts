@@ -37,9 +37,20 @@ export function shouldUseOenCta(seed: string): boolean {
 }
 
 /**
+ * パスセグメントの軽量エンコード。通常の市町村名（例: 秋田市）はそのまま通し、
+ * 通知内の URL を「▼ 地図で見る」（dispatch の pathSegment）と同じく綺麗に見せる。
+ * 日本語はパスに生で入れられる（クエリだと 400 になる）。特殊文字を含むときだけ
+ * encodeURIComponent する（フェイルセーフ）。
+ */
+function pathSeg(s: string): string {
+  return /[\s/?#%&+]/.test(s) ? encodeURIComponent(s) : s;
+}
+
+/**
  * 通知本文の末尾に足す「地域を応援」CTA 断片。無効時は空文字。
  * 既存の「▼ 地図で見る」と同じ体裁で、短いラベルの次行に URL を置く（簡潔）。
- * pref/city を渡すと /oen がその市町村の説明で着地する。無ければ汎用 /oen。
+ * pref/city があれば /oen/秋田県/秋田市 のクリーンなパスへ着地し、その市町村の
+ * 説明（クマ対策枠の有無／使い道）を出す。両方揃わなければ汎用 /oen。
  */
 export function lineOenCtaSuffix(
   base: string,
@@ -47,10 +58,9 @@ export function lineOenCtaSuffix(
   city?: string,
 ): string {
   if (!isLineOenCtaEnabled()) return "";
-  const params = new URLSearchParams();
-  if (pref) params.set("pref", pref);
-  if (city) params.set("city", city);
-  const q = params.toString();
-  const href = q ? `${base}/oen?${q}` : `${base}/oen`;
+  const href =
+    pref && city
+      ? `${base}/oen/${pathSeg(pref)}/${pathSeg(city)}`
+      : `${base}/oen`;
   return `\n\n▼ この地域を応援できます（ふるさと納税・PR）\n${href}`;
 }
