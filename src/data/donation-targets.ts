@@ -38,6 +38,65 @@ function rakutenSearch(query: string): string {
   return `https://search.rakuten.co.jp/search/mall/${encodeURIComponent(query)}/`;
 }
 
+/** 楽天ふるさと納税の「用途（使い道）から探す」カテゴリ URL。 */
+function rakutenPurpose(purpose: string): string {
+  return `https://event.rakuten.co.jp/furusato/purpose/${purpose}/`;
+}
+
+/**
+ * /oen ハブの「テーマから選ぶ」カテゴリ。各ボタン＝カテゴリ名＋説明（クマとの関係）＋
+ * そのテーマの楽天ふるさと納税へ。着地は /oen/go?cat=<key> 経由でアフィリ変換。
+ */
+export type OenCategory = {
+  key: string;
+  label: string;
+  note: string;
+  targetUrl: string;
+};
+
+export const OEN_CATEGORIES: OenCategory[] = [
+  {
+    key: "kuma",
+    label: "クマ・鳥獣対策",
+    note: "捕獲・見回り・電気柵など、直接の対策へ。",
+    targetUrl: rakutenSearch("ふるさと納税 鳥獣被害対策"),
+  },
+  {
+    key: "shizen",
+    label: "自然環境の保護",
+    note: "生息環境の保全は、人とクマの棲み分けの土台です。",
+    targetUrl: rakutenPurpose("environment"),
+  },
+  {
+    key: "yasei",
+    label: "野生動物の保護",
+    note: "クマも野生動物。共生の視点で守ります。",
+    targetUrl: rakutenSearch("ふるさと納税 野生動物 保護"),
+  },
+  {
+    key: "satoyama",
+    label: "森林・里山の保全",
+    note: "里山の荒廃は、出没が増えた根本原因のひとつ。",
+    targetUrl: rakutenSearch("ふるさと納税 里山 森林"),
+  },
+  {
+    key: "kanko",
+    label: "観光の振興",
+    note: "出没で減った観光客・風評の回復を支えます。",
+    targetUrl: rakutenPurpose("sightseeing"),
+  },
+  {
+    key: "sangyo",
+    label: "地域産業（農林業）",
+    note: "獣害で傷んだ農林業の生業を守ります。",
+    targetUrl: rakutenPurpose("industry"),
+  },
+];
+
+export function resolveCategory(key: string): OenCategory | undefined {
+  return OEN_CATEGORIES.find((c) => c.key === key);
+}
+
 export function resolveDonationTarget(
   pref?: string,
   city?: string,

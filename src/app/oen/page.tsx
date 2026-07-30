@@ -1,14 +1,28 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import {
   Footprints,
   Landmark,
   Wheat,
   Trees,
-  Heart,
+  Leaf,
+  PawPrint,
+  Camera,
   ArrowRight,
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import { OEN_CATEGORIES } from "@/data/donation-targets";
 import { isOenReleased } from "@/lib/oen-flag";
+
+/** カテゴリ key → アイコン（データ側は JSX を持たせない）。 */
+const CAT_ICON: Record<string, ReactNode> = {
+  kuma: <Footprints size={18} />,
+  shizen: <Leaf size={18} />,
+  yasei: <PawPrint size={18} />,
+  satoyama: <Trees size={18} />,
+  kanko: <Camera size={18} />,
+  sangyo: <Wheat size={18} />,
+};
 
 const SITE_URL = "https://kuma-watch.jp";
 
@@ -85,33 +99,53 @@ export default function OenPage() {
         </div>
       </section>
 
-      {/* 応援のしかた */}
+      {/* 応援のしかた（テーマから選ぶ） */}
       <section className="not-prose mt-8">
-        <h2 className="mb-3 text-lg font-bold text-stone-900">
-          応援のしかた（ふるさと納税）
+        <h2 className="mb-1 text-lg font-bold text-stone-900">
+          応援のしかた（テーマから選ぶ）
         </h2>
-        <ul className="flex flex-col gap-1.5 text-sm leading-relaxed text-stone-700">
-          <li>・関心のある地域を選んで応援できます</li>
-          <li>
-            ・<b className="font-bold">税の控除</b>が受けられます（負担を抑えて応援）
-          </li>
-          <li>・手続きと寄付は各ふるさと納税サイトで完結します</li>
-        </ul>
-        <p className="mt-3 border-t border-stone-100 pt-3 text-xs leading-relaxed text-stone-500">
-          ※ リンクはふるさと納税サイト（楽天ふるさと納税）へ移動します。KumaWatch
-          は紹介手数料を受け取る場合があり、運営費に充てています（PR）。
+        <p className="mb-3 text-sm leading-relaxed text-stone-600">
+          クマの問題は、対策だけでなく、自然・里山・観光・農林業ともつながっています。
+          関心のあるテーマから、ふるさと納税で応援できます（
+          <b className="font-bold">税の控除</b>も受けられます）。
         </p>
 
-        <a
-          href="/oen/go"
-          className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3.5 text-sm font-bold text-white hover:bg-emerald-800"
-        >
-          <Heart size={17} />
-          関心のある地域を応援する
-          <ArrowRight size={16} />
-        </a>
-        <p className="mt-2 text-center text-xs text-stone-400">
-          できる範囲で、関心のある地域から。それで十分です。
+        <div className="flex flex-col gap-2">
+          {OEN_CATEGORIES.map((c) => (
+            <a
+              key={c.key}
+              href={`/oen/go?cat=${c.key}`}
+              target="_blank"
+              rel="sponsored noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3 transition-colors hover:bg-emerald-50"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-100 text-emerald-700">
+                {CAT_ICON[c.key]}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold text-stone-900">
+                  {c.label}
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-stone-600">
+                  {c.note}
+                </span>
+              </span>
+              <ArrowRight
+                size={16}
+                className="shrink-0 text-emerald-600"
+                aria-hidden
+              />
+            </a>
+          ))}
+        </div>
+
+        <p className="mt-3 border-t border-stone-100 pt-3 text-xs leading-relaxed text-stone-500">
+          ※ リンクはふるさと納税サイト（楽天ふるさと納税）へ移動します。手続きと寄付は
+          各サイトで完結します。KumaWatch
+          は紹介手数料を受け取る場合があり、運営費に充てています（PR）。
+        </p>
+        <p className="mt-2 text-xs text-stone-400">
+          できる範囲で、関心のあるテーマから。それで十分です。
         </p>
       </section>
     </PageShell>
