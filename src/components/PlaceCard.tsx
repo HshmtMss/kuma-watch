@@ -29,7 +29,6 @@ import {
 } from "@/data/municipalities";
 import { findSourceByPrefCode } from "@/data/data-sources";
 import MunicipalNoticeBox from "@/components/MunicipalNoticeBox";
-import BearGearAffiliate from "@/components/BearGearAffiliate";
 import MunicipalLinks from "@/components/MunicipalLinks";
 import RiskCharts from "@/components/RiskCharts";
 import AskBox from "@/components/AskBox";
@@ -512,8 +511,6 @@ export default function PlaceCard({ lat, lon, initialName, src }: Props) {
         </div>
       </details>
 
-      {/* 控えめなクマ対策グッズ（アフィリエイト）。カード最下部・フッターの上に1行で */}
-      <BearGearAffiliate compact className="mt-3" />
     </div>
   );
 }
