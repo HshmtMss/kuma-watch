@@ -85,32 +85,6 @@ export default function OenPage() {
         </div>
       </section>
 
-      {/* クマだけの話ではない */}
-      <section className="not-prose mt-8">
-        <h2 className="mb-3 text-lg font-bold text-stone-900">
-          クマだけの話ではありません
-        </h2>
-        <div className="mb-2 flex flex-wrap items-center gap-1.5 text-xs font-bold text-stone-600">
-          {["クマ", "獣害全体", "農業・観光", "里山・生物多様性"].map((w, i) => (
-            <span key={w} className="contents">
-              {i > 0 && (
-                <span className="text-stone-400" aria-hidden>
-                  →
-                </span>
-              )}
-              <span className="rounded-full border border-stone-200 bg-white px-2.5 py-1">
-                {w}
-              </span>
-            </span>
-          ))}
-        </div>
-        <p className="text-sm leading-relaxed text-stone-600">
-          だからこの応援は、
-          <b className="font-bold text-stone-900">地方と自然を支える</b>
-          取り組みでもあります。
-        </p>
-      </section>
-
       {/* 応援のしかた */}
       <section className="not-prose mt-8">
         <h2 className="mb-3 text-lg font-bold text-stone-900">

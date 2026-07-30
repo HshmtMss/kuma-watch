@@ -38,7 +38,7 @@ export default function OenCard({
       </div>
       <h3 className="mt-2 text-base font-bold text-stone-900">{target.label}</h3>
       <p className="mt-1 text-xs leading-relaxed text-stone-600">
-        ふるさと納税で、鳥獣被害対策や里山の保全に。税の控除も受けられます。
+        ふるさと納税で。鳥獣被害対策・自然環境など、寄付時に使い道を選べます。税の控除も。
       </p>
 
       <a
