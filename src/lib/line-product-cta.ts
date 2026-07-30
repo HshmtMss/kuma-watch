@@ -21,11 +21,11 @@ export function isLineProductCtaEnabled(): boolean {
 
 /**
  * 通知本文の末尾に足す CTA 断片。無効時は空文字。
- * 既存の「▼ 地図で見る」と同じ体裁で 1 行だけ足す（煽らない・簡潔に）。
- * src=line で /products 側の流入計測に使える。
+ * 既存の「▼ 地図で見る」と同じ体裁で、短いラベルの次行に短縮 URL を置く（簡潔・煽らない）。
+ * ラベル・URL とも短いので折り返して余計な行にはならない。
+ * /gear は next.config で /products?src=line へリダイレクト（送客計測込み）。
  */
 export function lineProductCtaSuffix(base: string): string {
   if (!isLineProductCtaEnabled()) return "";
-  const url = `${base}/products?src=line`;
-  return `\n\n▼ クマ対策グッズ（スプレー・鈴ほか）\n${url}`;
+  return `\n\n▼ 対策グッズ\n${base}/gear`;
 }

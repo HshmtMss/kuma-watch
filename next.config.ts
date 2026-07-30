@@ -38,6 +38,10 @@ const nextConfig: NextConfig = {
         permanent: true,
       })),
       { source: "/map", destination: "/", permanent: true },
+      // LINE 通知内の「対策グッズ」CTA 用の短縮リンク。1 行に収めるため短くし、
+      // 送客計測の src=line はリダイレクト先で付与する。掲載先を差し替えられるよう
+      // 恒久ではなく一時 (307)。
+      { source: "/gear", destination: "/products?src=line", permanent: false },
       // /sources は /credits に統合済み。Search Console の
       // 「代替ページ」検出を抑えるため permanent (308) で渡す。
       // 旧バックリンクからのアクセスを正規 URL (/credits) に集約する。
