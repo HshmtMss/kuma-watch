@@ -11,8 +11,10 @@ import {
 
 const SITE_URL = "https://kuma-watch.jp";
 
-// ISR: 5 分ごとに再生成。新規記事の地域タグ反映を CDN エッジに短い遅延で反映。
-export const revalidate = 300;
+// 再生成しない（静的固定）。日本語スラッグ（県名）を ISR 再生成すると
+// x-next-cache-tags に日本語が入り Node が例外→500 になるため（既知バグ）。
+// 研究レポート一覧は 5 分更新が不要で、新規記事はデプロイ時（再ビルド）に反映される。
+export const revalidate = false;
 
 type Params = { pref: string };
 
