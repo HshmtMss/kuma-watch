@@ -64,7 +64,7 @@ export type JapanLandmark = {
 const CURATED_LANDMARKS: JapanLandmark[] = [
   // === 主要山岳 ===
   {
-    slug: "富士山",
+    slug: "fuji-san",
     name: "富士山",
     altNames: ["Fuji-san", "ふじさん"],
     prefName: "山梨県",
@@ -78,7 +78,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "富士山",
   },
   {
-    slug: "高尾山",
+    slug: "takao-san",
     name: "高尾山",
     altNames: ["Takao-san", "たかおさん"],
     prefName: "東京都",
@@ -108,7 +108,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     ],
   },
   {
-    slug: "大菩薩嶺",
+    slug: "daibosatsu",
     name: "大菩薩嶺",
     altNames: ["Daibosatsu", "だいぼさつれい"],
     prefName: "山梨県",
@@ -122,7 +122,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "大菩薩嶺",
   },
   {
-    slug: "八ヶ岳",
+    slug: "yatsugatake",
     name: "八ヶ岳",
     altNames: ["Yatsugatake", "やつがたけ"],
     prefName: "長野県",
@@ -136,7 +136,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "八ヶ岳",
   },
   {
-    slug: "北岳",
+    slug: "kitadake",
     name: "北岳",
     altNames: ["Kitadake"],
     prefName: "山梨県",
@@ -150,7 +150,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "北岳",
   },
   {
-    slug: "槍ヶ岳",
+    slug: "yarigatake",
     name: "槍ヶ岳",
     altNames: ["Yarigatake"],
     prefName: "長野県",
@@ -164,7 +164,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "槍ヶ岳",
   },
   {
-    slug: "穂高岳",
+    slug: "hotaka",
     name: "穂高岳",
     altNames: ["奥穂高岳", "Hotaka"],
     prefName: "長野県",
@@ -178,7 +178,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "穂高岳",
   },
   {
-    slug: "白馬岳",
+    slug: "shirouma",
     name: "白馬岳",
     altNames: ["Shirouma", "しろうまだけ"],
     prefName: "長野県",
@@ -192,7 +192,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "白馬岳",
   },
   {
-    slug: "立山",
+    slug: "tateyama",
     name: "立山",
     altNames: ["Tateyama"],
     prefName: "富山県",
@@ -206,7 +206,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "立山",
   },
   {
-    slug: "御嶽山",
+    slug: "ontake",
     name: "御嶽山",
     altNames: ["Ontake"],
     prefName: "長野県",
@@ -220,7 +220,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "御嶽山",
   },
   {
-    slug: "白山",
+    slug: "hakusan-2",
     name: "白山",
     altNames: ["Hakusan"],
     prefName: "石川県",
@@ -234,7 +234,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "白山",
   },
   {
-    slug: "妙高山",
+    slug: "myoko",
     name: "妙高山",
     altNames: ["Myoko"],
     prefName: "新潟県",
@@ -248,7 +248,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "妙高山",
   },
   {
-    slug: "蔵王",
+    slug: "zao",
     name: "蔵王",
     altNames: ["蔵王山", "Zao"],
     prefName: "山形県",
@@ -262,7 +262,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "蔵王",
   },
   {
-    slug: "鳥海山",
+    slug: "chokai",
     name: "鳥海山",
     altNames: ["Chokai"],
     prefName: "山形県",
@@ -276,7 +276,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "鳥海山",
   },
   {
-    slug: "岩手山",
+    slug: "iwate-san",
     name: "岩手山",
     altNames: ["Iwate-san"],
     prefName: "岩手県",
@@ -290,7 +290,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "岩手山",
   },
   {
-    slug: "八甲田山",
+    slug: "hakkoda",
     name: "八甲田山",
     altNames: ["Hakkoda"],
     prefName: "青森県",
@@ -304,7 +304,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "八甲田山",
   },
   {
-    slug: "羊蹄山",
+    slug: "yotei",
     name: "羊蹄山",
     altNames: ["Yotei", "蝦夷富士"],
     prefName: "北海道",
@@ -318,7 +318,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "羊蹄山",
   },
   {
-    slug: "大雪山",
+    slug: "daisetsu",
     name: "大雪山",
     altNames: ["Daisetsu", "旭岳"],
     prefName: "北海道",
@@ -332,7 +332,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "大雪山",
   },
   {
-    slug: "十勝岳",
+    slug: "tokachi",
     name: "十勝岳",
     altNames: ["Tokachi"],
     prefName: "北海道",
@@ -347,7 +347,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   },
   // === 国立公園・主要観光地 ===
   {
-    slug: "上高地",
+    slug: "kamikochi",
     name: "上高地",
     altNames: ["Kamikochi"],
     prefName: "長野県",
@@ -361,7 +361,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "上高地",
   },
   {
-    slug: "尾瀬",
+    slug: "oze",
     name: "尾瀬",
     altNames: ["Oze"],
     prefName: "群馬県",
@@ -375,7 +375,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "尾瀬",
   },
   {
-    slug: "知床",
+    slug: "shiretoko",
     name: "知床",
     altNames: ["Shiretoko"],
     prefName: "北海道",
@@ -389,7 +389,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "知床国立公園",
   },
   {
-    slug: "日光",
+    slug: "nikko",
     name: "日光",
     altNames: ["Nikko"],
     prefName: "栃木県",
@@ -403,7 +403,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "日光東照宮",
   },
   {
-    slug: "軽井沢",
+    slug: "karuizawa",
     name: "軽井沢",
     altNames: ["Karuizawa"],
     prefName: "長野県",
@@ -417,7 +417,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "軽井沢",
   },
   {
-    slug: "那須高原",
+    slug: "nasu",
     name: "那須高原",
     altNames: ["Nasu"],
     prefName: "栃木県",
@@ -431,7 +431,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "那須高原",
   },
   {
-    slug: "白川郷",
+    slug: "shirakawago",
     name: "白川郷",
     altNames: ["Shirakawago"],
     prefName: "岐阜県",
@@ -445,7 +445,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "白川郷",
   },
   {
-    slug: "高山",
+    slug: "takayama-2",
     name: "高山",
     altNames: ["飛騨高山", "Takayama"],
     prefName: "岐阜県",
@@ -459,7 +459,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "高山市",
   },
   {
-    slug: "屋久島",
+    slug: "yakushima",
     name: "屋久島",
     altNames: ["Yakushima"],
     prefName: "鹿児島県",
@@ -473,7 +473,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "屋久島",
   },
   {
-    slug: "阿蘇",
+    slug: "aso",
     name: "阿蘇",
     altNames: ["Aso"],
     prefName: "熊本県",
@@ -487,7 +487,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "阿蘇山",
   },
   {
-    slug: "箱根",
+    slug: "hakone",
     name: "箱根",
     altNames: ["Hakone"],
     prefName: "神奈川県",
@@ -502,7 +502,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   },
   // === ハイキング・登山口 ===
   {
-    slug: "奥多摩",
+    slug: "okutama",
     name: "奥多摩",
     altNames: ["Okutama"],
     prefName: "東京都",
@@ -516,7 +516,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "奥多摩",
   },
   {
-    slug: "丹沢",
+    slug: "tanzawa",
     name: "丹沢",
     altNames: ["Tanzawa"],
     prefName: "神奈川県",
@@ -530,7 +530,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "丹沢山",
   },
   {
-    slug: "雲取山",
+    slug: "kumotoriyama",
     name: "雲取山",
     altNames: ["Kumotoriyama"],
     prefName: "東京都",
@@ -544,7 +544,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "雲取山",
   },
   {
-    slug: "瑞牆山",
+    slug: "mizugaki",
     name: "瑞牆山",
     altNames: ["Mizugaki"],
     prefName: "山梨県",
@@ -558,7 +558,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "瑞牆山",
   },
   {
-    slug: "金峰山",
+    slug: "kinpu",
     name: "金峰山",
     altNames: ["Kinpu", "きんぷさん"],
     prefName: "山梨県",
@@ -572,7 +572,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "金峰山",
   },
   {
-    slug: "美ヶ原",
+    slug: "utsukushigahara",
     name: "美ヶ原",
     altNames: ["Utsukushigahara"],
     prefName: "長野県",
@@ -586,7 +586,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "美ヶ原",
   },
   {
-    slug: "霧ヶ峰",
+    slug: "kirigamine",
     name: "霧ヶ峰",
     altNames: ["Kirigamine"],
     prefName: "長野県",
@@ -600,7 +600,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "霧ヶ峰",
   },
   {
-    slug: "蓼科",
+    slug: "tateshina",
     name: "蓼科",
     altNames: ["Tateshina"],
     prefName: "長野県",
@@ -614,7 +614,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "蓼科高原",
   },
   {
-    slug: "清里",
+    slug: "kiyosato",
     name: "清里",
     altNames: ["Kiyosato"],
     prefName: "山梨県",
@@ -629,7 +629,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   },
   // === スキーリゾート・温泉地 (クマ生息域内) ===
   {
-    slug: "湯沢",
+    slug: "yuzawa",
     name: "湯沢",
     altNames: ["越後湯沢", "Yuzawa"],
     prefName: "新潟県",
@@ -643,7 +643,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "湯沢町",
   },
   {
-    slug: "白馬",
+    slug: "hakuba-2",
     name: "白馬",
     altNames: ["Hakuba"],
     prefName: "長野県",
@@ -657,7 +657,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "白馬村",
   },
   {
-    slug: "ニセコ",
+    slug: "niseko",
     name: "ニセコ",
     altNames: ["Niseko"],
     prefName: "北海道",
@@ -671,7 +671,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "ニセコ",
   },
   {
-    slug: "草津",
+    slug: "kusatsu-2",
     name: "草津",
     altNames: ["草津温泉", "Kusatsu"],
     prefName: "群馬県",
@@ -685,7 +685,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "草津温泉",
   },
   {
-    slug: "万座",
+    slug: "manza",
     name: "万座",
     altNames: ["Manza"],
     prefName: "群馬県",
@@ -699,7 +699,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "万座温泉",
   },
   {
-    slug: "野沢温泉",
+    slug: "nozawa",
     name: "野沢温泉",
     altNames: ["Nozawa"],
     prefName: "長野県",
@@ -713,7 +713,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "野沢温泉",
   },
   {
-    slug: "志賀高原",
+    slug: "shigakogen",
     name: "志賀高原",
     altNames: ["Shigakogen"],
     prefName: "長野県",
@@ -728,7 +728,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   },
   // === 湖・自然 ===
   {
-    slug: "中禅寺湖",
+    slug: "chuzenjiko",
     name: "中禅寺湖",
     altNames: ["Chuzenjiko"],
     prefName: "栃木県",
@@ -742,7 +742,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "中禅寺湖",
   },
   {
-    slug: "河口湖",
+    slug: "kawaguchiko",
     name: "河口湖",
     altNames: ["Kawaguchiko"],
     prefName: "山梨県",
@@ -756,7 +756,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "河口湖",
   },
   {
-    slug: "十和田湖",
+    slug: "towadako",
     name: "十和田湖",
     altNames: ["Towadako"],
     prefName: "青森県",
@@ -770,7 +770,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "十和田湖",
   },
   {
-    slug: "支笏湖",
+    slug: "shikotsuko",
     name: "支笏湖",
     altNames: ["Shikotsuko"],
     prefName: "北海道",
@@ -786,7 +786,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 山岳 (北アルプス・中央アルプス・中信・南信) ===
   {
-    slug: "剣岳",
+    slug: "tsurugidake",
     name: "剣岳",
     altNames: ["劔岳", "Tsurugidake"],
     prefName: "富山県",
@@ -800,7 +800,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "剱岳",
   },
   {
-    slug: "燕岳",
+    slug: "tsubakurodake",
     name: "燕岳",
     altNames: ["Tsubakurodake", "つばくろだけ"],
     prefName: "長野県",
@@ -814,7 +814,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "燕岳",
   },
   {
-    slug: "常念岳",
+    slug: "jonendake",
     name: "常念岳",
     altNames: ["Jonendake"],
     prefName: "長野県",
@@ -828,7 +828,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "常念岳",
   },
   {
-    slug: "涸沢",
+    slug: "karasawa",
     name: "涸沢",
     altNames: ["Karasawa"],
     prefName: "長野県",
@@ -842,7 +842,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "涸沢カール",
   },
   {
-    slug: "木曽駒ヶ岳",
+    slug: "kisokomagatake",
     name: "木曽駒ヶ岳",
     altNames: ["Kisokomagatake", "中央アルプス駒ヶ岳"],
     prefName: "長野県",
@@ -856,7 +856,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "木曽駒ヶ岳",
   },
   {
-    slug: "浅間山",
+    slug: "asamayama-2",
     name: "浅間山",
     altNames: ["Asamayama"],
     prefName: "長野県",
@@ -870,7 +870,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "浅間山",
   },
   {
-    slug: "谷川岳",
+    slug: "tanigawadake",
     name: "谷川岳",
     altNames: ["Tanigawadake"],
     prefName: "群馬県",
@@ -884,7 +884,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "谷川岳",
   },
   {
-    slug: "武尊山",
+    slug: "hotakasan",
     name: "武尊山",
     altNames: ["Hotakasan", "ほたかさん"],
     prefName: "群馬県",
@@ -898,7 +898,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "武尊山",
   },
   {
-    slug: "苗場山",
+    slug: "naebasan",
     name: "苗場山",
     altNames: ["Naebasan"],
     prefName: "新潟県",
@@ -912,7 +912,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "苗場山",
   },
   {
-    slug: "巻機山",
+    slug: "makihatayama",
     name: "巻機山",
     altNames: ["Makihatayama"],
     prefName: "新潟県",
@@ -926,7 +926,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "巻機山",
   },
   {
-    slug: "越後駒ヶ岳",
+    slug: "echigo-komagatake",
     name: "越後駒ヶ岳",
     altNames: ["Echigo-Komagatake"],
     prefName: "新潟県",
@@ -942,7 +942,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 東北 ===
   {
-    slug: "磐梯山",
+    slug: "bandaisan",
     name: "磐梯山",
     altNames: ["Bandaisan"],
     prefName: "福島県",
@@ -956,7 +956,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "磐梯山",
   },
   {
-    slug: "安達太良山",
+    slug: "adatarayama",
     name: "安達太良山",
     altNames: ["Adatarayama"],
     prefName: "福島県",
@@ -970,7 +970,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "安達太良山",
   },
   {
-    slug: "月山",
+    slug: "gassan",
     name: "月山",
     altNames: ["Gassan"],
     prefName: "山形県",
@@ -984,7 +984,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "月山",
   },
   {
-    slug: "八幡平",
+    slug: "hachimantai",
     name: "八幡平",
     altNames: ["Hachimantai"],
     prefName: "岩手県",
@@ -998,7 +998,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "八幡平",
   },
   {
-    slug: "早池峰山",
+    slug: "hayachinesan",
     name: "早池峰山",
     altNames: ["Hayachinesan"],
     prefName: "岩手県",
@@ -1012,7 +1012,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "早池峰山",
   },
   {
-    slug: "焼石岳",
+    slug: "yakeishidake",
     name: "焼石岳",
     altNames: ["Yakeishidake"],
     prefName: "岩手県",
@@ -1028,7 +1028,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 西日本の主要山岳 ===
   {
-    slug: "伯耆大山",
+    slug: "daisen",
     name: "伯耆大山",
     altNames: ["大山(鳥取県)", "Daisen", "ほうきだいせん"],
     prefName: "鳥取県",
@@ -1042,7 +1042,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "大山 (鳥取県)",
   },
   {
-    slug: "丹沢大山",
+    slug: "oyama-2",
     name: "丹沢大山",
     altNames: ["大山(神奈川県)", "Oyama", "おおやま"],
     prefName: "神奈川県",
@@ -1056,7 +1056,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "大山 (神奈川県)",
   },
   {
-    slug: "高野山",
+    slug: "koyasan",
     name: "高野山",
     altNames: ["Koyasan"],
     prefName: "和歌山県",
@@ -1070,7 +1070,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "高野山",
   },
   {
-    slug: "石鎚山",
+    slug: "ishizuchisan",
     name: "石鎚山",
     altNames: ["Ishizuchisan"],
     prefName: "愛媛県",
@@ -1084,7 +1084,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "石鎚山",
   },
   {
-    slug: "剣山",
+    slug: "tsurugisan",
     name: "剣山",
     altNames: ["Tsurugisan"],
     prefName: "徳島県",
@@ -1098,7 +1098,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "剣山",
   },
   {
-    slug: "雲仙岳",
+    slug: "unzendake",
     name: "雲仙岳",
     altNames: ["Unzendake"],
     prefName: "長崎県",
@@ -1112,7 +1112,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "雲仙岳",
   },
   {
-    slug: "久住山",
+    slug: "kujusan",
     name: "久住山",
     altNames: ["Kujusan", "九重山"],
     prefName: "大分県",
@@ -1126,7 +1126,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "久住山",
   },
   {
-    slug: "霧島山",
+    slug: "kirishimayama",
     name: "霧島山",
     altNames: ["Kirishimayama", "韓国岳"],
     prefName: "鹿児島県",
@@ -1142,7 +1142,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 湖・湿原 ===
   {
-    slug: "摩周湖",
+    slug: "mashuko",
     name: "摩周湖",
     altNames: ["Mashuko"],
     prefName: "北海道",
@@ -1156,7 +1156,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "摩周湖",
   },
   {
-    slug: "阿寒湖",
+    slug: "akanko",
     name: "阿寒湖",
     altNames: ["Akanko"],
     prefName: "北海道",
@@ -1170,7 +1170,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "阿寒湖",
   },
   {
-    slug: "田沢湖",
+    slug: "tazawako",
     name: "田沢湖",
     altNames: ["Tazawako"],
     prefName: "秋田県",
@@ -1184,7 +1184,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "田沢湖",
   },
   {
-    slug: "山中湖",
+    slug: "yamanakako",
     name: "山中湖",
     altNames: ["Yamanakako"],
     prefName: "山梨県",
@@ -1198,7 +1198,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "山中湖",
   },
   {
-    slug: "本栖湖",
+    slug: "motosuko",
     name: "本栖湖",
     altNames: ["Motosuko"],
     prefName: "山梨県",
@@ -1214,7 +1214,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 滝 ===
   {
-    slug: "華厳の滝",
+    slug: "kegon-no-taki",
     name: "華厳の滝",
     altNames: ["Kegon-no-taki"],
     prefName: "栃木県",
@@ -1228,7 +1228,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "華厳滝",
   },
   {
-    slug: "那智の滝",
+    slug: "nachi-no-taki",
     name: "那智の滝",
     altNames: ["Nachi-no-taki"],
     prefName: "和歌山県",
@@ -1242,7 +1242,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "那智滝",
   },
   {
-    slug: "白糸の滝",
+    slug: "shiraito-no-taki",
     name: "白糸の滝",
     altNames: ["Shiraito-no-taki"],
     prefName: "静岡県",
@@ -1256,7 +1256,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "白糸の滝",
   },
   {
-    slug: "袋田の滝",
+    slug: "fukuroda-no-taki",
     name: "袋田の滝",
     altNames: ["Fukuroda-no-taki"],
     prefName: "茨城県",
@@ -1272,7 +1272,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
 
   // === 追加: 文化・観光・温泉 ===
   {
-    slug: "妻籠宿",
+    slug: "tsumagojuku",
     name: "妻籠宿",
     altNames: ["Tsumagojuku"],
     prefName: "長野県",
@@ -1286,7 +1286,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "妻籠宿",
   },
   {
-    slug: "馬籠宿",
+    slug: "magomejuku",
     name: "馬籠宿",
     altNames: ["Magomejuku"],
     prefName: "岐阜県",
@@ -1300,7 +1300,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "馬籠宿",
   },
   {
-    slug: "富良野",
+    slug: "furano",
     name: "富良野",
     altNames: ["Furano"],
     prefName: "北海道",
@@ -1314,7 +1314,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "富良野市",
   },
   {
-    slug: "美瑛",
+    slug: "biei",
     name: "美瑛",
     altNames: ["Biei"],
     prefName: "北海道",
@@ -1328,7 +1328,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "美瑛町",
   },
   {
-    slug: "高千穂峡",
+    slug: "takachiho-kyo",
     name: "高千穂峡",
     altNames: ["Takachiho-kyo"],
     prefName: "宮崎県",
@@ -1342,7 +1342,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "高千穂峡",
   },
   {
-    slug: "蔵王温泉",
+    slug: "zao-onsen",
     name: "蔵王温泉",
     altNames: ["Zao-onsen"],
     prefName: "山形県",
@@ -1356,7 +1356,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "蔵王温泉",
   },
   {
-    slug: "銀山温泉",
+    slug: "ginzan-onsen",
     name: "銀山温泉",
     altNames: ["Ginzan-onsen"],
     prefName: "山形県",
@@ -1370,7 +1370,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "銀山温泉",
   },
   {
-    slug: "由布院",
+    slug: "yufuin",
     name: "由布院",
     altNames: ["Yufuin"],
     prefName: "大分県",
@@ -1387,7 +1387,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   // === 夏の観光地（渓谷・川遊び・高原・キャンプ場）2026-07 追加 ===
   // 周辺 10km の直近1年出没が実在するもののみ厳選（scout-summer-spots.mjs で検算済）。
   {
-    slug: "秋川渓谷",
+    slug: "akigawa-valley",
     name: "秋川渓谷",
     altNames: ["あきがわけいこく", "Akigawa Valley"],
     prefName: "東京都",
@@ -1401,7 +1401,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "秋川 (東京都)",
   },
   {
-    slug: "長瀞",
+    slug: "nagatoro",
     name: "長瀞",
     altNames: ["ながとろ", "Nagatoro"],
     prefName: "埼玉県",
@@ -1415,7 +1415,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "長瀞町",
   },
   {
-    slug: "昇仙峡",
+    slug: "shosenkyo",
     name: "昇仙峡",
     altNames: ["しょうせんきょう", "Shosenkyo"],
     prefName: "山梨県",
@@ -1429,7 +1429,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "昇仙峡",
   },
   {
-    slug: "寸又峡",
+    slug: "sumatakyo",
     name: "寸又峡",
     altNames: ["すまたきょう", "Sumatakyo"],
     prefName: "静岡県",
@@ -1443,7 +1443,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "夢の吊橋",
   },
   {
-    slug: "北軽井沢",
+    slug: "kitakaruizawa",
     name: "北軽井沢",
     altNames: ["きたかるいざわ", "スウィートグラス", "浅間高原"],
     prefName: "群馬県",
@@ -1457,7 +1457,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "北軽井沢駅",
   },
   {
-    slug: "嬬恋高原",
+    slug: "tsumagoikougen",
     name: "嬬恋高原",
     altNames: ["つまごいこうげん", "カンパーニャ嬬恋", "嬬恋村"],
     prefName: "群馬県",
@@ -1471,7 +1471,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "嬬恋村",
   },
   {
-    slug: "岩洞湖",
+    slug: "gandoko",
     name: "岩洞湖",
     altNames: ["がんどうこ", "Gandoko"],
     prefName: "岩手県",
@@ -1485,7 +1485,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "岩洞湖",
   },
   {
-    slug: "苗場",
+    slug: "naeba",
     name: "苗場・かぐらみつまた",
     altNames: ["なえば", "かぐら", "みつまた", "Naeba"],
     prefName: "新潟県",
@@ -1499,7 +1499,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "苗場スキー場",
   },
   {
-    slug: "菅平高原",
+    slug: "sugadaira",
     name: "菅平高原",
     altNames: ["すがだいらこうげん", "Sugadaira"],
     prefName: "長野県",
@@ -1513,7 +1513,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "菅平高原",
   },
   {
-    slug: "乗鞍高原",
+    slug: "norikura",
     name: "乗鞍高原",
     altNames: ["のりくらこうげん", "Norikura"],
     prefName: "長野県",
@@ -1527,7 +1527,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "乗鞍高原",
   },
   {
-    slug: "奥日光湯元",
+    slug: "okunikkou",
     name: "奥日光・湯元",
     altNames: ["おくにっこう", "湯ノ湖", "日光湯元温泉"],
     prefName: "栃木県",
@@ -1541,7 +1541,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "日光湯元温泉",
   },
   {
-    slug: "戸隠",
+    slug: "togakushi",
     name: "戸隠",
     altNames: ["とがくし", "戸隠神社", "戸隠高原"],
     prefName: "長野県",
@@ -1555,7 +1555,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     imageCredit: "戸隠神社",
   },
   {
-    slug: "然別湖",
+    slug: "lake-shikaribetsu",
     name: "然別湖",
     altNames: ["しかりべつこ", "Lake Shikaribetsu"],
     prefName: "北海道",
