@@ -18,11 +18,13 @@ export const metadata: Metadata = {
       "クマ対策の製品・サービスを KumaWatch に掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
     url: `${SITE_URL}/for-vendors`,
     type: "website",
+    images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "製品・サービスの掲載｜KumaWatch",
     description: "クマ対策の製品・サービスを KumaWatch に掲載。詳細はお問い合わせください。",
+    images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
 
