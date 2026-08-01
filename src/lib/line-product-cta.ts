@@ -63,7 +63,21 @@ type AdSlot = {
  *   },
  */
 const AD_SLOTS: AdSlot[] = [
-  // デフォルト（全配信）＝現行どおり自社の対策グッズへ送客。
+  // 観光地・登山口(spot)の通知 → 登山シーンの対策グッズ。
+  {
+    id: "trail",
+    label: "▼ 登山の対策グッズ",
+    path: "/gear?scene=trail",
+    match: (t) => t.kind === "spot",
+  },
+  // 市町村・登録地点(muni/geo)の通知 → 暮らし・畑シーンの対策グッズ。
+  {
+    id: "home",
+    label: "▼ 暮らし・畑の対策グッズ",
+    path: "/gear?scene=home",
+    match: (t) => t.kind === "muni" || t.kind === "geo",
+  },
+  // デフォルト（未マッチ）＝汎用の対策グッズへ送客。必ず最後に置く。
   { id: "default", label: "▼ 対策グッズ", path: "/gear" },
 ];
 
