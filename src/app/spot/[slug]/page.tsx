@@ -874,7 +874,7 @@ export default async function SpotPage({ params }: Props) {
       />
 
       {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
-      <BearGearAffiliate className="mt-4" />
+      <BearGearAffiliate className="mt-4" scene="trail" />
 
       {/* この地域を応援（その市町村のふるさと納税へ送客、フラグ裏）。地域支援の導線 */}
       <OenCard

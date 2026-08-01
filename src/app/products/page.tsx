@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
 };
 
-type SearchParams = Promise<{ for?: string; cat?: string }>;
+type SearchParams = Promise<{ for?: string; cat?: string; scene?: string }>;
 
 export default async function ProductsPage({
   searchParams,
@@ -150,8 +150,12 @@ export default async function ProductsPage({
       />
 
       {/* 定番の対策グッズをAmazonで探す（アフィリエイト・フラグ裏）。
-          下のキュレーション製品とは別に、まず手早く探せる導線として上部に置く */}
-      <BearGearAffiliate className="not-prose mt-6" />
+          下のキュレーション製品とは別に、まず手早く探せる導線として上部に置く。
+          個人向けのみ表示（自治体向けは下のキュレーション製品＝防護柵・監視等が主）。
+          LINE 通知からの scene（trail/home）を受け取り、商品セットを合わせる。 */}
+      {audience === "個人" && (
+        <BearGearAffiliate className="not-prose mt-6" scene={sp.scene} />
+      )}
 
       {grouped.length === 0 && (
         <p className="not-prose text-base text-stone-500">該当する製品がありません。</p>

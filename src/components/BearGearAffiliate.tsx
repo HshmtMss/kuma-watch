@@ -1,4 +1,4 @@
-import { affiliateEnabled, amazonSearchUrl, BEAR_GEAR } from "@/lib/affiliate";
+import { affiliateEnabled, amazonSearchUrl, getGearScene } from "@/lib/affiliate";
 
 /**
  * クマ対策グッズ（Amazon 検索リンク・アフィリエイト）。フラグ裏（affiliateEnabled）。
@@ -7,16 +7,24 @@ import { affiliateEnabled, amazonSearchUrl, BEAR_GEAR } from "@/lib/affiliate";
  * 景表法（ステマ規制）対応で「広告(PR)」を明示し、Amazon アソシエイトの表記を添える。
  * リンクは検索リンク（在庫切れに強い）で rel="sponsored nofollow"。
  * サーバコンポーネント（フックなし・env をビルド時にインライン）。
+ *
+ * scene で商品セットを出し分ける（trail=登山 / home=暮らし・畑 / camp=キャンプ）。
+ * 未指定は汎用(taisaku)＝従来と同一表示。/spot は trail、/place は home を渡す。
  */
 export default function BearGearAffiliate({
   className = "",
   compact = false,
+  scene,
 }: {
   className?: string;
   /** 控えめな1行表示（トップ地図カードなど、主張しすぎたくない場所向け）。 */
   compact?: boolean;
+  /** 商品セットのシーン（trail/home/camp）。未指定は汎用。 */
+  scene?: string;
 }) {
   if (!affiliateEnabled()) return null;
+
+  const gear = getGearScene(scene);
 
   if (compact) {
     return (
@@ -26,7 +34,7 @@ export default function BearGearAffiliate({
       >
         <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-bold text-stone-700">
-            クマ対策グッズ
+            {gear.title}
           </span>
           <span
             className="rounded-sm bg-stone-200/80 px-1 py-px text-[10px] font-semibold tracking-wider text-stone-500"
@@ -37,7 +45,7 @@ export default function BearGearAffiliate({
           </span>
         </div>
         <div className="mt-1 text-xs leading-relaxed text-stone-500">
-          {BEAR_GEAR.map((g, i) => (
+          {gear.items.map((g, i) => (
             <span key={g.key}>
               {i > 0 && <span className="text-stone-300"> ・ </span>}
               <a
@@ -65,9 +73,7 @@ export default function BearGearAffiliate({
       aria-label="クマ対策グッズ（広告）"
     >
       <div className="mb-1.5 flex items-center gap-2">
-        <h2 className="text-sm font-bold text-stone-800">
-          クマ対策グッズをそろえる
-        </h2>
+        <h2 className="text-sm font-bold text-stone-800">{gear.title}</h2>
         <span
           className="rounded-sm bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-stone-500"
           aria-label="広告（アフィリエイトリンク）"
@@ -76,11 +82,9 @@ export default function BearGearAffiliate({
           PR
         </span>
       </div>
-      <p className="mb-3 text-xs leading-relaxed text-stone-500">
-        山や畑に入るときの基本の備え。音で存在を知らせ、薄暗い時間帯を避けるのが第一です。
-      </p>
+      <p className="mb-3 text-xs leading-relaxed text-stone-500">{gear.blurb}</p>
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {BEAR_GEAR.map((g) => (
+        {gear.items.map((g) => (
           <li key={g.key}>
             <a
               href={amazonSearchUrl(g.keyword)}

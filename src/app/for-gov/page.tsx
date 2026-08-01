@@ -122,6 +122,20 @@ export default function ForGovPage() {
         </li>
       </ul>
 
+      {/* 自治体向けの対策製品（audience:自治体 を /products?for=gov で表示） */}
+      <h2 id="products">自治体向けの対策製品</h2>
+      <p>
+        防護柵・監視カメラ・捕獲機材・撃退装置など、<strong>自治体・猟友会向け</strong>の製品・サービスも整理して掲載しています。導入検討の比較にご利用ください。
+      </p>
+      <div className="not-prose my-4">
+        <Link
+          href="/products?for=gov"
+          className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
+        >
+          自治体向けの対策製品を見る →
+        </Link>
+      </div>
+
       {/* 導入の流れ — 3 ステップ */}
       <h2 id="process">3 ステップで開始</h2>
       <p>
