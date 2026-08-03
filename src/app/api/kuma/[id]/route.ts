@@ -39,11 +39,22 @@ export async function GET(
     if (matches.length === 0) {
       // 重複排除で getCachedSightings から落ちた記録 (通知リンクの s=<id> は
       // 排除前の生 id で来る) を、排除前データから引き当てて返す。
-      const raw = await getRawSightingById(
+      let raw = await getRawSightingById(
         targetId,
         hasHint ? hintLat : undefined,
         hasHint ? hintLon : undefined,
       );
+      // それでも無ければ「通知直後でまだ 5 分キャッシュに載っていない新規」を疑い、
+      // TTL を迂回して最新スナップショットを直読みして 1 回だけ拾い直す。
+      // (通知リンクを開いた瞬間に該当ピンが出ない問題への対処。60 秒スロットル有り)
+      if (!raw) {
+        raw = await getRawSightingById(
+          targetId,
+          hasHint ? hintLat : undefined,
+          hasHint ? hintLon : undefined,
+          true,
+        );
+      }
       if (raw) {
         return NextResponse.json(
           { record: unifiedToKumaRecord(raw) },
@@ -55,7 +66,11 @@ export async function GET(
           },
         );
       }
-      return NextResponse.json({ error: "not found" }, { status: 404 });
+      // 404 はキャッシュさせない (直後に載った時、古い not-found が居座らないよう)。
+      return NextResponse.json(
+        { error: "not found" },
+        { status: 404, headers: { "Cache-Control": "no-store" } },
+      );
     }
     const found =
       hasHint && matches.length > 1

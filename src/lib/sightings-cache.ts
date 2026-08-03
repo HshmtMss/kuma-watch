@@ -562,13 +562,38 @@ export function invalidateSightingsCache(): void {
 // 重複排除「前」の記録キャッシュ (getRawSightingById 用)。
 let rawMemCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
 
-/** 読み込み元(disk→bundled→集約)から、filterMisgeocoded のみ掛けた記録を返す。 */
-async function loadRawForLookup(): Promise<UnifiedSighting[]> {
-  if (rawMemCache && Date.now() - rawMemCache.loadedAt < MEM_CACHE_TTL_MS)
+// forceFresh の再取得スロットル。通知直後の「まだ 5 分キャッシュに載っていない」
+// 1 件を確実に開くため、TTL を無視して最新スナップショット(GitHub raw)を直読み
+// する。ただし存在しない id の連打で 22MB を何度も引かないよう、実際の再取得は
+// 60 秒に 1 回までに制限する(それ以外は既存キャッシュを使う)。
+let lastRawForceFreshAt = 0;
+const RAW_FORCE_FRESH_MIN_INTERVAL_MS = 60 * 1000;
+
+/**
+ * 読み込み元(disk→bundled→集約)から、filterMisgeocoded のみ掛けた記録を返す。
+ * forceFresh=true かつ前回の強制取得から 60 秒以上経っていれば、5 分 TTL を迂回して
+ * 最新スナップショットを直読みする(通知直後の新規レコードを拾う用)。
+ */
+async function loadRawForLookup(forceFresh = false): Promise<UnifiedSighting[]> {
+  const doForce =
+    forceFresh &&
+    Date.now() - lastRawForceFreshAt > RAW_FORCE_FRESH_MIN_INTERVAL_MS;
+  if (
+    !doForce &&
+    rawMemCache &&
+    Date.now() - rawMemCache.loadedAt < MEM_CACHE_TTL_MS
+  )
     return rawMemCache.records;
-  const disk = readDiskCache();
-  let recs: UnifiedSighting[] | null =
-    disk && disk.records.length > 0 ? disk.records : null;
+  let recs: UnifiedSighting[] | null = null;
+  if (doForce) {
+    // 5 分キャッシュを迂回し、最新の commit 済みスナップショットを直読み。
+    lastRawForceFreshAt = Date.now();
+    recs = await readSnapshotFromNet();
+  }
+  if (!recs) {
+    const disk = readDiskCache();
+    recs = disk && disk.records.length > 0 ? disk.records : null;
+  }
   if (!recs) recs = await readBundledSnapshot();
   if (!recs) recs = await aggregateAllSightings();
   const filtered = filterMisgeocoded(recs ?? []);
@@ -590,8 +615,9 @@ export async function getRawSightingById(
   id: string,
   hintLat?: number,
   hintLon?: number,
+  forceFresh = false,
 ): Promise<UnifiedSighting | null> {
-  const recs = await loadRawForLookup();
+  const recs = await loadRawForLookup(forceFresh);
   const matches = recs.filter((s) => String(s.id) === id);
   if (matches.length === 0) return null;
   if (
