@@ -14,6 +14,9 @@ import {
   Crosshair,
   BookOpen,
   LayoutGrid,
+  Wheat,
+  Footprints,
+  Tent,
   type LucideIcon,
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
@@ -23,7 +26,10 @@ import {
   CATEGORY_DESC,
   CATEGORY_ID,
   CATEGORY_LABEL,
+  SCENE_ORDER,
+  SCENE_LABEL,
   getProductsForAudience,
+  getProductsForScene,
   groupByCategory,
 } from "@/lib/products";
 
@@ -38,6 +44,14 @@ const PRODUCT_CATEGORY_ICON: Record<string, LucideIcon> = {
   監視検知: Radar,
   捕獲駆除: Crosshair,
   情報教育: BookOpen,
+};
+
+// シーン → Lucide アイコン。
+const SCENE_ICON: Record<string, LucideIcon> = {
+  nora: Wheat,
+  trail: Footprints,
+  camp: Tent,
+  home: House,
 };
 
 export const metadata: Metadata = {
@@ -65,9 +79,15 @@ export default async function ProductsPage({
   const audience: "個人" | "自治体" = sp.for === "gov" ? "自治体" : "個人";
 
   const products = getProductsForAudience(audience);
-  const grouped = groupByCategory(products);
   // アフィリ製品が1件でもあれば PR 開示を出す (無ければ出さない=誤解を招かない)。
   const hasAffiliate = products.some((p) => Boolean(p.affiliateUrl));
+
+  // シーンフィルタ (農作業・山菜採り / 登山 / キャンプ / 暮らし)。LINE の ?scene= とキー共有。
+  const activeScene: string =
+    sp.scene && SCENE_ORDER.includes(sp.scene) ? sp.scene : "all";
+  const sceneProducts =
+    activeScene === "all" ? products : getProductsForScene(products, activeScene);
+  const grouped = groupByCategory(sceneProducts);
 
   // カテゴリフィルタ。音声から探す導線を anchor jump → URL クエリ式に変更し、
   // /articles と同じ操作感に統一する。
@@ -80,16 +100,23 @@ export default async function ProductsPage({
       ? grouped
       : grouped.filter((g) => g.category === activeCat);
 
-  const audienceBaseHref = (aud: "個人" | "自治体") =>
-    aud === "自治体" ? "/products?for=gov" : "/products";
-
-  const catHref = (cat: string) => {
+  // 各種リンク生成。フィルタ間で他の軸(for/scene/cat)を保持する。
+  const buildHref = (opts: { gov: boolean; scene: string; cat?: string }) => {
     const params = new URLSearchParams();
-    if (audience === "自治体") params.set("for", "gov");
-    if (cat !== "all") params.set("cat", cat);
+    if (opts.gov) params.set("for", "gov");
+    if (opts.scene !== "all") params.set("scene", opts.scene);
+    if (opts.cat && opts.cat !== "all") params.set("cat", opts.cat);
     const qs = params.toString();
     return `/products${qs ? `?${qs}` : ""}`;
   };
+  // 対象切替は cat をリセット(組合せで空になり得るため)。scene は保持。
+  const audienceBaseHref = (aud: "個人" | "自治体") =>
+    buildHref({ gov: aud === "自治体", scene: activeScene });
+  // シーン切替も cat をリセット。for は保持。
+  const sceneHref = (scene: string) =>
+    buildHref({ gov: audience === "自治体", scene });
+  const catHref = (cat: string) =>
+    buildHref({ gov: audience === "自治体", scene: activeScene, cat });
 
   return (
     <PageShell
@@ -131,6 +158,27 @@ export default async function ProductsPage({
       />
 
       <CategoryTiles
+        title="シーンで絞り込み"
+        activeKey={activeScene}
+        items={[
+          {
+            key: "all",
+            href: sceneHref("all"),
+            label: "すべて",
+            icon: LayoutGrid,
+            count: products.length,
+          },
+          ...SCENE_ORDER.map<CategoryTileItem>((s) => ({
+            key: s,
+            href: sceneHref(s),
+            label: SCENE_LABEL[s],
+            icon: SCENE_ICON[s],
+            count: getProductsForScene(products, s).length,
+          })),
+        ]}
+      />
+
+      <CategoryTiles
         title="カテゴリで絞り込み"
         activeKey={activeCat}
         items={[
@@ -139,7 +187,7 @@ export default async function ProductsPage({
             href: catHref("all"),
             label: "すべて",
             icon: LayoutGrid,
-            count: products.length,
+            count: sceneProducts.length,
           },
           ...grouped.map<CategoryTileItem>((g) => ({
             key: g.category,

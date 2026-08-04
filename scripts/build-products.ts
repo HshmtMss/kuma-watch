@@ -54,6 +54,8 @@ type Product = {
   notes: string;
   audience: string;
   affiliateUrl: string;
+  /** カンマ区切りのシーンキー (nora=農作業・山菜採り / trail=登山 / camp=キャンプ / home=暮らし)。 */
+  scene: string;
 };
 
 function clean(v: string | undefined): string {
@@ -134,6 +136,7 @@ for (let i = 0; i < parsed.data.length; i++) {
     notes: clean(row.notes),
     audience,
     affiliateUrl: clean(row.affiliate_url),
+    scene: clean(row.scene),
   });
 }
 

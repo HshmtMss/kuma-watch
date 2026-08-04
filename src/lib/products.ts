@@ -22,7 +22,30 @@ export type Product = {
   /** アフィリエイトトラッキング付き URL。空ならアフィリエイト未提携で url に直接遷移。
    *  この列に値が入った時点で、ProductCard 側で PR 表記と rel="sponsored" が自動的に有効化される。 */
   affiliateUrl: string;
+  /** カンマ区切りのシーンキー (nora/trail/camp/home)。空はシーン非該当(情報・捕獲等)。 */
+  scene: string;
 };
+
+// 利用シーン軸。カテゴリ(撃退忌避…)とは別に「どの場面で使うか」で横断的に絞る。
+// LINE 通知の ?scene= (trail/home) ともキーを共有し、送客がそのまま該当シーンに着地する。
+export const SCENE_ORDER: readonly string[] = ["nora", "trail", "camp", "home"];
+
+export const SCENE_LABEL: Record<string, string> = {
+  nora: "農作業・山菜採り",
+  trail: "登山・ハイキング",
+  camp: "キャンプ・野営",
+  home: "暮らし・住まい",
+};
+
+/** 製品が指定シーンに該当するか。 */
+export function hasScene(p: Product, scene: string): boolean {
+  return p.scene.split(",").map((s) => s.trim()).includes(scene);
+}
+
+/** シーンで絞り込み (空シーンの製品は特定シーン選択時には出さない)。 */
+export function getProductsForScene(products: Product[], scene: string): Product[] {
+  return products.filter((p) => hasScene(p, scene));
+}
 
 // 表示時のカテゴリ順序。撃退・物理防御 → 住宅・装備 → 監視・捕獲・情報 の流れで、
 // 一般ユーザーが優先的に検討する順に並べる。
