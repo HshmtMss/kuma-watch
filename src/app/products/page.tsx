@@ -120,8 +120,8 @@ export default async function ProductsPage({
 
   return (
     <PageShell
-      title="クマ対策の製品・サービス"
-      lead="クマ対策に関する製品・サービスを整理しました。価格・在庫・仕様は外部リンク先で必ずご確認ください。"
+      title="対策グッズ"
+      lead="クマのいる山・野外・暮らしで安全に過ごすための製品・サービスを、シーン別に整理しました。価格・在庫・仕様は外部リンク先で必ずご確認ください。"
     >
       <nav
         aria-label="パンくずリスト"
@@ -202,8 +202,8 @@ export default async function ProductsPage({
       {hasAffiliate && (
         <p className="not-prose mt-4 border-l-[3px] border-stone-200 bg-stone-50 px-3 py-2 text-[11px] leading-relaxed text-stone-500">
           ※「
-          <span className="font-semibold text-stone-600">◯◯で見る（PR）</span>
-          」は広告（アフィリエイトリンク）を含みます。「公式サイト」は情報として掲載しているリンクです。掲載製品は編集方針にもとづき選定しており、広告の有無は掲載順に影響しません。
+          <span className="font-semibold text-stone-600">◯◯で探す（PR）</span>
+          」は広告（アフィリエイトリンク）を含みます（Amazon等のキーワード検索へ移動します）。「公式サイト」は情報として掲載しているリンクです。掲載製品は編集方針にもとづき選定しており、広告の有無は掲載順に影響しません。
         </p>
       )}
 

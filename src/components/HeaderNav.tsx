@@ -36,7 +36,6 @@ const LEARN_LINKS: NavLink[] = isLearnHubReleased()
       { href: "/learn/safety", label: "身を守る", desc: "遭遇時の対処・装備・通報" },
       { href: "/learn/know", label: "クマを知る", desc: "生態・季節・地域の解説記事" },
       { href: "/learn/latest", label: "最新を追う", desc: "出没速報・研究・政策の動き" },
-      { href: "/products", label: "対策グッズ・製品", desc: "スプレー・鈴・電気柵ほか（獣医師監修）" },
     ]
   : [
       { href: "/measures", label: "クマ対策の総合ガイド", desc: "獣医師監修の対策まとめ" },
@@ -189,6 +188,12 @@ export default function HeaderNav({
         </Link>
         <DesktopDropdown label="探す" items={EXPLORE_LINKS} />
         <DesktopDropdown label="学ぶ" items={LEARN_LINKS} />
+        <Link
+          href="/products"
+          className="flex items-center gap-1 rounded-full px-2 py-1.5 hover:text-stone-900"
+        >
+          対策グッズ
+        </Link>
         <DesktopDropdown label="法人" items={BUSINESS_LINKS} variant="cta" />
       </nav>
 
@@ -275,6 +280,13 @@ export default function HeaderNav({
                     />
                   ))}
                 </MobileGroup>
+                <Link
+                  href="/products"
+                  onClick={close}
+                  className="flex items-center gap-2 border-t border-gray-100 px-5 py-3 text-base font-bold text-stone-800 hover:bg-stone-50 active:bg-stone-100"
+                >
+                  対策グッズ
+                </Link>
                 <MobileGroup label="法人の方" accent>
                   {BUSINESS_LINKS.map((it) => (
                     <MobileItem

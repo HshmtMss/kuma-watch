@@ -24,8 +24,10 @@ export default function ProductCard({ product }: Props) {
   // CTA を役割で出し分ける:「買える(アフィリ)=塗りボタン+ストア名(PR)」/
   // 「情報・専門(非アフィリ)=控えめな枠線リンク=公式サイト/詳細」。
   const store = isAffiliate ? storeLabel(linkHref) : "";
+  // アフィリンクは「キーワード検索」なので "探す" と明示する(特定SKU直リンクではない=
+  // 「見る」だと違う商品名が出て違和感になるため)。非アフィリは公式/詳細。
   const ctaLabel = isAffiliate
-    ? `${store ? `${store}で見る` : "購入する"}（PR）`
+    ? `${store ? `${store}で探す` : "探す"}（PR）`
     : ext
       ? "公式サイト"
       : "詳細を見る";
