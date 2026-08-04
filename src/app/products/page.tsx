@@ -66,6 +66,8 @@ export default async function ProductsPage({
 
   const products = getProductsForAudience(audience);
   const grouped = groupByCategory(products);
+  // アフィリ製品が1件でもあれば PR 開示を出す (無ければ出さない=誤解を招かない)。
+  const hasAffiliate = products.some((p) => Boolean(p.affiliateUrl));
 
   // カテゴリフィルタ。音声から探す導線を anchor jump → URL クエリ式に変更し、
   // /articles と同じ操作感に統一する。
@@ -148,6 +150,14 @@ export default async function ProductsPage({
           })),
         ]}
       />
+
+      {hasAffiliate && (
+        <p className="not-prose mt-4 border-l-[3px] border-stone-200 bg-stone-50 px-3 py-2 text-[11px] leading-relaxed text-stone-500">
+          ※「
+          <span className="font-semibold text-stone-600">◯◯で見る（PR）</span>
+          」は広告（アフィリエイトリンク）を含みます。「公式サイト」は情報として掲載しているリンクです。掲載製品は編集方針にもとづき選定しており、広告の有無は掲載順に影響しません。
+        </p>
+      )}
 
       {/* 定番の対策グッズをAmazonで探す（アフィリエイト・フラグ裏）。
           下のキュレーション製品とは別に、まず手早く探せる導線として上部に置く。

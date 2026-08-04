@@ -6,6 +6,13 @@ function isExternal(url: string): boolean {
   return /^https?:\/\//.test(url);
 }
 
+/** アフィリ URL から送客先ストア名を推定 (CTA 文言用)。不明なら空。 */
+function storeLabel(url: string): string {
+  if (/amazon\.co\.jp|amzn\.to|amazon\.com/i.test(url)) return "Amazon";
+  if (/rakuten\.co\.jp|hb\.afl\.rakuten/i.test(url)) return "楽天";
+  return "";
+}
+
 export default function ProductCard({ product }: Props) {
   const p = product;
   // affiliateUrl が入っていれば優先。空なら通常 URL に直接遷移し PR 表記も出さない。
@@ -14,6 +21,14 @@ export default function ProductCard({ product }: Props) {
   const isAffiliate = Boolean(p.affiliateUrl);
   const linkHref = isAffiliate ? p.affiliateUrl : p.url;
   const ext = isExternal(linkHref);
+  // CTA を役割で出し分ける:「買える(アフィリ)=塗りボタン+ストア名(PR)」/
+  // 「情報・専門(非アフィリ)=控えめな枠線リンク=公式サイト/詳細」。
+  const store = isAffiliate ? storeLabel(linkHref) : "";
+  const ctaLabel = isAffiliate
+    ? `${store ? `${store}で見る` : "購入する"}（PR）`
+    : ext
+      ? "公式サイト"
+      : "詳細を見る";
 
   return (
     <article className="flex h-full flex-col rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
@@ -73,9 +88,14 @@ export default function ProductCard({ product }: Props) {
                 : "noopener noreferrer"
               : undefined
           }
-          className="mt-3 inline-flex items-center justify-center gap-1 rounded-full border border-amber-400 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-100"
+          className={
+            "mt-3 inline-flex items-center justify-center gap-1 rounded-full px-3 py-2 text-xs font-bold " +
+            (isAffiliate
+              ? "border border-amber-600 bg-amber-600 text-white hover:bg-amber-700"
+              : "border border-stone-300 bg-transparent font-semibold text-stone-600 hover:bg-stone-50")
+          }
         >
-          詳細を見る
+          {ctaLabel}
           {ext && (
             <svg
               width="11"
