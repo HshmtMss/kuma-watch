@@ -20,6 +20,8 @@ import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
 import OenCard from "@/components/OenCard";
+import SpotSeasonGuide from "@/components/SpotSeasonGuide";
+import { buildSpotSeasonGuide } from "@/lib/spot-season";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -866,12 +868,18 @@ export default async function SpotPage({ params }: Props) {
         </div>
       )}
 
-      {/* 季節別アドバイス — 安全に直結するため折りたたみに入れず常時表示。
-          市町村ページと共通の SeasonalAdvice。出没が無いスポットでも季節の注意は必ず出す。 */}
-      <SeasonalAdvice
-        season={seasonalAdvice.season}
-        point={seasonalAdvice.point}
-      />
+      {/* 季節別アドバイス。フラグON＋手キュレーション観光地では、写真つきの
+          「四季の楽しみ方」ガイド(SpotSeasonGuide)に格上げして置換する。
+          それ以外は従来の SeasonalAdvice(安全に直結するため常時表示)。 */}
+      {process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
+      PREBUILD_SPOT_SLUGS.includes(landmark.slug) ? (
+        <SpotSeasonGuide data={buildSpotSeasonGuide(landmark, areaDatesAll)} />
+      ) : (
+        <SeasonalAdvice
+          season={seasonalAdvice.season}
+          point={seasonalAdvice.point}
+        />
+      )}
 
       {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
       <BearGearAffiliate className="mt-4" scene="trail" />
