@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-04T09:57:44.156Z",
-  "total": 119,
-  "visibleTotal": 104,
+  "generatedAt": "2026-08-04T10:12:20.377Z",
+  "total": 123,
+  "visibleTotal": 108,
   "products": [
     {
       "id": "repel-001",
@@ -100,7 +100,7 @@
       "source": "初回調査",
       "notes": "コスパに優れる",
       "audience": "個人,自治体",
-      "affiliateUrl": "",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=UDAP%20%E7%86%8A%E6%92%83%E9%80%80%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20Griz%20Guard&tag=kumawatch-22",
       "scene": "nora,trail,camp"
     },
     {
@@ -140,7 +140,7 @@
       "source": "初回調査",
       "notes": "記事内で注意喚起すべき",
       "audience": "個人,自治体",
-      "affiliateUrl": "",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=POLICE%20MAGNUM%20%E7%86%8A%E6%92%83%E9%80%80%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC&tag=kumawatch-22",
       "scene": "nora,trail,camp"
     },
     {
@@ -1460,7 +1460,7 @@
       "source": "初回調査",
       "notes": "",
       "audience": "個人",
-      "affiliateUrl": "",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=Pfanner%20Protos%20%E6%9E%97%E6%A5%AD%20%E3%83%98%E3%83%AB%E3%83%A1%E3%83%83%E3%83%88&tag=kumawatch-22",
       "scene": "nora"
     },
     {
@@ -1500,7 +1500,7 @@
       "source": "初回調査",
       "notes": "",
       "audience": "個人",
-      "affiliateUrl": "",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3%E3%82%BD%E3%83%BC%20%E9%98%B2%E8%AD%B7%20%E6%89%8B%E8%A2%8B%20%E6%9E%97%E6%A5%AD&tag=kumawatch-22",
       "scene": "nora"
     },
     {
@@ -2082,6 +2082,86 @@
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=LED%E3%83%98%E3%83%83%E3%83%89%E3%83%A9%E3%82%A4%E3%83%88%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E7%99%BB%E5%B1%B1%20%E3%82%A2%E3%82%A6%E3%83%88%E3%83%89%E3%82%A2&tag=kumawatch-22",
       "scene": "trail,nora"
+    },
+    {
+      "id": "repel-032",
+      "category": "撃退忌避",
+      "subcategory": "音・緊急",
+      "name": "大音量防犯ブザー（携帯・緊急用）",
+      "vendor": "各社",
+      "url": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%8A%AF%E3%83%96%E3%82%B6%E3%83%BC%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E6%90%BA%E5%B8%AF%20%E3%82%AD%E3%83%BC%E3%83%9B%E3%83%AB%E3%83%80%E3%83%BC",
+      "price": "",
+      "purpose": "音でクマに存在を知らせ、緊急時に大音量で助けを呼ぶ",
+      "features": "小型・大音量。キーホルダー型など。高齢者・子ども・単独作業に",
+      "targetUse": "農作業・山菜採り・見回り",
+      "caveats": "電池残量を定期確認",
+      "relatedArticle": "",
+      "priority": "中",
+      "source": "編集部",
+      "notes": "型レベル掲載(Amazon検索)",
+      "audience": "個人",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%8A%AF%E3%83%96%E3%82%B6%E3%83%BC%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E6%90%BA%E5%B8%AF%20%E3%82%AD%E3%83%BC%E3%83%9B%E3%83%AB%E3%83%80%E3%83%BC&tag=kumawatch-22",
+      "scene": "nora,trail"
+    },
+    {
+      "id": "repel-033",
+      "category": "撃退忌避",
+      "subcategory": "忌避・設置",
+      "name": "ソーラー式 動物撃退器（センサー・光/音）",
+      "vendor": "各社",
+      "url": "https://www.amazon.co.jp/s?k=%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E3%82%BD%E3%83%BC%E3%83%A9%E3%83%BC%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%20%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%85%89",
+      "price": "",
+      "purpose": "人感センサーで光や音を出し、庭・畑への接近を抑える",
+      "features": "ソーラー/電池式・設置型。生ゴミ置き場・家庭菜園に",
+      "targetUse": "住宅・家庭菜園・敷地",
+      "caveats": "クマへの効果は限定的。誘引物除去と併用を",
+      "relatedArticle": "",
+      "priority": "中",
+      "source": "編集部",
+      "notes": "型レベル掲載(Amazon検索)",
+      "audience": "個人",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E3%82%BD%E3%83%BC%E3%83%A9%E3%83%BC%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%20%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%85%89&tag=kumawatch-22",
+      "scene": "home,nora"
+    },
+    {
+      "id": "gear-009",
+      "category": "個人装備",
+      "subcategory": "照明",
+      "name": "LEDランタン（野営・停電用）",
+      "vendor": "各社",
+      "url": "https://www.amazon.co.jp/s?k=LED%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%B3%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97%20%E9%98%B2%E7%81%BD",
+      "price": "",
+      "purpose": "野営地や停電時の明かりを確保する",
+      "features": "充電/電池式・防水。吊り下げ可",
+      "targetUse": "キャンプ・野営・防災",
+      "caveats": "",
+      "relatedArticle": "",
+      "priority": "中",
+      "source": "編集部",
+      "notes": "型レベル掲載(Amazon検索)",
+      "audience": "個人",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=LED%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%B3%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97%20%E9%98%B2%E7%81%BD&tag=kumawatch-22",
+      "scene": "camp,home"
+    },
+    {
+      "id": "gear-010",
+      "category": "個人装備",
+      "subcategory": "視認",
+      "name": "反射安全ベスト（早朝夕方の作業・見回り）",
+      "vendor": "各社",
+      "url": "https://www.amazon.co.jp/s?k=%E5%AE%89%E5%85%A8%E3%83%99%E3%82%B9%E3%83%88%20%E5%8F%8D%E5%B0%84%20%E9%AB%98%E8%A6%96%E8%AA%8D%20%E4%BD%9C%E6%A5%AD%20%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5",
+      "price": "",
+      "purpose": "薄暗い時間帯に存在を周囲へ示し、事故と出会い頭を避ける",
+      "features": "軽量・反射材。農作業・見回り・見守りに",
+      "targetUse": "早朝夕方の農作業・見回り",
+      "caveats": "",
+      "relatedArticle": "",
+      "priority": "中",
+      "source": "編集部",
+      "notes": "型レベル掲載(Amazon検索)",
+      "audience": "個人",
+      "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%AE%89%E5%85%A8%E3%83%99%E3%82%B9%E3%83%88%20%E5%8F%8D%E5%B0%84%20%E9%AB%98%E8%A6%96%E8%AA%8D%20%E4%BD%9C%E6%A5%AD%20%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5&tag=kumawatch-22",
+      "scene": "nora"
     }
   ]
 }
