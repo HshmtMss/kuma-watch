@@ -29,7 +29,7 @@ export default function OenCard({
 
   return (
     <section
-      className={`not-prose rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 ${className}`}
+      className={`not-prose rounded-2xl border border-stone-200 bg-white p-4 ${className}`}
     >
       <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
         <Heart size={14} />
