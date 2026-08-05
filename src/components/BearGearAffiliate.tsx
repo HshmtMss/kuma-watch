@@ -73,7 +73,8 @@ export default function BearGearAffiliate({
       aria-label="クマ対策グッズ（広告）"
     >
       <div className="mb-1.5 flex items-center gap-2">
-        <h2 className="text-sm font-bold text-stone-800">{gear.title}</h2>
+        {/* カード見出し。グローバルの .article-body h2(上余白+amber下線)を避けるため div */}
+        <div className="text-sm font-bold text-stone-800">{gear.title}</div>
         <span
           className="rounded-sm bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-stone-500"
           aria-label="広告（アフィリエイトリンク）"
