@@ -456,6 +456,12 @@ export default async function SpotPage({ params }: Props) {
         ? `${landmark.name}周辺 10 km で過去 1 年に ${count365} 件の出没（最新 ${formatDate(latestDate)}）。登山・観光前の警戒レベル確認に。`
         : `${landmark.name}（${landmark.prefName}）周辺のクマ出没情報。登山・観光前の警戒レベル確認に。`;
 
+  // 四季の楽しみ方ガイド（フラグON＋手キュレーション観光地）。表示時は既存の
+  // ヒーロー画像 figure を隠し、ガイドの季節ギャラリーを唯一の写真ゾーンにする。
+  const showSeasonGuide =
+    process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
+    PREBUILD_SPOT_SLUGS.includes(landmark.slug);
+
   return (
     <PageShell title={`${landmark.name}周辺のクマ出没情報`} lead={dynamicLead}>
       <script
@@ -481,8 +487,9 @@ export default async function SpotPage({ params }: Props) {
         <span className="font-semibold text-stone-700">{landmark.name}</span>
       </nav>
 
-      {/* ヒーロー画像 (Wikipedia REST 由来 / CC BY-SA 4.0 等) */}
-      {landmark.imageUrl && (
+      {/* ヒーロー画像 (Wikipedia REST 由来 / CC BY-SA 4.0 等)。
+          四季ガイド表示時は季節ギャラリーが写真の役割を担うので出さない。 */}
+      {!showSeasonGuide && landmark.imageUrl && (
         <figure className="not-prose mb-5 overflow-hidden rounded-xl border border-stone-200 bg-stone-100">
           <div className="relative aspect-[16/9] w-full">
             <Image
@@ -510,6 +517,12 @@ export default async function SpotPage({ params }: Props) {
         </figure>
       )}
 
+      {/* 四季の楽しみ方ガイド。観光(魅せる)を主役にページ先頭へ。安全ステータス
+          (リスクバナー)はこの下に静かに置く。 */}
+      {showSeasonGuide && (
+        <SpotSeasonGuide data={buildSpotSeasonGuide(landmark, areaDatesAll)} />
+      )}
+
       {/* 危険度ヒーローバナー — /place/[pref]/[muni] と共通の RiskBanner。
           マップへの導線は (1)「周辺の目撃マップ」直下のデスクトップ CTA と
           (2) モバイルの Sticky CTA に集約済みなので、ヒーロー内ボタンは持たない
@@ -523,15 +536,6 @@ export default async function SpotPage({ params }: Props) {
         latestDateText={latestDate ? formatDate(latestDate) : null}
         note={risk.note}
       />
-
-      {/* 四季の楽しみ方ガイド。安全ステータス(リスクバナー)の直下に、ページの
-          主コンテンツ=「観光×安全」の顔として配置（フラグON＋手キュレーション時）。 */}
-      {process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
-        PREBUILD_SPOT_SLUGS.includes(landmark.slug) && (
-          <SpotSeasonGuide
-            data={buildSpotSeasonGuide(landmark, areaDatesAll)}
-          />
-        )}
 
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
@@ -879,10 +883,7 @@ export default async function SpotPage({ params }: Props) {
 
       {/* 季節別アドバイス。四季ガイドを上部に出す場合は重複するのでここは出さない。
           ガイド非表示（通常の観光地/フラグOFF）のときだけ従来の SeasonalAdvice を表示。 */}
-      {!(
-        process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
-        PREBUILD_SPOT_SLUGS.includes(landmark.slug)
-      ) && (
+      {!showSeasonGuide && (
         <SeasonalAdvice
           season={seasonalAdvice.season}
           point={seasonalAdvice.point}
