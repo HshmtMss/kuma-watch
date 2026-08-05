@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import LegalLinks from "@/components/LegalLinks";
+import ProviderCredit from "@/components/ProviderCredit";
 
 type Props = {
   title: string;
@@ -78,6 +79,9 @@ export default function PageShell({ title, lead, children }: Props) {
               クマ出没通知を受け取る
             </Link>
           </div>
+          {/* 提供クレジット (サポーター機能公開時のみ表示)。命に関わる通知本文
+              ではなく、フッターの控えめな位置に置く。 */}
+          <ProviderCredit />
           {/* 全ページの最下段に補足リンクを置く。法的ページへの導線をどのページからも辿れるようにする。 */}
           <LegalLinks />
         </div>

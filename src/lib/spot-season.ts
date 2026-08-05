@@ -30,10 +30,43 @@ export type SeasonCard = {
   image?: string; // 季節の写真URL（無ければ色フォールバック）
 };
 
+export type Season4 = "spring" | "summer" | "autumn" | "winter";
 export type NowTip = {
   month: number;
-  label: string; // その月の見どころ
-  peak: Peak; // 新緑/紅葉の見頃なら色付け・「見頃！」表示
+  season: Season4;
+  headline: string; // 「新緑と桜の季節」など
+  description: string; // 現場の"旬"の解説（1〜2文）
+  image?: string; // 現在の季節の写真（無ければ代表画像）
+  peak: Peak; // 見頃(新緑/紅葉)の色付け用
+};
+
+function seasonOf(m: number): Season4 {
+  if (m >= 3 && m <= 5) return "spring";
+  if (m >= 6 && m <= 8) return "summer";
+  if (m >= 9 && m <= 11) return "autumn";
+  return "winter";
+}
+const NOW_COPY: Record<Season4, { headline: string; description: string }> = {
+  spring: {
+    headline: "新緑と桜の季節",
+    description:
+      "芽吹きの若葉と花が山を彩ります。澄んだ空気で気候も快適。一年で最も歩きやすい季節です。",
+  },
+  summer: {
+    headline: "夏山と沢の季節",
+    description:
+      "深い緑と、沢沿いの涼やかさが魅力。木陰の登山道は避暑にも。暑さ対策と水分補給を忘れずに。",
+  },
+  autumn: {
+    headline: "紅葉の季節",
+    description:
+      "一年で最も鮮やかに色づく季節。錦に染まる山と澄んだ空が広がります。ケーブルカーからの眺めも格別。",
+  },
+  winter: {
+    headline: "澄んだ展望の季節",
+    description:
+      "空気が澄み、遠くの山並みまで見渡せます。人も少なく、静かな山歩きを楽しめる季節です。",
+  },
 };
 
 export type SpotSeasonGuide = {
@@ -191,9 +224,17 @@ export function buildSpotSeasonGuide(
   ];
 
   const cm = currentMonth >= 1 && currentMonth <= 12 ? currentMonth : 1;
+  const nowSeason = seasonOf(cm);
+  const nowImage =
+    si?.[nowSeason] ??
+    (nowSeason === "autumn" || nowSeason === "summer"
+      ? landmark.imageUrl
+      : undefined);
   const now: NowTip = {
     month: cm,
-    label: BASE_LABELS[cm],
+    season: nowSeason,
+    ...NOW_COPY[nowSeason],
+    image: nowImage,
     peak: PEAK_OF[cm] ?? "",
   };
 

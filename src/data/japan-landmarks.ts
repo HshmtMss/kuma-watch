@@ -43,7 +43,7 @@ export type JapanLandmark = {
   imageCredit?: string;
   /** 季節別の写真 URL（四季ガイドの季節カード用）。任意。未指定の季節は
    *  代表画像 or 季節の色フォールバック。CC 画像を目視確認して入れること。 */
-  seasonImages?: { spring?: string; autumn?: string; winter?: string };
+  seasonImages?: { spring?: string; summer?: string; autumn?: string; winter?: string };
   /** 規模感の補足（年間来訪者数など）。任意・表示用。 */
   scaleNote?: string;
   /** 主要コース・エリア。周辺出没を「どのコースで」まで解像度を上げて集計表示する。
