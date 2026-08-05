@@ -537,7 +537,12 @@ export default async function SpotPage({ params }: Props) {
   );
 
   return (
-    <PageShell title={`${landmark.name}周辺のクマ出没情報`} lead={dynamicLead}>
+    <PageShell
+      title={`${landmark.name}周辺のクマ出没情報`}
+      // ガイド有りスポットはタイトル直下にクマ状況カードを置く構成のため、
+      // カードと内容が重複するリード文は出さない（タイトルに一本化）。
+      lead={showSeasonGuide ? undefined : dynamicLead}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -591,20 +596,10 @@ export default async function SpotPage({ params }: Props) {
         </figure>
       )}
 
-      {/* 四季の楽しみ方ガイド。観光(魅せる)を主役にページ先頭へ。安全ステータス
-          (リスクバナー)はこの下に静かに置く。 */}
-      {showSeasonGuide && (
-        <SpotSeasonGuide
-          data={buildSpotSeasonGuide(landmark, areaDatesAll, month)}
-        />
-      )}
-
-      {/* ガイド有りスポット: 観光の直後に「備え・応援」、その下に「クマ出没の状況」
-          （注意/マップ/最近）を1つのまとまりとして集約し、情報の飛び飛びを解消。 */}
-      {showSeasonGuide && actionBlock}
-      {showSeasonGuide && (
-        <h2 className="mt-8 scroll-mt-20">クマ出没の状況</h2>
-      )}
+      {/* 構成方針（ガイド有りスポット）: クマ出没情報を画面上部に集約する。
+          タイトル直下に状況カード(RiskBanner)→周辺の目撃マップ→LINE 登録 の順で
+          「クマ情報」を1つのまとまりにし、そのあとに観光情報(四季ガイド)を続ける。
+          タイトルと重複する「クマ出没の状況」h2 は置かない（H1 に一本化）。 */}
 
       {/* 危険度ヒーローバナー — /place/[pref]/[muni] と共通の RiskBanner。
           マップへの導線は (1)「周辺の目撃マップ」直下のデスクトップ CTA と
@@ -883,6 +878,26 @@ export default async function SpotPage({ params }: Props) {
         ctaLabel={`${landmark.name} の警戒レベルマップを開く →`}
       />
 
+      {/* ガイド有り: クマ情報のまとまりの締めに LINE 登録を置く（状況→地図→登録）。
+          ここまでで「クマ出没情報」を上部に集約し、この下から観光情報へ切り替える。 */}
+      {showSeasonGuide && (
+        <div className="mt-5">
+          <NotifyBlock
+            target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
+            surface="spot_visitor"
+            pushReleased={isSpotPushReleased()}
+          />
+        </div>
+      )}
+
+      {/* ここから観光情報。四季の楽しみ方（観光）→ 備え・応援（対策グッズ/ふるさと納税）。 */}
+      {showSeasonGuide && (
+        <SpotSeasonGuide
+          data={buildSpotSeasonGuide(landmark, areaDatesAll, month)}
+        />
+      )}
+      {showSeasonGuide && actionBlock}
+
       {/* 最近の出没事案。ガイド有りスポットでは詳しく見る内へ移すので、ここでは
           ガイド無し（通常スポット/フラグOFF）のときだけ本文に表示する。 */}
       {!showSeasonGuide && recentSightingsBlock}
@@ -1083,8 +1098,9 @@ export default async function SpotPage({ params }: Props) {
         </div>
       </details>
 
-      {/* 通知購読 — フッター。高尾山(デモ)は上部「通知で受け取る」に置くため二重を避ける。 */}
-      {!landmark.officialHub && (
+      {/* 通知購読 — フッター。高尾山(デモ)は上部「通知で受け取る」、ガイド有りスポットは
+          上部のクマ情報まとまり内(地図直後)に置くため、ここでは二重を避けて出さない。 */}
+      {!landmark.officialHub && !showSeasonGuide && (
         <NotifyBlock
           target={{ kind: "spot", slug: landmark.slug, name: landmark.name }}
           surface="spot_footer"
