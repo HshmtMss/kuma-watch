@@ -69,7 +69,7 @@ export default function BearGearAffiliate({
 
   return (
     <section
-      className={`rounded-2xl border border-stone-200 bg-white px-4 pb-4 pt-3 ${className}`}
+      className={`not-prose rounded-2xl border border-stone-200 bg-white p-4 ${className}`}
       aria-label="クマ対策グッズ（広告）"
     >
       <div className="mb-1.5 flex items-center gap-2">
