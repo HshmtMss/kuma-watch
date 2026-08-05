@@ -97,6 +97,9 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     seasonImages: {
       spring:
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Flower_%40_Mount_Takao_%289876478304%29.jpg/1280px-Flower_%40_Mount_Takao_%289876478304%29.jpg",
+      // 冬: 高尾山から見た雪の富士山（2025年2月）＝「澄んだ展望」。
+      winter:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Snowy_Mount_Fuji_from_Mount_Takao%2C_February_2025.jpg/1280px-Snowy_Mount_Fuji_from_Mount_Takao%2C_February_2025.jpg",
     },
     scaleNote: "年間約 260 万人が訪れる、世界有数の登山者数を誇る山。",
     areas: [
