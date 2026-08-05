@@ -41,6 +41,9 @@ export type JapanLandmark = {
   imageUrl?: string;
   /** 画像の出典 (Wikipedia 記事タイトル)。クレジット表記に使う。 */
   imageCredit?: string;
+  /** 季節別の写真 URL（四季ガイドの季節カード用）。任意。未指定の季節は
+   *  代表画像 or 季節の色フォールバック。CC 画像を目視確認して入れること。 */
+  seasonImages?: { spring?: string; autumn?: string; winter?: string };
   /** 規模感の補足（年間来訪者数など）。任意・表示用。 */
   scaleNote?: string;
   /** 主要コース・エリア。周辺出没を「どのコースで」まで解像度を上げて集計表示する。
@@ -90,6 +93,11 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
       "東京西部の代表的な観光・登山スポット。年間 260 万人を超えるハイカーが訪れる一方、近年は奥高尾・小仏方面でクマの目撃情報が増加。早朝・夕方の単独行動には注意が必要です。",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mt.takao.jpg/1280px-Mt.takao.jpg",
     imageCredit: "高尾山",
+    // 季節写真（Wikimedia Commons「Mount Takao」より）。※要目視確認・随時差替。
+    seasonImages: {
+      spring:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Flower_%40_Mount_Takao_%289876478304%29.jpg/1280px-Flower_%40_Mount_Takao_%289876478304%29.jpg",
+    },
     scaleNote: "年間約 260 万人が訪れる、世界有数の登山者数を誇る山。",
     areas: [
       { name: "1号路・表参道（薬王院〜山頂）", lat: 35.6253, lon: 139.2436, note: "ケーブルカー・観光客の主動線" },

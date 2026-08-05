@@ -27,6 +27,7 @@ export type SeasonCard = {
   why: string;
   sonae: SonaeLevel;
   popular?: boolean;
+  image?: string; // 季節の写真URL（無ければ色フォールバック）
 };
 
 export type NowTip = {
@@ -162,12 +163,14 @@ export function buildSpotSeasonGuide(
   });
 
   const copy = CARD_COPY[landmark.category] ?? MOUNTAIN_COPY;
+  const si = landmark.seasonImages;
   const cards: SeasonCard[] = [
     {
       key: "spring",
       when: "春 · 4〜5月",
       ...copy.spring,
       sonae: avgSonae(levels, [4, 5]),
+      image: si?.spring,
     },
     {
       key: "autumn",
@@ -175,12 +178,15 @@ export function buildSpotSeasonGuide(
       ...copy.autumn,
       sonae: avgSonae(levels, [10, 11]),
       popular: true,
+      // 秋(一番人気)は季節写真が無ければ代表画像を使う。
+      image: si?.autumn ?? landmark.imageUrl,
     },
     {
       key: "winter",
       when: copy.winterWhen,
       ...copy.winter,
       sonae: avgSonae(levels, [12, 1, 2]),
+      image: si?.winter,
     },
   ];
 

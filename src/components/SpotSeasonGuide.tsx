@@ -89,8 +89,8 @@ export default function SpotSeasonGuide({
       {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"） */}
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {data.cards.map((c) => {
-          // 紅葉(一番人気)のタイルは代表写真を使い、他は季節の色で。
-          const photo = c.popular ? data.imageUrl : undefined;
+          // その季節の写真があれば使い、無ければ季節の色で（春夏秋冬フォールバック）。
+          const photo = c.image;
           return (
             <div
               key={c.key}
