@@ -25,7 +25,8 @@ const METER_ON: Record<SonaeLevel, string> = {
 const SEASON_GRADIENT = {
   spring: "bg-gradient-to-br from-lime-200 via-lime-400 to-emerald-600",
   autumn: "bg-gradient-to-br from-amber-200 via-orange-400 to-orange-700",
-  winter: "bg-gradient-to-br from-slate-200 via-slate-300 to-slate-500",
+  // 冬: 白飛びを避け、空色→濃紺で「澄んだ冬空」を表現。
+  winter: "bg-gradient-to-b from-sky-300 via-slate-400 to-slate-700",
 } as const;
 
 function Meter({ level }: { level: SonaeLevel }) {
@@ -52,38 +53,55 @@ export default function SpotSeasonGuide({
     <section className="not-prose my-6" aria-label="四季の楽しみ方">
       {/* 見出し（テキスト。競合するヒーロー写真は置かない） */}
       <p className="text-[11px] font-bold tracking-wider text-emerald-700">
-        {data.name} · {data.area} · 四季の楽しみ方
+        四季の楽しみ方
       </p>
       <h2 className="mt-1 text-xl font-bold text-stone-900 sm:text-2xl">
         四季の{data.name}を、安心して楽しむ。
       </h2>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600">
-        四季それぞれに見どころがあります。鈴やラジオで存在を知らせ、早朝・夕方の単独行動を
-        避けること。
-        <b className="font-semibold text-stone-800">
-          季節に合ったそなえがあれば、いつ訪れても安心して満喫できます。
-        </b>
-      </p>
 
-      {/* 今の見頃（現場の"旬"）。現在月から動的に。 */}
+      {/* 今の見頃（現場の"旬"）を前面に。現在月から動的に。 */}
       <div
-        className={`mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-bold ${
+        className={`mt-3 flex items-center gap-3.5 rounded-xl border-l-4 px-4 py-3 ${
           data.now.peak === "autumn"
-            ? "border-amber-200 bg-amber-50 text-amber-800"
+            ? "border-amber-500 bg-amber-50"
             : data.now.peak === "spring"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-stone-200 bg-stone-50 text-stone-700"
+              ? "border-emerald-500 bg-emerald-50"
+              : "border-stone-300 bg-stone-50"
         }`}
       >
-        <span className="tabular-nums">今 {data.now.month}月</span>
-        <span className="text-stone-300">·</span>
-        <span>
-          {data.now.peak === "autumn"
-            ? "紅葉が見頃です"
-            : data.now.peak === "spring"
-              ? "新緑が見頃です"
-              : `${data.now.label}の季節`}
-        </span>
+        <div className="shrink-0 text-center leading-none">
+          <div className="text-[9px] font-bold tracking-widest text-stone-400">
+            NOW
+          </div>
+          <div className="mt-0.5 text-2xl font-extrabold tabular-nums text-stone-900">
+            {data.now.month}
+            <span className="text-xs font-bold text-stone-400">月</span>
+          </div>
+        </div>
+        <div className="min-w-0">
+          <div
+            className={`text-[15px] font-bold ${
+              data.now.peak === "autumn"
+                ? "text-amber-800"
+                : data.now.peak === "spring"
+                  ? "text-emerald-800"
+                  : "text-stone-800"
+            }`}
+          >
+            {data.now.peak === "autumn"
+              ? "紅葉が見頃です"
+              : data.now.peak === "spring"
+                ? "新緑が見頃です"
+                : `${data.now.label}を楽しめる季節`}
+          </div>
+          <div className="text-xs leading-relaxed text-stone-500">
+            {data.now.peak === "autumn"
+              ? "一年で最も美しい季節。鈴を持って、色づく山へ。"
+              : data.now.peak === "spring"
+                ? "若葉と花、快適な気候。気持ちのいい季節です。"
+                : "その季節ならではの見どころを楽しめます。"}
+          </div>
+        </div>
       </div>
 
       {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"） */}
