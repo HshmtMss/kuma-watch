@@ -462,6 +462,67 @@ export default async function SpotPage({ params }: Props) {
     process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
     PREBUILD_SPOT_SLUGS.includes(landmark.slug);
 
+  // 最近の出没事案（または出没0件の安全確認）。ガイド有りスポットでは詳しく見る内へ、
+  // 通常スポットでは従来どおり本文に表示する（配置だけ切り替えるため const 化）。
+  const recentSightingsBlock =
+    nearby.length > 0 ? (
+      <>
+        <h2>最近の出没事案</h2>
+        <ul className="not-prose space-y-2">
+          {nearby.slice(0, 12).map((r, i) => {
+            const href = r.cityName
+              ? placeHrefForSighting(landmark.prefName, r.cityName)
+              : null;
+            const body = (
+              <>
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
+                  <span className="text-xs text-stone-500">
+                    {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
+                    {r.sectionName ? ` ${r.sectionName}` : ""}
+                  </span>
+                </div>
+                {r.comment && (
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
+                )}
+              </>
+            );
+            return (
+              <li key={`${r.date}-${i}`}>
+                {href ? (
+                  <Link
+                    href={href}
+                    className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-stone-300 hover:bg-stone-50"
+                  >
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm">
+                    {body}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    ) : (
+      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+        <h2 className="text-base font-bold text-emerald-900">
+          {landmark.name}周辺のクマ出没状況（安全確認）
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-stone-700">
+          {landmark.name}の周辺 10 km では、報道・自治体発表などをもとにした直近 1 年の
+          クマ（熊）の出没・目撃情報の報告は
+          <strong className="font-bold">ありません</strong>。{habitatNote}
+        </p>
+        <p className="mt-2 text-xs text-stone-500">
+          新たな出没・目撃が報告され次第、本ページと地図に反映します。登山・
+          山菜採り・お出かけ前の確認にご活用ください。
+        </p>
+      </div>
+    );
+
   return (
     <PageShell title={`${landmark.name}周辺のクマ出没情報`} lead={dynamicLead}>
       <script
@@ -802,69 +863,9 @@ export default async function SpotPage({ params }: Props) {
         ctaLabel={`${landmark.name} の警戒レベルマップを開く →`}
       />
 
-      {/* 最近の出没事案 — 「最近何があったか」は来訪目的の核なので折りたたまず表示。
-          出没が無いスポットは、代わりに「安全確認」ブロックを出して thin content を回避。 */}
-      {nearby.length > 0 ? (
-        <>
-          <h2>最近の出没事案</h2>
-          <ul className="not-prose space-y-2">
-            {nearby.slice(0, 12).map((r, i) => {
-              const href = r.cityName
-                ? placeHrefForSighting(landmark.prefName, r.cityName)
-                : null;
-              const body = (
-                <>
-                  <div className="flex flex-wrap items-baseline gap-2">
-                    <span className="font-semibold text-stone-900">{formatDate(r.date)}</span>
-                    <span className="text-xs text-stone-500">
-                      {r.distanceKm.toFixed(1)} km / {r.cityName || "—"}
-                      {r.sectionName ? ` ${r.sectionName}` : ""}
-                    </span>
-                  </div>
-                  {r.comment && (
-                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-stone-600">{r.comment}</p>
-                  )}
-                </>
-              );
-              return (
-                <li key={`${r.date}-${i}`}>
-                  {href ? (
-                    <Link
-                      href={href}
-                      className="block rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm transition hover:border-stone-300 hover:bg-stone-50"
-                    >
-                      {body}
-                    </Link>
-                  ) : (
-                    <div className="rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm">
-                      {body}
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      ) : (
-        /* 出没 0 件スポットの「安全確認」ブロック。「◯◯ クマ 大丈夫?」という
-           安全確認意図に本文で明確に応え、県のクマ生息状況を添えて thin content を回避。
-           calm トーン（emerald・危険/警戒の語を使わない）を維持し、市町村ページの
-           0 件ブロックと文体を揃える。 */
-        <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
-          <h2 className="text-base font-bold text-emerald-900">
-            {landmark.name}周辺のクマ出没状況（安全確認）
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-stone-700">
-            {landmark.name}の周辺 10 km では、報道・自治体発表などをもとにした直近 1 年の
-            クマ（熊）の出没・目撃情報の報告は
-            <strong className="font-bold">ありません</strong>。{habitatNote}
-          </p>
-          <p className="mt-2 text-xs text-stone-500">
-            新たな出没・目撃が報告され次第、本ページと地図に反映します。登山・
-            山菜採り・お出かけ前の確認にご活用ください。
-          </p>
-        </div>
-      )}
+      {/* 最近の出没事案。ガイド有りスポットでは詳しく見る内へ移すので、ここでは
+          ガイド無し（通常スポット/フラグOFF）のときだけ本文に表示する。 */}
+      {!showSeasonGuide && recentSightingsBlock}
 
       {/* 季節別アドバイス。四季ガイドを上部に出す場合は重複するのでここは出さない。
           ガイド非表示（通常の観光地/フラグOFF）のときだけ従来の SeasonalAdvice を表示。 */}
@@ -893,6 +894,9 @@ export default async function SpotPage({ params }: Props) {
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
+
+      {/* 最近の出没事案 — ガイド有りスポットではここ(詳しく見る内)に表示。 */}
+      {showSeasonGuide && recentSightingsBlock}
 
       {/* このスポットについて — 皆が知っている前提の紹介文は前面に出さず詳細内へ。
           本文(blurb)はSEOのため残す。分類・緯度経度は一般ユーザに不要。 */}
