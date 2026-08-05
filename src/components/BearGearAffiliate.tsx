@@ -81,6 +81,13 @@ export default function BearGearAffiliate({
         >
           PR
         </span>
+        {/* 対策グッズの一覧(製品アグリゲータ)へ */}
+        <a
+          href="/gear"
+          className="ml-auto shrink-0 text-[11px] font-semibold text-amber-700 hover:underline"
+        >
+          対策グッズ一覧 →
+        </a>
       </div>
       <p className="mb-3 text-xs leading-relaxed text-stone-500">{gear.blurb}</p>
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
