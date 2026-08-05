@@ -524,6 +524,15 @@ export default async function SpotPage({ params }: Props) {
         note={risk.note}
       />
 
+      {/* 四季の楽しみ方ガイド。安全ステータス(リスクバナー)の直下に、ページの
+          主コンテンツ=「観光×安全」の顔として配置（フラグON＋手キュレーション時）。 */}
+      {process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
+        PREBUILD_SPOT_SLUGS.includes(landmark.slug) && (
+          <SpotSeasonGuide
+            data={buildSpotSeasonGuide(landmark, areaDatesAll)}
+          />
+        )}
+
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
           断定でなくバンド + 例年比で提示し、根拠を全部開示する。 */}
@@ -868,13 +877,12 @@ export default async function SpotPage({ params }: Props) {
         </div>
       )}
 
-      {/* 季節別アドバイス。フラグON＋手キュレーション観光地では、写真つきの
-          「四季の楽しみ方」ガイド(SpotSeasonGuide)に格上げして置換する。
-          それ以外は従来の SeasonalAdvice(安全に直結するため常時表示)。 */}
-      {process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
-      PREBUILD_SPOT_SLUGS.includes(landmark.slug) ? (
-        <SpotSeasonGuide data={buildSpotSeasonGuide(landmark, areaDatesAll)} />
-      ) : (
+      {/* 季節別アドバイス。四季ガイドを上部に出す場合は重複するのでここは出さない。
+          ガイド非表示（通常の観光地/フラグOFF）のときだけ従来の SeasonalAdvice を表示。 */}
+      {!(
+        process.env.NEXT_PUBLIC_SPOT_SEASON_GUIDE === "true" &&
+        PREBUILD_SPOT_SLUGS.includes(landmark.slug)
+      ) && (
         <SeasonalAdvice
           season={seasonalAdvice.season}
           point={seasonalAdvice.point}
