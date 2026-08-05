@@ -91,12 +91,28 @@ export default function SpotSeasonGuide({
         {data.cards.map((c) => {
           // その季節の写真があれば使い、無ければ季節の色で（春夏秋冬フォールバック）。
           const photo = c.image;
+          // 現在月がその季節に入っていれば「今の季節」として強調（現場の"今"）。
+          const nowMonths: Record<string, number[]> = {
+            spring: [3, 4, 5],
+            autumn: [9, 10, 11],
+            winter: [12, 1, 2],
+          };
+          const isNow = nowMonths[c.key]?.includes(data.now.month);
           return (
             <div
               key={c.key}
-              className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+              className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${
+                isNow
+                  ? "border-emerald-400 ring-2 ring-emerald-300"
+                  : "border-stone-200"
+              }`}
             >
               <div className="relative h-36">
+                {isNow && (
+                  <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                    今の季節
+                  </span>
+                )}
                 {photo ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
