@@ -508,46 +508,55 @@ export default function KumaMap({
               inBounds[Math.floor((i * inBounds.length) / maxPins)],
             );
       const nowMs = Date.now();
-      for (const r of toRender) {
-        // ピンの色で鮮度を表す: 直近1週間の出没は目立つローズ系の赤 (#e11d48)、
-        // それ以前は一律ダークブラウン (#78350f)。出どころ (公式/報道/市民) の別は
-        // ポップアップのバッジで示す。「直近1週間」= 出没日が RECENT_EVENT_DAYS 日
-        // 以内 (掲載時刻は使わない)。
-        const PIN_OLD = "#78350f";
-        const PIN_RECENT = "#e11d48";
-        const isFresh = isRecentSighting(r, nowMs);
-        const fill = isFresh ? PIN_RECENT : PIN_OLD;
-        const baseR = pinR;
+      // ピンの色で鮮度を表す: 直近1週間=鮮やかなローズ赤 (#e11d48)、それ以前=
+      // ダークブラウン (#78350f)。出どころ (公式/報道/市民) はポップアップのバッジで。
+      //
+      // ★描画順は「古い→直近」の2パス。直近(赤)を後に描くことで必ず上に来て、
+      //   1ヶ月以上表示でピンが密集・重なっても新しい情報が埋もれない(利用者要望
+      //   2026-08)。直近はサイズを他と揃え(近接の古いピンを大きく覆い隠さない)、
+      //   彩度 + 細い白ハロー + 白フチで目立たせる。
+      const PIN_OLD = "#78350f";
+      const PIN_RECENT = "#e11d48";
+      const baseR = pinR;
 
+      const addSightingMarker = (r: KumaRecord, isFresh: boolean) => {
         const openPopup = (e: unknown) => {
           (e as unknown as LeafletMouseEvent).originalEvent?.stopPropagation?.();
           showRecordPopup(L, r);
         };
-
-        // 直近1週間はヒートマップの暖色 (黄橙赤) の上でも埋もれないよう、白いハローを
-        // 背後に敷いてから濃い色ドットを重ね、少し大きめ + 白フチで「光って新しい」印象に。
         if (isFresh) {
+          // 細く薄い白ハロー。ヒートマップの暖色上でも新しさを示すが、近接ピンを
+          // 大きくは覆わない (以前の baseR+3.5 から縮小)。
           const halo: CircleMarker = L.circleMarker([r.lat, r.lon], {
-            radius: baseR + 3.5,
+            radius: baseR + 1.5,
             stroke: false,
             fillColor: "#ffffff",
-            fillOpacity: 0.9,
+            fillOpacity: 0.85,
             renderer: canvas,
           });
           halo.on("click", openPopup);
           halo.addTo(layer);
         }
-
         const marker: CircleMarker = L.circleMarker([r.lat, r.lon], {
-          radius: isFresh ? baseR + 1 : baseR,
+          // サイズは新旧同じ。目立たせるのは色(彩度)と白フチの太さで。
+          radius: baseR,
           color: "#ffffff",
-          weight: borderWeight,
-          fillColor: fill,
-          fillOpacity: isFresh ? 1 : 0.9,
+          weight: isFresh ? borderWeight + 0.4 : borderWeight,
+          fillColor: isFresh ? PIN_RECENT : PIN_OLD,
+          fillOpacity: isFresh ? 1 : 0.85,
           renderer: canvas,
         });
         marker.on("click", openPopup);
         marker.addTo(layer);
+      };
+
+      // 1) 古いピンを先に描く。
+      for (const r of toRender) {
+        if (!isRecentSighting(r, nowMs)) addSightingMarker(r, false);
+      }
+      // 2) 直近1週間を後に描く = 上に重なり、密集しても埋もれない。
+      for (const r of toRender) {
+        if (isRecentSighting(r, nowMs)) addSightingMarker(r, true);
       }
     });
   };
