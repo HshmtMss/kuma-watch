@@ -29,11 +29,18 @@ export type SeasonCard = {
   popular?: boolean;
 };
 
+export type NowTip = {
+  month: number;
+  label: string; // その月の見どころ
+  peak: Peak; // 新緑/紅葉の見頃なら色付け・「見頃！」表示
+};
+
 export type SpotSeasonGuide = {
   name: string;
   area: string; // "東京都八王子市"
   imageUrl?: string;
   imageCredit?: string;
+  now: NowTip; // 現在月の「旬」（現場の今）
   months: MonthCell[];
   cards: SeasonCard[];
   hasBearData: boolean; // 実データが十分か（少なければメーターは控えめ表現に）
@@ -141,6 +148,7 @@ function avgSonae(levels: SonaeLevel[], months: number[]): SonaeLevel {
 export function buildSpotSeasonGuide(
   landmark: JapanLandmark,
   areaDatesAll: string[],
+  currentMonth: number,
 ): SpotSeasonGuide {
   const { levels, enough } = monthlySonae(areaDatesAll);
   const months: MonthCell[] = Array.from({ length: 12 }, (_, i) => {
@@ -176,11 +184,19 @@ export function buildSpotSeasonGuide(
     },
   ];
 
+  const cm = currentMonth >= 1 && currentMonth <= 12 ? currentMonth : 1;
+  const now: NowTip = {
+    month: cm,
+    label: BASE_LABELS[cm],
+    peak: PEAK_OF[cm] ?? "",
+  };
+
   return {
     name: landmark.name,
     area: `${landmark.prefName}${landmark.muniName ?? ""}`,
     imageUrl: landmark.imageUrl,
     imageCredit: landmark.imageCredit,
+    now,
     months,
     cards,
     hasBearData: enough,

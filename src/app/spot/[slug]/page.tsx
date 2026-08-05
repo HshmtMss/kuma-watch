@@ -520,7 +520,9 @@ export default async function SpotPage({ params }: Props) {
       {/* 四季の楽しみ方ガイド。観光(魅せる)を主役にページ先頭へ。安全ステータス
           (リスクバナー)はこの下に静かに置く。 */}
       {showSeasonGuide && (
-        <SpotSeasonGuide data={buildSpotSeasonGuide(landmark, areaDatesAll)} />
+        <SpotSeasonGuide
+          data={buildSpotSeasonGuide(landmark, areaDatesAll, month)}
+        />
       )}
 
       {/* 危険度ヒーローバナー — /place/[pref]/[muni] と共通の RiskBanner。

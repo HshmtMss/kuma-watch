@@ -65,6 +65,27 @@ export default function SpotSeasonGuide({
         </b>
       </p>
 
+      {/* 今の見頃（現場の"旬"）。現在月から動的に。 */}
+      <div
+        className={`mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-bold ${
+          data.now.peak === "autumn"
+            ? "border-amber-200 bg-amber-50 text-amber-800"
+            : data.now.peak === "spring"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-stone-200 bg-stone-50 text-stone-700"
+        }`}
+      >
+        <span className="tabular-nums">今 {data.now.month}月</span>
+        <span className="text-stone-300">·</span>
+        <span>
+          {data.now.peak === "autumn"
+            ? "紅葉が見頃です"
+            : data.now.peak === "spring"
+              ? "新緑が見頃です"
+              : `${data.now.label}の季節`}
+        </span>
+      </div>
+
       {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"） */}
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {data.cards.map((c) => {
@@ -102,18 +123,18 @@ export default function SpotSeasonGuide({
                   </h3>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-3.5 py-2.5">
-                <span className="shrink-0 text-[11px] text-stone-500">
-                  そなえ
-                </span>
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[c.sonae]}`}
-                >
-                  {SONAE_LABEL[c.sonae]}
-                </span>
-                <span className="ml-auto truncate text-[11px] text-stone-400">
+              <div className="px-3.5 py-3">
+                <p className="text-[13px] leading-relaxed text-stone-600">
                   {c.why}
-                </span>
+                </p>
+                <div className="mt-2.5 flex items-center gap-2 text-[11px] text-stone-500">
+                  <span className="shrink-0">そなえ</span>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[c.sonae]}`}
+                  >
+                    {SONAE_LABEL[c.sonae]}
+                  </span>
+                </div>
               </div>
             </div>
           );
@@ -127,10 +148,7 @@ export default function SpotSeasonGuide({
           メーター＝その季節の「そなえの目安」（避ける印ではありません）
         </span>
       </div>
-      <div
-        className="mt-3 grid gap-1.5"
-        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(68px, 1fr))" }}
-      >
+      <div className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-6">
         {data.months.map((mo) => (
           <div
             key={mo.month}
