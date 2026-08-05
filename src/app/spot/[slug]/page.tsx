@@ -785,23 +785,6 @@ export default async function SpotPage({ params }: Props) {
         </section>
       )}
 
-      {/* ランドマーク紹介 — 分類・緯度経度は一般ユーザに不要なため省略。所在のみ表示。 */}
-      <h2>このスポットについて</h2>
-      <p>{landmark.blurb}</p>
-      {landmark.scaleNote && (
-        <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          <Users size={15} aria-hidden />
-          {landmark.scaleNote}
-        </p>
-      )}
-      <p className="not-prose my-3 text-sm text-stone-600">
-        <span className="text-stone-500">所在: </span>
-        <span className="font-semibold text-stone-900">
-          {landmark.prefName}
-          {landmark.muniName ? ` ${landmark.muniName}` : ""}
-        </span>
-      </p>
-
       {/* 周辺の目撃マップ — /place/[pref]/[muni] と共通の SightingsMapBlock。
           観光地は代表地点マーク＋半径10km 円を表示（境界は無し）。 */}
       <SightingsMapBlock
@@ -910,6 +893,24 @@ export default async function SpotPage({ params }: Props) {
           <span aria-hidden className="text-stone-400 transition group-open:rotate-180">▾</span>
         </summary>
         <div className="px-4 pb-2 [&>h2:first-of-type]:mt-2">
+
+      {/* このスポットについて — 皆が知っている前提の紹介文は前面に出さず詳細内へ。
+          本文(blurb)はSEOのため残す。分類・緯度経度は一般ユーザに不要。 */}
+      <h2>このスポットについて</h2>
+      <p>{landmark.blurb}</p>
+      {landmark.scaleNote && (
+        <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+          <Users size={15} aria-hidden />
+          {landmark.scaleNote}
+        </p>
+      )}
+      <p className="not-prose my-3 text-sm text-stone-600">
+        <span className="text-stone-500">所在: </span>
+        <span className="font-semibold text-stone-900">
+          {landmark.prefName}
+          {landmark.muniName ? ` ${landmark.muniName}` : ""}
+        </span>
+      </p>
 
       {/* 統計 */}
       <h2>出没統計</h2>
