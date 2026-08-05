@@ -523,6 +523,19 @@ export default async function SpotPage({ params }: Props) {
       </div>
     );
 
+  // 備え(対策グッズ)・応援(ふるさと納税)。ガイド有りスポットでは観光ガイドの直後へ、
+  // 通常スポットでは従来位置(マップ下)に置く（配置だけ切替）。
+  const actionBlock = (
+    <>
+      <BearGearAffiliate className="mt-4" scene="trail" />
+      <OenCard
+        pref={landmark.prefName}
+        city={landmark.muniName ?? undefined}
+        className="mt-4"
+      />
+    </>
+  );
+
   return (
     <PageShell title={`${landmark.name}周辺のクマ出没情報`} lead={dynamicLead}>
       <script
@@ -584,6 +597,13 @@ export default async function SpotPage({ params }: Props) {
         <SpotSeasonGuide
           data={buildSpotSeasonGuide(landmark, areaDatesAll, month)}
         />
+      )}
+
+      {/* ガイド有りスポット: 観光の直後に「備え・応援」、その下に「クマ出没の状況」
+          （注意/マップ/最近）を1つのまとまりとして集約し、情報の飛び飛びを解消。 */}
+      {showSeasonGuide && actionBlock}
+      {showSeasonGuide && (
+        <h2 className="mt-8 scroll-mt-20">クマ出没の状況</h2>
       )}
 
       {/* 危険度ヒーローバナー — /place/[pref]/[muni] と共通の RiskBanner。
@@ -876,15 +896,9 @@ export default async function SpotPage({ params }: Props) {
         />
       )}
 
-      {/* クマ対策グッズ（Amazon 検索リンク・アフィリエイト、フラグ裏）。対策の補助 */}
-      <BearGearAffiliate className="mt-4" scene="trail" />
-
-      {/* この地域を応援（その市町村のふるさと納税へ送客、フラグ裏）。地域支援の導線 */}
-      <OenCard
-        pref={landmark.prefName}
-        city={landmark.muniName ?? undefined}
-        className="mt-4"
-      />
+      {/* 備え・応援。ガイド有りスポットでは観光直後へ移したので、ここはガイド無し
+          （通常スポット/フラグOFF）のときだけ従来位置に表示する。 */}
+      {!showSeasonGuide && actionBlock}
 
       {/* 詳しく見る — 二次情報はアコーディオンに畳み、情報過多を解消（IA 再設計）。
           一目で要る「今の状況・予測・自治体情報・地図・季節の注意」を上に残し、深掘りは折りたたむ。 */}
