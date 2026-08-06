@@ -21,6 +21,7 @@ import NotifyBlock from "@/components/NotifyBlock";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
 import OenCard from "@/components/OenCard";
 import SpotSeasonGuide from "@/components/SpotSeasonGuide";
+import SpotAccess from "@/components/SpotAccess";
 import { buildSpotSeasonGuide } from "@/lib/spot-season";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
@@ -890,10 +891,19 @@ export default async function SpotPage({ params }: Props) {
         </div>
       )}
 
-      {/* ここから観光情報。四季の楽しみ方（観光）→ 備え・応援（対策グッズ/ふるさと納税）。 */}
+      {/* ここから観光情報。四季の楽しみ方（観光）→ アクセス → 備え・応援。 */}
       {showSeasonGuide && (
         <SpotSeasonGuide
           data={buildSpotSeasonGuide(landmark, areaDatesAll, month)}
+        />
+      )}
+      {/* アクセス（最寄駅・ケーブルカー等）を来訪前に確認しやすいよう前出し。
+          ガイド有りスポットのみ。詳細内の重複は下でガイド時は出さない。 */}
+      {showSeasonGuide && (landmark.access?.length ?? 0) > 0 && (
+        <SpotAccess
+          name={landmark.name}
+          access={landmark.access!}
+          className="mt-5"
         />
       )}
       {showSeasonGuide && actionBlock}
@@ -1036,9 +1046,14 @@ export default async function SpotPage({ params }: Props) {
         (officialLink?.bearUrl ||
           officialLink?.homeUrl ||
           (landmark.officialLinks?.length ?? 0) > 0)) ||
-        (landmark.access?.length ?? 0) > 0) && (
+        // ガイド有りは上部にアクセスを前出し済みなので、詳細内はアクセスで開かない。
+        (!showSeasonGuide && (landmark.access?.length ?? 0) > 0)) && (
         <>
-          <h2>公式情報・アクセス</h2>
+          <h2>
+            {!showSeasonGuide && (landmark.access?.length ?? 0) > 0
+              ? "公式情報・アクセス"
+              : "公式情報"}
+          </h2>
           {/* 公式リンクは showHub 時は上部ハブに集約済みなので、ここでは出さない（重複回避）。 */}
           {!showHub &&
             (officialLink?.bearUrl ||
@@ -1070,7 +1085,7 @@ export default async function SpotPage({ params }: Props) {
               ))}
             </div>
           )}
-          {(landmark.access?.length ?? 0) > 0 && (
+          {!showSeasonGuide && (landmark.access?.length ?? 0) > 0 && (
             <ul className="not-prose my-3 space-y-1.5 text-sm text-stone-700">
               {landmark.access!.map((a) => (
                 <li key={a.label} className="flex flex-wrap gap-x-2">
