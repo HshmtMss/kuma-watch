@@ -179,7 +179,7 @@ export default function SpotSeasonGuide({
       {/* 季節写真の帰属表示（CC ライセンス順守）。ヒーロー figure を隠す代わりに
           ここへ出典をまとめて明示する。 */}
       {data.credits.length > 0 && (
-        <p className="mt-2 text-[10.5px] leading-relaxed text-stone-400">
+        <p className="mt-2 text-[9px] leading-relaxed text-stone-400">
           写真:{" "}
           {data.credits.map((c, i) => (
             <span key={c.source}>
