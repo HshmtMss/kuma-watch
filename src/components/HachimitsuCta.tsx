@@ -27,7 +27,7 @@ export default function HachimitsuCta({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[11px] font-bold tracking-wide text-amber-700">
-          もしもクマに出会ったら
+          クマ対策の合言葉
         </span>
         <span className="block text-[15px] font-black leading-tight text-stone-800">
           合言葉「<span className="text-amber-700">はちみつ</span>、のこさない」

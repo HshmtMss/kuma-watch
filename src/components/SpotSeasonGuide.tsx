@@ -225,7 +225,7 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
           ※ 避ける印ではありません。どの季節も、そなえれば安心して楽しめます。
         </p>
 
-        {/* もしもの合言葉「はちみつ、のこさない」を共通ポップアップで開く（遭遇時の行動）。 */}
+        {/* クマ対策の合言葉「はちみつ、のこさない」を共通ポップアップで開く（予防〜遭遇時）。 */}
         <HachimitsuCta className="mt-3" />
       </div>
 
