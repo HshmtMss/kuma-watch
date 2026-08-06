@@ -16,7 +16,7 @@ export default function HachimitsuCta({
       aria-haspopup="dialog"
       aria-label="クマ対策の合言葉 はちみつ、のこさない を見る"
       onClick={() => window.dispatchEvent(new CustomEvent("open-hachimitsu"))}
-      className={`inline-flex items-center gap-2.5 rounded-full border border-amber-200 bg-amber-100 px-3.5 py-2 transition hover:border-amber-300 hover:bg-amber-200/70 ${className}`}
+      className={`flex w-full items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-100 px-3.5 py-3 text-left transition hover:border-amber-300 hover:bg-amber-200/70 ${className}`}
     >
       <span
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400 text-lg shadow-sm"
