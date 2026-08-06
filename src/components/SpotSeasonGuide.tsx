@@ -6,16 +6,57 @@ import type { SpotSeasonGuide, SonaeLevel } from "@/lib/spot-season";
  * （独立ヒーローは持たない＝ページに馴染ませる）。データは spot-season.ts で生成。
  */
 
-const SONAE_LABEL: Record<SonaeLevel, string> = {
-  1: "軽めでOK",
-  2: "鈴を持って",
-  3: "鈴・ラジオ＋時間帯",
+// そなえの目安(3段階)。名称・色・具体アクション。文言は現代化（ラジオは外す）。
+const SONAE_NAME: Record<SonaeLevel, string> = {
+  1: "軽め",
+  2: "ふつう",
+  3: "しっかり",
 };
-const SONAE_PILL: Record<SonaeLevel, string> = {
-  1: "bg-sky-50 text-sky-700",
-  2: "bg-emerald-50 text-emerald-700",
-  3: "bg-amber-50 text-amber-700",
+const SONAE_TEXT: Record<SonaeLevel, string> = {
+  1: "text-sky-700",
+  2: "text-emerald-700",
+  3: "text-amber-700",
 };
+const SONAE_BAR: Record<SonaeLevel, string> = {
+  1: "bg-sky-400",
+  2: "bg-emerald-500",
+  3: "bg-amber-500",
+};
+const SONAE_DESC: Record<SonaeLevel, string> = {
+  1: "いつもの装備でOK。クマ鈴があるとより安心。",
+  2: "クマ鈴を持ち、音を立てながら歩く。",
+  3: "クマ鈴を鳴らし、声やスマホでこまめに音を出す。早朝・夕方の単独は控える。",
+};
+
+// そなえメーター（3段階のバロメーター）。level まで色付き、残りはグレー。
+function SonaeMeter({ level }: { level: SonaeLevel }) {
+  const heights = [7, 11, 15];
+  return (
+    <span className="inline-flex h-4 items-end gap-[3px]" aria-hidden>
+      {heights.map((h, i) => (
+        <span
+          key={i}
+          className={`w-1.5 rounded-sm ${i < level ? SONAE_BAR[level] : "bg-stone-200"}`}
+          style={{ height: `${h}px` }}
+        />
+      ))}
+    </span>
+  );
+}
+
+// 「そなえ」行（ラベル＋メーター＋段階名）。旬バンドとカードで共用。
+function SonaeRow({ label, level }: { label: string; level: SonaeLevel }) {
+  return (
+    <div className="flex items-center gap-2 text-[11px] text-stone-500">
+      <span className="shrink-0">{label}</span>
+      <SonaeMeter level={level} />
+      <span className={`font-bold ${SONAE_TEXT[level]}`}>
+        {SONAE_NAME[level]}
+      </span>
+    </div>
+  );
+}
+
 // 季節写真が無い場合のフォールバック（季節の色で表現）。
 const SEASON_GRADIENT = {
   spring: "bg-gradient-to-br from-lime-200 via-lime-400 to-emerald-600",
@@ -97,13 +138,8 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
               <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
                 {data.now.description}
               </p>
-              <div className="mt-3 flex items-center gap-2 text-[11px] text-stone-500">
-                <span className="shrink-0">いまのそなえ</span>
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[data.now.sonae]}`}
-                >
-                  {SONAE_LABEL[data.now.sonae]}
-                </span>
+              <div className="mt-3">
+                <SonaeRow label="いまのそなえ" level={data.now.sonae} />
               </div>
             </div>
           </div>
@@ -154,18 +190,39 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
                   <p className="text-[13px] leading-relaxed text-stone-600">
                     {c.why}
                   </p>
-                  <div className="mt-2.5 flex items-center gap-2 text-[11px] text-stone-500">
-                    <span className="shrink-0">そなえ</span>
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[c.sonae]}`}
-                    >
-                      {SONAE_LABEL[c.sonae]}
-                    </span>
+                  <div className="mt-2.5">
+                    <SonaeRow label="そなえ" level={c.sonae} />
                   </div>
                 </div>
               </div>
             );
           })}
+      </div>
+
+      {/* そなえの目安の凡例（3段階の意味を1度だけ説明。避ける印ではないと明示）。 */}
+      <div className="mt-3 rounded-xl border border-stone-200 bg-stone-50/60 p-3.5">
+        <p className="mb-2 text-[11px] font-bold text-stone-500">
+          「そなえ」の目安（周辺の出没の多さから算出）
+        </p>
+        <ul className="space-y-1.5">
+          {([1, 2, 3] as SonaeLevel[]).map((lv) => (
+            <li
+              key={lv}
+              className="flex items-center gap-2.5 text-[11.5px] text-stone-600"
+            >
+              <SonaeMeter level={lv} />
+              <span
+                className={`w-14 shrink-0 whitespace-nowrap font-bold ${SONAE_TEXT[lv]}`}
+              >
+                {SONAE_NAME[lv]}
+              </span>
+              <span className="leading-snug">{SONAE_DESC[lv]}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 text-[10px] leading-snug text-stone-400">
+          ※ 避ける印ではありません。どの季節も、そなえれば安心して楽しめます。
+        </p>
       </div>
 
       {/* 季節写真の帰属表示（CC ライセンス順守）。ヒーロー figure を隠す代わりに
@@ -200,7 +257,7 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
         春の新緑、夏の沢、秋の紅葉、冬の展望——{data.name}
         にはそれぞれの季節に良さがあります。 山ではクマも暮らしていますが、
         <b className="font-semibold">
-          鈴やラジオで音を出し、早朝・夕方の単独行動を控える
+          クマ鈴を鳴らし、声やスマホで音を出し、早朝・夕方の単独行動を控える
         </b>
         ——それだけで、四季それぞれを安心して楽しめます。出会っても走らず、静かに距離を取りましょう。
       </div>
