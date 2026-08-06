@@ -1,11 +1,9 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-
 /**
  * 合言葉「はちみつ、のこさない」を開くCTAボタン。layout.tsx 常設の HachimitsuGuide が
  * open-hachimitsu イベントを受けて共通ポップアップを開く（地図トップの「対策」ボタンと
- * 同じ挙動・同じ内容を再利用）。ハチミツ(琥珀)色の、そなえ欄などに置ける見やすいボタン。
+ * 同じ挙動・同じ内容を再利用）。ロゴ(🍯)＋合言葉のみのコンパクトなハチミツ色ピル。
  */
 export default function HachimitsuCta({
   className = "",
@@ -16,29 +14,19 @@ export default function HachimitsuCta({
     <button
       type="button"
       aria-haspopup="dialog"
+      aria-label="クマ対策の合言葉 はちみつ、のこさない を見る"
       onClick={() => window.dispatchEvent(new CustomEvent("open-hachimitsu"))}
-      className={`group flex w-full items-center justify-center gap-2.5 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-amber-100/50 px-4 py-3 text-center transition hover:border-amber-300 hover:shadow-sm ${className}`}
+      className={`inline-flex items-center gap-2.5 rounded-full border border-amber-200 bg-amber-100 px-3.5 py-2 transition hover:border-amber-300 hover:bg-amber-200/70 ${className}`}
     >
       <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400 text-xl shadow-sm"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400 text-lg shadow-sm"
         aria-hidden
       >
         🍯
       </span>
-      <span>
-        <span className="block text-[11px] font-bold tracking-wide text-amber-700">
-          クマ対策の合言葉
-        </span>
-        <span className="block text-base font-black leading-tight text-stone-800">
-          「<span className="text-amber-700">はちみつ</span>、のこさない」
-        </span>
+      <span className="text-[15px] font-black leading-none text-stone-800">
+        「<span className="text-amber-700">はちみつ</span>、のこさない」
       </span>
-      <ChevronRight
-        size={18}
-        strokeWidth={2.2}
-        className="shrink-0 text-amber-500 transition group-hover:translate-x-0.5"
-        aria-hidden
-      />
     </button>
   );
 }
