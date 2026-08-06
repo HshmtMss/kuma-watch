@@ -30,7 +30,7 @@ export default function HachimitsuCta({
           クマ対策の合言葉
         </span>
         <span className="block text-[15px] font-black leading-tight text-stone-800">
-          合言葉「<span className="text-amber-700">はちみつ</span>、のこさない」
+          「<span className="text-amber-700">はちみつ</span>、のこさない」
         </span>
       </span>
       <ChevronRight
