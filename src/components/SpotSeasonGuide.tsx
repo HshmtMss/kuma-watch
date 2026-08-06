@@ -16,11 +16,6 @@ const SONAE_PILL: Record<SonaeLevel, string> = {
   2: "bg-emerald-50 text-emerald-700",
   3: "bg-amber-50 text-amber-700",
 };
-const METER_ON: Record<SonaeLevel, string> = {
-  1: "bg-sky-400",
-  2: "bg-emerald-500",
-  3: "bg-amber-500",
-};
 // 季節写真が無い場合のフォールバック（季節の色で表現）。
 const SEASON_GRADIENT = {
   spring: "bg-gradient-to-br from-lime-200 via-lime-400 to-emerald-600",
@@ -55,21 +50,6 @@ const NOW_ACCENT: Record<
     badge: "bg-sky-600",
   },
 };
-
-function Meter({ level }: { level: SonaeLevel }) {
-  const heights = [7, 11, 15];
-  return (
-    <div className="flex h-4 items-end gap-[3px]" aria-hidden>
-      {heights.map((h, i) => (
-        <span
-          key={i}
-          className={`w-1.5 rounded-sm ${i < level ? METER_ON[level] : "bg-stone-200"}`}
-          style={{ height: `${h}px` }}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
   return (
@@ -212,66 +192,6 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
           Wikimedia Commons
         </p>
       )}
-
-      {/* 12か月カレンダー（写真なし・情報に徹する） */}
-      <div className="mt-7 flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-base font-bold text-stone-800">12か月の見どころ</h3>
-        <span className="text-[11px] text-stone-400">
-          メーター＝その季節の「そなえの目安」（避ける印ではありません）
-        </span>
-      </div>
-      <div className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-4 lg:grid-cols-6">
-        {data.months.map((mo) => (
-          <div
-            key={mo.month}
-            className={`relative flex flex-col items-center gap-2 rounded-xl border p-2.5 pt-3 ${
-              mo.peak === "spring"
-                ? "border-emerald-200 bg-emerald-50/60"
-                : mo.peak === "autumn"
-                  ? "border-amber-200 bg-amber-50/70"
-                  : "border-stone-200 bg-white"
-            }`}
-          >
-            <div className="text-lg font-bold tabular-nums text-stone-900">
-              {mo.month}
-              <span className="text-[11px] font-medium text-stone-400">月</span>
-            </div>
-            <div
-              className={`flex min-h-[2.4em] items-center text-center text-[10.5px] leading-tight ${
-                mo.peak === "spring"
-                  ? "font-bold text-emerald-700"
-                  : mo.peak === "autumn"
-                    ? "font-bold text-amber-700"
-                    : "text-stone-600"
-              }`}
-            >
-              {mo.label}
-            </div>
-            <Meter level={mo.sonae} />
-            <div className="text-[9.5px] text-stone-400">そなえ</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11.5px] text-stone-500">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-4 rounded-sm bg-emerald-500" />
-          新緑・見頃
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-4 rounded-sm bg-amber-500" />
-          紅葉・見頃
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          そなえの目安
-          <span className="inline-flex items-end gap-[2px]">
-            <span className="inline-block h-1 w-1 rounded-sm bg-sky-400" />
-            <span className="inline-block h-2 w-1 rounded-sm bg-emerald-500" />
-            <span className="inline-block h-3 w-1 rounded-sm bg-amber-500" />
-          </span>
-          軽め → しっかり
-        </span>
-      </div>
 
       <div className="mt-5 rounded-xl border border-emerald-200/70 bg-emerald-50/70 p-4 text-[13px] leading-relaxed text-stone-700">
         <b className="font-semibold text-emerald-700">

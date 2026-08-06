@@ -13,13 +13,6 @@ import type { JapanLandmark } from "@/data/japan-landmarks";
 export type SonaeLevel = 1 | 2 | 3; // 1=軽め / 2=鈴を / 3=しっかり
 export type Peak = "spring" | "autumn" | "";
 
-export type MonthCell = {
-  month: number; // 1..12
-  label: string; // 見どころの一言
-  peak: Peak; // 見頃（新緑/紅葉）で色付け
-  sonae: SonaeLevel; // その月のそなえの目安（実データ由来）
-};
-
 export type SeasonCard = {
   key: "spring" | "summer" | "autumn" | "winter";
   when: string; // "春 · 4〜5月"
@@ -83,26 +76,9 @@ export type SpotSeasonGuide = {
   imageUrl?: string;
   imageCredit?: string;
   now: NowTip; // 現在月の「旬」（現場の今）
-  months: MonthCell[];
   cards: SeasonCard[];
   credits: ImageCredit[]; // 季節写真の帰属表示（CC ライセンス順守）
   hasBearData: boolean; // 実データが十分か（少なければメーターは控えめ表現に）
-};
-
-// 見どころの一言（自然地共通の基調。category で一部だけ差し替える）。
-const BASE_LABELS: Record<number, string> = {
-  1: "冬晴れ・展望",
-  2: "梅・静けさ",
-  3: "芽吹き",
-  4: "桜・新緑",
-  5: "新緑・快適",
-  6: "あじさい",
-  7: "沢・涼",
-  8: "夏山",
-  9: "初秋",
-  10: "紅葉はじめ",
-  11: "紅葉ピーク",
-  12: "冬枯れ・展望",
 };
 
 // category ごとの季節カードの見出し・説明（新緑・紅葉は共通の主役）。
@@ -117,44 +93,104 @@ type CategoryCopy = {
 };
 // mountain は必ず存在する既定（フォールバック）。
 const MOUNTAIN_COPY: CategoryCopy = {
-  spring: { title: "新緑と桜", why: "芽吹きの若葉と澄んだ空気。気候が最も快適な季節。" },
-  summer: { title: "沢と新緑", why: "沢沿いは涼やか。深い緑の中を歩ける避暑の季節。" },
-  autumn: { title: "紅葉の絶景", why: "一年で最も美しい季節。錦に染まる山を歩く。" },
-  winter: { title: "澄んだ展望", why: "空気が澄み、遠くの山並みまで見渡せる静かな山歩き。" },
+  spring: {
+    title: "新緑と桜",
+    why: "芽吹きの若葉と澄んだ空気。気候が最も快適な季節。",
+  },
+  summer: {
+    title: "沢と新緑",
+    why: "沢沿いは涼やか。深い緑の中を歩ける避暑の季節。",
+  },
+  autumn: {
+    title: "紅葉の絶景",
+    why: "一年で最も美しい季節。錦に染まる山を歩く。",
+  },
+  winter: {
+    title: "澄んだ展望",
+    why: "空気が澄み、遠くの山並みまで見渡せる静かな山歩き。",
+  },
   summerWhen: "夏 · 7〜8月",
   winterWhen: "冬 · 12〜2月",
 };
 const CARD_COPY: Partial<Record<JapanLandmark["category"], CategoryCopy>> = {
   mountain: MOUNTAIN_COPY,
   lake: {
-    spring: { title: "新緑の湖畔", why: "若葉に囲まれた水辺の散策。空気が澄んで快適。" },
-    summer: { title: "水辺の涼", why: "湖面をわたる風が涼やか。緑に囲まれた水辺の避暑。" },
-    autumn: { title: "紅葉と水鏡", why: "湖面に映る紅葉が見頃。一年で最も華やぐ季節。" },
-    winter: { title: "静寂の湖", why: "人が少なく、澄んだ空気と静けさを楽しめる。" },
+    spring: {
+      title: "新緑の湖畔",
+      why: "若葉に囲まれた水辺の散策。空気が澄んで快適。",
+    },
+    summer: {
+      title: "水辺の涼",
+      why: "湖面をわたる風が涼やか。緑に囲まれた水辺の避暑。",
+    },
+    autumn: {
+      title: "紅葉と水鏡",
+      why: "湖面に映る紅葉が見頃。一年で最も華やぐ季節。",
+    },
+    winter: {
+      title: "静寂の湖",
+      why: "人が少なく、澄んだ空気と静けさを楽しめる。",
+    },
     summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   waterfall: {
-    spring: { title: "新緑と清流", why: "若葉と水音が心地よい。水量も安定して見応え十分。" },
-    summer: { title: "滝と涼", why: "水しぶきと木陰が涼やか。一年で最も気持ちのいい季節。" },
-    autumn: { title: "紅葉と滝", why: "色づく木々と滝の共演。写真映えする名シーズン。" },
-    winter: { title: "澄んだ滝景", why: "空気が澄み、人の少ない静かな滝めぐり。" },
+    spring: {
+      title: "新緑と清流",
+      why: "若葉と水音が心地よい。水量も安定して見応え十分。",
+    },
+    summer: {
+      title: "滝と涼",
+      why: "水しぶきと木陰が涼やか。一年で最も気持ちのいい季節。",
+    },
+    autumn: {
+      title: "紅葉と滝",
+      why: "色づく木々と滝の共演。写真映えする名シーズン。",
+    },
+    winter: {
+      title: "澄んだ滝景",
+      why: "空気が澄み、人の少ない静かな滝めぐり。",
+    },
     summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   onsen: {
-    spring: { title: "新緑の湯めぐり", why: "若葉に包まれた露天。過ごしやすい気候。" },
-    summer: { title: "新緑の露天", why: "深い緑を眺める湯浴み。涼を求めての湯めぐり。" },
-    autumn: { title: "紅葉の露天風呂", why: "色づく山を眺める湯浴み。人気の季節。" },
-    winter: { title: "雪見と温泉", why: "澄んだ空気と、あたたかい湯。冬ならではの贅沢。" },
+    spring: {
+      title: "新緑の湯めぐり",
+      why: "若葉に包まれた露天。過ごしやすい気候。",
+    },
+    summer: {
+      title: "新緑の露天",
+      why: "深い緑を眺める湯浴み。涼を求めての湯めぐり。",
+    },
+    autumn: {
+      title: "紅葉の露天風呂",
+      why: "色づく山を眺める湯浴み。人気の季節。",
+    },
+    winter: {
+      title: "雪見と温泉",
+      why: "澄んだ空気と、あたたかい湯。冬ならではの贅沢。",
+    },
     summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   sightseeing: {
-    spring: { title: "桜と新緑", why: "花と若葉が彩る、一年で最も心地よい季節。" },
-    summer: { title: "緑と夏祭り", why: "深い緑と夏の風情。木陰を歩く涼やかな散策。" },
-    autumn: { title: "紅葉の彩り", why: "街道や境内が色づく、写真映えの名シーズン。" },
-    winter: { title: "澄んだ冬景色", why: "人が少なく静か。澄んだ空気の中をゆっくり歩ける。" },
+    spring: {
+      title: "桜と新緑",
+      why: "花と若葉が彩る、一年で最も心地よい季節。",
+    },
+    summer: {
+      title: "緑と夏祭り",
+      why: "深い緑と夏の風情。木陰を歩く涼やかな散策。",
+    },
+    autumn: {
+      title: "紅葉の彩り",
+      why: "街道や境内が色づく、写真映えの名シーズン。",
+    },
+    winter: {
+      title: "澄んだ冬景色",
+      why: "人が少なく静か。澄んだ空気の中をゆっくり歩ける。",
+    },
     summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
@@ -206,15 +242,6 @@ export function buildSpotSeasonGuide(
   currentMonth: number,
 ): SpotSeasonGuide {
   const { levels, enough } = monthlySonae(areaDatesAll);
-  const months: MonthCell[] = Array.from({ length: 12 }, (_, i) => {
-    const m = i + 1;
-    return {
-      month: m,
-      label: BASE_LABELS[m],
-      peak: PEAK_OF[m] ?? "",
-      sonae: levels[i],
-    };
-  });
 
   const copy = CARD_COPY[landmark.category] ?? MOUNTAIN_COPY;
   const si = landmark.seasonImages;
@@ -273,7 +300,6 @@ export function buildSpotSeasonGuide(
     imageUrl: landmark.imageUrl,
     imageCredit: landmark.imageCredit,
     now,
-    months,
     cards,
     credits: landmark.seasonImageCredits ?? [],
     hasBearData: enough,
