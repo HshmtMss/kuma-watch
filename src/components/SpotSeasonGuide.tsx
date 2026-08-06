@@ -34,10 +34,26 @@ const NOW_ACCENT: Record<
   "spring" | "summer" | "autumn" | "winter",
   { border: string; text: string; badge: string }
 > = {
-  spring: { border: "border-emerald-500", text: "text-emerald-800", badge: "bg-emerald-600" },
-  summer: { border: "border-teal-500", text: "text-teal-800", badge: "bg-teal-600" },
-  autumn: { border: "border-amber-500", text: "text-amber-800", badge: "bg-amber-600" },
-  winter: { border: "border-sky-500", text: "text-sky-800", badge: "bg-sky-600" },
+  spring: {
+    border: "border-emerald-500",
+    text: "text-emerald-800",
+    badge: "bg-emerald-600",
+  },
+  summer: {
+    border: "border-teal-500",
+    text: "text-teal-800",
+    badge: "bg-teal-600",
+  },
+  autumn: {
+    border: "border-amber-500",
+    text: "text-amber-800",
+    badge: "bg-amber-600",
+  },
+  winter: {
+    border: "border-sky-500",
+    text: "text-sky-800",
+    badge: "bg-sky-600",
+  },
 };
 
 function Meter({ level }: { level: SonaeLevel }) {
@@ -55,11 +71,7 @@ function Meter({ level }: { level: SonaeLevel }) {
   );
 }
 
-export default function SpotSeasonGuide({
-  data,
-}: {
-  data: SpotSeasonGuide;
-}) {
+export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
   return (
     <section className="not-prose my-6" aria-label="四季の楽しみ方">
       {/* 見出しは1つに集約（上に本文が多いので簡潔に） */}
@@ -105,76 +117,75 @@ export default function SpotSeasonGuide({
               <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
                 {data.now.description}
               </p>
+              <div className="mt-3 flex items-center gap-2 text-[11px] text-stone-500">
+                <span className="shrink-0">いまのそなえ</span>
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[data.now.sonae]}`}
+                >
+                  {SONAE_LABEL[data.now.sonae]}
+                </span>
+              </div>
             </div>
           </div>
         );
       })()}
 
-      {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"）。春夏秋冬の4枚。 */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {data.cards.map((c) => {
-          // その季節の写真があれば使い、無ければ季節の色で（春夏秋冬フォールバック）。
-          const photo = c.image;
-          // 現在月がその季節に入っていれば「今の季節」として強調（現場の"今"）。
-          const nowMonths: Record<string, number[]> = {
-            spring: [3, 4, 5],
-            summer: [6, 7, 8],
-            autumn: [9, 10, 11],
-            winter: [12, 1, 2],
-          };
-          const isNow = nowMonths[c.key]?.includes(data.now.month);
-          return (
-            <div
-              key={c.key}
-              className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${
-                isNow
-                  ? "border-emerald-400 ring-2 ring-emerald-300"
-                  : "border-stone-200"
-              }`}
-            >
-              <div className="relative h-36">
-                {isNow && (
-                  <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-                    今の季節
-                  </span>
-                )}
-                {photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={photo}
-                    alt={`${data.name}（${c.title}）`}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className={`h-full w-full ${SEASON_GRADIENT[c.key]}`} />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-3">
-                  <p className="text-[11px] font-bold tracking-wide text-white/90 drop-shadow">
-                    {c.when}
+      {/* 現在の季節は上の「いまの旬」で主役として見せるので、ここでは重複を避けて
+          "ほかの季節"だけを出す（各季節は1回だけ登場）。 */}
+      <p className="mt-6 text-[13px] font-bold text-stone-700">
+        ほかの季節も、それぞれに。
+      </p>
+      <div className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {data.cards
+          .filter((c) => c.key !== data.now.season)
+          .map((c) => {
+            // その季節の写真があれば使い、無ければ季節の色で（春夏秋冬フォールバック）。
+            const photo = c.image;
+            return (
+              <div
+                key={c.key}
+                className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+              >
+                <div className="relative h-36">
+                  {photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={photo}
+                      alt={`${data.name}（${c.title}）`}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`h-full w-full ${SEASON_GRADIENT[c.key]}`}
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-3">
+                    <p className="text-[11px] font-bold tracking-wide text-white/90 drop-shadow">
+                      {c.when}
+                    </p>
+                    <h3 className="text-lg font-bold leading-tight text-white drop-shadow-lg">
+                      {c.title}
+                    </h3>
+                  </div>
+                </div>
+                <div className="px-3.5 py-3">
+                  <p className="text-[13px] leading-relaxed text-stone-600">
+                    {c.why}
                   </p>
-                  <h3 className="text-lg font-bold leading-tight text-white drop-shadow-lg">
-                    {c.title}
-                  </h3>
+                  <div className="mt-2.5 flex items-center gap-2 text-[11px] text-stone-500">
+                    <span className="shrink-0">そなえ</span>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[c.sonae]}`}
+                    >
+                      {SONAE_LABEL[c.sonae]}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="px-3.5 py-3">
-                <p className="text-[13px] leading-relaxed text-stone-600">
-                  {c.why}
-                </p>
-                <div className="mt-2.5 flex items-center gap-2 text-[11px] text-stone-500">
-                  <span className="shrink-0">そなえ</span>
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${SONAE_PILL[c.sonae]}`}
-                  >
-                    {SONAE_LABEL[c.sonae]}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* 季節写真の帰属表示（CC ライセンス順守）。ヒーロー figure を隠す代わりに
@@ -266,8 +277,8 @@ export default function SpotSeasonGuide({
         <b className="font-semibold text-emerald-700">
           どの季節も、安心して楽しめます。
         </b>{" "}
-        春の新緑、夏の沢、秋の紅葉、冬の展望——{data.name}にはそれぞれの季節に良さがあります。
-        山ではクマも暮らしていますが、
+        春の新緑、夏の沢、秋の紅葉、冬の展望——{data.name}
+        にはそれぞれの季節に良さがあります。 山ではクマも暮らしていますが、
         <b className="font-semibold">
           鈴やラジオで音を出し、早朝・夕方の単独行動を控える
         </b>
@@ -276,7 +287,8 @@ export default function SpotSeasonGuide({
 
       {!data.hasBearData && (
         <p className="mt-2 text-[11px] text-stone-400">
-          ※ 周辺の出没データが少ないため、「そなえの目安」は一般的な季節傾向で表示しています。
+          ※
+          周辺の出没データが少ないため、「そなえの目安」は一般的な季節傾向で表示しています。
         </p>
       )}
     </section>

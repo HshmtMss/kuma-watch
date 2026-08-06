@@ -38,6 +38,7 @@ export type NowTip = {
   description: string; // 現場の"旬"の解説（1〜2文）
   image?: string; // 現在の季節の写真（無ければ代表画像）
   peak: Peak; // 見頃(新緑/紅葉)の色付け用
+  sonae: SonaeLevel; // 今月のそなえの目安（実データ由来）
 };
 
 function seasonOf(m: number): Season4 {
@@ -263,6 +264,7 @@ export function buildSpotSeasonGuide(
     ...NOW_COPY[nowSeason],
     image: nowImage,
     peak: PEAK_OF[cm] ?? "",
+    sonae: levels[cm - 1],
   };
 
   return {
