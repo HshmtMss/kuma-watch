@@ -1,4 +1,5 @@
 import type { SpotSeasonGuide, SonaeLevel } from "@/lib/spot-season";
+import HachimitsuCta from "@/components/HachimitsuCta";
 
 /**
  * 観光地ページ「四季の楽しみ方」ブロック。観光(魅せる)を主役に、クマ情報は
@@ -223,6 +224,9 @@ export default function SpotSeasonGuide({ data }: { data: SpotSeasonGuide }) {
         <p className="mt-2 text-[10px] leading-snug text-stone-400">
           ※ 避ける印ではありません。どの季節も、そなえれば安心して楽しめます。
         </p>
+
+        {/* もしもの合言葉「はちみつ、のこさない」を共通ポップアップで開く（遭遇時の行動）。 */}
+        <HachimitsuCta className="mt-3" />
       </div>
 
       {/* 季節写真の帰属表示（CC ライセンス順守）。ヒーロー figure を隠す代わりに
