@@ -69,6 +69,13 @@ const NOW_COPY: Record<Season4, { headline: string; description: string }> = {
   },
 };
 
+export type ImageCredit = {
+  label?: string;
+  by: string;
+  license: string;
+  source: string;
+};
+
 export type SpotSeasonGuide = {
   name: string;
   area: string; // "東京都八王子市"
@@ -77,6 +84,7 @@ export type SpotSeasonGuide = {
   now: NowTip; // 現在月の「旬」（現場の今）
   months: MonthCell[];
   cards: SeasonCard[];
+  credits: ImageCredit[]; // 季節写真の帰属表示（CC ライセンス順守）
   hasBearData: boolean; // 実データが十分か（少なければメーターは控えめ表現に）
 };
 
@@ -246,6 +254,7 @@ export function buildSpotSeasonGuide(
     now,
     months,
     cards,
+    credits: landmark.seasonImageCredits ?? [],
     hasBearData: enough,
   };
 }

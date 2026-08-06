@@ -44,6 +44,9 @@ export type JapanLandmark = {
   /** 季節別の写真 URL（四季ガイドの季節カード用）。任意。未指定の季節は
    *  代表画像 or 季節の色フォールバック。CC 画像を目視確認して入れること。 */
   seasonImages?: { spring?: string; summer?: string; autumn?: string; winter?: string };
+  /** 季節ギャラリーで表示するCC画像の帰属表示（作者・ライセンス・出典ファイルページ）。
+   *  CC BY-SA 等は帰属必須のため、ガイド表示時はギャラリー下にまとめて出す。 */
+  seasonImageCredits?: { label?: string; by: string; license: string; source: string }[];
   /** 規模感の補足（年間来訪者数など）。任意・表示用。 */
   scaleNote?: string;
   /** 主要コース・エリア。周辺出没を「どのコースで」まで解像度を上げて集計表示する。
@@ -97,10 +100,20 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     seasonImages: {
       spring:
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Flower_%40_Mount_Takao_%289876478304%29.jpg/1280px-Flower_%40_Mount_Takao_%289876478304%29.jpg",
+      // 秋: 高尾山薬王院の紅葉。「紅葉の絶景」カード用（従来は代表画像の流用だった）。
+      autumn:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg/1280px-%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg",
       // 冬: 高尾山から見た雪の富士山（2025年2月）＝「澄んだ展望」。
       winter:
         "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Snowy_Mount_Fuji_from_Mount_Takao%2C_February_2025.jpg/1280px-Snowy_Mount_Fuji_from_Mount_Takao%2C_February_2025.jpg",
     },
+    // 季節ギャラリーで表示するCC画像の帰属表示（ライセンス順守。作者・ライセンス・出典）。
+    seasonImageCredits: [
+      { label: "春", by: "Guilhem Vellut", license: "CC BY 2.0", source: "https://commons.wikimedia.org/wiki/File:Flower_@_Mount_Takao_(9876478304).jpg" },
+      { label: "夏", by: "Ans jpn", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Mt.takao.jpg" },
+      { label: "秋", by: "Hotate Chan", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg" },
+      { label: "冬", by: "Syced", license: "CC0", source: "https://commons.wikimedia.org/wiki/File:Snowy_Mount_Fuji_from_Mount_Takao,_February_2025.jpg" },
+    ],
     scaleNote: "年間約 260 万人が訪れる、世界有数の登山者数を誇る山。",
     areas: [
       { name: "1号路・表参道（薬王院〜山頂）", lat: 35.6253, lon: 139.2436, note: "ケーブルカー・観光客の主動線" },

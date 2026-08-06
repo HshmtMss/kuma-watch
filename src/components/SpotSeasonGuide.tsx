@@ -176,6 +176,31 @@ export default function SpotSeasonGuide({
         })}
       </div>
 
+      {/* 季節写真の帰属表示（CC ライセンス順守）。ヒーロー figure を隠す代わりに
+          ここへ出典をまとめて明示する。 */}
+      {data.credits.length > 0 && (
+        <p className="mt-2 text-[10.5px] leading-relaxed text-stone-400">
+          写真:{" "}
+          {data.credits.map((c, i) => (
+            <span key={c.source}>
+              {i > 0 && <span className="text-stone-300"> ・ </span>}
+              {c.label && <span>{c.label} </span>}
+              <a
+                href={c.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-stone-600 hover:underline"
+              >
+                {c.by}
+              </a>
+              <span>（{c.license}）</span>
+            </span>
+          ))}
+          <span className="text-stone-300"> / </span>
+          Wikimedia Commons
+        </p>
+      )}
+
       {/* 12か月カレンダー（写真なし・情報に徹する） */}
       <div className="mt-7 flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-base font-bold text-stone-800">12か月の見どころ</h3>
