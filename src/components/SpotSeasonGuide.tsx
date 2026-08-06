@@ -110,14 +110,15 @@ export default function SpotSeasonGuide({
         );
       })()}
 
-      {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"） */}
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {/* 季節ギャラリー（写真つきタイル＝このブロックの"顔"）。春夏秋冬の4枚。 */}
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {data.cards.map((c) => {
           // その季節の写真があれば使い、無ければ季節の色で（春夏秋冬フォールバック）。
           const photo = c.image;
           // 現在月がその季節に入っていれば「今の季節」として強調（現場の"今"）。
           const nowMonths: Record<string, number[]> = {
             spring: [3, 4, 5],
+            summer: [6, 7, 8],
             autumn: [9, 10, 11],
             winter: [12, 1, 2],
           };

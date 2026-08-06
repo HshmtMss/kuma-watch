@@ -100,6 +100,9 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     seasonImages: {
       spring:
         "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Flower_%40_Mount_Takao_%289876478304%29.jpg/1280px-Flower_%40_Mount_Takao_%289876478304%29.jpg",
+      // 夏: 6号路（琵琶滝の沢沿い）の緑の登山道。「沢と新緑」カード＝夏の旬用。
+      summer:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Trail_6_%40_Mount_Takao_%2812932069145%29.jpg/1280px-Trail_6_%40_Mount_Takao_%2812932069145%29.jpg",
       // 秋: 高尾山薬王院の紅葉。「紅葉の絶景」カード用（従来は代表画像の流用だった）。
       autumn:
         "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg/1280px-%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg",
@@ -110,7 +113,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
     // 季節ギャラリーで表示するCC画像の帰属表示（ライセンス順守。作者・ライセンス・出典）。
     seasonImageCredits: [
       { label: "春", by: "Guilhem Vellut", license: "CC BY 2.0", source: "https://commons.wikimedia.org/wiki/File:Flower_@_Mount_Takao_(9876478304).jpg" },
-      { label: "夏", by: "Ans jpn", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:Mt.takao.jpg" },
+      { label: "夏", by: "Guilhem Vellut", license: "CC BY 2.0", source: "https://commons.wikimedia.org/wiki/File:Trail_6_@_Mount_Takao_(12932069145).jpg" },
       { label: "秋", by: "Hotate Chan", license: "CC BY-SA 3.0", source: "https://commons.wikimedia.org/wiki/File:%E8%96%AC%E7%8E%8B%E9%99%A2%E3%81%AE%E7%B4%85%E8%91%89_-_panoramio.jpg" },
       { label: "冬", by: "Syced", license: "CC0", source: "https://commons.wikimedia.org/wiki/File:Snowy_Mount_Fuji_from_Mount_Takao,_February_2025.jpg" },
     ],

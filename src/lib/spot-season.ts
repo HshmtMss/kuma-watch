@@ -21,7 +21,7 @@ export type MonthCell = {
 };
 
 export type SeasonCard = {
-  key: "spring" | "autumn" | "winter";
+  key: "spring" | "summer" | "autumn" | "winter";
   when: string; // "春 · 4〜5月"
   title: string; // "新緑と桜"
   why: string;
@@ -108,41 +108,53 @@ const BASE_LABELS: Record<number, string> = {
 type CardCopy = { title: string; why: string };
 type CategoryCopy = {
   spring: CardCopy;
+  summer: CardCopy;
   autumn: CardCopy;
   winter: CardCopy;
+  summerWhen: string;
   winterWhen: string;
 };
 // mountain は必ず存在する既定（フォールバック）。
 const MOUNTAIN_COPY: CategoryCopy = {
   spring: { title: "新緑と桜", why: "芽吹きの若葉と澄んだ空気。気候が最も快適な季節。" },
+  summer: { title: "沢と新緑", why: "沢沿いは涼やか。深い緑の中を歩ける避暑の季節。" },
   autumn: { title: "紅葉の絶景", why: "一年で最も美しい季節。錦に染まる山を歩く。" },
   winter: { title: "澄んだ展望", why: "空気が澄み、遠くの山並みまで見渡せる静かな山歩き。" },
+  summerWhen: "夏 · 7〜8月",
   winterWhen: "冬 · 12〜2月",
 };
 const CARD_COPY: Partial<Record<JapanLandmark["category"], CategoryCopy>> = {
   mountain: MOUNTAIN_COPY,
   lake: {
     spring: { title: "新緑の湖畔", why: "若葉に囲まれた水辺の散策。空気が澄んで快適。" },
+    summer: { title: "水辺の涼", why: "湖面をわたる風が涼やか。緑に囲まれた水辺の避暑。" },
     autumn: { title: "紅葉と水鏡", why: "湖面に映る紅葉が見頃。一年で最も華やぐ季節。" },
     winter: { title: "静寂の湖", why: "人が少なく、澄んだ空気と静けさを楽しめる。" },
+    summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   waterfall: {
     spring: { title: "新緑と清流", why: "若葉と水音が心地よい。水量も安定して見応え十分。" },
+    summer: { title: "滝と涼", why: "水しぶきと木陰が涼やか。一年で最も気持ちのいい季節。" },
     autumn: { title: "紅葉と滝", why: "色づく木々と滝の共演。写真映えする名シーズン。" },
     winter: { title: "澄んだ滝景", why: "空気が澄み、人の少ない静かな滝めぐり。" },
+    summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   onsen: {
     spring: { title: "新緑の湯めぐり", why: "若葉に包まれた露天。過ごしやすい気候。" },
-    autumn: { title: "紅葉の露天風呂", why: "色づく山を眺める湯浴み。一番人気の季節。" },
+    summer: { title: "新緑の露天", why: "深い緑を眺める湯浴み。涼を求めての湯めぐり。" },
+    autumn: { title: "紅葉の露天風呂", why: "色づく山を眺める湯浴み。人気の季節。" },
     winter: { title: "雪見と温泉", why: "澄んだ空気と、あたたかい湯。冬ならではの贅沢。" },
+    summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
   sightseeing: {
     spring: { title: "桜と新緑", why: "花と若葉が彩る、一年で最も心地よい季節。" },
+    summer: { title: "緑と夏祭り", why: "深い緑と夏の風情。木陰を歩く涼やかな散策。" },
     autumn: { title: "紅葉の彩り", why: "街道や境内が色づく、写真映えの名シーズン。" },
     winter: { title: "澄んだ冬景色", why: "人が少なく静か。澄んだ空気の中をゆっくり歩ける。" },
+    summerWhen: "夏 · 7〜8月",
     winterWhen: "冬 · 12〜2月",
   },
 };
@@ -212,6 +224,13 @@ export function buildSpotSeasonGuide(
       ...copy.spring,
       sonae: avgSonae(levels, [4, 5]),
       image: si?.spring,
+    },
+    {
+      key: "summer",
+      when: copy.summerWhen,
+      ...copy.summer,
+      sonae: avgSonae(levels, [7, 8]),
+      image: si?.summer,
     },
     {
       key: "autumn",
