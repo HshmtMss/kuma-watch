@@ -532,30 +532,57 @@ function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
   );
 }
 
+// 進行中のロードを 1 本に束ねるための in-flight プロミス。
+// これが無いと、デプロイ直後(全ページ cold)にクローラ等が多数の生成スポットを
+// 叩いた際、1 インスタンス内で 22MB のスナップショット取得 + 全件 dedup が
+// 並列に何本も走り、メモリ超過/タイムアウトで関数がクラッシュ(5xx)する。
+let inFlight: Promise<UnifiedSighting[]> | null = null;
+
+/** キャッシュ未ヒット時の実ロード。ディスク → 同梱/GitHub → 実集約 の順。 */
+async function loadFreshSightings(): Promise<UnifiedSighting[]> {
+  const disk = readDiskCache();
+  if (disk && disk.records.length > 0) return cleanAndDedupe(disk.records);
+  const bundled = await readBundledSnapshot();
+  if (bundled && bundled.length > 0) return cleanAndDedupe(bundled);
+  return cleanAndDedupe(await aggregateAllSightings());
+}
+
+/** 同時実行を 1 本に束ねるロード。完了時に memCache を更新する。 */
+function refreshSightings(): Promise<UnifiedSighting[]> {
+  if (!inFlight) {
+    inFlight = loadFreshSightings()
+      .then((records) => {
+        memCache = { records, loadedAt: Date.now() };
+        return records;
+      })
+      .finally(() => {
+        inFlight = null;
+      });
+  }
+  return inFlight;
+}
+
 export async function getCachedSightings(): Promise<UnifiedSighting[]> {
-  if (memCache && Date.now() - memCache.loadedAt < MEM_CACHE_TTL_MS) {
+  const age = memCache ? Date.now() - memCache.loadedAt : Infinity;
+  // 新鮮ならそのまま返す。
+  if (memCache && age < MEM_CACHE_TTL_MS) return memCache.records;
+  // stale: バックグラウンドで更新しつつ即座に stale を返す
+  // (再ロードでリクエストを止めない・並列再ロードを起こさない)。
+  if (memCache) {
+    void refreshSightings().catch(() => {
+      /* 失敗時は stale を維持 */
+    });
     return memCache.records;
   }
-  const disk = readDiskCache();
-  if (disk && disk.records.length > 0) {
-    const cleaned = cleanAndDedupe(disk.records);
-    memCache = { records: cleaned, loadedAt: Date.now() };
-    return cleaned;
-  }
-  const bundled = await readBundledSnapshot();
-  if (bundled && bundled.length > 0) {
-    const cleaned = cleanAndDedupe(bundled);
-    memCache = { records: cleaned, loadedAt: Date.now() };
-    return cleaned;
-  }
-  const records = cleanAndDedupe(await aggregateAllSightings());
-  memCache = { records, loadedAt: Date.now() };
-  return records;
+  // cold: 同時アクセスは 1 本の in-flight ロードを共有し、22MB の多重読込による
+  // OOM/タイムアウトを防ぐ。ロード自体は失敗しても [] を返す設計(下流で200描画)。
+  return refreshSightings();
 }
 
 /** Cron 等でキャッシュを破棄する用 */
 export function invalidateSightingsCache(): void {
   memCache = null;
+  inFlight = null;
   rawMemCache = null;
 }
 
