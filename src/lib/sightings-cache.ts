@@ -151,7 +151,12 @@ async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const candidates = [RAW_URL, baseUrl].filter((u): u is string => Boolean(u));
   for (const url of candidates) {
     try {
-      const res = await fetch(url, { cache: "no-store" });
+      // バースト時に取得が張り付いて 60s 予算を食い潰さないよう 15s で打ち切り、
+      // 次の候補 (同一オリジン静的) へフォールバックする。
+      const res = await fetch(url, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+      });
       if (!res.ok) continue;
       const blob = (await res.json()) as { records?: UnifiedSighting[] };
       if (Array.isArray(blob.records) && blob.records.length > 0) {
@@ -538,23 +543,34 @@ function cleanAndDedupe(records: UnifiedSighting[]): UnifiedSighting[] {
 // 並列に何本も走り、メモリ超過/タイムアウトで関数がクラッシュ(5xx)する。
 let inFlight: Promise<UnifiedSighting[]> | null = null;
 
-/** キャッシュ未ヒット時の実ロード。ディスク → 同梱/GitHub → 実集約 の順。 */
+/** キャッシュ未ヒット時の実ロード。ディスク → 同梱/GitHub の順。 */
 async function loadFreshSightings(): Promise<UnifiedSighting[]> {
   const disk = readDiskCache();
   if (disk && disk.records.length > 0) return cleanAndDedupe(disk.records);
   const bundled = await readBundledSnapshot();
   if (bundled && bundled.length > 0) return cleanAndDedupe(bundled);
+  // serverless runtime では 3 分超かかる実集約は絶対に走らせない。
+  // (60s 制限で必ず timeout → 5xx。バースト時に GitHub raw 取得が失敗すると
+  //  この経路に落ちて /spot のオンデマンド描画がクラッシュしていた。)
+  // 集約はビルド時 (SSG) / ローカル dev でのみ許可。runtime は空で返し、
+  // ページは 200 (データ無し) で描画する — 次回リクエストで再取得を試みる。
+  const isBuildOrDev =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.NODE_ENV === "development";
+  if (!isBuildOrDev) return [];
   return cleanAndDedupe(await aggregateAllSightings());
 }
 
-/** 同時実行を 1 本に束ねるロード。完了時に memCache を更新する。 */
+/** 同時実行を 1 本に束ねるロード。成功 (非空) 時のみ memCache を更新する。 */
 function refreshSightings(): Promise<UnifiedSighting[]> {
   if (!inFlight) {
     inFlight = loadFreshSightings()
       .then((records) => {
-        memCache = { records, loadedAt: Date.now() };
+        // 取得失敗 (空) は memCache に載せない。stale を維持し次回再取得する。
+        if (records.length > 0) memCache = { records, loadedAt: Date.now() };
         return records;
       })
+      .catch(() => [] as UnifiedSighting[])
       .finally(() => {
         inFlight = null;
       });
