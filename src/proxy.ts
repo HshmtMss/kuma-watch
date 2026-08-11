@@ -42,6 +42,10 @@ for (const m of JAPAN_MUNICIPALITIES) {
 // 実在するランドマーク slug。実在ページの O(1) 判定用。
 const LANDMARK_SLUGS = new Set(JAPAN_LANDMARKS.map((l) => l.slug));
 
+// Next.js のメタデータルート。動的セグメントと同じ深さに現れるため、
+// 市町村名/slug と誤認してリダイレクトしないよう素通しする。
+const METADATA_SEGMENTS = new Set(["opengraph-image", "twitter-image"]);
+
 export function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
 
@@ -82,6 +86,15 @@ export function proxy(req: NextRequest): NextResponse {
 
   // "/place/{pref}/{muni}" の 3 セグメントのみを対象にする。
   if (parts[0] !== "place" || parts.length !== 3) {
+    return NextResponse.next();
+  }
+
+  // "/place/{pref}/opengraph-image" は都道府県ページの OGP 画像ルート
+  // (app/place/[pref]/opengraph-image.tsx) であって市町村ページではない。
+  // matcher "/place/:pref/:muni" がこれを市町村名として拾ってしまうため、
+  // マスターに無い名前として 308 で "/place/{pref}" (HTML) へ飛ばしていた。
+  // 結果、47 都道府県ページすべてで SNS シェア時に画像が取得できていない。
+  if (METADATA_SEGMENTS.has(parts[2])) {
     return NextResponse.next();
   }
 
