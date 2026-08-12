@@ -6,6 +6,7 @@ import {
   researchRegionsWithCount,
 } from "@/lib/research-entries";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
+import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -154,6 +155,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  // 英語(インバウンド)ページ。公開フラグ ON のときだけ sitemap に載せる。
+  const enEntries: MetadataRoute.Sitemap =
+    process.env.NEXT_PUBLIC_EN_ENABLED === "true"
+      ? [
+          {
+            url: `${SITE_URL}/en`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.7,
+            alternates: {
+              languages: { en: `${SITE_URL}/en`, ja: `${SITE_URL}/learn/safety` },
+            },
+          },
+          ...INBOUND_EN_SLUGS.map((slug) => ({
+            url: `${SITE_URL}/en/spot/${slug}`,
+            lastModified: now,
+            changeFrequency: "daily" as const,
+            priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/spot/${slug}`,
+                ja: `${SITE_URL}/spot/${slug}`,
+              },
+            },
+          })),
+        ]
+      : [];
+
   return [
     ...staticEntries,
     ...articleEntries,
@@ -164,5 +193,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...prefEntries,
     ...muniEntries,
     ...spotEntries,
+    ...enEntries,
   ];
 }

@@ -80,15 +80,20 @@ export default async function EnglishSpotPage({ params }: Props) {
   let count90 = 0;
   let count365 = 0;
   let latest: string | null = null;
+  const nearby: { date: string; distanceKm: number }[] = [];
   for (const s of sightings) {
     if (!s.date || s.date > today) continue;
-    if (haversineKm(l.lat, l.lon, s.lat, s.lon) > NEAR_RADIUS_KM) continue;
+    const d = haversineKm(l.lat, l.lon, s.lat, s.lon);
+    if (d > NEAR_RADIUS_KM) continue;
     if (s.date < cutoff365) continue;
     count365++;
     if (s.date >= cutoff90) count90++;
     if (!latest || s.date > latest) latest = s.date;
+    nearby.push({ date: s.date, distanceKm: d });
   }
+  nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   const mapUrl = `/?lat=${l.lat}&lon=${l.lon}&z=12`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}`;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -144,6 +149,41 @@ export default async function EnglishSpotPage({ params }: Props) {
           Real-time data from official reports and news, updated continuously.
         </p>
       </section>
+
+      {/* Recent sightings */}
+      {nearby.length > 0 && (
+        <>
+          <h2 className="mt-8 text-lg font-bold text-stone-900">
+            Recent sightings within 10 km
+          </h2>
+          <ul className="mt-3 space-y-1.5">
+            {nearby.slice(0, 8).map((s, i) => (
+              <li
+                key={`${s.date}-${i}`}
+                className="flex items-baseline justify-between gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm"
+              >
+                <span className="font-semibold text-stone-900">
+                  {fmtDate(s.date)}
+                </span>
+                <span className="text-xs text-stone-500">
+                  {s.distanceKm.toFixed(1)} km away
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {/* Getting there */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">Getting there</h2>
+      <a
+        href={directionsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 hover:border-stone-400 hover:bg-stone-50"
+      >
+        Get directions on Google Maps →
+      </a>
 
       {/* Season */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">
