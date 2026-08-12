@@ -1,0 +1,75 @@
+name: Build spatial shards
+
+# public/data/sightings.json を約 0.5° グリッドのシャード(data/sightings-grid/)へ
+# 分割・コミットする。/spot(21,305件・オンデマンド ISR)はこの近傍セル(数KB〜数MB)だけを
+# 読むことで、91k件/31MB の全件読込による OOM(status 0 → 5xx)を回避する。
+#
+# flash/refresh 系(sightings.json 更新)には手を入れず、独立した軽量ジョブとして
+# 15 分ごとに最新の sightings.json から再生成する。/spot は 6h ISR なので 15 分鮮度で十分。
+# 決定的シリアライズにより変更セルだけがコミットされる(churn 最小)。失敗しても
+# runtime は直前のシャード/全件フォールバックで動くため影響は無い。
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# sightings.json / grid への書き込みを flash/refresh と直列化し push 衝突を防ぐ。
+concurrency:
+  group: sightings-write
+  cancel-in-progress: false
+
+jobs:
+  shards:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --prefer-offline --no-audit
+
+      - name: Build shards
+        run: npm run build:shards
+
+      - name: Commit and push (with rebase retry)
+        run: |
+          if git diff --quiet data/sightings-grid; then
+            echo "No shard changes — skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/sightings-grid
+          git commit -m "Build spatial shards ($(date -u +%Y-%m-%dT%H:%M))"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            # シャードは sightings.json から機械生成なので衝突は ours で上書きし再生成。
+            if git rebase -X ours origin/main; then
+              if git push; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+              git reset --hard origin/main
+              npm run build:shards || true
+              if git diff --quiet data/sightings-grid; then
+                echo "No shard changes after rebase — done"
+                exit 0
+              fi
+              git add data/sightings-grid
+              git commit -m "Build spatial shards ($(date -u +%Y-%m-%dT%H:%M))" || true
+            fi
+            backoff=$(( attempt * 3 + (RANDOM % 4) ))
+            echo "[build-shards] push failed (attempt $attempt) — retrying in ${backoff}s"
+            sleep "$backoff"
+          done
+          echo "Failed after 5 attempts"
+          exit 1

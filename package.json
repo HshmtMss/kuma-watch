@@ -26,7 +26,8 @@
     "discover:products": "tsx --env-file-if-exists=.env.local scripts/discover-products.ts",
     "search:products": "tsx --env-file-if-exists=.env.local scripts/search-products.ts",
     "x:daily": "tsx --env-file-if-exists=.env.local scripts/post-x-daily.ts",
-    "x:alert": "tsx --env-file-if-exists=.env.local scripts/post-x-alert.ts"
+    "x:alert": "tsx --env-file-if-exists=.env.local scripts/post-x-alert.ts",
+    "build:shards": "tsx scripts/build-shards.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.73",

@@ -665,24 +665,124 @@ async function getRawSightingsCached(): Promise<UnifiedSighting[]> {
  * 21,305 件のオンデマンド描画（/spot）が同時に来てもメモリを使い切らない
  * （status 0 = OOM の解消）。dedup 端の取りこぼしを避け bbox に +6km の余白。
  */
-export async function getNearbySightings(
+// ---- 空間シャード（build-shards.ts が public/data/sightings-grid/ に生成） ----
+// /spot は近傍セル(数KB〜数MB)だけ読めば済むので、91k件/31MB の全件読込による
+// OOM を根本的に避ける。runtime は GitHub raw の該当セルだけ取得する。
+const SHARD_CELL_DEG = 0.5;
+const SHARD_BASE_RAW =
+  "https://raw.githubusercontent.com/HshmtMss/kuma-watch/main/data/sightings-grid";
+// セル単位の小キャッシュ（近隣 spot 間で再利用し取得を減らす）。
+const shardCache = new Map<
+  string,
+  { records: UnifiedSighting[]; loadedAt: number }
+>();
+
+function bboxDeltas(centerLat: number, padKm: number): { dLat: number } {
+  return { dLat: padKm / 111 };
+}
+function dLonFor(centerLat: number, padKm: number): number {
+  const cos = Math.cos((centerLat * Math.PI) / 180);
+  return padKm / (111 * (Math.abs(cos) > 1e-6 ? Math.abs(cos) : 1e-6));
+}
+
+function filterToBbox(
+  records: UnifiedSighting[],
   centerLat: number,
   centerLon: number,
-  radiusKm: number,
-): Promise<UnifiedSighting[]> {
-  const raw = await getRawSightingsCached();
-  const padKm = radiusKm + 6;
-  const dLat = padKm / 111;
-  const cos = Math.cos((centerLat * Math.PI) / 180);
-  const dLon = padKm / (111 * (Math.abs(cos) > 1e-6 ? Math.abs(cos) : 1e-6));
-  const near = raw.filter(
+  padKm: number,
+): UnifiedSighting[] {
+  const { dLat } = bboxDeltas(centerLat, padKm);
+  const dLon = dLonFor(centerLat, padKm);
+  return records.filter(
     (r) =>
       typeof r.lat === "number" &&
       typeof r.lon === "number" &&
       Math.abs(r.lat - centerLat) <= dLat &&
       Math.abs(r.lon - centerLon) <= dLon,
   );
-  return cleanAndDedupe(near);
+}
+
+function shardCellKeys(
+  centerLat: number,
+  centerLon: number,
+  padKm: number,
+): string[] {
+  const { dLat } = bboxDeltas(centerLat, padKm);
+  const dLon = dLonFor(centerLat, padKm);
+  const latMin = Math.floor((centerLat - dLat) / SHARD_CELL_DEG);
+  const latMax = Math.floor((centerLat + dLat) / SHARD_CELL_DEG);
+  const lonMin = Math.floor((centerLon - dLon) / SHARD_CELL_DEG);
+  const lonMax = Math.floor((centerLon + dLon) / SHARD_CELL_DEG);
+  const keys: string[] = [];
+  for (let la = latMin; la <= latMax; la++)
+    for (let lo = lonMin; lo <= lonMax; lo++) keys.push(`${la}_${lo}`);
+  return keys;
+}
+
+/** 1 セル取得。404(空セル)は []、ネットワーク失敗は null(=全件フォールバック信号)。 */
+async function fetchShardCell(key: string): Promise<UnifiedSighting[] | null> {
+  const cached = shardCache.get(key);
+  if (cached && Date.now() - cached.loadedAt < MEM_CACHE_TTL_MS)
+    return cached.records;
+  try {
+    const res = await fetch(`${SHARD_BASE_RAW}/${key}.json`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.status === 404) {
+      shardCache.set(key, { records: [], loadedAt: Date.now() });
+      return [];
+    }
+    if (!res.ok) return null;
+    const blob = (await res.json()) as { records?: UnifiedSighting[] };
+    const recs = Array.isArray(blob.records) ? blob.records : [];
+    shardCache.set(key, { records: recs, loadedAt: Date.now() });
+    return recs;
+  } catch {
+    return null;
+  }
+}
+
+/** シャードから近傍取得。1 つでも取得失敗があれば null → 全件フォールバックさせる。 */
+async function loadNearbyFromShards(
+  centerLat: number,
+  centerLon: number,
+  padKm: number,
+): Promise<UnifiedSighting[] | null> {
+  const keys = shardCellKeys(centerLat, centerLon, padKm);
+  const parts = await Promise.all(keys.map(fetchShardCell));
+  if (parts.some((p) => p === null)) return null;
+  return parts.flat() as UnifiedSighting[];
+}
+
+/**
+ * 中心から radiusKm 内の出没だけを返す（近接・報道の重複排除済み）。
+ *
+ * dedup は近距離（<=5km）内でしか記録を併合しないので、先に近傍だけ切り出してから
+ * cleanAndDedupe しても結果は全件処理と同一。runtime は空間シャード（近傍セルだけ・
+ * 数KB〜数MB）を読むため、91k件/31MB の全件読込による OOM（status 0 → 5xx）を避ける。
+ * シャードが未整備/取得失敗のときは従来の全件ロードにフォールバックする（安全）。
+ */
+export async function getNearbySightings(
+  centerLat: number,
+  centerLon: number,
+  radiusKm: number,
+): Promise<UnifiedSighting[]> {
+  const padKm = radiusKm + 6;
+  const isBuildOrDev =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.NODE_ENV === "development";
+  if (!isBuildOrDev) {
+    const shardRecs = await loadNearbyFromShards(centerLat, centerLon, padKm);
+    if (shardRecs !== null) {
+      return cleanAndDedupe(
+        filterToBbox(shardRecs, centerLat, centerLon, padKm),
+      );
+    }
+    // シャード未整備/取得失敗 → 全件フォールバック（下）。
+  }
+  const raw = await getRawSightingsCached();
+  return cleanAndDedupe(filterToBbox(raw, centerLat, centerLon, padKm));
 }
 
 /**
