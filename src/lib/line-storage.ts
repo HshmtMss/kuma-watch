@@ -366,6 +366,96 @@ export async function getSubscriptionsForUser(userId: string): Promise<{
   return { munis, spots: spotMembers ?? [], geos };
 }
 
+/** 全ユーザー(profile を持つ userId)を列挙する。管理集計・移行用。 */
+export async function getAllUserIds(): Promise<string[]> {
+  const r = client();
+  const ids: string[] = [];
+  let cursor = "0";
+  do {
+    const [next, keys] = (await r.scan(cursor, {
+      match: "luser:*",
+      count: 1000,
+    })) as [string, string[]];
+    cursor = next;
+    for (const k of keys) {
+      const rest = k.slice("luser:".length);
+      // luser:munis:* / luser:spots:* は逆引きセット。profile 本体だけ拾う。
+      if (!rest.includes(":")) ids.push(rest);
+    }
+  } while (cursor !== "0");
+  return ids;
+}
+
+/** 複数ユーザーの登録件数(muni+spot+geo)をまとめて取得(pipeline で高速)。 */
+export async function getRegistrationCounts(
+  userIds: string[],
+): Promise<Map<string, number>> {
+  const r = client();
+  const out = new Map<string, number>();
+  const CHUNK = 200;
+  for (let i = 0; i < userIds.length; i += CHUNK) {
+    const chunk = userIds.slice(i, i + CHUNK);
+    const p = r.pipeline();
+    for (const u of chunk) {
+      p.scard(`luser:munis:${u}`);
+      p.scard(`luser:spots:${u}`);
+      p.get(`lgeo:pts:${u}`);
+    }
+    const res = (await p.exec()) as unknown[];
+    for (let j = 0; j < chunk.length; j++) {
+      const m = Number(res[j * 3] ?? 0) || 0;
+      const s = Number(res[j * 3 + 1] ?? 0) || 0;
+      const gc = parseGeoPoints(
+        (res[j * 3 + 2] as string | GeoPoint[] | null) ?? null,
+      ).length;
+      out.set(chunk[j], m + s + gc);
+    }
+  }
+  return out;
+}
+
+/**
+ * ユーザーの登録を最大 keep 件に切り詰める。超過分は
+ * 「古い geo → spot → muni」の順で削除し、意図的な地域(muni)・観光地(spot)を
+ * 優先で残しつつ、地点(geo)は createdAt の新しい方を残す(＝実質「新しい keep 件」)。
+ * 既存の unsubscribe* を使うので逆引きセットも正しく掃除される。
+ */
+export async function trimUserRegistrations(
+  userId: string,
+  keep: number,
+): Promise<{ removed: number; kept: number }> {
+  const { munis, spots, geos } = await getSubscriptionsForUser(userId);
+  const total = munis.length + spots.length + geos.length;
+  if (total <= keep) return { removed: 0, kept: total };
+  let toRemove = total - keep;
+  let removed = 0;
+  // 1) 古い geo から
+  const geoOldestFirst = [...geos].sort(
+    (a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0),
+  );
+  for (const p of geoOldestFirst) {
+    if (toRemove <= 0) break;
+    await unsubscribeGeo({ userId, id: p.id });
+    removed++;
+    toRemove--;
+  }
+  // 2) spot
+  for (const slug of spots) {
+    if (toRemove <= 0) break;
+    await unsubscribeSpot({ userId, slug });
+    removed++;
+    toRemove--;
+  }
+  // 3) muni
+  for (const m of munis) {
+    if (toRemove <= 0) break;
+    await unsubscribeMuni({ userId, pref: m.pref, city: m.city });
+    removed++;
+    toRemove--;
+  }
+  return { removed, kept: total - removed };
+}
+
 /**
  * ブロック / アカウント削除 (webhook の unfollow) で失効した userId を完全削除。
  * dispatch 時に Messaging API が「blocked」相当を返した場合にも呼ぶ。

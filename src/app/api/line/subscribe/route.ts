@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyIdToken } from "@/lib/line-client";
 import {
+  getSubscriptionsForUser,
   isConfigured,
   subscribeGeo,
   subscribeMuni,
@@ -10,6 +11,13 @@ import { isLineReleased } from "@/lib/line-flag";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+// 1 ユーザーの通知登録は 3 種類(市町村/観光地/任意地点)の合計でこの件数まで。
+// 送信コスト(LINE 従量)の抑制と分かりやすさのため。env で調整可(既定 3)。
+const MAX_REGISTRATIONS = Math.max(
+  1,
+  Number(process.env.LINE_MAX_REGISTRATIONS ?? 5),
+);
 
 /**
  * LIFF の登録ページから叩かれる購読受付。
@@ -62,6 +70,12 @@ export async function POST(req: Request) {
   const { userId, displayName } = verified;
   const { pref, city, slug, geo } = body;
 
+  // 現在の登録(3種類合計)。上限判定と「既存の再登録はべき等で許可」に使う。
+  const subs = await getSubscriptionsForUser(userId);
+  const total = subs.munis.length + subs.spots.length + subs.geos.length;
+  const overLimit = { error: "limit", max: MAX_REGISTRATIONS, count: total };
+  const limitStatus = 409;
+
   // 任意地点 (geo)
   if (geo) {
     if (
@@ -75,6 +89,10 @@ export async function POST(req: Request) {
     ) {
       return NextResponse.json({ error: "invalid geo" }, { status: 400 });
     }
+    // geo は常に新規追加。上限に達していれば拒否。
+    if (total >= MAX_REGISTRATIONS) {
+      return NextResponse.json(overLimit, { status: limitStatus });
+    }
     const { id } = await subscribeGeo({
       userId,
       displayName,
@@ -86,15 +104,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, id });
   }
 
-  // 観光地 (slug)
+  // 観光地 (slug)。既に登録済みなら再登録はべき等で許可(件数は増えない)。
   if (slug) {
+    const already = subs.spots.includes(slug);
+    if (!already && total >= MAX_REGISTRATIONS) {
+      return NextResponse.json(overLimit, { status: limitStatus });
+    }
     await subscribeSpot({ userId, displayName, slug });
     return NextResponse.json({ ok: true });
   }
 
-  // 市町村 (pref + city)
+  // 市町村 (pref + city)。既に登録済みなら再登録はべき等で許可。
   if (!pref || !city) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
+  }
+  const alreadyMuni = subs.munis.some(
+    (m) => m.pref === pref && m.city === city,
+  );
+  if (!alreadyMuni && total >= MAX_REGISTRATIONS) {
+    return NextResponse.json(overLimit, { status: limitStatus });
   }
   await subscribeMuni({ userId, displayName, pref, city });
   return NextResponse.json({ ok: true });

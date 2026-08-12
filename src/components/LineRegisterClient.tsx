@@ -384,7 +384,25 @@ export default function LineRegisterClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(`登録に失敗しました (${res.status})`);
+      if (!res.ok) {
+        // 上限超過(409)は分かりやすい日本語で。それ以外は汎用メッセージ。
+        let max = 3;
+        let isLimit = false;
+        try {
+          const data = (await res.json()) as { error?: string; max?: number };
+          if (res.status === 409 && data?.error === "limit") {
+            isLimit = true;
+            if (typeof data.max === "number") max = data.max;
+          }
+        } catch {
+          /* body 無し */
+        }
+        throw new Error(
+          isLimit
+            ? `通知の登録は${max}件までです。不要な登録を解除してから追加してください。`
+            : `登録に失敗しました (${res.status})`,
+        );
+      }
       setDone(true);
       // LIFF (LINE 内) での購読完了。Web 側クリック (notify_click line) と対に
       // なる、LINE ファネルの最終コンバージョン。surface は着地時点で不明。
@@ -525,6 +543,9 @@ export default function LineRegisterClient({
         <p className="mt-1 text-xs leading-relaxed text-stone-500">
           自宅・実家・職場・よく行く山や畑など、気になる場所ごとに登録できます。
         </p>
+        <p className="mt-1.5 text-xs font-semibold text-stone-600">
+          通知の登録は、おひとり<span className="text-emerald-700">5件まで</span>です。
+        </p>
         <Link
           href="/"
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-emerald-700"
@@ -536,7 +557,14 @@ export default function LineRegisterClient({
 
       {/* 現在の登録一覧 */}
       <section className="mt-6">
-        <h2 className="text-sm font-semibold text-stone-700">現在の登録</h2>
+        <h2 className="text-sm font-semibold text-stone-700">
+          現在の登録
+          {subs && (
+            <span className="ml-1 font-normal text-stone-400">
+              （{subs.munis.length + subs.spots.length + subs.geos.length} / 5件まで）
+            </span>
+          )}
+        </h2>
         {notice && (
           <p
             className={`mt-2 rounded-lg px-3 py-2 text-xs font-medium ${
