@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
+import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 
 /**
  * 英語の土台ページ（インバウンド向け・追加方式）。日本語の既存ルートは触らず、
@@ -143,6 +145,31 @@ export default function EnglishSafetyHub() {
         >
           Open the live bear map →
         </Link>
+      </div>
+
+      {/* Popular spots (internal links to English spot pages) */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">
+        Popular hiking spots
+      </h2>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-stone-600">
+        Check recent bear sightings before you visit.
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {INBOUND_EN_SLUGS.map((slug) => {
+          const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
+          if (!l) return null;
+          const en =
+            l.altNames?.find((a) => /^[A-Za-z]/.test(a)) ?? l.name;
+          return (
+            <Link
+              key={slug}
+              href={`/en/spot/${slug}`}
+              className="rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm font-semibold text-stone-800 transition hover:border-amber-300 hover:bg-amber-50"
+            >
+              {en}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Gear (affiliate) */}

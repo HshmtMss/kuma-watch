@@ -1,0 +1,23 @@
+/** 英語化するインバウンド主要スポットの slug（/en と /en/spot で共有）。 */
+export const INBOUND_EN_SLUGS = [
+  "takao-san",
+  "fuji-san",
+  "kamikochi",
+  "nikko",
+  "hakone",
+  "shiretoko",
+  "daisetsu",
+  "yakushima",
+  "shirakawago",
+  "takayama-2",
+  "oze",
+  "karuizawa",
+  "tateyama",
+  "aso",
+  "yatsugatake",
+  "nasu",
+  "okutama",
+  "kumotoriyama",
+  "hotaka",
+  "yarigatake",
+] as const;
