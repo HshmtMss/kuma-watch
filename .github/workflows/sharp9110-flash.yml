@@ -99,7 +99,7 @@ jobs:
             --slurpfile prev /tmp/prev.json \
             --slurpfile curr /tmp/curr.json \
             '($prev[0].records | INDEX(.id)) as $seen
-             | { newRecords: ($curr[0].records | map(select($seen[.id] == null)) | map({id, prefectureName, cityName, lat, lon, date, time, comment, sourceUrl})) }' \
+             | { newRecords: ($curr[0].records | map(select($seen[.id] == null)) | map({id, prefectureName, cityName, sectionName, lat, lon, date, time, comment, sourceUrl})) }' \
             > /tmp/dispatch.json
           COUNT=$(jq '.newRecords | length' /tmp/dispatch.json)
           echo "[sharp9110] $COUNT new records to dispatch"
