@@ -668,7 +668,7 @@ async function getRawSightingsCached(): Promise<UnifiedSighting[]> {
 // ---- 空間シャード（build-shards.ts が public/data/sightings-grid/ に生成） ----
 // /spot は近傍セル(数KB〜数MB)だけ読めば済むので、91k件/31MB の全件読込による
 // OOM を根本的に避ける。runtime は GitHub raw の該当セルだけ取得する。
-const SHARD_CELL_DEG = 0.5;
+const SHARD_CELL_DEG = 0.25;
 const SHARD_BASE_RAW =
   "https://raw.githubusercontent.com/HshmtMss/kuma-watch/main/data/sightings-grid";
 // セル単位の小キャッシュ（近隣 spot 間で再利用し取得を減らす）。
@@ -725,9 +725,11 @@ async function fetchShardCell(key: string): Promise<UnifiedSighting[] | null> {
   if (cached && Date.now() - cached.loadedAt < MEM_CACHE_TTL_MS)
     return cached.records;
   try {
+    // ISR(静的)ページの描画中に呼ばれるため cache:"no-store" は使えない
+    // (Next.js が "static → dynamic" エラーで 500 になる)。revalidate で
+    // キャッシュ可能な fetch にする(シャードは 15 分ごと再生成なので 15 分で十分)。
     const res = await fetch(`${SHARD_BASE_RAW}/${key}.json`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000),
+      next: { revalidate: 900 },
     });
     if (res.status === 404) {
       shardCache.set(key, { records: [], loadedAt: Date.now() });
@@ -772,17 +774,18 @@ export async function getNearbySightings(
   const isBuildOrDev =
     process.env.NEXT_PHASE === "phase-production-build" ||
     process.env.NODE_ENV === "development";
-  if (!isBuildOrDev) {
-    const shardRecs = await loadNearbyFromShards(centerLat, centerLon, padKm);
-    if (shardRecs !== null) {
-      return cleanAndDedupe(
-        filterToBbox(shardRecs, centerLat, centerLon, padKm),
-      );
-    }
-    // シャード未整備/取得失敗 → 全件フォールバック（下）。
+  // ビルド(SSG)/dev は全件ロード(ローカル fs。ネットワーク不要で安定)。
+  if (isBuildOrDev) {
+    const raw = await getRawSightingsCached();
+    return cleanAndDedupe(filterToBbox(raw, centerLat, centerLon, padKm));
   }
-  const raw = await getRawSightingsCached();
-  return cleanAndDedupe(filterToBbox(raw, centerLat, centerLon, padKm));
+  // runtime は空間シャードのみ。no-store の全件ロードにフォールバックすると
+  // (a) "static → dynamic" 500 (b) 91k件/31MB の OOM を招くため行わない。
+  // シャード取得に失敗したら空(200・データ無し)で描画し、次回リクエストで再取得。
+  const shardRecs = await loadNearbyFromShards(centerLat, centerLon, padKm);
+  return cleanAndDedupe(
+    filterToBbox(shardRecs ?? [], centerLat, centerLon, padKm),
+  );
 }
 
 /**

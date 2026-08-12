@@ -21,7 +21,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
-const CELL_DEG = 0.5;
+const CELL_DEG = 0.25;
 
 function cellKey(lat: number, lon: number): string {
   return `${Math.floor(lat / CELL_DEG)}_${Math.floor(lon / CELL_DEG)}`;
