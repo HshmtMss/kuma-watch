@@ -26,7 +26,7 @@ import { buildSpotSeasonGuide } from "@/lib/spot-season";
 import { isSpotPushReleased } from "@/lib/push-flag";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
-import { getCachedSightings } from "@/lib/sightings-cache";
+import { getNearbySightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import { getMuniMessage, type MuniMessage } from "@/data/muni-messages";
 import { placeHrefForSighting } from "@/lib/muni-name";
@@ -114,7 +114,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!landmark) return { title: "ページが見つかりません" };
 
   // 周辺出没件数を概算
-  const sightings = await getCachedSightings();
+  // 近傍限定ロード: 全国全件の dedup(約1GBピーク)を避け、この地点周辺だけを
+  // dedup する。同時アクセス時の OOM(status 0 → 5xx)を防ぐため。結果は同一。
+  const sightings = await getNearbySightings(
+    landmark.lat,
+    landmark.lon,
+    NEAR_RADIUS_KM,
+  );
   const today = jstToday();
   const cutoff90 = jstDaysAgo(90);
   const cutoff365 = jstDaysAgo(RECENT_DAYS);
@@ -174,7 +180,13 @@ export default async function SpotPage({ params }: Props) {
   const landmark = JAPAN_LANDMARKS.find((l) => l.slug === slug);
   if (!landmark) notFound();
 
-  const sightings = await getCachedSightings();
+  // 近傍限定ロード: 全国全件の dedup(約1GBピーク)を避け、この地点周辺だけを
+  // dedup する。同時アクセス時の OOM(status 0 → 5xx)を防ぐため。結果は同一。
+  const sightings = await getNearbySightings(
+    landmark.lat,
+    landmark.lon,
+    NEAR_RADIUS_KM,
+  );
   const today = jstToday();
   const cutoff90 = jstDaysAgo(90);
   const cutoff365 = jstDaysAgo(365);

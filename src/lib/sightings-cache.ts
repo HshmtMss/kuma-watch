@@ -612,6 +612,79 @@ let rawMemCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
 let lastRawForceFreshAt = 0;
 const RAW_FORCE_FRESH_MIN_INTERVAL_MS = 60 * 1000;
 
+// ---- 近傍限定ロード（/spot 等の局所ページ用。全件 dedup を避け OOM を防ぐ） ----
+let rawInFlight: Promise<UnifiedSighting[]> | null = null;
+
+/** 生記録(filterMisgeocoded のみ)を安全にロード。runtime では実集約に落ちない。 */
+async function loadFreshRaw(): Promise<UnifiedSighting[]> {
+  const disk = readDiskCache();
+  if (disk && disk.records.length > 0) return filterMisgeocoded(disk.records);
+  const bundled = await readBundledSnapshot();
+  if (bundled && bundled.length > 0) return filterMisgeocoded(bundled);
+  const isBuildOrDev =
+    process.env.NEXT_PHASE === "phase-production-build" ||
+    process.env.NODE_ENV === "development";
+  if (!isBuildOrDev) return [];
+  return filterMisgeocoded(await aggregateAllSightings());
+}
+
+/** 同時実行を 1 本に束ねる生記録ロード。成功時のみ rawMemCache を更新。 */
+function refreshRaw(): Promise<UnifiedSighting[]> {
+  if (!rawInFlight) {
+    rawInFlight = loadFreshRaw()
+      .then((records) => {
+        if (records.length > 0) rawMemCache = { records, loadedAt: Date.now() };
+        return records;
+      })
+      .catch(() => [] as UnifiedSighting[])
+      .finally(() => {
+        rawInFlight = null;
+      });
+  }
+  return rawInFlight;
+}
+
+/** 生記録キャッシュ取得（stale 即返し + バックグラウンド更新 + in-flight 集約）。 */
+async function getRawSightingsCached(): Promise<UnifiedSighting[]> {
+  const age = rawMemCache ? Date.now() - rawMemCache.loadedAt : Infinity;
+  if (rawMemCache && age < MEM_CACHE_TTL_MS) return rawMemCache.records;
+  if (rawMemCache) {
+    void refreshRaw().catch(() => {});
+    return rawMemCache.records;
+  }
+  return refreshRaw();
+}
+
+/**
+ * 中心から radiusKm 内の出没だけを返す（近接・報道の重複排除済み）。
+ *
+ * dedup は近距離（<=5km）内でしか記録を併合しない。したがって「先に bbox で
+ * 近傍だけ切り出してから cleanAndDedupe しても、全件を dedup してから近傍を
+ * 切り出すのと結果は同じ」。全件（3万件超・31MB）を毎回 dedup する
+ * getCachedSightings と違い、重い 4 パスを局所の小集合だけに掛けるので、
+ * 21,305 件のオンデマンド描画（/spot）が同時に来てもメモリを使い切らない
+ * （status 0 = OOM の解消）。dedup 端の取りこぼしを避け bbox に +6km の余白。
+ */
+export async function getNearbySightings(
+  centerLat: number,
+  centerLon: number,
+  radiusKm: number,
+): Promise<UnifiedSighting[]> {
+  const raw = await getRawSightingsCached();
+  const padKm = radiusKm + 6;
+  const dLat = padKm / 111;
+  const cos = Math.cos((centerLat * Math.PI) / 180);
+  const dLon = padKm / (111 * (Math.abs(cos) > 1e-6 ? Math.abs(cos) : 1e-6));
+  const near = raw.filter(
+    (r) =>
+      typeof r.lat === "number" &&
+      typeof r.lon === "number" &&
+      Math.abs(r.lat - centerLat) <= dLat &&
+      Math.abs(r.lon - centerLon) <= dLon,
+  );
+  return cleanAndDedupe(near);
+}
+
 /**
  * 読み込み元(disk→bundled→集約)から、filterMisgeocoded のみ掛けた記録を返す。
  * forceFresh=true かつ前回の強制取得から 60 秒以上経っていれば、5 分 TTL を迂回して
