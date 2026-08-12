@@ -7,6 +7,7 @@ import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import TravelEssentials from "@/components/en/TravelEssentials";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -248,6 +249,8 @@ export default async function EnglishSpotPage({ params }: Props) {
           </p>
         </section>
       )}
+
+      <TravelEssentials className="mt-6" />
 
       <p className="mt-8 text-xs text-stone-400">
         日本語版:{" "}

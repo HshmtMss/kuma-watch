@@ -4,6 +4,7 @@ import Link from "next/link";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import TravelEssentials from "@/components/en/TravelEssentials";
 
 /**
  * 英語の土台ページ（インバウンド向け・追加方式）。日本語の既存ルートは触らず、
@@ -219,6 +220,8 @@ export default function EnglishSafetyHub() {
           </p>
         </section>
       )}
+
+      <TravelEssentials className="mt-6" />
 
       <p className="mt-8 text-xs text-stone-400">
         日本語版:{" "}
