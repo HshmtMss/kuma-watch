@@ -108,6 +108,15 @@ export default function EnglishSafetyHub() {
         ))}
       </ul>
 
+      <p className="mt-3 text-[13px]">
+        <Link
+          href="/en/bear-spray"
+          className="font-semibold text-emerald-700 underline"
+        >
+          Bear spray &amp; bells: rules and where to buy →
+        </Link>
+      </p>
+
       {/* When / where */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">
         When are bears most active?

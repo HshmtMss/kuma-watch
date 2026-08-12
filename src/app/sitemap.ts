@@ -168,6 +168,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               languages: { en: `${SITE_URL}/en`, ja: `${SITE_URL}/learn/safety` },
             },
           },
+          {
+            url: `${SITE_URL}/en/bear-spray`,
+            lastModified: now,
+            changeFrequency: "monthly" as const,
+            priority: 0.6,
+          },
           ...INBOUND_EN_SLUGS.map((slug) => ({
             url: `${SITE_URL}/en/spot/${slug}`,
             lastModified: now,

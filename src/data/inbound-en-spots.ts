@@ -1,5 +1,6 @@
 /** 英語化するインバウンド主要スポットの slug（/en と /en/spot で共有）。 */
 export const INBOUND_EN_SLUGS = [
+  // 定番(訪日客の来訪多い)
   "takao-san",
   "fuji-san",
   "kamikochi",
@@ -20,4 +21,20 @@ export const INBOUND_EN_SLUGS = [
   "kumotoriyama",
   "hotaka",
   "yarigatake",
+  // 追加(登山・雪・自然で訪日需要のある地名)
+  "zao",
+  "hakkoda",
+  "chokai",
+  "myoko",
+  "ontake",
+  "tateshina",
+  "kirigamine",
+  "utsukushigahara",
+  "mizugaki",
+  "tanzawa",
+  "kitadake",
+  "shirouma",
+  "tokachi",
+  "yotei",
+  "kinpu",
 ] as const;

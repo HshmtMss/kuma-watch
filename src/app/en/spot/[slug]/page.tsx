@@ -110,6 +110,24 @@ export default async function EnglishSpotPage({ params }: Props) {
         Bears near {name}
       </h1>
 
+      {/* Hero photo (Wikipedia CC). 帰属表示つき。 */}
+      {l.imageUrl && (
+        <figure className="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+          <div className="relative aspect-[16/9] w-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={l.imageUrl}
+              alt={`${name}, Japan`}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <figcaption className="border-t border-stone-200 bg-white px-3 py-1.5 text-[10px] text-stone-400">
+            Photo: Wikimedia Commons ({l.imageCredit ?? l.name})
+          </figcaption>
+        </figure>
+      )}
+
       {/* Real-time status */}
       <section className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
         {count365 > 0 ? (
