@@ -201,9 +201,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       seirei.lon / seirei.n,
     );
   }
-  // 出没データが無い市町村でも、buildMuniSeo の null パスでフォールバック
-  // タイトル ("○○のクマ出没情報・警戒レベル｜獣医師監修") を返す。
-  const { title, description } = buildMuniSeo(pref, muni, seoCell);
+  // 出没データが無い市町村では、県内の直近状況をスニペットに載せる
+  // (「○○市はクマが出たのか」に検索結果の時点で答える)。getPrefSummary は
+  // getPlaceCell と同じインデックスを引くだけなので追加のデータロードは無い。
+  const prefSummary = await getPrefSummary(pref);
+  const { title, description } = buildMuniSeo(pref, muni, seoCell, prefSummary);
   const path = `/place/${encodeURIComponent(pref)}/${encodeURIComponent(muni)}`;
 
   // 全市町村ページをインデックス対象にする（出没 0 件も含む）。

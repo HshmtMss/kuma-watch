@@ -52,6 +52,16 @@ function shortName(muni: string): string | null {
   return s.length >= 2 ? s : null;
 }
 
+/**
+ * 文中で繰り返すとき用の呼称。「足柄下郡箱根町」→「箱根町」のように郡を落とす。
+ * 正式名は description 冒頭の `{pref}{muni}` で 1 度出しているので、以降は
+ * 普段の呼び方に寄せて冗長さを避ける (郡付きは 3 回繰り返すと読みにくい)。
+ */
+function displayName(muni: string): string {
+  const m = /^.+郡(.+[町村])$/.exec(muni);
+  return m ? m[1] : muni;
+}
+
 export type PlaceCellLike = {
   count: number;
   count90d: number;
@@ -59,18 +69,70 @@ export type PlaceCellLike = {
   latestDate: string | null;
 };
 
+export type PrefSummaryLike = {
+  count90d: number;
+  count365d: number;
+  latestDate: string | null;
+};
+
+/**
+ * 出没データが無い市町村向けの「県内の直近状況」フラグメント。
+ *
+ * 検索需要のスパイクは発生地が読めず、実際には「普段クマが出ない都市部」で起きる。
+ * Search Console 実測 (2026-05-10〜08-12) では最大クエリが「昭島市 クマ」の
+ * 表示 109,168 で、CTR は 0.1% (掲載順位 9.6 の期待値 1.5% の 1/10)。原因は
+ * 順位ではなくスニペットで、昭島市固有の情報が 1 つも入っていなかった。
+ * 上位 60 place ページの実測でも 汎用スニペット 8 ページが CTR 1.16%、
+ * 数値入り 52 ページが CTR 2.91% と 2.5 倍の差がある。
+ *
+ * 市町村内が 0 件でも県内の直近事案はページ本文に既に出しているので、それを
+ * スニペットにも載せて「この街にクマは出たのか」に検索結果の時点で答える。
+ */
+function prefContext(
+  pref: string,
+  summary: PrefSummaryLike | null | undefined,
+): { short: string; long: string } | null {
+  if (!summary) return null;
+  const md = formatMonthDay(summary.latestDate);
+  if (md && isFresh(summary.latestDate) && summary.count90d > 0) {
+    return {
+      short: `${pref}は最新${md}`,
+      long: `${pref}内では直近 90 日で ${summary.count90d.toLocaleString()} 件、最新は ${md}`,
+    };
+  }
+  if (summary.count365d > 0) {
+    const n = summary.count365d.toLocaleString();
+    return { short: `${pref}は直近1年${n}件`, long: `${pref}内では直近 1 年で ${n} 件` };
+  }
+  return null;
+}
+
 /** /place/[pref]/[muni] 用のタイトル・ディスクリプション。 */
 export function buildMuniSeo(
   pref: string,
   muni: string,
   cell: PlaceCellLike | null,
+  prefSummary?: PrefSummaryLike | null,
 ): { title: string; description: string } {
   const place = `${pref}${muni}`;
 
-  if (!cell) {
+  // 直近 1 年の記録が無い市町村 (セル自体が無い / セルはあるが 0 件) は、
+  // 「記録が無い」ことを明示したうえで県内の直近状況を添える。無いことを伏せて
+  // クリックを取ると、開いた直後に離脱されて評価が下がる。獣医師監修を掲げる
+  // サイトとして、まず正確に答える。
+  if (!cell || cell.count365d === 0) {
+    const ctx = prefContext(pref, prefSummary);
+    if (ctx) {
+      const name = displayName(muni);
+      return {
+        title: `${muni}の熊出没情報マップ【直近1年の記録なし・${ctx.short}】｜${SUPERVISION}`,
+        description: `${place}の熊（クマ）出没情報。${name}内では直近 1 年の出没記録はありません。${ctx.long}。${name}と周辺の目撃マップで現在の状況を確認できます。${SUPERVISION}・無料・登録不要。`,
+      };
+    }
+    // 県内にも直近データが無い (沖縄県など生息しない地域) ときの最終フォールバック。
     return {
       title: `${muni}の熊出没情報マップ・警戒レベル｜${pref}・${SUPERVISION}`,
-      description: `${place}の熊（クマ）出没情報を 5km メッシュ単位で予報。${SUPERVISION}・無料・登録不要。登山・キャンプ・通勤前の 30 秒チェックに。隣接市町村の出没履歴・目撃マップも併せて確認できます。`,
+      description: `${place}の熊（クマ）出没情報を 5km メッシュ単位で予報。${SUPERVISION}・無料・登録不要。お住まいの地域・お出かけ先の安全確認に。隣接市町村の出没履歴・目撃マップも併せて確認できます。`,
     };
   }
 
