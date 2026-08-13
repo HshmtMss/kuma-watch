@@ -1,7 +1,7 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import { inJapanBounds, type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
-import { incidentKey } from "@/lib/incident-key";
+import { incidentKey, normalizeSection } from "@/lib/incident-key";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -232,7 +232,11 @@ export async function fetchLlmHtmlSightings(
     const cityName = s.cityName?.trim() || source.defaultCity || "";
     let lat = typeof s.lat === "number" ? s.lat : undefined;
     let lon = typeof s.lon === "number" ? s.lon : undefined;
-    let precise = lat !== undefined && lon !== undefined;
+    // 地区名が場所を特定しない (「市内」等や空) 場合、LLM の座標は市町村名から
+    // 引いた当て推量 (実測では役所の座標) にすぎないので precise を主張させない。
+    // news.ts と同じ規則。詳細はそちらのコメントを参照。
+    const sectionless = normalizeSection(s.sectionName) === "";
+    let precise = lat !== undefined && lon !== undefined && !sectionless;
     if (lat === undefined || lon === undefined) {
       const g = await geocodePlace(prefName, cityName, s.sectionName);
       if (g) {

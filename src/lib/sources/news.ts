@@ -22,7 +22,7 @@ import { isNewsSuppressed } from "@/lib/news-suppression";
 import { isNewsMisplaced } from "@/lib/muni-geo-check";
 import { jstToday } from "@/lib/jst-date";
 import { isRealCalendarDate } from "./date-utils";
-import { incidentKey } from "@/lib/incident-key";
+import { incidentKey, normalizeSection } from "@/lib/incident-key";
 import { snapToRiver } from "@/lib/river-snap";
 
 const GEMINI_MODEL = "gemini-3-flash-preview";
@@ -590,7 +590,16 @@ export async function fetchNewsSightings(
       lat = s.lat;
       lon = s.lon;
     }
-    let precise = lat !== undefined && lon !== undefined;
+    // 地区名が場所を特定しない (「市内」「市街地」「道路」「不明」や空) 場合、
+    // LLM が出した座標は記事から読み取った地点ではなく、市町村名から引いた
+    // 当て推量にすぎない。実測では市役所の座標が返ってくる:
+    //   会津若松市役所本庁舎 に 30 件、福島市役所 に 22 件のピンが積み上がり、
+    //   全国 91 地点 / 525 件が同じ形で役所に集中していた。
+    // geocodePlace は同じ状況を precise=false にしてジッターへ回している
+    // (「市区町村までは特定できたが地区が拾えなかった場合の丸め」)。LLM 座標の
+    // 経路だけがこの判定を飛ばしていたので、ここで揃える。
+    const sectionless = normalizeSection(s.sectionName) === "";
+    let precise = lat !== undefined && lon !== undefined && !sectionless;
     if (lat === undefined || lon === undefined) {
       const g = await geocodePlace(prefName, cityName, s.sectionName);
       if (g) {
