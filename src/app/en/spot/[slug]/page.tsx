@@ -9,6 +9,7 @@ import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
+import PushSubscribeButton from "@/components/PushSubscribeButton";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -215,6 +216,15 @@ export default async function EnglishSpotPage({ params }: Props) {
           Open the full nationwide map →
         </Link>
       </section>
+
+      {/* Web Push alerts (English). LINE is JP-only; foreigners use browser push. */}
+      <div className="mt-6">
+        <PushSubscribeButton
+          target={{ kind: "spot", slug: l.slug, name }}
+          surface="spot_footer"
+          en
+        />
+      </div>
 
       {/* Recent sightings */}
       {nearby.length > 0 && (

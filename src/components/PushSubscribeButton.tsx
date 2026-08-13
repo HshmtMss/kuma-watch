@@ -63,10 +63,11 @@ function targetBody(target: PushTarget): Record<string, string> {
 }
 
 /** 購読ボタン見出しに使う対象名 */
-function targetHeadline(target: PushTarget): string {
-  return target.kind === "spot"
-    ? `${target.name} 周辺の新規出没を通知で受け取る`
-    : `${target.city} の新規出没を通知で受け取る`;
+function targetHeadline(target: PushTarget, en: boolean): string {
+  const name = target.kind === "spot" ? target.name : target.city;
+  return en
+    ? `Get alerts for new bear sightings near ${name}`
+    : `${name} 周辺の新規出没を通知で受け取る`;
 }
 
 export default function PushSubscribeButton({
@@ -74,6 +75,7 @@ export default function PushSubscribeButton({
   hideHeading = false,
   bare = false,
   surface = "place_footer",
+  en = false,
 }: {
   target: PushTarget;
   /** 親セクションに見出しがある場合、内部の見出しを省いて二重表示を防ぐ。 */
@@ -85,6 +87,8 @@ export default function PushSubscribeButton({
   bare?: boolean;
   /** GA 計測用。この CTA がどの面に置かれているか。 */
   surface?: NotifySurface;
+  /** 英語表示 (インバウンド /en ページ用)。既定 false = 日本語(従来通り)。 */
+  en?: boolean;
 }) {
   const [state, setState] = useState<State>("loading");
   const [message, setMessage] = useState<string>("");
@@ -195,15 +199,18 @@ export default function PushSubscribeButton({
         throw new Error(`subscribe failed: ${res.status}`);
       }
       setState("active");
-      setMessage("通知を有効化しました");
+      setMessage(en ? "Alerts enabled" : "通知を有効化しました");
       trackNotifySubscribed({ channel: "push", target: target.kind, surface });
     } catch (e) {
       setState("idle");
+      const detail = e instanceof Error ? e.message : String(e);
       setMessage(
-        `通知の有効化に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        en
+          ? `Couldn't enable alerts: ${detail}`
+          : `通知の有効化に失敗しました: ${detail}`,
       );
     }
-  }, [target, surface]);
+  }, [target, surface, en]);
 
   const unsubscribe = useCallback(async () => {
     setState("loading");
@@ -232,31 +239,43 @@ export default function PushSubscribeButton({
     } catch (e) {
       setState("active");
       setMessage(
-        `通知の解除に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        en
+          ? `Couldn't turn off alerts: ${e instanceof Error ? e.message : String(e)}`
+          : `通知の解除に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
       );
     }
-  }, [target]);
+  }, [target, en]);
 
   // 端末で通知が表示できるかをユーザー自身が確認するためのお試し通知。
   const sendTest = useCallback(async () => {
     setMessage("");
     try {
       const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification("お試し通知 — KumaWatch", {
-        body: "この通知が見えれば設定は OK です。実際のクマ出没情報ではありません。",
-        icon: "/icons/Icon-192.png",
-        badge: "/icons/Icon-192.png",
-        data: { url: "/" },
-      });
+      await reg.showNotification(
+        en ? "Test notification — KumaWatch" : "お試し通知 — KumaWatch",
+        {
+          body: en
+            ? "If you can see this, notifications are working. This is not a real bear sighting."
+            : "この通知が見えれば設定は OK です。実際のクマ出没情報ではありません。",
+          icon: "/icons/Icon-192.png",
+          badge: "/icons/Icon-192.png",
+          data: { url: "/" },
+        },
+      );
       setMessage(
-        "お試し通知を送りました。画面に出ない場合は、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。",
+        en
+          ? "Test sent. If nothing appears, check that notifications are allowed for your browser and that Focus / Do Not Disturb is off."
+          : "お試し通知を送りました。画面に出ない場合は、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。",
       );
     } catch (e) {
+      const detail = e instanceof Error ? e.message : String(e);
       setMessage(
-        `お試し通知の表示に失敗しました: ${e instanceof Error ? e.message : String(e)}`,
+        en
+          ? `Couldn't show a test notification: ${detail}`
+          : `お試し通知の表示に失敗しました: ${detail}`,
       );
     }
-  }, []);
+  }, [en]);
 
   if (state === "unsupported" || state === "not-configured") {
     // 機能が動かない環境では何も出さない (ノイズ削減)
@@ -295,11 +314,13 @@ export default function PushSubscribeButton({
         <div className="min-w-0 flex-1">
           {!hideHeading && (
             <p className="text-sm font-semibold text-stone-900">
-              {targetHeadline(target)}
+              {targetHeadline(target, en)}
             </p>
           )}
           <p className={`text-xs leading-relaxed text-stone-600 ${hideHeading ? "" : "mt-0.5"}`}>
-            報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。
+            {en
+              ? "Get a browser notification when a new sighting is reported from official or news sources. No account, free."
+              : "報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。"}
           </p>
           {state === "active" && (
             <button
@@ -307,12 +328,14 @@ export default function PushSubscribeButton({
               onClick={sendTest}
               className="mt-2 text-xs font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
             >
-              お試し通知を送る
+              {en ? "Send a test notification" : "お試し通知を送る"}
             </button>
           )}
           {state === "denied" && (
             <p className="mt-2 text-xs text-rose-700">
-              ブラウザ通知が拒否されています。ブラウザの設定からこのサイトの通知を許可してください。
+              {en
+                ? "Notifications are blocked. Allow notifications for this site in your browser settings."
+                : "ブラウザ通知が拒否されています。ブラウザの設定からこのサイトの通知を許可してください。"}
             </p>
           )}
           {message && (
@@ -323,37 +346,62 @@ export default function PushSubscribeButton({
               href="/notifications"
               className="font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
             >
-              登録中の通知を管理・解除する
+              {en ? "Manage / turn off your alerts" : "登録中の通知を管理・解除する"}
             </Link>
           </p>
           {/* bare は既に「LINEを使っていない方へ」の details の中にいるので、
               details の入れ子を作らない。iPhone の注意書きは親カード側が持つ。 */}
           <details className={bare ? "hidden" : "mt-2"}>
             <summary className="cursor-pointer text-xs text-stone-500 hover:text-stone-700">
-              通知について
+              {en ? "About notifications" : "通知について"}
             </summary>
-            <ul className="mt-1.5 list-disc space-y-1 pl-4 text-xs leading-relaxed text-stone-500">
-              <li>アカウント登録は不要・無料です。</li>
-              <li>
-                許可すると、サイトを閉じていても新しい出没情報が届きます。
-              </li>
-              <li>
-                登録した地域・観光地の解除は、
-                <Link
-                  href="/notifications"
-                  className="underline decoration-dotted underline-offset-2"
-                >
-                  通知設定ページ
-                </Link>
-                からいつでもまとめて行えます。
-              </li>
-              <li>
-                iPhone は、Safari の共有メニューから「ホーム画面に追加」したうえで有効にできます。
-              </li>
-              <li>
-                通知が届かないときは、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。
-              </li>
-            </ul>
+            {en ? (
+              <ul className="mt-1.5 list-disc space-y-1 pl-4 text-xs leading-relaxed text-stone-500">
+                <li>No account needed. Free.</li>
+                <li>Once allowed, you get new sightings even with the site closed.</li>
+                <li>
+                  Turn alerts off anytime on the{" "}
+                  <Link
+                    href="/notifications"
+                    className="underline decoration-dotted underline-offset-2"
+                  >
+                    notification settings
+                  </Link>{" "}
+                  page.
+                </li>
+                <li>
+                  On iPhone: first &quot;Add to Home Screen&quot; from Safari&apos;s
+                  Share menu, open it, then enable notifications.
+                </li>
+                <li>
+                  Not receiving alerts? Check that notifications are allowed for
+                  your browser and that Focus / Do Not Disturb is off.
+                </li>
+              </ul>
+            ) : (
+              <ul className="mt-1.5 list-disc space-y-1 pl-4 text-xs leading-relaxed text-stone-500">
+                <li>アカウント登録は不要・無料です。</li>
+                <li>
+                  許可すると、サイトを閉じていても新しい出没情報が届きます。
+                </li>
+                <li>
+                  登録した地域・観光地の解除は、
+                  <Link
+                    href="/notifications"
+                    className="underline decoration-dotted underline-offset-2"
+                  >
+                    通知設定ページ
+                  </Link>
+                  からいつでもまとめて行えます。
+                </li>
+                <li>
+                  iPhone は、Safari の共有メニューから「ホーム画面に追加」したうえで有効にできます。
+                </li>
+                <li>
+                  通知が届かないときは、端末の通知設定でブラウザの通知が許可されているか、集中モード（おやすみモード）がオフかをご確認ください。
+                </li>
+              </ul>
+            )}
           </details>
         </div>
         <div className="shrink-0">
@@ -363,7 +411,7 @@ export default function PushSubscribeButton({
               onClick={subscribe}
               className="rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700"
             >
-              通知する
+              {en ? "Get alerts" : "通知する"}
             </button>
           )}
           {state === "active" && (
@@ -372,7 +420,7 @@ export default function PushSubscribeButton({
               onClick={unsubscribe}
               className="rounded-full border border-stone-300 bg-white px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
             >
-              通知中 ✓ / 解除
+              {en ? "On ✓ / Turn off" : "通知中 ✓ / 解除"}
             </button>
           )}
           {state === "loading" && (
@@ -381,7 +429,7 @@ export default function PushSubscribeButton({
               disabled
               className="rounded-full bg-stone-300 px-4 py-2 text-xs font-semibold text-white"
             >
-              処理中…
+              {en ? "Working…" : "処理中…"}
             </button>
           )}
           {state === "denied" && (
@@ -390,7 +438,7 @@ export default function PushSubscribeButton({
               disabled
               className="rounded-full bg-stone-200 px-4 py-2 text-xs font-semibold text-stone-500"
             >
-              通知が拒否中
+              {en ? "Blocked" : "通知が拒否中"}
             </button>
           )}
         </div>
