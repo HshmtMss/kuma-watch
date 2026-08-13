@@ -61,6 +61,9 @@ type NewRecord = {
   prefectureName: string;
   cityName: string;
   sectionName?: string; // 事案キー(市内の別地点を別事案として残す)に必要
+  // 座標が地名からの推定か実測かの判定 (isNotifiable → isApproximateLocation)。
+  // 市町村までしか場所が分からない記録は半径マッチの根拠にならないため通知しない。
+  sourceKind?: string;
   lat?: number;
   lon?: number;
   date?: string;

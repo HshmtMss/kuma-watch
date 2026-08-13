@@ -12,6 +12,7 @@
  * date が無い/不正/未来日の記録は通知しない（鮮度を確認できないため）。
  */
 import { jstDaysAgo, jstToday } from "./jst-date";
+import { isApproximateLocation } from "./location-precision";
 
 /**
  * 通知対象とする出没日の上限（日数）。
@@ -89,7 +90,8 @@ export function isFreshForNotify(
 }
 
 /**
- * この記録を通知してよいか。「出没日が今日」かつ「その日付が推定でない」こと。
+ * この記録を通知してよいか。
+ * 「出没日が今日」かつ「その日付が推定でない」かつ「場所が特定できている」こと。
  *
  * dateEstimated=true は、報道記事に日付が書かれておらず配信日で埋めた記録
  * (実際の出没は昨日以前かもしれない)。これを通知すると古い情報が流れるので
@@ -98,11 +100,24 @@ export function isFreshForNotify(
  * 報道は見出しに日付があることが多く(例「◯◯でクマ出没 7月25日」)、その場合は
  * dateEstimated=false=実日付なので、当日なら通知される。警察通報など
  * dateEstimated を持たないソースは常に実日付扱い(当日なら通知)。
+ *
+ * 場所が市町村までしか分からない記録 (isApproximateLocation) も通知しない。
+ * 配信先は「登録地点から半径 N km 以内か」で決めているが、その座標は地名から
+ * 起こした推定なので、誰に届くかが偶然で決まってしまう。届いた人にとっては
+ * 「近くで出た」という誤った知らせになり、逆に本当に近い人には届かない。
+ * 地図でもピンを出さない方針 (location-precision) と揃える。
  */
 export function isNotifiable(
-  record: { date?: string; dateEstimated?: boolean },
+  record: {
+    date?: string;
+    dateEstimated?: boolean;
+    sourceKind?: string;
+    source?: string;
+    sectionName?: string;
+  },
   today: string = jstToday(),
 ): boolean {
   if (record.dateEstimated) return false;
+  if (isApproximateLocation(record)) return false;
   return isFreshForNotify(record.date, today);
 }
