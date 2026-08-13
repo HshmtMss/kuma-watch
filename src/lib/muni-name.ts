@@ -41,10 +41,23 @@ export function resolveCanonicalMuniName(
     (m) => m.prefName === prefName && normMuni(m.cityName) === nc,
   );
   if (exact) return exact.cityName;
-  // 2. 郡付き正式名で末尾一致 (短縮 → 正式: 「浅川町」 → 「石川郡浅川町」)
-  const ends = JAPAN_MUNICIPALITIES.find(
-    (m) => m.prefName === prefName && normMuni(m.cityName).endsWith(nc),
-  );
+  // 2. 郡付き正式名・政令市の区で末尾一致
+  //    (短縮 → 正式: 「浅川町」 → 「石川郡浅川町」 / 「北区」 → 「広島市北区」)
+  //
+  //    素の endsWith は接頭辞を問わないため、別の市町村に化ける事故が起きる:
+  //      「広島市」  → 「東広島市」   (東 が付いただけの別の市)
+  //      「大阪市」  → 「東大阪市」
+  //      「名古屋市」→ 「北名古屋市」
+  //    いずれも政令市の親名で、本来は手順 4 が親ページへ寄せるべきものが、
+  //    ここで先に誤ヒットしていた。補われてよい接頭辞は「郡」または「市」
+  //    (政令市の区) で終わる完結した行政単位だけなので、そこだけを許可する。
+  const ends = JAPAN_MUNICIPALITIES.find((m) => {
+    if (m.prefName !== prefName) return false;
+    const full = normMuni(m.cityName);
+    if (full === nc || !full.endsWith(nc)) return false;
+    const prefix = full.slice(0, full.length - nc.length);
+    return prefix.endsWith("郡") || prefix.endsWith("市");
+  });
   if (ends) return ends.cityName;
   // 3. 生地点名が「正式市町村名 + 字/施設名」で始まる場合 (「石川郡浅川町◯◯」→「石川郡浅川町」)。
   //    最長一致するマスターを選び、短い名前への過剰一致を避ける。
