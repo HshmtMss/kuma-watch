@@ -10,6 +10,7 @@ import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
+import EnSeasons from "@/components/en/EnSeasons";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -302,6 +303,8 @@ export default async function EnglishSpotPage({ params }: Props) {
           </p>
         </div>
       )}
+
+      <EnSeasons landmark={l} currentMonth={new Date().getMonth() + 1} className="mt-8" />
 
       {/* Safety */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">Hike safely</h2>
