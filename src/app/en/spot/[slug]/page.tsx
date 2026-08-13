@@ -18,6 +18,10 @@ import MiniSightingsMap from "@/components/MiniSightingsMap";
 const SITE = "https://kuma-watch.jp";
 const EN_ENABLED = process.env.NEXT_PUBLIC_EN_ENABLED === "true";
 const NEAR_RADIUS_KM = 10;
+const MONTH_LABELS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 export const dynamicParams = false;
 export const revalidate = 21600;
@@ -88,16 +92,23 @@ export default async function EnglishSpotPage({ params }: Props) {
     lat: number;
     lon: number;
   }[] = [];
+  // 月別(季節性)は年をまたいで集計＝そのスポットで「何月に多いか」を可視化。
+  const monthly = new Array(12).fill(0) as number[];
   for (const s of sightings) {
     if (!s.date || s.date > today) continue;
     const d = haversineKm(l.lat, l.lon, s.lat, s.lon);
     if (d > NEAR_RADIUS_KM) continue;
+    const mo = Number(s.date.slice(5, 7));
+    if (mo >= 1 && mo <= 12) monthly[mo - 1]++;
     if (s.date < cutoff365) continue;
     count365++;
     if (s.date >= cutoff90) count90++;
     if (!latest || s.date > latest) latest = s.date;
     nearby.push({ date: s.date, distanceKm: d, lat: s.lat, lon: s.lon });
   }
+  const monthlyMax = Math.max(1, ...monthly);
+  const monthlyTotal = monthly.reduce((a, b) => a + b, 0);
+  const peakMonth = monthly.indexOf(Math.max(...monthly));
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   const mapUrl = `/?lat=${l.lat}&lon=${l.lon}&z=12`;
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}`;
@@ -245,10 +256,42 @@ export default async function EnglishSpotPage({ params }: Props) {
         When are bears most active?
       </h2>
       <p className="mt-2 text-[14.5px] leading-relaxed text-stone-600">
-        Most active in <b>autumn (September–November)</b> and <b>late spring</b>,
-        and around <b>dawn and dusk</b>. Poor acorn years push bears closer to
-        trails.
+        Bears are most active in <b>autumn (September–November)</b> and{" "}
+        <b>late spring</b>, and around <b>dawn and dusk</b>. Poor acorn years
+        push bears closer to trails.
       </p>
+
+      {/* Monthly pattern near this spot (data-driven) */}
+      {monthlyTotal > 0 && (
+        <div className="mt-3 rounded-2xl border border-stone-200 bg-white p-4">
+          <p className="text-xs font-bold text-stone-500">
+            Sightings by month within 10 km{" "}
+            <span className="font-normal text-stone-400">
+              (peak: {MONTH_LABELS[peakMonth]})
+            </span>
+          </p>
+          <div className="mt-3 flex items-end gap-1.5" aria-hidden>
+            {monthly.map((c, i) => (
+              <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                <div className="flex h-16 w-full items-end">
+                  <div
+                    className={`w-full rounded-sm ${
+                      i === peakMonth ? "bg-amber-500" : "bg-stone-300"
+                    }`}
+                    style={{ height: `${Math.max(4, (c / monthlyMax) * 100)}%` }}
+                  />
+                </div>
+                <span className="text-[9px] text-stone-400">
+                  {MONTH_LABELS[i][0]}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[10px] text-stone-400">
+            Based on {monthlyTotal} reported sightings within 10 km (all years).
+          </p>
+        </div>
+      )}
 
       {/* Safety */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">Hike safely</h2>
