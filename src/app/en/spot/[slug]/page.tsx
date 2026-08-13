@@ -11,6 +11,7 @@ import TravelEssentials from "@/components/en/TravelEssentials";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import EnSeasons from "@/components/en/EnSeasons";
+import { EN_BLURBS } from "@/data/inbound-en-blurbs";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -56,9 +57,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
   if (!l) return { title: "Not found" };
   const name = romaji(l.name, l.altNames);
+  const blurb = EN_BLURBS[slug];
   return {
     title: `Bears near ${name} — Sightings & Safety | KumaWatch`,
-    description: `Recent bear sightings near ${name}, Japan, plus when bears are active and how to hike safely. Check before you go.`,
+    description: blurb
+      ? `${blurb.slice(0, 150)} Check recent sightings and safety before you go.`.slice(0, 200)
+      : `Recent bear sightings near ${name}, Japan, plus when bears are active and how to hike safely. Check before you go.`,
     alternates: {
       canonical: `${SITE}/en/spot/${slug}`,
       languages: {
@@ -145,6 +149,13 @@ export default async function EnglishSpotPage({ params }: Props) {
             Photo: Wikimedia Commons ({l.imageCredit ?? l.name})
           </figcaption>
         </figure>
+      )}
+
+      {/* About (English intro) */}
+      {EN_BLURBS[slug] && (
+        <p className="mt-4 text-[15px] leading-relaxed text-stone-600">
+          {EN_BLURBS[slug]}
+        </p>
       )}
 
       {/* Real-time status */}
