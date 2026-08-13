@@ -8,6 +8,7 @@ import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import MiniSightingsMap from "@/components/MiniSightingsMap";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -81,7 +82,12 @@ export default async function EnglishSpotPage({ params }: Props) {
   let count90 = 0;
   let count365 = 0;
   let latest: string | null = null;
-  const nearby: { date: string; distanceKm: number }[] = [];
+  const nearby: {
+    date: string;
+    distanceKm: number;
+    lat: number;
+    lon: number;
+  }[] = [];
   for (const s of sightings) {
     if (!s.date || s.date > today) continue;
     const d = haversineKm(l.lat, l.lon, s.lat, s.lon);
@@ -90,7 +96,7 @@ export default async function EnglishSpotPage({ params }: Props) {
     count365++;
     if (s.date >= cutoff90) count90++;
     if (!latest || s.date > latest) latest = s.date;
-    nearby.push({ date: s.date, distanceKm: d });
+    nearby.push({ date: s.date, distanceKm: d, lat: s.lat, lon: s.lon });
   }
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   const mapUrl = `/?lat=${l.lat}&lon=${l.lon}&z=12`;
@@ -158,15 +164,45 @@ export default async function EnglishSpotPage({ params }: Props) {
             </p>
           </>
         )}
-        <Link
-          href={mapUrl}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
-        >
-          Open the live map →
-        </Link>
         <p className="mt-2 text-[11px] text-stone-400">
           Real-time data from official reports and news, updated continuously.
         </p>
+      </section>
+
+      {/* Embedded live map (same map as the Japanese page, English labels) */}
+      <section className="mt-6">
+        <h2 className="text-lg font-bold text-stone-900">Bear sightings map</h2>
+        <div className="mt-2 overflow-hidden rounded-2xl border border-stone-200">
+          <MiniSightingsMap
+            centerLat={l.lat}
+            centerLon={l.lon}
+            records={nearby.slice(0, 60).map((n) => ({
+              lat: n.lat,
+              lon: n.lon,
+              date: n.date,
+            }))}
+            showCenterMarker
+            radiusKm={NEAR_RADIUS_KM}
+            zoom={11}
+          />
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-stone-500">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-red-500" />
+            Past 90 days
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-stone-400" />
+            Within 1 year
+          </span>
+          <span className="text-stone-400">· 10 km radius shown</span>
+        </div>
+        <Link
+          href={mapUrl}
+          className="mt-2 inline-flex text-sm font-semibold text-emerald-700 hover:underline"
+        >
+          Open the full nationwide map →
+        </Link>
       </section>
 
       {/* Recent sightings */}
