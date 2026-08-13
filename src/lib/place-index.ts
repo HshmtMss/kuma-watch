@@ -1,6 +1,7 @@
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
+import { isApproximateLocation } from "@/lib/location-precision";
 
 export type PlaceCell = {
   prefectureName: string;
@@ -11,6 +12,10 @@ export type PlaceCell = {
   latestDate: string | null;
   latCentroid: number;
   lonCentroid: number;
+  // 直近1年のうち、場所が市町村までしか分からず地図に打てない件数
+  // (location-precision)。件数には含まれるがピンにしないので、その差を
+  // place ページで明示するために保持する。
+  unmappable365d: number;
 };
 
 export type PrefSummary = {
@@ -28,6 +33,9 @@ export type PlaceRecord = {
   date: string;
   sectionName?: string;
   comment?: string;
+  // 座標が地名からの推定か実測かを判定するために保持する
+  // (isApproximateLocation / location-precision.ts)。
+  sourceKind?: string;
 };
 
 type Index = {
@@ -144,6 +152,7 @@ async function build(): Promise<Index> {
       count: number;
       count90d: number;
       count365d: number;
+      unmappable365d: number;
       latestDate: string | null;
       latSum: number;
       lonSum: number;
@@ -177,6 +186,7 @@ async function build(): Promise<Index> {
         count: 0,
         count90d: 0,
         count365d: 0,
+        unmappable365d: 0,
         latestDate: null,
         latSum: 0,
         lonSum: 0,
@@ -191,7 +201,10 @@ async function build(): Promise<Index> {
     if (typeof r.date === "string" && r.date && r.date <= today) {
       if (!entry.latestDate || r.date > entry.latestDate) entry.latestDate = r.date;
       if (r.date >= cutoff90) entry.count90d++;
-      if (r.date >= cutoff365) entry.count365d++;
+      if (r.date >= cutoff365) {
+        entry.count365d++;
+        if (isApproximateLocation(r)) entry.unmappable365d++;
+      }
     }
   }
 
@@ -225,6 +238,8 @@ async function build(): Promise<Index> {
       date: r.date ?? "",
       sectionName: r.sectionName,
       comment: r.comment,
+      // 地図に打てる精度かの判定 (location-precision) に必要。
+      sourceKind: r.sourceKind,
     });
   }
   for (const arr of recordsByKey.values()) {
@@ -239,6 +254,7 @@ async function build(): Promise<Index> {
       count: e.count,
       count90d: e.count90d,
       count365d: e.count365d,
+      unmappable365d: e.unmappable365d,
       latestDate: e.latestDate,
       latCentroid: e.latSum / e.n,
       lonCentroid: e.lonSum / e.n,
@@ -414,6 +430,7 @@ export async function getWardsCell(
   let count = 0;
   let count90d = 0;
   let count365d = 0;
+  let unmappable365d = 0;
   let latestDate: string | null = null;
   let latSum = 0;
   let lonSum = 0;
@@ -424,6 +441,7 @@ export async function getWardsCell(
     count += c.count;
     count90d += c.count90d;
     count365d += c.count365d;
+    unmappable365d += c.unmappable365d;
     if (c.latestDate && (!latestDate || c.latestDate > latestDate)) {
       latestDate = c.latestDate;
     }
@@ -437,6 +455,7 @@ export async function getWardsCell(
     count,
     count90d,
     count365d,
+    unmappable365d,
     latestDate,
     latCentroid: n > 0 ? latSum / n : fallbackLat,
     lonCentroid: n > 0 ? lonSum / n : fallbackLon,

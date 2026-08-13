@@ -26,6 +26,7 @@ import {
   type PlaceRecord,
 } from "@/lib/place-index";
 import { buildMuniSeo } from "@/lib/place-seo";
+import { isApproximateLocation } from "@/lib/location-precision";
 import { getSeasonalAdvice, getBearRegion, getHabitatNote } from "@/lib/place-content";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -277,6 +278,7 @@ export default async function MuniPage({ params }: Props) {
       count: 0,
       count90d: 0,
       count365d: 0,
+      unmappable365d: 0,
       latestDate: null,
       latCentroid: masterEntry!.lat,
       lonCentroid: masterEntry!.lon,
@@ -494,7 +496,15 @@ export default async function MuniPage({ params }: Props) {
   // 地図プロット用 — 表示対象は「過去 1 年以内のデータ」のみ。
   // そのうち MiniSightingsMap 側で直近 90 日を赤、それ以外（91 日〜1 年）を
   // グレーで描く。古すぎる点が混じると最新傾向の解釈を歪めるためここで絞る。
-  const mapRecordsForYear = mapRecords.filter(within1Year);
+  // 場所が市町村までしか分からない事案は地図に打たない。座標は地名からの推定で、
+  // ピンにすると無関係な地点を「出没地点」として主張してしまう
+  // (location-precision.ts)。件数には残すので、地図に出ない分は下で明示する。
+  const mapRecordsForYear = mapRecords
+    .filter(within1Year)
+    .filter((r) => !isApproximateLocation(r));
+  // 件数は cell 側で全レコードを走査した値を使う。mapRecords は直近 60 件に
+  // 絞られているので、そこから数えると実際より少ない件数を出してしまう。
+  const unmappableCount = cell.unmappable365d;
 
   // 地区別件数 — sectionName で集約して件数の多い順に top 10。
   const sectionCounts = new Map<string, number>();
@@ -732,6 +742,16 @@ export default async function MuniPage({ params }: Props) {
         mapUrl={mapUrl}
         ctaLabel={`${muni} の警戒レベルマップを開く →`}
       />
+      {/* 地図に出していない事案の明示。件数（直近1年◯件）には入っているのに
+          ピンが少ないと「数が合わない」と受け取られるため、理由を添える。
+          報道が「◯◯市内で目撃」としか伝えていない事案は、座標が地名からの
+          推定でしかなく、ピンにすると無関係な場所を出没地点として示してしまう。 */}
+      {unmappableCount > 0 && (
+        <p className="mt-2 text-[13px] leading-relaxed text-stone-500">
+          このほか、{muni}内で{unmappableCount}件の出没が報じられていますが、
+          市町村より細かい場所が分からないため地図には表示していません（件数には含まれます）。
+        </p>
+      )}
 
       {/* 概要と詳細の境界。次セクション (h2) の上余白で十分なので区切り線は
           置かない。以前は <hr> を挟んでいたが「凡例の下に薄い線が残っていて

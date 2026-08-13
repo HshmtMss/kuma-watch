@@ -9,6 +9,7 @@ import type {
   UnifiedSighting,
 } from "@/lib/sources/types";
 import { jstToday } from "@/lib/jst-date";
+import { isApproximateLocation } from "@/lib/location-precision";
 
 export type KumaRecord = {
   id: number | string;
@@ -96,7 +97,14 @@ export async function GET(req: Request) {
             () => [] as UnifiedSighting[],
           )
         : [];
-    const all = [...unified, ...citizen].map(unifiedToKumaRecord);
+    // 場所が市町村までしか分かっていない事案は地図に出さない。座標は地名から
+    // 起こした推定でしかなく、ピンを打つと無関係な地点を「出没地点」として
+    // 主張してしまう (location-precision.ts)。件数には残るので、地図に出ない
+    // 分は place ページ側で明示する。
+    const pinnable = [...unified, ...citizen].filter(
+      (r) => !isApproximateLocation(r),
+    );
+    const all = pinnable.map(unifiedToKumaRecord);
 
     let records = all;
     if (pref) records = records.filter((r) => r.prefectureName === pref);

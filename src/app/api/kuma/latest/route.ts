@@ -3,6 +3,7 @@ import { getCachedSightings } from "@/lib/sightings-cache";
 import { getApprovedCitizenSightings } from "@/lib/submission-store";
 import type { UnifiedSighting } from "@/lib/sources/types";
 import { jstToday } from "@/lib/jst-date";
+import { isApproximateLocation } from "@/lib/location-precision";
 
 /**
  * 出没データの「軽量サマリ」だけを返すポーリング用エンドポイント。
@@ -28,7 +29,11 @@ export async function GET(req: Request) {
             () => [] as UnifiedSighting[],
           )
         : [];
-    const all = [...unified, ...citizen];
+    // /api/kuma と同じ除外規則にする。地図に出るレコードと突き合わせる署名なので、
+    // ここだけ母数が違うと「新着あり」と誤検知して無限に再取得してしまう。
+    const all = [...unified, ...citizen].filter(
+      (r) => !isApproximateLocation(r),
+    );
     const todayIso = jstToday();
 
     let matched = 0;

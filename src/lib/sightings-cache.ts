@@ -7,6 +7,7 @@ import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed } from "@/lib/news-suppression";
 import { isNewsMisplaced, isPrefLevelCity } from "@/lib/muni-geo-check";
 import { jstToday } from "@/lib/jst-date";
+import { withPinnableLocation } from "@/lib/location-precision";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
@@ -765,6 +766,14 @@ async function loadNearbyFromShards(
  * 数KB〜数MB）を読むため、91k件/31MB の全件読込による OOM（status 0 → 5xx）を避ける。
  * シャードが未整備/取得失敗のときは従来の全件ロードにフォールバックする（安全）。
  */
+/**
+ * ある地点の周辺の出没を返す。/spot の「半径 10km 以内で N 件」の根拠になる。
+ *
+ * 場所が市町村までしか分かっていない事案は除外する (location-precision)。座標が
+ * 地名からの推定なので、その点が半径 10km に入るかどうかは偶然で決まり、
+ * 「この観光地の周辺で起きた」という主張の根拠にならない。市町村ページと違って
+ * 距離が判定できない以上、件数からも外すのが正しい。
+ */
 export async function getNearbySightings(
   centerLat: number,
   centerLon: number,
@@ -777,14 +786,16 @@ export async function getNearbySightings(
   // ビルド(SSG)/dev は全件ロード(ローカル fs。ネットワーク不要で安定)。
   if (isBuildOrDev) {
     const raw = await getRawSightingsCached();
-    return cleanAndDedupe(filterToBbox(raw, centerLat, centerLon, padKm));
+    return withPinnableLocation(
+      cleanAndDedupe(filterToBbox(raw, centerLat, centerLon, padKm)),
+    );
   }
   // runtime は空間シャードのみ。no-store の全件ロードにフォールバックすると
   // (a) "static → dynamic" 500 (b) 91k件/31MB の OOM を招くため行わない。
   // シャード取得に失敗したら空(200・データ無し)で描画し、次回リクエストで再取得。
   const shardRecs = await loadNearbyFromShards(centerLat, centerLon, padKm);
-  return cleanAndDedupe(
-    filterToBbox(shardRecs ?? [], centerLat, centerLon, padKm),
+  return withPinnableLocation(
+    cleanAndDedupe(filterToBbox(shardRecs ?? [], centerLat, centerLon, padKm)),
   );
 }
 
