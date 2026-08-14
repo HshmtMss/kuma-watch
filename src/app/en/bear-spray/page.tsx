@@ -141,10 +141,10 @@ export default function BearSprayGuide() {
           Check sightings near your trail
         </p>
         <Link
-          href="/"
+          href="/en#spots"
           className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
         >
-          Open the live bear map →
+          See hiking spots &amp; sightings →
         </Link>
       </div>
     </main>

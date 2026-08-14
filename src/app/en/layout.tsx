@@ -37,8 +37,8 @@ export default function EnLayout({
             </span>
           </Link>
           <nav className="flex items-center gap-3 text-xs font-semibold">
-            <Link href="/" className="text-stone-600 hover:text-stone-900">
-              Map
+            <Link href="/en#spots" className="text-stone-600 hover:text-stone-900">
+              Spots
             </Link>
             <Link href="/" className="text-stone-400 hover:text-stone-600">
               日本語
@@ -60,8 +60,8 @@ export default function EnLayout({
             <Link href="/en" className="hover:text-stone-800">
               Bear safety guide
             </Link>
-            <Link href="/" className="hover:text-stone-800">
-              Live map
+            <Link href="/en#spots" className="hover:text-stone-800">
+              Hiking spots
             </Link>
             <Link href="/" className="hover:text-stone-800">
               日本語サイト

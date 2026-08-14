@@ -145,24 +145,24 @@ export default function EnglishSafetyHub() {
           Check sightings near your trail
         </h2>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-600">
-          KumaWatch maps real-time bear sightings across Japan, updated
-          continuously from official reports and news. Check your destination
-          before you go.
+          KumaWatch tracks real-time bear sightings across Japan, updated
+          continuously from official reports and news. Pick your destination
+          below to see recent sightings and a live map for that spot.
         </p>
         <Link
-          href="/"
+          href="#spots"
           className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
         >
-          Open the live bear map →
+          See hiking spots &amp; sightings →
         </Link>
       </div>
 
       {/* Popular spots (internal links to English spot pages) */}
-      <h2 className="mt-8 text-lg font-bold text-stone-900">
-        Popular hiking spots
+      <h2 id="spots" className="mt-8 scroll-mt-20 text-lg font-bold text-stone-900">
+        Hiking spots across Japan
       </h2>
       <p className="mt-1 text-[13.5px] leading-relaxed text-stone-600">
-        Check recent bear sightings before you visit.
+        Check recent bear sightings and a live map before you visit — {INBOUND_EN_SLUGS.length} spots.
       </p>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {INBOUND_EN_SLUGS.map((slug) => {

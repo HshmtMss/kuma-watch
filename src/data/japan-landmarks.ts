@@ -1472,7 +1472,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   {
     slug: "kitakaruizawa",
     name: "北軽井沢",
-    altNames: ["きたかるいざわ", "スウィートグラス", "浅間高原"],
+    altNames: ["Kita-Karuizawa", "きたかるいざわ", "スウィートグラス", "浅間高原"],
     prefName: "群馬県",
     muniName: "長野原町",
     category: "campground",
@@ -1486,7 +1486,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   {
     slug: "tsumagoikougen",
     name: "嬬恋高原",
-    altNames: ["つまごいこうげん", "カンパーニャ嬬恋", "嬬恋村"],
+    altNames: ["Tsumagoi Kogen", "つまごいこうげん", "カンパーニャ嬬恋", "嬬恋村"],
     prefName: "群馬県",
     muniName: "嬬恋村",
     category: "campground",
@@ -1556,7 +1556,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   {
     slug: "okunikkou",
     name: "奥日光・湯元",
-    altNames: ["おくにっこう", "湯ノ湖", "日光湯元温泉"],
+    altNames: ["Oku-Nikko / Yumoto", "おくにっこう", "湯ノ湖", "日光湯元温泉"],
     prefName: "栃木県",
     muniName: "日光市",
     category: "resort",
@@ -1570,7 +1570,7 @@ const CURATED_LANDMARKS: JapanLandmark[] = [
   {
     slug: "togakushi",
     name: "戸隠",
-    altNames: ["とがくし", "戸隠神社", "戸隠高原"],
+    altNames: ["Togakushi", "とがくし", "戸隠神社", "戸隠高原"],
     prefName: "長野県",
     muniName: "長野市",
     category: "national_park",

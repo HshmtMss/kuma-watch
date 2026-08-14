@@ -116,7 +116,6 @@ export default async function EnglishSpotPage({ params }: Props) {
   const monthlyTotal = monthly.reduce((a, b) => a + b, 0);
   const peakMonth = monthly.indexOf(Math.max(...monthly));
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-  const mapUrl = `/?lat=${l.lat}&lon=${l.lon}&z=12`;
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}`;
 
   return (
@@ -222,10 +221,10 @@ export default async function EnglishSpotPage({ params }: Props) {
           <span className="text-stone-400">· 10 km radius shown</span>
         </div>
         <Link
-          href={mapUrl}
+          href="/en#spots"
           className="mt-2 inline-flex text-sm font-semibold text-emerald-700 hover:underline"
         >
-          Open the full nationwide map →
+          Browse more hiking spots →
         </Link>
       </section>
 
