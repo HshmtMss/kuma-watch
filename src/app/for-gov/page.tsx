@@ -7,15 +7,16 @@ const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
 
+const META_DESC =
+  "御自治体が公式ページに出したクマ出没情報と注意喚起を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページまで届けます。御自治体のご対応は、これまで通り公式ページに発表するだけ。まず 3 ヶ月無料。";
+
 export const metadata: Metadata = {
-  title: "自治体の方へ｜公式クマ情報を住民・観光客へ配信",
-  description:
-    "御自治体が公式ページで発表したクマ出没情報を、登録した住民・観光客の通知へ自動でお届けします。まず 3 ヶ月無料でお試しいただけます。実装・運用は当社が担当します。",
+  title: "自治体の方へ｜公式クマ情報を住民・観光客・訪日客へ届ける",
+  description: META_DESC,
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
     title: "自治体の方へ｜KumaWatch",
-    description:
-      "御自治体の公式クマ情報を、住民・観光客の通知へ自動でお届け。まず 3 ヶ月無料でお試しいただけます。",
+    description: META_DESC,
     url: `${SITE_URL}/for-gov`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
@@ -23,11 +24,31 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "自治体の方へ｜KumaWatch",
-    description:
-      "御自治体の公式クマ情報を、住民・観光客の通知へ自動でお届け。まず 3 ヶ月無料でお試しいただけます。",
+    description: META_DESC,
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
+
+// 「誰に届くか」を 3 つに分けて具体化する。従来は「住民・観光客の通知へ自動で
+// お届け」という一文だけで、届く相手も届き方も読み取れず問い合わせに繋がって
+// いなかった。件数はすべて実データで検証済みの値を使う。
+const AUDIENCES = [
+  {
+    who: "住民",
+    how: "LINE・スマホの通知",
+    body: "地域を登録した住民のスマホへ、御自治体の発表を通知します。公式ページを見に来ていない方にも届きます。",
+  },
+  {
+    who: "観光客・登山者",
+    how: "「○○市 クマ」の検索結果",
+    body: "市町村ごと・登山口や観光地ごとの専用ページを用意しています。出かける前に検索した人が、御自治体の情報に辿り着きます。",
+  },
+  {
+    who: "訪日外国人",
+    how: "英語ページ",
+    body: "高尾山・富士山・上高地・日光・知床など、主要 35 か所の英語ページを公開しています。日本語の公式ページだけでは届かない層に伝わります。",
+  },
+];
 
 const PROCESS_STEPS = [
   {
@@ -44,7 +65,6 @@ const PROCESS_STEPS = [
   },
 ];
 
-// FAQ は重要 3 件に圧縮 (費用 / 作業負担 / 運用形態)
 const FAQ = [
   {
     q: "費用はかかりますか？",
@@ -52,11 +72,19 @@ const FAQ = [
   },
   {
     q: "自治体側の負担はありますか？",
-    a: "ありません。これまで通り公式ページに発表していただくだけです。検知・配信はすべて当社で完結します。",
+    a: "ありません。これまで通り公式ページに発表していただくだけです。更新の検知・配信はすべて当社で完結し、新しいシステムや専用 API・CSV のご準備も不要です。",
   },
   {
     q: "公式の出没情報ページが無くても導入できますか？",
-    a: "ご相談ください。HP がない、PDF・紙運用、広報誌中心、SNS のみ — 御自治体の運用に合わせて配信元を組み立てます。",
+    a: "ご相談ください。HP がない、PDF・紙運用、広報誌中心、SNS のみ — 御自治体の運用に合わせて配信元を組み立てます。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。",
+  },
+  {
+    q: "観光客や訪日外国人にはどう届きますか？",
+    a: "登山口・観光地ごとのページから地域のページへ辿れる構造にしており、「○○市 クマ」と検索した方が御自治体の情報に行き着きます。訪日外国人には、高尾山・富士山・上高地・日光・知床など主要 35 か所の英語ページで伝えます。",
+  },
+  {
+    q: "当市の注意喚起の文章も載りますか？",
+    a: "はい。御自治体のクマ関連ページから住民向けの注意喚起を取り込み、地域のページに出典付きで掲載します。掲載内容のご確認・修正のご依頼はいつでも承ります。",
   },
 ];
 
@@ -64,24 +92,35 @@ export default function ForGovPage() {
   return (
     <PageShell
       title="自治体の方へ"
-      lead="御自治体が公式ページで発表したクマ出没情報を、登録した住民・観光客の通知へ自動でお届けします。届けるのは御自治体の一次情報です。"
+      lead="御自治体が公式ページに出したクマ出没情報と注意喚起を、住民・観光客・訪日外国人に届けるところまでを担います。御自治体のご対応は、これまで通り公式ページに発表するだけです。"
     >
       {/* Hero */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-800">
-          自治体向け・公式情報の配信
+          自治体向け・公式情報の到達支援
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          御自治体の公式クマ情報を、住民・観光客へ早く、正確に。
+          公式に出した情報を、
+          <br className="hidden sm:block" />
+          読まれるところまで届けます。
         </h2>
         <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
-          公式ページで発表された情報を、登録した住民・観光客の通知へ自動でお届けします。届けるのは御自治体の一次情報です。
+          クマの出没情報も注意喚起も、公式ページに掲載した時点では「置いてある」だけで、住民や観光客が見に来なければ伝わりません。KumaWatch
+          は、御自治体が出した情報を <strong>住民のスマホ</strong>・
+          <strong>観光客の検索結果</strong>・<strong>訪日外国人向けの英語ページ</strong>
+          まで運びます。
         </p>
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
           <li className="flex gap-2">
             <span className="text-amber-600">✓</span>
             <span>
-              公式に発表するだけで、見に来ない住民・観光客にも<strong>すぐ届く</strong>
+              御自治体の作業は<strong>これまで通り公式ページに出すだけ</strong>
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-amber-600">✓</span>
+            <span>
+              新しいシステム・専用 API・CSV の<strong>ご準備は不要</strong>
             </span>
           </li>
           <li className="flex gap-2">
@@ -108,33 +147,41 @@ export default function ForGovPage() {
         </div>
       </section>
 
-      {/* できること */}
-      <h2>できること</h2>
+      {/* 誰に届くか — 本サービスの中核。3 つの届け先を具体的に示す */}
+      <h2 id="audience">誰に届くのか</h2>
+      <div className="not-prose my-5 space-y-3">
+        {AUDIENCES.map((a) => (
+          <div
+            key={a.who}
+            className="rounded-xl border border-stone-200 bg-white p-4"
+          >
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="text-sm font-bold text-stone-900">{a.who}</span>
+              <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-800">
+                {a.how}
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
+              {a.body}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* 何を届けるか */}
+      <h2 id="what">何を届けるのか</h2>
       <ul>
         <li>
-          御自治体が公式ページで発表した情報を、住民・観光客の通知へ<strong>自動でお届け</strong>
+          <strong>クマの出没情報</strong> — 御自治体が公表した個別の出没事案
         </li>
         <li>
-          発表が<strong>すぐ届く</strong>（住民・観光客が見に来なくても届く）
-        </li>
-        <li>
-          一次情報は<strong>御自治体の公式ページへ誘導</strong>（置き換えず、正確に）
+          <strong>御自治体からの注意喚起</strong> —
+          「入山時は鈴を」「果実の放置に注意」といった住民向けメッセージを、地域のページに掲載します
         </li>
       </ul>
-
-      {/* 自治体向けの対策製品（audience:自治体 を /products?for=gov で表示） */}
-      <h2 id="products">自治体向けの対策製品</h2>
       <p>
-        防護柵・監視カメラ・捕獲機材・撃退装置など、<strong>自治体・猟友会向け</strong>の製品・サービスも整理して掲載しています。導入検討の比較にご利用ください。
+        どちらも<strong>御自治体名と公式ページへのリンクを必ず併記</strong>します。読んだ人は最後に公式ページへ戻る導線になっており、一次情報源としての位置づけは変わりません。
       </p>
-      <div className="not-prose my-4">
-        <Link
-          href="/products?for=gov"
-          className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
-        >
-          自治体向けの対策製品を見る →
-        </Link>
-      </div>
 
       {/* 導入の流れ — 3 ステップ */}
       <h2 id="process">3 ステップで開始</h2>
