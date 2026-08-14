@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  BellRing,
+  ExternalLink,
+  Files,
+  Globe,
+  Map,
+  MapPin,
+  Megaphone,
+  ShieldCheck,
+  type LucideIcon,
+} from "lucide-react";
 import PrintButton from "./PrintButton";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -14,7 +25,52 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-// 庁内稟議用の単一スプレッド型ドキュメント。
+// 提供機能。稟議で読まれるのは見出しだけなので、アイコン + 見出し + 1 文に絞る。
+// 詳細は各項目の中で完結させ、同じ内容を他セクションで繰り返さない。
+const FEATURES = [
+  {
+    icon: BellRing,
+    title: "公式ページ更新の自動検知・通知",
+    body: "御自治体の発表を検知し、地域を登録した住民・観光客へ LINE / プッシュ通知でお届けします。",
+  },
+  {
+    icon: Megaphone,
+    title: "御自治体の注意喚起の掲載",
+    body: "出没記録だけでなく、住民向けの注意喚起も出典付きで掲載します。",
+  },
+  {
+    icon: MapPin,
+    title: "市町村ごとの専用ページ",
+    body: "「○○市 クマ」で検索した住民・観光客が、御自治体の情報に辿り着きます。",
+  },
+  {
+    icon: Globe,
+    title: "訪日外国人への英語配信",
+    body: "高尾山・富士山・知床など主要 105 か所の英語ページで、日本語では届かない層に伝えます。",
+  },
+  {
+    icon: ExternalLink,
+    title: "公式ページへの送客",
+    body: "全ての情報に自治体名と公式リンクを併記。一次情報源としての位置づけは変わりません。",
+  },
+  {
+    icon: Map,
+    title: "全国クマ出没マップ",
+    body: "5km メッシュで 4 段階（警戒 / 注意 / 観察 / 静穏）に区分。出発前に 30 秒で確認できます。",
+  },
+  {
+    icon: Files,
+    title: "運用形態を問わない取り込み",
+    body: "HP・PDF・紙・広報誌・SNS のいずれでも対応します。公式ページ整備後は自動で一次出典を切り替えます。",
+  },
+  {
+    icon: ShieldCheck,
+    title: "獣医師による監修",
+    body: "クマの生態・人獣共通感染症・公衆衛生のリスク評価を監修しています。",
+  },
+] as const;
+
+// 庁内スプレッド型ドキュメント。
 // - PageShell のヘッダー/フッターは画面表示時のみ。@media print で非表示にし、
 //   A4 1 枚に収まるよう余白とフォントを最適化。
 // - 各セクションに print: page-break 制御を入れて自然な改ページを誘導。
@@ -107,39 +163,10 @@ export default function MunicipalSpecPage() {
           <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
             1. 提供機能
           </h2>
-          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Item
-              title="① 市町村別の専用ページ（自動生成）"
-              body="/place/[県]/[市町村] という独立 URL で市町村ごとの専用ページを自動生成。「○○市 クマ」検索で表示される媒体になり、連携自治体さまの情報をここに集約してリッチに掲載します。"
-            />
-            <Item
-              title="② 公式ページ更新の自動検知・通知配信"
-              body="御自治体の公式クマ情報ページの更新を自動で検知し、地域を登録した住民・観光客の通知（LINE・プッシュ通知）へお届けします。発表を見に来ない住民・観光客にも、公式情報が速く届きます。"
-            />
-            <Item
-              title="⑦ 御自治体からの注意喚起の掲載"
-              body="出没の記録だけでなく、御自治体がクマ関連ページに掲載している住民向けの注意喚起（入山時の対策・誘引物の管理など）を取り込み、地域のページに出典付きで掲載します。掲載内容のご確認・修正のご依頼はいつでも承ります。"
-            />
-            <Item
-              title="⑧ 訪日外国人への英語配信"
-              body="高尾山・富士山・上高地・日光・知床・屋久島など主要 105 か所の英語ページを公開。日本語の公式ページだけでは届かない訪日外国人にも、クマの状況と対処法が伝わります。"
-            />
-            <Item
-              title="③ 公式ページへのリンク・送客"
-              body="全ての出没情報に自治体名と公式ページへのリンクを併記。住民は最終的に必ず公式サイトに戻れる設計で、自治体側の一次情報源としての権威性も損ないません。"
-            />
-            <Item
-              title="④ 全国クマ出没マップ"
-              body="集約データを 5km メッシュで区分表示（警戒 / 注意 / 観察 / 静穏 の 4 段階）。住民・観光客は出発前にスマホで 30 秒チェックでき、登山口・観光地ページから市町村ページへ自然に誘導されます。"
-            />
-            <Item
-              title="⑤ 多様な運用形態への対応"
-              body="HP がない、PDF 運用、紙運用、広報誌中心、SNS のみ — 自治体さまの運用は本当に様々で、それで構いません。報道・住民投稿・隣接自治体や県の発表で補完するなど、状況に応じて対応します。後日、公式ページを整備された際は自動でそちらを一次出典に切り替えます。"
-            />
-            <Item
-              title="⑥ 獣医師による監修"
-              body="クマの生態・人獣共通感染症・公衆衛生のリスク評価を獣医師が監修。注意喚起の表現・警戒レベル算出の妥当性を担保。"
-            />
+          <div className="mt-3 grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2">
+            {FEATURES.map((f) => (
+              <Item key={f.title} icon={f.icon} title={f.title} body={f.body} />
+            ))}
           </div>
         </section>
 
@@ -151,68 +178,64 @@ export default function MunicipalSpecPage() {
           <div className="mt-2 overflow-hidden rounded-lg border border-stone-200">
             <ProcessRow
               n={1}
-              title="まずはご相談"
-              when="メールでお気軽に"
-              detail="contact@research-coordinate.co.jp 宛に「連携を検討したい」とご一報ください。公式 HP・PDF・紙運用・SNS など、貴自治体の運用形態は問いません。"
+              title="ご相談"
+              when="御自治体のご対応はここだけ"
+              detail="contact@research-coordinate.co.jp 宛に「連携を検討したい」とご一報ください。"
             />
             <ProcessRow
               n={2}
               title="設定"
               when="当社で配信を構築"
-              detail="配信元にする公式ページと情報源（HTML / PDF / CSV / KML / ArcGIS / API など）を当社で設定します。御自治体側での実装・新規 API のご用意は不要です。"
+              detail="配信元にする公式ページを当社で設定します。御自治体側での実装・新規 API のご用意は不要です。"
             />
             <ProcessRow
               n={3}
               title="配信開始"
-              when="まず 3 ヶ月無料でお試し"
-              detail="御自治体専用の配信を開始します。以降、御自治体は公式ページに発表するだけで、更新が住民・観光客の通知へ自動で届きます。検知・配信の運用は当社が担当します。"
+              when="まず 3 ヶ月無料"
+              detail="以降は公式ページに発表するだけで、更新が自動で届きます。追加の作業は発生しません。"
               last
             />
           </div>
-          <p className="mt-2 text-xs text-stone-600 print:text-[9pt]">
-            ※ 御自治体ご担当者のご対応は、最初のご相談のみ。以降は公式ページの発表に沿って自動配信され、追加の作業は発生しません。
-          </p>
         </section>
 
-        {/* 技術仕様 */}
+        {/* 仕様・取り扱い — 旧「3. 技術仕様」と「4. 出典・著作権・個人情報」を統合。
+            通読される箇所ではないので、庁内で確認される要点だけを短く並べる。
+            2 列にして縦の長さを半分にし、文章ではなく語で答える。 */}
         <section className="mt-6 print:break-inside-avoid">
           <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
-            3. 技術仕様
+            3. 仕様・情報の取り扱い
           </h2>
-          <Spec
-            rows={[
-              ["対応形式", "HTML / PDF / CSV / KML（Google MyMaps 含む）/ ArcGIS / 各種 API。新規 API のご用意は不要。"],
-              ["更新頻度", "公式ソースは 4 時間ごと（1 日 6 回）の自動取り込み。報道は数分間隔で巡回。差分のみ反映。"],
-              ["反映時間", "公式サイト更新からおおよそ 4 時間以内。報道で先に伝わった場合はそれより早く反映されます。"],
-              ["位置精度", "自治体公開時点の粒度を超えない（番地までで公開されていれば番地まで）。緯度経度は OpenStreetMap / Nominatim でジオコーディング。市町村より細かい場所が分からない情報は、地図上に地点として表示しません。"],
-              ["カバー範囲", "全国 1,895 市区町村分のページを用意し、うち 1,817 市区町村で出没情報を掲載（2026 年 8 月時点）。"],
-              ["インフラ", "Vercel。CDN 配信。SLA は best-effort（Vercel 自体の SLA に準ずる）。"],
-              ["データ形式", "JSON API ／ 5km 標準地域メッシュ ／ Schema.org JSON-LD。"],
-            ]}
-          />
-        </section>
-
-        {/* コンプライアンス */}
-        <section className="mt-6 print:break-before-page">
-          <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
-            4. 出典・著作権・個人情報
-          </h2>
-          <Spec
-            rows={[
-              ["出典明記", "全ての出没情報に「出典: ○○市」のラベルと公式ページへのリンクを併記。"],
-              ["著作権", "情報そのものの著作権は自治体に帰属。当社は集約・可視化のみを行います。"],
-              ["改変表示", "位置情報の正規化（番地→緯度経度変換）等を行う場合、改変箇所を内部ログに記録し、ご要望時に開示。"],
-              ["個人情報", "住民・通報者の個人情報は一切収集しません。公開情報のみ取り扱います。"],
-              ["連携停止", "メール 1 通で即時停止可能。停止後速やかに該当自治体の取り込みを停止し、表示を取り下げます。"],
-              ["免責", "最終的な一次情報は公式サイトでご確認いただく設計。詳細な免責事項は kuma-watch.jp/disclaimer。"],
-            ]}
-          />
+          <div className="mt-2 grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+            <Spec
+              rows={[
+                ["更新頻度", "4 時間ごと（1 日 6 回）。報道は数分間隔"],
+                ["反映時間", "公式サイト更新から約 4 時間以内"],
+                ["対応形式", "HTML / PDF / CSV / KML / ArcGIS / API"],
+                ["カバー範囲", "1,895 市区町村（うち 1,817 に出没情報）"],
+                ["位置精度", "自治体の公開粒度を超えない"],
+              ]}
+            />
+            <Spec
+              rows={[
+                ["出典", "「出典: ○○市」＋公式リンクを必ず併記"],
+                ["著作権", "情報の著作権は自治体に帰属"],
+                ["個人情報", "収集しません（公開情報のみ）"],
+                ["連携停止", "メール 1 通で即時停止"],
+                ["免責", "一次情報は公式サイトで確認いただく設計"],
+              ]}
+            />
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-stone-500 print:text-[8.5pt]">
+            緯度経度は OpenStreetMap / Nominatim で付与し、市町村より細かい場所が分からない情報は地図上に地点として表示しません。位置の正規化を行った箇所は内部ログに記録し、ご要望時に開示します。インフラは
+            Vercel（SLA は best-effort）。データは JSON API / 5km 標準地域メッシュ /
+            Schema.org JSON-LD で提供。詳細な免責事項は kuma-watch.jp/disclaimer。
+          </p>
         </section>
 
         {/* FAQ */}
         <section className="mt-6 print:break-inside-avoid">
           <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
-            5. よくあるご質問
+            4. よくあるご質問
           </h2>
           <div className="mt-2 space-y-2.5">
             <FAQ
@@ -245,7 +268,7 @@ export default function MunicipalSpecPage() {
         {/* 運営 */}
         <section className="mt-6 print:break-inside-avoid">
           <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
-            6. 運営体制
+            5. 運営体制
           </h2>
           <div className="mt-2 rounded-lg border border-stone-200 bg-white p-4 print:p-3">
             <div className="mb-2 flex items-center gap-3">
@@ -269,9 +292,8 @@ export default function MunicipalSpecPage() {
               rows={[
                 ["所在地", "〒160-0023 東京都新宿区西新宿 1-20-3 西新宿高木ビル 8F"],
                 ["代表メール", "contact@research-coordinate.co.jp"],
-                ["Web", "https://www.research-coordinate.co.jp"],
+                ["Web", "https://www.research-coordinate.co.jp/labs/vet/"],
                 ["事業領域", "獣医療・野生動物・公衆衛生領域の研究支援および技術プロジェクト"],
-                ["主な実績", "全国クマ出没事案の時空間分析・日次/週次/月次レポート公開（kuma-watch.jp/research）"],
               ]}
               compact
             />
@@ -281,7 +303,7 @@ export default function MunicipalSpecPage() {
         {/* お問い合わせ CTA */}
         <section className="mt-6 print:break-inside-avoid">
           <h2 className="text-lg font-bold text-stone-900 print:text-[13pt]">
-            7. お問い合わせ
+            6. お問い合わせ
           </h2>
           <p className="mt-1 text-sm leading-relaxed print:text-[10pt]">
             連携のご相談・追加資料のご請求は下記までご連絡ください。原則 3 営業日以内にご返信いたします。
@@ -296,9 +318,6 @@ export default function MunicipalSpecPage() {
                 contact@research-coordinate.co.jp
               </a>
             </div>
-            <div className="mt-1 text-xs text-stone-600 print:text-[9pt]">
-              件名は「KumaWatch 自治体連携のご相談」推奨。担当部署名・対象の出没情報ページ URL をお書き添えください。
-            </div>
           </div>
         </section>
 
@@ -312,15 +331,30 @@ export default function MunicipalSpecPage() {
   );
 }
 
-function Item({ title, body }: { title: string; body: string }) {
+// カードの枠線をやめ、アイコン + 見出し + 1 文の横並びにする。8 枚の囲みが
+// 並ぶと文字の塊に見えて読まれないため、余白で区切って視線を見出しに通す。
+function Item({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: LucideIcon;
+  title: string;
+  body: string;
+}) {
   return (
-    <div className="rounded-lg border border-stone-200 bg-white p-3 print:p-2.5">
-      <div className="text-sm font-semibold text-stone-900 print:text-[10pt]">
-        {title}
+    <div className="flex gap-3 print:break-inside-avoid">
+      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800 print:h-6 print:w-6">
+        <Icon size={15} aria-hidden />
+      </span>
+      <div className="min-w-0">
+        <div className="text-sm font-bold text-stone-900 print:text-[10pt]">
+          {title}
+        </div>
+        <p className="mt-0.5 text-xs leading-relaxed text-stone-600 print:text-[9pt]">
+          {body}
+        </p>
       </div>
-      <p className="mt-1 text-xs leading-relaxed text-stone-700 print:text-[9pt]">
-        {body}
-      </p>
     </div>
   );
 }
