@@ -9,7 +9,7 @@ const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
 
 const META_DESC =
-  "御地域のクマ出没情報と安全に関する情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページまで届けます。受け手が探しに行かなくても届く配信基盤で、発信を浸透につなげます。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
+  "KumaWatch は、クマの情報を調べる人が日常的に使っているサービスです。御地域のクマ出没情報と安全に関する情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページに載せ、探しに来ない人にも届けます。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
 
 export const metadata: Metadata = {
   title: "自治体の方へ｜地域の情報を住民・観光客・訪日客へ届ける",
@@ -109,12 +109,14 @@ export default function ForGovPage() {
           <br className="hidden sm:block" />
           情報の発信と浸透を目指しませんか？
         </h2>
+        {/* 見出しが「情報の発信と浸透を目指しませんか？」と問いを立てているので、
+            本文は課題を繰り返さず答えだけを書く。「発信/届く/浸透」を重ねると
+            3 文で同じ語が 2 回ずつ出て読みにくくなる。 */}
         <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
-          しっかり発信していても、必要な人に届き、浸透するまでには距離があります。KumaWatch
-          は一般の方に日常的に使われている配信基盤で、
-          <strong>受け手が探しに行かなくても情報が届きます</strong>。御地域の情報を
+          KumaWatch は、クマの情報を調べる人が日常的に使っているサービスです。御地域の情報を
           <strong>住民のスマホ</strong>・<strong>観光客の検索結果</strong>・
-          <strong>訪日外国人向けの英語ページ</strong>まで運び、発信を浸透につなげます。
+          <strong>訪日外国人向けの英語ページ</strong>に載せ、
+          <strong>探しに来ない人にも届けます</strong>。
         </p>
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
           <li className="flex gap-2">
