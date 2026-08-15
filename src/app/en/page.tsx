@@ -7,6 +7,39 @@ import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import { EN_GENERATED_SPOTS } from "@/data/inbound-en-generated";
 import { REGION_ORDER, prefRegion, prefEn } from "@/data/pref-en";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import JsonLd from "@/components/JsonLd";
+
+// FAQPage 構造化データ。回答はページ上の可視テキストに一致させる（Google 方針）。
+const FAQ_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Are there bears in Japan?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Bears live across much of Japan's mountains and forests, including popular trails near Tokyo, the Japan Alps, Nikko, and all of Hokkaido. Encounters are rare, but a little preparation keeps your hike safe.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "When are bears most active in Japan?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Bears are most active in autumn (September–November), when they feed heavily before winter, and again in late spring. They move most around dawn and dusk.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What should I do if I meet a bear?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Stay calm and do not run or scream. Keep facing the bear and back away slowly, giving it space and an escape route. Never get between a bear and its cub. Use bear spray only at close range as a last resort.",
+      },
+    },
+  ],
+};
 
 /**
  * 英語の土台ページ（インバウンド向け・追加方式）。日本語の既存ルートは触らず、
@@ -71,6 +104,7 @@ export default function EnglishSafetyHub() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
+      <JsonLd data={FAQ_LD} />
       <p className="text-xs font-bold tracking-wider text-amber-700">
         HIKING IN JAPAN
       </p>

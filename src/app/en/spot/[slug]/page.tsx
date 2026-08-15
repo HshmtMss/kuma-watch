@@ -12,6 +12,8 @@ import {
   getEnGeneratedSpot,
 } from "@/data/inbound-en-generated";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import JsonLd from "@/components/JsonLd";
+import { prefEn } from "@/data/pref-en";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import EnSeasons from "@/components/en/EnSeasons";
@@ -58,6 +60,7 @@ function resolveEnSpot(
     const l = {
       slug: gen.slug,
       name: gen.name,
+      prefName: gen.prefName,
       lat: gen.lat,
       lon: gen.lon,
       imageUrl: gen.imageUrl,
@@ -148,8 +151,53 @@ export default async function EnglishSpotPage({ params }: Props) {
   nearby.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}`;
 
+  // 構造化データ: 観光地(TouristAttraction・座標つき) ＋ パンくず。
+  const region = prefEn(l.prefName ?? "");
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "TouristAttraction",
+      name,
+      description: (
+        blurb ?? `Recent bear sightings and hiking safety for ${name}, Japan.`
+      ).slice(0, 300),
+      url: `${SITE}/en/spot/${slug}`,
+      ...(l.imageUrl ? { image: l.imageUrl } : {}),
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: l.lat,
+        longitude: l.lon,
+      },
+      address: {
+        "@type": "PostalAddress",
+        ...(region ? { addressRegion: region } : {}),
+        addressCountry: "JP",
+      },
+      isAccessibleForFree: true,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Bear Safety in Japan",
+          item: `${SITE}/en`,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name,
+          item: `${SITE}/en/spot/${slug}`,
+        },
+      ],
+    },
+  ];
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
+      <JsonLd data={jsonLd} />
       <nav className="text-xs text-stone-500">
         <Link href="/en" className="hover:text-stone-900">
           Bear Safety

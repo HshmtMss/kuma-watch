@@ -195,6 +195,14 @@ export default function HeaderNav({
           対策グッズ
         </Link>
         <DesktopDropdown label="法人" items={BUSINESS_LINKS} variant="cta" />
+        {/* 英語(インバウンド)サイトへの切替。hreflang と併せて相互リンクを担保。 */}
+        <Link
+          href="/en"
+          hrefLang="en"
+          className="rounded-full px-2 py-1.5 text-stone-400 hover:text-stone-800"
+        >
+          English
+        </Link>
       </nav>
 
       {/* モバイル: 検索アイコン + ハンバーガー */}
@@ -298,6 +306,14 @@ export default function HeaderNav({
                     />
                   ))}
                 </MobileGroup>
+                <Link
+                  href="/en"
+                  hrefLang="en"
+                  onClick={close}
+                  className="flex items-center gap-2 border-t border-gray-100 px-5 py-3 text-base font-semibold text-stone-600 hover:bg-stone-50 active:bg-stone-100"
+                >
+                  English
+                </Link>
               </nav>
             </>
           )}

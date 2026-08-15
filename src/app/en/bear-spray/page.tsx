@@ -3,6 +3,38 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import JsonLd from "@/components/JsonLd";
+
+const ARTICLE_LD = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Bear Spray & Bells in Japan: Rules and Where to Buy",
+    description:
+      "Is bear spray legal in Japan? Can you fly with it? What about bear bells? A practical guide for hikers, plus where to buy in Japan.",
+    url: "https://kuma-watch.jp/en/bear-spray",
+    inLanguage: "en",
+    isPartOf: "https://kuma-watch.jp/en",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Bear Safety in Japan",
+        item: "https://kuma-watch.jp/en",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Bear Spray & Bells",
+        item: "https://kuma-watch.jp/en/bear-spray",
+      },
+    ],
+  },
+];
 
 /**
  * インバウンド向け土台記事その2：日本でのクマ鈴/クマ撃退スプレーのルールと入手。
@@ -32,6 +64,7 @@ export default function BearSprayGuide() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
+      <JsonLd data={ARTICLE_LD} />
       <nav className="text-xs text-stone-500">
         <Link href="/en" className="hover:text-stone-900">
           Bear Safety
