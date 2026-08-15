@@ -25,6 +25,7 @@ type HistRow = { date: string; totalSubscribers: number };
 
 type PushStats = {
   totalSubscribers: number;
+  enSubscribers: number;
   activeMuniCount: number;
   totalSubscriptions: number;
   avgMunisPerSubscriber: number;
@@ -131,6 +132,11 @@ function PushStatsContent({
           {/* サマリタイル */}
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Tile label="実登録者数" value={stats.totalSubscribers} unit="人" />
+            <Tile
+              label="うち英語(インバウンド)"
+              value={stats.enSubscribers}
+              unit="人"
+            />
             <Tile
               label="登録あり自治体"
               value={stats.activeMuniCount}

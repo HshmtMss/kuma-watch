@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { JAPAN_LANDMARKS, type JapanLandmark } from "@/data/japan-landmarks";
 import { getNearbySightings } from "@/lib/sightings-cache";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import {
+  EN_GENERATED_SLUGS,
+  getEnGeneratedSpot,
+} from "@/data/inbound-en-generated";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
@@ -30,7 +34,7 @@ export const dynamicParams = false;
 export const revalidate = 21600;
 
 export function generateStaticParams() {
-  return INBOUND_EN_SLUGS.map((slug) => ({ slug }));
+  return [...INBOUND_EN_SLUGS, ...EN_GENERATED_SLUGS].map((slug) => ({ slug }));
 }
 
 type Props = { params: Promise<{ slug: string }> };
@@ -39,6 +43,32 @@ function romaji(name: string, alt?: string[]): string {
   // altNames の先頭(ローマ字表記)を優先。無ければ日本語名のまま。
   const r = alt?.find((a) => /^[A-Za-z]/.test(a));
   return r ?? name;
+}
+
+/**
+ * slug を英語スポットに解決する。生成分(EN_GENERATED)を先に見るので、日本語側の
+ * SPOT_COVERAGE が ON でも JAPAN_LANDMARKS の日本語名で上書きされない。
+ * 生成分は自己完結データから JapanLandmark 互換オブジェクトを組み立てる。
+ */
+function resolveEnSpot(
+  slug: string,
+): { l: JapanLandmark; name: string; blurb?: string } | null {
+  const gen = getEnGeneratedSpot(slug);
+  if (gen) {
+    const l = {
+      slug: gen.slug,
+      name: gen.name,
+      lat: gen.lat,
+      lon: gen.lon,
+      imageUrl: gen.imageUrl,
+      imageCredit: gen.imageCredit,
+      altNames: [gen.enName],
+    } as unknown as JapanLandmark;
+    return { l, name: gen.enName, blurb: gen.enBlurb };
+  }
+  const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
+  if (!l) return null;
+  return { l, name: romaji(l.name, l.altNames), blurb: EN_BLURBS[slug] };
 }
 
 function fmtDate(iso: string | null): string | null {
@@ -54,10 +84,9 @@ function fmtDate(iso: string | null): string | null {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
-  if (!l) return { title: "Not found" };
-  const name = romaji(l.name, l.altNames);
-  const blurb = EN_BLURBS[slug];
+  const resolved = resolveEnSpot(slug);
+  if (!resolved) return { title: "Not found" };
+  const { name, blurb } = resolved;
   return {
     title: `Bears near ${name} — Sightings & Safety | KumaWatch`,
     description: blurb
@@ -81,10 +110,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EnglishSpotPage({ params }: Props) {
   if (!EN_ENABLED) notFound();
   const { slug } = await params;
-  const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
-  if (!l) notFound();
+  const resolved = resolveEnSpot(slug);
+  if (!resolved) notFound();
+  const { l, name, blurb } = resolved;
 
-  const name = romaji(l.name, l.altNames);
   const sightings = await getNearbySightings(l.lat, l.lon, NEAR_RADIUS_KM);
   const today = jstToday();
   const cutoff90 = jstDaysAgo(90);
@@ -93,6 +122,7 @@ export default async function EnglishSpotPage({ params }: Props) {
   let count365 = 0;
   let latest: string | null = null;
   const nearby: {
+    id: string;
     date: string;
     distanceKm: number;
     lat: number;
@@ -110,7 +140,7 @@ export default async function EnglishSpotPage({ params }: Props) {
     count365++;
     if (s.date >= cutoff90) count90++;
     if (!latest || s.date > latest) latest = s.date;
-    nearby.push({ date: s.date, distanceKm: d, lat: s.lat, lon: s.lon });
+    nearby.push({ id: s.id, date: s.date, distanceKm: d, lat: s.lat, lon: s.lon });
   }
   const monthlyMax = Math.max(1, ...monthly);
   const monthlyTotal = monthly.reduce((a, b) => a + b, 0);
@@ -151,9 +181,9 @@ export default async function EnglishSpotPage({ params }: Props) {
       )}
 
       {/* About (English intro) */}
-      {EN_BLURBS[slug] && (
+      {blurb && (
         <p className="mt-4 text-[15px] leading-relaxed text-stone-600">
-          {EN_BLURBS[slug]}
+          {blurb}
         </p>
       )}
 
@@ -200,6 +230,7 @@ export default async function EnglishSpotPage({ params }: Props) {
             centerLat={l.lat}
             centerLon={l.lon}
             records={nearby.slice(0, 60).map((n) => ({
+              id: n.id,
               lat: n.lat,
               lon: n.lon,
               date: n.date,

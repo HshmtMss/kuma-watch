@@ -12,6 +12,7 @@ import {
   recordPushDispatch,
 } from "@/lib/push-storage";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
+import { enSpotName } from "@/lib/en-spot-name";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday } from "@/lib/jst-date";
 import {
@@ -72,7 +73,13 @@ type Body = {
   newRecords?: NewRecord[];
 };
 
-type Sub = { hash: string; endpoint: string; p256dh: string; auth: string };
+type Sub = {
+  hash: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  lang?: "en";
+};
 
 function isBearerAuthed(req: Request): boolean {
   const secret = process.env.PUSH_DISPATCH_SECRET;
@@ -119,6 +126,28 @@ async function deliver(subs: Sub[], payload: string): Promise<number> {
   }
   return sent;
 }
+
+const EN_MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+/** ISO日付 → "Aug 15, 2026"。英語通知文用。 */
+function fmtEn(iso?: string | null): string {
+  if (!iso) return "";
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  return m ? `${EN_MONTHS[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}` : "";
+}
+/** 購読者を言語(en/ja)で二分する。英語購読者には英語通知＋/en着地を送る。 */
+function splitLang<T extends { lang?: "en" }>(subs: T[]): { ja: T[]; en: T[] } {
+  const ja: T[] = [];
+  const en: T[] = [];
+  for (const s of subs) (s.lang === "en" ? en : ja).push(s);
+  return { ja, en };
+}
+const PUSH_ICONS = {
+  icon: "/icons/Icon-192.png",
+  badge: "/icons/Icon-192.png",
+} as const;
 
 export async function POST(req: Request) {
   if (!isConfigured()) {
@@ -204,15 +233,7 @@ export async function POST(req: Request) {
     if (subs.length === 0) continue;
     recipientCount += subs.length;
     const n = g.records.length;
-    const title =
-      n === 1
-        ? `${g.city} で新規クマ出没`
-        : `${g.city} で新規クマ出没 (${n} 件)`;
     const top = g.records[0];
-    const text =
-      top.comment && top.comment.length > 0
-        ? top.comment.slice(0, 90)
-        : `${top.date ?? ""} ${g.pref}${g.city}`.trim();
     const url = notifyMapUrl(
       "",
       top.lat,
@@ -221,15 +242,31 @@ export async function POST(req: Request) {
       `/place/${encodeURIComponent(g.pref)}/${encodeURIComponent(g.city)}`,
       top.id,
     );
-    const payload = JSON.stringify({
-      title,
-      body: text,
-      url,
-      tag: `kuma-${g.pref}-${g.city}`,
-      icon: "/icons/Icon-192.png",
-      badge: "/icons/Icon-192.png",
-    });
-    sentCount += await deliver(subs, payload);
+    const tag = `kuma-${g.pref}-${g.city}`;
+    const { ja, en } = splitLang(subs);
+    if (ja.length > 0) {
+      const title =
+        n === 1
+          ? `${g.city} で新規クマ出没`
+          : `${g.city} で新規クマ出没 (${n} 件)`;
+      const text =
+        top.comment && top.comment.length > 0
+          ? top.comment.slice(0, 90)
+          : `${top.date ?? ""} ${g.pref}${g.city}`.trim();
+      sentCount += await deliver(
+        ja,
+        JSON.stringify({ title, body: text, url, tag, ...PUSH_ICONS }),
+      );
+    }
+    if (en.length > 0) {
+      const title =
+        n === 1 ? `New bear sighting nearby` : `${n} new bear sightings nearby`;
+      const body = `${fmtEn(top.date)} — a bear was reported in your area.`.trim();
+      sentCount += await deliver(
+        en,
+        JSON.stringify({ title, body, url, tag, ...PUSH_ICONS }),
+      );
+    }
   }
 
   // ── 2b. spot 単位でグルーピングして送信 (近傍 10km の地理マッチ) ───────
@@ -261,25 +298,50 @@ export async function POST(req: Request) {
       if (subs.length === 0) continue;
       recipientCount += subs.length;
       const n = g.records.length;
-      const title =
-        n === 1
-          ? `${g.name}周辺で新規クマ出没`
-          : `${g.name}周辺で新規クマ出没 (${n} 件)`;
       const top = g.records[0];
-      const text =
-        top.comment && top.comment.length > 0
-          ? top.comment.slice(0, 90)
-          : `${top.date ?? ""} ${g.name}周辺`.trim();
-      const url = `/spot/${encodeURIComponent(g.slug)}`;
-      const payload = JSON.stringify({
-        title,
-        body: text,
-        url,
-        tag: `kuma-spot-${g.slug}`,
-        icon: "/icons/Icon-192.png",
-        badge: "/icons/Icon-192.png",
-      });
-      sentCount += await deliver(subs, payload);
+      const tag = `kuma-spot-${g.slug}`;
+      const { ja, en } = splitLang(subs);
+      if (ja.length > 0) {
+        const title =
+          n === 1
+            ? `${g.name}周辺で新規クマ出没`
+            : `${g.name}周辺で新規クマ出没 (${n} 件)`;
+        const text =
+          top.comment && top.comment.length > 0
+            ? top.comment.slice(0, 90)
+            : `${top.date ?? ""} ${g.name}周辺`.trim();
+        sentCount += await deliver(
+          ja,
+          JSON.stringify({
+            title,
+            body: text,
+            // ?s=<出没ID> でスポットの埋め込み地図が該当ピンを強調＆自動オープン。
+            url: `/spot/${encodeURIComponent(g.slug)}?s=${encodeURIComponent(top.id)}`,
+            tag,
+            ...PUSH_ICONS,
+          }),
+        );
+      }
+      if (en.length > 0) {
+        // 英語通知: 英語名＋英語文＋英語スポットページ(/en/spot)に着地。
+        const enName = enSpotName(g.slug) ?? g.name;
+        const title =
+          n === 1
+            ? `New bear sighting near ${enName}`
+            : `${n} new bear sightings near ${enName}`;
+        const body =
+          `${fmtEn(top.date)} — reported within about 10 km. Tap for details and safety tips.`.trim();
+        sentCount += await deliver(
+          en,
+          JSON.stringify({
+            title,
+            body,
+            url: `/en/spot/${encodeURIComponent(g.slug)}?s=${encodeURIComponent(top.id)}`,
+            tag,
+            ...PUSH_ICONS,
+          }),
+        );
+      }
     }
   }
 
@@ -298,26 +360,30 @@ export async function POST(req: Request) {
       if (matched.length === 0) continue;
       matched.forEach((r) => dispatchedIds.add(r.id));
       recipientCount += 1;
-      const place = pt.label || "登録地点";
       const n = matched.length;
-      const title =
-        n === 1
+      const top = matched[0];
+      // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
+      const isEn = gsub.lang === "en";
+      const place = pt.label || (isEn ? "your saved spot" : "登録地点");
+      const url = notifyMapUrl("", top.lat, top.lon, place, "/", top.id);
+      const title = isEn
+        ? n === 1
+          ? `New bear sighting near ${place}`
+          : `${n} new bear sightings near ${place}`
+        : n === 1
           ? `${place}周辺で新規クマ出没`
           : `${place}周辺で新規クマ出没 (${n} 件)`;
-      const top = matched[0];
-      const text =
-        top.comment && top.comment.length > 0
+      const text = isEn
+        ? `${fmtEn(top.date)} — reported within ${pt.radiusKm} km.`.trim()
+        : top.comment && top.comment.length > 0
           ? top.comment.slice(0, 90)
           : `${top.date ?? ""} ${place}周辺 (半径${pt.radiusKm}km)`.trim();
-      // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
-      const url = notifyMapUrl("", top.lat, top.lon, place, "/", top.id);
       const payload = JSON.stringify({
         title,
         body: text,
         url,
         tag: `kuma-geo-${pt.id}`,
-        icon: "/icons/Icon-192.png",
-        badge: "/icons/Icon-192.png",
+        ...PUSH_ICONS,
       });
       sentCount += await deliver(
         [

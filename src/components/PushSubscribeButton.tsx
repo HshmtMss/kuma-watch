@@ -193,6 +193,9 @@ export default function PushSubscribeButton({
           // どの導線から登録したかをサーバにも残す (GA4 だけだと実登録と
           // 突き合わせられず、面別の効果測定ができないため)
           surface,
+          // 英語(インバウンド /en)からの購読は lang="en" を付与。サーバ側で
+          // 言語別集計＋言語別配信(英語通知文・/en 着地)に使う。
+          ...(en ? { lang: "en" as const } : {}),
         }),
       });
       if (!res.ok) {

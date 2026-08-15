@@ -4,6 +4,8 @@ import Link from "next/link";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import { EN_GENERATED_SPOTS } from "@/data/inbound-en-generated";
+import { REGION_ORDER, prefRegion, prefEn } from "@/data/pref-en";
 import TravelEssentials from "@/components/en/TravelEssentials";
 
 /**
@@ -162,9 +164,12 @@ export default function EnglishSafetyHub() {
         Hiking spots across Japan
       </h2>
       <p className="mt-1 text-[13.5px] leading-relaxed text-stone-600">
-        Check recent bear sightings and a live map before you visit — {INBOUND_EN_SLUGS.length} spots.
+        Check recent bear sightings and a live map before you visit —{" "}
+        {INBOUND_EN_SLUGS.length + EN_GENERATED_SPOTS.length} spots across Japan.
       </p>
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+
+      <h3 className="mt-4 text-sm font-bold text-stone-500">Popular spots</h3>
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {INBOUND_EN_SLUGS.map((slug) => {
           const l = JAPAN_LANDMARKS.find((x) => x.slug === slug);
           if (!l) return null;
@@ -181,6 +186,69 @@ export default function EnglishSafetyHub() {
           );
         })}
       </div>
+
+      {/* More nature & hiking spots, grouped by region (self-contained EN data) */}
+      {EN_GENERATED_SPOTS.length > 0 &&
+        (() => {
+          const byRegion = new Map<string, typeof EN_GENERATED_SPOTS>();
+          for (const s of EN_GENERATED_SPOTS) {
+            const rg = prefRegion(s.prefName);
+            const arr = byRegion.get(rg) ?? [];
+            arr.push(s);
+            byRegion.set(rg, arr);
+          }
+          return (
+            <div className="mt-6">
+              <h3 className="text-sm font-bold text-stone-500">
+                More nature &amp; hiking spots by region
+              </h3>
+              <div className="mt-2 space-y-6">
+                {REGION_ORDER.filter((r) => byRegion.has(r)).map((region) => {
+                  // 地方 → 県 でサブグループ化して見やすく
+                  const byPref = new Map<string, typeof EN_GENERATED_SPOTS>();
+                  for (const s of byRegion.get(region)!) {
+                    const p = prefEn(s.prefName);
+                    const arr = byPref.get(p) ?? [];
+                    arr.push(s);
+                    byPref.set(p, arr);
+                  }
+                  const prefs = [...byPref.keys()].sort();
+                  return (
+                    <div key={region}>
+                      <p className="text-[13px] font-bold text-stone-700">
+                        {region}
+                      </p>
+                      <div className="mt-1.5 space-y-2.5">
+                        {prefs.map((pref) => (
+                          <div key={pref}>
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-400">
+                              {pref}
+                            </p>
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {byPref
+                                .get(pref)!
+                                .slice()
+                                .sort((a, b) => a.enName.localeCompare(b.enName))
+                                .map((s) => (
+                                  <Link
+                                    key={s.slug}
+                                    href={`/en/spot/${s.slug}`}
+                                    className="rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-[13px] font-medium text-stone-700 transition hover:border-amber-300 hover:bg-amber-50"
+                                  >
+                                    {s.enName}
+                                  </Link>
+                                ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
       {/* Gear (affiliate) */}
       {affiliateEnabled() && (

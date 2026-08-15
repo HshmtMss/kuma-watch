@@ -880,6 +880,7 @@ export default async function SpotPage({ params }: Props) {
         centerLat={landmark.lat}
         centerLon={landmark.lon}
         records={nearby.slice(0, 60).map((n) => ({
+          id: String(n.id),
           lat: n.lat,
           lon: n.lon,
           date: n.date,

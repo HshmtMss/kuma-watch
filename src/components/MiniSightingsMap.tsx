@@ -10,6 +10,8 @@ export type MiniSighting = {
   date: string;
   sectionName?: string;
   comment?: string;
+  /** 出没ID。通知(?s=<id>)で着地したとき、この記録を強調表示するために使う。 */
+  id?: string;
 };
 
 type Props = {
@@ -130,18 +132,32 @@ export default function MiniSightingsMap({
 
       const now = Date.now();
       const recentMs = recencyHighlightDays * 86_400_000;
+      // 通知(?s=<出没ID>)で着地したとき、その出没ピンを強調＆自動で開く。
+      // 「さっきの通知はどれ？」を無くすため。URL は client でしか読めないので
+      // ここ(useEffect 内)で読む＝ページは静的のままにできる。
+      const highlightId =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("s")
+          : null;
+      let hlMarker: ReturnType<typeof L.circleMarker> | null = null;
+      let hlLatLon: [number, number] | null = null;
       // タッチデバイスで押しやすい大きさ。circleMarker の HitBox は radius と一致するため、
       // 小さすぎると指でタップしてポップアップが開かない。10〜12px なら親指でも届く。
       for (const r of records) {
         const t = Date.parse(r.date);
         const isRecent = Number.isFinite(t) && now - t <= recentMs;
+        const isHighlight = Boolean(highlightId && r.id && r.id === highlightId);
         const marker = L.circleMarker([r.lat, r.lon], {
-          radius: isRecent ? 10 : 8,
-          color: isRecent ? "#7f1d1d" : "#6b7280",
-          weight: isRecent ? 2 : 1.5,
-          fillColor: isRecent ? "#dc2626" : "#9ca3af",
-          fillOpacity: isRecent ? 0.9 : 0.7,
+          radius: isHighlight ? 13 : isRecent ? 10 : 8,
+          color: isHighlight ? "#b45309" : isRecent ? "#7f1d1d" : "#6b7280",
+          weight: isHighlight ? 4 : isRecent ? 2 : 1.5,
+          fillColor: isHighlight ? "#f59e0b" : isRecent ? "#dc2626" : "#9ca3af",
+          fillOpacity: isHighlight ? 1 : isRecent ? 0.9 : 0.7,
         });
+        if (isHighlight) {
+          hlMarker = marker;
+          hlLatLon = [r.lat, r.lon];
+        }
         const date = r.date || "(日付不明)";
         const where = r.sectionName ? `<div>${escapeHtml(r.sectionName)}</div>` : "";
         // comment が出典 URL そのものの場合 (例: 報道記事 URL) は、生 URL を
@@ -162,6 +178,12 @@ export default function MiniSightingsMap({
            </div>`,
         );
         marker.addTo(map);
+      }
+
+      // 通知で指定された出没ピンがあれば、そこへ寄せて吹き出しを自動で開く。
+      if (hlMarker && hlLatLon) {
+        map.setView(hlLatLon, Math.max(zoom, 13));
+        hlMarker.openPopup();
       }
 
       cleanup = () => {

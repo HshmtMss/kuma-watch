@@ -30,6 +30,8 @@ type SubscribeBody = {
    * サーバ側にも残す。無くても購読は成立させる (任意項目)。
    */
   surface?: string;
+  /** 英語(インバウンド /en)からの購読なら "en"。言語別配信・集計に使う。 */
+  lang?: "en";
 };
 
 export async function POST(req: Request) {
@@ -53,6 +55,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
   const { subscription, pref, city, slug, geo, surface } = body;
+  const lang = body.lang === "en" ? ("en" as const) : undefined;
   if (
     !subscription?.endpoint ||
     !subscription.keys?.p256dh ||
@@ -92,6 +95,7 @@ export async function POST(req: Request) {
       lon: geo.lon,
       radiusKm: geo.radiusKm,
       label: geo.label ? geo.label.slice(0, 60) : undefined,
+      ...(lang ? { lang } : {}),
     });
     return NextResponse.json({ ok: true, id });
   }
@@ -109,6 +113,8 @@ export async function POST(req: Request) {
       p256dh: subscription.keys.p256dh,
       auth: subscription.keys.auth,
       slug,
+      ...(typeof surface === "string" && surface ? { surface } : {}),
+      ...(lang ? { lang } : {}),
     });
     return NextResponse.json({ ok: true });
   }
@@ -124,6 +130,7 @@ export async function POST(req: Request) {
     pref,
     city,
     ...(typeof surface === "string" && surface ? { surface } : {}),
+    ...(lang ? { lang } : {}),
   });
   return NextResponse.json({ ok: true });
 }

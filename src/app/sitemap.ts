@@ -7,6 +7,7 @@ import {
 } from "@/lib/research-entries";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import { EN_GENERATED_SLUGS } from "@/data/inbound-en-generated";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -179,6 +180,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: now,
             changeFrequency: "daily" as const,
             priority: 0.7,
+            alternates: {
+              languages: {
+                en: `${SITE_URL}/en/spot/${slug}`,
+                ja: `${SITE_URL}/spot/${slug}`,
+              },
+            },
+          })),
+          // 自然/登山系の生成スポット（英語）。curated より優先度を一段下げる。
+          ...EN_GENERATED_SLUGS.map((slug) => ({
+            url: `${SITE_URL}/en/spot/${slug}`,
+            lastModified: now,
+            changeFrequency: "weekly" as const,
+            priority: 0.5,
             alternates: {
               languages: {
                 en: `${SITE_URL}/en/spot/${slug}`,

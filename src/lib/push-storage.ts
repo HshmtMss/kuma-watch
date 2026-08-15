@@ -36,7 +36,16 @@ type StoredSubscription = {
    * 実登録データからは永久に復元できない。導線改修の効果測定に必須。
    */
   surface?: string;
+  /**
+   * 購読者の言語。英語(インバウンド /en)ページからの登録は "en"。
+   * 未設定=日本語(従来)。dispatch の言語別配信・管理画面の言語別集計に使う。
+   */
+  lang?: "en";
 };
+
+// 英語購読者の hash を集める Set。言語別カウントを scard で O(1) に取るための
+// インデックス (sub 本体を全 GET せずに数えられる)。sub:{hash} を消す全経路で srem する。
+const LANG_EN_KEY = "sub:lang:en";
 
 /** 任意地点 + 半径の通知購読 (地図で選んだ「自宅周辺」など) の 1 点。 */
 export type GeoPoint = {
@@ -125,6 +134,7 @@ export async function subscribe(input: {
   pref: string;
   city: string;
   surface?: string;
+  lang?: "en";
 }): Promise<{ hash: string }> {
   const r = client();
   const hash = hashEndpoint(input.endpoint);
@@ -136,6 +146,7 @@ export async function subscribe(input: {
     createdAt: now,
     lastSeen: now,
     ...(input.surface ? { surface: input.surface } : {}),
+    ...(input.lang === "en" ? { lang: "en" } : {}),
   };
   const mk = muniKey(input.pref, input.city);
   await Promise.all([
@@ -143,6 +154,7 @@ export async function subscribe(input: {
     r.sadd(`muni:${mk}`, hash),
     r.sadd(`muni:active`, mk),
     r.sadd(`sub:munis:${hash}`, mk),
+    ...(input.lang === "en" ? [r.sadd(LANG_EN_KEY, hash)] : []),
   ]);
   return { hash };
 }
@@ -166,7 +178,7 @@ export async function unsubscribeMuni(input: {
   }
   // この endpoint が他の muni / spot / geo も持っていなければ完全削除。
   if (!(await endpointStillReferenced(hash))) {
-    await r.del(`sub:${hash}`);
+    await Promise.all([r.del(`sub:${hash}`), r.srem(LANG_EN_KEY, hash)]);
   }
 }
 
@@ -209,6 +221,7 @@ export async function getSubscribersForMuni(
   endpoint: string;
   p256dh: string;
   auth: string;
+  lang?: "en";
 }[]> {
   const r = client();
   const mk = muniKey(pref, city);
@@ -222,6 +235,7 @@ export async function getSubscribersForMuni(
     endpoint: string;
     p256dh: string;
     auth: string;
+    lang?: "en";
   }[] = [];
   for (let i = 0; i < hashes.length; i++) {
     const v = raw[i];
@@ -234,6 +248,7 @@ export async function getSubscribersForMuni(
       endpoint: parsed.endpoint,
       p256dh: parsed.p256dh,
       auth: parsed.auth,
+      ...(parsed.lang === "en" ? { lang: "en" as const } : {}),
     });
   }
   return out;
@@ -242,6 +257,8 @@ export async function getSubscribersForMuni(
 export type PushStats = {
   /** ユニーク購読者数 (= sub:{hash} の件数。1 端末 = 1。複数地域登録でも 1) */
   totalSubscribers: number;
+  /** うち英語(インバウンド /en)からの購読者数 (= sub:lang:en の件数)。 */
+  enSubscribers: number;
   /** 購読者が 1 人以上いる市町村の数 */
   activeMuniCount: number;
   /** (購読者 × 地域) のペア総数 (= 各 muni の購読者数の合計)。複数地域ユーザは重複計上 */
@@ -284,6 +301,9 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
       }
     }
   } while (cursor !== "0");
+
+  // 1b) 英語(インバウンド)購読者数: sub:lang:en を SCARD (O(1))。
+  const enSubscribers = (await r.scard(LANG_EN_KEY)) ?? 0;
 
   // 2) 地域別購読者数: muni:active の各 muni を SCARD。
   const muniKeys = await r.smembers<string[]>(`muni:active`);
@@ -360,6 +380,7 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
 
   return {
     totalSubscribers,
+    enSubscribers,
     activeMuniCount,
     totalSubscriptions,
     avgMunisPerSubscriber:
@@ -380,6 +401,7 @@ export async function getPushStats(topN = 30): Promise<PushStats> {
 export type PushSnapshot = {
   date: string; // YYYY-MM-DD (JST)
   totalSubscribers: number;
+  enSubscribers?: number;
   totalSubscriptions: number;
   activeMuniCount: number;
   activeSpotCount: number;
@@ -399,6 +421,7 @@ export async function recordPushSnapshot(): Promise<PushSnapshot> {
   const snap: PushSnapshot = {
     date: jstDate(),
     totalSubscribers: s.totalSubscribers,
+    enSubscribers: s.enSubscribers,
     totalSubscriptions: s.totalSubscriptions,
     activeMuniCount: s.activeMuniCount,
     activeSpotCount: s.activeSpotCount,
@@ -496,6 +519,8 @@ export async function subscribeSpot(input: {
   p256dh: string;
   auth: string;
   slug: string;
+  surface?: string;
+  lang?: "en";
 }): Promise<{ hash: string }> {
   const r = client();
   const hash = hashEndpoint(input.endpoint);
@@ -506,12 +531,15 @@ export async function subscribeSpot(input: {
     auth: input.auth,
     createdAt: now,
     lastSeen: now,
+    ...(input.surface ? { surface: input.surface } : {}),
+    ...(input.lang === "en" ? { lang: "en" } : {}),
   };
   await Promise.all([
     r.set(`sub:${hash}`, JSON.stringify(sub)),
     r.sadd(`spot:${input.slug}`, hash),
     r.sadd(`spot:active`, input.slug),
     r.sadd(`sub:spots:${hash}`, input.slug),
+    ...(input.lang === "en" ? [r.sadd(LANG_EN_KEY, hash)] : []),
   ]);
   return { hash };
 }
@@ -532,7 +560,7 @@ export async function unsubscribeSpot(input: {
   }
   // muni / spot / geo いずれも残っていなければ sub 本体を削除
   if (!(await endpointStillReferenced(hash))) {
-    await r.del(`sub:${hash}`);
+    await Promise.all([r.del(`sub:${hash}`), r.srem(LANG_EN_KEY, hash)]);
   }
 }
 
@@ -559,6 +587,7 @@ export async function getSubscribersForSpot(slug: string): Promise<
     endpoint: string;
     p256dh: string;
     auth: string;
+    lang?: "en";
   }[]
 > {
   const r = client();
@@ -572,6 +601,7 @@ export async function getSubscribersForSpot(slug: string): Promise<
     endpoint: string;
     p256dh: string;
     auth: string;
+    lang?: "en";
   }[] = [];
   for (let i = 0; i < hashes.length; i++) {
     const v = raw[i];
@@ -583,6 +613,7 @@ export async function getSubscribersForSpot(slug: string): Promise<
       endpoint: parsed.endpoint,
       p256dh: parsed.p256dh,
       auth: parsed.auth,
+      ...(parsed.lang === "en" ? { lang: "en" as const } : {}),
     });
   }
   return out;
@@ -632,6 +663,7 @@ export async function subscribeGeo(input: {
   lon: number;
   radiusKm: number;
   label?: string;
+  lang?: "en";
 }): Promise<{ hash: string; id: string }> {
   const r = client();
   const hash = hashEndpoint(input.endpoint);
@@ -642,6 +674,7 @@ export async function subscribeGeo(input: {
     auth: input.auth,
     createdAt: now,
     lastSeen: now,
+    ...(input.lang === "en" ? { lang: "en" } : {}),
   };
   const id = randomUUID();
   const point: GeoPoint = {
@@ -658,6 +691,7 @@ export async function subscribeGeo(input: {
     r.set(`sub:${hash}`, JSON.stringify(sub)),
     r.set(`geo:pts:${hash}`, JSON.stringify(points)),
     r.sadd(`geo:active`, hash),
+    ...(input.lang === "en" ? [r.sadd(LANG_EN_KEY, hash)] : []),
   ]);
   return { hash, id };
 }
@@ -675,7 +709,7 @@ export async function unsubscribeGeo(input: {
     await Promise.all([r.del(`geo:pts:${hash}`), r.srem(`geo:active`, hash)]);
   }
   if (!(await endpointStillReferenced(hash))) {
-    await r.del(`sub:${hash}`);
+    await Promise.all([r.del(`sub:${hash}`), r.srem(LANG_EN_KEY, hash)]);
   }
 }
 
@@ -694,6 +728,7 @@ export async function getAllGeoSubscribers(): Promise<
     p256dh: string;
     auth: string;
     points: GeoPoint[];
+    lang?: "en";
   }[]
 > {
   const r = client();
@@ -711,6 +746,7 @@ export async function getAllGeoSubscribers(): Promise<
     p256dh: string;
     auth: string;
     points: GeoPoint[];
+    lang?: "en";
   }[] = [];
   for (let i = 0; i < hashes.length; i++) {
     const subRaw = res[i * 2];
@@ -728,6 +764,7 @@ export async function getAllGeoSubscribers(): Promise<
       p256dh: sub.p256dh,
       auth: sub.auth,
       points,
+      ...(sub.lang === "en" ? { lang: "en" as const } : {}),
     });
   }
   return out;
@@ -770,6 +807,7 @@ export async function purgeSubscription(hash: string): Promise<void> {
     pipeline.srem(`spot:${slug}`, hash);
   }
   pipeline.srem(`geo:active`, hash);
+  pipeline.srem(LANG_EN_KEY, hash);
   pipeline.del(`sub:${hash}`);
   pipeline.del(`sub:munis:${hash}`);
   pipeline.del(`sub:spots:${hash}`);
