@@ -155,6 +155,10 @@ export default function MunicipalSpecPage() {
               <strong>監修：</strong>
               獣医師。獣医療・公衆衛生・野生動物の専門領域として品質を担保。
             </li>
+            <li>
+              <strong>オプション：</strong>
+              御地域の出没傾向の分析・対策の効果検証を協働で進めるご提案も承ります（詳細はお問い合わせください）。
+            </li>
           </ul>
         </section>
 

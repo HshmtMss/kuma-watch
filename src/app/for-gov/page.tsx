@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FlaskConical } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 
@@ -203,7 +204,32 @@ export default function ForGovPage() {
         ))}
       </div>
 
-      {/* FAQ — 3 件に圧縮 */}
+      {/* もう 1 つの提案 — 情報の到達支援とは別軸のオプション。
+          詳細は問い合わせに委ね、ここでは「そういう話もできる」ことだけ示す。 */}
+      <h2 id="research">オプション：地域特性に応じた傾向・対策研究</h2>
+      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
+            <FlaskConical size={17} aria-hidden />
+          </span>
+          <div>
+            <p className="m-0 text-sm leading-relaxed text-stone-700">
+              情報を届ける仕組みとは別に、
+              <strong>御地域の出没傾向の分析や対策の効果検証を、協働で進めるご提案</strong>
+              もしています。当ラボでは全国データの時空間分析のほか、ブナ・ナラの結実状況と出没の対応検証、都道府県別のクマ管理計画の集約などを公開しています。
+            </p>
+            <p className="m-0 mt-2 text-sm leading-relaxed text-stone-700">
+              御地域の課題に合わせた進め方をご相談できます。ご関心があれば
+              <a href="#contact" className="font-semibold text-emerald-800 underline">
+                お問い合わせ
+              </a>
+              ください。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ */}
       <h2 id="faq">よくあるご質問</h2>
       <div className="not-prose my-4 space-y-2">
         {FAQ.map((f) => (
