@@ -9,10 +9,10 @@ const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
 
 const META_DESC =
-  "御自治体が公式ページに出したクマ出没情報と注意喚起を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページまで届けます。御自治体のご対応は、これまで通り公式ページに発表するだけ。まず 3 ヶ月無料。";
+  "御地域の出没情報・安全情報・観光情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページまで届けます。受け手は何もしなくても情報が届く配信基盤。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
 
 export const metadata: Metadata = {
-  title: "自治体の方へ｜公式クマ情報を住民・観光客・訪日客へ届ける",
+  title: "自治体の方へ｜地域の情報を住民・観光客・訪日客へ届ける",
   description: META_DESC,
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
@@ -37,7 +37,7 @@ const AUDIENCES = [
   {
     who: "住民",
     how: "LINE・スマホの通知",
-    body: "地域を登録した住民のスマホへ、御自治体の発表を通知します。公式ページを見に来ていない方にも届きます。",
+    body: "地域を登録した住民のスマホへ直接届きます。受け手が見に行かなくても、必要なときに手元に届く形です。",
   },
   {
     who: "観光客・登山者",
@@ -47,14 +47,14 @@ const AUDIENCES = [
   {
     who: "訪日外国人",
     how: "英語ページ",
-    body: "高尾山・富士山・上高地・日光・知床など、主要 105 か所の英語ページを公開しています。日本語の公式ページだけでは届かない層に伝わります。",
+    body: "高尾山・富士山・上高地・日光・知床など、主要 105 か所の英語ページを公開しています。日本語だけでは届かない層に伝わります。",
   },
 ];
 
 const PROCESS_STEPS = [
   {
     title: "ご相談",
-    body: "下のフォームからご一報ください。配信元にする公式ページ（HP・PDF・SNS 等）を確認します。運用形態は問いません。",
+    body: "下のフォームからご一報ください。配信元にする情報（HP・PDF・SNS 等）を確認します。運用形態は問いません。",
   },
   {
     title: "設定",
@@ -97,29 +97,30 @@ export default function ForGovPage() {
   return (
     <PageShell
       title="自治体の方へ"
-      lead="御自治体が公式ページに出したクマ出没情報と注意喚起を、住民・観光客・訪日外国人に届けるところまでを担います。御自治体のご対応は、これまで通り公式ページに発表するだけです。"
+      lead="御地域の情報を、住民・観光客・訪日外国人に正しく届けます。KumaWatch は一般の利用者に日常的に使われている配信基盤で、受け手は何もしなくても情報が届きます。"
     >
       {/* Hero */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-800">
-          自治体向け・公式情報の到達支援
+          自治体向け・地域情報の配信基盤
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          公式に出した情報を、
+          正しい情報を、
           <br className="hidden sm:block" />
-          読まれるところまで届けます。
+          届くところまで。
         </h2>
         <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
-          クマの出没情報も注意喚起も、公式ページに掲載した時点では「置いてある」だけで、住民や観光客が見に来なければ伝わりません。KumaWatch
-          は、御自治体が出した情報を <strong>住民のスマホ</strong>・
-          <strong>観光客の検索結果</strong>・<strong>訪日外国人向けの英語ページ</strong>
-          まで運びます。
+          出かける前に自治体のホームページを見に行く人は、ほとんどいません。KumaWatch
+          は一般の利用者に日常的に使われている配信基盤で、
+          <strong>受け手は何もしなくても情報が届きます</strong>。御地域の情報を
+          <strong>住民のスマホ</strong>・<strong>観光客の検索結果</strong>・
+          <strong>訪日外国人向けの英語ページ</strong>まで運びます。
         </p>
         <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
           <li className="flex gap-2">
             <span className="text-amber-600">✓</span>
             <span>
-              御自治体の作業は<strong>これまで通り公式ページに出すだけ</strong>
+              御自治体の作業は<strong>これまで通り情報を出すだけ</strong>
             </span>
           </li>
           <li className="flex gap-2">
@@ -173,19 +174,25 @@ export default function ForGovPage() {
         ))}
       </div>
 
-      {/* 何を届けるか */}
+      {/* 何を届けるか — 出没情報に限定せず「地域の情報」として広く扱う。
+          注意喚起は含むが、そこだけに絞ると地域振興の文脈が落ちるため。 */}
       <h2 id="what">何を届けるのか</h2>
       <ul>
         <li>
           <strong>クマの出没情報</strong> — 御自治体が公表した個別の出没事案
         </li>
         <li>
-          <strong>御自治体からの注意喚起</strong> —
-          「入山時は鈴を」「果実の放置に注意」といった住民向けメッセージを、地域のページに掲載します
+          <strong>安全に関する情報</strong> —
+          注意喚起、入山規制、対策の呼びかけなど
+        </li>
+        <li>
+          <strong>観光・地域の情報</strong> —
+          季節の見どころ、施設の開閉、イベントなど、来訪につながる情報
         </li>
       </ul>
       <p>
-        どちらも<strong>御自治体名と公式ページへのリンクを必ず併記</strong>します。読んだ人は最後に公式ページへ戻る導線になっており、一次情報源としての位置づけは変わりません。
+        安全情報だけでは、伝わるのは「危ないから来ないでください」だけになります。地域の魅力とあわせて届けることで、
+        <strong>安全と来訪の両立</strong>に使っていただけます。情報には<strong>御自治体名と出典リンクを必ず併記</strong>します。
       </p>
 
       {/* 導入の流れ — 3 ステップ */}
@@ -218,20 +225,9 @@ export default function ForGovPage() {
           </span>
           <div>
             <p className="m-0 text-sm leading-relaxed text-stone-700">
-              情報を届ける仕組みとは別に、
+              配信とは別に、
               <strong>御地域の出没傾向を分析し、対策の優先順位を一緒に組み立てるご提案</strong>
-              もしています。「どこに人員と予算を割くか」を、件数ではなくデータで決めるための材料をお出しします。
-            </p>
-            <p className="m-0 mt-2 text-sm leading-relaxed text-stone-700">
-              全国データの分析では、出没は奥山ではなく
-              <strong>森林率 40〜60% の境界地帯</strong>
-              に集中すること、10 月の誘引物では
-              <strong>柿が突出</strong>していること、
-              <strong>一度出没した地点は約 1 週間リスクが高い状態が続く</strong>
-              ことなどが見えています。同じ見方を御地域のデータに当てて、実情に合った打ち手を検討できます。
-            </p>
-            <p className="m-0 mt-2 text-sm leading-relaxed text-stone-700">
-              ご関心があれば
+              もしています。詳細は
               <a href="#contact" className="font-semibold text-emerald-800 underline">
                 お問い合わせ
               </a>
