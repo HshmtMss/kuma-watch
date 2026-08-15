@@ -215,11 +215,19 @@ export default function ForGovPage() {
           <div>
             <p className="m-0 text-sm leading-relaxed text-stone-700">
               情報を届ける仕組みとは別に、
-              <strong>御地域の出没傾向の分析や対策の効果検証を、協働で進めるご提案</strong>
-              もしています。当ラボでは全国データの時空間分析のほか、ブナ・ナラの結実状況と出没の対応検証、都道府県別のクマ管理計画の集約などを公開しています。
+              <strong>御地域の出没傾向を分析し、対策の優先順位を一緒に組み立てるご提案</strong>
+              もしています。「どこに人員と予算を割くか」を、件数ではなくデータで決めるための材料をお出しします。
             </p>
             <p className="m-0 mt-2 text-sm leading-relaxed text-stone-700">
-              御地域の課題に合わせた進め方をご相談できます。ご関心があれば
+              全国データの分析では、出没は奥山ではなく
+              <strong>森林率 40〜60% の境界地帯</strong>
+              に集中すること、10 月の誘引物では
+              <strong>柿が突出</strong>していること、
+              <strong>一度出没した地点は約 1 週間リスクが高い状態が続く</strong>
+              ことなどが見えています。同じ見方を御地域のデータに当てて、実情に合った打ち手を検討できます。
+            </p>
+            <p className="m-0 mt-2 text-sm leading-relaxed text-stone-700">
+              ご関心があれば
               <a href="#contact" className="font-semibold text-emerald-800 underline">
                 お問い合わせ
               </a>
