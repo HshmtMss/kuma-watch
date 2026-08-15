@@ -24,6 +24,14 @@ const FAQ_LD = {
     },
     {
       "@type": "Question",
+      name: "Are there different kinds of bear in Japan?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Asian black bears (tsukinowaguma) live in the mountains of Honshu and Shikoku, while larger brown bears (higuma) live only on Hokkaido. There are essentially no bears in Kyushu or Okinawa.",
+      },
+    },
+    {
+      "@type": "Question",
       name: "When are bears most active in Japan?",
       acceptedAnswer: {
         "@type": "Answer",
@@ -119,6 +127,49 @@ export default function EnglishSafetyHub() {
         do.
       </p>
 
+      {/* Species / where they live */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">
+        Two kinds of bear in Japan
+      </h2>
+      <p className="mt-2 text-[14.5px] leading-relaxed text-stone-600">
+        Which bear you might meet depends entirely on where you hike.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-stone-200 bg-white p-4">
+          <h3 className="text-[15px] font-bold text-stone-900">
+            Asian black bear
+          </h3>
+          <p className="text-[12px] font-semibold text-stone-400">
+            tsukinowaguma · Honshu &amp; Shikoku
+          </p>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
+            Smaller (about 1.2–1.5 m, often 50–120 kg), with a pale crescent on
+            the chest. It lives through the mountains of Honshu — the Japan Alps,
+            Tohoku, Nikko, and the forested hills around Tokyo. Usually shy and
+            keen to avoid people, but a startled bear or a mother with cubs can be
+            dangerous.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-stone-200 bg-white p-4">
+          <h3 className="text-[15px] font-bold text-stone-900">Brown bear</h3>
+          <p className="text-[12px] font-semibold text-stone-400">
+            higuma · Hokkaido only
+          </p>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
+            Much larger and stronger (males can exceed 200 kg), found only on
+            Hokkaido — including Shiretoko and Daisetsuzan. Treat brown-bear
+            country with extra caution: keep your distance and never approach for
+            a photo.
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 text-[14.5px] leading-relaxed text-stone-600">
+        There are essentially <b>no bears in Kyushu or Okinawa</b>, and only a
+        tiny, rarely-seen population remains in Shikoku. If you are sightseeing in
+        cities, bears are not a concern — this matters mainly for hiking and
+        rural travel.
+      </p>
+
       {/* 5 rules */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">
         5 rules for bear country
@@ -169,11 +220,28 @@ export default function EnglishSafetyHub() {
         If you meet a bear
       </h2>
       <ol className="mt-2 space-y-1.5 text-[14.5px] leading-relaxed text-stone-600">
-        <li>1. Stay calm. Do not run or scream.</li>
-        <li>2. Keep facing the bear and back away slowly.</li>
+        <li>1. Stay calm. Do not run or scream — running can trigger a chase.</li>
+        <li>2. Keep facing the bear and back away slowly, watching it as you go.</li>
         <li>3. Give it space and an escape route — never get between a bear and its cub.</li>
-        <li>4. If it approaches, make yourself known calmly; use bear spray only at close range as a last resort.</li>
+        <li>4. If it approaches, stand your ground and make yourself known calmly; use bear spray only at close range as a last resort.</li>
+        <li>5. If a bear makes contact, protect your head and neck with your arms and backpack, and keep your face down.</li>
       </ol>
+      <p className="mt-2 text-[13.5px] leading-relaxed text-stone-600">
+        In Hokkaido&apos;s brown-bear country, keep an even greater distance and
+        leave the area promptly if you see one — do not linger for photos.
+      </p>
+
+      {/* Family */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">
+        Hiking with children &amp; families
+      </h2>
+      <p className="mt-2 text-[14.5px] leading-relaxed text-stone-600">
+        Keep children close and within sight, especially at dawn, dusk, and near
+        dense brush or rushing streams where a bear may not hear you coming. Make
+        noise together — talking and a bell are enough. Carry out every snack and
+        wrapper: food smells are the most common reason a bear approaches a trail
+        or campsite.
+      </p>
 
       {/* Check sightings */}
       <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-4">

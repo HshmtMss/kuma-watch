@@ -34,6 +34,36 @@ const ARTICLE_LD = [
       },
     ],
   },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Is bear spray legal in Japan?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Buying and carrying bear spray for wildlife defense is allowed, and it is sold at outdoor stores across Japan, especially in Hokkaido. It is meant for bears, not against people.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Can I bring bear spray on a plane to Japan?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "No. Pressurized irritant sprays are prohibited in both carry-on and checked luggage. Buy it after you arrive in Japan, and use up, give away, or dispose of it before you fly home.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do I need bear spray to hike in Japan?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "For most day hikes in Honshu, a bear bell and awareness are usually enough, since Asian black bears tend to move away once they know you are there. Bear spray matters most in Hokkaido's brown-bear country and on remote backcountry routes.",
+        },
+      },
+    ],
+  },
 ];
 
 /**
@@ -83,6 +113,19 @@ export default function BearSprayGuide() {
         know as a visitor.
       </p>
 
+      {/* Do you need it */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">
+        Do you actually need bear spray?
+      </h2>
+      <p className="mt-2 text-[14.5px] leading-relaxed text-stone-600">
+        For most visitors on popular day hikes in Honshu, a <b>bell and
+        awareness are usually enough</b> — Asian black bears typically move away
+        once they know you&apos;re there. Bear spray matters most in{" "}
+        <b>Hokkaido&apos;s brown-bear country</b> and on remote, quiet, or
+        multi-day backcountry routes. If in doubt, carry it: it&apos;s light, and
+        you only ever need it once.
+      </p>
+
       {/* Bells */}
       <h2 className="mt-8 text-lg font-bold text-stone-900">
         Bear bells — your everyday tool
@@ -127,6 +170,18 @@ export default function BearSprayGuide() {
         <li>3. Aim slightly downward at the bear's face; account for wind.</li>
         <li>4. After spraying, leave the area calmly — don't linger.</li>
       </ol>
+
+      {/* Flying / disposal */}
+      <h2 className="mt-8 text-lg font-bold text-stone-900">
+        Flying home &amp; disposal
+      </h2>
+      <p className="mt-2 text-[14.5px] leading-relaxed text-stone-600">
+        You cannot take bear spray on a plane, in carry-on or checked bags. Plan
+        to <b>use up, give away, or dispose of it before you fly</b> — many
+        outdoor shops and mountain huts in Hokkaido will take a used canister,
+        and some rent spray so you never have to travel with it. Never pack a
+        pressurized canister in your luggage.
+      </p>
 
       {/* Gear affiliate */}
       {affiliateEnabled() && (
