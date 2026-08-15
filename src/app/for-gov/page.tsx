@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, Send } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 
@@ -153,7 +153,66 @@ export default function ForGovPage() {
         </div>
       </section>
 
-      {/* 誰に届くか — 本サービスの中核。3 つの届け先を具体的に示す */}
+      {/* 2 本柱 — 御提案は「配信」と「研究」の 2 つ。従来は配信の話が
+          ページ全体を占め、研究は FAQ 手前の小さな囲みだけで同格に見えなかった。
+          最初に 2 つ並べ、以降の詳細が提案 1 のものであることを示す。 */}
+      <h2 id="offers">ご提案は 2 つです</h2>
+      <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-5">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-amber-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+            提案 1
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
+              <Send size={16} aria-hidden />
+            </span>
+            <div>
+              <h3 className="m-0 text-[15px] font-bold leading-snug text-stone-900">
+                くまウォッチを活用しての情報の発信と浸透を目指しませんか？
+              </h3>
+              <p className="m-0 mt-2 text-[13px] leading-relaxed text-stone-700">
+                一般の方に<strong>&ldquo;届く&rdquo;情報発信</strong>で、浸透をサポートします。
+              </p>
+              <p className="m-0 mt-1.5 text-[12px] leading-relaxed text-stone-500">
+                本ページで詳しくご説明しています。まず 3 ヶ月無料。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 p-5">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-700 px-2.5 py-0.5 text-[11px] font-bold text-white">
+            提案 2・オプション
+          </div>
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
+              <FlaskConical size={16} aria-hidden />
+            </span>
+            <div>
+              <h3 className="m-0 text-[15px] font-bold leading-snug text-stone-900">
+                地域特化型の傾向・対策研究を推進しませんか？
+              </h3>
+              <p className="m-0 mt-2 text-[13px] leading-relaxed text-stone-700">
+                <strong>&ldquo;地域の特性&rdquo;に応じた分析アルゴリズムの開発</strong>
+                をオプションでご提供します。
+              </p>
+              <p className="m-0 mt-1.5 text-[12px] leading-relaxed text-stone-500">
+                詳細は
+                <a href="#contact" className="font-semibold text-emerald-800 underline">
+                  お問い合わせ
+                </a>
+                ください。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p className="text-sm text-stone-500">
+        以下は<strong>提案 1</strong>のご説明です。
+      </p>
+
+      {/* 誰に届くか — 提案 1 の中核。3 つの届け先を具体的に示す */}
       <h2 id="audience">誰に届くのか</h2>
       <div className="not-prose my-5 space-y-3">
         {AUDIENCES.map((a) => (
@@ -208,28 +267,6 @@ export default function ForGovPage() {
             <p className="mt-1 text-xs leading-relaxed text-stone-600">{p.body}</p>
           </div>
         ))}
-      </div>
-
-      {/* もう 1 つの提案 — 情報の到達支援とは別軸のオプション。
-          詳細は問い合わせに委ね、ここでは「そういう話もできる」ことだけ示す。 */}
-      <h2 id="research">オプション：地域特性に応じた傾向・対策研究</h2>
-      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
-            <FlaskConical size={17} aria-hidden />
-          </span>
-          <div>
-            <p className="m-0 text-sm leading-relaxed text-stone-700">
-              配信とは別に、
-              <strong>御地域の出没傾向を分析し、対策の優先順位を一緒に組み立てるご提案</strong>
-              もしています。詳細は
-              <a href="#contact" className="font-semibold text-emerald-800 underline">
-                お問い合わせ
-              </a>
-              ください。
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* FAQ */}
