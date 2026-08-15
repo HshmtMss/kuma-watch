@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FlaskConical, Send } from "lucide-react";
+import { FlaskConical } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 
@@ -97,17 +97,17 @@ export default function ForGovPage() {
   return (
     <PageShell
       title="自治体の方へ"
-      lead="御地域の情報を、住民・観光客・訪日外国人に正しく届けます。KumaWatch は一般の利用者に日常的に使われている配信基盤で、受け手は何もしなくても情報が届きます。"
+      lead="御地域の情報を、住民・観光客・訪日外国人に正しく届けます。"
     >
       {/* Hero */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold text-amber-800">
-          自治体向け・地域情報の配信基盤
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-600 px-3 py-1 text-[11px] font-bold text-white">
+          提案 1
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          正しい情報を、
+          くまウォッチを活用しての
           <br className="hidden sm:block" />
-          届くところまで。
+          情報の発信と浸透を目指しませんか？
         </h2>
         <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
           出かける前に自治体のホームページを見に行く人は、ほとんどいません。KumaWatch
@@ -152,65 +152,6 @@ export default function ForGovPage() {
           </Link>
         </div>
       </section>
-
-      {/* 2 本柱 — 御提案は「配信」と「研究」の 2 つ。従来は配信の話が
-          ページ全体を占め、研究は FAQ 手前の小さな囲みだけで同格に見えなかった。
-          最初に 2 つ並べ、以降の詳細が提案 1 のものであることを示す。 */}
-      <h2 id="offers">ご提案は 2 つです</h2>
-      <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-5">
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-amber-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
-            提案 1
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
-              <Send size={16} aria-hidden />
-            </span>
-            <div>
-              <h3 className="m-0 text-[15px] font-bold leading-snug text-stone-900">
-                くまウォッチを活用しての情報の発信と浸透を目指しませんか？
-              </h3>
-              <p className="m-0 mt-2 text-[13px] leading-relaxed text-stone-700">
-                一般の方に<strong>&ldquo;届く&rdquo;情報発信</strong>で、浸透をサポートします。
-              </p>
-              <p className="m-0 mt-1.5 text-[12px] leading-relaxed text-stone-500">
-                本ページで詳しくご説明しています。まず 3 ヶ月無料。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 p-5">
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-700 px-2.5 py-0.5 text-[11px] font-bold text-white">
-            提案 2・オプション
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
-              <FlaskConical size={16} aria-hidden />
-            </span>
-            <div>
-              <h3 className="m-0 text-[15px] font-bold leading-snug text-stone-900">
-                地域特化型の傾向・対策研究を推進しませんか？
-              </h3>
-              <p className="m-0 mt-2 text-[13px] leading-relaxed text-stone-700">
-                <strong>&ldquo;地域の特性&rdquo;に応じた分析アルゴリズムの開発</strong>
-                をオプションでご提供します。
-              </p>
-              <p className="m-0 mt-1.5 text-[12px] leading-relaxed text-stone-500">
-                詳細は
-                <a href="#contact" className="font-semibold text-emerald-800 underline">
-                  お問い合わせ
-                </a>
-                ください。
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <p className="text-sm text-stone-500">
-        以下は<strong>提案 1</strong>のご説明です。
-      </p>
 
       {/* 誰に届くか — 提案 1 の中核。3 つの届け先を具体的に示す */}
       <h2 id="audience">誰に届くのか</h2>
@@ -288,6 +229,26 @@ export default function ForGovPage() {
             </div>
           </details>
         ))}
+      </div>
+
+      {/* 提案 2 — 問い合わせの直前に置く。ここまで読んだ方に「もう 1 つある」と
+          伝われば十分なので 1〜2 行に留め、中身は問い合わせに委ねる。 */}
+      <h2 id="research">提案 2（オプション）</h2>
+      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
+            <FlaskConical size={17} aria-hidden />
+          </span>
+          <div>
+            <h3 className="m-0 text-[15px] font-bold leading-snug text-stone-900">
+              地域特化型の傾向・対策研究を推進しませんか？
+            </h3>
+            <p className="m-0 mt-1.5 text-sm leading-relaxed text-stone-700">
+              <strong>&ldquo;地域の特性&rdquo;に応じた分析アルゴリズムの開発</strong>
+              をオプションでご提供します。詳細は下記よりお問い合わせください。
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* お問い合わせ */}
