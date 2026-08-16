@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import EnSources from "@/components/en/EnSources";
 import JsonLd from "@/components/JsonLd";
 
 const ARTICLE_LD = [
@@ -15,6 +16,8 @@ const ARTICLE_LD = [
     url: "https://kuma-watch.jp/en/bear-spray",
     inLanguage: "en",
     isPartOf: "https://kuma-watch.jp/en",
+    datePublished: "2026-08-13",
+    dateModified: "2026-08-17",
   },
   {
     "@context": "https://schema.org",
@@ -223,6 +226,8 @@ export default function BearSprayGuide() {
       )}
 
       <TravelEssentials className="mt-6" />
+
+      <EnSources updated="August 17, 2026" className="mt-8" />
 
       <div className="mt-8 rounded-2xl border border-stone-200 bg-white p-4">
         <p className="text-sm font-bold text-stone-900">

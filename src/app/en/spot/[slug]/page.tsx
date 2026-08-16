@@ -12,6 +12,7 @@ import {
   getEnGeneratedSpot,
 } from "@/data/inbound-en-generated";
 import TravelEssentials from "@/components/en/TravelEssentials";
+import EnSources from "@/components/en/EnSources";
 import JsonLd from "@/components/JsonLd";
 import { prefEn } from "@/data/pref-en";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
@@ -450,6 +451,8 @@ export default async function EnglishSpotPage({ params }: Props) {
       )}
 
       <TravelEssentials className="mt-6" />
+
+      <EnSources updated={fmtDate(jstToday()) ?? undefined} className="mt-8" />
 
       <p className="mt-8 text-xs text-stone-400">
         日本語版:{" "}

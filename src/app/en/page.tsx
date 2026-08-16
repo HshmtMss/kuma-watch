@@ -8,11 +8,14 @@ import { EN_GENERATED_SPOTS } from "@/data/inbound-en-generated";
 import { REGION_ORDER, prefRegion, prefEn } from "@/data/pref-en";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import JsonLd from "@/components/JsonLd";
+import EnSources from "@/components/en/EnSources";
 
 // FAQPage 構造化データ。回答はページ上の可視テキストに一致させる（Google 方針）。
+const REVIEWED = "August 17, 2026";
 const FAQ_LD = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  dateModified: "2026-08-17",
   mainEntity: [
     {
       "@type": "Question",
@@ -401,6 +404,8 @@ export default function EnglishSafetyHub() {
       )}
 
       <TravelEssentials className="mt-6" />
+
+      <EnSources updated={REVIEWED} className="mt-8" />
 
       <p className="mt-8 text-xs text-stone-400">
         日本語版:{" "}
