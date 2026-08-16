@@ -5,6 +5,7 @@ import { affiliateEnabled, amazonSearchUrl } from "@/lib/affiliate";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import { EN_GENERATED_SPOTS } from "@/data/inbound-en-generated";
+import { EN_TRAILS } from "@/data/en-trails";
 import { REGION_ORDER, prefRegion, prefEn } from "@/data/pref-en";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import JsonLd from "@/components/JsonLd";
@@ -262,6 +263,34 @@ export default function EnglishSafetyHub() {
         >
           See hiking spots &amp; sightings →
         </Link>
+      </div>
+
+      {/* Multi-day trails (route-level bear status) */}
+      <h2 id="trails" className="mt-8 scroll-mt-20 text-lg font-bold text-stone-900">
+        Popular multi-day trails
+      </h2>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-stone-600">
+        Walking a famous route? Check recent bear sightings along the whole
+        trail, section by section.
+      </p>
+      <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+        {EN_TRAILS.map((t) => (
+          <Link
+            key={t.slug}
+            href={`/en/trail/${t.slug}`}
+            className="rounded-2xl border border-stone-200 bg-white p-3.5 transition hover:border-amber-300 hover:bg-amber-50"
+          >
+            <span className="block text-[15px] font-bold text-stone-900">
+              {t.name}
+            </span>
+            <span className="mt-0.5 block text-[12px] font-semibold text-stone-400">
+              {t.region}
+            </span>
+            <span className="mt-1 block text-[12.5px] leading-snug text-stone-600">
+              {t.tagline}
+            </span>
+          </Link>
+        ))}
       </div>
 
       {/* Popular spots (internal links to English spot pages) */}

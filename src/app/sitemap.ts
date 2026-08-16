@@ -8,6 +8,7 @@ import {
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import { EN_GENERATED_SLUGS } from "@/data/inbound-en-generated";
+import { EN_TRAIL_SLUGS } from "@/data/en-trails";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -186,6 +187,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 ja: `${SITE_URL}/spot/${slug}`,
               },
             },
+          })),
+          // 有名トレイル（英語・ルート単位）。訪日の検索意図が強い。
+          ...EN_TRAIL_SLUGS.map((slug) => ({
+            url: `${SITE_URL}/en/trail/${slug}`,
+            lastModified: now,
+            changeFrequency: "daily" as const,
+            priority: 0.7,
           })),
           // 自然/登山系の生成スポット（英語）。curated より優先度を一段下げる。
           ...EN_GENERATED_SLUGS.map((slug) => ({
