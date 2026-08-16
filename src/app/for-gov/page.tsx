@@ -104,7 +104,7 @@ export default function ForGovPage() {
           提案 1
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          くまウォッチを活用しての
+          くまウォッチを活用して
           <br className="hidden sm:block" />
           情報の発信と浸透を目指しませんか？
         </h2>

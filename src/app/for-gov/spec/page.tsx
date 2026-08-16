@@ -135,7 +135,7 @@ export default function MunicipalSpecPage() {
           <ul className="mt-2 space-y-1 text-sm leading-relaxed text-stone-800 print:text-[10pt]">
             <li>
               <strong>ご提案 1：</strong>
-              くまウォッチを活用しての情報の発信と浸透。御地域のクマ出没情報と安全に関する情報を、住民のスマホ（LINE・プッシュ通知）、観光客が見る検索結果、訪日外国人向けの英語ページまで届けます。一般の方に「届く」情報発信で浸透をサポートします。
+              くまウォッチを活用して情報の発信と浸透を。御地域のクマ出没情報と安全に関する情報を、住民のスマホ（LINE・プッシュ通知）、観光客が見る検索結果、訪日外国人向けの英語ページまで届けます。一般の方に「届く」情報発信で浸透をサポートします。
             </li>
             <li>
               <strong>ご提案 2（オプション）：</strong>
