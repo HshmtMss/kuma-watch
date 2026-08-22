@@ -8,6 +8,8 @@ export type AnalyticsRecord = {
   time?: string; // HH:MM
   prefectureName?: string;
   cityName?: string;
+  /** 地区名。地点別の台帳 (site-hotspots.ts) で代表地名に使う */
+  sectionName?: string;
   comment?: string;
   sourceKind?: string;
   source?: string;

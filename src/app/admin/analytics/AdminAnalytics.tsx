@@ -20,6 +20,9 @@ import AnalyticsHourSeason, {
 import AnalyticsMuniProfile, {
   type MuniProfile,
 } from "@/components/admin/AnalyticsMuniProfile";
+import AnalyticsSiteHotspots, {
+  type SiteHotspotBoard,
+} from "@/components/admin/AnalyticsSiteHotspots";
 
 type MonthPoint = { month: string; count: number };
 type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
@@ -189,6 +192,7 @@ type Data = {
   spatialSeasonal: SeasonFrame[];
   surge: SurgeBoard | null;
   muni: MunicipalityBoard | null;
+  siteHotspots: SiteHotspotBoard;
   muniOptions: string[];
   muniProfile: MuniProfile | null;
   momentum: Momentum;
@@ -301,6 +305,7 @@ function Content({
         spatialSeasonal={data.spatialSeasonal}
         muni={data.muni}
         muniProfile={data.muniProfile}
+        siteHotspots={data.siteHotspots}
       />
 
       <div className="flex flex-wrap items-center gap-2 print:hidden">
@@ -402,6 +407,20 @@ function Content({
           <AnalyticsMuniBoard data={data.muni} />
         </Section>
       )}
+
+      {/* 地点別の台帳 — 「地域の中のどこから手を付けるか」。C(急増地域)は
+          市町村単位なので、市町村を選ぶと1行に潰れて使えない。こちらは
+          約1kmメッシュで、対策の設置場所を決めるための優先順位表。 */}
+      <Section
+        title={`くり返し出没している地点（${scope}）`}
+        note={`直近3年・約1kmメッシュ（K「再発性」と同じ粒度）で、出没の多い地点から並べた表。看板・草刈り・電気柵・箱わなをどこに置くかを決めるための優先順位で、他地域との比較ではない。「出た年数」が期間いっぱいの地点は、単年のまとまりではなく毎年出ている常襲地点。`}
+      >
+        <AnalyticsSiteHotspots
+          data={data.siteHotspots}
+          showCity={!muni}
+          years={3}
+        />
+      </Section>
 
       {/* M: 森林率 — 出没が起きる土地の性質。対策の投資先を決める材料 */}
       {data.forest && (

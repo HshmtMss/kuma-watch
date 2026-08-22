@@ -2,6 +2,7 @@ import type { SeasonFrame } from "@/components/admin/AnalyticsSeasonMap";
 import type { SurgeBoard } from "@/components/admin/AnalyticsSurgeBoard";
 import type { MunicipalityBoard } from "@/components/admin/AnalyticsMuniBoard";
 import type { MuniProfile } from "@/components/admin/AnalyticsMuniProfile";
+import type { SiteHotspotBoard } from "@/components/admin/AnalyticsSiteHotspots";
 
 /**
  * 要約レポート（印刷=PDF用）。地図は非同期で印刷に載りにくいので使わず、
@@ -16,6 +17,7 @@ export default function AnalyticsReport({
   spatialSeasonal,
   muni,
   muniProfile,
+  siteHotspots,
 }: {
   scope: string;
   today: string;
@@ -24,6 +26,7 @@ export default function AnalyticsReport({
   spatialSeasonal: SeasonFrame[];
   muni: MunicipalityBoard | null;
   muniProfile: MuniProfile | null;
+  siteHotspots: SiteHotspotBoard;
 }) {
   const n = surge?.national;
   const peak = spatialSeasonal.reduce(
@@ -39,6 +42,8 @@ export default function AnalyticsReport({
           ? "減少"
           : "横ばい";
   const risingNames = surge?.rising.slice(0, 6).map((r) => r.pref) ?? [];
+  const top5Share =
+    siteHotspots.cumulative.find((c) => c.topN === 5)?.share ?? null;
 
   return (
     <div className="analytics-report text-stone-900 print:text-[10.5pt]">
@@ -215,12 +220,72 @@ export default function AnalyticsReport({
         </section>
       )}
 
+      {/* くり返し出没している地点 — レポートの実務パート。「どこから手を付けるか」
+          を地点で示す。全国レポートでは出さない (上位5地点でも全国の1%程度で紙に
+          載せる意味がない)。県・市町村を選んだ、自治体に渡すレポートだけ。 */}
+      {(muni || muniProfile) && siteHotspots.sites.length > 0 && (
+        <section className="mb-4 break-inside-avoid">
+          <div className="text-[8pt] font-bold uppercase tracking-wide text-stone-500">
+            くり返し出没している地点（約1kmメッシュ・{siteHotspots.since} 以降）
+          </div>
+          {top5Share != null && (
+            <p className="mt-1 text-[9pt] text-stone-600">
+              上位5地点で、この地域の出没の
+              <strong>{Math.round(top5Share * 100)}%</strong>
+              を占める（対象 {siteHotspots.scopedTotal.toLocaleString()} 件・
+              出没のあった地点 {siteHotspots.cells.toLocaleString()} か所）。
+            </p>
+          )}
+          <table className="mt-1 w-full border-collapse text-[9.5pt]">
+            <thead>
+              <tr className="border-b border-stone-300 text-left text-[8pt] text-stone-500">
+                <th className="py-0.5">地点</th>
+                <th className="py-0.5 text-right">期間計</th>
+                <th className="py-0.5 text-right">直近1年</th>
+                <th className="py-0.5 text-right">出た年数</th>
+                <th className="py-0.5 text-right">多い月</th>
+                <th className="py-0.5 text-right">人身</th>
+              </tr>
+            </thead>
+            <tbody>
+              {siteHotspots.sites.slice(0, 10).map((s) => (
+                <tr key={s.key} className="border-b border-stone-100">
+                  <td className="py-0.5 font-medium">
+                    {s.label || "地点名なし"}
+                    {s.city && s.label !== s.city && (
+                      <span className="ml-1 text-[8pt] text-stone-400">
+                        {s.city}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-0.5 text-right font-bold tabular-nums">
+                    {s.total}
+                  </td>
+                  <td className="py-0.5 text-right tabular-nums">{s.last12}</td>
+                  <td className="py-0.5 text-right tabular-nums">
+                    {s.years}/{siteHotspots.spanYears}
+                  </td>
+                  <td className="py-0.5 text-right tabular-nums">
+                    {s.peakMonth ? `${s.peakMonth}月` : "—"}
+                  </td>
+                  <td className="py-0.5 text-right tabular-nums">
+                    {s.injuries > 0 ? s.injuries : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
       {/* 注記 */}
       <section className="mt-5 border-t border-stone-300 pt-2 text-[8pt] leading-relaxed text-stone-500">
         <div className="font-bold">データについて</div>
         急増判定は直近30日と直前30日の同一情報源どうしの短期比較（季節の平年比ではない）。
         件数は情報源や取り込みタイミングに影響される。市町村の県内シェアは地名の丸めで
-        高く出る場合がある。詳細な地図・時系列・時間帯分析は管理画面（画面表示）を参照。
+        高く出る場合がある。地点別の集計は緯度0.01度（約1km）のメッシュ単位で、地名は
+        そのメッシュで最も多く記録された地区名。詳細な地図・時系列・時間帯分析は
+        管理画面（画面表示）を参照。
         <div className="mt-1 text-stone-400">
           生成：kuma-watch 分析ダッシュボード（基準日 {today}）
         </div>

@@ -17,6 +17,7 @@ import {
   cubShareByMonth,
   injurySources,
 } from "@/lib/contact-risk";
+import { siteHotspots } from "@/lib/site-hotspots";
 import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
 import { forecastAccuracy, loadForecastLog } from "@/lib/forecast-log";
 import {
@@ -152,6 +153,10 @@ export async function GET(req: Request) {
         // 自治体カルテ: 県を選んだときだけ、県内の市町村ベンチマーク（シェア＋動き）。
         // 一覧は県の全記録で計算（市町村選択で scoped が絞られても県内比較は保つ）。
         muni: pref ? municipalityBoard(prefScoped, today, pref) : null,
+        // 地点別の出没台帳: 市町村の「中」のどこから手を付けるか。
+        // C(急増地域)は市町村単位なので市町村を選ぶと1行に潰れる。こちらは
+        // 約1kmメッシュ (K の再発性と同じ粒度) で、直近3年のくり返しを数える。
+        siteHotspots: siteHotspots(scoped, today, { limit: 20 }),
         // E/F/G/H: 勢い・重心移動・親子連れ・年次サマリー
         momentum: momentum(scoped, today),
         centroid: yearlyCentroid(scoped, today, 12),
