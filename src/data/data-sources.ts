@@ -2,6 +2,9 @@ export type SourceKind = "municipal" | "police" | "aggregator" | "prefecture";
 export type ExtractorType =
   | "llm-html"
   | "llm-pdf"
+  // 長野県の月別目撃情報 PDF 専用。1 行 1 件の整った表なので正規表現で確実に読む
+  // (LLM 経由は 1,154 件中 451 件しか取れていなかった)。src/lib/sources/nagano-pdf.ts
+  | "nagano-pdf-table"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -837,7 +840,15 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     notes: "県公式 Web は PDF 月次リストのみで点座標非公開。県公認の閲覧手段は『けものおと2』スマホアプリ (com.kemonote2b.app, 株式会社アイエスイー製、山形県のけものノートと同ベンダー)。API は kuma/kuma の guest 資格情報を受け付けず、県と直接協定しないとデータ取得不可。R7 (2025) 全年集計は 12 本の月別 PDF から 2,346 件・71 市町村。点座標を補うため市町村の独自公開ページ (nagano-* 系 source) を併用",
     verifiedAt: "2026-04-26",
   },
-  // 長野県 月別目撃情報 PDF (R7.4 〜 R8.4) — 各 PDF を Gemini PDF native input で抽出
+  // 長野県 月別目撃情報 PDF (R7.4 〜) — 各 PDF を Gemini PDF native input で抽出
+  //
+  // 注意: 県はファイル名に規則性が無く (r070430_mokugeki / 0706_mokugeki / 531kuma /
+  // 630mokugeki2 ...)、月末版が公開されると暫定版を消す。実際 424mokugeki.pdf
+  // (R8.4 暫定) は 430mokugeki.pdf (月末版) に差し替えられて 404 になっていた。
+  // 新しい月が公開されてもここに追記しない限り取り込まれないので、シーズン中は
+  // 月1回 kuma-map.html を見て追記すること。長野は北アルプス・上高地を抱える
+  // 主要なクマ県で、ここが止まると /spot と /place の両方が同時に薄くなる。
+  //   一覧: https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/kuma-map.html
   ...(
     [
       { ym: "R7.4 (2025-04)", file: "r070430_mokugeki.pdf" },
@@ -852,7 +863,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { ym: "R8.1 (2026-01)", file: "20260206-mokugeki.pdf" },
       { ym: "R8.2 (2026-02)", file: "20260306-mokugeki.pdf" },
       { ym: "R8.3 (2026-03)", file: "20260331-mokugeki.pdf" },
-      { ym: "R8.4 (2026-04)", file: "424mokugeki.pdf" },
+      // 令和8年度 (今シーズン)。424mokugeki.pdf (暫定版) は県が削除済み → 月末版 430 に差し替え。
+      { ym: "R8.4 (2026-04)", file: "430mokugeki.pdf" },
+      { ym: "R8.5 (2026-05)", file: "531kuma.pdf" },
+      { ym: "R8.6 (2026-06)", file: "630mokugeki2.pdf" },
+      { ym: "R8.7 (2026-07)", file: "731mokugeki4.pdf" },
+      { ym: "R8.8 (2026-08)", file: "820mokugeki.pdf" },
     ].map(({ ym, file }) => ({
       id: `nagano-pdf-${file.replace(/\.pdf$/, "")}`,
       kind: "prefecture" as SourceKind,
@@ -866,8 +882,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
           hint: `長野県 ${ym} 月別目撃情報一覧 PDF`,
         },
       ],
-      extractor: "llm-pdf" as ExtractorType,
-      notes: `長野県公式の月別目撃情報 PDF。表形式 (No / 月日 / 市町村 / 区分 / 目撃痕跡別 / 大きさ / 頭数 / 状況) を Gemini で構造化抽出`,
+      extractor: "nagano-pdf-table" as ExtractorType,
+      notes: `長野県公式の月別目撃情報 PDF。表形式 (No / 月日 / 市町村 / 区分 / 目撃痕跡別 / 大きさ / 頭数 / 状況) を正規表現で抽出`,
       verifiedAt: "2026-04-26",
     }))
   ),

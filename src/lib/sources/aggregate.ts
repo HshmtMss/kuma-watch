@@ -6,6 +6,7 @@ import { fetchHigumapSightings } from "./higumap";
 import { fetchKemonoteSightings } from "./kemonote";
 import { fetchKmlSightings } from "./kml";
 import { fetchLlmHtmlSightings } from "./llm-html";
+import { fetchNaganoPdfSightings } from "./nagano-pdf";
 import { fetchPdfLlmSightings } from "./pdf-llm";
 import type { UnifiedSighting } from "./types";
 
@@ -18,6 +19,9 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   const kemonote = DATA_SOURCES.filter((s) => s.extractor === "kemonote-api");
   const llmHtml = DATA_SOURCES.filter((s) => s.extractor === "llm-html");
   const llmPdf = DATA_SOURCES.filter((s) => s.extractor === "llm-pdf");
+  const naganoPdf = DATA_SOURCES.filter(
+    (s) => s.extractor === "nagano-pdf-table",
+  );
 
   const results = await Promise.all([
     ...arcgis.map((s) => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
@@ -28,6 +32,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
     ...kemonote.map((s) => fetchKemonoteSightings(s).catch(() => [] as UnifiedSighting[])),
     ...llmHtml.map((s) => fetchLlmHtmlSightings(s).catch(() => [] as UnifiedSighting[])),
     ...llmPdf.map((s) => fetchPdfLlmSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...naganoPdf.map((s) => fetchNaganoPdfSightings(s).catch(() => [] as UnifiedSighting[])),
   ]);
 
   const merged: UnifiedSighting[] = [];
