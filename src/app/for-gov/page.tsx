@@ -92,16 +92,38 @@ export default function ForGovPage() {
       title="自治体の方へ"
       lead="御地域の情報を、住民・観光客・訪日外国人に正しく届けます。"
     >
-      {/* Hero */}
-      <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-600 px-3 py-1 text-[11px] font-bold text-white">
-          提案 1
+      {/* ページの骨格。以前は小さなバッジ (11px) が提案 1 / 2 の唯一の目印で、
+          「提案が 2 つあり、どこからどこまでがどちらか」が読み取れなかった。
+          ①冒頭に 2 枚の索引を置き、②各提案の頭に帯を敷いて章の切れ目を作り、
+          ③その提案に属する見出しを帯と同じ色でそろえる、の 3 点で構造を示す。 */}
+      <div className="not-prose mb-9">
+        <p className="m-0 mb-3 text-sm font-semibold text-stone-700">
+          御自治体へのご提案は、次の 2 つです。
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <IndexCard
+            n={1}
+            tone="amber"
+            name="情報の発信と浸透"
+            body="御地域の出没情報と注意喚起を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページへ届けます。"
+          />
+          <IndexCard
+            n={2}
+            tone="emerald"
+            option
+            name="地域特化型の傾向・対策研究"
+            body="御地域の特性に合わせた分析アルゴリズムを開発します。成果物の実物（全 12 ページ）を掲載しています。"
+          />
         </div>
-        <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          くまウォッチを活用して
-          <br className="hidden sm:block" />
-          情報の発信と浸透を目指しませんか？
-        </h2>
+      </div>
+
+      {/* ─────────── ご提案 1 ─────────── */}
+      <ProposalBanner
+        n={1}
+        tone="amber"
+        title="くまウォッチを活用して情報の発信と浸透を目指しませんか？"
+      />
+      <section className="not-prose mt-3 mb-8 rounded-2xl bg-gradient-to-br from-amber-50 to-stone-50 p-5 sm:p-6">
         {/* 見出しが「情報の発信と浸透を目指しませんか？」と問いを立てているので、
             本文は課題を繰り返さず答えだけを書く。「発信/届く/浸透」を重ねると
             3 文で同じ語が 2 回ずつ出て読みにくくなる。 */}
@@ -233,21 +255,14 @@ export default function ForGovPage() {
         ))}
       </div>
 
-      {/* 提案 2 — 提案 1 (ヒーロー) と同格なので体裁を揃える。バッジ + 見出し +
-          本文をグラデーションの枠なしカードに載せる形で統一し、色だけ変える。
-          問い合わせの直前に置き、中身は問い合わせに委ねて 1〜2 行に留める。 */}
-      <section className="not-prose my-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-700 px-3 py-1 text-[11px] font-bold text-white">
-          提案 2・オプション
-        </div>
-        <h2
-          id="research"
-          className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl"
-        >
-          地域特化型の傾向・対策研究を
-          <br className="hidden sm:block" />
-          推進しませんか？
-        </h2>
+      {/* ─────────── ご提案 2 ─────────── */}
+      <ProposalBanner
+        n={2}
+        tone="emerald"
+        option
+        title="地域特化型の傾向・対策研究を推進しませんか？"
+      />
+      <section className="not-prose mt-3 mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6 [&_strong]:text-emerald-800">
         <p className="m-0 text-sm leading-relaxed text-stone-700">
           <strong>&ldquo;地域の特性&rdquo;に応じた分析アルゴリズムの開発</strong>
           をオプションでご提供します。どのような成果物になるかは、下の分析例をご覧ください。
@@ -261,7 +276,11 @@ export default function ForGovPage() {
 
       {/* 分析例 — 提案 2 の成果物そのもの。要約カードは置かず、レポートを
           全 12 ページそのまま読めるようにする (めくる / PDF ダウンロード)。 */}
-      <h2 id="analysis">分析例：データ分析レポート 2026</h2>
+      {/* 提案 2 に属する見出しなので、下線を帯と同じ緑にそろえる
+          (.article-body h2 の既定は amber。Tailwind の utility が勝つ) */}
+      <h2 id="analysis" className="border-b-emerald-400">
+        分析例：データ分析レポート 2026
+      </h2>
       <p>
         提案 2 でお出しする成果物の実物です。自社データ <strong>78,029 件</strong>（2026
         年 7 月 26
@@ -310,5 +329,110 @@ function ProposalFigure({
         画像をタップすると拡大表示します
       </figcaption>
     </figure>
+  );
+}
+
+// 冒頭の索引カード。ページに入って最初に「提案は 2 つ」と分かるようにする。
+function IndexCard({
+  n,
+  tone,
+  name,
+  body,
+  option,
+}: {
+  n: number;
+  tone: "amber" | "emerald";
+  name: string;
+  body: string;
+  option?: boolean;
+}) {
+  const amber = tone === "amber";
+  return (
+    <a
+      href={`#proposal-${n}`}
+      className={`block rounded-xl border p-4 transition-colors ${
+        amber
+          ? "border-amber-300 bg-amber-50/70 hover:bg-amber-50"
+          : "border-emerald-300 bg-emerald-50/70 hover:bg-emerald-50"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-extrabold text-white ${
+            amber ? "bg-amber-600" : "bg-emerald-700"
+          }`}
+        >
+          {n}
+        </span>
+        <span
+          className={`text-[11px] font-bold tracking-widest ${
+            amber ? "text-amber-800" : "text-emerald-800"
+          }`}
+        >
+          ご提案 {n}
+        </span>
+        {option && (
+          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+            オプション
+          </span>
+        )}
+      </div>
+      <div className="mt-2 text-base font-bold text-stone-900">{name}</div>
+      <p className="mt-1 text-xs leading-relaxed text-stone-600">{body}</p>
+      <span
+        className={`mt-2 inline-block text-xs font-semibold ${
+          amber ? "text-amber-800" : "text-emerald-800"
+        }`}
+      >
+        この提案を見る →
+      </span>
+    </a>
+  );
+}
+
+// 各提案の頭に敷く帯。ページの中で「章がここから変わる」ことを示す唯一の合図なので、
+// 面で色を置いて、番号と問いかけを本文より大きく出す。
+// h2 には .article-body h2 の既定 (amber の下線 / 濃い文字色) が効くため、
+// Tailwind の utility で打ち消している。
+function ProposalBanner({
+  n,
+  tone,
+  title,
+  option,
+}: {
+  n: number;
+  tone: "amber" | "emerald";
+  title: string;
+  option?: boolean;
+}) {
+  const amber = tone === "amber";
+  return (
+    <div
+      id={`proposal-${n}`}
+      className={`not-prose mt-10 scroll-mt-4 rounded-2xl px-5 py-5 sm:px-6 ${
+        amber ? "bg-amber-600" : "bg-emerald-700"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-sm font-extrabold ${
+            amber ? "text-amber-700" : "text-emerald-800"
+          }`}
+        >
+          {n}
+        </span>
+        <span className="text-[11px] font-bold tracking-[0.2em] text-white/85">
+          ご提案 {n}
+        </span>
+        {option && (
+          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white">
+            オプション
+          </span>
+        )}
+      </div>
+      <h2 className="m-0 mt-2.5 border-b-0 p-0 text-xl font-bold leading-snug text-white sm:text-2xl">
+        {title}
+      </h2>
+    </div>
   );
 }
