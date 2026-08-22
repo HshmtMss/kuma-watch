@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 
@@ -84,6 +85,57 @@ const FAQ = [
   },
 ];
 
+// 提案 2 の裏づけとして載せる分析例。レポート全文ではなく、自治体が予算と人員を
+// どこに向けるかの判断に直結する数字だけを 4 つに絞る。
+// 2026 年 10 月の件数予測 (3,879 件) は載せない。モデルの平均誤差が 121% と大きく、
+// 公開ページで数字だけが独り歩きすると誤った安心・不安を与えるため。
+const ANALYSIS_FINDINGS = [
+  {
+    tag: "どこで起きるか",
+    value: "2.28",
+    unit: "倍",
+    title: "森林率 40〜60% の境界帯",
+    body: "国土の 9% しかないこの帯に出没の 19% が集中します。奥山（森林率 80% 以上）は国土の 40% を占めますが出没は 29%（0.73 倍）。守るべきは奥山でも市街地でもなく、その境界です。",
+  },
+  {
+    tag: "何をしている時か",
+    value: "85.9",
+    unit: "倍",
+    title: "山菜・きのこ採りの最中",
+    body: "人身被害の起きやすさ（全体の平均を 1.0 としたとき）。農作業中 18.9 倍、登山・入山 12.6 倍に対し、車両運転中は 0.3 倍です。",
+  },
+  {
+    tag: "いつまで警戒するか",
+    value: "2.61",
+    unit: "倍",
+    title: "出没から 7 日以内の同じ場所",
+    body: "一度出た地点で再び出没する割合は 26.2%（平常時 10.0%）。14 日以内で 2.05 倍、30 日以内で 1.51 倍と下がっていきます。",
+  },
+  {
+    tag: "何に引き寄せられるか",
+    value: "3,475",
+    unit: "件",
+    title: "10〜11 月の誘引物は「柿」が突出",
+    body: "秋のピークで最多の誘引物。次いで栗 854 件、生ゴミ・堆肥 166 件です。夏（8〜9 月）はその他果樹 687 件が中心で、月ごとに要因が入れ替わります。",
+  },
+];
+
+// レポートの結論。数字ではなく「次に何をするか」なので、上の 4 枚とは別立てにする。
+const ANALYSIS_ACTIONS = [
+  {
+    head: "投資",
+    body: "奥山へのリソース投下を見直し、森林率 40〜60% のモザイク地帯の藪刈り・緩衝帯整備に予算と人員を集中する。",
+  },
+  {
+    head: "防衛",
+    body: "被害率が最も高い農地で、柿などの未収穫果樹や生ゴミを 10 月のピーク前に撤去・管理する。",
+  },
+  {
+    head: "行動",
+    body: "出没が確認された地点は、少なくとも 7 日間は立ち入りを制限する運用を徹底する。",
+  },
+];
+
 export default function ForGovPage() {
   return (
     <PageShell
@@ -139,6 +191,14 @@ export default function ForGovPage() {
           </a>
         </div>
       </section>
+
+      {/* 提案 1 の全体像。ヒーローの 3 点を図で示したもので、以降の
+          「誰に届くのか」「3 ステップで開始」の見取り図にもなる。
+          横長の図はスマホだと文字が小さくなるので、原寸を開けるようにしておく。 */}
+      <ProposalFigure
+        src="/for-gov/proposal-1.webp"
+        alt="提案 1 の図解。自治体の作業負担ゼロで情報の届く範囲を最大化する。左から、住民・観光客・訪日客のスマホへ配信、追加作業や新システムは不要で 3 ヶ月無料、ご相談・自動設定・配信開始の 3 ステップ。"
+      />
 
       {/* 誰に届くか — 提案 1 の中核。3 つの届け先を具体的に示す */}
       <h2 id="audience">誰に届くのか</h2>
@@ -240,9 +300,75 @@ export default function ForGovPage() {
         </h2>
         <p className="m-0 text-sm leading-relaxed text-stone-700">
           <strong>&ldquo;地域の特性&rdquo;に応じた分析アルゴリズムの開発</strong>
-          をオプションでご提供します。詳細はお問い合わせください。
+          をオプションでご提供します。どのような成果物になるかは、下の分析例をご覧ください。
         </p>
+        <ProposalFigure
+          src="/for-gov/proposal-2.webp"
+          alt="提案 2 の図解。地域の特性に最適化した独自アルゴリズムで、より高度なクマ対策を実現する。左から、地域特性に最適化した専用設計、蓄積データを実効的な対策へ、お問い合わせ・ニーズの整理・開発の 3 ステップ。"
+          inset
+        />
       </section>
+
+      {/* 分析例 — 提案 2 が具体的に何を出すのかを、実データの数字で示す。
+          レポートは 12 ページあるが、ここは「予算と人員をどこへ向けるか」に
+          直結する 4 つだけに絞る。 */}
+      <h2 id="analysis">分析例：データから見える対策の優先順位</h2>
+      <p>
+        自社データ <strong>78,029 件</strong>（2026 年 7 月時点）を、場所・時期・行動・誘引物の 4
+        つの軸で分析した例です。出没件数の多さと、実際に人身被害が起きる場所は一致しません。
+      </p>
+      <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
+        {ANALYSIS_FINDINGS.map((f) => (
+          <div
+            key={f.title}
+            className="rounded-xl border border-stone-200 bg-white p-4"
+          >
+            <div className="text-[11px] font-semibold text-emerald-700">
+              {f.tag}
+            </div>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-3xl font-bold leading-none text-stone-900">
+                {f.value}
+              </span>
+              <span className="text-sm font-semibold text-stone-600">
+                {f.unit}
+              </span>
+            </div>
+            <div className="mt-1.5 text-sm font-bold text-stone-900">
+              {f.title}
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-stone-600">
+              {f.body}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="not-prose my-5 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 sm:p-5">
+        <div className="text-sm font-bold text-stone-900">
+          このレポートの結論
+        </div>
+        <ol className="m-0 mt-3 space-y-2.5 p-0">
+          {ANALYSIS_ACTIONS.map((a) => (
+            <li key={a.head} className="flex gap-3">
+              <span className="mt-0.5 shrink-0 rounded-full bg-emerald-700 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                {a.head}
+              </span>
+              <span className="text-xs leading-relaxed text-stone-700">
+                {a.body}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <p className="text-xs leading-relaxed text-stone-500">
+        出典：KumaWatch データ分析レポート 2026（獣医工学ラボ／リサーチコーディネート株式会社）。2026
+        年 7 月 26 日時点の自社データ 78,029
+        件に基づきます。行動別の倍率は、目撃記録にクマの様子しか残らない場合があるため実際より大きく出る傾向があります（順位の傾向は変わりません）。
+        <br />
+        御自治体の区域に限定した分析、季節・誘引物別の対策カレンダー、定期レポートのご提供も承ります。
+      </p>
 
       {/* お問い合わせ */}
       <h2 id="contact">お問い合わせ</h2>
@@ -251,5 +377,35 @@ export default function ForGovPage() {
       </p>
       <ContactForm kind="gov" />
     </PageShell>
+  );
+}
+
+// 横長の図解。スマホでは文字が小さくなるため、原寸を別タブで開けるようにする。
+// inset は色付きカードの内側に置く場合 (提案 2) の余白調整。
+function ProposalFigure({
+  src,
+  alt,
+  inset,
+}: {
+  src: string;
+  alt: string;
+  inset?: boolean;
+}) {
+  return (
+    <figure className={`not-prose ${inset ? "mt-4" : "my-6"}`}>
+      <a href={src} target="_blank" rel="noopener noreferrer">
+        <Image
+          src={src}
+          alt={alt}
+          width={1600}
+          height={859}
+          className="h-auto w-full rounded-xl border border-stone-200 bg-white"
+          sizes="(max-width: 768px) 100vw, 768px"
+        />
+      </a>
+      <figcaption className="mt-1.5 text-center text-[11px] text-stone-500">
+        画像をタップすると拡大表示します
+      </figcaption>
+    </figure>
   );
 }
