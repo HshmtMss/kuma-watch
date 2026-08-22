@@ -5,6 +5,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import DispatchLogTable, {
   type DispatchRow,
 } from "@/components/admin/DispatchLogTable";
+import RegistrationHistoryChart from "@/components/admin/RegistrationHistoryChart";
 
 /**
  * LINE 登録状況ダッシュボード (合言葉でログイン)。
@@ -152,7 +153,13 @@ function LineStatsContent({
             />
           </div>
 
-          <HistoryChart history={stats.history ?? []} />
+          <RegistrationHistoryChart
+            points={(stats.history ?? []).map((h) => ({
+              date: h.date,
+              value: h.totalUsers,
+            }))}
+            color="#06c755"
+          />
 
           <div className="h-6" />
 
@@ -219,102 +226,6 @@ function LineStatsContent({
         </p>
       )}
     </>
-  );
-}
-
-function HistoryChart({ history }: { history: HistRow[] }) {
-  if (history.length < 2) {
-    return (
-      <section>
-        <h2 className="text-base font-bold text-stone-900">登録者数の推移</h2>
-        <p className="mt-1 rounded-xl border border-stone-200 bg-white px-4 py-6 text-center text-sm text-stone-500">
-          日次スナップショットを蓄積中です（毎日 0:10 JST 記録）。数日で推移が表示されます。
-        </p>
-      </section>
-    );
-  }
-  const W = 640;
-  const H = 140;
-  const PADL = 34;
-  const PADR = 8;
-  const PADT = 10;
-  const PADB = 22;
-  const plotW = W - PADL - PADR;
-  const plotH = H - PADT - PADB;
-  const n = history.length;
-  const max = Math.max(1, ...history.map((h) => h.totalUsers));
-  const niceMax = max <= 5 ? max : Math.ceil(max / 5) * 5;
-  const x = (i: number) => PADL + (i / (n - 1)) * plotW;
-  const y = (v: number) => PADT + (1 - v / niceMax) * plotH;
-  const pts = history.map((h, i) => `${x(i)},${y(h.totalUsers)}`).join(" ");
-  const first = history[0];
-  const latest = history[n - 1];
-  const delta = latest.totalUsers - first.totalUsers;
-  const md = (d: string) => d.slice(5).replace("-", "/");
-  return (
-    <section>
-      <div className="mb-1 flex items-baseline justify-between">
-        <h2 className="text-base font-bold text-stone-900">登録者数の推移</h2>
-        <span className="text-xs text-stone-500">
-          直近{n}日 {delta >= 0 ? "+" : ""}
-          {delta}人
-        </span>
-      </div>
-      <div className="rounded-2xl border border-stone-200 bg-white p-3">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-          {[0, niceMax].map((t) => (
-            <g key={t}>
-              <line
-                x1={PADL}
-                y1={y(t)}
-                x2={W - PADR}
-                y2={y(t)}
-                stroke={t === 0 ? "#d1d5db" : "#f1f1f0"}
-                strokeWidth="1"
-              />
-              <text
-                x={PADL - 5}
-                y={y(t) + 3.5}
-                textAnchor="end"
-                fontSize="10"
-                fill="#9ca3af"
-              >
-                {t}
-              </text>
-            </g>
-          ))}
-          <polyline
-            points={pts}
-            fill="none"
-            stroke="#06c755"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-          {history.map((h, i) => (
-            <circle
-              key={i}
-              cx={x(i)}
-              cy={y(h.totalUsers)}
-              r={i === n - 1 ? 3.5 : 2}
-              fill="#06c755"
-            />
-          ))}
-          <text x={x(0)} y={H - 6} textAnchor="start" fontSize="10" fill="#9ca3af">
-            {md(first.date)}
-          </text>
-          <text
-            x={x(n - 1)}
-            y={H - 6}
-            textAnchor="end"
-            fontSize="10"
-            fill="#9ca3af"
-          >
-            {md(latest.date)}
-          </text>
-        </svg>
-      </div>
-    </section>
   );
 }
 
