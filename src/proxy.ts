@@ -64,6 +64,13 @@ export function proxy(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
+  // 旧「庁内稟議用 資料」ページ (/for-gov/spec) は 2026-08-22 に廃止。
+  // /for-gov と内容がほぼ重複し、自治体側に 2 枚を読ませる形になっていたため。
+  // 自治体へ直接お送りした URL や被リンクが残りうるので 308 で /for-gov へ集約する。
+  if (pathname === "/for-gov/spec") {
+    return NextResponse.redirect(new URL("/for-gov", req.url), 308);
+  }
+
   const parts = pathname.split("/").filter(Boolean);
 
   // "/spot/{slug}" の 2 セグメント。
@@ -123,5 +130,10 @@ export function proxy(req: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/place/:pref/:muni", "/spot/:slug", "/data/sightings.json"],
+  matcher: [
+    "/place/:pref/:muni",
+    "/spot/:slug",
+    "/data/sightings.json",
+    "/for-gov/spec",
+  ],
 };

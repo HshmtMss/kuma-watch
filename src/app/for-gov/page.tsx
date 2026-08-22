@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 
 const SITE_URL = "https://kuma-watch.jp";
-const CONTACT_MAILTO =
-  "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E8%87%AA%E6%B2%BB%E4%BD%93%E9%80%A3%E6%90%BA%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
-
 const META_DESC =
   "KumaWatch は、クマの情報を調べる人が日常的に使っているサービスです。御地域のクマ出没情報と安全に関する情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページに載せ、探しに来ない人にも届けます。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
 
@@ -141,12 +137,6 @@ export default function ForGovPage() {
           >
             お問い合わせ →
           </a>
-          <Link
-            href="/for-gov/spec"
-            className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-100"
-          >
-            庁内稟議用 資料
-          </Link>
         </div>
       </section>
 
@@ -260,20 +250,6 @@ export default function ForGovPage() {
         以下のフォームにご記入のうえ送信ボタンを押すと、そのまま運営に届きます。担当より 3 営業日以内にご返信いたします。
       </p>
       <ContactForm kind="gov" />
-      <div className="not-prose mt-4 flex flex-wrap gap-2 text-xs text-stone-600">
-        <Link
-          href="/for-gov/spec"
-          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
-        >
-          庁内稟議用 資料を見る (印刷対応)
-        </Link>
-        <a
-          href={CONTACT_MAILTO}
-          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-4 py-1.5 font-semibold text-stone-700 hover:bg-stone-50"
-        >
-          フォームを使わずメールで送る
-        </a>
-      </div>
     </PageShell>
   );
 }
