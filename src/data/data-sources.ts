@@ -5,6 +5,9 @@ export type ExtractorType =
   // 長野県の月別目撃情報 PDF 専用。1 行 1 件の整った表なので正規表現で確実に読む
   // (LLM 経由は 1,154 件中 451 件しか取れていなかった)。src/lib/sources/nagano-pdf.ts
   | "nagano-pdf-table"
+  // 山口県の年度別目撃情報 PDF 専用。9 列の表を正規表現で読む。
+  // src/lib/sources/yamaguchi-pdf.ts
+  | "yamaguchi-pdf-table"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -1387,11 +1390,14 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.yamaguchi.lg.jp/soshiki/41/20698.html", role: "list", hint: "自然保護課 ツキノワグマ被害防止ページ" },
       { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208249.xlsx", role: "excel", hint: "過去からの月別クマ目撃情報 (H9-R6)" },
       { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208250.xlsx", role: "excel", hint: "令和6年度 市町別・月別クマ目撃情報" },
-      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/238451.pdf", role: "pdf", hint: "令和8年度（最新）市町別・月別クマ目撃情報" },
-      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/238452.pdf", role: "pdf", hint: "令和8年度 目撃情報詳細" },
+      // 注意: 県は更新のたびに attachment 番号を振り直し、旧ファイルを消す。
+      // 登録していた 238451/238452 は 404 になり、山口県は 1 件も取れていなかった。
+      // シーズン中は月1回、下記 list ページで番号を確認して差し替えること。
+      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/248466.pdf", role: "pdf", hint: "令和8年度 目撃情報詳細 (R8.8.21 現在・242件)" },
+      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/239822.pdf", role: "pdf", hint: "令和7年度 目撃情報詳細 (405件)" },
       { url: "https://www.pref.yamaguchi.lg.jp/site/police/212182.html", role: "map", hint: "YPくまっぷ（山口県警察、R7 地点マップ）" },
     ],
-    extractor: "direct-excel",
+    extractor: "yamaguchi-pdf-table",
     notes: "西中国地域個体群、絶滅危惧。R6 799 件（岩国・周南中心）、R7 確定 PDF 未公表（県警 YPくまっぷで点データ公開）。Excel は市町別×月別×目撃/捕獲の集計表形式",
     verifiedAt: "2026-04-21",
   },
