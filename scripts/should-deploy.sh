@@ -34,8 +34,12 @@ fi
 echo "changed files:"
 echo "$CHANGED"
 
-# sightings.json 以外に何も変わっていなければビルドをスキップ
-NON_DATA_CHANGES=$(echo "$CHANGED" | grep -vE '^public/data/sightings\.json$' || true)
+# 描画に影響しないデータファイルだけの変更ならビルドをスキップ。
+#   public/data/sightings.json … /api/kuma が runtime 読み込みするので再ビルド不要
+#   data/geocode-cache.json    … 取り込み時のジオコード結果。ページには出ない
+#     (refresh-sightings がこれも一緒にコミットするようになったため追加。
+#      これが無いと 4 時間ごとに 4,400 ページの再ビルドが走る)
+NON_DATA_CHANGES=$(echo "$CHANGED" | grep -vE '^(public/data/sightings\.json|data/geocode-cache\.json)$' || true)
 
 if [ -z "$NON_DATA_CHANGES" ]; then
   echo "only sightings.json changed → skip build (CDN serves new JSON via static)"
