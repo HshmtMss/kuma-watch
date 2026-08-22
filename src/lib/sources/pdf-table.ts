@@ -146,8 +146,19 @@ export async function rowsToSightings(
   let skipped = 0;
   let pinned = 0;
   let rejected = 0;
+  let unknownCity = 0;
+  const unknownNames = new Set<string>();
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
+    // 市町村マスタに無い名前は取り込まない。列のずれや表の注記行を拾うと
+    // 「山口県/午前」のような存在しない市町村が混ざり (時刻欄が語で書かれた行で
+    // 実際に起きた)、/place の集計とリンクが壊れる。県ごとのパーサ側でも
+    // 防いでいるが、様式変更で再発しうるのでここでも止める。
+    if (!resolveMuni(prefName, r.cityName)) {
+      unknownCity++;
+      unknownNames.add(r.cityName);
+      continue;
+    }
     const g = await geocodePlace(prefName, r.cityName, r.sectionName);
     if (!g) {
       skipped++;
@@ -190,7 +201,11 @@ export async function rowsToSightings(
   }
   console.log(
     `[pdf-table ${sourceId}] ${rows.length} rows → ${out.length} sightings ` +
-      `(ピン ${pinned} / 市町村どまり ${out.length - pinned} / 包含検証で却下 ${rejected} / ジオコード不可 ${skipped})`,
+      `(ピン ${pinned} / 市町村どまり ${out.length - pinned} / 包含検証で却下 ${rejected} / ジオコード不可 ${skipped}` +
+      (unknownCity
+        ? ` / 市町村マスタに無い名前 ${unknownCity} [${[...unknownNames].slice(0, 5).join(",")}]`
+        : "") +
+      ")",
   );
   return out;
 }

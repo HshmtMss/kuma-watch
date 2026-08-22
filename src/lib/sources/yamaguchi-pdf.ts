@@ -5,6 +5,7 @@ import {
   rowsToSightings,
   type TableRow,
 } from "./pdf-table";
+import { resolveMuni } from "@/lib/muni-boundary";
 import type { UnifiedSighting } from "./types";
 
 /**
@@ -23,7 +24,12 @@ import type { UnifiedSighting } from "./types";
  *
  * 年は和暦 (8 = 令和8年 = 2026)。年度をまたぐので、行ごとの年をそのまま使う
  * (令和7年度の PDF にも令和8年1〜3月の行が入る)。
- * 時間が空の行があるため、時刻トークンの有無で列をずらす。
+ *
+ * 時刻欄は「9:15」だけでなく「不明」「午前」「未明」「早朝」等の語も入る。
+ * 当初は H:MM かどうかだけで列をずらしていたため、これらの行で時刻の語が
+ * 市町村名として取り込まれ、「山口県/午前」のような存在しない市町村が
+ * 混ざっていた。列の位置ではなく、市町村マスタに実在するかどうかで
+ * 市町村の位置を決める。
  */
 
 const PREF = "山口県";
@@ -54,19 +60,31 @@ export function parseYamaguchiText(text: string): TableRow[] {
     if (month < 1 || month > 12 || day < 1 || day > 31) continue;
 
     const toks = rest.trim().split(/\s+/);
-    // 時刻列は空のことがある。あればここで落として列を揃える。
-    if (toks.length && TIME.test(toks[0])) toks.shift();
-    const cityName = toks.shift() ?? "";
-    if (!cityName) continue;
-    const sectionName = toks.shift() ?? "";
-    const detail = toks.join(" ");
+    // 時刻欄は「9:15」のことも「不明」「午前」「未明」等の語のこともあり、
+    // 位置で数えると市町村を取り違える。先頭から 2 つまでの範囲で、
+    // 市町村マスタに実在する語を市町村として採る。
+    let ci = -1;
+    for (let k = 0; k < Math.min(2, toks.length); k++) {
+      if (resolveMuni(PREF, toks[k])) {
+        ci = k;
+        break;
+      }
+    }
+    if (ci < 0) continue; // 市町村を特定できない行は落とす (推測で埋めない)
+    const timeText = ci > 0 && !TIME.test(toks[0]) ? toks[0] : "";
+    const cityName = toks[ci];
+    const sectionName = toks[ci + 1] ?? "";
+    const detail = toks.slice(ci + 2).join(" ");
 
     // 「クマ２頭を目撃」等から頭数を拾う。書かれていなければ 1。
     const hm = /([0-9０-９]+)\s*頭/.exec(detail);
     const headCount = hm ? Number(hm[1].normalize("NFKC")) || 1 : 1;
 
     // 状況(目撃/捕獲/痕跡)は件数の意味が変わるので本文に残す。
-    const comment = [sectionName, status, detail].filter(Boolean).join(" ");
+    // 時刻が語で書かれていた場合 (「未明」等) はそれも残す。
+    const comment = [sectionName, status, timeText, detail]
+      .filter(Boolean)
+      .join(" ");
 
     out.push({
       date: `${year}-${pad2(month)}-${pad2(day)}`,
