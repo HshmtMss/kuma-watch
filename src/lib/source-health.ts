@@ -36,10 +36,20 @@ export type SourceHealth = {
   prev90: number;
   /** 年度完結の過去データ (止まっていて正常) */
   archived: boolean;
-  status: "ok" | "slowing" | "stale" | "archived";
+  status: "ok" | "slowing" | "stale" | "archived" | "missing";
 };
 
 type Rec = { source?: string; date?: string };
+
+/**
+ * 取り込み対象として登録されているソース (DATA_SOURCES のうち extractor を持つもの)。
+ * 「本来データが来るはずの一覧」を渡すことで、1 件も来ていないものを検出できる。
+ */
+export type ExpectedSource = {
+  id: string;
+  /** present 以外 (extinct / absent / rare) は 0 件が正常なので警告しない。 */
+  bearStatus: string;
+};
 
 const STALE_DAYS = 60;
 const SLOWING_DROP = 0.5;
@@ -60,7 +70,7 @@ function shiftDays(iso: string, days: number): string {
 export function sourceHealth(
   records: Rec[],
   today: string,
-  opts?: { minCount?: number },
+  opts?: { minCount?: number; expected?: ExpectedSource[] },
 ): SourceHealth[] {
   const minCount = opts?.minCount ?? 50;
   const cut90 = shiftDays(today, -90);
@@ -109,8 +119,33 @@ export function sourceHealth(
       status,
     });
   }
+  // 登録済みなのに 1 件も返していないソースを "missing" として足す。
+  //
+  // これが無いと最悪の壊れ方が一番見えない。健全性は records から集計するので、
+  // 全く取れていないソースは行そのものが現れず、「壊れている」と「そもそも
+  // 存在しない」が区別できなかった。実測で取り込み対象 111 本のうち 40 本が
+  // 0 件で、その中に山口・徳島・広島・鳥取など本当に取れていない県が
+  // 埋もれていた。
+  //
+  // クマがいない県 (九州・沖縄・香川など bearStatus が present 以外) は
+  // 0 件が正常なので対象から外す。ここを混ぜると警告が意味を失う。
+  for (const e of opts?.expected ?? []) {
+    if (agg.has(e.id)) continue;
+    if (e.bearStatus !== "present") continue;
+    out.push({
+      source: e.id,
+      count: 0,
+      latestDate: "",
+      ageDays: 0,
+      recent90: 0,
+      prev90: 0,
+      archived: false,
+      status: "missing",
+    });
+  }
+
   // 問題のあるものを上に、経過日数の大きい順
-  const rank = { stale: 0, slowing: 1, ok: 2, archived: 3 } as const;
+  const rank = { missing: 0, stale: 1, slowing: 2, ok: 3, archived: 4 } as const;
   return out.sort(
     (x, y) => rank[x.status] - rank[y.status] || y.ageDays - x.ageDays,
   );

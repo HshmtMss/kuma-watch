@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCachedSightings } from "@/lib/sightings-cache";
 import { sourceHealth } from "@/lib/source-health";
+import { DATA_SOURCES } from "@/data/data-sources";
 import { listChurn } from "@/lib/churn-log";
 import { jstToday } from "@/lib/jst-date";
 
@@ -19,7 +20,13 @@ export async function GET(req: Request) {
   }
   const today = jstToday();
   const records = await getCachedSightings();
-  const health = sourceHealth(records, today);
+  // 「本来データが来るはずのソース」を渡し、1 件も来ていないものを missing として
+// 検出させる。extractor を持つ登録だけが取り込み対象 (URL だけの参照用エントリは除く)。
+const expected = DATA_SOURCES.filter((s) => s.extractor).map((s) => ({
+  id: s.id,
+  bearStatus: s.bearStatus,
+}));
+const health = sourceHealth(records, today, { expected });
   const churn = await listChurn(180);
 
   const hidden = records.filter(
