@@ -42,6 +42,35 @@ function pad2(n: number): string {
   return String(n).padStart(2, "0");
 }
 
+/**
+ * 「CJK部首補助」(U+2E80〜U+2EFF) を通常の漢字へ寄せる。
+ *
+ * 長野県の PDF は組版の都合でこのブロックの字を混ぜてくる。全 17 本で 8 種・452 箇所。
+ * 見た目は同じでもコードポイントが違うため、たとえば「⻑野市」(U+2ED1) は
+ * 「長野市」(U+9577) と別文字列になり、市町村マスタに一致せず 148 件が
+ * 長野市に紐づかなかった。
+ *
+ * NFKC では直らない。康熙部首 (U+2F00〜) には互換分解があるが、こちらの
+ * CJK部首補助には無いため、明示的に対応表を持つしかない。
+ */
+const CJK_RADICAL_FIX: Record<string, string> = {
+  "⻑": "長", // ⻑
+  "⻄": "西", // ⻄
+  "⺠": "民", // ⺠
+  "⻘": "青", // ⻘
+  "⻨": "麦", // ⻨
+  "⻤": "鬼", // ⻤
+  "⻲": "亀", // ⻲
+  "⻯": "竜", // ⻯
+};
+
+function normalizeText(text: string): string {
+  // NFKC で全角英数・康熙部首を寄せたうえで、残る CJK部首補助を対応表で置換。
+  return text
+    .normalize("NFKC")
+    .replace(/[⺀-⻿]/g, (c) => CJK_RADICAL_FIX[c] ?? c);
+}
+
 export type NaganoRow = {
   date: string;
   cityName: string;
@@ -71,9 +100,7 @@ export type NaganoRow = {
  */
 export function parseNaganoText(text: string): NaganoRow[] {
   const out: NaganoRow[] = [];
-  // PDF によっては康熙部首の「⻑」(U+2F9F) が混ざり「⻑野市」になって
-  // ジオコーダが引けない。NFKC で通常の漢字・半角数字へ寄せる。
-  for (const rawLine of text.normalize("NFKC").split("\n")) {
+  for (const rawLine of normalizeText(text).split("\n")) {
     const line = rawLine.trim();
     if (!line) continue;
     const toks = line.split(/\s+/);
