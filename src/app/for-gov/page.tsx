@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
+import ReportViewer from "./ReportViewer";
 
 const SITE_URL = "https://kuma-watch.jp";
 const META_DESC =
@@ -82,57 +83,6 @@ const FAQ = [
   {
     q: "当市の注意喚起の文章も載りますか？",
     a: "はい。御自治体のクマ関連ページから住民向けの注意喚起を取り込み、地域のページに出典付きで掲載します。掲載内容のご確認・修正のご依頼はいつでも承ります。",
-  },
-];
-
-// 提案 2 の裏づけとして載せる分析例。レポート全文ではなく、自治体が予算と人員を
-// どこに向けるかの判断に直結する数字だけを 4 つに絞る。
-// 2026 年 10 月の件数予測 (3,879 件) は載せない。モデルの平均誤差が 121% と大きく、
-// 公開ページで数字だけが独り歩きすると誤った安心・不安を与えるため。
-const ANALYSIS_FINDINGS = [
-  {
-    tag: "どこで起きるか",
-    value: "2.28",
-    unit: "倍",
-    title: "森林率 40〜60% の境界帯",
-    body: "国土の 9% しかないこの帯に出没の 19% が集中します。奥山（森林率 80% 以上）は国土の 40% を占めますが出没は 29%（0.73 倍）。守るべきは奥山でも市街地でもなく、その境界です。",
-  },
-  {
-    tag: "何をしている時か",
-    value: "85.9",
-    unit: "倍",
-    title: "山菜・きのこ採りの最中",
-    body: "人身被害の起きやすさ（全体の平均を 1.0 としたとき）。農作業中 18.9 倍、登山・入山 12.6 倍に対し、車両運転中は 0.3 倍です。",
-  },
-  {
-    tag: "いつまで警戒するか",
-    value: "2.61",
-    unit: "倍",
-    title: "出没から 7 日以内の同じ場所",
-    body: "一度出た地点で再び出没する割合は 26.2%（平常時 10.0%）。14 日以内で 2.05 倍、30 日以内で 1.51 倍と下がっていきます。",
-  },
-  {
-    tag: "何に引き寄せられるか",
-    value: "3,475",
-    unit: "件",
-    title: "10〜11 月の誘引物は「柿」が突出",
-    body: "秋のピークで最多の誘引物。次いで栗 854 件、生ゴミ・堆肥 166 件です。夏（8〜9 月）はその他果樹 687 件が中心で、月ごとに要因が入れ替わります。",
-  },
-];
-
-// レポートの結論。数字ではなく「次に何をするか」なので、上の 4 枚とは別立てにする。
-const ANALYSIS_ACTIONS = [
-  {
-    head: "投資",
-    body: "奥山へのリソース投下を見直し、森林率 40〜60% のモザイク地帯の藪刈り・緩衝帯整備に予算と人員を集中する。",
-  },
-  {
-    head: "防衛",
-    body: "被害率が最も高い農地で、柿などの未収穫果樹や生ゴミを 10 月のピーク前に撤去・管理する。",
-  },
-  {
-    head: "行動",
-    body: "出没が確認された地点は、少なくとも 7 日間は立ち入りを制限する運用を徹底する。",
   },
 ];
 
@@ -309,65 +259,18 @@ export default function ForGovPage() {
         />
       </section>
 
-      {/* 分析例 — 提案 2 が具体的に何を出すのかを、実データの数字で示す。
-          レポートは 12 ページあるが、ここは「予算と人員をどこへ向けるか」に
-          直結する 4 つだけに絞る。 */}
-      <h2 id="analysis">分析例：データから見える対策の優先順位</h2>
+      {/* 分析例 — 提案 2 の成果物そのもの。要約カードは置かず、レポートを
+          全 12 ページそのまま読めるようにする (めくる / PDF ダウンロード)。 */}
+      <h2 id="analysis">分析例：データ分析レポート 2026</h2>
       <p>
-        自社データ <strong>78,029 件</strong>（2026 年 7 月時点）を、場所・時期・行動・誘引物の 4
-        つの軸で分析した例です。出没件数の多さと、実際に人身被害が起きる場所は一致しません。
+        提案 2 でお出しする成果物の実物です。自社データ <strong>78,029 件</strong>（2026
+        年 7 月 26
+        日時点）を、空間・時間・行動・誘引物・先行指標の 5 つの軸で分析しています。全 12
+        ページをそのまま掲載しています。
       </p>
-      <div className="not-prose my-5 grid gap-3 sm:grid-cols-2">
-        {ANALYSIS_FINDINGS.map((f) => (
-          <div
-            key={f.title}
-            className="rounded-xl border border-stone-200 bg-white p-4"
-          >
-            <div className="text-[11px] font-semibold text-emerald-700">
-              {f.tag}
-            </div>
-            <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-3xl font-bold leading-none text-stone-900">
-                {f.value}
-              </span>
-              <span className="text-sm font-semibold text-stone-600">
-                {f.unit}
-              </span>
-            </div>
-            <div className="mt-1.5 text-sm font-bold text-stone-900">
-              {f.title}
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-stone-600">
-              {f.body}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="not-prose my-5 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 sm:p-5">
-        <div className="text-sm font-bold text-stone-900">
-          このレポートの結論
-        </div>
-        <ol className="m-0 mt-3 space-y-2.5 p-0">
-          {ANALYSIS_ACTIONS.map((a) => (
-            <li key={a.head} className="flex gap-3">
-              <span className="mt-0.5 shrink-0 rounded-full bg-emerald-700 px-2.5 py-0.5 text-[11px] font-bold text-white">
-                {a.head}
-              </span>
-              <span className="text-xs leading-relaxed text-stone-700">
-                {a.body}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </div>
-
+      <ReportViewer />
       <p className="text-xs leading-relaxed text-stone-500">
-        出典：KumaWatch データ分析レポート 2026（獣医工学ラボ／リサーチコーディネート株式会社）。2026
-        年 7 月 26 日時点の自社データ 78,029
-        件に基づきます。行動別の倍率は、目撃記録にクマの様子しか残らない場合があるため実際より大きく出る傾向があります（順位の傾向は変わりません）。
-        <br />
-        御自治体の区域に限定した分析、季節・誘引物別の対策カレンダー、定期レポートのご提供も承ります。
+        発行：獣医工学ラボ（リサーチコーディネート株式会社）。御自治体の区域に限定した分析、季節・誘引物別の対策カレンダー、出没直後の即応ルール設計、定期レポートのご提供も承ります。
       </p>
 
       {/* お問い合わせ */}
