@@ -10,6 +10,13 @@ export type RiskBannerProps = {
   contextLabel: string;
   /** 整形済みの最新目撃日（例: 「2026年7月10日」）。無ければ行を出さない。 */
   latestDateText?: string | null;
+  /**
+   * 整形済みの「最も近い記録」（例: 「北東 2.1 km・京都市左京区 鹿ケ谷（2026年8月19日）」）。
+   * 件数は同じ 10km 圏を共有する近接スポットで同値になるが、最寄りの一点は地点ごとに
+   * 必ず変わる。利用者にとっても、どちら側の話かが分かる方が件数より実用的。
+   * 無ければ行を出さない。
+   */
+  nearestText?: string | null;
   /** 一言の補足。省略時は補足行を出さない。 */
   note?: string;
 };
@@ -30,6 +37,7 @@ export default function RiskBanner({
   headline,
   contextLabel,
   latestDateText,
+  nearestText,
   note,
 }: RiskBannerProps) {
   return (
@@ -52,6 +60,11 @@ export default function RiskBanner({
           {latestDateText && (
             <div className={`mt-0.5 text-xs ${RISK_TEXT[tone]}/80`}>
               最新の目撃: {latestDateText}
+            </div>
+          )}
+          {nearestText && (
+            <div className={`mt-0.5 text-xs ${RISK_TEXT[tone]}/80`}>
+              最も近い記録: {nearestText}
             </div>
           )}
           {note && (

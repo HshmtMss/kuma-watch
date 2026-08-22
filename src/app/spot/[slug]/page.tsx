@@ -89,6 +89,37 @@ function haversineKm(
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+/**
+ * スポットから見た方角を 8 方位の日本語で返す。
+ * 「10km 圏に N 件」だけだと同一エリアのスポットが全部同じ内容になるため、
+ * 「どちら側の話か」を添えて地点ごとの固有情報にする（利用者にとっても、
+ * 避ける方角が分かる方が件数より実用的）。
+ */
+const COMPASS_8 = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"] as const;
+
+function bearing8(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): string {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const φ1 = toRad(lat1);
+  const φ2 = toRad(lat2);
+  const Δλ = toRad(lon2 - lon1);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x =
+    Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  const deg = ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+  // 45度刻みの境界で丸める (337.5〜22.5 が「北」)。
+  return COMPASS_8[Math.round(deg / 45) % 8];
+}
+
+/** 距離の表記。1km 未満は m、それ以上は小数第1位までの km。 */
+function formatDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+}
+
 function formatDate(iso: string | null): string {
   if (!iso) return "-";
   const t = Date.parse(iso);
@@ -212,10 +243,33 @@ export default async function SpotPage({ params }: Props) {
   let count90 = 0;
   let count365 = 0;
   let latestDate: string | null = null;
+  // 最も近い記録 (直近 1 年)。「10km 圏に N 件」だけだと、同じ市街地に密集した
+  // スポットが互いに同じ円を見て同じ内容になる。地点ごとに必ず変わる「最寄りの
+  // 一点」を別に持ち、方角付きで示す。
+  // getNearbySightings は radius+6km を読むため、10km 圏が 0 件のスポットでも
+  // 12km 先の記録を拾える（追加ロード無し）。
+  let nearest:
+    | {
+        date: string;
+        cityName: string;
+        sectionName: string;
+        distanceKm: number;
+        bearing: string;
+      }
+    | null = null;
   for (const s of sightings) {
     if (!s.date || s.date > today) continue;
     allDates.push(s.date);
     const d = haversineKm(landmark.lat, landmark.lon, s.lat, s.lon);
+    if (s.date >= cutoff365 && (!nearest || d < nearest.distanceKm)) {
+      nearest = {
+        date: s.date,
+        cityName: s.cityName ?? "",
+        sectionName: s.sectionName ?? "",
+        distanceKm: d,
+        bearing: bearing8(landmark.lat, landmark.lon, s.lat, s.lon),
+      };
+    }
     if (d > NEAR_RADIUS_KM) continue;
     areaDatesAll.push(s.date);
     if (s.date < cutoff365) continue;
@@ -399,6 +453,17 @@ export default async function SpotPage({ params }: Props) {
               headline: "周辺 10 km で出没情報なし",
               note: "目撃情報がない期間ですが、季節や天候で状況は変わります。",
             };
+
+  // 最寄りの記録を 1 行に整形（例:「北東 2.1 km・京都市左京区 鹿ケ谷（2026年8月19日）」）。
+  // 件数と違い、これは同じエリアのスポットでも 1 件ずつ内容が変わる。
+  const nearestPlace = nearest
+    ? [nearest.cityName, nearest.sectionName].filter(Boolean).join(" ")
+    : "";
+  const nearestText = nearest
+    ? `${nearest.bearing} ${formatDistance(nearest.distanceKm)}${
+        nearestPlace ? `・${nearestPlace}` : ""
+      }（${formatDate(nearest.date)}）`
+    : null;
 
   // 季節別アドバイス
   const month = new Date().getMonth() + 1;
@@ -625,8 +690,28 @@ export default async function SpotPage({ params }: Props) {
         headline={risk.headline}
         contextLabel={`${landmark.name} 周辺 10 km の状況`}
         latestDateText={latestDate ? formatDate(latestDate) : null}
+        nearestText={nearestText}
         note={risk.note}
       />
+
+      {/* このスポットについて — 以前は「詳しく見る」の折りたたみ内にあったが、
+          blurb はこのページ唯一の地点固有の文章で、隠すと残るのは地点名と件数
+          だけになる。状況カードの直下に出して本文に据える。 */}
+      <h2>このスポットについて</h2>
+      <p>{landmark.blurb}</p>
+      {landmark.scaleNote && (
+        <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+          <Users size={15} aria-hidden />
+          {landmark.scaleNote}
+        </p>
+      )}
+      <p className="not-prose my-3 text-sm text-stone-600">
+        <span className="text-stone-500">所在: </span>
+        <span className="font-semibold text-stone-900">
+          {landmark.prefName}
+          {landmark.muniName ? ` ${landmark.muniName}` : ""}
+        </span>
+      </p>
 
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
@@ -950,23 +1035,8 @@ export default async function SpotPage({ params }: Props) {
       {/* 最近の出没事案 — ガイド有りスポットではここ(詳しく見る内)に表示。 */}
       {showSeasonGuide && recentSightingsBlock}
 
-      {/* このスポットについて — 皆が知っている前提の紹介文は前面に出さず詳細内へ。
-          本文(blurb)はSEOのため残す。分類・緯度経度は一般ユーザに不要。 */}
-      <h2>このスポットについて</h2>
-      <p>{landmark.blurb}</p>
-      {landmark.scaleNote && (
-        <p className="not-prose my-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-          <Users size={15} aria-hidden />
-          {landmark.scaleNote}
-        </p>
-      )}
-      <p className="not-prose my-3 text-sm text-stone-600">
-        <span className="text-stone-500">所在: </span>
-        <span className="font-semibold text-stone-900">
-          {landmark.prefName}
-          {landmark.muniName ? ` ${landmark.muniName}` : ""}
-        </span>
-      </p>
+      {/* 「このスポットについて」は折りたたみの外（状況カード直下）へ移動。
+          blurb はこのページ唯一の地点固有の文章なので、詳細内に隠さない。 */}
 
       {/* 統計 */}
       <h2>出没統計</h2>
