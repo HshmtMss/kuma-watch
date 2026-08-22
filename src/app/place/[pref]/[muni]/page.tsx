@@ -34,6 +34,8 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
 import NotifyBlock from "@/components/NotifyBlock";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
+import GovContactCta from "@/components/GovContactCta";
+import { isGovCtaReleased } from "@/lib/gov-cta-flag";
 import OenCard from "@/components/OenCard";
 import { isPushReleased } from "@/lib/push-flag";
 
@@ -1079,6 +1081,11 @@ export default async function MuniPage({ params }: Props) {
           </>
         );
       })()}
+
+      {/* 自治体ご担当者の方へ (法人ページ /for-gov への導線)。公式情報の直後に置き、
+          「うちの情報は合っているか」という担当者の関心の流れに乗せる。
+          住民向けの内容ではないので控えめな体裁にし、フラグで段階公開する。 */}
+      {isGovCtaReleased() && <GovContactCta pref={pref} muni={muni} />}
 
       <h2>登山・キャンプの注意点</h2>
       <p>

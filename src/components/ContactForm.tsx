@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * 問い合わせフォーム (汎用)。送信は /api/contact への JSON POST。サーバー側で
@@ -62,6 +62,22 @@ export default function ContactForm({ kind }: { kind: ContactKind }) {
   const [errorMsg, setErrorMsg] = useState("");
   // ボット除け (ハニーポット)。人間には見えない。埋まっていたらサーバーが捨てる。
   const [honeypot, setHoneypot] = useState("");
+
+  /**
+   * 市町村ページの「ご担当者の方へ」導線 (/for-gov?from=秋田県秋田市) から来たときは、
+   * 自治体名の欄をあらかじめ埋めておく。担当者の入力が 1 つ減り、こちらは問い合わせが
+   * どの市町村から来たかを把握できる。
+   *
+   * useSearchParams ではなく window.location を読むのは、/for-gov を静的なまま
+   * 保つため (searchParams をページで受けると動的レンダリングに落ちる)。
+   * マウント時に一度だけ入れ、以降の編集は上書きしない。
+   */
+  useEffect(() => {
+    if (kind !== "gov") return;
+    const from = new URLSearchParams(window.location.search).get("from")?.trim();
+    if (!from) return;
+    setData((prev) => (prev.org ? prev : { ...prev, org: from }));
+  }, [kind]);
 
   function handleChange(key: string, v: string) {
     setData((prev) => ({ ...prev, [key]: v }));
