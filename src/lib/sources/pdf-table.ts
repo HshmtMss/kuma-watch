@@ -1,4 +1,5 @@
 import { geocodePlace, jitterWithin } from "./geocode";
+import { containingCode, resolveMuni } from "@/lib/muni-boundary";
 import { incidentKey } from "@/lib/incident-key";
 import type { UnifiedSighting } from "./types";
 
@@ -101,13 +102,40 @@ export function dropOutlierDates(rows: TableRow[], limitDays = 200): TableRow[] 
 }
 
 /**
+ * 字 (小字) の座標を「地図にピンを打ってよい」と認めるかの最終判定。
+ *
+ * ピンの正確さはこのサイトで最も重要な性質なので、出典が字を持っていても
+ * 座標が検証を通ったものだけを精密扱いにする。ここは geocodePlace 内の
+ * accepts() より厳しくしてある:
+ *
+ *   geocodePlace: isInsideMuni(...) !== false   … 判定不能 (境界データ無し等) も許容
+ *   ここ        : containingCode(...) が当該市町村と一致  … 判定できたものだけ許容
+ *
+ * 県 PDF は 1 度に数千件を入れるため、1 件ずつ人が見て気づくことがない。
+ * 「判定できなかったので通す」を許すと誤ったピンが静かに積み上がるので、
+ * 一括投入の経路では確証が取れたものだけを通す。落ちたものは捨てずに
+ * 市区町村どまりへ格下げする (件数には残り、地図には出ない)。
+ */
+function verifiedInMuni(
+  lat: number,
+  lon: number,
+  prefName: string,
+  cityName: string,
+): boolean {
+  const muni = resolveMuni(prefName, cityName);
+  if (!muni) return false;
+  const code = containingCode(lat, lon);
+  if (!code) return false;
+  return muni.cityCodes.includes(code);
+}
+
+/**
  * 表の行を UnifiedSighting に変換する。
  *
- * 座標は市町村までで引く。字が分かっていても、字単位のジオコーディングは
- * 外部サービス (Nominatim) への直列問い合わせが数百〜千件規模になり、
- * 4 時間ごと・30 分枠の集約に載らないため。sectionName は空にして
- * location-precision に「市町村までしか分からない事案」として扱わせ
- * (件数には入るが地図にピンは打たない)、字は comment に文章として残す。
+ * 字が分かっている行は字で座標を引き、上の verifiedInMuni を通ったものだけを
+ * 精密な点として地図に出す。通らなかったもの・字が無いものは市区町村どまりに
+ * 落とし、location-precision に「市町村までしか分からない事案」として扱わせる
+ * (件数には入るが地図にピンは打たない)。字は comment に文章として残す。
  */
 export async function rowsToSightings(
   rows: TableRow[],
@@ -116,14 +144,23 @@ export async function rowsToSightings(
 ): Promise<UnifiedSighting[]> {
   const out: UnifiedSighting[] = [];
   let skipped = 0;
+  let pinned = 0;
+  let rejected = 0;
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    const g = await geocodePlace(prefName, r.cityName, "");
+    const g = await geocodePlace(prefName, r.cityName, r.sectionName);
     if (!g) {
       skipped++;
       continue;
     }
-    const pos = g.precise
+    // 字まで当たった点だけを、独立にポリゴン包含で検証する。
+    const verified =
+      g.precise &&
+      Boolean(r.sectionName) &&
+      verifiedInMuni(g.lat, g.lon, prefName, r.cityName);
+    if (g.precise && !verified) rejected++;
+    if (verified) pinned++;
+    const pos = verified
       ? g
       : jitterWithin(
           prefName,
@@ -143,13 +180,17 @@ export async function rowsToSightings(
       date: r.date,
       prefectureName: prefName,
       cityName: r.cityName.slice(0, 40),
-      sectionName: "",
+      // 検証を通ったときだけ字を持たせる。座標が市区町村どまりなのに字名を
+      // 持たせると location-precision が精密扱いにし、ジッタ座標を
+      // 「その字で出た」と主張してしまう。
+      sectionName: verified ? r.sectionName.slice(0, 40) : "",
       comment: r.comment.slice(0, 80),
       headCount: r.headCount,
     });
   }
   console.log(
-    `[pdf-table ${sourceId}] ${rows.length} rows → ${out.length} sightings (geocode skip ${skipped})`,
+    `[pdf-table ${sourceId}] ${rows.length} rows → ${out.length} sightings ` +
+      `(ピン ${pinned} / 市町村どまり ${out.length - pinned} / 包含検証で却下 ${rejected} / ジオコード不可 ${skipped})`,
   );
   return out;
 }

@@ -52,13 +52,16 @@ jobs:
 
       - name: Commit if changed
         run: |
-          if git diff --quiet public/data/sightings.json; then
+          # ジオコードキャッシュ (data/geocode-cache.json) も一緒にコミットする。
+          # ここを残さないと字単位の座標を毎回引き直すことになり、Nominatim の
+          # 1 req/sec 制限で 30 分枠に載らない。新しい地名が増えた分だけ差分が出る。
+          if git diff --quiet public/data/sightings.json data/geocode-cache.json; then
             echo "No changes — skipping commit"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data/sightings.json
+          git add public/data/sightings.json data/geocode-cache.json
           git commit -m "Refresh sightings data ($(date -u +%Y-%m-%d))"
           # 防御的 rebase + リトライ。concurrency group で直列化はされているが、
           # 別グループ(gov)・手動 push・稀な push 自体の一過性失敗を耐えるため、

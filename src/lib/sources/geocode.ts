@@ -1,7 +1,14 @@
 // Nominatim ジオコードの共有モジュール。
 // pdf-llm と llm-html の両方が使う in-memory キャッシュ + 直列キューを集約し、
 // Nominatim の利用ポリシー (1 req/sec) を全 extractor 横断で守る。
-// キャッシュはディスクにも永続化 (.cache/geocode.json) し、サーバ再起動・再ビルドを跨いで再利用。
+// キャッシュはディスクに永続化し、サーバ再起動・再ビルドを跨いで再利用する。
+//
+// 保存先は data/geocode-cache.json (リポジトリにコミットする)。以前は .cache/ 配下
+// だったが、そこは .gitignore されており CI では毎回空から始まっていた。字 (小字)
+// 単位のジオコードは 1 req/sec の直列キューなので、数千件を毎回引き直すと 4 時間
+// ごと・30 分枠の集約に載らない。結果、字が分かっている出典 (長野・山口の県 PDF 等)
+// でも市区町村までしか座標を引けず、地図にピンを打てなかった。
+// コミットしておけば引き直しは新しい地名だけで済む。
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,8 +22,10 @@ import { inJapanBounds } from "./types";
 
 const GEOCODE_CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const GEOCODE_MIN_INTERVAL_MS = 1100;
-const CACHE_DIR = join(process.cwd(), ".cache");
-const CACHE_FILE = join(CACHE_DIR, "geocode.json");
+const CACHE_DIR = join(process.cwd(), "data");
+const CACHE_FILE = join(CACHE_DIR, "geocode-cache.json");
+// 旧保存先 (.gitignore 配下)。移行期間中は読み込みだけ引き継ぐ。
+const LEGACY_CACHE_FILE = join(process.cwd(), ".cache", "geocode.json");
 const PERSIST_DEBOUNCE_MS = 10_000;
 
 type CacheEntry =
@@ -24,14 +33,18 @@ type CacheEntry =
   | { at: number; missing: true };
 
 function loadDiskCache(): Map<string, CacheEntry> {
-  try {
-    if (!existsSync(CACHE_FILE)) return new Map();
-    const raw = readFileSync(CACHE_FILE, "utf8");
-    const obj = JSON.parse(raw) as Record<string, CacheEntry>;
-    return new Map(Object.entries(obj));
-  } catch {
-    return new Map();
+  const out = new Map<string, CacheEntry>();
+  // 旧 → 新 の順に読み、同じキーは新側で上書きする。
+  for (const file of [LEGACY_CACHE_FILE, CACHE_FILE]) {
+    try {
+      if (!existsSync(file)) continue;
+      const obj = JSON.parse(readFileSync(file, "utf8")) as Record<string, CacheEntry>;
+      for (const [k, v] of Object.entries(obj)) out.set(k, v);
+    } catch {
+      // 壊れたキャッシュは黙って捨てる (再取得すればよい)
+    }
   }
+  return out;
 }
 
 const geocodeCache: Map<string, CacheEntry> = loadDiskCache();
