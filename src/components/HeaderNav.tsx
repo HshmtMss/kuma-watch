@@ -353,7 +353,7 @@ export default function HeaderNav({
                 {/* 画面内に収める。あふれる分はメニュー内スクロールにして、
                     末尾の「法人の方」「English」まで必ず届くようにする。 */}
                 <nav
-                  className="fixed z-[2010] w-72 max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white shadow-xl"
+                  className="fixed z-[2010] w-[21rem] max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white shadow-xl"
                   style={{
                     top: pos.top,
                     right: pos.right,
@@ -365,7 +365,7 @@ export default function HeaderNav({
                   <Link
                     href="/notify"
                     onClick={close}
-                    className="flex items-center gap-2 border-b border-gray-100 px-5 py-3 text-base font-bold text-emerald-700 hover:bg-emerald-50 active:bg-emerald-100"
+                    className="flex items-center gap-2 border-b border-gray-100 px-4 py-2.5 text-[15px] font-bold text-emerald-700 hover:bg-emerald-50 active:bg-emerald-100"
                   >
                     <BellIcon size={18} />
                     通知を受け取る
@@ -393,7 +393,7 @@ export default function HeaderNav({
                   <Link
                     href="/products"
                     onClick={close}
-                    className="flex items-center gap-2 border-t border-gray-100 px-5 py-3 text-base font-bold text-stone-800 hover:bg-stone-50 active:bg-stone-100"
+                    className="flex items-center gap-2 border-t border-gray-100 px-4 py-2.5 text-[15px] font-bold text-stone-800 hover:bg-stone-50 active:bg-stone-100"
                   >
                     対策グッズ
                   </Link>
@@ -412,7 +412,7 @@ export default function HeaderNav({
                     href="/en"
                     hrefLang="en"
                     onClick={close}
-                    className="flex items-center gap-2 border-t border-gray-100 px-5 py-3 text-base font-semibold text-stone-600 hover:bg-stone-50 active:bg-stone-100"
+                    className="flex items-center gap-2 border-t border-gray-100 px-4 py-2.5 text-[15px] font-semibold text-stone-600 hover:bg-stone-50 active:bg-stone-100"
                   >
                     English
                   </Link>
@@ -438,13 +438,15 @@ function MobileGroup({
   return (
     <div className="border-t border-gray-100 first:border-t-0">
       <div
-        className={`px-5 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider ${
+        className={`px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider ${
           accent ? "text-amber-700" : "text-gray-400"
         }`}
       >
         {label}
       </div>
-      {children}
+      {/* 2 列。1 列だと 13 行で画面のほぼ全部を覆い、地図が見えなくなる。
+          行数を半分にして、地図を残したまま全項目を出す (スクロール不要)。 */}
+      <div className="grid grid-cols-2 gap-x-1 px-2 pb-2">{children}</div>
     </div>
   );
 }
@@ -466,7 +468,7 @@ function MobileItem({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-2 px-5 py-3 text-base font-medium hover:bg-amber-50 active:bg-amber-100 ${
+      className={`flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[13.5px] font-medium leading-tight hover:bg-amber-50 active:bg-amber-100 ${
         accent ? "text-amber-900" : "text-gray-800"
       }`}
     >
