@@ -705,13 +705,41 @@ export default async function SpotPage({ params }: Props) {
           {landmark.scaleNote}
         </p>
       )}
+      {/* 所在地。市町村は座標のポリゴン包含で確定させてあるので（scripts/fill-spot-muni.ts）、
+          そのまま市町村ページへ繋ぐ。出没 0 件のスポットでも、来訪者を実データのある
+          ページへ送れる（旅行者は地域をまたいで移動するので、ここが行き止まりだと
+          「この場所は大丈夫」で終わってしまう）。 */}
       <p className="not-prose my-3 text-sm text-stone-600">
         <span className="text-stone-500">所在: </span>
-        <span className="font-semibold text-stone-900">
+        <Link
+          href={`/place/${encodeURIComponent(landmark.prefName)}`}
+          className="font-semibold text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-900"
+        >
           {landmark.prefName}
-          {landmark.muniName ? ` ${landmark.muniName}` : ""}
-        </span>
+        </Link>
+        {landmark.muniName && (
+          <>
+            {" "}
+            <Link
+              href={placeHrefForSighting(landmark.prefName, landmark.muniName)}
+              className="font-semibold text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-900"
+            >
+              {landmark.muniName}
+            </Link>
+          </>
+        )}
       </p>
+      {landmark.muniName && (
+        <p className="not-prose my-3">
+          <Link
+            href={placeHrefForSighting(landmark.prefName, landmark.muniName)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-800 hover:border-stone-900"
+          >
+            <MapIcon size={15} aria-hidden />
+            {landmark.muniName}のクマ出没情報を見る →
+          </Link>
+        </p>
+      )}
 
       {/* 今後4週間の出没見通し（統計予測）— B2B 差別化の中核。
           現在の状況カードの直下に「先読み」を置き、いま→今後の流れを示す。
