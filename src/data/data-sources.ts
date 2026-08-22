@@ -8,6 +8,8 @@ export type ExtractorType =
   // 山口県の年度別目撃情報 PDF 専用。9 列の表を正規表現で読む。
   // src/lib/sources/yamaguchi-pdf.ts
   | "yamaguchi-pdf-table"
+  // 奈良県の年度別目撃情報一覧 PDF 専用。src/lib/sources/nara-pdf.ts
+  | "nara-pdf-table"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -1273,6 +1275,30 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     },
     notes: "Google My Map 110 件。県全域ではなく奈良市・木津川市・山添村限定。name=地名、description=日付+時刻",
     verifiedAt: "2026-04-20",
+  },
+  {
+    // 県全域の目撃情報一覧 (大字まで記載)。上の nara (Google My Map) は
+    // 奈良市・木津川市・山添村の 3 市村限定なので、こちらを別ソースとして持つ。
+    //
+    // 注意: ドメインが 2 つあり、.jp 側は 403 で拒否される。.lg.jp を使うこと。
+    //   × https://www.pref.nara.jp/documents/22870/...     → 403
+    //   ○ https://www.pref.nara.lg.jp/documents/22870/...  → 200
+    // 旧登録 (pref.nara.jp/dd.aspx) が 403 になり、奈良県は 2026-03-28 以降
+    // 止まっていた。県はファイル名を更新日時にするので、シーズン中は月1回
+    // 下記 list ページで確認して差し替えること。
+    id: "nara-pdf",
+    kind: "prefecture",
+    prefCode: "29",
+    regionLabel: "奈良県 ツキノワグマ目撃情報一覧 (県全域)",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.nara.lg.jp/n118/p043003.html", role: "list", hint: "県 ツキノワグマ出没情報" },
+      { url: "https://www.pref.nara.lg.jp/documents/22870/20260813160322.pdf", role: "pdf", hint: "令和8年度 目撃情報一覧 (R8.8.13 現在・77件)" },
+      { url: "https://www.pref.nara.lg.jp/documents/22870/20260710180023.pdf", role: "pdf", hint: "令和7年度 目撃情報一覧 (155件)" },
+    ],
+    extractor: "nara-pdf-table",
+    notes: "表形式 (No / 日時 / 市町村 / 大字)。日付は和暦。「大台ヶ原」は市町村ではなく県も別枠集計なので取り込めない",
+    verifiedAt: "2026-08-23",
   },
   {
     id: "wakayama",

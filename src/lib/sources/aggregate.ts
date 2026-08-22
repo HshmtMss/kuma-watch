@@ -7,6 +7,7 @@ import { fetchKemonoteSightings } from "./kemonote";
 import { fetchKmlSightings } from "./kml";
 import { fetchLlmHtmlSightings } from "./llm-html";
 import { fetchNaganoPdfSightings } from "./nagano-pdf";
+import { fetchNaraPdfSightings } from "./nara-pdf";
 import { fetchYamaguchiPdfSightings } from "./yamaguchi-pdf";
 import { fetchPdfLlmSightings } from "./pdf-llm";
 import type { UnifiedSighting } from "./types";
@@ -26,6 +27,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   const yamaguchiPdf = DATA_SOURCES.filter(
     (s) => s.extractor === "yamaguchi-pdf-table",
   );
+  const naraPdf = DATA_SOURCES.filter((s) => s.extractor === "nara-pdf-table");
 
   const results = await Promise.all([
     ...arcgis.map((s) => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
@@ -38,6 +40,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
     ...llmPdf.map((s) => fetchPdfLlmSightings(s).catch(() => [] as UnifiedSighting[])),
     ...naganoPdf.map((s) => fetchNaganoPdfSightings(s).catch(() => [] as UnifiedSighting[])),
     ...yamaguchiPdf.map((s) => fetchYamaguchiPdfSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...naraPdf.map((s) => fetchNaraPdfSightings(s).catch(() => [] as UnifiedSighting[])),
   ]);
 
   const merged: UnifiedSighting[] = [];
