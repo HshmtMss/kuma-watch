@@ -59,6 +59,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # ジオコードキャッシュを取り込みが書き換えていたら元に戻す。
+          # 追跡ファイルが未ステージのまま残ると、下の git rebase が
+          # "cannot rebase: You have unstaged changes" で失敗する
+          # (2026-08-23 に data/geocode-cache.json で実際に発生し、5分ごとに
+          #  失敗し続けた)。このジョブが commit するのは sightings.json だけで、
+          # キャッシュの更新は refresh-sightings が担うので捨ててよい。
+          # ※ 対象をファイル名で限定すること。`git checkout -- .` にすると
+          #    取り込んだばかりの sightings.json まで巻き戻してしまう。
+          git checkout -- data/geocode-cache.json 2>/dev/null || true
+
           # concurrency group があっても、ローカルからの code push や別ワークフロー
           # の git push と race することがある。コンフリクト時は origin/main に
           # 戻して ingest を再実行 (dedup により Gemini コストは最小限) → push。

@@ -48,6 +48,10 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           KEMONOTE_USERNAME: ${{ secrets.KEMONOTE_USERNAME }}
           KEMONOTE_PASSWORD: ${{ secrets.KEMONOTE_PASSWORD }}
+          # ジオコードキャッシュ (data/geocode-cache.json) を書き戻すのはこのジョブだけ。
+          # 他の取り込みジョブ (news-flash 等) が書くと作業ツリーが汚れ、直後の
+          # git pull --rebase が "You have unstaged changes" で失敗する。
+          GEOCODE_CACHE_PERSIST: "1"
         run: npm run build:sightings
 
       - name: Commit if changed

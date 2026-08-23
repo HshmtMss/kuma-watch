@@ -53,7 +53,28 @@ let queue: Promise<unknown> = Promise.resolve();
 let persistTimer: NodeJS.Timeout | null = null;
 let dirty = false;
 
+/**
+ * キャッシュをディスクに書き戻してよいか。
+ *
+ * data/geocode-cache.json は追跡対象なので、書き込むと作業ツリーが汚れる。
+ * news-flash (5分ごと) は取り込み後に commit → git pull --rebase をするため、
+ * ジオコードで新しい地名が増えるたびに
+ *   error: cannot rebase: You have unstaged changes.
+ * で失敗していた (2026-08-23。キャッシュを .cache/ から data/ へ移した副作用)。
+ *
+ * 読み込みは常に行う (キャッシュの恩恵は全ジョブが受ける)。書き戻すのは
+ * キャッシュを commit する役割のジョブだけに限る:
+ *   - refresh-sightings … GEOCODE_CACHE_PERSIST=1 を明示的に渡す
+ *   - ローカル実行      … CI 環境変数が無いので書く
+ * それ以外 (news-flash 等) は読むだけにして、作業ツリーを汚さない。
+ */
+function canPersist(): boolean {
+  if (process.env.GEOCODE_CACHE_PERSIST === "1") return true;
+  return !process.env.CI;
+}
+
 function schedulePersist(): void {
+  if (!canPersist()) return;
   dirty = true;
   if (persistTimer) return;
   persistTimer = setTimeout(() => {
