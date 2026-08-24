@@ -501,12 +501,35 @@ export default function KumaMap({
         }
       }
       const inBounds: KumaRecord[] = [...bestByCoord.values()];
-      const toRender =
+      const sampled =
         inBounds.length <= maxPins
           ? inBounds
           : Array.from({ length: maxPins }, (_, i) =>
               inBounds[Math.floor((i * inBounds.length) / maxPins)],
             );
+      // 通知/共有リンクで開いた記録は必ず描く。
+      //
+      // この記録は 3 通りの理由で描画セットから落ちうる:
+      //   (a) 取り込み直後で records にまだ載っていない (別 API で 1 件取得している)
+      //   (b) 同一座標の重なり解消 (bestByCoord) で、より新しい記録に代表を譲った
+      //   (c) 均等サンプリング (maxPins) で間引かれた
+      // どれに当たっても「吹き出しは出ているのに、その地点にピンが無い」状態に
+      // なり、利用者は近くの別のピンを出没地点と誤認する。通知の当の地点だけは
+      // 間引きの対象外にする。
+      const focused = focusRecordRef.current;
+      const toRender: KumaRecord[] = sampled;
+      if (
+        focused &&
+        typeof focused.lat === "number" &&
+        typeof focused.lon === "number" &&
+        focused.lat >= south &&
+        focused.lat <= north &&
+        focused.lon >= west &&
+        focused.lon <= east &&
+        !sampled.some((r) => String(r.id) === String(focused.id))
+      ) {
+        toRender.push(focused);
+      }
       const nowMs = Date.now();
       // ピンの色で鮮度を表す: 直近1週間=鮮やかなローズ赤 (#e11d48)、それ以前=
       // ダークブラウン (#78350f)。出どころ (公式/報道/市民) はポップアップのバッジで。
@@ -775,6 +798,9 @@ export default function KumaMap({
   // map 準備前は mapReady=false で待ち、準備後に確実に走らせる。
   const focusExactRef = useRef<string | null>(null); // 正確な記録を開いたか
   const focusFetchRef = useRef<string | null>(null); // フェッチ開始済みか
+  // 通知/共有リンクで開いた当の記録。描画セットから漏れてもピンを必ず出すため
+  // に保持する (下記 renderPinLayer で強制的に足す)。
+  const focusRecordRef = useRef<KumaRecord | null>(null);
   useEffect(() => {
     const id = focusSightingId;
     if (!id || focusExactRef.current === id) return;
@@ -786,6 +812,9 @@ export default function KumaMap({
       if (isExact) focusExactRef.current = id;
       import("leaflet").then((L) => {
         if (focusExactRef.current === id && !isExact) return; // 既に正確版を表示済み
+        // 吹き出しだけ出してピンが無い状態を防ぐ (下記 renderPinLayer が読む)。
+        focusRecordRef.current = rec;
+        renderPinLayer();
         showRecordPopup(L, rec);
         const reopen = () => showRecordPopup(L, rec);
         map.once("moveend", reopen);
