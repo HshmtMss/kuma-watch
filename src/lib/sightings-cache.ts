@@ -149,27 +149,52 @@ async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const baseUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}/data/sightings.json${key ? `?k=${encodeURIComponent(key)}` : ""}`
     : null;
-  const candidates = [RAW_URL, baseUrl].filter((u): u is string => Boolean(u));
-  for (const url of candidates) {
+  const candidates: { url: string; label: string }[] = [
+    { url: RAW_URL, label: "github-raw" },
+    ...(baseUrl ? [{ url: baseUrl, label: "same-origin(同梱・デプロイ時点で固定)" }] : []),
+  ];
+  for (const c of candidates) {
+    const t0 = Date.now();
     try {
       // バースト時に取得が張り付いて 60s 予算を食い潰さないよう打ち切り、
       // 次の候補 (同一オリジン静的) へフォールバックする。
       // スナップショットは 35MB まで育っており 15s では切れる回があった
       // (切れると同梱の古いファイルに落ち、データが stale になる)。
       // 候補は 2 つなので 20s × 2 = 40s で 60s 予算に収まる。
-      const res = await fetch(url, {
+      const res = await fetch(c.url, {
         cache: "no-store",
         signal: AbortSignal.timeout(20000),
       });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        console.warn(`[sightings] ${c.label} 取得失敗 status=${res.status}`);
+        continue;
+      }
       const blob = (await res.json()) as { records?: UnifiedSighting[] };
       if (Array.isArray(blob.records) && blob.records.length > 0) {
+        // どちらから読んだかを必ず残す。same-origin はデプロイ時点で固まって
+        // いるため、ここに落ちているとデータがデプロイ経過時間ぶん古くなる。
+        // 「フォールバックが成功扱いで stale を返す」のは気づきにくいので、
+        // 成功時もソースを記録する。
+        const latest = blob.records.reduce(
+          (m, r) => (typeof r.ingestedAt === "number" && r.ingestedAt > m ? r.ingestedAt : m),
+          0,
+        );
+        const ageMin = latest ? Math.round((Date.now() - latest) / 60000) : -1;
+        console.log(
+          `[sightings] スナップショット取得: ${c.label} ${blob.records.length}件 ` +
+            `${((Date.now() - t0) / 1000).toFixed(1)}s 最終取り込みから${ageMin}分`,
+        );
         return blob.records;
       }
-    } catch {
-      // 次の候補へ
+      console.warn(`[sightings] ${c.label} は records が空`);
+    } catch (e) {
+      const err = e as Error;
+      console.warn(
+        `[sightings] ${c.label} 取得失敗 ${((Date.now() - t0) / 1000).toFixed(1)}s: ${err.name}: ${err.message.slice(0, 100)}`,
+      );
     }
   }
+  console.warn("[sightings] すべての候補から取得できませんでした");
   return null;
 }
 
