@@ -139,6 +139,29 @@ function readSnapshotFromFs(): UnifiedSighting[] | null {
   return null;
 }
 
+/**
+ * 直近に成功したスナップショットの取得元。
+ *
+ * same-origin(同梱) はデプロイ時点で固まっているため、ここに落ちているとデータが
+ * デプロイ経過時間ぶん古くなる。しかもフォールバックは「成功」なので静かに stale を
+ * 返す。ログはキャッシュミス時にしか出ず捕まえにくいので、API 応答から確認できる
+ * ようにして外から計測できる状態を保つ。
+ */
+let lastSnapshotSource: string | null = null;
+let lastSnapshotAt = 0;
+
+export function getSnapshotDiagnostics(): {
+  source: string | null;
+  loadedAt: number;
+  ageMs: number;
+} {
+  return {
+    source: lastSnapshotSource,
+    loadedAt: lastSnapshotAt,
+    ageMs: lastSnapshotAt ? Date.now() - lastSnapshotAt : -1,
+  };
+}
+
 /** GitHub raw (main の最新コミット) → 同一オリジン静的ファイルの順に取得。 */
 async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const RAW_URL =
@@ -184,6 +207,8 @@ async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
           `[sightings] スナップショット取得: ${c.label} ${blob.records.length}件 ` +
             `${((Date.now() - t0) / 1000).toFixed(1)}s 最終取り込みから${ageMin}分`,
         );
+        lastSnapshotSource = c.label;
+        lastSnapshotAt = Date.now();
         return blob.records;
       }
       console.warn(`[sightings] ${c.label} は records が空`);

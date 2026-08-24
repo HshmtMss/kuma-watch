@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   aggregateAllSightings,
   getCachedSightings,
+  getSnapshotDiagnostics,
 } from "@/lib/sightings-cache";
 import { getApprovedCitizenSightings } from "@/lib/submission-store";
 import type {
@@ -147,6 +148,12 @@ export async function GET(req: Request) {
       }
     }
 
+    // スナップショットをどこから読んだか。same-origin(同梱) はデプロイ時点で
+    // 固まっているため、ここに落ちているとデータがデプロイ経過時間ぶん古くなる。
+    // フォールバックは「成功」なので静かに stale を返し、ログはキャッシュミス時に
+    // しか出ず捕まえにくい。応答に載せて外から計測できるようにしておく。
+    const snapshot = getSnapshotDiagnostics();
+
     return NextResponse.json(
       {
         records: outRecords,
@@ -155,6 +162,9 @@ export async function GET(req: Request) {
         latestIngestedAt,
         shown: outRecords.length,
         sources: bySource,
+        // 診断用。データが古いときに「どこから読んだか」を外から確認できる。
+        snapshotSource: snapshot.source,
+        snapshotAgeSec: snapshot.ageMs >= 0 ? Math.round(snapshot.ageMs / 1000) : -1,
       },
       {
         headers: {
