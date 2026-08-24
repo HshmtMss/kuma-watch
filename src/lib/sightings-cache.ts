@@ -152,11 +152,14 @@ async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
   const candidates = [RAW_URL, baseUrl].filter((u): u is string => Boolean(u));
   for (const url of candidates) {
     try {
-      // バースト時に取得が張り付いて 60s 予算を食い潰さないよう 15s で打ち切り、
+      // バースト時に取得が張り付いて 60s 予算を食い潰さないよう打ち切り、
       // 次の候補 (同一オリジン静的) へフォールバックする。
+      // スナップショットは 35MB まで育っており 15s では切れる回があった
+      // (切れると同梱の古いファイルに落ち、データが stale になる)。
+      // 候補は 2 つなので 20s × 2 = 40s で 60s 予算に収まる。
       const res = await fetch(url, {
         cache: "no-store",
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(20000),
       });
       if (!res.ok) continue;
       const blob = (await res.json()) as { records?: UnifiedSighting[] };
@@ -229,6 +232,15 @@ export async function aggregateAllSightings(): Promise<UnifiedSighting[]> {
 // プロセスローカルに保持する (Vercel の serverless でもインスタンス内で再利用される)。
 let memCache: { records: UnifiedSighting[]; loadedAt: number } | null = null;
 const MEM_CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
+// stale を返し続けてよい上限。
+//
+// 以前は上限が無く、バックグラウンド更新が失敗し続ける限りそのインスタンスは
+// 古いデータを無期限に返していた。実際に地図 API が 126 分前の状態を返し、
+// 当日の出没が地図に出ず、通知リンクを開いても該当地点にピンが無い状態になった。
+// スナップショットは 35MB あり取得が 15s で切れることがあるので、失敗は起きる前提。
+// ここを超えたら「即返し」をやめて更新を待つ。待っても駄目なら stale を返すが、
+// その場合はログに残して気づけるようにする。
+const MAX_STALE_MS = 30 * 60 * 1000;
 
 // 近接重複の名寄せ (dedup A)。同一事案が複数ソース (news / sharp9110 / 公式) や 4h 取り込みの
 // 都合で別レコード化し、地図に複数ピンが重なる問題への対処。日付 + 緯度経度を約 220m グリッド
@@ -585,10 +597,24 @@ export async function getCachedSightings(): Promise<UnifiedSighting[]> {
   if (memCache && age < MEM_CACHE_TTL_MS) return memCache.records;
   // stale: バックグラウンドで更新しつつ即座に stale を返す
   // (再ロードでリクエストを止めない・並列再ロードを起こさない)。
-  if (memCache) {
+  if (memCache && age < MAX_STALE_MS) {
     void refreshSightings().catch(() => {
-      /* 失敗時は stale を維持 */
+      /* 失敗時は stale を維持。ただし MAX_STALE_MS までの間だけ。 */
     });
+    return memCache.records;
+  }
+  // 古すぎる: 更新を待つ。クマの出没を扱うので、応答が数秒遅れることより
+  // 何時間も前の状態を返し続ける方が害が大きい。
+  if (memCache) {
+    try {
+      const fresh = await refreshSightings();
+      if (fresh.length > 0) return fresh;
+    } catch {
+      /* 下の stale フォールバックへ */
+    }
+    console.warn(
+      `[sightings] スナップショットの更新に失敗。${Math.round(age / 60000)} 分前のデータを返します`,
+    );
     return memCache.records;
   }
   // cold: 同時アクセスは 1 本の in-flight ロードを共有し、22MB の多重読込による
