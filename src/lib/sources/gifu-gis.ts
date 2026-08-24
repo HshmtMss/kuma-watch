@@ -46,13 +46,45 @@ const F_HEAD = "fieldvalue8";
 type AttrRecord = Record<string, string>;
 
 /**
- * 古い TLS を受け入れる接続。証明書の検証は通常どおり行い、
- * 鍵交換パラメータの最低強度だけ緩める (この 1 ホストへの読み取り専用)。
+ * 古い TLS を受け入れる接続。証明書の検証は通常どおり行い、鍵交換
+ * パラメータの最低強度だけ緩める (この 1 ホストへの読み取り専用)。
+ *
+ * 環境で通る設定が違う。ローカル (Node 25) は SECLEVEL=1 で足りたが、
+ * CI (Node 20) では同じ指定で fetch failed になった。undici / OpenSSL の
+ * 版差に依存するので、緩い順ではなく「必要最小限の緩さ」から順に試す。
  */
-function legacyTlsAgent(): Agent {
-  return new Agent({
-    connect: { ciphers: "DEFAULT@SECLEVEL=1" },
-  });
+const TLS_ATTEMPTS: { label: string; connect: Record<string, unknown> }[] = [
+  { label: "SECLEVEL=1", connect: { ciphers: "DEFAULT@SECLEVEL=1" } },
+  { label: "SECLEVEL=0", connect: { ciphers: "ALL@SECLEVEL=0" } },
+  {
+    label: "SECLEVEL=0 + TLSv1",
+    connect: { ciphers: "ALL@SECLEVEL=0", minVersion: "TLSv1" },
+  },
+];
+
+/** 実際に接続できた Agent を返す。全部だめなら最後の失敗を投げる。 */
+async function connectLegacy(): Promise<{ agent: Agent; cookie: string }> {
+  let lastErr: unknown = null;
+  for (const t of TLS_ATTEMPTS) {
+    const agent = new Agent({ connect: t.connect });
+    try {
+      const r = await agreeAndFetch(
+        "/gifu/Agreement/Agree",
+        `MapId=${MAP_ID}`,
+        "",
+        agent,
+      );
+      console.log(`[gifu-gis] TLS ${t.label} で接続`);
+      return { agent, cookie: r.cookie };
+    } catch (e) {
+      lastErr = e;
+      const err = e as Error & { cause?: Error };
+      console.log(
+        `[gifu-gis] TLS ${t.label} 失敗: ${(err.cause?.message ?? err.message).slice(0, 100)}`,
+      );
+    }
+  }
+  throw lastErr;
 }
 
 /** レイヤ名から年度を取る。「R8クマ目撃」→ 2026、「H28クマ出没」→ 2016。 */
@@ -116,18 +148,12 @@ export async function fetchGifuGisSightings(
 ): Promise<UnifiedSighting[]> {
   const layers = source.gifuGisLayers ?? [];
   if (!layers.length) return [];
-  const dispatcher = legacyTlsAgent();
   const out: UnifiedSighting[] = [];
 
   try {
-    // 利用許諾に同意してセッションを得る。
-    const agreed = await agreeAndFetch(
-      "/gifu/Agreement/Agree",
-      `MapId=${MAP_ID}`,
-      "",
-      dispatcher,
-    );
-    let cookie = agreed.cookie;
+    // 利用許諾に同意してセッションを得る (ここで TLS も確立する)。
+    const { agent: dispatcher, cookie: agreedCookie } = await connectLegacy();
+    let cookie = agreedCookie;
 
     for (const layer of layers) {
       const fy = layerFiscalYear(layer.name);
@@ -216,7 +242,12 @@ export async function fetchGifuGisSightings(
       );
     }
   } catch (e) {
-    console.log(`[gifu-gis] 取得失敗: ${(e as Error).message.slice(0, 160)}`);
+    // undici の "fetch failed" は原因が cause 側にある。そこを出さないと
+    // CI で何が起きたか分からない (実際にこれで切り分けに手間取った)。
+    const err = e as Error & { cause?: Error };
+    console.log(
+      `[gifu-gis] 取得失敗: ${(err.cause?.message ?? err.message).slice(0, 200)}`,
+    );
     return out;
   }
   return out;
