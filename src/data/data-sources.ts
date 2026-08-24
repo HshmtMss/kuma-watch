@@ -10,6 +10,8 @@ export type ExtractorType =
   | "yamaguchi-pdf-table"
   // 奈良県の年度別目撃情報一覧 PDF 専用。src/lib/sources/nara-pdf.ts
   | "nara-pdf-table"
+  // 岐阜県 県域統合型GIS のクママップ。src/lib/sources/gifu-gis.ts
+  | "gifu-gis"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -37,6 +39,14 @@ export type DataSourceUrl = {
   url: string;
   role: UrlRole;
   hint?: string;
+};
+
+/** 岐阜県 GIS のレイヤ (年度ごとに 1 レイヤ)。gifu-gis extractor が使う。 */
+export type GifuGisLayer = {
+  /** 例 "R8クマ目撃"。先頭の元号+年から年度を決めるので改名しないこと。 */
+  name: string;
+  layerId: number;
+  fieldSetId: number;
 };
 
 export type ArcGisFieldMappings = {
@@ -109,6 +119,8 @@ export type KmlSource = {
 };
 
 export type DataSourceEntry = {
+  /** 岐阜県 GIS のレイヤ一覧 (extractor: "gifu-gis" のときのみ)。 */
+  gifuGisLayers?: GifuGisLayer[];
   id: string;
   kind: SourceKind;
   prefCode: string;
@@ -1051,8 +1063,33 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://gis-gifu.jp/gifu/Portal", role: "gis", hint: "県域統合型 GIS（legacy SSL で API 化不能）" },
     ],
     extractor: "direct-shapefile-zip",
-    notes: "CKAN で R2(2020)〜R7(2025)の年度別 Shapefile ZIP を公開。JGD2011 平面直角 7 系→WGS84 変換後マージ。2019 以前は別 CSV",
+    notes: "CKAN で R2(2020)〜R7(2025)の年度別 Shapefile ZIP を公開。JGD2011 平面直角 7 系→WGS84 変換後マージ。2019 以前は別 CSV。※ データセット名が「クママップ（過去）」になり最新は 2025-10 で停止。現行は gifu-gis を参照",
     verifiedAt: "2026-04-20",
+  },
+  {
+    // 県域統合型GIS の「クママップ」。CKAN 側が「（過去）」になり 2025-10 で
+    // 止まったため、現行データはこちらから取る。緯度経度が直接入っており、
+    // 字レベルの地名・時間帯・出没場所の種別・頭数まで揃う。
+    //
+    // 年度ごとに 1 レイヤ。新年度 (R9 等) が増えたらここに追記する。
+    // レイヤ ID は Init_Extract の応答で確認できる。
+    id: "gifu-gis",
+    kind: "prefecture",
+    prefCode: "21",
+    regionLabel: "岐阜県 クママップ（県域統合型GIS）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.gifu.lg.jp/page/4964.html", role: "list", hint: "県公式 ツキノワグマについて" },
+      { url: "https://gis-gifu.jp/gifu/Map?mid=10538", role: "gis", hint: "クママップ (利用許諾の同意が必要・古い TLS)" },
+    ],
+    extractor: "gifu-gis",
+    gifuGisLayers: [
+      { name: "R8クマ目撃", layerId: 1053898200, fieldSetId: 98200 },
+      { name: "R7クマ目撃", layerId: 1053898100, fieldSetId: 98100 },
+      { name: "R6クマ目撃", layerId: 1053898000, fieldSetId: 98000 },
+    ],
+    notes: "利用許諾に同意してセッションを得たうえで Attribute/GetLayerAttr から取得。サーバの TLS が古く SECLEVEL を下げた接続が要る。R8 は 533 件 (2026-08 時点)",
+    verifiedAt: "2026-08-24",
   },
   {
     id: "shizuoka-gmap",
