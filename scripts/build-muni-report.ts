@@ -25,11 +25,14 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   monthlyCounts,
-  seasonality,
+  seasonalityComparison,
   hourHistogram,
   municipalityProfile,
+  timedProvenance,
   type AnalyticsRecord,
 } from "../src/lib/sighting-analytics";
+import { withNormalizedMuni } from "../src/lib/analytics-muni";
+import { injurySources } from "../src/lib/contact-risk";
 import { recurrence, concentration } from "../src/lib/recurrence";
 import {
   placeRisk,
@@ -61,11 +64,16 @@ const raw = JSON.parse(
   readFileSync(join(process.cwd(), "public", "data", "sightings.json"), "utf8"),
 ) as { records?: unknown } | unknown[];
 // スナップショットは { generatedAt, records } 形式。素の配列も受け付ける。
-const all = (Array.isArray(raw)
-  ? raw
-  : Array.isArray(raw.records)
-    ? raw.records
-    : []) as AnalyticsRecord[];
+// 市町村名は情報源ごとに粒度がばらばら (青森は「むつ市大畑町地区」のような
+// 地区付きが1,040種)。正規化しないと、むつ市のレポートに むつ市の記録の
+// 半分しか入らない。集計の入口で市町村マスターの表記へ寄せる。
+const all = withNormalizedMuni(
+  (Array.isArray(raw)
+    ? raw
+    : Array.isArray(raw.records)
+      ? raw.records
+      : []) as AnalyticsRecord[],
+);
 const prefRecords = all.filter((r) => r.prefectureName === PREF);
 const muni = all.filter(
   (r) => r.prefectureName === PREF && (r.cityName ?? "").trim() === MUNI,
@@ -81,7 +89,23 @@ const lastDate = dates[dates.length - 1];
 
 // ─── 集計 ───
 const profile = municipalityProfile(prefRecords, today, PREF, MUNI, 30);
-const season = seasonality(muni, today, 3);
+// 年をまたぐ比較は、比較する全年に記録がある情報源に絞れるときだけ出す
+// (絞らないと、情報源が増えた分がそのまま「今年は激増」に見える)。
+const season = seasonalityComparison(muni, today, 2);
+// 年間のリズム(形)は、直近3年の月別合計で見る。水準の比較ではないので
+// 情報源の増減の影響を受けにくく、「何月に備えるか」には十分。
+const shapeFrom = String(Number(today.slice(0, 4)) - 2);
+const monthShape = new Array(12).fill(0) as number[];
+for (const r of muni) {
+  const d = (r.date ?? "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d.slice(0, 4) < shapeFrom) continue;
+  monthShape[Number(d.slice(5, 7)) - 1] += 1;
+}
+const timed = timedProvenance(muni, 3);
+/** 時間帯の分布を出すのに必要な、時刻ありレコードの最低数 */
+const MIN_TIMED = 30;
+
+const injSources = injurySources(muni).slice(0, 4);
 const months36 = monthlyCounts(muni, today, 36);
 const hours = hourHistogram(muni);
 const conc = concentration(muni);
@@ -94,6 +118,16 @@ const activities = activityRisk(muni);
 const sev = severityBreakdown(muni);
 const injHour = injuryByHour(muni);
 const injuries = muni.filter(isInjuryRecord);
+// 場所・誘引物・行動は記録本文の語句判定なので、記録が短い地域では
+// クマの生態ではなく「書き方」を映してしまう。判定率と文字数で線を引く
+// (/admin/analytics の regionProfile と同じ基準)。
+const avgCommentLen =
+  muni.reduce((a, r) => a + (r.comment ?? "").length, 0) / Math.max(1, muni.length);
+const textReliable =
+  avgCommentLen >= 15 && places.total > 0 && places.classified / places.total >= 0.2;
+const textWarning = textReliable
+  ? ""
+  : `<div class="note"><b>この地域は記録が短く、内訳は当てになりません。</b>コメントの平均は ${avgCommentLen.toFixed(0)} 字、場所を判定できたのは ${places.total > 0 ? ((places.classified / places.total) * 100).toFixed(0) : 0}% です。以下の内訳はクマの生態ではなく<b>記録の書き方</b>を反映している可能性が高いため、対策の根拠には使わないでください。公表時に状況を一言添えていただけると、翌年から精度が上がります。</div>`;
 
 // 地区別（sectionName）。市内のどこに寄っているかは自治体が最も知りたい情報。
 const bySection = new Map<string, number>();
@@ -117,7 +151,7 @@ for (const r of muni) {
 const years = [...byYear.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
 // ─── 結論（データから機械的に導く。文章の生成はしない）───
-const peakMonth = season.reduce((best, s) => (s.priorAvg > best.priorAvg ? s : best), season[0]);
+const peakMonthIdx = monthShape.reduce((b, v, i) => (v > monthShape[b] ? i : b), 0);
 const peakHour = hours.buckets.reduce((b, c) => (c.count > b.count ? c : b), hours.buckets[0]);
 // placeRisk は人身被害率の降順で返る。件数の最多と、被害率の最も高い区分は別物。
 const placesByCount = [...places.buckets].sort((a, b) => b.count - a.count);
@@ -133,6 +167,9 @@ const reportData = {
   coverage: { total: muni.length, firstDate, lastDate },
   profile,
   season,
+  monthShape,
+  timed,
+  injurySources: injSources,
   months36,
   years,
   hours,
@@ -305,13 +342,33 @@ const html = `<title>${esc(MUNI)}クマ出没レポート</title>
 <p>直近 30 日（${esc(profile.recentLabel)}）は <b>${num(profile.recent)} 件</b>、その前の 30 日（${esc(profile.prevLabel)}）は <b>${num(profile.prev)} 件</b>${profile.ratio !== null ? `で、${profile.ratio} 倍です。` : "です。"}</p>
 
 <h2><span class="n">02</span>年間のリズム — いつ多いか</h2>
-<p class="lead">月ごとの件数。今年と、過去 3 年の同月平均を並べています。</p>
+<p class="lead">直近 3 年の月別合計です。何月に備えるかを決めるための図で、年ごとの多い少ないではありません。</p>
 <figure>${barChart(
-  season.map((s) => ({ label: MONTH_LABELS[s.month - 1], value: s.thisYear, alt: s.priorAvg })),
-  { unit: "件", altLabel: "過去3年平均" },
+  monthShape.map((v, i) => ({ label: MONTH_LABELS[i], value: v })),
+  { unit: "件" },
 )}</figure>
-<div class="note">今年の棒は ${esc(today.slice(0, 7))} までの実績です。それ以降の月はまだ到来していないため 0 と表示されます。過去 3 年平均との比較は、今月までの範囲でお読みください。</div>
-<p>過去 3 年の平均で最も多いのは <b>${peakMonth.month} 月（平均 ${peakMonth.priorAvg} 件）</b>です。対策の準備は、この月に入る前に終わっている必要があります。</p>
+<p>直近 3 年で最も多いのは <b>${peakMonthIdx + 1} 月（合計 ${num(monthShape[peakMonthIdx])} 件）</b>です。対策の準備は、この月に入る前に終わっている必要があります。</p>
+
+<h3>今年は例年と比べて多いのか</h3>
+${
+  season.comparable
+    ? `<p>年をまたいで件数を比べるには、比べる全ての年に記録がある情報源だけに絞る必要があります（情報源が増えた分が「増加」に見えてしまうため）。絞った結果は次のとおりです。</p>
+<figure>${barChart(
+        season.series[season.series.length - 1].monthly.map((v, i) => ({
+          label: MONTH_LABELS[i],
+          value: v ?? 0,
+          alt:
+            season.series
+              .slice(0, -1)
+              .reduce((a, y) => a + (y.monthly[i] ?? 0), 0) /
+            Math.max(1, season.series.length - 1),
+        })),
+        { unit: "件", altLabel: "比較年の平均" },
+      )}</figure>
+<p>完了した月までの件数は ${season.totals.map((t) => `${t.year} 年 ${num(t.count)} 件`).join("、")} で、今年は過去 ${season.totals.length - 1} 年平均の <b>${season.vsPriorAvg} 倍</b>です。</p>
+<div class="note">対象の情報源：${esc(season.sources.join("、"))}${season.stoppedSources.length ? `／今年の途中で記録が止まったため除外：${esc(season.stoppedSources.join("、"))}` : ""}。今年の棒は完了した月まで（${esc(today.slice(0, 7))} は集計に含めていません）。</div>`
+    : `<div class="note">この地域では、年をまたぐ件数の比較を出していません。${esc(season.reason ?? "")}情報源の構成が年によって違う状態で平均を取ると、増えたのがクマなのか公表なのか区別できないためです。上の「年間のリズム」と、次の「年ごとの推移」を、母数の変化とあわせてお読みください。</div>`
+}
 
 <h2><span class="n">03</span>年ごとの推移</h2>
 <p class="lead">年次の件数。年による差が大きいことを確認するための図です。</p>
@@ -328,13 +385,17 @@ const html = `<title>${esc(MUNI)}クマ出没レポート</title>
 )}</figure>
 
 <h2><span class="n">05</span>時間帯 — 何時に多いか</h2>
-<p class="lead">時刻の記録がある ${num(hours.withTime)} 件（全体の ${((hours.withTime / muni.length) * 100).toFixed(1)}%）の分布です。</p>
+${
+  hours.withTime < MIN_TIMED
+    ? `<div class="note">この地域は時刻が記録されている出没が ${num(hours.withTime)} 件（全体の ${((hours.withTime / muni.length) * 100).toFixed(1)}%）しかないため、時間帯の分布は出していません。少数の記録から「何時が多い」と読むと、たまたまの偏りを傾向と取り違えます。時刻の公表が増えれば作成できます。</div>`
+    : `<p class="lead">時刻の記録がある ${num(hours.withTime)} 件（全体の ${((hours.withTime / muni.length) * 100).toFixed(1)}%）の分布です。</p>
 <figure>${barChart(
-  hours.buckets.map((b) => ({ label: b.label, value: b.count })),
-  { unit: "件" },
-)}</figure>
+        hours.buckets.map((b) => ({ label: b.label, value: b.count })),
+        { unit: "件" },
+      )}</figure>
 <p>最も多いのは <b>${esc(peakHour.label)} 時台（${num(peakHour.count)} 件）</b>です。</p>
-<div class="note">時刻が入っている記録は一部に限られ、警察通報（#9110）由来が中心です。全体の傾向として断定はできませんが、通報された中での相対的な偏りは読み取れます。</div>
+<div class="note">時刻が入っている記録は一部に限られます${timed.sources.length ? `（この地域では ${esc(timed.sources.map((x) => `${x.name} ${Math.round(x.share * 100)}%`).join("、"))}）` : ""}。出没した時刻ではなく通報された時刻であること、時刻を書く情報源が限られることから、全体の傾向として断定はできませんが、通報された中での相対的な偏りは読み取れます。</div>`
+}
 
 ${
   sections.length
@@ -374,6 +435,7 @@ ${rankTable(
 ${
   places.buckets.length
     ? `<h2><span class="n">09</span>場所の種類 — 件数と人身被害は一致しない</h2>
+${textWarning}
 <p class="lead">記録本文から場所を判定できた ${num(places.classified)} 件（全 ${num(places.total)} 件の ${((places.classified / places.total) * 100).toFixed(0)}%）の内訳です。</p>
 ${rankTable(
   placesByCount.map((b) => ({
@@ -390,6 +452,7 @@ ${rankTable(
 ${
   attractants.length
     ? `<h2><span class="n">10</span>誘引物 — 何に引き寄せられているか</h2>
+${textWarning}
 <p class="lead">記録本文に誘引物への言及がある件数と、最も多い月です。</p>
 ${rankTable(
   attractants.map((a) => ({
@@ -413,6 +476,7 @@ ${rankTable(
   <div class="kpi"><b>${num(sev.light)} 件</b><span>軽傷</span></div>
   <div class="kpi"><b>${num(sev.unspecified)} 件</b><span>程度の記載なし</span></div>
 </div>
+<div class="note">人身被害は記録本文の語句から判定しているため、拾えるかどうかは公表元がどれだけ詳しく書くかで決まります。全国では県ごとの検出率が 8.69%〜0.10% と大きく違い、この差は被害の起きやすさではなく記録の書き方の差です。<b>他の市町村の数字と比べないでください。</b>${injSources.length ? `この地域の被害記録の出どころは ${esc(injSources.map((x) => `${x.source} ${Math.round(x.share * 100)}%`).join("、"))} です。` : ""}</div>
 ${
   activities.some((a) => a.injuries > 0)
     ? `<p>被害時の行動として記録に現れる語の偏りです。</p>
@@ -431,8 +495,8 @@ ${rankTable(
 <h2><span class="n">12</span>このデータから言えること</h2>
 <div class="actions">
   <ol>
-    <li><b>時期</b>：過去 3 年の平均で最も多いのは <b>${peakMonth.month} 月</b>（平均 ${peakMonth.priorAvg} 件）です。注意喚起・草刈り・誘引物の片付けは、この月に入る前に完了している必要があります。</li>
-    <li><b>時間</b>：時刻の記録がある中では <b>${esc(peakHour.label)} 時台</b>が最多です。屋外作業・通学の時間帯と重なるかをご確認ください。</li>
+    <li><b>時期</b>：直近 3 年で最も多いのは <b>${peakMonthIdx + 1} 月</b>（合計 ${num(monthShape[peakMonthIdx])} 件）です。注意喚起・草刈り・誘引物の片付けは、この月に入る前に完了している必要があります。</li>
+    ${hours.withTime >= MIN_TIMED ? `<li><b>時間</b>：時刻の記録がある ${num(hours.withTime)} 件の中では <b>${esc(peakHour.label)} 時台</b>が最多です。屋外作業・通学の時間帯と重なるかをご確認ください。</li>` : `<li><b>時間</b>：時刻が記録された出没が ${num(hours.withTime)} 件しかなく、時間帯の傾向は出せません。公表時に時刻を添えていただけると、翌年から作成できます。</li>`}
     ${topSection ? `<li><b>場所</b>：地区名の記録がある中では <b>${esc(topSection.name)}</b> が最多で ${num(topSection.count)} 件（地区名のある記録の ${((topSection.count / withSection) * 100).toFixed(1)}%）です。</li>` : ""}
     ${topPlace ? `<li><b>環境</b>：場所を判定できた記録では <b>${esc(topPlace.key)}</b> が最多（${num(topPlace.count)} 件）です。${topRatePlace && topRatePlace.key !== topPlace.key ? `ただし人身被害の割合が最も高いのは <b>${esc(topRatePlace.key)}</b>（${num(topRatePlace.count)} 件中 ${topRatePlace.injuries} 件・${(topRatePlace.rate * 100).toFixed(2)}%）で、件数の多い場所とは一致しません。` : ""}</li>` : ""}
     ${topAttractant ? `<li><b>誘引物</b>：最も多く言及されるのは <b>${esc(topAttractant.key)}</b>（${num(topAttractant.count)} 件、最多は ${topAttractant.peakMonth} 月）です。</li>` : ""}
