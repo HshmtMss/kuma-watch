@@ -72,6 +72,7 @@ type BacktestRow = {
   type: string;
 };
 type Regime = {
+  typeBaseCount: number;
   years: RegimeYear[];
   backtest: BacktestRow[];
   typeSources?: string[];
@@ -431,6 +432,7 @@ function Content({
       {data.surge && (
         <Section
           title="早期警戒：今どこで急に増えているか"
+          nationwide
           note="直近30日と直前30日の県別件数を比較した急増アラート。同一情報源どうしの短期比較なので、情報源増加や当年の取り込みラグの影響を受けにくい。"
         >
           <AnalyticsSurgeBoard data={data.surge} />
@@ -509,6 +511,7 @@ function Content({
 
           <Section
             title="M-2. 秋型の年は「人里寄り」で起きる"
+            nationwide
             note={`観測条件を固定するため、全期間に存在するソース(${data.forest.stableSources.join("・") || "—"})だけで集計。全ソースで見ると単調に下がって見えるが、それは2023年以降に追加したソースが人里寄りのデータを多く含むためで、実態ではない。`}
           >
             <div className="overflow-x-auto">
@@ -1024,6 +1027,15 @@ function Content({
         title="I. 年の「型」と10月の予測"
         note="秋(9-11月)/初夏(6-7月)の比で年の型を判定する。環境省統計に基づく堅果類の豊凶記録と6年すべて一致した（凶作年は1.46以上、豊作・並作年は0.52以下で重なりなし）。型は堅果類の豊凶を反映していると考えてよい。"
       >
+        {data.regime.typeBaseCount === 0 && (
+          <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
+            <strong>この地域では年の型を判定できません。</strong>
+            年をまたぐ比較は、全期間を通して記録している情報源だけで行う必要が
+            ありますが（全ソースで計算すると 2020年の大凶作が夏型に化ける）、
+            条件を満たす情報源は全国で3件（青森・富山・岩手）しかなく、この地域には
+            ありません。下の表の件数は実数ですが、「秋/初夏」と「型」は出せません。
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead>
@@ -1054,7 +1066,11 @@ function Content({
                         夏型
                       </span>
                     ) : (
-                      <span className="text-xs text-stone-400">未確定（年途中）</span>
+                      <span className="text-xs text-stone-400">
+                        {data.regime.typeBaseCount === 0
+                          ? "判定不可"
+                          : "未確定（年途中）"}
+                      </span>
                     )}
                   </td>
                 </tr>
@@ -1462,6 +1478,7 @@ function Content({
       {/* C: 地域傾向・急増検知（全国固定） */}
       <Section
         title="C. 急増地域（全国）"
+        nationwide
         note="直近30日の市町村別件数が、過去1年の同期間あたり平均を大きく超えるもの。早期警戒用。※データ源の追加でも急増に見える場合があるため、recent と平均の両方で判断。"
       >
         {data.hotspots.length === 0 ? (
@@ -1482,6 +1499,7 @@ function Content({
 
       <Section
         title="都道府県別（全国）"
+        nationwide
         note="直近90日 / 直近365日の件数（多い順・上位20）。"
       >
         <Table
@@ -1625,14 +1643,24 @@ function Section({
   title,
   note,
   children,
+  nationwide,
 }: {
   title: string;
   note?: string;
   children: React.ReactNode;
+  /** 地域を選んでも中身が変わらない (全国固定の) セクション */
+  nationwide?: boolean;
 }) {
   return (
     <section>
-      <h2 className="text-base font-bold text-stone-900">{title}</h2>
+      <h2 className="text-base font-bold text-stone-900">
+        {title}
+        {nationwide && (
+          <span className="ml-2 whitespace-nowrap rounded bg-stone-200 px-1.5 py-0.5 align-middle text-[10px] font-bold text-stone-600">
+            全国固定・地域で絞り込まれません
+          </span>
+        )}
+      </h2>
       {note && <p className="mb-2 mt-0.5 text-xs text-stone-500">{note}</p>}
       <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
         {children}

@@ -289,6 +289,10 @@ export async function GET(req: Request) {
           const curYear = Number(today.slice(0, 4));
           const curMonth = Number(today.slice(5, 7));
           return {
+            // 型の判定に使えた件数。県を選ぶと 0 になることが多く
+            // (固定ソースは青森・富山・岩手の3つしかない)、0 のときに
+            // 「未確定(年途中)」と出すのは誤った説明になる。
+            typeBaseCount: typeBase.length,
             years: recent.map((p) => ({
               year: p.year,
               total: p.total,

@@ -119,6 +119,12 @@ export type KmlSource = {
 };
 
 export type DataSourceEntry = {
+  /**
+   * その期間で完結する過去データか (年度別・月別のアーカイブ等)。
+   * true のものは更新が止まって当然なので、健全性チェックの警告対象から外す。
+   * これを付けないと月別 PDF が毎月「止まった」と警告され、本当の異常が埋もれる。
+   */
+  periodBounded?: boolean;
   /** 岐阜県 GIS のレイヤ一覧 (extractor: "gifu-gis" のときのみ)。 */
   gifuGisLayers?: GifuGisLayer[];
   id: string;
@@ -900,6 +906,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         },
       ],
       extractor: "nagano-pdf-table" as ExtractorType,
+      // 月別アーカイブ。その月が終われば更新されないのが正常。
+      periodBounded: true,
       notes: `長野県公式の月別目撃情報 PDF。表形式 (No / 月日 / 市町村 / 区分 / 目撃痕跡別 / 大きさ / 頭数 / 状況) を正規表現で抽出`,
       verifiedAt: "2026-04-26",
     }))
@@ -1172,6 +1180,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         },
       ],
       extractor: "llm-pdf" as ExtractorType,
+      // 年度別アーカイブ。
+      periodBounded: true,
       notes: "静岡県公式 PDF。表形式 (目撃日 / 市町 / 地名等 / 備考)",
       verifiedAt: "2026-04-26",
     }))
