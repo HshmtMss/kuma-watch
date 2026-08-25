@@ -18,6 +18,7 @@ import {
   injurySources,
 } from "@/lib/contact-risk";
 import { siteHotspots } from "@/lib/site-hotspots";
+import { withNormalizedMuni } from "@/lib/analytics-muni";
 import { BUNA_SOURCE_URL, bunaSummary } from "@/data/buna-index";
 import { forecastAccuracy, loadForecastLog } from "@/lib/forecast-log";
 import {
@@ -110,7 +111,12 @@ export async function GET(req: Request) {
   const muni = pref ? (url.searchParams.get("muni") ?? "").trim() : "";
 
   try {
-    const all = (await getCachedSightings()) as AnalyticsRecord[];
+    // 市町村名はソースごとに粒度も表記もばらばら (青森は「むつ市大畑町地区」の
+    // ような地区付きが 1,040 種)。集計の入口で市町村マスターの表記へ寄せないと、
+    // 県内シェア・順位・県平均比がすべて壊れる。
+    const all = withNormalizedMuni(
+      (await getCachedSightings()) as AnalyticsRecord[],
+    );
     // 県フィルタ（市町村ベンチマークや選択肢は県の全記録で計算する）。
     const prefScoped = pref
       ? all.filter((r) => r.prefectureName === pref)
