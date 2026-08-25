@@ -23,6 +23,7 @@ import AnalyticsMuniProfile, {
 import AnalyticsSiteHotspots, {
   type SiteHotspotBoard,
 } from "@/components/admin/AnalyticsSiteHotspots";
+import InjuryNote from "@/components/admin/InjuryNote";
 
 type MonthPoint = { month: string; count: number };
 type SeasonalityComparison = {
@@ -304,6 +305,13 @@ function Content({
     return <p className="text-sm text-stone-500">集計中…（初回は数秒）</p>;
 
   const scope = muni ? `${pref} ${muni}` : pref || "全国";
+  // 人身被害の数字を出すセクションに共通で添える注記
+  const injuryNote = (
+    <InjuryNote
+      sources={data.contact.injurySources}
+      avgCommentLength={data.profile.quality.avgCommentLength}
+    />
+  );
 
   return (
     <div
@@ -433,6 +441,7 @@ function Content({
           showCity={!muni}
           years={3}
         />
+        {injuryNote}
       </Section>
 
       {/* M: 森林率 — 出没が起きる土地の性質。対策の投資先を決める材料 */}
@@ -820,6 +829,7 @@ function Content({
           出没件数が最も多いのは道路ですが、被害率は最も低くなります（多くが車内からの
           目撃のため）。件数の多い場所を避けても、危険を避けたことにはなりません。
         </p>
+        {injuryNote}
       </Section>
 
       <Section
@@ -840,6 +850,7 @@ function Content({
           大半は程度が書かれていません。公開元が「軽傷/重傷」を記載するかは
           自治体ごとに違うため、程度別の件数は地域間で比較できません。
         </p>
+        {injuryNote}
       </Section>
 
       <Section
@@ -1413,6 +1424,7 @@ function Content({
             String(y.injuries),
           ])}
         />
+        {injuryNote}
       </Section>
 
       {/* C: 地域傾向・急増検知（全国固定） */}
@@ -1512,6 +1524,7 @@ function Content({
           ]}
           labelEvery={4}
         />
+        {injuryNote}
       </Section>
 
       <Section title="直近の人身被害（推定）" note="コメントから人身被害らしき事案を新しい順に抽出。">
