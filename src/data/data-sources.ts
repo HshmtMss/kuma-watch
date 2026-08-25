@@ -14,6 +14,8 @@ export type ExtractorType =
   | "gifu-gis"
   // 青森県「くまログあおもり」。src/lib/sources/kumalog-aomori.ts
   | "kumalog-aomori"
+  // 愛知県の年度別出没情報 PDF。src/lib/sources/aichi-pdf.ts
+  | "aichi-pdf-table"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -1246,10 +1248,13 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "愛知県 ツキノワグマ情報",
     bearStatus: "present",
     urls: [
+      // 注意: 県は更新のたびに attachment 番号を振り直す。シーズン中は月1回
+      // 上の list ページで番号を確認して差し替えること。
+      { url: "https://www.pref.aichi.jp/uploaded/attachment/626110.pdf", role: "pdf", hint: "ツキノワグマ出没情報（令和8年度）" },
       { url: "https://www.pref.aichi.jp/soshiki/shizen/tsukinowaguma.html", role: "list", hint: "県公式 ツキノワグマトップ" },
       { url: "https://www.pref.aichi.jp/press-release/tsukinowaguma2025.html", role: "list", hint: "2025年度 出没予測プレスリリース" },
     ],
-    extractor: "llm-html",
+    extractor: "aichi-pdf-table",
     notes: "三河山間部に生息（レッドリストあいち2025: 絶滅危惧IA類）。県は年度ごとに出没予測と確認情報を PDF で公開",
     verifiedAt: "2026-04-26",
   },
