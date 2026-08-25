@@ -1,0 +1,30 @@
+# 取り込みソースの健全性チェック。
+#
+# 「壊れていることに気づけない」のが一番まずい。岐阜県は 306 日、山口県・
+# 奈良県は数ヶ月にわたり 0 件のまま放置されていた (2026-08 に発覚)。健全性の
+# 計器自体は前からあったが /admin を見に行かないと気づけず、誰も見ていなかった。
+#
+# ここで失敗させると GitHub から通知メールが飛ぶ = 既に読まれている経路に乗る。
+# 復旧不能と分かっているものは src/data/source-gaps.ts に登録して除外するので、
+# 通知が飛ぶのは「新しく壊れたとき」だけになる。
+name: Source health check
+
+on:
+  schedule:
+    # 毎日 JST 09:00 (UTC 00:00)。朝に 1 通だけ届く。
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Check source health
+        run: npx tsx scripts/check-source-health.ts
