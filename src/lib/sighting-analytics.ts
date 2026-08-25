@@ -69,8 +69,15 @@ export type SeasonPoint = {
 };
 
 /**
- * 季節性: 各月(1-12)について今年の件数と、過去 priorYears 年の同月平均を返す。
- * 「今年は例年より多いか/早いか」を見る。
+ * 各月(1-12)の今年の件数と、過去 priorYears 年の同月平均。
+ *
+ * ⚠ 「今年 vs 例年」の水準比較には使わないこと。このデータセットは年々
+ * ソースが増えており、priorAvg はソースが少なかった年を含むため必ず小さく
+ * 出る (全国6月で 今年7,724 vs 例年1,504)。水準を比べるなら観測条件を固定した
+ * seasonalityComparison を使う。
+ *
+ * 「その地域のピーク月はいつか」のような年内の形を見る用途では使える
+ * (scripts/build-muni-report.ts がこの用途で使っている)。
  */
 export function seasonality(
   records: AnalyticsRecord[],
@@ -101,6 +108,199 @@ export function seasonality(
     out.push({ month: mo, thisYear: cur, priorAvg: Math.round(avg * 10) / 10 });
   }
   return out;
+}
+
+/**
+ * 季節性の年比較 — 「今年は例年より多いか」を、比較できるときだけ出す。
+ *
+ * === なぜ単純な「過去N年平均」ではだめか ===
+ * このデータセットは年々ソースが増えている。全レコードで平均を取ると:
+ *   全国 6月: 今年 7,724件 vs 例年 1,504件 (5.1倍)
+ *   年別総数 2019:1,569 … 2023:8,754 2025:43,089
+ * クマが5倍になったのではなく、取り込み先が増えただけ。長野県に至っては
+ * 「例年」の中に 2024年の1件が入る。この比較はどの地域でも永久に
+ * 「今年は激増」と表示し続ける。
+ *
+ * === 対処 ===
+ * 比較する全ての年に存在するソースだけに絞ってから比べる (観測条件の固定)。
+ * 年の型の判定 (bear-regime) や森林率の年次比較で既に使っている考え方を、
+ * 季節性にも適用する。絞った結果:
+ *   全国 (今年+2年): 今年 6,423 vs 例年 5,984 → 1.07倍
+ *
+ * 窓は「今年 + 直近2年」を既定にする。必要な年数を増やすほど条件を満たす
+ * ソースは単調に減るため (長い窓の集合は短い窓の部分集合)、まず3年で試す。
+ *
+ * さらに、年の途中で止まったソースを外す。実測 2026年の秋田県:
+ *   sharp9110  4月392 5月831 6月858 7月0 8月0   ← 7月に停止
+ *   news       6月244 7月818 8月118              ← 入れ替わりで引き継いだ
+ * sharp9110 は「3年続けて記録がある」条件は満たすので、外さないと今年だけ
+ * 7月以降が0に落ち、実態と逆の「激減」を描いてしまう。
+ * 冬に記録が無いのは正常なので、「例年その月に出ているのに今年はほぼ0」
+ * (例年の2割未満) だけを停止と見なす (季節の沈黙と区別する)。
+ * 全国で見ると sharp9110 の7月は 31件 残っており「0」では拾えないが、
+ * 例年の水準からは激減しているのでこの比で外れる。実際の減少を取り違える
+ * 可能性はあるが、止まった情報源で「激減」を描くより害が小さい。
+ *
+ * === 出せない地域は出さない ===
+ * 長野県は3年続けて記録しているソースが無く、青森県は固定ソースの今年の
+ * 記録が33件しかない (ソースの入れ替わり)。こういう地域で比較を描くと、
+ * データの都合を実態と取り違える。comparable=false を返し、理由を書く。
+ */
+export type SeasonalityYearSeries = {
+  year: number;
+  /** 1月から12月。今年の未到来・進行中の月は null */
+  monthly: (number | null)[];
+};
+export type SeasonalityComparison = {
+  comparable: boolean;
+  /** comparable=false のとき、画面にそのまま出す理由 */
+  reason: string | null;
+  /** 比較に使ったソース (観測条件を固定した集合) */
+  sources: string[];
+  /** 年の途中で止まったため比較から外したソース */
+  stoppedSources: string[];
+  /** 比較に使った年 (今年を含む・昇順) */
+  years: number[];
+  series: SeasonalityYearSeries[];
+  /** 各年の「経過済みの月まで」の件数。母数の開示用 */
+  totals: { year: number; count: number }[];
+  /** 今年 ÷ 過去年平均 (経過済みの月ベース)。比較できないときは null */
+  vsPriorAvg: number | null;
+};
+
+/** 年ごとの母数がこれ未満なら比較しない。ソースの入れ替わりを拾うための下限 */
+const MIN_YEAR_SAMPLE = 50;
+
+/** その年・その月の件数を数える (完了した月だけ数えたい場合は monthLimit) */
+function countYearMonth(
+  records: AnalyticsRecord[],
+  sources: Set<string>,
+): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  for (const r of records) {
+    if (!sources.has(r.source ?? "")) continue;
+    const d = ymd(r.date);
+    if (!d) continue;
+    const y = Number(d.slice(0, 4));
+    const mo = Number(d.slice(5, 7));
+    if (mo < 1 || mo > 12) continue;
+    let arr = out.get(y);
+    if (!arr) {
+      arr = new Array(12).fill(0);
+      out.set(y, arr);
+    }
+    arr[mo - 1] += 1;
+  }
+  return out;
+}
+
+export function seasonalityComparison(
+  records: AnalyticsRecord[],
+  today: string,
+  priorYears = 2,
+): SeasonalityComparison {
+  const thisYear = Number(today.slice(0, 4));
+  const curMonth = Number(today.slice(5, 7));
+  const years: number[] = [];
+  for (let y = thisYear - priorYears; y <= thisYear; y++) years.push(y);
+  const empty = (
+    reason: string,
+    stoppedSources: string[] = [],
+  ): SeasonalityComparison => ({
+    comparable: false,
+    reason,
+    sources: [],
+    stoppedSources,
+    years,
+    series: [],
+    totals: [],
+    vsPriorAvg: null,
+  });
+
+  // 比較する全ての年に記録があるソースだけを使う
+  const seen = new Map<string, Set<number>>();
+  for (const r of records) {
+    const d = ymd(r.date);
+    const src = r.source ?? "";
+    if (!d || !src) continue;
+    const y = Number(d.slice(0, 4));
+    if (!seen.has(src)) seen.set(src, new Set());
+    seen.get(src)!.add(y);
+  }
+  const persistent = [...seen.entries()]
+    .filter(([, ys]) => years.every((y) => ys.has(y)))
+    .map(([s]) => s)
+    .sort();
+  if (persistent.length === 0)
+    return empty(
+      `${years[0]}年から今年まで続けて記録している情報源がないため、年をまたぐ比較ができません。`,
+    );
+
+  // 直前の完了月で「例年は出ているのに今年は0」のソースは、年の途中で
+  // 止まったと見なして外す。1月は直前の完了月が前年になるので判定しない。
+  const lastDone = curMonth - 1; // 1-12。0 なら判定しない
+  const stoppedSources: string[] = [];
+  const sources: string[] = [];
+  for (const src of persistent) {
+    if (lastDone < 1) {
+      sources.push(src);
+      continue;
+    }
+    const one = countYearMonth(records, new Set([src]));
+    const priorAtMonth =
+      years.slice(0, -1).map((y) => one.get(y)?.[lastDone - 1] ?? 0);
+    const expected =
+      priorAtMonth.reduce((a, b) => a + b, 0) / Math.max(1, priorAtMonth.length);
+    const actual = one.get(thisYear)?.[lastDone - 1] ?? 0;
+    if (expected >= 5 && actual < expected * 0.2) stoppedSources.push(src);
+    else sources.push(src);
+  }
+  if (sources.length === 0)
+    return empty(
+      `比較できる情報源（${stoppedSources.join(", ")}）が今年の途中で記録を止めています。別の情報源が引き継いでいる場合、年をまたぐ比較はできません。`,
+      stoppedSources,
+    );
+
+  const byYear = countYearMonth(records, new Set(sources));
+  // 母数は「今年の経過済みの月」に揃える (進行中の月は含めない)
+  const elapsed = curMonth - 1;
+  const totals = years.map((y) => ({
+    year: y,
+    count: (byYear.get(y) ?? []).slice(0, elapsed).reduce((a, b) => a + b, 0),
+  }));
+  const thin = totals.filter((t) => t.count < MIN_YEAR_SAMPLE);
+  if (elapsed < 1)
+    return empty("今年はまだ完了した月がないため、比較できません。", stoppedSources);
+  if (thin.length > 0)
+    return empty(
+      `観測条件を揃えると ${thin
+        .map((t) => `${t.year}年 ${t.count}件`)
+        .join(" / ")} と母数が足りません（情報源の入れ替わりの可能性）。`,
+      stoppedSources,
+    );
+
+  const series: SeasonalityYearSeries[] = years.map((y) => {
+    const arr = byYear.get(y) ?? new Array(12).fill(0);
+    return {
+      year: y,
+      // 今年の進行中・未到来の月は描かない (0 に落ちて「激減」に見えるため)
+      monthly: arr.map((v, i) => (y === thisYear && i + 1 >= curMonth ? null : v)),
+    };
+  });
+  const priorAvg =
+    totals.slice(0, -1).reduce((a, t) => a + t.count, 0) / priorYears;
+  const cur = totals[totals.length - 1].count;
+
+  return {
+    comparable: true,
+    reason: null,
+    sources,
+    stoppedSources,
+    years,
+    series,
+    totals,
+    vsPriorAvg: priorAvg > 0 ? Number((cur / priorAvg).toFixed(2)) : null,
+  };
 }
 
 // ============ C: 地域傾向・急増検知 ============

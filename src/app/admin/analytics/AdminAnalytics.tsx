@@ -25,7 +25,16 @@ import AnalyticsSiteHotspots, {
 } from "@/components/admin/AnalyticsSiteHotspots";
 
 type MonthPoint = { month: string; count: number };
-type SeasonPoint = { month: number; thisYear: number; priorAvg: number };
+type SeasonalityComparison = {
+  comparable: boolean;
+  reason: string | null;
+  sources: string[];
+  stoppedSources: string[];
+  years: number[];
+  series: { year: number; monthly: (number | null)[] }[];
+  totals: { year: number; count: number }[];
+  vsPriorAvg: number | null;
+};
 type PrefRow = { pref: string; d90: number; d365: number };
 type Hotspot = {
   pref: string;
@@ -188,7 +197,7 @@ type Data = {
   pref: string | null;
   total: number;
   monthly: MonthPoint[];
-  seasonality: SeasonPoint[];
+  seasonality: SeasonalityComparison;
   spatialSeasonal: SeasonFrame[];
   surge: SurgeBoard | null;
   muni: MunicipalityBoard | null;
@@ -212,6 +221,10 @@ type Data = {
   forest: ForestData;
   prefOptions: string[];
 };
+
+const MONTH_LABELS = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);
+/** 過去年の線の色 (今年はアンバー。過去年は古いほど薄い灰) */
+const SEASON_PRIOR_COLORS = ["#d6d3d1", "#a8a29e", "#78716c"];
 
 export default function AdminAnalytics() {
   return (
@@ -1270,27 +1283,65 @@ function Content({
         />
       </Section>
 
+      {/* 季節性の年比較 — ソースが揃っている年だけで比べる。揃わない地域では
+          グラフを出さず理由を書く。全レコードの平均で比べると、ソース追加の
+          せいでどの地域も「今年は激増」と出続けるため。 */}
       <Section
-        title="季節性（今年 vs 例年）"
-        note={`${scope}・月別に今年と過去5年平均を比較。「今年は例年より多いか/早いか」。`}
+        title="季節性（年の比較）"
+        note={`${scope}・月別の件数を年ごとに並べる。比較する全ての年に記録がある情報源だけに絞って集計している（絞らないと、情報源が増えた分がそのまま「増加」に見える）。今年は完了した月まで。`}
       >
-        <LineChart
-          labels={data.seasonality.map((s) => `${s.month}月`)}
-          series={[
-            {
-              name: "今年",
-              color: "#d97706",
-              values: data.seasonality.map((s) => s.thisYear),
-            },
-            {
-              name: "例年平均",
-              color: "#a8a29e",
-              dashed: true,
-              values: data.seasonality.map((s) => s.priorAvg),
-            },
-          ]}
-          labelEvery={1}
-        />
+        {!data.seasonality.comparable ? (
+          <div className="rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+            <div className="font-bold">この地域では年の比較を出せません</div>
+            <p className="mt-0.5 text-xs leading-relaxed">
+              {data.seasonality.reason}
+            </p>
+          </div>
+        ) : (
+          <>
+            <LineChart
+              labels={MONTH_LABELS}
+              series={data.seasonality.series.map((y, i) => ({
+                name: `${y.year}年`,
+                color:
+                  i === data.seasonality.series.length - 1
+                    ? "#d97706"
+                    : SEASON_PRIOR_COLORS[i % SEASON_PRIOR_COLORS.length],
+                dashed: i !== data.seasonality.series.length - 1,
+                values: y.monthly,
+              }))}
+              labelEvery={1}
+            />
+            <div className="mt-3 border-t border-stone-100 pt-2 text-xs text-stone-500">
+              <div>
+                完了した月までの件数：
+                {data.seasonality.totals
+                  .map((t) => `${t.year}年 ${t.count.toLocaleString("ja-JP")}件`)
+                  .join(" / ")}
+                {data.seasonality.vsPriorAvg != null && (
+                  <>
+                    {" → 今年は過去"}
+                    {data.seasonality.totals.length - 1}
+                    {"年平均の "}
+                    <strong className="text-stone-700">
+                      {data.seasonality.vsPriorAvg}倍
+                    </strong>
+                  </>
+                )}
+              </div>
+              <div className="mt-0.5">
+                観測条件を固定した情報源 {data.seasonality.sources.length} 件：
+                {data.seasonality.sources.join(", ")}
+              </div>
+              {data.seasonality.stoppedSources.length > 0 && (
+                <div className="mt-0.5">
+                  今年の途中で止まったため除外：
+                  {data.seasonality.stoppedSources.join(", ")}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </Section>
 
       {/* G: 親子連れ率 */}
@@ -1590,7 +1641,13 @@ function LineChart({
   labelEvery,
 }: {
   labels: string[];
-  series: { name: string; color: string; values: number[]; dashed?: boolean }[];
+  series: {
+    name: string;
+    color: string;
+    /** null は「値が無い」= 線を切る (今年の未到来の月など) */
+    values: (number | null)[];
+    dashed?: boolean;
+  }[];
   labelEvery: number;
 }) {
   const w = 640;
@@ -1600,7 +1657,9 @@ function LineChart({
   const padT = 10;
   const padB = 22;
   const n = labels.length;
-  const allVals = series.flatMap((s) => s.values);
+  const allVals = series
+    .flatMap((s) => s.values)
+    .filter((v): v is number => v !== null);
   const max = Math.max(1, ...allVals);
   const x = (i: number) =>
     padL + (n <= 1 ? 0 : (i / (n - 1)) * (w - padL - padR));
@@ -1642,10 +1701,19 @@ function LineChart({
           ) : null,
         )}
         {series.map((s) => {
+          // null で線を切る (次の実値から M で描き直す)
+          let pen = "M";
           const d = s.values
-            .map(
-              (v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`,
-            )
+            .map((v, i) => {
+              if (v === null) {
+                pen = "M";
+                return "";
+              }
+              const seg = `${pen}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+              pen = "L";
+              return seg;
+            })
+            .filter(Boolean)
             .join(" ");
           return (
             <path

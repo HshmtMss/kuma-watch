@@ -29,7 +29,7 @@ import {
 } from "@/lib/bear-regime";
 import {
   monthlyCounts,
-  seasonality,
+  seasonalityComparison,
   prefectureCounts,
   hotspots,
   hourHistogram,
@@ -148,7 +148,10 @@ export async function GET(req: Request) {
           : null,
         // A: 時系列
         monthly: monthlyCounts(scoped, today, 36),
-        seasonality: seasonality(scoped, today, 5),
+        // 季節性の年比較。ソースが揃っている年だけで比べ、揃わない地域では
+        // 比較そのものを出さない (全レコードの平均だと、ソース追加のせいで
+        // どの地域も永久に「今年は激増」と表示される)。
+        seasonality: seasonalityComparison(scoped, today, 2),
         // 時空間: 暦月ごとの出没密度（約22kmメッシュ）。地図アニメーションで
         // 「季節で出没が人里へ広がる」様子を見せる。
         spatialSeasonal: spatialSeasonal(scoped),
