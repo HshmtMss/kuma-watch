@@ -184,8 +184,20 @@ async function readSnapshotFromNet(): Promise<UnifiedSighting[] | null> {
       // スナップショットは 35MB まで育っており 15s では切れる回があった
       // (切れると同梱の古いファイルに落ち、データが stale になる)。
       // 候補は 2 つなので 20s × 2 = 40s で 60s 予算に収まる。
+      // cache は指定しない (既定 = "auto no cache")。
+      //
+      // ここは ISR ページの再生成中にも呼ばれる (/search → DiscoverHub →
+      // getCachedSightings)。cache:"no-store" は「毎リクエスト取得」を強制するため
+      // Next が経路を動的とみなし、再生成が
+      //   Error: Page changed from static to dynamic at runtime /search,
+      //   reason: no-store fetch ...
+      // で失敗していた (利用者には古い静的ページが 200 で返るので気づきにくい)。
+      // 既定と revalidate は静的プリレンダリングと両立し、再生成のたびに 1 回取得
+      // する。シャード側 (fetchShardCell) が既に同じ方針を採っている。
+      // 35MB は Data Cache (2MB上限) に載らないので実際には毎回取得になるが、
+      // 鮮度は memCache (5分) が持つので問題ない。
       const res = await fetch(c.url, {
-        cache: "no-store",
+        next: { revalidate: REVALIDATE_SECONDS },
         signal: AbortSignal.timeout(20000),
       });
       if (!res.ok) {
@@ -234,7 +246,8 @@ async function readBundledSnapshot(): Promise<UnifiedSighting[] | null> {
   //   - ビルド中(SSG) / ローカル開発 … 同梱ファイルが最新なので fs を優先。
   //   - 本番 runtime            … GitHub raw を優先し、各 commit を ~数分で反映。
   // どちらも memCache (5分TTL) 経由なのでフェッチ頻度はインスタンス当り低い。
-  // 22MB と大きく Data Cache(2MB上限) に載らないため cache:"no-store"。
+  // 22MB と大きく Data Cache(2MB上限) に載らないため実質キャッシュされない
+  // (cache 指定は revalidate。no-store は ISR 再生成を壊すので使わない)。
   const preferFs =
     process.env.NEXT_PHASE === "phase-production-build" ||
     process.env.NODE_ENV === "development";
