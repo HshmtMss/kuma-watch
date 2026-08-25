@@ -655,6 +655,53 @@ export function seasonHourHeatmap(
   return { rows, withTime, totalRecords, peak };
 }
 
+/**
+ * 時刻のある記録が「誰のものか」。
+ *
+ * 時間帯の分析は時刻がある記録だけで作るが、時刻を書く情報源は限られる。
+ * 実測 (全国98,397件): 時刻ありは23,420件 (23.8%) で、その 89.8% が秋田県、
+ * 5.0% が山口県。つまり「全国の出没時間帯」と称するものは、ほぼ秋田県の、
+ * しかも警察#9110 の通報時刻の分布である。
+ * 時間帯のグラフには必ずこの内訳を添えて、どこの話かを見せる。
+ */
+export type TimedProvenance = {
+  withTime: number;
+  total: number;
+  /** 時刻ありレコードの県内訳 (多い順) */
+  prefs: { name: string; count: number; share: number }[];
+  /** 同・情報源内訳 (多い順) */
+  sources: { name: string; count: number; share: number }[];
+};
+
+export function timedProvenance(
+  records: AnalyticsRecord[],
+  limit = 3,
+): TimedProvenance {
+  const prefs = new Map<string, number>();
+  const sources = new Map<string, number>();
+  let withTime = 0;
+  let total = 0;
+  for (const r of records) {
+    total += 1;
+    if (!/^\d{1,2}:\d{2}$/.test((r.time ?? "").trim())) continue;
+    withTime += 1;
+    const p = (r.prefectureName ?? "").trim();
+    if (p) prefs.set(p, (prefs.get(p) ?? 0) + 1);
+    const src = (r.source ?? "").trim();
+    if (src) sources.set(src, (sources.get(src) ?? 0) + 1);
+  }
+  const top = (m: Map<string, number>) =>
+    [...m.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit)
+      .map(([name, count]) => ({
+        name,
+        count,
+        share: withTime > 0 ? Number((count / withTime).toFixed(3)) : 0,
+      }));
+  return { withTime, total, prefs: top(prefs), sources: top(sources) };
+}
+
 /** 曜日別件数（日〜土）。全記録の date から算出。 */
 export function dowHistogram(
   records: AnalyticsRecord[],

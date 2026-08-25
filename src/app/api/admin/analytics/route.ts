@@ -43,6 +43,7 @@ import {
   municipalityBoard,
   municipalityProfile,
   seasonHourHeatmap,
+  timedProvenance,
   type AnalyticsRecord,
 } from "@/lib/sighting-analytics";
 
@@ -176,6 +177,9 @@ export async function GET(req: Request) {
         hotspots: hotspots(all, today, { limit: 40 }),
         // B: 時間帯・曜日
         hours: hourHistogram(scoped),
+        // 時刻のある記録がどこの県・どの情報源のものか。時間帯のグラフは
+        // 「全国」と言いながら実質1県ということが起きるので必ず添える。
+        hoursProvenance: timedProvenance(scoped),
         dow: dowHistogram(scoped, today),
         // 時間帯 × 季節: 「何時に出るか」が季節でどう動くか
         hourSeason: seasonHourHeatmap(scoped),

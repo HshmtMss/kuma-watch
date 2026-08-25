@@ -212,6 +212,12 @@ type Data = {
   prefectures: PrefRow[];
   hotspots: Hotspot[];
   hours: { buckets: Bucket[]; withTime: number };
+  hoursProvenance: {
+    withTime: number;
+    total: number;
+    prefs: { name: string; count: number; share: number }[];
+    sources: { name: string; count: number; share: number }[];
+  };
   hourSeason: HourSeasonHeatmap;
   dow: Bucket[];
   severity: { series: SeverityPoint[]; recentInjuries: IncidentRow[] };
@@ -305,6 +311,17 @@ function Content({
     return <p className="text-sm text-stone-500">集計中…（初回は数秒）</p>;
 
   const scope = muni ? `${pref} ${muni}` : pref || "全国";
+  // コメント本文から分類するセクション (J系) 共通の警告
+  const textNote = !data.profile.quality.textReliable ? (
+    <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-900">
+      ⚠ この地域の記録は平均{" "}
+      {Math.round(data.profile.quality.avgCommentLength)}{" "}
+      字と短く、場所を分類できたのは{" "}
+      {Math.round(data.profile.quality.placeClassifiedRate * 100)}%
+      です。下の内訳はクマの生態ではなく<strong>記録の書き方</strong>を
+      反映している可能性が高いので、対策の根拠には使わないでください。
+    </p>
+  ) : null;
   // 人身被害の数字を出すセクションに共通で添える注記
   const injuryNote = (
     <InjuryNote
@@ -797,6 +814,7 @@ function Content({
         title="J. どこで危ないか（出没の多さ ≠ 危険度）"
         note={`${scope}・コメント本文から場所を分類。分類できるのは全体の約4割で、割合は分類できた中での値。`}
       >
+        {textNote}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead>
@@ -857,6 +875,7 @@ function Content({
         title="J-2. 何をしているときに襲われているか"
         note="人身被害での出現率 ÷ 全記録での出現率。順位は妥当だが、倍率は報告バイアスで大きめに出る（下記注意）。"
       >
+        {textNote}
         <div className="flex flex-col gap-2">
           {data.contact.activity.map((a) => (
             <div key={a.key} className="flex items-center gap-3">
@@ -965,6 +984,7 @@ function Content({
         title="J-3. 誘引物と時期（接触機会そのものを減らす）"
         note="コメントに現れる誘引物の言及件数と、その月別分布。"
       >
+        {textNote}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[420px] text-sm">
             <thead>
@@ -1462,12 +1482,13 @@ function Content({
         />
       </Section>
 
-      {/* B: 時間帯・曜日 */}
+      {/* B: 時間帯・曜日。時刻を書く情報源は限られるので、どこの分布かを必ず出す */}
       <Section
         title="B. 出没の時間帯"
-        note={`${scope}・時刻が判明した ${data.hours.withTime.toLocaleString("ja-JP")} 件ベース（2時間刻み）。全件ではない点に注意。`}
+        note={`${scope}・時刻が判明した ${data.hours.withTime.toLocaleString("ja-JP")} 件（全体の${Math.round((data.hoursProvenance.withTime / Math.max(1, data.hoursProvenance.total)) * 100)}%）ベース、2時間刻み。`}
       >
         <Bars data={data.hours.buckets} color="#0369a1" />
+        <TimedProvenanceNote data={data.hoursProvenance} showPrefs={!pref} />
       </Section>
 
       {/* B-1.5: 時間帯 × 季節。「何時に出るか」が季節でどう動くか */}
@@ -1477,6 +1498,7 @@ function Content({
           note={`${scope}・時刻が判明した記録で、暦月ごとに「何時台が多いか」を色で示す。夕方中心か早朝中心かが月で移る。`}
         >
           <AnalyticsHourSeason data={data.hourSeason} />
+          <TimedProvenanceNote data={data.hoursProvenance} showPrefs={!pref} />
         </Section>
       )}
 
@@ -1754,6 +1776,67 @@ function LineChart({
             </span>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * 時間帯グラフに添える「これは誰の時刻か」。
+ *
+ * 時刻を書く情報源は限られる (全国では時刻ありの89.8%が秋田県・警察#9110)。
+ * 「全国の出没時間帯」に見えて実は1県の通報時刻、という取り違えを防ぐ。
+ */
+function TimedProvenanceNote({
+  data,
+  showPrefs,
+}: {
+  data: {
+    withTime: number;
+    total: number;
+    prefs: { name: string; count: number; share: number }[];
+    sources: { name: string; count: number; share: number }[];
+  };
+  /** 県を選んでいるときは県内訳が自明 (100%) なので出さない */
+  showPrefs: boolean;
+}) {
+  if (data.withTime === 0) return null;
+  const topPref = data.prefs[0];
+  // 1つの県が過半なら「全体の傾向」として読めない
+  const skewed = showPrefs && topPref && topPref.share >= 0.5;
+  return (
+    <div
+      className={`mt-2 rounded-lg px-3 py-2 text-[11px] leading-relaxed ${
+        skewed ? "bg-amber-50 text-amber-900" : "bg-stone-50 text-stone-600"
+      }`}
+    >
+      <strong>時刻がある記録の出どころ：</strong>
+      {showPrefs && data.prefs.length > 0 && (
+        <>
+          {" "}
+          {data.prefs
+            .map((p) => `${p.name} ${Math.round(p.share * 100)}%`)
+            .join(" / ")}
+        </>
+      )}
+      {data.sources.length > 0 && (
+        <>
+          {showPrefs && data.prefs.length > 0 ? "、" : " "}
+          情報源は{" "}
+          {data.sources
+            .map((x) => `${x.name} ${Math.round(x.share * 100)}%`)
+            .join(" / ")}
+        </>
+      )}
+      。
+      {skewed && (
+        <>
+          {" "}
+          <strong>
+            この分布は実質{topPref.name}のものです。
+          </strong>
+          他地域に当てはめないでください。
+        </>
       )}
     </div>
   );
