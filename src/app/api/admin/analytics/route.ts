@@ -44,6 +44,7 @@ import {
   municipalityProfile,
   seasonHourHeatmap,
   timedProvenance,
+  weeklyTrail,
   type AnalyticsRecord,
 } from "@/lib/sighting-analytics";
 
@@ -160,6 +161,9 @@ export async function GET(req: Request) {
         // 県別に比べる。同一ソース内・短期の比較なので、ソース増加や当年ラグの影響を
         // 受けにくく honest（年次の平年比は継続ソースが乏しく誤報になるため不採用）。
         surge: surgeBoard(all, today),
+        // 週ごとの実数。直近1週は公表途中で必ず低く出るので、急増ボードの
+        // 判断材料として並べて見せる (補正はしない・理由は weeklyTrail 参照)。
+        weeklyTrail: weeklyTrail(scoped, today, 4),
         // 自治体カルテ: 県を選んだときだけ、県内の市町村ベンチマーク（シェア＋動き）。
         // 一覧は県の全記録で計算（市町村選択で scoped が絞られても県内比較は保つ）。
         muni: pref ? municipalityBoard(prefScoped, today, pref) : null,

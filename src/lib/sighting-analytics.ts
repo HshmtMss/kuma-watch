@@ -913,6 +913,36 @@ export function surgeBoard(
   };
 }
 
+/**
+ * 直近 n 週の件数（1週ずつ遡る）。
+ *
+ * 急増ボードの「直近30日 vs 前30日」は、直近側がまだ公表途中である分だけ
+ * 低く出る。実測 (全国): 直近7日 483 / 前7日 706 / 3週前 709 / 4週前 663 で、
+ * 3〜4週前は横ばいなのに直近1週だけ 3割低い。季節ではなく公表の遅れである。
+ *
+ * 補正はしない。ingestedAt は 8割埋まっているが、ソース追加時の一括取り込みで
+ * 「出没日→取り込み」が数か月に見えるレコードが混ざり、遅れの分布を推定
+ * できない (source-health.ts が鮮度指標に使えないとしているのと同じ理由)。
+ * 数字を作らず、週ごとの実数を並べて読み手に判断材料を渡す。
+ */
+export type WeekCount = { label: string; count: number };
+export function weeklyTrail(
+  records: AnalyticsRecord[],
+  today: string,
+  weeks = 4,
+): WeekCount[] {
+  const out: WeekCount[] = [];
+  for (let w = 0; w < weeks; w++) {
+    const from = shiftDays(today, w * 7 + 6);
+    const toExclusive = shiftDays(today, w * 7 - 1);
+    out.push({
+      label: w === 0 ? "直近7日" : `${w * 7 + 1}〜${w * 7 + 7}日前`,
+      count: countBetween(records, from, toExclusive),
+    });
+  }
+  return out;
+}
+
 // ---- 自治体カルテ（県内の市町村ベンチマーク）--------------------------------
 // 「自分の県のどの市町村で起きているか／自分の市町村は増えているか」を出す。
 // 直近1年の件数で県内の位置づけ（シェア）を、直近30日 vs 直前30日で今の動きを

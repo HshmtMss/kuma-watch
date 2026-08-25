@@ -201,6 +201,7 @@ type Data = {
   seasonality: SeasonalityComparison;
   spatialSeasonal: SeasonFrame[];
   surge: SurgeBoard | null;
+  weeklyTrail: { label: string; count: number }[];
   muni: MunicipalityBoard | null;
   siteHotspots: SiteHotspotBoard;
   muniOptions: string[];
@@ -433,6 +434,17 @@ function Content({
           note="直近30日と直前30日の県別件数を比較した急増アラート。同一情報源どうしの短期比較なので、情報源増加や当年の取り込みラグの影響を受けにくい。"
         >
           <AnalyticsSurgeBoard data={data.surge} />
+          <div className="mt-3 rounded-lg bg-stone-50 px-3 py-2 text-[11px] leading-relaxed text-stone-600">
+            <strong className="text-stone-700">直近ほど数字は埋まっていません：</strong>
+            {scope}の週別件数は{" "}
+            {data.weeklyTrail
+              .map((w) => `${w.label} ${w.count.toLocaleString("ja-JP")}件`)
+              .join(" / ")}
+            。出没日から公表・取り込みまで数日〜数週かかるため、直近1週は必ず
+            低く出ます。3〜4週前どうしが横ばいなのに直近だけ落ちている場合、
+            それは減少ではなく公表の遅れです（遅れの分布は情報源ごとにばらつきが
+            大きく、一括取り込みの混入で推定できないため、補正はしていません）。
+          </div>
         </Section>
       )}
 
