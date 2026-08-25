@@ -8,6 +8,7 @@ import { fetchKmlSightings } from "./kml";
 import { fetchLlmHtmlSightings } from "./llm-html";
 import { fetchNaganoPdfSightings } from "./nagano-pdf";
 import { fetchGifuGisSightings } from "./gifu-gis";
+import { fetchKumalogAomoriSightings } from "./kumalog-aomori";
 import { fetchNaraPdfSightings } from "./nara-pdf";
 import { fetchYamaguchiPdfSightings } from "./yamaguchi-pdf";
 import { fetchPdfLlmSightings } from "./pdf-llm";
@@ -30,6 +31,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   );
   const naraPdf = DATA_SOURCES.filter((s) => s.extractor === "nara-pdf-table");
   const gifuGis = DATA_SOURCES.filter((s) => s.extractor === "gifu-gis");
+  const kumalog = DATA_SOURCES.filter((s) => s.extractor === "kumalog-aomori");
 
   const results = await Promise.all([
     ...arcgis.map((s) => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
@@ -44,6 +46,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
     ...yamaguchiPdf.map((s) => fetchYamaguchiPdfSightings(s).catch(() => [] as UnifiedSighting[])),
     ...naraPdf.map((s) => fetchNaraPdfSightings(s).catch(() => [] as UnifiedSighting[])),
     ...gifuGis.map((s) => fetchGifuGisSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...kumalog.map((s) => fetchKumalogAomoriSightings(s).catch(() => [] as UnifiedSighting[])),
   ]);
 
   const merged: UnifiedSighting[] = [];

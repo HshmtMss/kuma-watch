@@ -12,6 +12,8 @@ export type ExtractorType =
   | "nara-pdf-table"
   // 岐阜県 県域統合型GIS のクママップ。src/lib/sources/gifu-gis.ts
   | "gifu-gis"
+  // 青森県「くまログあおもり」。src/lib/sources/kumalog-aomori.ts
+  | "kumalog-aomori"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -32,7 +34,8 @@ export type UrlRole =
   | "gpx"
   | "excel"
   | "arcgis"
-  | "gis";
+  | "gis"
+  | "api";
 export type BearStatus = "present" | "rare" | "extinct" | "absent";
 
 export type DataSourceUrl = {
@@ -204,8 +207,28 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       nameFormat: "city-section-wareki",
       nameSeparator: "、",
     },
-    notes: "Google My Map の name 欄に『市町村、地区名、和暦日付』形式で 7,624 件。2026-04 時点で県内最大規模",
+    // 2026-03-22 で更新停止。県は「くまログあおもり」へ移行した (下記)。
+    periodBounded: true,
+    notes: "Google My Map の name 欄に『市町村、地区名、和暦日付』形式で 7,624 件。2026-03-22 で更新停止",
     verifiedAt: "2026-04-20",
+  },
+  {
+    // 県の Google マイマップ (aomori) が 2026-03-22 で止まった移行先。
+    // 住民投稿型で、緯度経度・住所・頭数・親子連れ・状況文まで揃う。
+    // クマ以外 (イノシシ・ニホンジカ) も同じ API に載るので種別で絞ること。
+    id: "kumalog-aomori",
+    kind: "prefecture",
+    prefCode: "02",
+    regionLabel: "青森県 くまログあおもり（県公式・住民投稿型）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.aomori.lg.jp/soshiki/kankyo/shizen/kumalog_aomori.html", role: "list", hint: "県公式の案内" },
+      { url: "https://kumalog-aomori.info/", role: "map", hint: "くまログあおもり 情報マップ" },
+      { url: "https://kumalog-aomori.info/api/ver1/sightings/post_list_external", role: "api", hint: "外部公開 API (filter[startdate]/[enddate] で期間指定)" },
+    ],
+    extractor: "kumalog-aomori",
+    notes: "期間指定なしだと直近2週間ほどしか返らない。2025-04〜2026-08 でツキノワグマ 4,363 件",
+    verifiedAt: "2026-08-26",
   },
   {
     id: "iwate",
@@ -266,8 +289,34 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       dateField: "年月日",
       fiscalYear: 2025,
     },
+    // 令和7年度で完結したアーカイブ。現行は下の miyagi-r8。
+    periodBounded: true,
     notes: "3,535 件。name には和暦日付 or 種別（目撃/痕跡/人身被害）。ExtendedData 年月日 に US 形式 or M月D日",
     verifiedAt: "2026-04-20",
+  },
+  {
+    // 令和8年度 (現行)。県は年度ごとに別のマイマップを作り、前年度のものは
+    // 更新を止める。年度が替わったらここに新しい mid を足すこと
+    // (令和7年度分が 2026-03-23 で止まり 156 日気づけなかった)。
+    //   一覧: https://www.pref.miyagi.jp/soshiki/sizenhogo/r8kumamokugeki.html
+    id: "miyagi-r8",
+    kind: "prefecture",
+    prefCode: "04",
+    regionLabel: "宮城県 ツキノワグマ（令和8年度 Google My Map）",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.pref.miyagi.jp/soshiki/sizenhogo/r8kumamokugeki.html", role: "list", hint: "令和8年度クマ目撃等情報" },
+      { url: "https://www.google.com/maps/d/viewer?mid=12_b92SRipXWwvkUfNCsDdEUWhEOmzUc", role: "map", hint: "宮城県 Google My Map（令和8年度）" },
+    ],
+    extractor: "direct-kml",
+    kml: {
+      kmlUrl: "https://www.google.com/maps/d/kml?mid=12_b92SRipXWwvkUfNCsDdEUWhEOmzUc&forcekml=1",
+      nameFormat: "date-only",
+      dateField: "年月日",
+      fiscalYear: 2026,
+    },
+    notes: "令和8年度分。ExtendedData 年月日 に M月D日。2026-08-24 時点で 4〜8 月分",
+    verifiedAt: "2026-08-26",
   },
   {
     id: "akita",
@@ -546,7 +595,11 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     extractor: "direct-csv",
     csv: {
       csvUrl:
-        "https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/tukinowaguma_source20260302",
+        // 注意: 都は更新のたびにファイル名の日付を変え、旧ファイルは残るが
+        // 更新されない。登録が 20260302 のままで 2025/12/1 以降が入らず 206 日
+        // 気づけなかった。シーズン中は月1回 data ページで確認して差し替えること。
+        //   一覧: https://www.kankyo.metro.tokyo.lg.jp/nature/animals_plants/bear/data
+        "https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/tukinowaguma_source20260610",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
