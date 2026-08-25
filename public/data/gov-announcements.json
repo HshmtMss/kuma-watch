@@ -1,6 +1,28 @@
 {
-  "generatedAt": 1784858331092,
+  "generatedAt": 1787639606667,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_05460.html",
+      "ministry": "env",
+      "date": "2026-08-25",
+      "title": "「クマ撃退スプレーの性能に係る推奨要件」の公表及び「クマ撃退スプレーに関する注意喚起」の実施について",
+      "url": "https://www.env.go.jp/press/press_05460.html",
+      "tag": "自然環境",
+      "category": "guidance",
+      "summary": "クマ撃退スプレーの性能に関する推奨要件を公表し、同時にクマ撃退スプレーの使用に関する注意喚起を実施する。クマ被害対策としての適切な利用を促すための情報提供。",
+      "ingestedAt": 1787639606667
+    },
+    {
+      "id": "env:https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080825.html",
+      "ministry": "env",
+      "date": "2026-08-25",
+      "title": "クマ撃退スプレーの性能に係る推奨要件",
+      "url": "https://www.env.go.jp/nature/choju/effort/effort12/kuma-oshirase-r080825.html",
+      "tag": "クマ被害対策",
+      "category": "guidance",
+      "summary": "クマ被害対策として有効なクマ撃退スプレーの性能について、国が推奨する要件を定める。これは適切な製品選択の目安となる。",
+      "ingestedAt": 1787639606667
+    },
     {
       "id": "env:https://www.env.go.jp/press/press_05326.html",
       "ministry": "env",
