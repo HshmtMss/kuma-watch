@@ -41,17 +41,45 @@ export function normalizePdfText(text: string): string {
   return text.normalize("NFKC").replace(/[⺀-⻿]/g, (c) => CJK_RADICAL_FIX[c] ?? c);
 }
 
-/** PDF を取得してテキスト化する。取得・解析に失敗したら null。 */
+/**
+ * PDF を取得してテキスト化する。取得・解析に失敗したら null。
+ *
+ * 一時的な接続失敗で丸ごと 0 件になるのを防ぐため数回やり直す。集約は
+ * 「取れたものだけで全件を作り直す」設計なので、1 回の失敗がそのソースの
+ * 消失に直結する (2026-08-27 に CI 側のネットワーク不調で愛知県が 0 件に
+ * なった)。
+ */
+async function fetchWithRetry(url: string, label: string): Promise<Response | null> {
+  const ATTEMPTS = 3;
+  for (let i = 1; i <= ATTEMPTS; i++) {
+    try {
+      const res = await fetch(url, {
+        // 自治体サイトは UA なしを 302 で弾くことがある (愛知県で実際に発生)。
+        headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+        signal: AbortSignal.timeout(25000),
+      });
+      if (res.ok) return res;
+      console.log(`[pdf-table ${label}] fetch failed ${res.status} (${i}/${ATTEMPTS})`);
+      // 4xx は繰り返しても変わらないので即やめる (URL が変わった等)。
+      if (res.status >= 400 && res.status < 500) return null;
+    } catch (e) {
+      const err = e as Error & { cause?: Error };
+      console.log(
+        `[pdf-table ${label}] fetch failed (${i}/${ATTEMPTS}): ${(err.cause?.message ?? err.message).slice(0, 80)}`,
+      );
+    }
+    if (i < ATTEMPTS) await new Promise((r) => setTimeout(r, 1500 * i));
+  }
+  return null;
+}
+
 export async function fetchPdfText(
   url: string,
   label: string,
 ): Promise<string | null> {
   try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.log(`[pdf-table ${label}] fetch failed ${res.status}`);
-      return null;
-    }
+    const res = await fetchWithRetry(url, label);
+    if (!res) return null;
     const buf = new Uint8Array(await res.arrayBuffer());
     // unpdf は pdfjs を serverless 向けに同梱したもの。動的 import にして
     // 使わないルート (地図・通知系) のバンドルに載せない。

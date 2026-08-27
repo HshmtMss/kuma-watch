@@ -78,6 +78,43 @@ async function main(): Promise<void> {
   }
   const prevById = new Map(prevRecords.map((r) => [r.id, r]));
 
+  // ソース単位の激減チェック。
+  //
+  // 集約は「取れたものだけで全件を作り直す」設計なので、ネットワークが不調な
+  // 回に走ると、取れなかったソースが丸ごと消えたスナップショットで上書きされる。
+  // 2026-08-27 に CI 側で 24 件の Connect Timeout が出た回がまさにそれで、
+  // 青森 5,095 件・福井 202 件・愛知 35 件が 0 件になったまま「成功」した。
+  // 総件数は 99,369 件あり、全体を見ても異常に見えない。
+  //
+  // 前回 50 件以上あったソースが今回 0 件なら、取得側の障害とみなして中止する。
+  // (県が公開をやめた場合も 0 件になるが、その場合は健全性チェックが翌日に
+  //  検出するので、まず「壊れたデータで上書きしない」方を優先する。)
+  const MIN_TO_GUARD = 50;
+  const prevBySource = new Map<string, number>();
+  for (const r of prevRecords) {
+    if (r.sourceKind === "news") continue; // news は carried 側なので対象外
+    const k = r.source ?? "";
+    if (k) prevBySource.set(k, (prevBySource.get(k) ?? 0) + 1);
+  }
+  const freshBySource = new Map<string, number>();
+  for (const r of fresh) {
+    const k = r.source ?? "";
+    if (k) freshBySource.set(k, (freshBySource.get(k) ?? 0) + 1);
+  }
+  const vanished: string[] = [];
+  for (const [src, n] of prevBySource) {
+    if (n < MIN_TO_GUARD) continue;
+    if ((freshBySource.get(src) ?? 0) === 0) vanished.push(`${src}(前回${n}件)`);
+  }
+  if (vanished.length > 0) {
+    console.error(
+      `[build-sightings] ソースが丸ごと消えています: ${vanished.join(", ")}\n` +
+        `  取得側の障害の可能性が高いのでスナップショットを上書きしません。\n` +
+        `  公開先が本当に無くなったのなら data-sources.ts / source-gaps.ts を更新してください。`,
+    );
+    process.exit(1);
+  }
+
   // 再集約に含まれない種別 (news など) を前回から引き継ぐ。
   // news は無制限肥大を防ぐため直近 NEWS_RETENTION_DAYS 日分のみ引き継ぐ。
   const NEWS_RETENTION_DAYS = 180;
