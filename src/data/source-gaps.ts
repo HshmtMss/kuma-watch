@@ -45,6 +45,13 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
     checkedAt: "2026-08-23",
   },
 
+  {
+    id: "wakayama",
+    reason:
+      "県が公開しているのは目撃マップ (画像 PDF) と市町村別の年次集計のみで、1 件ずつの記録が無い。紀伊半島中部個体群は奈良県 (nara-pdf) と共通なので、県境付近はそちらで一部carriedされる",
+    checkedAt: "2026-08-28",
+  },
+
   // --- 自治体側の更新が止まっているだけで、当方の取り込みは正常 ---
   {
     id: "tokyo",

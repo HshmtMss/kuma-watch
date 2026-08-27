@@ -16,6 +16,10 @@ export type ExtractorType =
   | "kumalog-aomori"
   // 愛知県の年度別出没情報 PDF。src/lib/sources/aichi-pdf.ts
   | "aichi-pdf-table"
+  // 神奈川県の年度別 目撃等情報 PDF。src/lib/sources/kanagawa-pdf.ts
+  | "kanagawa-pdf-table"
+  // 福井県「福井クマ情報」の埋め込み JSON。src/lib/sources/fukui-map.ts
+  | "fukui-map"
   | "direct-csv"
   | "direct-gpx"
   | "direct-excel"
@@ -636,9 +640,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "神奈川県 ツキノワグマ情報",
     bearStatus: "present",
     urls: [
+      // 注意: 県は更新のたびにファイル名の日付を変える (kuma_r8_0824.pdf)。
+      // シーズン中は月1回 list ページで確認して差し替えること。
+      { url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r8_0824.pdf", role: "pdf", hint: "令和8年度 目撃等情報 (R8.8.24 時点)" },
       { url: "https://www.pref.kanagawa.jp/docs/t4i/cnt/f3813/index.html", role: "list", hint: "神奈川県ツキノワグマ情報" },
     ],
-    extractor: "llm-html",
+    extractor: "kanagawa-pdf-table",
     notes: "丹沢・道志山系に少数個体群。第二種特定鳥獣管理計画の対象",
     verifiedAt: "2026-04-26",
   },
@@ -747,8 +754,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2.html", role: "list", hint: "県自然環境課 トップページ（PDF リンク）" },
       { url: "https://www.pref.fukui.lg.jp/doc/shizen/tixyouzixyuu/tukinowaguma2_d/fil/R4-8.pdf", role: "pdf", hint: "出没状況（R4〜R8）月別・地域別集計 PDF" },
     ],
-    extractor: "custom-webmap",
-    notes: "県公式は独自 OpenLayers GIS で API 未公開。PDF は月別/地域別の集計のみで座標データなし。R7 年計 950 件。Sharp9110 経由のデータなし",
+    extractor: "fukui-map",
+    notes: "トップページの隠しフィールド hdnKumaData に地図描画用 JSON が埋まっており、そこから直接取れる (追加リクエスト不要)。埋め込みは直近3か月ほど。緯度経度・字・時刻・種別・頭数つき",
     verifiedAt: "2026-04-21",
   },
   {
