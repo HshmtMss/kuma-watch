@@ -65,6 +65,35 @@ function cleanNum(v: string | undefined): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
+/**
+ * 一覧ページから現行の CSV URL を探す。
+ * pattern はリンクの href に対して当てる正規表現 (最初の一致を採る)。
+ */
+async function discoverCsvUrl(
+  listUrl: string,
+  pattern?: string,
+): Promise<string | null> {
+  if (!pattern) return null;
+  try {
+    const res = await fetch(listUrl, {
+      next: { revalidate: 3600 },
+      headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const re = new RegExp(`href="([^"]*${pattern}[^"]*)"`, "i");
+    const m = re.exec(html);
+    if (!m) return null;
+    const href = m[1];
+    if (href.startsWith("http")) return href;
+    const base = new URL(listUrl);
+    return `${base.origin}${href.startsWith("/") ? "" : "/"}${href}`;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchCsvSightings(
   entry: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
@@ -76,8 +105,16 @@ export async function fetchCsvSightings(
   const csv = entry.csv;
   const delim = csv.delimiter ?? ",";
 
+  // 配布ファイル名に更新日が入る自治体があり、更新のたびに URL が変わって
+  // 旧 URL は残るが中身が古いまま (東京都: tukinowaguma_source20260302 →
+  // 20260610)。登録した URL が固定だと静かに古いデータを配り続けるので、
+  // 一覧ページから現行の URL を探す。見つからなければ登録済みにフォールバック。
+  const csvUrl = csv.discoverFrom
+    ? ((await discoverCsvUrl(csv.discoverFrom, csv.discoverPattern)) ?? csv.csvUrl)
+    : csv.csvUrl;
+
   try {
-    const r = await fetch(csv.csvUrl, {
+    const r = await fetch(csvUrl, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
       next: { revalidate: 3600 },
     });

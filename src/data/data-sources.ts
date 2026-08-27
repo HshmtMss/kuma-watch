@@ -84,6 +84,16 @@ export type CsvFieldMappings = {
 
 export type CsvSource = {
   csvUrl: string;
+  /**
+   * 配布ファイル名に更新日が入る自治体向け。この一覧ページから現行の URL を
+   * 探し、見つかれば csvUrl より優先する。
+   * 東京都は tukinowaguma_source20260302 → 20260610 のように番号が変わり、
+   * 旧 URL は残るが中身が古いままなので、固定していると静かに古いデータを
+   * 配り続ける (実際に 206 日気づけなかった)。
+   */
+  discoverFrom?: string;
+  /** href に当てる正規表現の断片 (例: "tukinowaguma_source\\d+")。 */
+  discoverPattern?: string;
   encoding?: "utf-8" | "sjis";
   delimiter?: "," | "\t";
   dateFormat?: "iso" | "ja-slash" | "epoch-ms";
@@ -602,6 +612,9 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         // 気づけなかった。シーズン中は月1回 data ページで確認して差し替えること。
         //   一覧: https://www.kankyo.metro.tokyo.lg.jp/nature/animals_plants/bear/data
         "https://www.kankyo.metro.tokyo.lg.jp/documents/d/kankyo/tukinowaguma_source20260610",
+      discoverFrom:
+        "https://www.kankyo.metro.tokyo.lg.jp/nature/animals_plants/bear/data",
+      discoverPattern: "tukinowaguma_source\\d+",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",

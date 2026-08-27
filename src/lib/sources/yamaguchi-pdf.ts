@@ -98,13 +98,63 @@ export function parseYamaguchiText(text: string): TableRow[] {
   return dropOutlierDates(out, 300);
 }
 
+/**
+ * 一覧ページから「目撃情報詳細」PDF の URL を見つける。
+ *
+ * 県は更新のたびに attachment 番号を振り直し、旧番号は 404 になる。実際に
+ * 248466 を登録した翌日には 248599 へ変わっていた。番号を直書きすると
+ * 毎週壊れるので、リンク名から拾う。
+ *
+ * リンク名の形: 「目撃情報詳細080825.pdf」(080825 = 令和8年8月25日)
+ * 令和7年度分は「令和7年度クマ目撃情報詳細 .pdf」なので、年度表記の無い
+ * ものを現行版とみなす。
+ */
+async function discoverDetailPdfs(listUrl: string): Promise<string[]> {
+  try {
+    const res = await fetch(listUrl, {
+      next: { revalidate: 3600 },
+      headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const out: string[] = [];
+    const re =
+      /href="([^"]*\/uploaded\/attachment\/(\d+)\.pdf)"[^>]*>([^<]{0,80})/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(html))) {
+      const label = m[3];
+      // 「目撃情報詳細」を含むものだけ。集計 (市町別・月別) や啓発資料は除く。
+      if (!label.includes("目撃情報詳細")) continue;
+      const href = m[1].startsWith("http")
+        ? m[1]
+        : `https://www.pref.yamaguchi.lg.jp${m[1]}`;
+      out.push(href);
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchYamaguchiPdfSightings(
   source: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
-  const pdfs = (source.urls ?? []).filter((u) => u.role === "pdf");
+  // 一覧ページから現行の PDF を見つける。見つからなければ登録済みの URL に頼る
+  // (ページ構造が変わっても完全には止まらないように)。
+  const listUrl = (source.urls ?? []).find((u) => u.role === "list")?.url;
+  const discovered = listUrl ? await discoverDetailPdfs(listUrl) : [];
+  const registered = (source.urls ?? [])
+    .filter((u) => u.role === "pdf")
+    .map((u) => u.url);
+  const urls = [...new Set([...discovered, ...registered])];
+  if (discovered.length === 0 && listUrl) {
+    console.log(`[yamaguchi] 一覧から PDF を見つけられず、登録済み URL を使う`);
+  }
+
   const rows: TableRow[] = [];
-  for (const u of pdfs) {
-    const text = await fetchPdfText(u.url, source.id);
+  for (const url of urls) {
+    const text = await fetchPdfText(url, source.id);
     if (!text) continue;
     rows.push(...parseYamaguchiText(text));
   }
