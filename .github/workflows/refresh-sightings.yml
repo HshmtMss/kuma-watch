@@ -63,6 +63,11 @@ jobs:
             echo "No changes — skipping commit"
             exit 0
           fi
+          # ジオコードキャッシュは和集合でマージする。CI と手元の両方が追記する
+          # 辞書なので、行単位だと毎回コンフリクトし、どちらかを捨てると
+          # 引き直しが発生する (実際に何度も起きた)。
+          git config merge.geocodecache.name "geocode cache union merge"
+          git config merge.geocodecache.driver "node scripts/merge-geocode-cache.mjs %O %A %B"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/data/sightings.json data/geocode-cache.json

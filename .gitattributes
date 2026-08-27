@@ -1,0 +1,5 @@
+# ジオコードキャッシュは「地名 → 座標」の辞書で、CI と手元の両方が追記する。
+# 行単位のマージだと毎回コンフリクトし、どちらかを捨てると引き直しが発生する。
+# 和集合を取る専用ドライバに任せる (設定は下記コマンドで有効化)。
+#   git config merge.geocodecache.driver "node scripts/merge-geocode-cache.mjs %O %A %B"
+data/geocode-cache.json merge=geocodecache
