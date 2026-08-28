@@ -1,5 +1,6 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import {
+  discoverPdfUrls,
   dropOutlierDates,
   fetchPdfText,
   rowsToSightings,
@@ -87,9 +88,20 @@ export function parseNaraText(text: string): TableRow[] {
 export async function fetchNaraPdfSightings(
   source: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
+  // 県は更新のたびにファイル名 (更新日時) を変え、旧 URL は 404 になる。
+  // 実際に登録から 2 日で令和8年度分が 404 になった。一覧ページから拾う。
+  const listUrl = (source.urls ?? []).find((u) => u.role === "list")?.url;
+  const discovered = listUrl
+    ? (await discoverPdfUrls(listUrl, "目撃情報一覧")).map((d) => d.url)
+    : [];
+  const registered = (source.urls ?? [])
+    .filter((u) => u.role === "pdf")
+    .map((u) => u.url);
+  const urls = [...new Set([...discovered, ...registered])];
+
   const rows: TableRow[] = [];
-  for (const u of (source.urls ?? []).filter((x) => x.role === "pdf")) {
-    const text = await fetchPdfText(u.url, source.id);
+  for (const url of urls) {
+    const text = await fetchPdfText(url, source.id);
     if (!text) continue;
     rows.push(...parseNaraText(text));
   }

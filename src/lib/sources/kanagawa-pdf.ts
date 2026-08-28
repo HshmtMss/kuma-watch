@@ -1,5 +1,6 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import {
+  discoverPdfUrls,
   dropOutlierDates,
   fetchPdfText,
   rowsToSightings,
@@ -65,8 +66,27 @@ export function parseKanagawaText(text: string, fiscalYear: number): TableRow[] 
 export async function fetchKanagawaPdfSightings(
   source: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
+  // 県は更新のたびに attachment 番号やファイル名を変え、旧 URL は 404 になる。
+  // 一覧ページのリンク文言は安定しているのでそこから拾い、見つからなければ
+  // 登録済みにフォールバックする。
+  const listUrl = (source.urls ?? []).find((u) => u.role === "list")?.url;
+  const discovered = listUrl ? await discoverPdfUrls(listUrl, "目撃等情報") : [];
+  const registered = (source.urls ?? [])
+    .filter((u) => u.role === "pdf")
+    .map((u) => ({ url: u.url, hint: u.hint }));
+  const seen = new Set<string>();
+  // 年度が読み取れたものだけを使う。過去年度の一覧も同じ文言で並んでいるため、
+  // 年度を無視すると 3 年分をまとめて取り込み、日付が未来まで伸びる
+  // (神奈川で実際に 2027-03 まで出た)。
+  const targets = [
+    ...discovered
+      .filter((d) => d.fiscalYear !== null)
+      .map((d) => ({ url: d.url, hint: `令和${d.fiscalYear! - 2018}年度` })),
+    ...registered,
+  ].filter((t) => !seen.has(t.url) && seen.add(t.url));
+
   const rows: TableRow[] = [];
-  for (const u of (source.urls ?? []).filter((x) => x.role === "pdf")) {
+  for (const u of targets) {
     const text = await fetchPdfText(u.url, source.id);
     if (!text) continue;
     // hint に年度を書いておく (「令和8年度」→ 2026)。

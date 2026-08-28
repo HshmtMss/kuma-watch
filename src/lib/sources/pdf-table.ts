@@ -42,6 +42,100 @@ export function normalizePdfText(text: string): string {
 }
 
 /**
+ * 一覧ページから、ラベルに keyword を含む PDF の URL を集める。
+ *
+ * 自治体は更新のたびにファイル名や attachment 番号を変え、旧 URL は 404 に
+ * なる。登録に直書きすると数日で壊れる (山口県は翌日、奈良県は 2 日で 404)。
+ * ページ側のリンク文言は安定していることが多いので、そこから拾う。
+ */
+export type DiscoveredPdf = { url: string; label: string; fiscalYear: number | null };
+
+export async function discoverPdfUrls(
+  listUrl: string,
+  keyword: string,
+): Promise<DiscoveredPdf[]> {
+  try {
+    const res = await fetch(listUrl, {
+      next: { revalidate: 3600 },
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; KumaWatch/1.0; +https://kuma-watch.jp)",
+      },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const out: DiscoveredPdf[] = [];
+    const seen = new Set<string>();
+    const re = /href="([^"]*\.pdf)"[^>]*>([^<]{0,160})/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(html))) {
+      const label = m[2];
+      if (!label.includes(keyword)) continue;
+      const url = new URL(m[1], listUrl).toString();
+      if (seen.has(url)) continue;
+      seen.add(url);
+      // 年度はリンク文言から読む。ファイル名の数字 (kuma_r8_0824) は更新日で
+      // あって年度とは限らないので当てにしない。
+      const fy = /令和(\d{1,2})年度/.exec(label);
+      out.push({
+        url,
+        label,
+        fiscalYear: fy ? 2018 + Number(fy[1]) : null,
+      });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * リダイレクトを手動で追い、Set-Cookie を次のリクエストへ引き継ぐ。
+ *
+ * 自治体サイトの一部は WAF が「Cookie を配る 302 → 本体」の順で応答する。
+ * fetch の自動リダイレクトは Cookie を返さないので同じ 302 を繰り返し、
+ * redirect count exceeded になる (愛知県 / Imperva Incapsula)。
+ */
+async function fetchFollowing(
+  url: string,
+  getCookie: () => string,
+  setCookie: (c: string) => void,
+  maxHops = 5,
+): Promise<Response | null> {
+  let current = url;
+  for (let hop = 0; hop < maxHops; hop++) {
+    const res = await fetch(current, {
+      redirect: "manual",
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (compatible; KumaWatch/1.0; +https://kuma-watch.jp)",
+        Accept: "application/pdf,*/*",
+        ...(getCookie() ? { Cookie: getCookie() } : {}),
+      },
+      signal: AbortSignal.timeout(25000),
+    });
+    const sc = res.headers.get("set-cookie");
+    if (sc) {
+      const jar = sc
+        .split(/,(?=[^;]+=)/)
+        .map((c) => c.split(";")[0].trim())
+        .filter(Boolean)
+        .join("; ");
+      setCookie(getCookie() ? `${getCookie()}; ${jar}` : jar);
+    }
+    if (res.status >= 300 && res.status < 400) {
+      const loc = res.headers.get("location");
+      if (!loc) return res;
+      current = new URL(loc, current).toString();
+      continue;
+    }
+    return res;
+  }
+  return null;
+}
+
+/**
  * PDF を取得してテキスト化する。取得・解析に失敗したら null。
  *
  * 一時的な接続失敗で丸ごと 0 件になるのを防ぐため数回やり直す。集約は
@@ -51,17 +145,18 @@ export function normalizePdfText(text: string): string {
  */
 async function fetchWithRetry(url: string, label: string): Promise<Response | null> {
   const ATTEMPTS = 3;
+  // WAF (愛知県は Imperva Incapsula) が Cookie を配ってから本体を返す。
+  // 自動でリダイレクトを追うと Cookie を返さないため延々と回され
+  // "redirect count exceeded" になる。手動で追い、Cookie を持ち回る。
+  let cookie = "";
   for (let i = 1; i <= ATTEMPTS; i++) {
     try {
-      const res = await fetch(url, {
-        // 自治体サイトは UA なしを 302 で弾くことがある (愛知県で実際に発生)。
-        headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
-        signal: AbortSignal.timeout(25000),
-      });
-      if (res.ok) return res;
-      console.log(`[pdf-table ${label}] fetch failed ${res.status} (${i}/${ATTEMPTS})`);
-      // 4xx は繰り返しても変わらないので即やめる (URL が変わった等)。
-      if (res.status >= 400 && res.status < 500) return null;
+      const res = await fetchFollowing(url, () => cookie, (c) => (cookie = c));
+      if (res && res.ok) return res;
+      if (res) {
+        console.log(`[pdf-table ${label}] fetch failed ${res.status} (${i}/${ATTEMPTS})`);
+        if (res.status >= 400 && res.status < 500) return null;
+      }
     } catch (e) {
       const err = e as Error & { cause?: Error };
       console.log(
