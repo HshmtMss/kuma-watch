@@ -94,6 +94,31 @@ async function discoverCsvUrl(
   }
 }
 
+/**
+ * 状況欄の英語表記を日本語に直す。
+ *
+ * 東京都の CSV は Witness / trace / Filming / capture と英語で、そのまま
+ * 日本語ページに出ていた (地図の吹き出しに「Witness」と表示されていた)。
+ * 出典の値をそのまま見せる方針は「区分の文言は実データから」に沿うが、
+ * 読み手が理解できないなら情報として機能しないので、語の対応だけ当てる。
+ * 表に無い語は変換せずそのまま残す (勝手に解釈しない)。
+ */
+const SITUATION_JA: Record<string, string> = {
+  witness: "目撃",
+  sightings: "目撃",
+  trace: "痕跡",
+  traces: "痕跡",
+  filming: "撮影",
+  capture: "捕獲",
+  captured: "捕獲",
+};
+
+function localizeSituation(v: string): string {
+  const t = v.trim();
+  if (!t) return t;
+  return SITUATION_JA[t.toLowerCase()] ?? t;
+}
+
 export async function fetchCsvSightings(
   entry: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
@@ -171,7 +196,9 @@ export async function fetchCsvSightings(
         prefectureName: prefName,
         cityName: (iCity >= 0 && row[iCity]) || "",
         sectionName: (iSection >= 0 && row[iSection]) || "",
-        comment: (iSituation >= 0 && row[iSituation]) || "",
+        comment: localizeSituation(
+          (iSituation >= 0 && row[iSituation]) || "",
+        ),
         headCount: iHead >= 0 ? cleanNum(row[iHead]) : 1,
       });
     }
