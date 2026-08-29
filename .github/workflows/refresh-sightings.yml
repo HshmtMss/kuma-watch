@@ -52,7 +52,23 @@ jobs:
           # 他の取り込みジョブ (news-flash 等) が書くと作業ツリーが汚れ、直後の
           # git pull --rebase が "You have unstaged changes" で失敗する。
           GEOCODE_CACHE_PERSIST: "1"
-        run: npm run build:sightings
+        # 一時的なネットワーク障害で失敗することがある (GitHub Actions 側から
+        # 自治体サイトへの Connect Timeout)。その場合は激減ガードが働いて
+        # スナップショットを守るが、ジョブとしては失敗するので通知が飛ぶ。
+        # 4 時間ごとに 1 通ずつ来ると通知が意味を失うので、間を置いて再試行し、
+        # それでも駄目なときだけ失敗させる。
+        run: |
+          for attempt in 1 2 3; do
+            if npm run build:sightings; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "[refresh] 集約に失敗 (試行 $attempt/3) — 60 秒後に再試行"
+              sleep 60
+            fi
+          done
+          echo "[refresh] 3 回とも失敗しました"
+          exit 1
 
       - name: Commit if changed
         run: |

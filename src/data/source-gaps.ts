@@ -79,10 +79,71 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
     "nagano-nakano",
     "nagano-yamanouchi",
     "nagano-sakaki",
-  ].map((id) => ({
-    id,
+  ].map(
+    (id): SourceGap => ({
+      id,
+      reason:
+        "県の月別 PDF (nagano-pdf-*) が全市町村を網羅するため個別取り込みは不要",
+      checkedAt: "2026-08-23",
+    }),
+  ),
+
+  // --- 別ソースが同じ県をカバーしているので実害が無いもの ---
+  //
+  // 登録そのものは残す (公開先を追う手がかりになる) が、警告からは外す。
+  // 「その県のデータが無い」わけではないことを確認済み。
+  {
+    id: "akita",
     reason:
-      "県の月別 PDF (nagano-pdf-*) が全市町村を網羅するため個別取り込みは不要",
-    checkedAt: "2026-08-23",
-  })),
+      "秋田県のデータは sharp9110 経由で 21,035 件・最新も当日分まで入っている。この登録は ArcGIS Hub の文書用エントリで、0 件でも県のカバレッジに影響しない",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "kyoto",
+    reason:
+      "BODIK の公開が 2018-12 で停止 (過去データとして 10,225 件保持)。現行分は news 経由で直近1年 490 件あり、県のカバレッジは維持されている",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "iwate",
+    reason:
+      "この登録 (県 Google マイマップ) は 2025-10 で停止。岩手県は iwate-morioka-mymap と news で直近1年 1,694 件あり、カバレッジは維持されている",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "gifu",
+    reason:
+      "CKAN が「クママップ（過去）」になり 2025-10 で停止。現行分は gifu-gis (県域統合型GIS) から 2,319 件取得しているので実害なし",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "tochigi",
+    reason:
+      "この登録 (2025年度マイマップ) は年度で完結。栃木県は tochigi-2026-mymap と news で直近1年 664 件あり、カバレッジは維持されている",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "nara",
+    reason:
+      "この登録 (Google マイマップ) は奈良市・木津川市・山添村の3市村限定で 2026-03 で停止。県全域は nara-pdf から 209 件取得しているので実害なし",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "yamagata-kemonote",
+    reason:
+      "けものノート API は認証が必要で資格情報を持っていない。山形県は yamagata-gmap-r7 と news で直近1年 2,434 件あり、カバレッジは維持されている",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "yamagata",
+    reason:
+      "この登録 (CSV) は取得できていないが、yamagata-gmap-r7 が同じ県をカバーしている (上記と同じ理由)",
+    checkedAt: "2026-08-30",
+  },
+  {
+    id: "shizuoka",
+    reason:
+      "この登録 (トップページ) からは個別記録が取れない。静岡県は shizuoka-gmap / shizuoka-r7-gmap / shizuoka-pdf-* で直近1年 529 件あり、カバレッジは維持されている",
+    checkedAt: "2026-08-30",
+  },
 ];

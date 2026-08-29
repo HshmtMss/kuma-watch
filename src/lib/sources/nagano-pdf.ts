@@ -1,5 +1,6 @@
 import type { DataSourceEntry } from "@/data/data-sources";
 import {
+  discoverPdfUrls,
   dropOutlierDates,
   fetchPdfText,
   rowsToSightings,
@@ -142,9 +143,30 @@ export function parseNaganoText(text: string): TableRow[] {
 export async function fetchNaganoPdfSightings(
   source: DataSourceEntry,
 ): Promise<UnifiedSighting[]> {
-  const pdfUrl = source.urls.find((u) => u.role === "pdf")?.url;
-  if (!pdfUrl) return [];
-  const text = await fetchPdfText(pdfUrl, source.id);
+  // 県はファイル名に規則性が無く、更新のたびに差し替える
+  // (630mokugeki2 → 630mokugeki3、820mokugeki → 827mokugeki)。
+  // 直書きした URL は数日で 404 になり、そのソースが 0 件になって
+  // 激減ガードが集約全体を止めていた。一覧ページのリンク文言
+  // 「令和N年M月」は安定しているので、そこから現行 URL を引き当てる。
+  const listUrl = source.urls.find((u) => u.role === "list")?.url;
+  const registered = source.urls.find((u) => u.role === "pdf")?.url;
+
+  // regionLabel は「長野県 ツキノワグマ目撃情報 R8.6 (2026-06)」の形。
+  // ここから「令和8年6月」を組み立てて一覧のリンク文言と突き合わせる。
+  const rm = /R(\d{1,2})\.(\d{1,2})/.exec(source.regionLabel);
+  let url = registered;
+  if (listUrl && rm) {
+    const label = `令和${rm[1]}年${rm[2]}月`;
+    const found = await discoverPdfUrls(listUrl, label);
+    // 「令和8年4月」は「令和8年4月」にしか一致しないが、念のため
+    // 完全一致するものを優先する (「令和8年4月分」等の揺れを吸収)。
+    const exact = found.find((f) => f.label.trim().startsWith(label));
+    if (exact) url = exact.url;
+    else if (found.length > 0) url = found[0].url;
+  }
+  if (!url) return [];
+
+  const text = await fetchPdfText(url, source.id);
   if (!text) return [];
   return rowsToSightings(parseNaganoText(text), PREF, source.id);
 }
