@@ -943,8 +943,9 @@ export const DATA_SOURCES: DataSourceEntry[] = [
   // 注意: 県はファイル名に規則性が無く (r070430_mokugeki / 0706_mokugeki / 531kuma /
   // 630mokugeki2 ...)、月末版が公開されると暫定版を消す。実際 424mokugeki.pdf
   // (R8.4 暫定) は 430mokugeki.pdf (月末版) に差し替えられて 404 になっていた。
-  // 新しい月が公開されてもここに追記しない限り取り込まれないので、シーズン中は
-  // 月1回 kuma-map.html を見て追記すること。長野は北アルプス・上高地を抱える
+  // ファイル名の差し替えは nagano-pdf.ts が一覧ページから自動追従するので
+  // 追記は不要。ただし「新しい月」が始まったらここに 1 行足すこと
+  // (月の一覧そのものはここが持っているため)。長野は北アルプス・上高地を抱える
   // 主要なクマ県で、ここが止まると /spot と /place の両方が同時に薄くなる。
   //   一覧: https://www.pref.nagano.lg.jp/shinrin/sangyo/ringyo/choju/joho/kuma-map.html
   ...(
@@ -970,7 +971,11 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       // 820mokugeki.pdf も同様に削除 → 827mokugeki.pdf (2026-08-30 確認)。
       { ym: "R8.8 (2026-08)", file: "827mokugeki.pdf" },
     ].map(({ ym, file }) => ({
-      id: `nagano-pdf-${file.replace(/\.pdf$/, "")}`,
+      // ID は年月から作る。ファイル名から作ると、県がファイルを差し替える
+      // たびに ID が総入れ替えになり、全レコードの id も変わってしまう
+      // (2026-08 に 630mokugeki2→3 / 820→827 で実際に発生)。
+      // 月は変わらないので、これで ID が安定する。
+      id: `nagano-pdf-${(/\((\d{4}-\d{2})\)/.exec(ym)?.[1] ?? ym).replace(/[^\d-]/g, "")}`,
       kind: "prefecture" as SourceKind,
       prefCode: "20",
       regionLabel: `長野県 ツキノワグマ目撃情報 ${ym}`,
