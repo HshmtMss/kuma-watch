@@ -27,6 +27,7 @@ import {
   resolveMuni,
 } from "../src/lib/muni-boundary";
 import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
+import { DATA_SOURCES } from "../src/data/data-sources";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
 const MUNI_BY_CODE = new Map(JAPAN_MUNICIPALITIES.map((m) => [m.cityCode, m]));
@@ -89,7 +90,14 @@ async function main(): Promise<void> {
   // 前回 50 件以上あったソースが今回 0 件なら、取得側の障害とみなして中止する。
   // (県が公開をやめた場合も 0 件になるが、その場合は健全性チェックが翌日に
   //  検出するので、まず「壊れたデータで上書きしない」方を優先する。)
+  //
+  // ただし data-sources.ts から定義ごと消えた ID は対象外にする。守りたいのは
+  // 「ネットワーク不調で取れなかった」ケースであって、定義の削除・改名は人が
+  // 意図してやったことだから。長野の月別 PDF のように、県がファイル名を差し替え
+  // ると ID (nagano-pdf-<ファイル名>) ごと変わるため、これを見ないと改名のたびに
+  // ここで永久に止まる (2026-08-28〜30 に実際に発生)。
   const MIN_TO_GUARD = 50;
+  const definedSourceIds = new Set(DATA_SOURCES.map((s) => s.id));
   const prevBySource = new Map<string, number>();
   for (const r of prevRecords) {
     if (r.sourceKind === "news") continue; // news は carried 側なので対象外
@@ -102,9 +110,20 @@ async function main(): Promise<void> {
     if (k) freshBySource.set(k, (freshBySource.get(k) ?? 0) + 1);
   }
   const vanished: string[] = [];
+  const retired: string[] = [];
   for (const [src, n] of prevBySource) {
     if (n < MIN_TO_GUARD) continue;
-    if ((freshBySource.get(src) ?? 0) === 0) vanished.push(`${src}(前回${n}件)`);
+    if ((freshBySource.get(src) ?? 0) !== 0) continue;
+    if (!definedSourceIds.has(src)) {
+      retired.push(`${src}(前回${n}件)`);
+      continue;
+    }
+    vanished.push(`${src}(前回${n}件)`);
+  }
+  if (retired.length > 0) {
+    console.log(
+      `[build-sightings] 定義が消えたソースを引退扱いにしました: ${retired.join(", ")}`,
+    );
   }
   if (vanished.length > 0) {
     console.error(

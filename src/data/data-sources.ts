@@ -964,9 +964,11 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       // 令和8年度 (今シーズン)。424mokugeki.pdf (暫定版) は県が削除済み → 月末版 430 に差し替え。
       { ym: "R8.4 (2026-04)", file: "430mokugeki.pdf" },
       { ym: "R8.5 (2026-05)", file: "531kuma.pdf" },
-      { ym: "R8.6 (2026-06)", file: "630mokugeki2.pdf" },
+      // 630mokugeki2.pdf (暫定版) は県が削除 → 630mokugeki3.pdf に差し替え (2026-08-30 確認)。
+      { ym: "R8.6 (2026-06)", file: "630mokugeki3.pdf" },
       { ym: "R8.7 (2026-07)", file: "731mokugeki4.pdf" },
-      { ym: "R8.8 (2026-08)", file: "820mokugeki.pdf" },
+      // 820mokugeki.pdf も同様に削除 → 827mokugeki.pdf (2026-08-30 確認)。
+      { ym: "R8.8 (2026-08)", file: "827mokugeki.pdf" },
     ].map(({ ym, file }) => ({
       id: `nagano-pdf-${file.replace(/\.pdf$/, "")}`,
       kind: "prefecture" as SourceKind,
