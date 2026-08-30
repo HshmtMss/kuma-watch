@@ -146,4 +146,10 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
       "この登録 (トップページ) からは個別記録が取れない。静岡県は shizuoka-gmap / shizuoka-r7-gmap / shizuoka-pdf-* で直近1年 529 件あり、カバレッジは維持されている",
     checkedAt: "2026-08-30",
   },
+  {
+    id: "aichi",
+    reason:
+      "県サイトが Imperva の WAF で保護されており、GitHub Actions (Azure) の IP からは JavaScript 実行を要求する中間ページ (<TITLE>Loading</TITLE>) が返って PDF に到達できない。手元の回線からは同じリクエストで 200 が返るので IP による判定。UA・Cookie 引き継ぎ・リトライを入れても越えられなかった (CI 上で実測)。パーサ自体は正しく、手元では 35 件取得できる。愛知のツキノワグマは絶滅危惧IA類で年 35 件程度と小さく、回避策 (国内プロキシ等) を用意してまで取る規模ではないと判断",
+    checkedAt: "2026-08-31",
+  },
 ];
