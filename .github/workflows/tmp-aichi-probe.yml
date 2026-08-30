@@ -1,0 +1,24 @@
+name: tmp aichi probe
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: probe
+        run: |
+          U="https://www.pref.aichi.jp/uploaded/attachment/626110.pdf"
+          echo "--- 素のcurl ---"
+          curl -s -o /dev/null -w "  http=%{http_code}\n" --max-time 40 "$U" || echo "  接続失敗"
+          echo "--- ブラウザ相当UA ---"
+          curl -s -o /dev/null -w "  http=%{http_code}\n" --max-time 40 \
+            -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36" "$U" || echo "  接続失敗"
+          echo "--- 一覧ページ(HTML) ---"
+          curl -s -o /dev/null -w "  http=%{http_code}\n" --max-time 40 \
+            -A "Mozilla/5.0" "https://www.pref.aichi.jp/soshiki/shizen/tsukinowaguma.html" || echo "  接続失敗"
+          echo "--- 403本文の先頭 ---"
+          curl -s --max-time 40 -A "Mozilla/5.0" "$U" | head -c 400 || true
+          echo
+          echo "--- 送信元IP ---"
+          curl -s --max-time 30 https://api.ipify.org || true
