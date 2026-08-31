@@ -97,11 +97,10 @@ export default function NotifyCard({
       )}
 
       <p className="text-xs leading-relaxed text-stone-600 sm:text-sm">
-        新しい出没情報が入ると、LINE のトークに直接お知らせします。
-        アプリを入れたままで受け取れるので、iPhone でも設定は要りません。無料です。
+        新しい情報が入るたびに、LINE のトークに届きます。無料で、いつでも解除できます。
       </p>
       <p className="mt-1.5 text-xs leading-relaxed text-stone-500">
-        初回は公式アカウントの友だち追加が必要です。解除は LINE のトーク画面からいつでもできます。
+        はじめての方は公式アカウントの友だち追加が必要です。
       </p>
 
       <a

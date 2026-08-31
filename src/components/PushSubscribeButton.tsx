@@ -320,11 +320,15 @@ export default function PushSubscribeButton({
               {targetHeadline(target, en)}
             </p>
           )}
-          <p className={`text-xs leading-relaxed text-stone-600 ${hideHeading ? "" : "mt-0.5"}`}>
-            {en
-              ? "Get a browser notification when a new sighting is reported from official or news sources. No account, free."
-              : "報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。"}
-          </p>
+          {/* bare は「LINEを使っていない方は…」の summary の直下に出るので、
+              同じことを言い直さない。ボタンだけ残す。 */}
+          {!bare && (
+            <p className={`text-xs leading-relaxed text-stone-600 ${hideHeading ? "" : "mt-0.5"}`}>
+              {en
+                ? "Get a browser notification when a new sighting is reported from official or news sources. No account, free."
+                : "報道・自治体公式情報から新たに登録された目撃情報を、ブラウザ通知でお届けします。アカウント登録は不要・無料です。"}
+            </p>
+          )}
           {state === "active" && (
             <button
               type="button"
@@ -344,7 +348,7 @@ export default function PushSubscribeButton({
           {message && (
             <p className="mt-2 text-xs text-stone-700">{message}</p>
           )}
-          <p className="mt-2 text-xs">
+          <p className={bare ? "text-xs" : "mt-2 text-xs"}>
             <Link
               href="/notifications"
               className="font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
@@ -353,7 +357,7 @@ export default function PushSubscribeButton({
             </Link>
           </p>
           {/* bare は既に「LINEを使っていない方へ」の details の中にいるので、
-              details の入れ子を作らない。iPhone の注意書きは親カード側が持つ。 */}
+              details の入れ子を作らない。 */}
           <details className={bare ? "hidden" : "mt-2"}>
             <summary className="cursor-pointer text-xs text-stone-500 hover:text-stone-700">
               {en ? "About notifications" : "通知について"}
