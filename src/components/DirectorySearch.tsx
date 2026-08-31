@@ -13,6 +13,8 @@ import { Search, X } from "lucide-react";
  * - 完全にクライアント側の即時フィルタ（API 不要）。
  * - 前方一致を優先し、部分一致も拾う。Enter で先頭候補へ遷移。
  * - items はサーバ側で軽量な {label, sub, href} に射影して渡す。
+ * - en で英語表記に切り替える（/en 配下から使う）。照合ロジックは共通で、
+ *   英語スポット名は ASCII なので前方一致・部分一致がそのまま効く。
  */
 export type DirectoryItem = { label: string; sub?: string; href: string };
 
@@ -20,10 +22,13 @@ export default function DirectorySearch({
   items,
   placeholder,
   limit = 12,
+  en = false,
 }: {
   items: DirectoryItem[];
   placeholder: string;
   limit?: number;
+  /** 英語 UI（/en 配下）で使う場合に true。 */
+  en?: boolean;
 }) {
   const router = useRouter();
   const [q, setQ] = useState("");
@@ -79,7 +84,7 @@ export default function DirectorySearch({
             <button
               type="button"
               onClick={() => setQ("")}
-              aria-label="クリア"
+              aria-label={en ? "Clear" : "クリア"}
               className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-600"
             >
               <X size={18} aria-hidden />
@@ -92,7 +97,7 @@ export default function DirectorySearch({
         <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
           {results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-stone-500">
-              「{q}」に一致する項目はありません
+              {en ? `No spots match “${q}”` : `「${q}」に一致する項目はありません`}
             </p>
           ) : (
             <ul className="max-h-80 overflow-y-auto py-1">
@@ -115,7 +120,9 @@ export default function DirectorySearch({
               ))}
               {total > results.length && (
                 <li className="px-4 py-2 text-xs text-stone-400">
-                  ほか {total - results.length} 件 — キーワードを絞り込んでください
+                  {en
+                    ? `${total - results.length} more — keep typing to narrow it down`
+                    : `ほか ${total - results.length} 件 — キーワードを絞り込んでください`}
                 </li>
               )}
             </ul>

@@ -7,6 +7,7 @@ import {
 } from "@/lib/research-entries";
 import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
+import { isEnSpotIndexReleased } from "@/lib/en-spot-index-flag";
 import { EN_GENERATED_SLUGS } from "@/data/inbound-en-generated";
 import { EN_TRAIL_SLUGS } from "@/data/en-trails";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
@@ -176,6 +177,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "monthly" as const,
             priority: 0.6,
           },
+          // 英語スポット一覧（検索つき）。公開フラグが二段なのでここでも確認する。
+          ...(isEnSpotIndexReleased()
+            ? [
+                {
+                  url: `${SITE_URL}/en/spot`,
+                  lastModified: now,
+                  changeFrequency: "weekly" as const,
+                  priority: 0.7,
+                  alternates: {
+                    languages: {
+                      en: `${SITE_URL}/en/spot`,
+                      ja: `${SITE_URL}/spot`,
+                    },
+                  },
+                },
+              ]
+            : []),
           ...INBOUND_EN_SLUGS.map((slug) => ({
             url: `${SITE_URL}/en/spot/${slug}`,
             lastModified: now,

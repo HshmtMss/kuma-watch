@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { isEnSpotIndexReleased } from "@/lib/en-spot-index-flag";
 
 /**
  * /en 配下の英語チャンク。ルート layout はグローバルヘッダーを持たない(各ページが
@@ -37,7 +38,10 @@ export default function EnLayout({
             </span>
           </Link>
           <nav className="flex items-center gap-3 text-xs font-semibold">
-            <Link href="/en#spots" className="text-stone-600 hover:text-stone-900">
+            <Link
+              href={isEnSpotIndexReleased() ? "/en/spot" : "/en#spots"}
+              className="text-stone-600 hover:text-stone-900"
+            >
               Spots
             </Link>
             <Link href="/" className="text-stone-400 hover:text-stone-600">
@@ -60,7 +64,10 @@ export default function EnLayout({
             <Link href="/en" className="hover:text-stone-800">
               Bear safety guide
             </Link>
-            <Link href="/en#spots" className="hover:text-stone-800">
+            <Link
+              href={isEnSpotIndexReleased() ? "/en/spot" : "/en#spots"}
+              className="hover:text-stone-800"
+            >
               Hiking spots
             </Link>
             <Link href="/" className="hover:text-stone-800">

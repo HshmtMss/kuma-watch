@@ -6,6 +6,11 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { INBOUND_EN_SLUGS } from "@/data/inbound-en-spots";
 import { EN_GENERATED_SPOTS } from "@/data/inbound-en-generated";
 import { EN_TRAILS } from "@/data/en-trails";
+import DirectorySearch, {
+  type DirectoryItem,
+} from "@/components/DirectorySearch";
+import { EN_SPOTS } from "@/data/en-spot-list";
+import { isEnSpotIndexReleased } from "@/lib/en-spot-index-flag";
 import { REGION_ORDER, prefRegion, prefEn } from "@/data/pref-en";
 import TravelEssentials from "@/components/en/TravelEssentials";
 import JsonLd from "@/components/JsonLd";
@@ -61,6 +66,22 @@ const FAQ_LD = {
  */
 const SITE = "https://kuma-watch.jp";
 const EN_ENABLED = process.env.NEXT_PUBLIC_EN_ENABLED === "true";
+
+/** 検索対象。スポット＋トレイル。/en/spot と同じ並び（トレイルを先に）。 */
+function searchItems(): DirectoryItem[] {
+  return [
+    ...EN_TRAILS.map((t) => ({
+      label: t.name,
+      sub: t.region,
+      href: `/en/trail/${t.slug}`,
+    })),
+    ...EN_SPOTS.map((s) => ({
+      label: s.enName,
+      sub: prefEn(s.prefName),
+      href: `/en/spot/${s.slug}`,
+    })),
+  ];
+}
 
 export const metadata: Metadata = {
   title: "Bears in Japan: A Hiker's Safety Guide | KumaWatch",
@@ -302,6 +323,17 @@ export default function EnglishSafetyHub() {
         {INBOUND_EN_SLUGS.length + EN_GENERATED_SPOTS.length} spots across Japan.
       </p>
 
+      {/* 一覧＋文字検索が公開されていれば、名前で直行できる窓を先頭に置く。 */}
+      {isEnSpotIndexReleased() && (
+        <div className="mt-4">
+          <DirectorySearch
+            en
+            items={searchItems()}
+            placeholder="Search a mountain, trail or destination"
+          />
+        </div>
+      )}
+
       <h3 className="mt-4 text-sm font-bold text-stone-500">Popular spots</h3>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {INBOUND_EN_SLUGS.map((slug) => {
@@ -321,8 +353,30 @@ export default function EnglishSafetyHub() {
         })}
       </div>
 
+      {/* 一覧ページが公開されたら、地方別リンク帳はそちらに持たせる。 */}
+      {isEnSpotIndexReleased() && (
+        <Link
+          href="/en/spot"
+          className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3 transition hover:border-amber-300 hover:bg-amber-50"
+        >
+          <span>
+            <span className="block text-[14.5px] font-bold text-stone-900">
+              Browse all {INBOUND_EN_SLUGS.length + EN_GENERATED_SPOTS.length}{" "}
+              spots by region
+            </span>
+            <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-600">
+              Including spots with no recent sightings.
+            </span>
+          </span>
+          <span aria-hidden className="shrink-0 text-stone-400">
+            →
+          </span>
+        </Link>
+      )}
+
       {/* More nature & hiking spots, grouped by region (self-contained EN data) */}
-      {EN_GENERATED_SPOTS.length > 0 &&
+      {!isEnSpotIndexReleased() &&
+        EN_GENERATED_SPOTS.length > 0 &&
         (() => {
           const byRegion = new Map<string, typeof EN_GENERATED_SPOTS>();
           for (const s of EN_GENERATED_SPOTS) {
