@@ -32,6 +32,9 @@ type Props = {
   boundaryUrl?: string;
   /** 強調する市町村の 5 桁コード (japan-municipalities の cityCode = N03_007)。 */
   boundaryCode?: string;
+  /** 英語ページ (/en 配下) から使う場合に true。地図の操作 UI と吹き出しの
+   *  定型文を英語にする。出没データ本体(地名・本文)は日本語のまま。 */
+  en?: boolean;
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -49,6 +52,7 @@ export default function MiniSightingsMap({
   radiusKm,
   boundaryUrl,
   boundaryCode,
+  en = false,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -158,7 +162,7 @@ export default function MiniSightingsMap({
           hlMarker = marker;
           hlLatLon = [r.lat, r.lon];
         }
-        const date = r.date || "(日付不明)";
+        const date = r.date || (en ? "(date unknown)" : "(日付不明)");
         const where = r.sectionName ? `<div>${escapeHtml(r.sectionName)}</div>` : "";
         // comment が出典 URL そのものの場合 (例: 報道記事 URL) は、生 URL を
         // 出さず「報道記事を見る ↗」リンクに置き換える。ユーザーには URL 文字列が
@@ -167,7 +171,7 @@ export default function MiniSightingsMap({
         const isUrlComment = /^https?:\/\/\S+$/i.test(rawComment);
         const note = rawComment
           ? isUrlComment
-            ? `<div style="margin-top:2px"><a href="${escapeHtml(rawComment)}" target="_blank" rel="noopener noreferrer" style="color:#b45309;text-decoration:underline">報道記事を見る ↗</a></div>`
+            ? `<div style="margin-top:2px"><a href="${escapeHtml(rawComment)}" target="_blank" rel="noopener noreferrer" style="color:#b45309;text-decoration:underline">${en ? "Read the news report ↗" : "報道記事を見る ↗"}</a></div>`
             : `<div style="margin-top:2px;color:#374151">${escapeHtml(rawComment).slice(0, 120)}</div>`
           : "";
         marker.bindPopup(
@@ -196,7 +200,7 @@ export default function MiniSightingsMap({
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm, boundaryUrl, boundaryCode]);
+  }, [centerLat, centerLon, zoom, records, recencyHighlightDays, showCenterMarker, radiusKm, boundaryUrl, boundaryCode, en]);
 
   // 全画面切替時: コンテナのサイズが変わるので Leaflet に再計測させる。
   // 全画面中はホイールズームを有効化（じっくり見たいケースなので操作性を上げる）。
@@ -260,21 +264,29 @@ export default function MiniSightingsMap({
           overflow: "hidden",
         }}
         className="border border-stone-200 bg-stone-100"
-        aria-label="周辺のクマ目撃マップ"
+        aria-label={en ? "Map of nearby bear sightings" : "周辺のクマ目撃マップ"}
       />
       <button
         type="button"
         onClick={() => setIsFull((v) => !v)}
         className="absolute right-2 top-2 z-[1000] flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow ring-1 ring-stone-200 backdrop-blur hover:bg-white"
-        aria-label={isFull ? "全画面を閉じる" : "地図を全画面で表示"}
+        aria-label={
+          isFull
+            ? en
+              ? "Exit full screen"
+              : "全画面を閉じる"
+            : en
+              ? "View map full screen"
+              : "地図を全画面で表示"
+        }
       >
         {isFull ? (
           <>
-            <X size={14} aria-hidden /> 閉じる
+            <X size={14} aria-hidden /> {en ? "Close" : "閉じる"}
           </>
         ) : (
           <>
-            <Maximize size={14} aria-hidden /> 全画面
+            <Maximize size={14} aria-hidden /> {en ? "Full screen" : "全画面"}
           </>
         )}
       </button>

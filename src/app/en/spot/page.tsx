@@ -25,18 +25,20 @@ import { isEnSpotIndexReleased } from "@/lib/en-spot-index-flag";
 const SITE = "https://kuma-watch.jp";
 const EN_ENABLED = process.env.NEXT_PUBLIC_EN_ENABLED === "true";
 const TOTAL = EN_SPOTS.length;
+/** 見出し・本文に出す件数は英語表記の桁区切りで（1524 ではなく 1,524）。 */
+const TOTAL_LABEL = TOTAL.toLocaleString("en-US");
 
 export const revalidate = 21600;
 
 export const metadata: Metadata = {
-  title: `Bear sightings by destination — ${TOTAL} spots in Japan | KumaWatch`,
-  description: `Search ${TOTAL} mountains, trails and destinations across Japan and see recent bear sightings near each one before you go. Spots with no recent sightings are listed too.`,
+  title: `Bear sightings by destination — ${TOTAL_LABEL} spots in Japan | KumaWatch`,
+  description: `Search ${TOTAL_LABEL} mountains, trails and destinations across Japan and see recent bear sightings near each one before you go. Spots with no recent sightings are listed too.`,
   alternates: {
     canonical: `${SITE}/en/spot`,
     languages: { en: `${SITE}/en/spot`, ja: `${SITE}/spot` },
   },
   openGraph: {
-    title: `Bear sightings by destination — ${TOTAL} spots in Japan`,
+    title: `Bear sightings by destination — ${TOTAL_LABEL} spots in Japan`,
     url: `${SITE}/en/spot`,
     type: "website",
   },
@@ -79,7 +81,8 @@ export default function EnglishSpotIndex() {
       </h1>
       <p className="mt-3 text-[15px] leading-relaxed text-stone-600">
         Type the name of a mountain, trail, park or hot spring and see whether
-        bears have been reported near it recently. {TOTAL} spots across Japan,
+        bears have been reported near it recently. {TOTAL_LABEL} spots across
+        Japan,
         from official reports and news.
       </p>
       <p className="mt-2 text-[13.5px] leading-relaxed text-stone-500">

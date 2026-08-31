@@ -361,7 +361,10 @@ export default function EnglishSafetyHub() {
         >
           <span>
             <span className="block text-[14.5px] font-bold text-stone-900">
-              Browse all {INBOUND_EN_SLUGS.length + EN_GENERATED_SPOTS.length}{" "}
+              Browse all{" "}
+              {(
+                INBOUND_EN_SLUGS.length + EN_GENERATED_SPOTS.length
+              ).toLocaleString("en-US")}{" "}
               spots by region
             </span>
             <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-600">

@@ -75,6 +75,28 @@ function resolveEnSpot(
   return { l, name: romaji(l.name, l.altNames), blurb: EN_BLURBS[slug] };
 }
 
+/**
+ * 中心地点から見た 8 方位。距離だけだと「どちら側で出たのか」が分からず、
+ * 尾根の向こう側なのか登山口の側なのかを読み手が判断できない。
+ */
+function compass(
+  fromLat: number,
+  fromLon: number,
+  toLat: number,
+  toLon: number,
+): string {
+  const rad = (d: number) => (d * Math.PI) / 180;
+  const dLon = rad(toLon - fromLon);
+  const y = Math.sin(dLon) * Math.cos(rad(toLat));
+  const x =
+    Math.cos(rad(fromLat)) * Math.sin(rad(toLat)) -
+    Math.sin(rad(fromLat)) * Math.cos(rad(toLat)) * Math.cos(dLon);
+  const deg = ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+  return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][
+    Math.round(deg / 45) % 8
+  ];
+}
+
 function fmtDate(iso: string | null): string | null {
   if (!iso) return null;
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
@@ -287,6 +309,7 @@ export default async function EnglishSpotPage({ params }: Props) {
             showCenterMarker
             radiusKm={NEAR_RADIUS_KM}
             zoom={11}
+            en
           />
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-stone-500">
@@ -333,7 +356,8 @@ export default async function EnglishSpotPage({ params }: Props) {
                   {fmtDate(s.date)}
                 </span>
                 <span className="text-xs text-stone-500">
-                  {s.distanceKm.toFixed(1)} km away
+                  {s.distanceKm.toFixed(1)} km{" "}
+                  {compass(l.lat, l.lon, s.lat, s.lon)}
                 </span>
               </li>
             ))}

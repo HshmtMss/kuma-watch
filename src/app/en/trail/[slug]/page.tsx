@@ -225,6 +225,7 @@ export default async function EnglishTrailPage({ params }: Props) {
               lon: r.lon,
               date: r.date,
             }))}
+            en
           />
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-stone-500">
