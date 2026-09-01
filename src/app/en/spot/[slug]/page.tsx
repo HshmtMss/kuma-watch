@@ -246,7 +246,9 @@ export default async function EnglishSpotPage({ params }: Props) {
             />
           </div>
           <figcaption className="border-t border-stone-200 bg-white px-3 py-1.5 text-[10px] text-stone-400">
-            Photo: Wikimedia Commons ({l.imageCredit ?? l.name})
+            {/* 括弧内は被写体名。英語ページなので英語表記を使う
+                (imageCredit は日本語名が入っている)。 */}
+            Photo: Wikimedia Commons ({name})
           </figcaption>
         </figure>
       )}

@@ -38,6 +38,19 @@ type Props = {
 };
 
 const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+/**
+ * 英語ページ用のタイル。標準 OSM は現地語ラベル＝日本国内は漢字なので、訪日の
+ * 読み手には地名が読めない。ラテン文字併記のタイルを配信する提供元 (Stadia 等)
+ * の URL を env で差し替える。未設定なら標準 OSM のまま (フェイルセーフ)。
+ *
+ *   NEXT_PUBLIC_EN_TILE_URL    例: https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
+ *   NEXT_PUBLIC_EN_TILE_ATTRIB 提供元が求める帰属表示 (未設定なら OSM のもの)
+ *
+ * 提供元を固定しないのは、契約先が変わってもコード変更なしで切り替えるため。
+ */
+const EN_TILE_URL = process.env.NEXT_PUBLIC_EN_TILE_URL;
+const EN_TILE_ATTRIB = process.env.NEXT_PUBLIC_EN_TILE_ATTRIB;
 const TILE_ATTRIB =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
@@ -74,7 +87,12 @@ export default function MiniSightingsMap({
       }).setView([centerLat, centerLon], zoom);
       mapRef.current = map;
 
-      L.tileLayer(TILE_URL, { attribution: TILE_ATTRIB, maxZoom: 18 }).addTo(map);
+      const useEnTiles = en && Boolean(EN_TILE_URL);
+      L.tileLayer(useEnTiles ? EN_TILE_URL! : TILE_URL, {
+        attribution: useEnTiles ? (EN_TILE_ATTRIB ?? TILE_ATTRIB) : TILE_ATTRIB,
+        maxZoom: 18,
+        detectRetina: useEnTiles, // {r} を使う提供元向け。標準 OSM は等倍のまま。
+      }).addTo(map);
 
       // 行政界の強調（市町村ページ）。県別 GeoJSON を取得し、該当コードの
       // ポリゴンだけを描いて範囲にフィットさせる。失敗しても地図表示は継続。
