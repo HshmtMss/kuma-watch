@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
+import ProductCard from "@/components/ProductCard";
+import type { Product } from "@/lib/products";
 
 const SITE_URL = "https://kuma-watch.jp";
 const CONTACT_MAILTO =
@@ -26,6 +28,46 @@ export const metadata: Metadata = {
     description: "クマ対策の製品・サービスを KumaWatch に掲載。詳細はお問い合わせください。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
+};
+
+/**
+ * 掲載検討時に事業者が最初に見る数字。出典が違うので更新時は必ずセットで見直す。
+ *   検索: Search Console 直近28日 / 通知: LINE 公式アカウントのターゲットリーチ
+ *   通知の届く範囲: 管理画面 /admin/push-stats の登録内訳
+ * 数字は必ず「いつ時点か」と一緒に出す (古い数字を実績として出さない)。
+ */
+const AUDIENCE_AS_OF = "2026年8月";
+const AUDIENCE_STATS: { value: string; unit: string; label: string }[] = [
+  { value: "5.0", unit: "万クリック/月", label: "検索から訪れる回数" },
+  { value: "118", unit: "万回/月", label: "検索結果での表示回数" },
+  { value: "2,900", unit: "人", label: "クマ出没通知の登録者" },
+  { value: "419", unit: "自治体", label: "通知が登録された地域" },
+];
+
+/**
+ * 掲載イメージ用のサンプル。実在製品を「掲載例」として出すと、その事業者が
+ * 出稿しているように読めてしまうため、架空の製品で見た目だけを見せる。
+ * 実際の一覧は /products へのリンクで確認してもらう。
+ */
+const SAMPLE_PRODUCT: Product = {
+  id: "sample",
+  category: "撃退・忌避",
+  subcategory: "スプレー",
+  name: "（サンプル）クマ撃退スプレー PRO",
+  vendor: "サンプル社",
+  url: "https://kuma-watch.jp/products",
+  price: "12,000円前後",
+  purpose: "至近距離での退避行動を助ける",
+  features: "有効射程8m・軽量200g・ホルスター付属",
+  targetUse: "登山・山菜採り・農作業",
+  caveats: "航空機の預け入れ・機内持ち込みは不可",
+  relatedArticle: "",
+  priority: "",
+  source: "",
+  notes: "",
+  audience: "個人",
+  affiliateUrl: "https://kuma-watch.jp/products",
+  scene: "trail",
 };
 
 // 対象カテゴリ。説明はチップ表示時に hover で出すかページ下部に短くまとめる程度。
@@ -53,35 +95,36 @@ export default function ForVendorsPage() {
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
           クマ対策の製品・サービスを、必要としている読者に届けます。
         </h2>
-        <ul className="m-0 mb-5 space-y-1.5 text-sm leading-relaxed text-stone-700">
-          <li className="flex gap-2">
-            <span className="text-emerald-600">✓</span>
-            <span>クマ対策に関心の高い読者層に直接リーチ</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-emerald-600">✓</span>
-            <span>掲載先・露出形式・期間を柔軟に組み合わせ</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-emerald-600">✓</span>
-            <span>景品表示法・ステマ規制に準拠した PR 表記</span>
-          </li>
-        </ul>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
-            style={{ color: "#fff", textDecoration: "none" }}
-          >
-            お問い合わせ →
-          </a>
-          <a
-            href="#pricing"
-            className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-white px-5 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
-          >
-            料金の考え方
-          </a>
+        {/* 読者規模。抽象的な形容より、数字を4つ出すほうが検討が進む。 */}
+        <div className="mb-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          {AUDIENCE_STATS.map((s) => (
+            <div
+              key={s.label}
+              className="rounded-xl border border-emerald-100 bg-white px-3 py-2.5"
+            >
+              <div className="text-lg font-black leading-none text-stone-900">
+                {s.value}
+                <span className="ml-1 text-[11px] font-semibold text-stone-500">
+                  {s.unit}
+                </span>
+              </div>
+              <div className="mt-1.5 text-[11px] leading-snug text-stone-600">
+                {s.label}
+              </div>
+            </div>
+          ))}
         </div>
+        <p className="m-0 mb-5 text-xs text-stone-500">
+          {AUDIENCE_AS_OF}時点。検索は Search Console 直近28日、通知はブロックを除いた到達数。
+          有料掲載枠には「PR」表記と rel=&quot;sponsored&quot; を付与します。
+        </p>
+        <a
+          href="#contact"
+          className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+          style={{ color: "#fff", textDecoration: "none" }}
+        >
+          掲載について相談する →
+        </a>
       </section>
 
       {/* 何が掲載できるか — カテゴリは chip 表示で 1 画面に収める */}
@@ -99,8 +142,17 @@ export default function ForVendorsPage() {
           </span>
         ))}
       </div>
+      {/* 掲載イメージ。言葉だけだと「どう見えるか」が伝わらないので実物を出す。 */}
+      <h2 id="example">掲載されるとこう見えます</h2>
+      <p>
+        製品ページの一覧に、写真・特長・価格帯・注意書きを添えたカードで並びます。
+        購入導線のあるものは PR 表記付きのボタンになります。
+      </p>
+      <div className="not-prose my-4 max-w-md">
+        <ProductCard product={SAMPLE_PRODUCT} />
+      </div>
       <p className="text-sm text-stone-600">
-        既存の掲載例は{" "}
+        上はサンプルです。実際に並んでいる 100 点あまりは{" "}
         <Link href="/products">対策製品ページ</Link>
         でご覧いただけます。
       </p>
@@ -108,8 +160,14 @@ export default function ForVendorsPage() {
       {/* 料金の考え方 */}
       <h2 id="pricing">料金の考え方</h2>
       <p>
-        掲載料金は<strong>個別にご提案</strong>しています。基本構造は以下の 3 軸で、相見積もりがしやすい透明な価格設計を心がけています。
+        掲載料金は<strong>個別にご提案</strong>しています。
+        ご予算感をお伝えいただければ、その範囲で組める案をお出しします。
+        少額からのトライアル枠もご相談ください。
       </p>
+      <details className="not-prose my-4 rounded-xl border border-stone-200 bg-white p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-stone-700">
+          料金の決まり方（掲載先・見せ方・期間の 3 つ）
+        </summary>
       <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-stone-200 bg-white p-4">
           <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
@@ -159,9 +217,7 @@ export default function ForVendorsPage() {
           </ul>
         </div>
       </div>
-      <p className="text-xs text-stone-500">
-        ご予算感をお伝えいただければ、その範囲で組める案をご提案します。少額からのトライアル枠もご相談ください。
-      </p>
+      </details>
 
       {/* 掲載までの流れ */}
       <h2>掲載までの流れ</h2>
