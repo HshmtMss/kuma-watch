@@ -91,7 +91,10 @@ export default function MiniSightingsMap({
       L.tileLayer(useEnTiles ? EN_TILE_URL! : TILE_URL, {
         attribution: useEnTiles ? (EN_TILE_ATTRIB ?? TILE_ATTRIB) : TILE_ATTRIB,
         maxZoom: 18,
-        detectRetina: useEnTiles, // {r} を使う提供元向け。標準 OSM は等倍のまま。
+        // detectRetina は付けない。Leaflet の detectRetina は tileSize を半分に
+        // して zoomOffset を +1 するため、取得タイル数が 4 倍になる (無料枠を
+        // 一気に食う)。URL の {r} は Browser.retina だけで @2x に置換されるので、
+        // 高解像度版はリクエスト数を増やさずに得られる。
       }).addTo(map);
 
       // 行政界の強調（市町村ページ）。県別 GeoJSON を取得し、該当コードの
