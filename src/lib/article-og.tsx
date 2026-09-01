@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadJaFont } from "@/lib/og-font";
+import { jaFontOptions } from "@/lib/og-font";
 import { getArticle } from "@/lib/articles-meta";
 
 // 記事 (/articles/[slug]) 共通の OG 画像 (1200×630)。各記事フォルダの
@@ -23,18 +23,7 @@ export async function makeArticleOg(slug: string): Promise<ImageResponse> {
   const title = (article?.title ?? "クマ解説記事").slice(0, 60);
 
   const text = `${title}KumaWatchクマ解説記事kuma-watch.jp`;
-  const fontBold = await loadJaFont(text, 700);
-  const fontReg = await loadJaFont(text, 400);
-  const fonts: {
-    name: string;
-    data: ArrayBuffer;
-    style: "normal";
-    weight: 400 | 700;
-  }[] = [];
-  if (fontBold)
-    fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal", weight: 700 });
-  if (fontReg)
-    fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal", weight: 400 });
+  const fontOptions = await jaFontOptions(text);
 
   // タイトルは長文になりうるので、文字数で段階的に縮小し折り返しで収める。
   const len = title.length;
@@ -140,6 +129,6 @@ export async function makeArticleOg(slug: string): Promise<ImageResponse> {
         </div>
       </div>
     ),
-    { ...OG_SIZE, fonts },
+    { ...OG_SIZE, ...fontOptions },
   );
 }

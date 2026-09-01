@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { PREF_CODE_TO_NAME } from "@/lib/prefectures";
 import { getPlaceCell } from "@/lib/place-index";
-import { loadJaFont } from "@/lib/og-font";
+import { jaFontOptions } from "@/lib/og-font";
 
 export const alt = "KumaWatch — 全国クマ出没予報";
 export const size = { width: 1200, height: 630 };
@@ -46,12 +46,7 @@ export default async function OGImage({ params }: Props) {
         : { bg: "#fef9c3", accent: "#a16207" };
 
   const text = `${pref}${muni}のクマ出没情報警戒レベルマップKumaWatchクマウォッチ全国予報総目撃過去日年月最新件1234567890.-:kumawatchjp`;
-  const fontBold = await loadJaFont(text, 700);
-  const fontReg = await loadJaFont(text, 400);
-
-  const fonts = [];
-  if (fontBold) fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal" as const, weight: 700 as const });
-  if (fontReg) fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal" as const, weight: 400 as const });
+  const fontOptions = await jaFontOptions(text);
 
   return new ImageResponse(
     (
@@ -240,6 +235,6 @@ export default async function OGImage({ params }: Props) {
         </div>
       </div>
     ),
-    { ...size, fonts },
+    { ...size, ...fontOptions },
   );
 }

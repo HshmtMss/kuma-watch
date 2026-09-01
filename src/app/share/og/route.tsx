@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadJaFont } from "@/lib/og-font";
+import { jaFontOptions } from "@/lib/og-font";
 import { reversePlaceName } from "@/lib/reverse-place";
 
 export const runtime = "nodejs";
@@ -32,11 +32,7 @@ export async function GET(req: Request) {
   const label = labelRaw.slice(0, 24) || "この地点";
 
   const text = `${label}のクマ警戒レベルKumaWatchクマウォッチ全国マップkumawatchjp1234567890.-`;
-  const fontBold = await loadJaFont(text, 700);
-  const fontReg = await loadJaFont(text, 400);
-  const fonts: { name: string; data: ArrayBuffer; style: "normal"; weight: 400 | 700 }[] = [];
-  if (fontBold) fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal", weight: 700 });
-  if (fontReg) fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal", weight: 400 });
+  const fontOptions = await jaFontOptions(text);
 
   // 地点名サイズは文字数で段階調整。
   // 利用可能幅 ≈ 688px (左カラム780 - 左パディング72 - 右安全余白20)。
@@ -176,7 +172,7 @@ export async function GET(req: Request) {
     ),
     {
       ...SIZE,
-      fonts,
+      ...fontOptions,
       headers: {
         "Cache-Control": "public, max-age=3600, s-maxage=86400, immutable",
       },

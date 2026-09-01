@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadJaFont } from "@/lib/og-font";
+import { jaFontOptions } from "@/lib/og-font";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 
 // /spot/[slug] の OG 画像 (1200×630)。地点名入りのリッチカードにして SNS 共有時に
@@ -34,18 +34,7 @@ export default async function OgImage({ params }: Props) {
   const label = (landmark?.name ?? slug).slice(0, 24) || "この地点";
 
   const text = `${label}周辺のクマ出没情報KumaWatchクマウォッチkuma-watch.jp`;
-  const fontBold = await loadJaFont(text, 700);
-  const fontReg = await loadJaFont(text, 400);
-  const fonts: {
-    name: string;
-    data: ArrayBuffer;
-    style: "normal";
-    weight: 400 | 700;
-  }[] = [];
-  if (fontBold)
-    fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal", weight: 700 });
-  if (fontReg)
-    fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal", weight: 400 });
+  const fontOptions = await jaFontOptions(text);
 
   const labelFontSize =
     label.length <= 3 ? 150
@@ -166,6 +155,6 @@ export default async function OgImage({ params }: Props) {
         </div>
       </div>
     ),
-    { ...size, fonts },
+    { ...size, ...fontOptions },
   );
 }

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadJaFont } from "@/lib/og-font";
+import { jaFontOptions } from "@/lib/og-font";
 
 // アプリ全体の既定 OG 画像 (1200×630)。独自の opengraph-image / openGraph.images を
 // 持たないページ (ホーム・/spot・/articles 等) はこれが使われる。SNS 共有時に
@@ -22,18 +22,7 @@ function getBearDataUrl(): string {
 export default async function OgImage() {
   const text =
     "KumaWatchクマウォッチ全国クマ出没警戒レベルマップ地図でひと目でチェックkuma-watch.jp";
-  const fontBold = await loadJaFont(text, 700);
-  const fontReg = await loadJaFont(text, 400);
-  const fonts: {
-    name: string;
-    data: ArrayBuffer;
-    style: "normal";
-    weight: 400 | 700;
-  }[] = [];
-  if (fontBold)
-    fonts.push({ name: "NotoSansJP", data: fontBold, style: "normal", weight: 700 });
-  if (fontReg)
-    fonts.push({ name: "NotoSansJP", data: fontReg, style: "normal", weight: 400 });
+  const fontOptions = await jaFontOptions(text);
 
   return new ImageResponse(
     (
@@ -144,6 +133,6 @@ export default async function OgImage() {
         </div>
       </div>
     ),
-    { ...size, fonts },
+    { ...size, ...fontOptions },
   );
 }
