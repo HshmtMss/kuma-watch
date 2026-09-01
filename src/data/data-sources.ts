@@ -1390,6 +1390,116 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     notes: "県研究機関ベースでデータ精度高。ドングリ豊凶データも同機関から入手可",
     verifiedAt: "2026-04-20",
   },
+
+  // --- 兵庫県の市町村ページ (2026-09-02 追加) ---
+  //
+  // 兵庫県は県として個別の出没記録を公開していない (森林動物研究センターの
+  // 10km 集約マップと市町別の年次集計のみ)。県を叩いても件数は増えないが、
+  // 市町村は個別の目撃情報を出している。
+  //
+  // muni-official-links.ts の bearUrl 26 件を scripts/survey-muni-bear-pages.ts で
+  // 下見し、実際に個別記録が取れた 7 ページだけを登録した。残り 11 ページは
+  // 注意喚起のみで記録が無い。登録すると毎回無駄な LLM 呼び出しと健全性
+  // チェックのノイズになるので入れない。季節で載り始めるので survey を
+  // 再実行して拾い直す。
+  {
+    id: "hyogo-tatsuno",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 たつの市 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.tatsuno.lg.jp/soshiki/1020/gyomu/2/3801.html", role: "list", hint: "たつの市 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "たつの市",
+    notes: "市の目撃情報一覧。下見時 20 件 (最新 2025-10-26)",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-inagawa",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 猪名川町 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.town.inagawa.lg.jp/soshiki/1042/gyomu/14/1/1836.html", role: "list", hint: "猪名川町 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "猪名川町",
+    notes: "町の目撃情報一覧。下見時 6 件 (最新 2026-07-31)",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-takarazuka",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 宝塚市 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.takarazuka.hyogo.jp/kanko/1009480/1017049/1021453.html", role: "list", hint: "宝塚市 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "宝塚市",
+    notes: "市の目撃情報一覧。近隣市 (神戸市北区等) の事案も併記されるので cityName は本文優先。下見時 6 件",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-kawanishi",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 川西市 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.kawanishi.hyogo.jp/business/nouringyo/1004140/1004141.html", role: "list", hint: "川西市 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "川西市",
+    notes: "市の目撃・痕跡情報一覧。下見時 6 件 (最新 2025-09-28)",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-kobe",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 神戸市 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.kobe.lg.jp/a99375/tukinowaguma.html", role: "list", hint: "神戸市 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "神戸市",
+    notes: "市の一覧。9 区が同じページを共有するため市単位で 1 ソースにする (区ごとに登録すると 9 重取り込みになる)",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-miki",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 三木市 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.city.miki.lg.jp/soshiki/34/49226.html", role: "list", hint: "三木市 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "三木市",
+    notes: "市の目撃情報。下見時 1 件 (最新 2026-08-25)",
+    verifiedAt: "2026-09-02",
+  },
+  {
+    id: "hyogo-shinonsen",
+    kind: "municipal",
+    prefCode: "28",
+    regionLabel: "兵庫県 新温泉町 クマ出没情報",
+    bearStatus: "present",
+    urls: [
+      { url: "https://www.town.shinonsen.hyogo.jp/page/?mode=detail&page_id=44141a9a8a134f1d2dbeffd988d9bcac", role: "list", hint: "新温泉町 クマ出没情報" },
+    ],
+    extractor: "llm-html",
+    defaultCity: "新温泉町",
+    notes: "町の人身被害・目撃情報。下見時 1 件",
+    verifiedAt: "2026-09-02",
+  },
   {
     id: "nara",
     kind: "prefecture",

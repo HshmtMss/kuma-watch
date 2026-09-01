@@ -172,9 +172,37 @@ function usableSection(section: string): string {
 }
 
 /**
- * pref + city + section の 3 段階フォールバックでジオコード。
+ * 地区名の末尾に付く修飾語。「北区道場町の山林」「東畦野1丁目3-4付近」のように、
+ * LLM は地名に状況説明をくっつけて返すことがある (schema では禁じているが守られない)。
+ * この一語のせいで Nominatim が解決できず、市の代表点まで丸められる。
+ * 実例: 神戸市「北区道場町の山林」が市中心へ落ち、正しい位置から 19km ずれた。
+ *
+ * 「内」単独は入れない。「揖西町中垣内」のような実在の地名を削ってしまう。
+ */
+const SECTION_TAIL =
+  /(の(山林|山中|山|林|畑|田|河川敷|集落|一帯|方面)|付近|周辺|地内|地先|一帯|方面)$/;
+
+/**
+ * 修飾語を末尾から剥がした候補を、長い順に返す。
+ * 元の文字列と GENERIC_SECTION に落ちるものは含めない。
+ */
+function sectionFallbacks(section: string): string[] {
+  const out: string[] = [];
+  let cur = section;
+  for (let i = 0; i < 3; i++) {
+    const next = cur.replace(SECTION_TAIL, "").trim();
+    if (!next || next === cur) break;
+    cur = next;
+    if (!GENERIC_SECTION.test(cur) && !out.includes(cur)) out.push(cur);
+  }
+  return out;
+}
+
+/**
+ * pref + city + section の段階フォールバックでジオコード。
  * - 全部入りでヒットすれば precise=true
  * - section の最初の塊だけでヒットすれば precise=true
+ * - 末尾の修飾語 (「〜の山林」「〜付近」) を剥がしてヒットすれば precise=true
  * - 市町村まで丸めれば precise=false (要ジッター)
  *
  * どの段でも「主張する市区町村のポリゴン内か」を検証し、外れた候補は捨てて
@@ -227,6 +255,17 @@ export async function geocodePlace(
       const r2 = await geocodeQuery(q);
       if (r2 && accepts(r2.lat, r2.lon) && !isCityPoint(r2.lat, r2.lon))
         return { ...r2, precise: true };
+    }
+
+    // 末尾の修飾語を剥がして再挑戦する。ここで当たらないと市の代表点まで
+    // 丸められ、同じ事案が別ソースから来たときに何 km も離れた 2 本のピンになる。
+    for (const cand of sectionFallbacks(section)) {
+      if (cand === head) continue;
+      const q = [prefName, city, cand].filter(Boolean).join(" ").trim();
+      if (q === cityOnly) continue;
+      const r3 = await geocodeQuery(q);
+      if (r3 && accepts(r3.lat, r3.lon) && !isCityPoint(r3.lat, r3.lon))
+        return { ...r3, precise: true };
     }
   }
 
