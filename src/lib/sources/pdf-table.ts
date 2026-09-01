@@ -50,6 +50,20 @@ export function normalizePdfText(text: string): string {
  */
 export type DiscoveredPdf = { url: string; label: string; fiscalYear: number | null };
 
+/**
+ * リンク文言から年度を読む。「令和8年度」→ 2026 (年度の開始年)。
+ *
+ * ファイル名の数字 (kuma_r8_0824) は更新日であって年度とは限らないので
+ * 当てにしない。奈良県のように全角で「令和８年度」と書く県があるため
+ * 全角数字も受ける。
+ */
+function fiscalYearFromLabel(label: string): number | null {
+  const m = /令和\s*([0-9０-９]{1,2})\s*年度/.exec(label);
+  if (!m) return null;
+  const n = Number(m[1].normalize("NFKC"));
+  return Number.isFinite(n) ? 2018 + n : null;
+}
+
 export async function discoverPdfUrls(
   listUrl: string,
   keyword: string,
@@ -65,26 +79,24 @@ export async function discoverPdfUrls(
     });
     if (!res.ok) return [];
     const html = await res.text();
-    const out: DiscoveredPdf[] = [];
-    const seen = new Set<string>();
+    // 同じ PDF が複数の文言で貼られることがあるので、URL ごとに 1 件へ寄せる。
+    const byUrl = new Map<string, DiscoveredPdf>();
     const re = /href="([^"]*\.pdf)"[^>]*>([^<]{0,160})/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(html))) {
       const label = m[2];
       if (!label.includes(keyword)) continue;
       const url = new URL(m[1], listUrl).toString();
-      if (seen.has(url)) continue;
-      seen.add(url);
-      // 年度はリンク文言から読む。ファイル名の数字 (kuma_r8_0824) は更新日で
-      // あって年度とは限らないので当てにしない。
-      const fy = /令和(\d{1,2})年度/.exec(label);
-      out.push({
-        url,
-        label,
-        fiscalYear: fy ? 2018 + Number(fy[1]) : null,
-      });
+      const fiscalYear = fiscalYearFromLabel(label);
+      const prev = byUrl.get(url);
+      // 先勝ちにしない。神奈川県は最新年度の PDF を「ツキノワグマの目撃等情報を
+      // 更新しました（令和8年8月31日）」と「【令和8年度】目撃等情報（…）」の
+      // 2 箇所から同じファイルに貼っており、先に出る前者には年度が入っていない。
+      // 年度不明として落ちた結果、今年度分だけが取り込まれなかった (2026-09-01)。
+      if (prev && (prev.fiscalYear !== null || fiscalYear === null)) continue;
+      byUrl.set(url, { url, label, fiscalYear });
     }
-    return out;
+    return [...byUrl.values()];
   } catch {
     return [];
   }

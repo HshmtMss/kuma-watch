@@ -30,6 +30,18 @@ import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
 import { DATA_SOURCES } from "../src/data/data-sources";
 import type { UnifiedSighting } from "../src/lib/sources/types";
 
+function isIsoDate(d: string | undefined): d is string {
+  return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+}
+
+/** from → to の日数。どちらも YYYY-MM-DD 前提。 */
+function daysBetweenIso(from: string, to: string): number {
+  const a = Date.parse(`${from}T00:00:00Z`);
+  const b = Date.parse(`${to}T00:00:00Z`);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return 0;
+  return Math.round((b - a) / 86_400_000);
+}
+
 const MUNI_BY_CODE = new Map(JAPAN_MUNICIPALITIES.map((m) => [m.cityCode, m]));
 
 // 全体再集約 (aggregateAllSightings) が生成する公式ソースの種別。これらは
@@ -99,15 +111,21 @@ async function main(): Promise<void> {
   const MIN_TO_GUARD = 50;
   const definedSourceIds = new Set(DATA_SOURCES.map((s) => s.id));
   const prevBySource = new Map<string, number>();
+  const prevLatest = new Map<string, string>();
   for (const r of prevRecords) {
     if (r.sourceKind === "news") continue; // news は carried 側なので対象外
     const k = r.source ?? "";
-    if (k) prevBySource.set(k, (prevBySource.get(k) ?? 0) + 1);
+    if (!k) continue;
+    prevBySource.set(k, (prevBySource.get(k) ?? 0) + 1);
+    if (isIsoDate(r.date) && r.date > (prevLatest.get(k) ?? "")) prevLatest.set(k, r.date);
   }
   const freshBySource = new Map<string, number>();
+  const freshLatest = new Map<string, string>();
   for (const r of fresh) {
     const k = r.source ?? "";
-    if (k) freshBySource.set(k, (freshBySource.get(k) ?? 0) + 1);
+    if (!k) continue;
+    freshBySource.set(k, (freshBySource.get(k) ?? 0) + 1);
+    if (isIsoDate(r.date) && r.date > (freshLatest.get(k) ?? "")) freshLatest.set(k, r.date);
   }
   const vanished: string[] = [];
   const retired: string[] = [];
@@ -130,6 +148,37 @@ async function main(): Promise<void> {
       `[build-sightings] ソースが丸ごと消えています: ${vanished.join(", ")}\n` +
         `  取得側の障害の可能性が高いのでスナップショットを上書きしません。\n` +
         `  公開先が本当に無くなったのなら data-sources.ts / source-gaps.ts を更新してください。`,
+    );
+    process.exit(1);
+  }
+
+  // 最新の出没日が後退していないか。
+  //
+  // 上の 0 件チェックは「ソースが丸ごと消えた」しか拾えない。複数の PDF を
+  // 束ねるソースは、今年度分の 1 本だけが 404 になっても過去年度分は取れるので
+  // 素通りしてしまう。2026-09-01 に神奈川 (373→342 件) と奈良 (209→147 件) が
+  // これで最新日ごと 5 ヶ月前へ巻き戻り、直近の出没が地図から消えた。
+  // 件数の目減りは神奈川で 8% しかなく、割合で見張っても拾えない。
+  // 一方「最新の出没日が月単位で戻る」のは取得漏れ以外にまず起きないので、
+  // そこを見る。
+  const MAX_DATE_REGRESSION_DAYS = 30;
+  const regressed: string[] = [];
+  for (const [src, n] of prevBySource) {
+    if (n < MIN_TO_GUARD) continue;
+    if (!definedSourceIds.has(src)) continue; // 定義ごと消えた ID は引退扱い
+    const before = prevLatest.get(src);
+    const after = freshLatest.get(src);
+    if (!before || !after) continue;
+    const back = daysBetweenIso(after, before);
+    if (back > MAX_DATE_REGRESSION_DAYS) {
+      regressed.push(`${src}(最新 ${before} → ${after} / ${back} 日後退)`);
+    }
+  }
+  if (regressed.length > 0) {
+    console.error(
+      `[build-sightings] 最新の出没日が後退しています: ${regressed.join(", ")}\n` +
+        `  一部の PDF/ページだけ取れなかった可能性が高いのでスナップショットを上書きしません。\n` +
+        `  公開先のファイル名が変わっていないか data-sources.ts を確認してください。`,
     );
     process.exit(1);
   }

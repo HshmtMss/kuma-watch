@@ -642,12 +642,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       // 注意: 県は更新のたびにファイル名の日付を変える (kuma_r8_0824.pdf)。
       // シーズン中は月1回 list ページで確認して差し替えること。
-      { url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r8_0824.pdf", role: "pdf", hint: "令和8年度 目撃等情報 (R8.8.24 時点)" },
+      { url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r8_0831.pdf", role: "pdf", hint: "令和8年度 目撃等情報 (R8.8.31 時点)" },
       { url: "https://www.pref.kanagawa.jp/docs/t4i/cnt/f3813/index.html", role: "list", hint: "神奈川県ツキノワグマ情報" },
     ],
     extractor: "kanagawa-pdf-table",
     notes: "丹沢・道志山系に少数個体群。第二種特定鳥獣管理計画の対象",
-    verifiedAt: "2026-04-26",
+    verifiedAt: "2026-09-01",
   },
   {
     id: "niigata",
@@ -1425,12 +1425,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.nara.lg.jp/n118/p043003.html", role: "list", hint: "県 ツキノワグマ出没情報" },
-      { url: "https://www.pref.nara.lg.jp/documents/22870/20260813160322.pdf", role: "pdf", hint: "令和8年度 目撃情報一覧 (R8.8.13 現在・77件)" },
+      { url: "https://www.pref.nara.lg.jp/documents/22870/20260901133554.pdf", role: "pdf", hint: "令和8年度 目撃情報一覧 (R8.9.1 現在)" },
       { url: "https://www.pref.nara.lg.jp/documents/22870/20260710180023.pdf", role: "pdf", hint: "令和7年度 目撃情報一覧 (155件)" },
     ],
     extractor: "nara-pdf-table",
     notes: "表形式 (No / 日時 / 市町村 / 大字)。日付は和暦。「大台ヶ原」は市町村ではなく県も別枠集計なので取り込めない",
-    verifiedAt: "2026-08-23",
+    verifiedAt: "2026-09-01",
   },
   {
     id: "wakayama",
