@@ -157,6 +157,42 @@ export default function ForVendorsPage() {
         でご覧いただけます。
       </p>
 
+      {/* 掲載枠が実際に動いている証拠。読者が「見て終わり」ではなく購入まで
+          進んでいることを、実測値で示す。 */}
+      <div className="not-prose my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+        <p className="m-0 text-sm font-semibold text-stone-900">
+          このカードは、読者の購入まで届いています
+        </p>
+        <div className="mt-3 flex flex-wrap gap-x-8 gap-y-3">
+          <div>
+            <div className="text-lg font-black leading-none text-stone-900">
+              1,126
+              <span className="ml-1 text-[11px] font-semibold text-stone-500">
+                クリック/月
+              </span>
+            </div>
+            <div className="mt-1.5 text-[11px] text-stone-600">
+              製品カードから販売ページへ
+            </div>
+          </div>
+          <div>
+            <div className="text-lg font-black leading-none text-stone-900">
+              4.4
+              <span className="ml-1 text-[11px] font-semibold text-stone-500">
+                %
+              </span>
+            </div>
+            <div className="mt-1.5 text-[11px] text-stone-600">
+              クリックのうち購入に至った割合
+            </div>
+          </div>
+        </div>
+        <p className="m-0 mt-3 text-[11px] leading-relaxed text-stone-500">
+          直近30日の実測値（Amazon 経由で計測できた分）。一般的な EC の購入率は
+          1〜2% 程度とされる中で、目的を持って調べている読者が多いことの表れです。
+        </p>
+      </div>
+
       {/* 料金の考え方 */}
       <h2 id="pricing">料金の考え方</h2>
       <p>
