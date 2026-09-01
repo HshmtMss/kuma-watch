@@ -68,3 +68,16 @@ data/discovery-queries.txt
 
 # 全文検索インデックス (prebuild で生成、コミット不要)
 public/search-index.json
+
+# 自治体連絡先リスト (営業用). 個々は公開情報だが、集約リストをパブリックリポジトリに
+# 置くのは再公開にあたるためコミットしない。scripts/build-muni-contacts.ts で再生成する。
+data/muni-contacts.csv
+data/muni-contacts.xlsx
+data/muni-contacts.json
+data/muni-contacts-cache.json
+data/muni-contacts-stage2.json
+data/pref-contacts.csv
+data/pref-contacts.json
+data/pref-contacts-cache.json
+# 手作業で補った連絡先。再生成できないので消さないこと (バックアップは各自で)
+data/muni-contacts-manual.json

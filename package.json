@@ -27,7 +27,10 @@
     "search:products": "tsx --env-file-if-exists=.env.local scripts/search-products.ts",
     "x:daily": "tsx --env-file-if-exists=.env.local scripts/post-x-daily.ts",
     "x:alert": "tsx --env-file-if-exists=.env.local scripts/post-x-alert.ts",
-    "build:shards": "tsx scripts/build-shards.ts"
+    "build:shards": "tsx scripts/build-shards.ts",
+    "build:muni-contacts": "tsx --env-file-if-exists=.env.local scripts/build-muni-contacts.ts",
+    "build:pref-contacts": "tsx --env-file-if-exists=.env.local scripts/build-pref-contacts.ts",
+    "build:contacts-xlsx": "python3 scripts/export-muni-contacts-xlsx.py"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.73",
