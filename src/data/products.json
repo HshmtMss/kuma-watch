@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T22:24:09.882Z",
+  "generatedAt": "2026-09-01T22:49:29.352Z",
   "total": 133,
   "visibleTotal": 118,
   "products": [
@@ -21,7 +21,9 @@
       "notes": "モンベル取扱で認知高",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%9E%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%99%E3%82%A2%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20234mL&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-002",
@@ -41,7 +43,9 @@
       "notes": "北海道向け推奨／URL修正済",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%9E%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%99%E3%82%A2%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20272mL&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-003",
@@ -61,7 +65,9 @@
       "notes": "日本の研究者・自治体採用率トップ",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E6%92%83%E9%80%80%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E3%82%A2%E3%82%BD%E3%83%BC%E3%83%AB%E3%83%88%20CA230&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-004",
@@ -81,7 +87,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Counter%20Assault%20CA290%20Stronger&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-005",
@@ -101,7 +109,9 @@
       "notes": "コスパに優れる",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=UDAP%2012HP%20Griz%20Guard%20Pepper%20Power&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-006",
@@ -121,7 +131,9 @@
       "notes": "国産唯一の本格スプレー／情報修正済",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E4%B8%80%E7%9B%AE%E6%95%A3&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-007",
@@ -141,7 +153,9 @@
       "notes": "記事内で注意喚起すべき",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=POLICE%20MAGNUM%20B-609%20B-610&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-008",
@@ -161,7 +175,9 @@
       "notes": "研修・教育コンテンツに最適／URL修正済",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20234mL&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-009",
@@ -181,7 +197,9 @@
       "notes": "スプレーとセット販売推奨",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%99%E3%83%AB%E3%83%88%E3%83%9B%E3%83%AB%E3%82%B9%E3%82%BF%E3%83%BC&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-010",
@@ -201,7 +219,9 @@
       "notes": "消音機能つきの定番",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-011",
@@ -221,7 +241,9 @@
       "notes": "大音量モデル",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-012",
@@ -241,7 +263,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Bear%20Bell&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-013",
@@ -261,7 +285,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Magic%20Bear%20Bell&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-014",
@@ -281,7 +307,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%A3%AE%E3%81%AE%E9%88%B4%20BEAR%20BELL%20%E3%82%AB%E3%83%90%E3%83%BC%E4%BB%98%20TBKC1&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-015",
@@ -301,7 +329,9 @@
       "notes": "軽量・遭難対策兼用",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%BF%E3%83%8B%E3%82%A6%E3%83%A0%E3%82%A8%E3%83%9E%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%82%B7%E3%83%BC%E3%83%9B%E3%82%A4%E3%83%83%E3%82%B9%E3%83%AB&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-016",
@@ -321,7 +351,9 @@
       "notes": "エントリーモデル",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-017",
@@ -341,7 +373,9 @@
       "notes": "スプレー+ホーンのセット推奨",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%99%E3%82%A2%E3%83%9B%E3%83%BC%E3%83%B3%20130dB&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-018",
@@ -361,7 +395,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E3%82%88%E3%81%91%E3%83%9B%E3%83%BC%E3%83%B3%20110dB%20%E5%85%85%E9%9B%BB%E5%BC%8F&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-019",
@@ -381,7 +417,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%82%AC%E3%83%BC%E3%83%89%E3%83%A9%E3%82%A4%E3%83%88%20H-D32&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-020",
@@ -401,7 +439,9 @@
       "notes": "国産で実績データあり",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-021",
@@ -421,7 +461,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A6%E3%83%AB%E3%83%95%E3%83%94%E3%83%BC&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-022",
@@ -441,7 +483,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%9C%A8%E9%85%A2%E6%B6%B2&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-023",
@@ -461,7 +505,9 @@
       "notes": "長期持続型シートとして手軽",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%92%83%E9%80%80%E3%82%AF%E3%83%9E&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-024",
@@ -481,7 +527,9 @@
       "notes": "銃刀法非該当の数少ない熊対策武器。新規カテゴリ",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-001",
@@ -501,7 +549,9 @@
       "notes": "自治体提携の第一候補",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-002",
@@ -521,7 +571,9 @@
       "notes": "NTT系で信頼性高",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-003",
@@ -541,7 +593,9 @@
       "notes": "URL正規化済",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-004",
@@ -561,7 +615,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-005",
@@ -581,7 +637,9 @@
       "notes": "中小自治体向けエントリー",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-006",
@@ -601,7 +659,9 @@
       "notes": "API連携可で技術的に親和性高",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-007",
@@ -621,7 +681,9 @@
       "notes": "既存カメラ流用可",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-008",
@@ -641,7 +703,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-009",
@@ -661,7 +725,9 @@
       "notes": "FASTBEARとセット運用前提",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-012",
@@ -681,7 +747,9 @@
       "notes": "国内メーカー",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=MCS-H881%20%E3%83%88%E3%83%AC%E3%82%A4%E3%83%AB%E3%82%AB%E3%83%A1%E3%83%A9&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-013",
@@ -701,7 +769,9 @@
       "notes": "4G通信モデル",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-014",
@@ -721,7 +791,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-015",
@@ -741,7 +813,9 @@
       "notes": "定番モデル",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Bushnell%20%E3%83%88%E3%83%AD%E3%83%95%E3%82%A3%E3%83%BC%E3%82%AB%E3%83%A0%20XLT%2032MP%20NoGlow&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-016",
@@ -761,7 +835,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Ltl%20Acorn%206210MC&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-017",
@@ -781,7 +857,9 @@
       "notes": "国産代表撃退装置、メーカー提携候補",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-018",
@@ -801,7 +879,9 @@
       "notes": "個人ユーザー向け連携優先度高",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-019",
@@ -821,7 +901,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-020",
@@ -841,7 +923,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-021",
@@ -861,7 +945,9 @@
       "notes": "NTT系の最先端技術。クマ対応は今後",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-022",
@@ -881,7 +967,9 @@
       "notes": "東北発スタートアップ。秋田に強み",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-001",
@@ -901,7 +989,9 @@
       "notes": "クマ専用設計の決定版",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-002",
@@ -921,7 +1011,9 @@
       "notes": "電気柵記事から直接リンク可",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-003",
@@ -941,7 +1033,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-004",
@@ -961,7 +1055,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-005",
@@ -981,7 +1077,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%82%AC%E3%83%BC%E3%83%89&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-006",
@@ -1001,7 +1099,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-007",
@@ -1021,7 +1121,9 @@
       "notes": "北海道向けで権威性高",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-008",
@@ -1041,7 +1143,9 @@
       "notes": "電気柵と併用推奨",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%83%95%E3%82%A7%E3%83%B3%E3%82%B9%20%E3%83%AF%E3%82%A4%E3%83%A4%E3%83%BC%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-009",
@@ -1061,7 +1165,9 @@
       "notes": "フードコンテナ記事から直接リンク",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=BearVault%20BV500%20Journey&tag=kumawatch-22",
-      "scene": "trail,camp"
+      "scene": "trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-010",
@@ -1081,7 +1187,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=BearVault%20BV450%20Jaunt&tag=kumawatch-22",
-      "scene": "trail,camp"
+      "scene": "trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-011",
@@ -1101,7 +1209,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Counter%20Assault%20Bear%20Keg&tag=kumawatch-22",
-      "scene": "trail,camp"
+      "scene": "trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-012",
@@ -1121,7 +1231,9 @@
       "notes": "軽量装備向け",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Ursack%20Major&tag=kumawatch-22",
-      "scene": "trail,camp"
+      "scene": "trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-013",
@@ -1141,7 +1253,9 @@
       "notes": "匂い管理の基本装備",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=OPSAK%20%E9%98%B2%E8%87%AD%E8%A2%8B&tag=kumawatch-22",
-      "scene": "trail,camp"
+      "scene": "trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-014",
@@ -1161,7 +1275,9 @@
       "notes": "自治体パートナーシップの会話起点",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "home-001",
@@ -1181,7 +1297,9 @@
       "notes": "住宅周辺の基本装備",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%E7%94%A8%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%88%20LED-AC315&tag=kumawatch-22",
-      "scene": "home"
+      "scene": "home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "home-002",
@@ -1201,7 +1319,9 @@
       "notes": "電池式で設置容易",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%81%A9%E3%81%93%E3%81%A7%E3%82%82%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%88%20ASL-090&tag=kumawatch-22",
-      "scene": "home"
+      "scene": "home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "home-003",
@@ -1221,7 +1341,9 @@
       "notes": "誘引物管理の必需品",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%E7%94%A8%E5%AF%86%E9%96%89%E3%82%B9%E3%83%88%E3%83%83%E3%82%AB%E3%83%BC&tag=kumawatch-22",
-      "scene": "home"
+      "scene": "home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "home-004",
@@ -1241,7 +1363,9 @@
       "notes": "地域コミュニティ向け",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%94%9F%E3%82%B4%E3%83%9F%E4%BF%9D%E7%AE%A1%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%20%E3%82%B4%E3%83%9F%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3&tag=kumawatch-22",
-      "scene": "home"
+      "scene": "home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-001",
@@ -1261,7 +1385,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-002",
@@ -1281,7 +1407,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-003",
@@ -1301,7 +1429,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-004",
@@ -1321,7 +1451,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-005",
@@ -1341,7 +1473,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-006",
@@ -1361,7 +1495,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-007",
@@ -1381,7 +1517,9 @@
       "notes": "法的論点として記事に反映済み",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-008",
@@ -1401,7 +1539,9 @@
       "notes": "2025年9月制度改正反映",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-009",
@@ -1421,7 +1561,9 @@
       "notes": "",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-010",
@@ -1441,7 +1583,9 @@
       "notes": "自治体導入後押し材料",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-001",
@@ -1461,7 +1605,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Protos%C2%AE%20Integral%20Forest&tag=kumawatch-22",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-002",
@@ -1481,7 +1627,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88%E3%83%98%E3%83%AB%E3%83%A1%E3%83%83%E3%83%88%20%E3%83%95%E3%82%A1%E3%83%B3%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%20576412401&tag=kumawatch-22",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-003",
@@ -1501,7 +1649,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3%E3%82%BD%E3%83%BC%E4%BF%9D%E8%AD%B7%E6%89%8B%E8%A2%8B%20MT-C&tag=kumawatch-22",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-004",
@@ -1521,7 +1671,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-005",
@@ -1541,7 +1693,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3%E3%82%BD%E3%83%BC%E3%83%97%E3%83%AD%E3%83%86%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%91%E3%83%B3%E3%83%84&tag=kumawatch-22",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-006",
@@ -1561,7 +1715,9 @@
       "notes": "単独行のリスク管理",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Garmin%20inReach%20Mini%202%20Messenger&tag=kumawatch-22",
-      "scene": "trail,nora"
+      "scene": "trail,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-007",
@@ -1581,7 +1737,9 @@
       "notes": "",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%9E%E8%A2%AB%E5%AE%B3%E7%94%A8%E6%95%91%E6%80%A5%E3%82%BB%E3%83%83%E3%83%88&tag=kumawatch-22",
-      "scene": "trail,nora"
+      "scene": "trail,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-001",
@@ -1601,7 +1759,9 @@
       "notes": "北海道の権威。コンテンツ協業候補",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-002",
@@ -1621,7 +1781,9 @@
       "notes": "研究監修・専門家紹介の経路",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-003",
@@ -1641,7 +1803,9 @@
       "notes": "駆除議論記事で言及候補",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-004",
@@ -1661,7 +1825,9 @@
       "notes": "",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-005",
@@ -1681,7 +1847,9 @@
       "notes": "一次データソース",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-006",
@@ -1701,7 +1869,9 @@
       "notes": "自治体向け事業の競合・パートナー候補",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-007",
@@ -1721,7 +1891,9 @@
       "notes": "監修・取材依頼候補",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-008",
@@ -1741,7 +1913,9 @@
       "notes": "北海道のヒグマ研究で連携候補",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-009",
@@ -1761,7 +1935,9 @@
       "notes": "テック寄り監修・データ協業候補",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-010",
@@ -1781,7 +1957,9 @@
       "notes": "統計データソース",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "info-011",
@@ -1801,7 +1979,9 @@
       "notes": "事件解説記事の参考文献",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-023",
@@ -1821,7 +2001,9 @@
       "notes": "2026/4提供開始・100自治体導入目標。出典:NTT公式プレス2026-03-24",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-025",
@@ -1841,7 +2023,9 @@
       "notes": "害獣対策用品カテゴリにクマ撃退スプレー(国産/UDAP/カウンターアソールト)も展開。出典:ostrich.co.jp",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-024",
@@ -1861,7 +2045,9 @@
       "notes": "防犯カメラメーカーが動物検知AIを2026/1新発売。出典:atsumi.co.jp",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-026",
@@ -1881,7 +2067,9 @@
       "notes": "官公庁向け装備資機材メーカーの国産熊スプレー。出典:jwin.co.jp/kuma",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-027",
@@ -1901,7 +2089,9 @@
       "notes": "福井県鯖江市。楽天等で自治体・官公庁採用品の表記。出典:plus.fujikon-hd.com",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-011",
@@ -1921,7 +2111,9 @@
       "notes": "クマ捕獲にも使う箱罠の遠隔監視。島根県大田市と鳥獣被害対策DX協定。出典:ntt-tc.co.jp",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-028",
@@ -1941,7 +2133,9 @@
       "notes": "創業50年の防災用品メーカー。出典:facil.jp/bearguard",
       "audience": "個人",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "capture-012",
@@ -1961,7 +2155,9 @@
       "notes": "業務用生ごみ処理機を鳥獣個体処理に応用。出典:sinkpia-j.co.jp",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": ""
+      "scene": "",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-025",
@@ -1981,7 +2177,9 @@
       "notes": "建設コンサル。国営公園の管理実績でクマ画像を学習。出典:suncoh.co.jp(日刊工業新聞)",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-026",
@@ -2001,7 +2199,9 @@
       "notes": "山形県の地域販社が開発。出典:山形新聞2026-03-14/河北新報2026-04-11",
       "audience": "自治体",
       "affiliateUrl": "",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-029",
@@ -2021,7 +2221,9 @@
       "notes": "高崎市の警備会社(特殊装備部)。クマ・防犯両用。出典:地域×Tech東北 出展ページ",
       "audience": "個人,自治体",
       "affiliateUrl": "",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-030",
@@ -2041,7 +2243,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%81%BD%E3%83%A9%E3%82%B8%E3%82%AA%20%E6%89%8B%E5%9B%9E%E3%81%97%20%E5%85%85%E9%9B%BB%20SONY%20%E6%90%BA%E5%B8%AF&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-031",
@@ -2061,7 +2265,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E9%88%B4%20%E3%82%B9%E3%83%86%E3%83%83%E3%82%AD%20%E6%9D%96%20%E3%83%88%E3%83%AC%E3%83%83%E3%82%AD%E3%83%B3%E3%82%B0%E3%83%9D%E3%83%BC%E3%83%AB%20%E5%B1%B1%E8%8F%9C%E6%8E%A1%E3%82%8A&tag=kumawatch-22",
-      "scene": "nora,trail,camp"
+      "scene": "nora,trail,camp",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-008",
@@ -2081,7 +2287,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%98%E3%83%83%E3%83%89%E3%83%A9%E3%82%A4%E3%83%88%20GENTOS%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E7%99%BB%E5%B1%B1&tag=kumawatch-22",
-      "scene": "trail,nora"
+      "scene": "trail,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-032",
@@ -2101,7 +2309,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%8A%AF%E3%83%96%E3%82%B6%E3%83%BC%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E6%90%BA%E5%B8%AF%20%E3%82%AD%E3%83%BC%E3%83%9B%E3%83%AB%E3%83%80%E3%83%BC&tag=kumawatch-22",
-      "scene": "nora,trail"
+      "scene": "nora,trail",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-033",
@@ -2121,7 +2331,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E3%82%BD%E3%83%BC%E3%83%A9%E3%83%BC%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%20%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%85%89&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-009",
@@ -2141,7 +2353,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=LED%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%B3%20GENTOS%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
-      "scene": "camp,home"
+      "scene": "camp,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-010",
@@ -2161,7 +2375,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%AE%89%E5%85%A8%E3%83%99%E3%82%B9%E3%83%88%20%E5%8F%8D%E5%B0%84%20%E9%AB%98%E8%A6%96%E8%AA%8D%20%E4%BD%9C%E6%A5%AD%20%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5&tag=kumawatch-22",
-      "scene": "nora"
+      "scene": "nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-034",
@@ -2181,7 +2397,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%87%90%E4%B8%AD%E9%9B%BB%E7%81%AF%20GENTOS%20%E5%BC%B7%E5%8A%9B%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4&tag=kumawatch-22",
-      "scene": "nora,trail"
+      "scene": "nora,trail",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "gear-011",
@@ -2201,7 +2419,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%A2%E3%83%90%E3%82%A4%E3%83%AB%E3%83%90%E3%83%83%E3%83%86%E3%83%AA%E3%83%BC%20Anker%20%E5%A4%A7%E5%AE%B9%E9%87%8F%20%E9%98%B2%E7%81%BD&tag=kumawatch-22",
-      "scene": "trail,nora"
+      "scene": "trail,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "home-005",
@@ -2221,7 +2441,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%94%9F%E3%82%B4%E3%83%9F%E5%87%A6%E7%90%86%E6%A9%9F%20%E5%B1%8B%E5%A4%96%20%E5%AF%86%E9%96%89%20%E3%82%B3%E3%83%B3%E3%83%9D%E3%82%B9%E3%83%88%20%E9%98%B2%E8%87%AD&tag=kumawatch-22",
-      "scene": "home"
+      "scene": "home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-015",
@@ -2241,7 +2463,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%BC%E3%83%A9%E3%83%BC%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%20%E5%AF%86%E9%96%89%20%E4%BF%9D%E5%86%B7%20%E9%98%B2%E8%87%AD%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
-      "scene": "camp,trail"
+      "scene": "camp,trail",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-035",
@@ -2261,7 +2485,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%9E%E5%87%BA%E6%B2%A1%E6%B3%A8%E6%84%8F%20%E7%9C%8B%E6%9D%BF%20%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88%20%E3%81%AE%E3%81%BC%E3%82%8A&tag=kumawatch-22",
-      "scene": "nora,trail,home"
+      "scene": "nora,trail,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-036",
@@ -2281,7 +2507,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E6%90%BA%E5%B8%AF%20%E3%83%8F%E3%83%B3%E3%83%87%E3%82%A3&tag=kumawatch-22",
-      "scene": "nora,home"
+      "scene": "nora,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "repel-037",
@@ -2301,7 +2529,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%9B%BB%E5%AD%90%E3%83%9B%E3%83%BC%E3%83%B3%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E7%86%8A%E3%82%88%E3%81%91&tag=kumawatch-22",
-      "scene": "trail,nora"
+      "scene": "trail,nora",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "fence-016",
@@ -2321,7 +2551,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%99%E3%82%A2%E3%83%90%E3%83%83%E3%82%B0%20%E9%A3%9F%E6%96%99%20%E5%90%8A%E3%82%8A%E4%B8%8B%E3%81%92%20%E3%83%AD%E3%83%BC%E3%83%97%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
-      "scene": "camp,trail"
+      "scene": "camp,trail",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-027",
@@ -2341,7 +2573,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%82%A2%E3%83%A9%E3%83%BC%E3%83%A0%20%E4%BE%B5%E5%85%A5%E8%AD%A6%E5%A0%B1%20%E4%BA%BA%E6%84%9F&tag=kumawatch-22",
-      "scene": "camp,home"
+      "scene": "camp,home",
+      "imageUrl": "",
+      "featured": false
     },
     {
       "id": "monitor-028",
@@ -2361,7 +2595,9 @@
       "notes": "型レベル掲載(Amazon検索)",
       "audience": "個人,自治体",
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%20%E9%98%B2%E7%8A%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Wi-Fi%20Tapo%20%E4%BA%BA%E6%84%9F&tag=kumawatch-22",
-      "scene": "home,nora"
+      "scene": "home,nora",
+      "imageUrl": "",
+      "featured": false
     }
   ]
 }

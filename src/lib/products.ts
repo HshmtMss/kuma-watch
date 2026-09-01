@@ -24,6 +24,12 @@ export type Product = {
   affiliateUrl: string;
   /** カンマ区切りのシーンキー (nora/trail/camp/home)。空はシーン非該当(情報・捕獲等)。 */
   scene: string;
+  /** 製品写真。public/products/ 配下のパス (例 /products/foo.jpg)。
+   *  注目掲載(featured)でのみ使う。通常掲載は従来どおり文字だけ。 */
+  imageUrl: string;
+  /** 注目掲載(有料枠)。カテゴリ先頭に写真つきの大きいカードで固定表示する。
+   *  通常掲載との差はここだけで、掲載の可否・順序以外の編集方針は変えない。 */
+  featured: boolean;
 };
 
 // 利用シーン軸。カテゴリ(撃退忌避…)とは別に「どの場面で使うか」で横断的に絞る。

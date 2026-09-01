@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import ProductCard from "@/components/ProductCard";
+import FeaturedProductCard from "@/components/FeaturedProductCard";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
 import {
   CATEGORY_DESC,
@@ -233,6 +234,16 @@ export default async function ProductsPage({
               {CATEGORY_DESC[group.category]}
             </p>
           )}
+          {/* 注目掲載(有料枠)はカテゴリ先頭に固定。サブカテゴリの並びには混ぜない。 */}
+          {group.subcategories
+            .flatMap((sub) => sub.products)
+            .filter((p) => p.featured)
+            .map((p) => (
+              <div key={`featured-${p.id}`} className="mt-4">
+                <FeaturedProductCard product={p} />
+              </div>
+            ))}
+
           {group.subcategories.map((sub) => (
             <div key={sub.subcategory} className="mt-4">
               {sub.subcategory && (
@@ -241,11 +252,13 @@ export default async function ProductsPage({
                 </h3>
               )}
               <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {sub.products.map((p) => (
-                  <li key={p.id} className="h-full">
-                    <ProductCard product={p} />
-                  </li>
-                ))}
+                {sub.products
+                  .filter((p) => !p.featured)
+                  .map((p) => (
+                    <li key={p.id} className="h-full">
+                      <ProductCard product={p} />
+                    </li>
+                  ))}
               </ul>
             </div>
           ))}

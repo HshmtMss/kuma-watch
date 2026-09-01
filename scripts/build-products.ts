@@ -56,6 +56,8 @@ type Product = {
   affiliateUrl: string;
   /** カンマ区切りのシーンキー (nora=農作業・山菜採り / trail=登山 / camp=キャンプ / home=暮らし)。 */
   scene: string;
+  imageUrl: string;
+  featured: boolean;
 };
 
 function clean(v: string | undefined): string {
@@ -99,6 +101,17 @@ for (let i = 0; i < parsed.data.length; i++) {
     issues.push(`row ${rowNum}: 未知の audience "${audience}" (${name})`);
   }
 
+  // 注目掲載(有料枠)。"1" / "true" / "yes" を真とする。写真ありきの枠なので
+  // 画像が無いまま featured を立てるのはミスとして落とす。
+  const featuredRaw = clean(row.featured).toLowerCase();
+  const featured = ["1", "true", "yes"].includes(featuredRaw);
+  if (featuredRaw && !featured && featuredRaw !== "0" && featuredRaw !== "false") {
+    issues.push(`row ${rowNum}: featured の値が不正 "${featuredRaw}" (${name})`);
+  }
+  if (featured && !clean(row.image_url)) {
+    issues.push(`row ${rowNum}: featured には image_url が必須 (${name})`);
+  }
+
   let id = clean(row.id);
   if (!id) {
     const prefix = CATEGORY_PREFIX[category] ?? "misc";
@@ -137,6 +150,8 @@ for (let i = 0; i < parsed.data.length; i++) {
     audience,
     affiliateUrl: clean(row.affiliate_url),
     scene: clean(row.scene),
+    imageUrl: clean(row.image_url),
+    featured,
   });
 }
 

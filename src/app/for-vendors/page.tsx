@@ -3,6 +3,7 @@ import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 import ProductCard from "@/components/ProductCard";
+import FeaturedProductCard from "@/components/FeaturedProductCard";
 import type { Product } from "@/lib/products";
 
 const SITE_URL = "https://kuma-watch.jp";
@@ -49,7 +50,7 @@ const AUDIENCE_STATS: { value: string; unit: string; label: string }[] = [
  * 出稿しているように読めてしまうため、架空の製品で見た目だけを見せる。
  * 実際の一覧は /products へのリンクで確認してもらう。
  */
-const SAMPLE_PRODUCT: Product = {
+const SAMPLE_BASE: Product = {
   id: "sample",
   category: "撃退・忌避",
   subcategory: "スプレー",
@@ -68,6 +69,16 @@ const SAMPLE_PRODUCT: Product = {
   audience: "個人",
   affiliateUrl: "https://kuma-watch.jp/products",
   scene: "trail",
+  imageUrl: "",
+  featured: false,
+};
+
+/** 注目掲載(有料枠)のサンプル。写真枠は空にしてプレースホルダを出す。 */
+const SAMPLE_FEATURED: Product = {
+  ...SAMPLE_BASE,
+  id: "sample-featured",
+  features: "有効射程8m・軽量200g・ホルスター付属。実売価格と入手先も併記します。",
+  featured: true,
 };
 
 // 対象カテゴリ。説明はチップ表示時に hover で出すかページ下部に短くまとめる程度。
@@ -145,11 +156,34 @@ export default function ForVendorsPage() {
       {/* 掲載イメージ。言葉だけだと「どう見えるか」が伝わらないので実物を出す。 */}
       <h2 id="example">掲載されるとこう見えます</h2>
       <p>
-        製品ページの一覧に、写真・特長・価格帯・注意書きを添えたカードで並びます。
-        購入導線のあるものは PR 表記付きのボタンになります。
+        掲載は 2 通りあります。<strong>注目掲載</strong>は製品写真が入り、
+        カテゴリの先頭に固定されます。
       </p>
-      <div className="not-prose my-4 max-w-md">
-        <ProductCard product={SAMPLE_PRODUCT} />
+      <div className="not-prose my-4 space-y-5">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="rounded-sm bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">
+              注目掲載
+            </span>
+            <span className="text-xs text-stone-500">
+              写真つき・幅広・カテゴリ先頭に固定
+            </span>
+          </div>
+          <FeaturedProductCard product={SAMPLE_FEATURED} />
+        </div>
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="rounded-sm bg-stone-100 px-2 py-0.5 text-[11px] font-bold text-stone-600">
+              通常掲載
+            </span>
+            <span className="text-xs text-stone-500">
+              文字のみ・カテゴリ内の通常順
+            </span>
+          </div>
+          <div className="max-w-md">
+            <ProductCard product={SAMPLE_BASE} />
+          </div>
+        </div>
       </div>
       <p className="text-sm text-stone-600">
         上はサンプルです。実際に並んでいる 100 点あまりは{" "}
