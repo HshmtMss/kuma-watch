@@ -110,6 +110,18 @@ async function main(): Promise<void> {
   // ここで永久に止まる (2026-08-28〜30 に実際に発生)。
   const MIN_TO_GUARD = 50;
   const definedSourceIds = new Set(DATA_SOURCES.map((s) => s.id));
+  // 市町村のお知らせページ (llm-html) はこの守りの対象外にする。
+  //
+  // これらは数件しか載らないうえ、季節が変われば掲載ごと消えるのが普通。
+  // 兵庫では調査時点で 26 ページ中 11 ページが 0 件だった。1 つの町のページが
+  // 空になっただけで全国の取り込みが止まるのは釣り合わない。守りたいのは
+  // 「県の一括データが取れなかった」ケースであって、町のお知らせの入れ替わり
+  // ではない。壊れていないかは scripts/survey-muni-bear-pages.ts で見直す。
+  const muniPageIds = new Set(
+    DATA_SOURCES.filter((s) => s.kind === "municipal" && s.extractor === "llm-html").map(
+      (s) => s.id,
+    ),
+  );
   const prevBySource = new Map<string, number>();
   const prevLatest = new Map<string, string>();
   for (const r of prevRecords) {
@@ -131,6 +143,7 @@ async function main(): Promise<void> {
   const retired: string[] = [];
   for (const [src, n] of prevBySource) {
     if (n < MIN_TO_GUARD) continue;
+    if (muniPageIds.has(src)) continue;
     if ((freshBySource.get(src) ?? 0) !== 0) continue;
     if (!definedSourceIds.has(src)) {
       retired.push(`${src}(前回${n}件)`);

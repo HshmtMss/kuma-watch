@@ -37,10 +37,26 @@ function main() {
   const health = sourceHealth(records, today(), { expected });
 
   const known = new Map(KNOWN_SOURCE_GAPS.map((g) => [g.id, g]));
+
+  // 市町村のお知らせページは「今は載っていない」が普通の状態。兵庫では 26 ページ
+  // 中 11 ページが調査時点で 0 件だった (だから登録していない)。登録した側も
+  // 季節が変われば 0 件になる。これを missing として鳴らすと毎朝の通知が
+  // 意味を失い、本当の異常が埋もれる。
+  //
+  // 見落としにはならない。件数が育ったソース (前回 50 件以上) が 0 になる場合は
+  // build-sightings の「ソースが丸ごと消えています」がビルドごと止めるので、
+  // そちらの方がはるかに大きな音で鳴る。ここで拾わないのは、そもそも数件しか
+  // 載らない小さなページだけ。壊れていないかは
+  // scripts/survey-muni-bear-pages.ts を定期的に回して見直す。
+  const isMuniPage = (id: string): boolean => {
+    const s = DATA_SOURCES.find((x) => x.id === id);
+    return s?.kind === "municipal" && s.extractor === "llm-html";
+  };
   const problems: SourceHealth[] = [];
   const accepted: SourceHealth[] = [];
   for (const h of health) {
     if (h.status !== "missing" && h.status !== "stale") continue;
+    if (h.status === "missing" && isMuniPage(h.source)) continue;
     // 登録されていないソース (過去の一括取り込み等) は対象外。
     if (!liveIds.has(h.source)) continue;
     if (known.has(h.source)) accepted.push(h);
