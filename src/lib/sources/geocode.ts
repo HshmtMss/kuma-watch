@@ -29,7 +29,10 @@ const LEGACY_CACHE_FILE = join(process.cwd(), ".cache", "geocode.json");
 const PERSIST_DEBOUNCE_MS = 10_000;
 
 type CacheEntry =
-  | { at: number; lat: number; lon: number }
+  // name は Nominatim が返した地物の名前。「その地名を指しているのか」の
+  // 検証に使う。名前を持たない旧エントリは検証できないので従来どおり受け入れる
+  // (TTL 30 日で入れ替わる)。
+  | { at: number; lat: number; lon: number; name?: string }
   | { at: number; missing: true };
 
 function loadDiskCache(): Map<string, CacheEntry> {
@@ -114,13 +117,13 @@ function rateLimitedFetch(query: string): Promise<Response> {
 
 async function geocodeQuery(
   placeQuery: string,
-): Promise<{ lat: number; lon: number } | null> {
+): Promise<{ lat: number; lon: number; name?: string } | null> {
   if (!placeQuery) return null;
   const cached = geocodeCache.get(placeQuery);
   const now = Date.now();
   if (cached && now - cached.at < GEOCODE_CACHE_TTL_MS) {
     if ("missing" in cached) return null;
-    return { lat: cached.lat, lon: cached.lon };
+    return { lat: cached.lat, lon: cached.lon, name: cached.name };
   }
   try {
     const r = await rateLimitedFetch(placeQuery);
@@ -131,7 +134,7 @@ async function geocodeQuery(
       schedulePersist();
       return null;
     }
-    const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
+    const arr = (await r.json()) as Array<{ lat: string; lon: string; name?: string; display_name?: string }>;
     const hit = arr[0];
     if (!hit) {
       geocodeCache.set(placeQuery, { at: Date.now(), missing: true });
@@ -145,9 +148,10 @@ async function geocodeQuery(
       schedulePersist();
       return null;
     }
-    geocodeCache.set(placeQuery, { at: Date.now(), lat, lon });
+    const name = (hit.name || (hit.display_name ?? "").split(",")[0] || "").slice(0, 60);
+    geocodeCache.set(placeQuery, { at: Date.now(), lat, lon, name });
     schedulePersist();
-    return { lat, lon };
+    return { lat, lon, name };
   } catch {
     return null;
   }
@@ -198,6 +202,35 @@ function sectionFallbacks(section: string): string[] {
   return out;
 }
 
+
+/**
+ * Nominatim が返した地物が、本当にその地名を指しているかを見る。
+ *
+ * Nominatim は limit=1 で必ず何かを返す。地区名を解決できないと、綴りが
+ * 似ているだけの無関係な地物を最上位で返してくる。実例:
+ *   「秋田市 浜田石山」  → 秋田県立秋田工業高等学校 (amenity/school)
+ *   「秋田市 外旭川待合」→ 秋田北インター線        (highway/primary)
+ *   「弘前市 大沢地区」  → 裾野地区体育文化センター
+ * これを「地区まで当たった」と扱っていたため、別々の地区の出没が同じ一点に
+ * 積み上がり、しかも学校や郵便局の上にピンが立っていた。
+ *
+ * 判定は「地名の 2 文字以上の並びが、地物の名前に現れるか」。
+ * 「賀見畑」→「賀見畑簡易郵便局」のように施設名で当たる正しいケースは
+ * 通し、綴りが無関係なものだけを落とす。「地区」「丁目」等の一般語は
+ * それだけで一致してしまうので先に除く。
+ */
+const OVERLAP_STOPWORDS = /(地区|丁目|地内|地先|付近|周辺|大字|小字|字|地域|方面|一帯|山中|山林|集落)/g;
+
+function nameLooksRelated(section: string, name: string | undefined): boolean {
+  // 名前を持たない旧キャッシュは検証できない。従来どおり受け入れる。
+  if (name === undefined) return true;
+  const a = section.normalize("NFKC").replace(OVERLAP_STOPWORDS, "");
+  const b = name.normalize("NFKC");
+  if (a.length < 2) return true; // 2 文字未満は判定材料にならない
+  for (let i = 0; i + 2 <= a.length; i++) if (b.includes(a.slice(i, i + 2))) return true;
+  return false;
+}
+
 /**
  * pref + city + section の段階フォールバックでジオコード。
  * - 全部入りでヒットすれば precise=true
@@ -246,14 +279,14 @@ export async function geocodePlace(
   // 市区町村クエリそのものなので、precise を主張できない。
   if (section && full !== cityOnly) {
     const r = await geocodeQuery(full);
-    if (r && accepts(r.lat, r.lon) && !isCityPoint(r.lat, r.lon))
+    if (r && accepts(r.lat, r.lon) && !isCityPoint(r.lat, r.lon) && nameLooksRelated(section, r.name))
       return { ...r, precise: true };
 
     const head = section.split(/[\s 　]/)[0];
     if (head && head !== section && !GENERIC_SECTION.test(head)) {
       const q = [prefName, city, head].filter(Boolean).join(" ").trim();
       const r2 = await geocodeQuery(q);
-      if (r2 && accepts(r2.lat, r2.lon) && !isCityPoint(r2.lat, r2.lon))
+      if (r2 && accepts(r2.lat, r2.lon) && !isCityPoint(r2.lat, r2.lon) && nameLooksRelated(head, r2.name))
         return { ...r2, precise: true };
     }
 
@@ -264,7 +297,7 @@ export async function geocodePlace(
       const q = [prefName, city, cand].filter(Boolean).join(" ").trim();
       if (q === cityOnly) continue;
       const r3 = await geocodeQuery(q);
-      if (r3 && accepts(r3.lat, r3.lon) && !isCityPoint(r3.lat, r3.lon))
+      if (r3 && accepts(r3.lat, r3.lon) && !isCityPoint(r3.lat, r3.lon) && nameLooksRelated(cand, r3.name))
         return { ...r3, precise: true };
     }
   }
