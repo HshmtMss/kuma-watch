@@ -50,7 +50,8 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
                   aria-hidden
                   className="pointer-events-none absolute inset-0 flex items-center justify-center"
                 >
-                  <span className="-rotate-[20deg] text-2xl font-black tracking-[0.35em] text-stone-900/20">
+                  {/* 明るい写真にも暗い写真にも乗るよう、白＋影で抜く。 */}
+                  <span className="-rotate-[20deg] whitespace-nowrap text-xl font-black tracking-[0.3em] text-white/75 [text-shadow:0_1px_4px_rgba(0,0,0,0.5)] sm:text-2xl">
                     SAMPLE
                   </span>
                 </span>
