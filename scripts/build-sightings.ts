@@ -62,7 +62,7 @@ async function main(): Promise<void> {
   // 前回スナップショットから carried で引き継ぐ運用。ここで fresh 側にも news を
   // 混ぜると、refresh 毎に (fresh の news) + (carried の news) で二重化し、
   // 同一事案の重複ピンが際限なく増える。fresh からは news を除外する。
-  const fresh = (await aggregateAllSightings()).filter(
+  let fresh = (await aggregateAllSightings()).filter(
     (r) => r.sourceKind !== "news",
   );
   const elapsedSec = ((Date.now() - start) / 1000).toFixed(1);
@@ -90,6 +90,43 @@ async function main(): Promise<void> {
     // 初回 / 読めない場合は引き継ぎなし
   }
   const prevById = new Map(prevRecords.map((r) => [r.id, r]));
+
+  // 年度で完結するアーカイブ (静岡の年度別 PDF 等) は中身が変わらない。
+  //
+  // それを 4 時間ごとに LLM で読み直すと、返ってくる件数が実行のたびに揺れる。
+  // 静岡 R7 は同じ PDF から 200 件 → 4 件 → 89 件と変動した。エラーではなく、
+  // Gemini が拾う行数そのものが変わる。中身が同じものを読み直して減るのは
+  // 抽出のブレでしかないので、前回より少ないときは前回分をそのまま使う。
+  //
+  // 増えたときは新しい方を採る (抽出が良くなった可能性があるため)。
+  const archiveIds = new Set(
+    DATA_SOURCES.filter((s) => s.periodBounded).map((s) => s.id),
+  );
+  if (archiveIds.size > 0) {
+    const countBy = (rows: UnifiedSighting[]) => {
+      const m = new Map<string, number>();
+      for (const r of rows) {
+        const k = r.source ?? "";
+        if (archiveIds.has(k)) m.set(k, (m.get(k) ?? 0) + 1);
+      }
+      return m;
+    };
+    const prevArchive = countBy(prevRecords);
+    const freshArchive = countBy(fresh);
+    const keepPrev = new Set<string>();
+    for (const [src, n] of prevArchive)
+      if ((freshArchive.get(src) ?? 0) < n) keepPrev.add(src);
+    if (keepPrev.size > 0) {
+      const detail = [...keepPrev]
+        .map((s) => `${s}(${freshArchive.get(s) ?? 0}→前回${prevArchive.get(s)}件)`)
+        .join(", ");
+      console.log(
+        `[build-sightings] アーカイブの抽出が前回より少ないため前回分を使います: ${detail}`,
+      );
+      fresh = fresh.filter((r) => !keepPrev.has(r.source ?? ""));
+      fresh.push(...prevRecords.filter((r) => keepPrev.has(r.source ?? "")));
+    }
+  }
 
   // ソース単位の激減チェック。
   //
