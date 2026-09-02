@@ -14,13 +14,18 @@ import type { Product } from "@/lib/products";
  * imageUrl が空のときは写真枠のプレースホルダを出す。/for-vendors の掲載例で
  * 「写真はご提供いただく」ことを示すのにも使う。
  */
-type Props = { product: Product };
+type Props = {
+  product: Product;
+  /** 掲載サンプルとして見せる場合。写真に薄く SAMPLE の透かしを重ねる。
+   *  画像ファイル自体には焼き込まない（本番の有料掲載は同じ部品を透かし無しで使う）。 */
+  sample?: boolean;
+};
 
 function isExternal(url: string): boolean {
   return /^https?:\/\//.test(url);
 }
 
-export default function FeaturedProductCard({ product }: Props) {
+export default function FeaturedProductCard({ product, sample = false }: Props) {
   const p = product;
   const isAffiliate = Boolean(p.affiliateUrl);
   const linkHref = isAffiliate ? p.affiliateUrl : p.url;
@@ -32,13 +37,25 @@ export default function FeaturedProductCard({ product }: Props) {
         {/* 写真 */}
         <div className="relative aspect-[16/10] w-full shrink-0 bg-stone-100 sm:aspect-auto sm:h-auto sm:w-56">
           {p.imageUrl ? (
-            <Image
-              src={p.imageUrl}
-              alt={p.name}
-              fill
-              sizes="(max-width: 640px) 100vw, 224px"
-              className="object-cover"
-            />
+            <>
+              <Image
+                src={p.imageUrl}
+                alt={p.name}
+                fill
+                sizes="(max-width: 640px) 100vw, 224px"
+                className="object-cover"
+              />
+              {sample && (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                >
+                  <span className="-rotate-[20deg] text-2xl font-black tracking-[0.35em] text-stone-900/20">
+                    SAMPLE
+                  </span>
+                </span>
+              )}
+            </>
           ) : (
             <div className="flex h-full min-h-36 w-full items-center justify-center border-b border-dashed border-stone-300 p-4 text-center text-[11px] leading-relaxed text-stone-400 sm:border-b-0 sm:border-r">
               製品写真

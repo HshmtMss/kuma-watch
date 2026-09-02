@@ -160,7 +160,7 @@ export default function ForVendorsPage() {
         固定されます。通常掲載は文字のみ・カテゴリ内の通常順です。
       </p>
       <div className="not-prose my-4">
-        <FeaturedProductCard product={SAMPLE_FEATURED} />
+        <FeaturedProductCard product={SAMPLE_FEATURED} sample />
         <p className="mt-2 text-[11px] text-stone-400">
           掲載イメージです。製品名・社名・写真はサンプルで、実在の製品ではありません。
         </p>
