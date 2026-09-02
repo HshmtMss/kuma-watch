@@ -96,7 +96,7 @@ export default function ForVendorsPage() {
   return (
     <PageShell
       title="製品・サービスの掲載"
-      lead="クマ対策の製品・サービスを KumaWatch に掲載いただけます。住民・観光客・登山者・自治体担当者が日々訪れるサイトに、貴社の取り組みをお届けします。"
+      lead="クマ対策の製品・サービスを KumaWatch に掲載いただけます。"
     >
       {/* Hero — 3 メッセージで即決 */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">
@@ -126,8 +126,7 @@ export default function ForVendorsPage() {
           ))}
         </div>
         <p className="m-0 mb-5 text-xs text-stone-500">
-          {AUDIENCE_AS_OF}時点。検索は Search Console 直近28日、通知はブロックを除いた到達数。
-          有料掲載枠には「PR」表記と rel=&quot;sponsored&quot; を付与します。
+          {AUDIENCE_AS_OF}時点の実測値
         </p>
         <a
           href="#contact"
@@ -140,9 +139,7 @@ export default function ForVendorsPage() {
 
       {/* 何が掲載できるか — カテゴリは chip 表示で 1 画面に収める */}
       <h2 id="categories">掲載できる製品・サービス</h2>
-      <p>
-        クマ・野生動物対策に関連する製品・サービスを対象としています。以下のカテゴリ以外でもご相談いただけます。
-      </p>
+      <p>クマ・野生動物対策に関わるものが対象です。以下のカテゴリ以外もご相談ください。</p>
       <div className="not-prose my-4 flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
           <span
@@ -161,12 +158,9 @@ export default function ForVendorsPage() {
       </p>
       <div className="not-prose my-4">
         <FeaturedProductCard product={SAMPLE_FEATURED} sample />
-        <p className="mt-2 text-[11px] text-stone-400">
-          掲載イメージです。製品名・社名・写真はサンプルで、実在の製品ではありません。
-        </p>
       </div>
       <p className="text-sm text-stone-600">
-        上はサンプルです。実際に並んでいる 100 点あまりは{" "}
+        上はサンプルです。実際の掲載は{" "}
         <Link href="/products">対策製品ページ</Link>
         でご覧いただけます。
       </p>
@@ -201,85 +195,30 @@ export default function ForVendorsPage() {
             </div>
           </div>
         </div>
-        <p className="m-0 mt-3 text-[11px] leading-relaxed text-stone-500">
-          直近30日の実測値（Amazon 経由で計測できた分）。一般的な EC の購入率は
-          1〜2% 程度とされる中で、目的を持って調べている読者が多いことの表れです。
+        <p className="m-0 mt-3 text-[11px] text-stone-500">
+          直近30日の実測値（Amazon 経由）
         </p>
       </div>
 
       {/* 料金の考え方 */}
       <h2 id="pricing">料金の考え方</h2>
       <p>
-        掲載料金は<strong>個別にご提案</strong>しています。
-        ご予算感をお伝えいただければ、その範囲で組める案をお出しします。
+        掲載先（製品ページ・対策ハブ・記事内）、見せ方、期間の組み合わせで決まります。
+        <strong>ご予算感をお伝えいただければ、その範囲で組める案をお出しします。</strong>
         少額からのトライアル枠もご相談ください。
       </p>
-      <details className="not-prose my-4 rounded-xl border border-stone-200 bg-white p-4">
-        <summary className="cursor-pointer text-sm font-semibold text-stone-700">
-          料金の決まり方（掲載先・見せ方・期間の 3 つ）
-        </summary>
-      <div className="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-stone-200 bg-white p-4">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-            1. 掲載先
-          </div>
-          <div className="mt-1 text-sm font-semibold text-stone-900">
-            どこに出すか
-          </div>
-          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
-            <li>
-              ・<Link href="/products" className="underline">対策製品ページ</Link>
-            </li>
-            <li>
-              ・<Link href="/measures" className="underline">対策ハブ</Link>
-            </li>
-            <li>・関連記事ページ</li>
-            <li>
-              ・<Link href="/for-gov" className="underline">自治体向けページ</Link>
-            </li>
-          </ul>
-        </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-            2. 露出形式
-          </div>
-          <div className="mt-1 text-sm font-semibold text-stone-900">
-            どう見せるか
-          </div>
-          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
-            <li>・一覧カード掲載</li>
-            <li>・カテゴリ内 Pin 表示</li>
-            <li>・記事内 PR 枠</li>
-            <li>・監修付き解説記事 (協賛型)</li>
-          </ul>
-        </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-            3. 掲載期間
-          </div>
-          <div className="mt-1 text-sm font-semibold text-stone-900">
-            どのくらい出すか
-          </div>
-          <ul className="mt-2 space-y-1 text-xs leading-relaxed text-stone-600">
-            <li>・3 か月 / 6 か月 / 1 年単位</li>
-            <li>・シーズン (春・秋) 集中</li>
-            <li>・自治体導入連動の単発</li>
-          </ul>
-        </div>
-      </div>
-      </details>
 
       {/* 掲載までの流れ */}
       <h2>掲載までの流れ</h2>
       <ol>
         <li>
-          <strong>ご相談</strong> — 下のフォームから、掲載をご希望の製品・サービス、想定読者層、ご予算感などをお聞かせください。
+          <strong>ご相談</strong> — 製品とご予算感をフォームからお知らせください。
         </li>
         <li>
-          <strong>掲載内容のすり合わせ</strong> — 写真・紹介文・リンク先・配置場所・期間をご提案し、相互合意の上で決定します。
+          <strong>すり合わせ</strong> — 掲載内容・場所・期間を決めます。
         </li>
         <li>
-          <strong>公開・運用</strong> — 合意後、当社で実装・公開。差し替えやレポーティングについてもご相談に応じます。
+          <strong>公開</strong> — 当社で実装して公開します。
         </li>
       </ol>
 
@@ -290,7 +229,7 @@ export default function ForVendorsPage() {
           どんな製品でも掲載できますか?
         </summary>
         <div className="border-t border-stone-200 px-4 py-3 text-sm leading-relaxed text-stone-700">
-          クマ・野生動物対策に関連し、住民・観光客・自治体の安全に資すると判断した製品・サービスを対象としています。獣医工学ラボの監修方針に沿わない製品（科学的根拠が薄いもの、安全性に懸念があるもの等）はお断りする場合があります。
+          クマ・野生動物対策に関わり、安全に資すると判断したものが対象です。科学的根拠や安全性に懸念がある製品はお断りする場合があります。
         </div>
       </details>
       <details className="my-2 rounded-xl border border-stone-200 bg-white open:bg-stone-50">
@@ -306,11 +245,11 @@ export default function ForVendorsPage() {
           自治体・公共機関でも掲載できますか?
         </summary>
         <div className="border-t border-stone-200 px-4 py-3 text-sm leading-relaxed text-stone-700">
-          自治体さま向けには別途{" "}
+          自治体さま向けには{" "}
           <Link href="/for-gov" className="text-amber-700 underline">
             自治体の方へ
           </Link>
-          をご用意しています。公式ページで発表されたクマ出没情報を、住民・観光客の通知へ自動でお届けする配信サービスです。
+          をご用意しています。
         </div>
       </details>
 
