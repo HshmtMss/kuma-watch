@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
-import ProductCard from "@/components/ProductCard";
 import FeaturedProductCard from "@/components/FeaturedProductCard";
 import type { Product } from "@/lib/products";
 
@@ -73,11 +72,12 @@ const SAMPLE_BASE: Product = {
   featured: false,
 };
 
-/** 注目掲載(有料枠)のサンプル。写真枠は空にしてプレースホルダを出す。 */
+/** 注目掲載(有料枠)のサンプル。写真は生成画像で、実在の製品・ブランドではない。 */
 const SAMPLE_FEATURED: Product = {
   ...SAMPLE_BASE,
   id: "sample-featured",
   features: "有効射程8m・軽量200g・ホルスター付属。実売価格と入手先も併記します。",
+  imageUrl: "/products/sample-featured.jpg",
   featured: true,
 };
 
@@ -156,34 +156,14 @@ export default function ForVendorsPage() {
       {/* 掲載イメージ。言葉だけだと「どう見えるか」が伝わらないので実物を出す。 */}
       <h2 id="example">掲載されるとこう見えます</h2>
       <p>
-        掲載は 2 通りあります。<strong>注目掲載</strong>は製品写真が入り、
-        カテゴリの先頭に固定されます。
+        <strong>注目掲載</strong>は製品写真が入り、幅広のカードでカテゴリの先頭に
+        固定されます。通常掲載は文字のみ・カテゴリ内の通常順です。
       </p>
-      <div className="not-prose my-4 space-y-5">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <span className="rounded-sm bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">
-              注目掲載
-            </span>
-            <span className="text-xs text-stone-500">
-              写真つき・幅広・カテゴリ先頭に固定
-            </span>
-          </div>
-          <FeaturedProductCard product={SAMPLE_FEATURED} />
-        </div>
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <span className="rounded-sm bg-stone-100 px-2 py-0.5 text-[11px] font-bold text-stone-600">
-              通常掲載
-            </span>
-            <span className="text-xs text-stone-500">
-              文字のみ・カテゴリ内の通常順
-            </span>
-          </div>
-          <div className="max-w-md">
-            <ProductCard product={SAMPLE_BASE} />
-          </div>
-        </div>
+      <div className="not-prose my-4">
+        <FeaturedProductCard product={SAMPLE_FEATURED} />
+        <p className="mt-2 text-[11px] text-stone-400">
+          掲載イメージです。製品名・社名・写真はサンプルで、実在の製品ではありません。
+        </p>
       </div>
       <p className="text-sm text-stone-600">
         上はサンプルです。実際に並んでいる 100 点あまりは{" "}
