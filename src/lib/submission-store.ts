@@ -44,6 +44,16 @@ export type StoredSubmission = {
   /** 写真EXIFから読み取った撮影位置（あれば）。ピン位置(lat/lon)とは別。 */
   photoLat?: number;
   photoLon?: number;
+  /**
+   * 写真EXIF の撮影情報。公開する写真からは圧縮で剥がれるので、判断材料として
+   * ここにだけ残す。takenAt は端末の時計、gpsAt は衛星由来 (UTC) で別系統。
+   */
+  photoTakenAt?: string;
+  photoGpsAt?: string;
+  photoDirection?: number;
+  photoDirectionRef?: string;
+  photoDevice?: string;
+  photoSoftware?: string;
   prefectureName?: string;
   cityName?: string;
   sectionName?: string;
@@ -84,6 +94,9 @@ export function withAssessment(sub: StoredSubmission): StoredSubmission {
       photoUrl: sub.photoUrl,
       photoLat: sub.photoLat,
       photoLon: sub.photoLon,
+      photoTakenAt: sub.photoTakenAt,
+      photoGpsAt: sub.photoGpsAt,
+      photoSoftware: sub.photoSoftware,
       comment: sub.comment,
       cityCode: sub.cityCode,
     }),

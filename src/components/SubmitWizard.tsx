@@ -20,7 +20,7 @@ import {
   Clock,
   type LucideIcon,
 } from "lucide-react";
-import { readExifGps, type PhotoGps } from "@/lib/exif-gps";
+import { readExif, type PhotoExif } from "@/lib/exif-gps";
 
 /**
  * クマ目撃投稿ウィザード（4 ステップ）。
@@ -152,7 +152,9 @@ export default function SubmitWizard({
   const [placeName, setPlaceName] = useState<string | null>(null);
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
   // 写真EXIFから読み取った撮影位置（取れた場合のみ）。投稿に添付し管理画面で照合。
-  const [photoGps, setPhotoGps] = useState<PhotoGps | null>(null);
+  // 写真の EXIF (撮影位置・撮影日時・方向・機種)。圧縮すると剥がれるので圧縮前に読む。
+  // 公開する写真には残らない。投稿の内部フィールドとして承認の判断にだけ使う。
+  const [photoExif, setPhotoExif] = useState<PhotoExif | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
@@ -300,8 +302,8 @@ export default function SubmitWizard({
     try {
       // 圧縮(canvas再エンコード)するとEXIFが剥がれるので、その「前」に元ファイルから
       // 撮影位置(GPS)を読み取っておく。取れなければ null のまま。
-      const gps = await readExifGps(file);
-      setPhotoGps(gps);
+      const exif = await readExif(file);
+      setPhotoExif(exif);
       // スマホの写真は数MBあり、そのまま送ると Vercel のリクエスト上限(4.5MB)を
       // 超えて「サーバーエラー」になる。長辺 1600px・JPEG に縮小して送る。
       const compressed = await compressImage(file);
@@ -332,8 +334,14 @@ export default function SubmitWizard({
           comment: comment || undefined,
           contact: contact || undefined,
           photoDataUrl: photoDataUrl || undefined,
-          photoLat: photoGps?.lat,
-          photoLon: photoGps?.lon,
+          photoLat: photoExif?.gps?.lat,
+          photoLon: photoExif?.gps?.lon,
+          photoTakenAt: photoExif?.takenAt,
+          photoGpsAt: photoExif?.gpsAt,
+          photoDirection: photoExif?.direction,
+          photoDirectionRef: photoExif?.directionRef,
+          photoDevice: photoExif?.device,
+          photoSoftware: photoExif?.software,
           // LINE 内 (LIFF) からの投稿は idToken を添える。サーバが検証して
           // userId を紐付ける (Web からの匿名投稿では undefined)。
           idToken: idToken || undefined,
@@ -670,7 +678,7 @@ export default function SubmitWizard({
                   type="button"
                   onClick={() => {
                     setPhotoDataUrl(null);
-                    setPhotoGps(null);
+                    setPhotoExif(null);
                     setPhotoError(null);
                   }}
                   className="h-11 rounded-full px-4 text-base font-medium text-red-600 hover:bg-red-50"

@@ -74,6 +74,12 @@ type Submission = {
   photoUrl?: string;
   photoLat?: number;
   photoLon?: number;
+  photoTakenAt?: string;
+  photoGpsAt?: string;
+  photoDirection?: number;
+  photoDirectionRef?: string;
+  photoDevice?: string;
+  photoSoftware?: string;
   prefectureName?: string;
   cityName?: string;
   sectionName?: string;
@@ -129,6 +135,31 @@ const CREDIBILITY_STYLE: Record<string, string> = {
   medium: "bg-sky-100 text-sky-900",
   low: "bg-stone-200 text-stone-700",
 };
+
+/** 方位角を八方位の言葉にする。度だけだと向きが頭に入らない */
+function compassLabel(deg: number): string {
+  const dirs = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
+/**
+ * 写真のEXIF。承認の判断材料なので管理画面にだけ出す。
+ * 公開する写真からは圧縮で剥がれているので、ここに出しても外へは漏れない。
+ */
+function PhotoExifRow({ s }: { s: Submission }) {
+  const bits: string[] = [];
+  if (s.photoTakenAt) bits.push(`撮影 ${s.photoTakenAt.replace("T", " ")}`);
+  if (s.photoDirection != null)
+    bits.push(
+      `向き ${compassLabel(s.photoDirection)} (${s.photoDirection}°${s.photoDirectionRef === "M" ? " 磁北" : ""})`,
+    );
+  if (s.photoDevice) bits.push(s.photoDevice);
+  if (s.photoSoftware) bits.push(`加工 ${s.photoSoftware}`);
+  if (bits.length === 0) return null;
+  return (
+    <p className="mt-1 text-xs text-stone-500">写真: {bits.join(" ・ ")}</p>
+  );
+}
 
 /** 経過時間を「4時間前」「3日前」の形で返す */
 function sinceLabel(ms: number): string {
@@ -615,6 +646,7 @@ function SubmissionsContent({
                       {s.assessment.reason}
                     </p>
                   )}
+                  <PhotoExifRow s={s} />
                   {s.rejectReason && (
                     <p className="mt-1.5 text-sm text-rose-700">
                       却下理由: {s.rejectReason}

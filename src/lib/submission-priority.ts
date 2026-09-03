@@ -126,13 +126,37 @@ export function distanceKm(
 const PHOTO_GAP_WARN_KM = 1;
 /** ここまで離れると別の場所の写真の疑いが濃い */
 const PHOTO_GAP_BAD_KM = 5;
+/** 撮影日時と申告日時のズレ。これを超えたら注意 */
+const TIME_GAP_WARN_H = 6;
+/** ここまでズレると別の日の写真の疑いが濃い */
+const TIME_GAP_BAD_H = 48;
+/**
+ * 撮影日時 (端末の時計) と GPS 日時 (衛星) の食い違い。
+ * 両者は別系統なので、大きくずれるのは時計をいじった痕跡になる。
+ * 端末のタイムゾーン設定ずれを誤検出しないよう、余裕をもって 26 時間。
+ */
+const CLOCK_MISMATCH_H = 26;
+
+/** "2026-09-04T07:21:33" (ゾーンなし=ローカル) を ms にする */
+function localMs(iso?: string): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) ? t : null;
+}
 
 export function assessCredibility(input: {
   lat: number;
   lon: number;
+  occurredAt?: string;
   photoUrl?: string;
   photoLat?: number;
   photoLon?: number;
+  /** EXIF 撮影日時 (端末の時計) */
+  photoTakenAt?: string;
+  /** EXIF GPS 日時 (衛星・UTC) */
+  photoGpsAt?: string;
+  /** 加工ソフト名 (あれば注意書きに出す) */
+  photoSoftware?: string;
   comment?: string;
   cityCode?: string;
 }): { credibility: Credibility; reason: string; flags: string[] } {
@@ -148,13 +172,58 @@ export function assessCredibility(input: {
     if (gapKm >= PHOTO_GAP_WARN_KM) flags.push(`位置ズレ ${gapKm.toFixed(1)}km`);
   }
 
-  // 写真の撮影位置がピンと一致 = いまのところ最も強い裏付け
-  if (gapKm != null && gapKm < PHOTO_GAP_WARN_KM)
+  // 撮影日時と申告日時のズレ。古い写真の使い回しがここで見える
+  let gapH: number | null = null;
+  const takenMs = localMs(input.photoTakenAt);
+  const occurredMs = localMs(input.occurredAt);
+  if (takenMs != null && occurredMs != null) {
+    gapH = Math.abs(occurredMs - takenMs) / HOUR;
+    if (gapH >= TIME_GAP_WARN_H)
+      flags.push(
+        gapH >= 24
+          ? `撮影日時が ${Math.round(gapH / 24)}日ずれ`
+          : `撮影日時が ${Math.round(gapH)}時間ずれ`,
+      );
+  }
+
+  // 端末の時計と衛星時刻の食い違い = 日時をいじった痕跡
+  const gpsMs = localMs(input.photoGpsAt);
+  const clockOff =
+    takenMs != null && gpsMs != null
+      ? Math.abs(takenMs - gpsMs) / HOUR
+      : null;
+  if (clockOff != null && clockOff >= CLOCK_MISMATCH_H)
+    flags.push("撮影日時とGPS時刻が不一致");
+
+  if (input.photoSoftware) flags.push(`加工ソフト: ${input.photoSoftware}`);
+
+  // 別の日の写真は、位置が合っていても裏付けにならない
+  if (gapH != null && gapH >= TIME_GAP_BAD_H)
     return {
-      credibility: "high",
-      reason: "写真の撮影位置がピンと一致",
+      credibility: "low",
+      reason: `写真の撮影日時が申告と ${Math.round(gapH / 24)}日ずれている`,
       flags,
     };
+  if (clockOff != null && clockOff >= CLOCK_MISMATCH_H)
+    return {
+      credibility: "low",
+      reason: "写真の撮影日時とGPS時刻が食い違っている",
+      flags,
+    };
+
+  // 位置も日時も申告と合う写真 = いまのところ最も強い裏付け
+  if (gapKm != null && gapKm < PHOTO_GAP_WARN_KM) {
+    const timeOk = gapH == null || gapH < TIME_GAP_WARN_H;
+    return {
+      credibility: timeOk ? "high" : "medium",
+      reason: timeOk
+        ? gapH != null
+          ? "写真の撮影位置・日時とも申告と一致"
+          : "写真の撮影位置がピンと一致"
+        : `撮影位置は一致するが、日時が ${Math.round(gapH!)}時間ずれている`,
+      flags,
+    };
+  }
 
   if (gapKm != null && gapKm >= PHOTO_GAP_BAD_KM)
     return {
@@ -188,6 +257,9 @@ export function assessSubmission(input: {
   photoUrl?: string;
   photoLat?: number;
   photoLon?: number;
+  photoTakenAt?: string;
+  photoGpsAt?: string;
+  photoSoftware?: string;
   comment?: string;
   cityCode?: string;
   now?: number;

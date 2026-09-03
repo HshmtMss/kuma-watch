@@ -26,7 +26,22 @@ export type SubmitPayload = {
   /** 写真EXIFから読み取った撮影位置（クライアントが圧縮前に抽出）。 */
   photoLat?: number;
   photoLon?: number;
+  /** 撮影日時 (端末の時計。ゾーンなし = ローカル時刻) */
+  photoTakenAt?: string;
+  /** GPS 由来の撮影日時 (UTC)。端末の時計とは別系統なので突き合わせに使う */
+  photoGpsAt?: string;
+  /** 撮影方向 (度) と基準 ("T"=真北 / "M"=磁北) */
+  photoDirection?: number;
+  photoDirectionRef?: string;
+  /** 機種・加工ソフト */
+  photoDevice?: string;
+  photoSoftware?: string;
 };
+
+/** EXIF 由来の文字列。長さだけ切って素通しする (表示は管理画面のみ) */
+function exifStr(v: unknown, max = 80): string | undefined {
+  return typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
+}
 
 const SITUATION_VALUES = new Set(["sight", "trace", "damage", "injury"]);
 
@@ -57,6 +72,13 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
   const situation = b.situation;
   if (typeof situation !== "string" || !SITUATION_VALUES.has(situation))
     return { ok: false, error: "状況が不正です" };
+
+  // EXIF は投稿者が申告した値ではなく写真から出た値。壊れていても投稿は通す
+  const photoTakenAt = exifStr(b.photoTakenAt, 32);
+  const photoGpsAt = exifStr(b.photoGpsAt, 32);
+  const dirRaw = Number(b.photoDirection);
+  const photoDirection =
+    Number.isFinite(dirRaw) && dirRaw >= 0 && dirRaw <= 360 ? dirRaw : undefined;
 
   const comment = typeof b.comment === "string" ? b.comment.slice(0, 300) : undefined;
   const contact = typeof b.contact === "string" ? b.contact.slice(0, 200) : undefined;
@@ -94,6 +116,12 @@ function validate(body: unknown): { ok: true; payload: SubmitPayload } | { ok: f
       photoDataUrl,
       photoLat: photoLat != null && photoLon != null ? photoLat : undefined,
       photoLon: photoLat != null && photoLon != null ? photoLon : undefined,
+      photoTakenAt,
+      photoGpsAt,
+      photoDirection,
+      photoDirectionRef: exifStr(b.photoDirectionRef, 2),
+      photoDevice: exifStr(b.photoDevice),
+      photoSoftware: exifStr(b.photoSoftware),
     },
   };
 }
@@ -232,6 +260,12 @@ export async function POST(req: Request) {
     photoUrl,
     photoLat: rest.photoLat,
     photoLon: rest.photoLon,
+    photoTakenAt: rest.photoTakenAt,
+    photoGpsAt: rest.photoGpsAt,
+    photoDirection: rest.photoDirection,
+    photoDirectionRef: rest.photoDirectionRef,
+    photoDevice: rest.photoDevice,
+    photoSoftware: rest.photoSoftware,
     prefectureName: geo.prefectureName,
     cityName: geo.cityName,
     sectionName: geo.sectionName,
@@ -248,6 +282,9 @@ export async function POST(req: Request) {
       photoUrl,
       photoLat: rest.photoLat,
       photoLon: rest.photoLon,
+      photoTakenAt: rest.photoTakenAt,
+      photoGpsAt: rest.photoGpsAt,
+      photoSoftware: rest.photoSoftware,
       comment: rest.comment,
       cityCode,
     }),
