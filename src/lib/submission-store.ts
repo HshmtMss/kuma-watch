@@ -14,6 +14,11 @@
 import { Redis } from "@upstash/redis";
 import { del } from "@vercel/blob";
 import type { UnifiedSighting } from "@/lib/sources/types";
+import {
+  assessSubmission,
+  type Assessment,
+  type RejectReason,
+} from "@/lib/submission-priority";
 
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
@@ -51,7 +56,39 @@ export type StoredSubmission = {
    * (投稿の公開表示はあくまで匿名)。
    */
   lineUserId?: string;
+  /**
+   * 総務省コード (5桁)。投稿時に県名+市町村名から引く。
+   * 将来この画面を自治体に渡すとき「自分の市町村の投稿だけ」に絞る鍵になる。
+   * あとから既存データに埋めるのは面倒なので、いま入れておく。
+   */
+  cityCode?: string;
+  /** 緊急度・信ぴょう性の判定。投稿時に 1 回だけ計算する */
+  assessment?: Assessment;
+  /** 却下したときの理由 (定型)。溜まればフォームの改善材料になる */
+  rejectReason?: RejectReason;
 };
+
+/**
+ * 判定を持たない古い投稿に、読み出し時だけ判定を付ける。
+ * 保存はしない (再計算は安いし、古いデータを書き換えたくない)。
+ */
+export function withAssessment(sub: StoredSubmission): StoredSubmission {
+  if (sub.assessment) return sub;
+  return {
+    ...sub,
+    assessment: assessSubmission({
+      situation: sub.situation,
+      occurredAt: sub.occurredAt,
+      lat: sub.lat,
+      lon: sub.lon,
+      photoUrl: sub.photoUrl,
+      photoLat: sub.photoLat,
+      photoLon: sub.photoLon,
+      comment: sub.comment,
+      cityCode: sub.cityCode,
+    }),
+  };
+}
 
 const ALL_KEY = "cs:all";
 const APPROVED_KEY = "cs:approved";
@@ -120,13 +157,14 @@ export async function listSubmissions(opts?: {
     .map((v) => parse(v as string | StoredSubmission | null))
     .filter((s): s is StoredSubmission => s !== null);
   if (opts?.status) out = out.filter((s) => s.status === opts.status);
-  return out.slice(0, limit);
+  return out.slice(0, limit).map(withAssessment);
 }
 
 /** 承認 / 却下。あとから何度でも切り替え可能 (status を上書き)。 */
 export async function moderateSubmission(
   id: string,
   decision: "approve" | "reject",
+  rejectReason?: RejectReason,
 ): Promise<StoredSubmission | null> {
   const r = client();
   const sub = await getSubmission(id);
@@ -137,6 +175,8 @@ export async function moderateSubmission(
     ...sub,
     status,
     reviewedAt: Date.now(),
+    // 承認に戻したら理由は消す (却下の記録が残り続けないように)
+    rejectReason: decision === "reject" ? rejectReason : undefined,
   };
   await r.set(`cs:sub:${id}`, JSON.stringify(updated));
   // 公開中インデックス (地図マージ用) を同期

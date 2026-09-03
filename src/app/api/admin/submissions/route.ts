@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { REJECT_REASONS, type RejectReason } from "@/lib/submission-priority";
 import {
   deleteSubmission,
   listSubmissions,
@@ -14,7 +15,7 @@ export const dynamic = "force-dynamic";
  * 管理者向け：市民投稿のモデレーション API。
  * ADMIN_SECRET (合言葉) を Bearer で送って認証する。/admin/submissions から呼ぶ。
  *   GET ?status=pending|approved|rejected|all → 投稿一覧 (新しい順)
- *   POST { id, decision: "approve" | "reject" | "delete" }
+ *   POST { id, decision: "approve" | "reject" | "delete", reason? }
  *        承認 / 却下 / 削除。承認・却下はあとから何度でもやり直せる。
  */
 function authed(req: Request): boolean {
@@ -54,13 +55,21 @@ export async function POST(req: Request) {
       { status: 503 },
     );
   }
-  let body: { id?: string; decision?: string };
+  let body: { id?: string; decision?: string; reason?: string };
   try {
-    body = (await req.json()) as { id?: string; decision?: string };
+    body = (await req.json()) as {
+      id?: string;
+      decision?: string;
+      reason?: string;
+    };
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
   const { id, decision } = body;
+  // 却下理由は定型のみ受け付ける (自由記入を溜めても集計できないため)
+  const reason = (REJECT_REASONS as readonly string[]).includes(body.reason ?? "")
+    ? (body.reason as RejectReason)
+    : undefined;
   if (
     !id ||
     (decision !== "approve" && decision !== "reject" && decision !== "delete")
@@ -74,7 +83,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, deleted: true });
   }
 
-  const updated = await moderateSubmission(id, decision);
+  const updated = await moderateSubmission(id, decision, reason);
   if (!updated) {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }

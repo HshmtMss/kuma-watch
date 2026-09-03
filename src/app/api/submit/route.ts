@@ -6,6 +6,9 @@ import {
   type StoredSubmission,
 } from "@/lib/submission-store";
 import { verifyIdToken } from "@/lib/line-client";
+import { assessSubmission } from "@/lib/submission-priority";
+import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
+import { resolveCanonicalMuniName } from "@/lib/muni-name";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -146,6 +149,22 @@ async function uploadPhoto(
   }
 }
 
+/**
+ * 県名+市町村名 → 総務省コード。境界ポリゴンは serverless に載せられないので
+ * 名前で引く (逆ジオコーディングの表記ゆれは resolveCanonicalMuniName が吸収する)。
+ * 引けなければ undefined のまま進む — コードが無くても投稿は受け付ける。
+ */
+function lookupCityCode(
+  prefName?: string,
+  cityName?: string,
+): string | undefined {
+  if (!prefName || !cityName) return undefined;
+  const canonical = resolveCanonicalMuniName(prefName, cityName) ?? cityName;
+  return JAPAN_MUNICIPALITIES.find(
+    (m) => m.prefName === prefName && m.cityName === canonical,
+  )?.cityCode;
+}
+
 export async function POST(req: Request) {
   let raw: unknown;
   try {
@@ -199,6 +218,8 @@ export async function POST(req: Request) {
       : Promise.resolve(null),
   ]);
 
+  const cityCode = lookupCityCode(geo.prefectureName, geo.cityName);
+
   const submission: StoredSubmission = {
     id,
     lat: rest.lat,
@@ -217,6 +238,19 @@ export async function POST(req: Request) {
     receivedAt: Date.now(),
     status: "pending",
     lineUserId: lineUser?.userId,
+    cityCode,
+    // 判定は投稿時に 1 回だけ。ここで落ちても投稿は保存する (判定は後から補える)
+    assessment: assessSubmission({
+      situation: rest.situation,
+      occurredAt: rest.occurredAt,
+      lat: rest.lat,
+      lon: rest.lon,
+      photoUrl,
+      photoLat: rest.photoLat,
+      photoLon: rest.photoLon,
+      comment: rest.comment,
+      cityCode,
+    }),
   };
 
   // 個人情報 (連絡先・コメント本文) は Vercel ログに残さない。長さだけ記録。
@@ -228,6 +262,8 @@ export async function POST(req: Request) {
       pref: submission.prefectureName,
       city: submission.cityName,
       hasPhoto: Boolean(photoUrl),
+      urgency: submission.assessment?.urgency,
+      credibility: submission.assessment?.credibility,
       via: lineUser ? "line" : "web",
       contactLen: rest.contact?.length ?? 0,
       commentLen: rest.comment?.length ?? 0,

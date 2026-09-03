@@ -3,13 +3,27 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminSubmissionsMap, { type MapItem } from "./AdminSubmissionsMap";
 import AdminShell from "@/components/admin/AdminShell";
+import {
+  BUCKET_LABEL,
+  CREDIBILITY_LABEL,
+  REJECT_REASONS,
+  URGENCY_LABEL,
+  compareByPriority,
+  priorityBucket,
+  type Assessment,
+  type PriorityBucket,
+  type RejectReason,
+} from "@/lib/submission-priority";
 
 /**
  * 市民投稿モデレーション画面 (合言葉でログイン)。
  *
  * - ステータス絞り込み: 承認待ち / 公開中 / 却下 / すべて
+ * - 承認待ちのときは「優先度の受信箱」を出す:
+ *     ① 今すぐ見る (至急)  ② 順に見る  ③ 後で見る (信ぴょう性 低)
+ *   至急は信ぴょう性に関係なく①に入る。①が空であること自体が合図になる。
  * - リスト表示 / 地図表示の切替
- * - 承認 / 却下 / 削除 (あとから何度でもやり直せる)
+ * - 承認 / 却下 (理由を定型で記録) / 削除 (あとから何度でもやり直せる)
  *
  * server コードを client に取り込まないよう、型はこのファイル内で定義する。
  */
@@ -64,6 +78,9 @@ type Submission = {
   cityName?: string;
   sectionName?: string;
   receivedAt: number;
+  cityCode?: string;
+  assessment?: Assessment;
+  rejectReason?: RejectReason;
 };
 
 // 2点間の距離(km)。写真の撮影位置とピン位置のズレ確認用。
@@ -83,6 +100,78 @@ function distanceKm(
 }
 
 type Decision = "approve" | "reject" | "delete";
+
+const BUCKET_ORDER: PriorityBucket[] = ["now", "queue", "later"];
+const BUCKET_NO: Record<PriorityBucket, string> = {
+  now: "①",
+  queue: "②",
+  later: "③",
+};
+/** 選択中のチップの色。至急は赤、通常は琥珀、低は石 */
+const BUCKET_ON: Record<PriorityBucket, string> = {
+  now: "bg-rose-600 text-white",
+  queue: "bg-amber-600 text-white",
+  later: "bg-stone-700 text-white",
+};
+const BUCKET_OFF: Record<PriorityBucket, string> = {
+  now: "border border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100",
+  queue: "border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100",
+  later: "border border-stone-300 bg-white text-stone-700 hover:bg-stone-50",
+};
+
+const URGENCY_STYLE: Record<string, string> = {
+  urgent: "bg-rose-600 text-white",
+  normal: "bg-amber-100 text-amber-900",
+  low: "bg-stone-100 text-stone-600",
+};
+const CREDIBILITY_STYLE: Record<string, string> = {
+  high: "bg-emerald-100 text-emerald-900",
+  medium: "bg-sky-100 text-sky-900",
+  low: "bg-stone-200 text-stone-700",
+};
+
+/** 経過時間を「4時間前」「3日前」の形で返す */
+function sinceLabel(ms: number): string {
+  const h = Math.floor((Date.now() - ms) / 3600_000);
+  if (h < 1) return "1時間以内";
+  if (h < 24) return `${h}時間前`;
+  return `${Math.floor(h / 24)}日前`;
+}
+
+/**
+ * 優先度のバッジ。承認者が最初に見る 2 つ (緊急度・信ぴょう性) と、
+ * その理由 1 行だけを出す。数値スコアは出さない。
+ */
+function PriorityBadges({ a }: { a?: Assessment }) {
+  if (!a)
+    return (
+      <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-500">
+        未判定
+      </span>
+    );
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span
+        className={`rounded-full px-2 py-0.5 text-xs font-bold ${URGENCY_STYLE[a.urgency]}`}
+      >
+        {URGENCY_LABEL[a.urgency]}
+      </span>
+      <span
+        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${CREDIBILITY_STYLE[a.credibility]}`}
+      >
+        信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
+      </span>
+      {a.flags.map((f) => (
+        <span
+          key={f}
+          className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-900"
+        >
+          ⚑ {f}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function fmtDateTime(iso: string): string {
   const d = new Date(iso);
@@ -118,8 +207,13 @@ function SubmissionsContent({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // 自由検索（地名・地区・コメント・連絡先）。ステータス絞り込みの内側で効く。
   const [query, setQuery] = useState("");
+  // 承認待ちのときだけ効く優先度の箱。null = すべて
+  const [bucket, setBucket] = useState<PriorityBucket | null>(null);
+  // 却下理由を聞くダイアログの対象 (id)。null = 閉じている
+  const [rejecting, setRejecting] = useState<string | null>(null);
 
-  const shown = useMemo(() => {
+  // 検索で絞ったもの。優先度チップの件数はここを母数にする
+  const searched = useMemo(() => {
     const t = query.trim().toLowerCase();
     if (!t) return items;
     return items.filter((s) =>
@@ -130,6 +224,28 @@ function SubmissionsContent({
         .includes(t),
     );
   }, [items, query]);
+
+  /** 箱ごとの件数。①が空であること自体が「急ぎは無い」の合図になる */
+  const bucketCounts = useMemo(() => {
+    const c: Record<PriorityBucket, number> = { now: 0, queue: 0, later: 0 };
+    for (const s of searched) c[priorityBucket(s.assessment)] += 1;
+    return c;
+  }, [searched]);
+
+  const oldestPending = useMemo(() => {
+    const t = searched.filter((s) => s.status === "pending");
+    if (t.length === 0) return null;
+    return Math.min(...t.map((s) => s.receivedAt));
+  }, [searched]);
+
+  const shown = useMemo(() => {
+    const base = bucket
+      ? searched.filter((s) => priorityBucket(s.assessment) === bucket)
+      : searched;
+    // 承認待ちは優先度順。公開中・却下は既定の新しい順のまま (履歴として見るため)
+    if (status !== "pending") return base;
+    return [...base].sort(compareByPriority);
+  }, [searched, bucket, status]);
 
   const load = useCallback(
     async (st: string) => {
@@ -163,7 +279,7 @@ function SubmissionsContent({
   }, [load, status]);
 
   const moderate = useCallback(
-    async (id: string, decision: Decision) => {
+    async (id: string, decision: Decision, reason?: RejectReason) => {
       if (decision === "delete" && !window.confirm("この投稿を完全に削除します。よろしいですか?")) {
         return;
       }
@@ -175,7 +291,7 @@ function SubmissionsContent({
             "Content-Type": "application/json",
             Authorization: `Bearer ${secret}`,
           },
-          body: JSON.stringify({ id, decision }),
+          body: JSON.stringify({ id, decision, reason }),
         });
         if (!res.ok) throw new Error(String(res.status));
         // ステータスが変わると現在の絞り込みから外れるので再読込
@@ -240,6 +356,7 @@ function SubmissionsContent({
   const changeTab = (key: string) => {
     setStatus(key);
     setSelected(new Set());
+    setBucket(null);
   };
 
   const mapItems: MapItem[] = shown.map((s) => ({
@@ -288,6 +405,67 @@ function SubmissionsContent({
           </button>
         ))}
       </div>
+
+      {/* 優先度の受信箱。承認待ちのときだけ出す。
+          ①今すぐ見る = 緊急度「至急」(信ぴょう性は問わない)
+          ②順に見る   = 通常・低 かつ 信ぴょう性 高/中
+          ③後で見る   = 信ぴょう性 低。捨てずに沈めるだけ */}
+      {status === "pending" && (
+        <div className="mb-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
+          <div className="mb-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-base font-bold text-stone-900">
+              未処理 {searched.length} 件
+            </span>
+            {oldestPending && (
+              <span className="text-sm text-stone-500">
+                いちばん古いもの {sinceLabel(oldestPending)}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {BUCKET_ORDER.map((b) => {
+              const on = bucket === b;
+              const n = bucketCounts[b];
+              return (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setBucket(on ? null : b)}
+                  aria-pressed={on}
+                  className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition ${
+                    on ? BUCKET_ON[b] : BUCKET_OFF[b]
+                  } ${n === 0 && !on ? "opacity-50" : ""}`}
+                >
+                  <span>
+                    {BUCKET_NO[b]} {BUCKET_LABEL[b]}
+                  </span>
+                  <span
+                    className={`min-w-[1.5rem] rounded-full px-1.5 py-0.5 text-center text-xs tabular-nums ${
+                      on ? "bg-white/25" : "bg-white/70"
+                    }`}
+                  >
+                    {n}
+                  </span>
+                </button>
+              );
+            })}
+            {bucket && (
+              <button
+                type="button"
+                onClick={() => setBucket(null)}
+                className="rounded-xl px-3 py-2 text-sm text-stone-500 hover:bg-stone-100"
+              >
+                すべて表示
+              </button>
+            )}
+          </div>
+          {bucketCounts.now === 0 && !bucket && (
+            <p className="mt-2.5 text-sm text-stone-500">
+              至急の対応が必要な投稿はありません。②から順に確認してください。
+            </p>
+          )}
+        </div>
+      )}
 
       {/* 自由検索（地名・地区・コメント・連絡先） */}
       <div className="mb-3">
@@ -407,6 +585,7 @@ function SubmissionsContent({
           selected={selected}
           toggleSelect={toggleSelect}
           moderate={moderate}
+          onReject={setRejecting}
           busy={busy}
         />
       )}
@@ -428,6 +607,20 @@ function SubmissionsContent({
                 />
               )}
               <div className="p-4">
+                {/* 承認者が最初に見るもの: 緊急度・信ぴょう性・その理由 */}
+                <div className="mb-3 rounded-xl bg-stone-50 px-3 py-2">
+                  <PriorityBadges a={s.assessment} />
+                  {s.assessment && (
+                    <p className="mt-1.5 text-sm leading-relaxed text-stone-700">
+                      {s.assessment.reason}
+                    </p>
+                  )}
+                  {s.rejectReason && (
+                    <p className="mt-1.5 text-sm text-rose-700">
+                      却下理由: {s.rejectReason}
+                    </p>
+                  )}
+                </div>
                 <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                   <input
                     type="checkbox"
@@ -515,11 +708,11 @@ function SubmissionsContent({
                   </button>
                   <button
                     type="button"
-                    onClick={() => moderate(s.id, "reject")}
+                    onClick={() => setRejecting(s.id)}
                     disabled={busy === s.id || s.status === "rejected"}
                     className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
                   >
-                    却下
+                    却下…
                   </button>
                   <button
                     type="button"
@@ -535,6 +728,54 @@ function SubmissionsContent({
           ))}
         </ul>
       )}
+
+      {/* 却下理由。溜まればフォームの改善材料になるので、定型 5 つから選ばせる。
+          自由記入は集計できないので置かない。 */}
+      {rejecting && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-stone-900/40 p-4 sm:items-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="却下の理由を選ぶ"
+          onClick={() => setRejecting(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-1 text-base font-bold text-stone-900">
+              却下の理由
+            </h3>
+            <p className="mb-3 text-sm text-stone-500">
+              あとで投稿フォームを直すときの材料になります。
+            </p>
+            <div className="flex flex-col gap-2">
+              {REJECT_REASONS.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => {
+                    const id = rejecting;
+                    setRejecting(null);
+                    void moderate(id, "reject", r);
+                  }}
+                  className="rounded-xl border border-stone-300 px-4 py-3 text-left text-sm font-semibold text-stone-800 hover:bg-stone-50"
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setRejecting(null)}
+              className="mt-3 w-full rounded-xl px-4 py-2.5 text-sm text-stone-500 hover:bg-stone-100"
+            >
+              やめる
+            </button>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
@@ -545,16 +786,19 @@ function SubmissionTable({
   selected,
   toggleSelect,
   moderate,
+  onReject,
   busy,
 }: {
   items: Submission[];
   selected: Set<string>;
   toggleSelect: (id: string) => void;
-  moderate: (id: string, decision: Decision) => void;
+  moderate: (id: string, decision: Decision, reason?: RejectReason) => void;
+  onReject: (id: string) => void;
   busy: string | null;
 }) {
   const HEADERS = [
     "",
+    "優先度",
     "状態",
     "状況",
     "発生",
@@ -598,6 +842,14 @@ function SubmissionTable({
                   onChange={() => toggleSelect(s.id)}
                   aria-label="選択"
                 />
+              </td>
+              <td className="px-2 py-2">
+                <PriorityBadges a={s.assessment} />
+                {s.assessment && (
+                  <div className="mt-1 max-w-[18rem] text-[11px] leading-snug text-stone-500">
+                    {s.assessment.reason}
+                  </div>
+                )}
               </td>
               <td className="whitespace-nowrap px-2 py-2">
                 <span
@@ -693,7 +945,7 @@ function SubmissionTable({
                   </button>
                   <button
                     type="button"
-                    onClick={() => moderate(s.id, "reject")}
+                    onClick={() => onReject(s.id)}
                     disabled={busy === s.id || s.status === "rejected"}
                     className="rounded border border-stone-300 px-2 py-1 font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
                   >
