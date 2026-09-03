@@ -15,6 +15,7 @@ import TravelEssentials from "@/components/en/TravelEssentials";
 import EnSources from "@/components/en/EnSources";
 import JsonLd from "@/components/JsonLd";
 import { prefEn } from "@/data/pref-en";
+import { enPlaceLabel } from "@/lib/muni-en";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import EnSeasons from "@/components/en/EnSeasons";
@@ -153,6 +154,8 @@ export default async function EnglishSpotPage({ params }: Props) {
     distanceKm: number;
     lat: number;
     lon: number;
+    /** 「Matsumoto, Nagano」。英語表記が引けなければ null。 */
+    place: string | null;
   }[] = [];
   // 月別(季節性)は年をまたいで集計＝そのスポットで「何月に多いか」を可視化。
   const monthly = new Array(12).fill(0) as number[];
@@ -166,7 +169,14 @@ export default async function EnglishSpotPage({ params }: Props) {
     count365++;
     if (s.date >= cutoff90) count90++;
     if (!latest || s.date > latest) latest = s.date;
-    nearby.push({ id: s.id, date: s.date, distanceKm: d, lat: s.lat, lon: s.lon });
+    nearby.push({
+      id: s.id,
+      date: s.date,
+      distanceKm: d,
+      lat: s.lat,
+      lon: s.lon,
+      place: enPlaceLabel(s.prefectureName, s.cityName),
+    });
   }
   const monthlyMax = Math.max(1, ...monthly);
   const monthlyTotal = monthly.reduce((a, b) => a + b, 0);
@@ -307,6 +317,8 @@ export default async function EnglishSpotPage({ params }: Props) {
               lat: n.lat,
               lon: n.lon,
               date: n.date,
+              // 吹き出しは英語表記だけ出す(日本語の地名は英語ページに出さない)。
+              sectionName: n.place ?? undefined,
             }))}
             showCenterMarker
             radiusKm={NEAR_RADIUS_KM}
@@ -354,10 +366,15 @@ export default async function EnglishSpotPage({ params }: Props) {
                 key={`${s.date}-${i}`}
                 className="flex items-baseline justify-between gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm"
               >
-                <span className="font-semibold text-stone-900">
-                  {fmtDate(s.date)}
+                <span className="min-w-0">
+                  <span className="font-semibold text-stone-900">
+                    {fmtDate(s.date)}
+                  </span>
+                  {s.place && (
+                    <span className="ml-2 text-xs text-stone-600">{s.place}</span>
+                  )}
                 </span>
-                <span className="text-xs text-stone-500">
+                <span className="shrink-0 text-xs text-stone-500">
                   {s.distanceKm.toFixed(1)} km{" "}
                   {compass(l.lat, l.lon, s.lat, s.lon)}
                 </span>

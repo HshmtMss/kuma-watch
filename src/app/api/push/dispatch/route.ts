@@ -13,6 +13,7 @@ import {
 } from "@/lib/push-storage";
 import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import { enSpotName } from "@/lib/en-spot-name";
+import { enPlaceLabel } from "@/lib/muni-en";
 import { haversineKm } from "@/lib/nearby-sightings";
 import { jstToday } from "@/lib/jst-date";
 import {
@@ -259,9 +260,18 @@ export async function POST(req: Request) {
       );
     }
     if (en.length > 0) {
-      const title =
-        n === 1 ? `New bear sighting nearby` : `${n} new bear sightings nearby`;
-      const body = `${fmtEn(top.date)} — a bear was reported in your area.`.trim();
+      // 場所を英語で言えるなら言う。"your area" では、どこの話か分からない。
+      const place = enPlaceLabel(g.pref, g.city);
+      const title = place
+        ? n === 1
+          ? `New bear sighting in ${place}`
+          : `${n} new bear sightings in ${place}`
+        : n === 1
+          ? `New bear sighting nearby`
+          : `${n} new bear sightings nearby`;
+      const body = place
+        ? `${fmtEn(top.date)} — a bear was reported in ${place}.`.trim()
+        : `${fmtEn(top.date)} — a bear was reported in your area.`.trim();
       sentCount += await deliver(
         en,
         JSON.stringify({ title, body, url, tag, ...PUSH_ICONS }),

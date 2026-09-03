@@ -14,6 +14,7 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 import MiniSightingsMap from "@/components/MiniSightingsMap";
 import EnSources from "@/components/en/EnSources";
 import JsonLd from "@/components/JsonLd";
+import { enPlaceLabel } from "@/lib/muni-en";
 
 /**
  * インバウンド向け「有名トレイル」の英語ページ。点(スポット)ではなく、ルート上の
@@ -67,7 +68,15 @@ type Agg = {
   count90: number;
   count365: number;
   latest: string | null;
-  recent: { id: string; date: string; lat: number; lon: number; near: string }[];
+  recent: {
+    id: string;
+    date: string;
+    lat: number;
+    lon: number;
+    near: string;
+    /** 「Matsumoto, Nagano」。地図の吹き出しで使う。引けなければ null。 */
+    place: string | null;
+  }[];
   perWp: { name: string; count90: number }[];
 };
 
@@ -76,7 +85,13 @@ async function aggregate(t: EnTrail): Promise<Agg> {
   const cutoff90 = jstDaysAgo(90);
   const cutoff365 = jstDaysAgo(365);
   const seen = new Set<string>();
-  const merged: { id: string; date: string; lat: number; lon: number }[] = [];
+  const merged: {
+    id: string;
+    date: string;
+    lat: number;
+    lon: number;
+    place: string | null;
+  }[] = [];
   const perWp = t.waypoints.map((w) => ({ name: w.name, count90: 0 }));
 
   for (let wi = 0; wi < t.waypoints.length; wi++) {
@@ -88,7 +103,13 @@ async function aggregate(t: EnTrail): Promise<Agg> {
       if (rec.date >= cutoff90) perWp[wi].count90++;
       if (!seen.has(rec.id)) {
         seen.add(rec.id);
-        merged.push({ id: rec.id, date: rec.date, lat: rec.lat, lon: rec.lon });
+        merged.push({
+          id: rec.id,
+          date: rec.date,
+          lat: rec.lat,
+          lon: rec.lon,
+          place: enPlaceLabel(rec.prefectureName, rec.cityName),
+        });
       }
     }
   }
@@ -224,6 +245,7 @@ export default async function EnglishTrailPage({ params }: Props) {
               lat: r.lat,
               lon: r.lon,
               date: r.date,
+              sectionName: r.place ?? undefined,
             }))}
             en
           />
