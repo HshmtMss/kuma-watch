@@ -53,21 +53,26 @@ jobs:
           # git pull --rebase が "You have unstaged changes" で失敗する。
           GEOCODE_CACHE_PERSIST: "1"
         # 一時的なネットワーク障害で失敗することがある (GitHub Actions 側から
-        # 自治体サイトへの Connect Timeout)。その場合は激減ガードが働いて
-        # スナップショットを守るが、ジョブとしては失敗するので通知が飛ぶ。
-        # 4 時間ごとに 1 通ずつ来ると通知が意味を失うので、間を置いて再試行し、
-        # それでも駄目なときだけ失敗させる。
+        # 自治体サイトへの Connect Timeout、ArcGIS 側の一時的な不調など)。
+        # その場合は激減ガードが働いてスナップショットを守るが、ジョブとしては
+        # 失敗するので通知が飛ぶ。4 時間ごとに 1 通ずつ来ると通知が意味を失うので、
+        # 間を置いて再試行し、それでも駄目なときだけ失敗させる。
+        #
+        # 待ちは 60 秒では足りなかった。2026-09-03 は福島・新潟 (どちらも ArcGIS)
+        # が数分にわたり不調で、3 回とも 2 分以内に終わって空振りした。ソースが
+        # 163 本あると「どれか 1 本が数分だけ不調」は定期的に起きる。失敗する回は
+        # ガードで早く止まる (1 回 1〜2 分) ので、間隔を延ばしても 30 分枠に収まる。
         run: |
-          for attempt in 1 2 3; do
+          for attempt in 1 2 3 4; do
             if npm run build:sightings; then
               exit 0
             fi
-            if [ "$attempt" -lt 3 ]; then
-              echo "[refresh] 集約に失敗 (試行 $attempt/3) — 60 秒後に再試行"
-              sleep 60
+            if [ "$attempt" -lt 4 ]; then
+              echo "[refresh] 集約に失敗 (試行 $attempt/4) — 240 秒後に再試行"
+              sleep 240
             fi
           done
-          echo "[refresh] 3 回とも失敗しました"
+          echo "[refresh] 4 回とも失敗しました"
           exit 1
 
       - name: Commit if changed
