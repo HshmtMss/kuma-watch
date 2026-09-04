@@ -20,6 +20,7 @@ import MiniSightingsMap from "@/components/MiniSightingsMap";
 import PushSubscribeButton from "@/components/PushSubscribeButton";
 import EnSeasons from "@/components/en/EnSeasons";
 import { EN_BLURBS } from "@/data/inbound-en-blurbs";
+import SpotScopeNote from "@/components/SpotScopeNote";
 
 /**
  * インバウンド向け英語スポットページ（追加方式 /en）。日本語の /spot は無改修。
@@ -304,6 +305,12 @@ export default async function EnglishSpotPage({ params }: Props) {
           Real-time data from official reports and news, updated continuously.
         </p>
       </section>
+
+      {/* 日本語ページと同じ注記。英語ページも施設名を冠した見出しになるため、
+          「周辺の情報であってその地点自体の評価ではない」ことを同じ位置で示す。 */}
+      <div className="mt-4">
+        <SpotScopeNote name={name} radiusKm={NEAR_RADIUS_KM} lang="en" />
+      </div>
 
       {/* Embedded live map (same map as the Japanese page, English labels) */}
       <section className="mt-6">

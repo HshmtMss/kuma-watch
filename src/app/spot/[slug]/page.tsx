@@ -16,6 +16,7 @@ import SightingsMapBlock from "@/components/SightingsMapBlock";
 import SeasonalAdvice from "@/components/SeasonalAdvice";
 import { getHabitatNote } from "@/lib/place-content";
 import RiskBanner from "@/components/RiskBanner";
+import SpotScopeNote from "@/components/SpotScopeNote";
 import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
@@ -693,6 +694,11 @@ export default async function SpotPage({ params }: Props) {
         nearestText={nearestText}
         note={risk.note}
       />
+
+      {/* このページが何を集めたものかの明示。RiskBanner の直下に固定で置く。
+          施設名を冠したページで「周辺の情報」と「その地点自体の危険性」が
+          混同されるのを防ぐ（詳細は SpotScopeNote の説明）。 */}
+      <SpotScopeNote name={landmark.name} radiusKm={NEAR_RADIUS_KM} />
 
       {/* このスポットについて — 以前は「詳しく見る」の折りたたみ内にあったが、
           blurb はこのページ唯一の地点固有の文章で、隠すと残るのは地点名と件数
