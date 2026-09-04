@@ -1,6 +1,28 @@
 {
-  "generatedAt": 1787639606667,
+  "generatedAt": 1788517035060,
   "items": [
+    {
+      "id": "maff:https://www.maff.go.jp/j/press/nousin/tyozyu/260904.html",
+      "ministry": "maff",
+      "date": "2026-09-04",
+      "title": "鳥獣被害対策やジビエ利用に係る優良な取組を募集します！",
+      "url": "https://www.maff.go.jp/j/press/nousin/tyozyu/260904.html",
+      "tag": "農村振興",
+      "category": "press",
+      "summary": "鳥獣による被害対策や捕獲した野生鳥獣の食肉利用（ジビエ）に関して、優れた取り組み事例を広く募集する発表。",
+      "ingestedAt": 1788517035060
+    },
+    {
+      "id": "env:https://www.env.go.jp/press/press_05519.html",
+      "ministry": "env",
+      "date": "2026-09-04",
+      "title": "クマ出没対策コンサルティング実証事業の参加地方公共団体の募集について",
+      "url": "https://www.env.go.jp/press/press_05519.html",
+      "tag": "自然環境",
+      "category": "policy",
+      "summary": "クマの出没対策に関するコンサルティング実証事業について、参加を希望する地方公共団体を募集する発表。",
+      "ingestedAt": 1788517035060
+    },
     {
       "id": "env:https://www.env.go.jp/press/press_05460.html",
       "ministry": "env",
