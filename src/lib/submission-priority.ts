@@ -159,12 +159,16 @@ export function assessCredibility(input: {
   photoSoftware?: string;
   comment?: string;
   cityCode?: string;
+  /** 逆ジオコーディングで得た市町村名。cityCode 導入前の投稿にも入っている */
+  cityName?: string;
 }): { credibility: Credibility; reason: string; flags: string[] } {
   const flags: string[] = [];
   const hasPhoto = Boolean(input.photoUrl);
   const hasComment = Boolean(input.comment && input.comment.trim().length >= 10);
 
-  if (!input.cityCode) flags.push("市町村を特定できず");
+  // cityCode は後から入れた項目なので、それだけで判断すると過去の投稿が
+  // すべて「特定できず」になる。市町村名が取れていれば場所は分かっている
+  if (!input.cityCode && !input.cityName) flags.push("市町村を特定できず");
 
   let gapKm: number | null = null;
   if (hasPhoto && input.photoLat != null && input.photoLon != null) {
@@ -262,6 +266,7 @@ export function assessSubmission(input: {
   photoSoftware?: string;
   comment?: string;
   cityCode?: string;
+  cityName?: string;
   now?: number;
 }): Assessment {
   const u = assessUrgency(input);

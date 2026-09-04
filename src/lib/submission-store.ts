@@ -99,6 +99,7 @@ export function withAssessment(sub: StoredSubmission): StoredSubmission {
       photoSoftware: sub.photoSoftware,
       comment: sub.comment,
       cityCode: sub.cityCode,
+      cityName: sub.cityName,
     }),
   };
 }

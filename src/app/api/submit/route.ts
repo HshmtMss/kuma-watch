@@ -287,6 +287,7 @@ export async function POST(req: Request) {
       photoSoftware: rest.photoSoftware,
       comment: rest.comment,
       cityCode,
+      cityName: geo.cityName,
     }),
   };
 

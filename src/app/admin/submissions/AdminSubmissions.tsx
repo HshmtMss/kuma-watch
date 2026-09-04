@@ -173,7 +173,14 @@ function sinceLabel(ms: number): string {
  * 優先度のバッジ。承認者が最初に見る 2 つ (緊急度・信ぴょう性) と、
  * その理由 1 行だけを出す。数値スコアは出さない。
  */
-function PriorityBadges({ a }: { a?: Assessment }) {
+function PriorityBadges({
+  a,
+  compact = false,
+}: {
+  a?: Assessment;
+  /** 表など幅が取れない場所では文言を詰める */
+  compact?: boolean;
+}) {
   if (!a)
     return (
       <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-500">
@@ -181,21 +188,22 @@ function PriorityBadges({ a }: { a?: Assessment }) {
       </span>
     );
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex flex-wrap items-center gap-1">
       <span
-        className={`rounded-full px-2 py-0.5 text-xs font-bold ${URGENCY_STYLE[a.urgency]}`}
+        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-bold ${URGENCY_STYLE[a.urgency]}`}
       >
         {URGENCY_LABEL[a.urgency]}
       </span>
       <span
-        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${CREDIBILITY_STYLE[a.credibility]}`}
+        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${CREDIBILITY_STYLE[a.credibility]}`}
       >
-        信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
+        {compact ? "信" : "信ぴょう性"} {CREDIBILITY_LABEL[a.credibility]}
       </span>
       {a.flags.map((f) => (
         <span
           key={f}
-          className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-900"
+          className="whitespace-nowrap rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-900"
+          title={f}
         >
           ⚑ {f}
         </span>
@@ -848,11 +856,16 @@ function SubmissionTable({
   ];
   return (
     <div className="overflow-x-auto rounded-2xl border border-stone-200">
-      <table className="w-full min-w-[72rem] border-collapse text-xs">
+      <table className="w-full min-w-[84rem] border-collapse text-xs">
         <thead>
           <tr className="bg-stone-50 text-left text-stone-500">
             {HEADERS.map((h, i) => (
-              <th key={i} className="whitespace-nowrap px-2 py-2 font-medium">
+              <th
+                key={i}
+                className={`whitespace-nowrap px-2 py-2 font-medium ${
+                  h === "優先度" ? "w-56 min-w-[14rem]" : ""
+                }`}
+              >
                 {h}
               </th>
             ))}
@@ -875,10 +888,10 @@ function SubmissionTable({
                   aria-label="選択"
                 />
               </td>
-              <td className="px-2 py-2">
-                <PriorityBadges a={s.assessment} />
+              <td className="w-56 min-w-[14rem] px-2 py-2">
+                <PriorityBadges a={s.assessment} compact />
                 {s.assessment && (
-                  <div className="mt-1 max-w-[18rem] text-[11px] leading-snug text-stone-500">
+                  <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-500">
                     {s.assessment.reason}
                   </div>
                 )}
