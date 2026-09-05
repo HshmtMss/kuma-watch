@@ -17,6 +17,7 @@ import SeasonalAdvice from "@/components/SeasonalAdvice";
 import { getHabitatNote } from "@/lib/place-content";
 import RiskBanner from "@/components/RiskBanner";
 import SpotScopeNote from "@/components/SpotScopeNote";
+import SpotOperatorNote from "@/components/SpotOperatorNote";
 import type { RiskTone } from "@/lib/risk";
 import NotifyBlock from "@/components/NotifyBlock";
 import BearGearAffiliate from "@/components/BearGearAffiliate";
@@ -29,6 +30,7 @@ import { JAPAN_LANDMARKS, PREBUILD_SPOT_SLUGS } from "@/data/japan-landmarks";
 import { JAPAN_MUNICIPALITIES } from "@/data/japan-municipalities";
 import { getNearbySightings } from "@/lib/sightings-cache";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
+import { getSpotOperatorNote } from "@/data/spot-operator-notes";
 import { getMuniMessage, type MuniMessage } from "@/data/muni-messages";
 import { placeHrefForSighting } from "@/lib/muni-name";
 import { jstToday, jstDaysAgo } from "@/lib/jst-date";
@@ -480,6 +482,8 @@ export default async function SpotPage({ params }: Props) {
   // 出没 0 件スポットの「安全確認」ブロック用に、県のクマ生息状況を一文で。
   // 市町村ページと共通の getHabitatNote（県ごとに文面が変わり thin/duplicate 回避）。
   const habitatNote = getHabitatNote(landmark.prefName);
+  // 施設運営者から提供を受けた取り組み（あれば）。自動生成の紹介文とは出所が違う。
+  const operatorNote = getSpotOperatorNote(slug);
 
   // 地図に飛ぶときに地点名も渡す。トップの選択カードに「富士山」など名前が出るので、
   // どこから来たかが視覚的に保たれ「連続性」が出る。
@@ -711,6 +715,11 @@ export default async function SpotPage({ params }: Props) {
           {landmark.scaleNote}
         </p>
       )}
+
+      {/* 施設側から提供を受けた取り組み。「この場所はどういう所か」の直後に
+          「その場所が何をしているか」を続ける。周辺の出没件数だけが並ぶ状態を
+          解消するのが目的なので、地図より前に置く。 */}
+      {operatorNote && <SpotOperatorNote note={operatorNote} />}
       {/* 所在地。市町村は座標のポリゴン包含で確定させてあるので（scripts/fill-spot-muni.ts）、
           そのまま市町村ページへ繋ぐ。出没 0 件のスポットでも、来訪者を実データのある
           ページへ送れる（旅行者は地域をまたいで移動するので、ここが行き止まりだと
