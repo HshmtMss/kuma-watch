@@ -2453,12 +2453,14 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "栃木県 那須町 クマ出没情報",
     bearStatus: "present",
     urls: [
-      { url: "https://www.town.nasu.lg.jp/0292/info-0000000090-1.html", role: "list", hint: "那須町 クマ出没情報" },
+      { url: "https://www.town.nasu.lg.jp/0292/info-0000004399-1.html", role: "list", hint: "那須町 クマ出没情報" },
     ],
     extractor: "llm-html",
     defaultCity: "那須町",
-    notes: "下見時 50 件 (最新 2025-02-08)",
-    verifiedAt: "2026-09-04",
+    // 旧ページ info-0000000090 は令和6年度までのアーカイブで 2025-02-08 で更新停止。
+    // 現行の掲載先は info-0000004399 (令和8年度以降)。2026-09-07 に差し替え。
+    notes: "下見時 54 件 (最新 2026-08-31)",
+    verifiedAt: "2026-09-07",
   },
   {
     id: "tochigi-sano",
