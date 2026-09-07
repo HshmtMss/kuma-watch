@@ -279,6 +279,7 @@ export async function POST(req: Request) {
       occurredAt: rest.occurredAt,
       lat: rest.lat,
       lon: rest.lon,
+      contact: rest.contact,
       photoUrl,
       photoLat: rest.photoLat,
       photoLon: rest.photoLon,

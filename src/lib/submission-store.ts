@@ -91,6 +91,7 @@ export function withAssessment(sub: StoredSubmission): StoredSubmission {
       occurredAt: sub.occurredAt,
       lat: sub.lat,
       lon: sub.lon,
+      contact: sub.contact,
       photoUrl: sub.photoUrl,
       photoLat: sub.photoLat,
       photoLon: sub.photoLon,

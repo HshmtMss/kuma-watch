@@ -59,6 +59,12 @@ export type Assessment = {
   assessedAt: number;
   /** rule = ルールのみ / ai = 写真判定を含む。後から ai が上書きする */
   source: "rule" | "ai";
+  /**
+   * 裏付けの乏しさ。人身被害のように緊急度が高い申告ほど、根拠が無いときに
+   * 承認者へ知らせる必要がある。「いたずら」と決めつけず、欠けている証拠を並べる。
+   * 本文の言い回しが不自然かどうかは、ここでは判定できない (別途 LLM が要る)。
+   */
+  thinEvidence?: string[];
 };
 
 // ────────────────────────────────────────
@@ -252,12 +258,38 @@ export function assessCredibility(input: {
   return { credibility: "low", reason: "写真も状況の記述もなし", flags };
 }
 
+/**
+ * 裏付けが乏しい点を列挙する。決めつけないよう、事実だけを短く書く。
+ *
+ * 「人の首が取れた。」のような明らかな悪ふざけは、人間なら本文の言い回しで
+ * 一瞬で見抜ける。ルールでは言い回しを判定できないので、代わりに
+ * 「写真も連絡先も無く、本文が極端に短い」という欠落の重なりを示す。
+ * 言い回しの判定は LLM の仕事なので、ここでは踏み込まない。
+ */
+function thinEvidenceOf(input: {
+  situation: SubmissionSituationKey;
+  photoUrl?: string;
+  contact?: string;
+  comment?: string;
+}): string[] {
+  // 痕跡・目撃は写真が無くて当たり前なので対象外。実害の申告だけを見る
+  if (input.situation !== "injury" && input.situation !== "damage") return [];
+  const missing: string[] = [];
+  if (!input.photoUrl) missing.push("写真なし");
+  if (!input.contact) missing.push("連絡先なし");
+  const len = input.comment?.trim().length ?? 0;
+  if (len < 20) missing.push(len === 0 ? "状況の記述なし" : "記述が短い");
+  // 1 つ欠けるのは普通。3 つ揃って初めて「裏付けが無い」と言える
+  return missing.length >= 3 ? missing : [];
+}
+
 /** 投稿 1 件から判定をまとめて作る */
 export function assessSubmission(input: {
   situation: SubmissionSituationKey;
   occurredAt: string;
   lat: number;
   lon: number;
+  contact?: string;
   photoUrl?: string;
   photoLat?: number;
   photoLon?: number;
@@ -271,6 +303,7 @@ export function assessSubmission(input: {
 }): Assessment {
   const u = assessUrgency(input);
   const c = assessCredibility(input);
+  const thin = thinEvidenceOf(input);
   return {
     urgency: u.urgency,
     credibility: c.credibility,
@@ -278,6 +311,7 @@ export function assessSubmission(input: {
     flags: c.flags,
     assessedAt: input.now ?? Date.now(),
     source: "rule",
+    thinEvidence: thin.length > 0 ? thin : undefined,
   };
 }
 
@@ -298,7 +332,12 @@ const CREDIBILITY_RANK: Record<Credibility, number> = {
   low: 2,
 };
 
-/** 箱の中の並び順: 緊急度 → 信ぴょう性 → 新しい順 */
+/**
+ * 箱の中の並び順: 緊急度 → 信ぴょう性 → 新しい順。
+ * ①の中でも信ぴょう性の高いものが上に来る。裏付けの無い人身被害の申告を
+ * ①から外すことはしない (機械が人身被害を沈めてはいけない) が、
+ * 確かなものより下に置くことで、①の先頭が信用できる状態を保つ。
+ */
 export function compareByPriority(
   a: { assessment?: Assessment; occurredAt: string },
   b: { assessment?: Assessment; occurredAt: string },

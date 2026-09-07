@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminSubmissionsMap, { type MapItem } from "./AdminSubmissionsMap";
+import SubmissionList, { type Submission } from "./SubmissionList";
 import AdminShell from "@/components/admin/AdminShell";
 import {
   BUCKET_LABEL,
@@ -61,34 +62,6 @@ const TABS: { key: string; label: string }[] = [
   { key: "all", label: "すべて" },
 ];
 
-type Submission = {
-  id: string;
-  lat: number;
-  lon: number;
-  occurredAt: string;
-  headCount: number;
-  situation: Situation;
-  status: Status;
-  comment?: string;
-  contact?: string;
-  photoUrl?: string;
-  photoLat?: number;
-  photoLon?: number;
-  photoTakenAt?: string;
-  photoGpsAt?: string;
-  photoDirection?: number;
-  photoDirectionRef?: string;
-  photoDevice?: string;
-  photoSoftware?: string;
-  prefectureName?: string;
-  cityName?: string;
-  sectionName?: string;
-  receivedAt: number;
-  cityCode?: string;
-  assessment?: Assessment;
-  rejectReason?: RejectReason;
-};
-
 // 2点間の距離(km)。写真の撮影位置とピン位置のズレ確認用。
 function distanceKm(
   aLat: number,
@@ -135,31 +108,6 @@ const CREDIBILITY_STYLE: Record<string, string> = {
   medium: "bg-sky-100 text-sky-900",
   low: "bg-stone-200 text-stone-700",
 };
-
-/** 方位角を八方位の言葉にする。度だけだと向きが頭に入らない */
-function compassLabel(deg: number): string {
-  const dirs = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
-  return dirs[Math.round(deg / 45) % 8];
-}
-
-/**
- * 写真のEXIF。承認の判断材料なので管理画面にだけ出す。
- * 公開する写真からは圧縮で剥がれているので、ここに出しても外へは漏れない。
- */
-function PhotoExifRow({ s }: { s: Submission }) {
-  const bits: string[] = [];
-  if (s.photoTakenAt) bits.push(`撮影 ${s.photoTakenAt.replace("T", " ")}`);
-  if (s.photoDirection != null)
-    bits.push(
-      `向き ${compassLabel(s.photoDirection)} (${s.photoDirection}°${s.photoDirectionRef === "M" ? " 磁北" : ""})`,
-    );
-  if (s.photoDevice) bits.push(s.photoDevice);
-  if (s.photoSoftware) bits.push(`加工 ${s.photoSoftware}`);
-  if (bits.length === 0) return null;
-  return (
-    <p className="mt-1 text-xs text-stone-500">写真: {bits.join(" ・ ")}</p>
-  );
-}
 
 /** 経過時間を「4時間前」「3日前」の形で返す */
 function sinceLabel(ms: number): string {
@@ -241,7 +189,8 @@ function SubmissionsContent({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState("pending");
-  const [view, setView] = useState<"table" | "card" | "map">("table");
+  // 既定は一覧。自治体職員が上から順に捌く画面なので、表計算より一覧を先に出す
+  const [view, setView] = useState<"list" | "table" | "map">("list");
   // 一括操作の選択状態（リスト表示のチェックボックス）。
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // 自由検索（地名・地区・コメント・連絡先）。ステータス絞り込みの内側で効く。
@@ -526,7 +475,7 @@ function SubmissionsContent({
           )}
         </span>
         <div className="inline-flex overflow-hidden rounded-full border border-stone-300">
-          {(["table", "card", "map"] as const).map((v) => (
+          {(["list", "table", "map"] as const).map((v) => (
             <button
               key={v}
               type="button"
@@ -537,7 +486,7 @@ function SubmissionsContent({
                   : "bg-white text-stone-700 hover:bg-stone-50"
               }`}
             >
-              {v === "table" ? "表" : v === "card" ? "カード" : "地図"}
+              {v === "list" ? "一覧" : v === "table" ? "表" : "地図"}
             </button>
           ))}
         </div>
@@ -561,7 +510,7 @@ function SubmissionsContent({
         <AdminSubmissionsMap items={mapItems} onModerate={moderate} />
       )}
 
-      {(view === "table" || view === "card") && shown.length > 0 && (
+      {(view === "table" || view === "list") && shown.length > 0 && (
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm">
               <label className="flex items-center gap-1.5 text-stone-600">
                 <input
@@ -629,144 +578,15 @@ function SubmissionsContent({
         />
       )}
 
-      {view === "card" && (
-        <ul className="flex flex-col gap-4">
-            {shown.map((s) => (
-            <li
-              key={s.id}
-              className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
-            >
-              {s.photoUrl && (
-                // 管理画面のみで使う確認用画像。最適化不要なので素の img を使う。
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={s.photoUrl}
-                  alt="投稿写真"
-                  className="max-h-72 w-full bg-stone-100 object-contain"
-                />
-              )}
-              <div className="p-4">
-                {/* 承認者が最初に見るもの: 緊急度・信ぴょう性・その理由 */}
-                <div className="mb-3 rounded-xl bg-stone-50 px-3 py-2">
-                  <PriorityBadges a={s.assessment} />
-                  {s.assessment && (
-                    <p className="mt-1.5 text-sm leading-relaxed text-stone-700">
-                      {s.assessment.reason}
-                    </p>
-                  )}
-                  <PhotoExifRow s={s} />
-                  {s.rejectReason && (
-                    <p className="mt-1.5 text-sm text-rose-700">
-                      却下理由: {s.rejectReason}
-                    </p>
-                  )}
-                </div>
-                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4"
-                    checked={selected.has(s.id)}
-                    onChange={() => toggleSelect(s.id)}
-                    aria-label="この投稿を選択"
-                  />
-                  <span
-                    className={`rounded-full px-2 py-0.5 font-semibold ${STATUS_STYLE[s.status]}`}
-                  >
-                    {STATUS_LABEL[s.status]}
-                  </span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 font-semibold ${SITUATION_STYLE[s.situation]}`}
-                  >
-                    {SITUATION_LABEL[s.situation]}
-                  </span>
-                  <span className="text-stone-500">頭数 {s.headCount}</span>
-                  <span className="tabular-nums text-stone-500">
-                    発生 {fmtDateTime(s.occurredAt)}
-                  </span>
-                  <span className="tabular-nums text-stone-400">
-                    受信 {fmtDateTime(new Date(s.receivedAt).toISOString())}
-                  </span>
-                </div>
-
-                <div className="text-sm font-semibold text-stone-900">
-                  {s.prefectureName || "—"}
-                  {s.cityName ? ` ${s.cityName}` : ""}
-                  {s.sectionName ? ` ${s.sectionName}` : ""}
-                </div>
-
-                {s.comment && (
-                  <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-stone-700">
-                    {s.comment}
-                  </p>
-                )}
-
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
-                  <a
-                    href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-700 underline"
-                  >
-                    ピン位置を地図で確認 ({s.lat.toFixed(4)}, {s.lon.toFixed(4)})
-                  </a>
-                  {s.contact && <span>連絡先: {s.contact}</span>}
-                </div>
-
-                {s.photoLat != null && s.photoLon != null && (
-                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-500">
-                    <span className="rounded bg-stone-100 px-1.5 py-0.5 font-medium text-stone-600">
-                      📷 写真の撮影位置
-                    </span>
-                    <a
-                      href={`https://www.google.com/maps?q=${s.photoLat},${s.photoLon}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-700 underline"
-                    >
-                      {s.photoLat.toFixed(4)}, {s.photoLon.toFixed(4)}
-                    </a>
-                    <span className="tabular-nums">
-                      ピンから{" "}
-                      {distanceKm(s.lat, s.lon, s.photoLat, s.photoLon).toFixed(2)}
-                      km
-                    </span>
-                  </div>
-                )}
-
-                <div className="mt-2 font-mono text-[10px] text-stone-400">
-                  ID: {s.id}
-                </div>
-
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "approve")}
-                    disabled={busy === s.id || s.status === "approved"}
-                    className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
-                  >
-                    承認して公開
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRejecting(s.id)}
-                    disabled={busy === s.id || s.status === "rejected"}
-                    className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
-                  >
-                    却下…
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "delete")}
-                    disabled={busy === s.id}
-                    className="ml-auto rounded-full px-3 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40"
-                  >
-                    削除
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+      {view === "list" && shown.length > 0 && (
+        <SubmissionList
+          items={shown}
+          selected={selected}
+          toggleSelect={toggleSelect}
+          moderate={moderate}
+          onReject={setRejecting}
+          busy={busy}
+        />
       )}
 
       {/* 却下理由。溜まればフォームの改善材料になるので、定型 5 つから選ばせる。
