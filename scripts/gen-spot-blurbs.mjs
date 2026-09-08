@@ -15,7 +15,9 @@ if (!process.env.GEMINI_API_KEY && existsSync(".env.local")) {
   }
 }
 const google = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL = process.env.GEMINI_SPOT_MODEL ?? "gemini-2.5-flash";
+// .mjs から TS を import できないため既定値をここに置く。
+// 変更時は src/lib/gemini-models.ts の GEMINI_BULK_MODEL と揃えること。
+const MODEL = process.env.GEMINI_SPOT_MODEL ?? "gemini-3.1-flash-lite";
 const BATCH = 40;
 const DELAY_MS = 5200; // ~11-12 req/min（429 回避のため控えめに、1回で多く処理）
 const LIMIT = process.argv[2] ? +process.argv[2] : Infinity;

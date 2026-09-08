@@ -247,7 +247,7 @@ export default async function DataPage() {
 
       <h3>3. AI による分類・抽出</h3>
       <p>
-        ニュース報道と自治体 HTML スクレイピングでは Gemini (gemini-2.5-flash) を以下の用途で使用しています:
+        ニュース報道と自治体 HTML スクレイピングでは Gemini (gemini-3.1-flash-lite) を以下の用途で使用しています:
       </p>
       <ul>
         <li>

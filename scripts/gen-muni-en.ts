@@ -17,6 +17,7 @@ import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { z } from "zod";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { GEMINI_BULK_MODEL } from "../src/lib/gemini-models";
 
 if (!process.env.GEMINI_API_KEY && existsSync(".env.local")) {
   for (const line of readFileSync(".env.local", "utf8").split("\n")) {
@@ -25,7 +26,7 @@ if (!process.env.GEMINI_API_KEY && existsSync(".env.local")) {
   }
 }
 const google = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL = process.env.GEMINI_SPOT_MODEL ?? "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_SPOT_MODEL ?? GEMINI_BULK_MODEL;
 const BATCH = 60;
 const DELAY_MS = 4000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

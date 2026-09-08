@@ -10,6 +10,8 @@
  * 必要環境変数: GEMINI_API_KEY (extract 段階)。
  */
 
+import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+
 export type GovMinistry = "env" | "maff" | "rinya";
 
 export type GovAnnouncement = {
@@ -329,9 +331,8 @@ export function filterBearRelated(items: ParsedItem[]): ParsedItem[] {
 // 入力: 候補アイテム → 出力: { id, isBearRelated, summary, category }
 // 入力数は事前フィルタで絞られているので一括で投げる。
 // ────────────────────────────────────────
-const GEMINI_MODEL =
-  process.env.GEMINI_GOV_MODEL ?? "gemini-2.5-flash";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_MODEL = process.env.GEMINI_GOV_MODEL ?? GEMINI_BULK_MODEL;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_MODEL);
 
 type ClassifiedResult = {
   index: number;

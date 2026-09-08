@@ -24,13 +24,13 @@ import { jstToday } from "@/lib/jst-date";
 import { isRealCalendarDate } from "./date-utils";
 import { incidentKey, normalizeSection } from "@/lib/incident-key";
 import { snapToRiver } from "@/lib/river-snap";
+import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
 
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
 // 1 回のバッチで Gemini に渡す記事数の上限。
 // FEEDS が多系統 (全国 + 警察/防災 + 西日本県別 + NHK/Yahoo) に増えたため
-// バッチ分割で処理。Gemini gemini-3-flash は 50 記事程度なら
+// バッチ分割で処理。Flash 系は 50 記事程度なら
 // responseSchema の JSON 上限内に収まる。
 const MAX_ARTICLES_PER_BATCH = 50;
 const SOURCE_CACHE_TTL_MS = 60 * 60 * 1000;

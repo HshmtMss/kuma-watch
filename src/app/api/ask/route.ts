@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { buildAggregateContext, formatAggregateForPrompt } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
+import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint } from "@/lib/gemini-models";
 
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_INTERACTIVE_MODEL);
 
 type AskPayload = {
   question: string;

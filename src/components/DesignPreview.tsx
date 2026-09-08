@@ -452,7 +452,7 @@ function VariantD({ place }: { place: MockPlace }) {
           {place.llmSummary}
         </p>
         <p className="mt-2 text-[10px] text-gray-500">
-          (Gemini 3 Flash 生成・根拠は周辺目撃と公式集計)
+          (Gemini 生成・根拠は周辺目撃と公式集計)
         </p>
       </div>
     </div>

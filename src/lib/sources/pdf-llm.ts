@@ -2,9 +2,9 @@ import type { DataSourceEntry } from "@/data/data-sources";
 import { type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
 import { incidentKey } from "@/lib/incident-key";
+import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
 
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
 const MAX_SIGHTINGS_PER_SOURCE = 200;
 const SOURCE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;

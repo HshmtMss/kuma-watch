@@ -1,3 +1,4 @@
+import { GEMINI_BULK_MODEL, geminiEndpoint } from "../../src/lib/gemini-models";
 /**
  * 自治体・都道府県の公式ページから「お問い合わせ先」を抜き出す共通処理。
  *
@@ -12,8 +13,7 @@
  */
 
 export const UA = "KumaWatch/1.0 (+https://kuma-watch.jp; contact directory build)";
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 const PER_ORIGIN_INTERVAL_MS = 1500;
 export const PAGE_TEXT_MAX = 14000;
 

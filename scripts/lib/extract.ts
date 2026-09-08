@@ -8,6 +8,7 @@ import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { z } from "zod";
 import { parse } from "node-html-parser";
+import { GEMINI_BULK_MODEL } from "../../src/lib/gemini-models";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -179,7 +180,7 @@ export async function extractFromUrl(
   const text = extractRelevantText(html);
   const t0 = Date.now();
   const result = await generateObject({
-    model: google("gemini-2.5-flash"),
+    model: google(GEMINI_BULK_MODEL),
     schema: ProductSchema,
     system: SYSTEM_PROMPT,
     prompt: `次の Web ページから商品情報を構造化してください。

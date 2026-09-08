@@ -23,6 +23,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { GEMINI_REPORT_MODEL } from "../src/lib/gemini-models";
 
 type CliArgs = {
   mode: "daily" | "weekly" | "monthly";
@@ -70,7 +71,7 @@ const ROOT = process.cwd();
 const MARKER = "// auto-generated: research-report v1";
 
 const GEMINI_MODEL =
-  process.env.GEMINI_RESEARCH_MODEL ?? "gemini-2.5-pro";
+  process.env.GEMINI_RESEARCH_MODEL ?? GEMINI_REPORT_MODEL;
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 // 上限。プロンプトに渡す出没レコードの最大件数 (大量に渡すとトークン爆発)

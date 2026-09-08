@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Imagen を使って記事ヒーロー画像を 1 回限り生成するスクリプト。
+ * Gemini の画像生成モデルで記事ヒーロー画像を 1 回限り生成するスクリプト。
  *
  * 用途: 既存画像とテーマが合わない / 共有が嫌な記事に対し、
  *        専用のヒーロー画像を AI 生成して public/articles/<slug>.jpg に保存する。
@@ -10,15 +10,20 @@
  *   tsx scripts/generate-article-images.ts <slug>     # 単一スラッグだけ実行
  *
  * 必要環境変数:
- *   GEMINI_API_KEY  — Google AI Studio の API キー (有料ティアで Imagen 利用可能)
+ *   GEMINI_API_KEY  — Google AI Studio の API キー (画像生成は有料ティアのみ)
  *
- * モデル: imagen-4.0-generate-001 (1 枚 $0.04 程度)
- *   - 利用不可なら imagen-3.0-generate-002 にフォールバック。
+ * モデル: src/lib/gemini-models.ts の GEMINI_IMAGE_MODEL
+ *   = gemini-3.1-flash-lite-image (1 枚 $0.0336 程度)。
+ *   失敗したら gemini-3.1-flash-image → gemini-2.5-flash-image の順に落とす。
+ *
+ * 旧構成の imagen-4.0-generate-001 / imagen-3.0-generate-002 は
+ * 2026-08-17 に Google 側で停止済み (models API にも存在しない)。
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { experimental_generateImage as generateImage } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { GEMINI_IMAGE_MODEL } from "../src/lib/gemini-models";
 
 // .env.local を簡易ロード（既存スクリプトに合わせて dotenv パッケージは使わない）
 const ENV_PATH = join(process.cwd(), ".env.local");
@@ -429,27 +434,25 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // モデル優先順: Imagen 4 → Imagen 3 にフォールバック。
-  // 最初の 1 枚で 4 が失敗した場合は以後すべて 3 で生成する。
-  let model = "imagen-4.0-generate-001";
-  let usedFallback = false;
+  // モデル優先順。失敗したら 1 段ずつ落とし、以後は落とした先で生成し続ける。
+  const FALLBACKS = [
+    GEMINI_IMAGE_MODEL,
+    "gemini-3.1-flash-image",
+    "gemini-2.5-flash-image",
+  ];
+  let tier = 0;
   let ok = 0;
   let ng = 0;
 
   for (const t of targets) {
-    const success = await generateOne(t, model);
-    if (success) {
-      ok++;
-    } else if (!usedFallback && model.startsWith("imagen-4")) {
-      console.log("[gen] Imagen 4 failed — falling back to Imagen 3");
-      model = "imagen-3.0-generate-002";
-      usedFallback = true;
-      const retry = await generateOne(t, model);
-      if (retry) ok++;
-      else ng++;
-    } else {
-      ng++;
+    let success = await generateOne(t, FALLBACKS[tier]);
+    while (!success && tier < FALLBACKS.length - 1) {
+      tier++;
+      console.log(`[gen] falling back to ${FALLBACKS[tier]}`);
+      success = await generateOne(t, FALLBACKS[tier]);
     }
+    if (success) ok++;
+    else ng++;
   }
 
   console.log(`\n[gen] Done. success=${ok} failed=${ng}`);

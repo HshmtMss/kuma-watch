@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint } from "@/lib/gemini-models";
 
-const GEMINI_MODEL = "gemini-3-flash-preview";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_INTERACTIVE_MODEL);
 
 export type AdvicePayload = {
   level: string;

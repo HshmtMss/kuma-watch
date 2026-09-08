@@ -30,6 +30,7 @@ import { join } from "node:path";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import Papa from "papaparse";
+import { GEMINI_BULK_MODEL } from "../src/lib/gemini-models";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -146,7 +147,7 @@ type SearchHit = { url: string; title: string };
 
 async function searchForQuery(query: string): Promise<SearchHit[]> {
   const result = await generateText({
-    model: google("gemini-2.5-flash"),
+    model: google(GEMINI_BULK_MODEL),
     tools: { google_search: google.tools.googleSearch({}) },
     prompt: `日本国内のクマ対策（撃退・忌避・監視・防護・捕獲・装備・情報サービス等）に関する **製品ページ・商品ページ・サービス紹介ページ** を Web 検索で探してください。
 

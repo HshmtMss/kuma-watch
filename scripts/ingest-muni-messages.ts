@@ -26,9 +26,10 @@ import { MUNI_OFFICIAL_LINKS } from "../src/data/muni-official-links";
 import { JAPAN_MUNICIPALITIES } from "../src/data/japan-municipalities";
 import { JAPAN_LANDMARKS } from "../src/data/japan-landmarks";
 import { fetchHtml, extractRelevantText } from "./lib/extract";
+import { GEMINI_BULK_MODEL } from "../src/lib/gemini-models";
 
 const google = createGoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
-const MODEL = process.env.GEMINI_MUNI_MODEL ?? "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MUNI_MODEL ?? GEMINI_BULK_MODEL;
 const OUT = join(process.cwd(), "src", "data", "muni-messages-generated.json");
 // Gemini 無料枠 (15 RPM) を超えないよう 1 件あたり 4.5 秒空ける。
 const DELAY_MS = 4500;

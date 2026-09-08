@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { findSourceById, type DataSourceEntry } from "@/data/data-sources";
+import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
 
-const GEMINI_MODEL = "gemini-2.5-flash";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 const CACHE_SECONDS = 60 * 60 * 12;
 const FETCH_TIMEOUT_MS = 10_000;
 
