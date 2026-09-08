@@ -67,13 +67,20 @@ const STATUS_STYLE: Record<Status, string> = {
   approved: "bg-emerald-100 text-emerald-900",
   rejected: "bg-rose-100 text-rose-900",
 };
-const PRIORITY_STYLE: Record<Priority, string> = {
+/** 優先度のチップ。高だけを塗り、低は控えめにして視線を上に集める */
+const PRIORITY_CHIP: Record<Priority, string> = {
   high: "bg-rose-600 text-white",
-  medium: "bg-amber-500 text-white",
-  low: "bg-stone-200 text-stone-700",
+  medium: "bg-amber-100 text-amber-900 ring-1 ring-amber-300",
+  low: "bg-stone-100 text-stone-500 ring-1 ring-stone-200",
+};
+/** 行の左端の帯。一覧をスクロールしたとき、色だけで優先度を追えるようにする */
+const PRIORITY_BAR: Record<Priority, string> = {
+  high: "bg-rose-500",
+  medium: "bg-amber-400",
+  low: "bg-stone-200",
 };
 const PRIORITY_LABEL: Record<Priority, string> = {
-  high: "優先度 高",
+  high: "高",
   medium: "中",
   low: "低",
 };
@@ -103,6 +110,14 @@ function sinceLabel(iso: string): string {
 function compassLabel(deg: number): string {
   const dirs = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
   return dirs[Math.round(deg / 45) % 8];
+}
+
+/** 「−」のような欠損の代替文字を地名として並べない */
+function joinPlace(parts: (string | undefined)[]): string {
+  const out = parts
+    .map((v) => v?.trim())
+    .filter((v): v is string => Boolean(v) && !/^[-−–—ー]$/.test(v!));
+  return out.join(" ") || "場所不明";
 }
 
 function distanceKm(a: number, b: number, c: number, d: number): number {
@@ -144,9 +159,7 @@ export default function SubmissionList({
       {items.map((s) => {
         const a = s.assessment;
         const isOpen = open.has(s.id);
-        const place =
-          [s.prefectureName, s.cityName, s.sectionName].filter(Boolean).join(" ") ||
-          "場所不明";
+        const place = joinPlace([s.prefectureName, s.cityName, s.sectionName]);
         const gapKm =
           s.photoLat != null && s.photoLon != null
             ? distanceKm(s.lat, s.lon, s.photoLat, s.photoLon)
@@ -155,269 +168,268 @@ export default function SubmissionList({
         return (
           <li
             key={s.id}
-            className={`overflow-hidden rounded-xl border bg-white ${
-              a?.urgency === "urgent"
-                ? "border-rose-300 shadow-sm"
-                : "border-stone-200"
-            }`}
+            className="flex overflow-hidden rounded-xl border border-stone-200 bg-white"
           >
-            <div className="flex gap-3 p-3">
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 shrink-0"
-                checked={selected.has(s.id)}
-                onChange={() => toggleSelect(s.id)}
-                aria-label="この投稿を選択"
-              />
+            {/* 左端の帯。色だけで優先度を追える */}
+            <div
+              className={`w-1.5 shrink-0 ${a ? PRIORITY_BAR[a.priority] : "bg-stone-200"}`}
+              aria-hidden
+            />
 
-              {/* 写真は小さく添える。判断に使うときは詳細で拡大する */}
-              {s.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={s.photoUrl}
-                  alt=""
-                  className="h-16 w-16 shrink-0 rounded-lg bg-stone-100 object-cover"
+            <div className="min-w-0 flex-1">
+              <div className="flex gap-3 p-3">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                  checked={selected.has(s.id)}
+                  onChange={() => toggleSelect(s.id)}
+                  aria-label="この投稿を選択"
                 />
-              ) : (
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-stone-50 text-[11px] text-stone-400">
-                  写真なし
-                </div>
-              )}
 
-              <div className="min-w-0 flex-1">
-                {/* 1 行目: 優先度と日付。捌く順と鮮度がここで分かる */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {a && (
-                    <span
-                      className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-bold ${PRIORITY_STYLE[a.priority]}`}
-                    >
-                      {PRIORITY_LABEL[a.priority]}
-                    </span>
-                  )}
-                  <span className="text-sm tabular-nums text-stone-700">
-                    {fmtDateTime(s.occurredAt)}
-                  </span>
-                  <span className="text-sm text-stone-400">
-                    ({sinceLabel(s.occurredAt)})
-                  </span>
-                  {s.status !== "pending" && (
-                    <span
-                      className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[s.status]}`}
-                    >
-                      {STATUS_LABEL[s.status]}
-                    </span>
-                  )}
-                </div>
-
-                {/* 2 行目: 場所 */}
-                <div className="mt-1 text-base font-semibold text-stone-900">
-                  {place}
-                </div>
-
-                {/* 3 行目: 本文。一番の判断材料なので省略しない */}
-                {s.comment ? (
-                  <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-stone-700">
-                    {s.comment}
-                  </p>
-                ) : (
-                  <p className="mt-1 text-sm text-stone-400">（コメントなし）</p>
-                )}
-
-                {/* 優先度の内訳。状況・信ぴょう性はここに畳む */}
-                {a && (
-                  <p className="mt-1.5 text-xs text-stone-500">
-                    {SITUATION_LABEL[s.situation]}
-                    {s.headCount > 0 ? ` ${s.headCount}頭` : ""} ・ {a.reason}
-                  </p>
-                )}
-
-                {/* 裏付けの乏しさ。決めつけず、欠けているものを並べる */}
-                {a?.thinEvidence && (
-                  <p className="mt-1.5 rounded-lg bg-orange-50 px-2 py-1 text-xs text-orange-900">
-                    裏付けが乏しい: {a.thinEvidence.join("・")} —
-                    内容をよく確かめてください
-                  </p>
-                )}
-                {a?.flags && a.flags.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {a.flags.map((f) => (
-                      <span
-                        key={f}
-                        className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-900"
-                      >
-                        ⚑ {f}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {s.rejectReason && (
-                  <p className="mt-1 text-xs text-rose-700">
-                    却下理由: {s.rejectReason}
-                  </p>
-                )}
-
-                {/* 操作 */}
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {s.status === "approved" ? (
-                    // 公開は取り消せる。地図から下がるだけで投稿は残る
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            "この投稿の公開を取り消します。\n地図から下がりますが投稿は残るので、あとで公開し直せます。",
-                          )
-                        )
-                          moderate(s.id, "reject");
-                      }}
-                      disabled={busy === s.id}
-                      className="rounded-full border border-stone-400 px-4 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
-                    >
-                      公開を取り消す
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const where = place;
-                          if (
-                            window.confirm(
-                              `この投稿を地図に公開します。\n\n${where}\n${fmtDateTime(s.occurredAt)}\n${s.comment ?? "（コメントなし）"}\n\n公開すると、地図と通知で誰でも見られる状態になります。\nあとから取り消すこともできます。`,
-                            )
-                          )
-                            moderate(s.id, "approve");
-                        }}
-                        disabled={busy === s.id}
-                        className="rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
-                      >
-                        承認して公開
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onReject(s.id)}
-                        disabled={busy === s.id || s.status === "rejected"}
-                        className="rounded-full border border-stone-300 px-4 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
-                      >
-                        却下…
-                      </button>
-                    </>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => toggleOpen(s.id)}
-                    aria-expanded={isOpen}
-                    className="rounded-full px-3 py-1.5 text-sm font-semibold text-stone-600 hover:bg-stone-100"
-                  >
-                    詳細 {isOpen ? "▲" : "▼"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "delete")}
-                    disabled={busy === s.id}
-                    className="ml-auto rounded-full px-3 py-1.5 text-sm text-rose-600 hover:bg-rose-50 disabled:opacity-40"
-                  >
-                    削除
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {isOpen && (
-              <div className="border-t border-stone-200 bg-stone-50 p-3">
+                {/* 写真は無いほうが多い。無いときは枠も置かず、本文に幅を渡す */}
                 {s.photoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={s.photoUrl}
-                    alt="投稿写真"
-                    className="mb-3 max-h-96 w-full rounded-lg bg-white object-contain"
+                    alt=""
+                    className="h-20 w-20 shrink-0 cursor-zoom-in rounded-lg bg-stone-100 object-cover"
+                    onClick={() => toggleOpen(s.id)}
                   />
                 )}
-                <dl className="grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 text-sm">
-                  {a && (
-                    <Row label="優先度の内訳">
-                      緊急度 {a.urgency === "urgent" ? "至急" : a.urgency === "normal" ? "通常" : "低"}
-                      {" ・ "}
-                      信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
-                    </Row>
-                  )}
-                  <Row label="状況">
+
+                <div className="min-w-0 flex-1">
+                  {/* 見出し: 場所と優先度 */}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="min-w-0 text-base font-bold leading-snug text-stone-900">
+                      {place}
+                    </h3>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {s.status !== "pending" && (
+                        <span
+                          className={`whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-semibold ${STATUS_STYLE[s.status]}`}
+                        >
+                          {STATUS_LABEL[s.status]}
+                        </span>
+                      )}
+                      {a && (
+                        <span
+                          className={`whitespace-nowrap rounded px-2 py-0.5 text-xs font-bold ${PRIORITY_CHIP[a.priority]}`}
+                          title={a.reason}
+                        >
+                          {PRIORITY_LABEL[a.priority]}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 日時と種類。1 行にまとめて、同じ語を二度出さない */}
+                  <p className="mt-0.5 text-xs text-stone-500">
+                    <span className="tabular-nums">{fmtDateTime(s.occurredAt)}</span>
+                    <span className="mx-1.5">·</span>
+                    {sinceLabel(s.occurredAt)}
+                    <span className="mx-1.5">·</span>
                     {SITUATION_LABEL[s.situation]}
-                    {s.headCount > 0 ? ` ・ ${s.headCount}頭` : ""}
-                  </Row>
-                  <Row label="受信">
-                    {fmtDateTime(new Date(s.receivedAt).toISOString())}
-                  </Row>
-                  <Row label="ピン位置">
-                    <a
-                      href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-700 underline"
+                    {s.headCount > 0 ? ` ${s.headCount}頭` : ""}
+                    {s.photoUrl && gapKm != null && gapKm >= 1 && (
+                      <>
+                        <span className="mx-1.5">·</span>
+                        <span className="text-orange-700">
+                          写真の位置が {gapKm.toFixed(1)}km ずれ
+                        </span>
+                      </>
+                    )}
+                  </p>
+
+                  {/* 本文。一番の判断材料なので省略しない */}
+                  {s.comment ? (
+                    <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-stone-800">
+                      {s.comment}
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-sm text-stone-400">コメントなし</p>
+                  )}
+
+                  {s.rejectReason && (
+                    <p className="mt-1 text-xs text-rose-700">
+                      却下理由: {s.rejectReason}
+                    </p>
+                  )}
+
+                  {/* 操作 */}
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                    {s.status === "approved" ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "この投稿の公開を取り消します。\n地図から下がりますが投稿は残るので、あとで公開し直せます。",
+                            )
+                          )
+                            moderate(s.id, "reject");
+                        }}
+                        disabled={busy === s.id}
+                        className="rounded-lg border border-stone-400 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
+                      >
+                        公開を取り消す
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `この投稿を地図に公開します。\n\n${place}\n${fmtDateTime(s.occurredAt)}\n${s.comment ?? "（コメントなし）"}\n\n公開すると、地図と通知で誰でも見られる状態になります。\nあとから取り消すこともできます。`,
+                              )
+                            )
+                              moderate(s.id, "approve");
+                          }}
+                          disabled={busy === s.id}
+                          className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
+                        >
+                          承認して公開
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onReject(s.id)}
+                          disabled={busy === s.id || s.status === "rejected"}
+                          className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
+                        >
+                          却下
+                        </button>
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => toggleOpen(s.id)}
+                      aria-expanded={isOpen}
+                      className="rounded-lg px-2.5 py-1.5 text-sm text-stone-600 hover:bg-stone-100"
                     >
-                      {s.lat.toFixed(4)}, {s.lon.toFixed(4)}
-                    </a>
-                  </Row>
-                  {s.photoLat != null && s.photoLon != null && (
-                    <Row label="写真の位置">
+                      詳細 {isOpen ? "▲" : "▼"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moderate(s.id, "delete")}
+                      disabled={busy === s.id}
+                      className="ml-auto rounded-lg px-2 py-1.5 text-xs text-stone-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+                    >
+                      削除
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {isOpen && (
+                <div className="border-t border-stone-200 bg-stone-50 p-3">
+                  {s.photoUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={s.photoUrl}
+                      alt="投稿写真"
+                      className="mb-3 max-h-96 w-full rounded-lg bg-white object-contain"
+                    />
+                  )}
+                  <dl className="grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+                    {a && (
+                      <>
+                        <Row label="優先度の理由">{a.reason}</Row>
+                        <Row label="内訳">
+                          緊急度{" "}
+                          {a.urgency === "urgent"
+                            ? "至急"
+                            : a.urgency === "normal"
+                              ? "通常"
+                              : "低"}
+                          {" ・ "}信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
+                        </Row>
+                        {a.thinEvidence && (
+                          <Row label="足りない情報">
+                            {a.thinEvidence.join("・")}
+                          </Row>
+                        )}
+                      </>
+                    )}
+                    <Row label="状況">
+                      {SITUATION_LABEL[s.situation]}
+                      {s.headCount > 0 ? ` ・ ${s.headCount}頭` : ""}
+                    </Row>
+                    <Row label="受信">
+                      {fmtDateTime(new Date(s.receivedAt).toISOString())}
+                    </Row>
+                    <Row label="ピン位置">
                       <a
-                        href={`https://www.google.com/maps?q=${s.photoLat},${s.photoLon}`}
+                        href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-700 underline"
                       >
-                        {s.photoLat.toFixed(4)}, {s.photoLon.toFixed(4)}
+                        {s.lat.toFixed(4)}, {s.lon.toFixed(4)}
                       </a>
-                      {gapKm != null && (
-                        <span
-                          className={
-                            gapKm >= 1 ? "ml-2 text-orange-800" : "ml-2 text-stone-500"
-                          }
+                    </Row>
+                    {s.photoLat != null && s.photoLon != null && (
+                      <Row label="写真の位置">
+                        <a
+                          href={`https://www.google.com/maps?q=${s.photoLat},${s.photoLon}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-700 underline"
                         >
-                          ピンから {gapKm.toFixed(1)}km
+                          {s.photoLat.toFixed(4)}, {s.photoLon.toFixed(4)}
+                        </a>
+                        {gapKm != null && (
+                          <span
+                            className={
+                              gapKm >= 1
+                                ? "ml-2 text-orange-800"
+                                : "ml-2 text-stone-500"
+                            }
+                          >
+                            ピンから {gapKm.toFixed(1)}km
+                          </span>
+                        )}
+                      </Row>
+                    )}
+                    {s.photoTakenAt && (
+                      <Row label="撮影日時">
+                        {s.photoTakenAt.replace("T", " ")}
+                        <span className="ml-2 text-stone-500">
+                          (申告 {fmtDateTime(s.occurredAt)})
                         </span>
-                      )}
+                      </Row>
+                    )}
+                    {s.photoGpsAt && (
+                      <Row label="GPS日時">
+                        {s.photoGpsAt.replace("T", " ").replace("Z", " UTC")}
+                      </Row>
+                    )}
+                    {s.photoDirection != null && (
+                      <Row label="撮影方向">
+                        {compassLabel(s.photoDirection)} ({s.photoDirection}°
+                        {s.photoDirectionRef === "M" ? " 磁北" : ""})
+                      </Row>
+                    )}
+                    {s.photoDevice && <Row label="撮影機材">{s.photoDevice}</Row>}
+                    {s.photoSoftware && (
+                      <Row label="加工ソフト">
+                        <span className="text-orange-900">{s.photoSoftware}</span>
+                      </Row>
+                    )}
+                    {s.contact && <Row label="連絡先">{s.contact}</Row>}
+                    {s.cityCode && <Row label="団体コード">{s.cityCode}</Row>}
+                    <Row label="受付番号">
+                      <span className="text-xs text-stone-500">{s.id}</span>
                     </Row>
+                  </dl>
+                  {s.photoUrl && !s.photoTakenAt && (
+                    <p className="mt-2 text-xs text-stone-500">
+                      この写真に撮影情報 (EXIF) はありません。SNS 経由の画像や
+                      スクリーンショット、2026年9月より前の投稿では取得できません。
+                    </p>
                   )}
-                  {s.photoTakenAt && (
-                    <Row label="撮影日時">
-                      {s.photoTakenAt.replace("T", " ")}
-                      <span className="ml-2 text-stone-500">
-                        (申告 {fmtDateTime(s.occurredAt)})
-                      </span>
-                    </Row>
-                  )}
-                  {s.photoGpsAt && (
-                    <Row label="GPS日時">
-                      {s.photoGpsAt.replace("T", " ").replace("Z", " UTC")}
-                    </Row>
-                  )}
-                  {s.photoDirection != null && (
-                    <Row label="撮影方向">
-                      {compassLabel(s.photoDirection)} ({s.photoDirection}°
-                      {s.photoDirectionRef === "M" ? " 磁北" : ""})
-                    </Row>
-                  )}
-                  {s.photoDevice && <Row label="撮影機材">{s.photoDevice}</Row>}
-                  {s.photoSoftware && (
-                    <Row label="加工ソフト">
-                      <span className="text-orange-900">{s.photoSoftware}</span>
-                    </Row>
-                  )}
-                  {s.contact && <Row label="連絡先">{s.contact}</Row>}
-                  {s.cityCode && <Row label="団体コード">{s.cityCode}</Row>}
-                  <Row label="受付番号">
-                    <span className="text-xs text-stone-500">{s.id}</span>
-                  </Row>
-                </dl>
-                {s.photoUrl && !s.photoTakenAt && (
-                  <p className="mt-2 text-xs text-stone-500">
-                    この写真に撮影情報 (EXIF) はありません。SNS 経由の画像や
-                    スクリーンショット、2026年9月より前の投稿では取得できません。
-                  </p>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </li>
         );
       })}
