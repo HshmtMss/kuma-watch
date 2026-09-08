@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1788517035060,
+  "generatedAt": 1788862929183,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_05540.html",
+      "ministry": "env",
+      "date": "2026-09-08",
+      "title": "令和８年度市街地等におけるクマ対策に係る技術導入実証事業の公募について",
+      "url": "https://www.env.go.jp/press/press_05540.html",
+      "tag": "自然環境",
+      "category": "budget",
+      "summary": "令和8年度における市街地等での人身被害を防ぐためのクマ対策として、最新の技術導入および実証を行う事業の公募に関する情報です。自治体や関係団体を対象に、科学的知見に基づいた効率的なクマのモニタリングや忌避技術の導入を支援するものです。",
+      "ingestedAt": 1788862929183
+    },
     {
       "id": "maff:https://www.maff.go.jp/j/press/nousin/tyozyu/260904.html",
       "ministry": "maff",
