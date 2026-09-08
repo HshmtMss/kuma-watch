@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildAggregateContext, formatAggregateForPrompt } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
-import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_INTERACTIVE_MODEL);
 
@@ -47,10 +47,10 @@ async function callGemini(
       body: JSON.stringify(body),
     });
     if (!r.ok) return null;
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null;
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[ask] gemini no text (${reason})`);
+    return text;
   } catch {
     return null;
   }

@@ -2,7 +2,7 @@ import type { DataSourceEntry } from "@/data/data-sources";
 import { type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
 import { incidentKey } from "@/lib/incident-key";
-import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
@@ -147,10 +147,9 @@ async function callGeminiExtract(
       );
       return null;
     }
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[pdf] gemini no text (${reason})`);
     if (!text) return null;
     let parsed: { sightings?: SightingDraft[] } | null = null;
     try {

@@ -10,7 +10,7 @@ import {
 } from "@/lib/aggregate-context";
 import { findNearbySightings, type NearbySighting } from "@/lib/nearby-sightings";
 import { getMuniOfficialLink } from "@/data/muni-official-links";
-import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_INTERACTIVE_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_INTERACTIVE_MODEL);
 const SUMMARY_CACHE_SECONDS = 21600;
@@ -148,10 +148,9 @@ async function callGemini(
       console.error("[summary] gemini failed", r.status);
       return null;
     }
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[summary] gemini no text (${reason})`);
     return text || null;
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "unknown";

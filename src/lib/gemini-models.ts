@@ -44,3 +44,40 @@ export const GEMINI_IMAGE_MODEL =
 export function geminiEndpoint(model: string): string {
   return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 }
+
+type GeminiResponse = {
+  candidates?: {
+    content?: { parts?: { text?: string }[] };
+    finishReason?: string;
+  }[];
+  promptFeedback?: { blockReason?: string };
+};
+
+/**
+ * generateContent のレスポンスから本文テキストを取り出す。
+ *
+ * parts[0] を直に見ないのは、思考モデルが本文より前に text を持たない part
+ * (thought 等) を挟むことがあるため。text を持つ最初の part を採る。
+ *
+ * 取れなかった理由は呼び出し側で握り潰さず記録できるよう reason に入れる。
+ * 2026-09-08 のニュース取り込みは「0 件」としか出ず原因が追えなかった。
+ */
+export function geminiText(data: unknown): {
+  text: string | null;
+  reason: string | null;
+} {
+  const d = data as GeminiResponse;
+  const blocked = d?.promptFeedback?.blockReason;
+  if (blocked) return { text: null, reason: `blocked:${blocked}` };
+
+  const candidate = d?.candidates?.[0];
+  if (!candidate) return { text: null, reason: "no-candidates" };
+
+  const text = candidate.content?.parts?.find((p) => p?.text)?.text?.trim();
+  if (!text) {
+    const finish = candidate.finishReason ?? "unknown";
+    const parts = candidate.content?.parts?.length ?? 0;
+    return { text: null, reason: `no-text:finishReason=${finish},parts=${parts}` };
+  }
+  return { text, reason: null };
+}

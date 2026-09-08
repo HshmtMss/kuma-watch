@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { findSourceById, type DataSourceEntry } from "@/data/data-sources";
-import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 const CACHE_SECONDS = 60 * 60 * 12;
@@ -143,10 +143,9 @@ ${pageTexts.join("\n\n---\n\n").slice(0, 30_000)}
       }),
     });
     if (!r.ok) return null;
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[extract] gemini no text (${reason})`);
     if (!text) return null;
     const parsed = JSON.parse(text) as { sightings?: ExtractedSighting[] };
     return Array.isArray(parsed.sightings) ? parsed.sightings : [];

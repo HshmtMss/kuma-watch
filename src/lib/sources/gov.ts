@@ -10,7 +10,7 @@
  * 必要環境変数: GEMINI_API_KEY (extract 段階)。
  */
 
-import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 export type GovMinistry = "env" | "maff" | "rinya";
 
@@ -415,11 +415,12 @@ export async function classifyWithGemini(
     const err = await res.text().catch(() => "");
     throw new Error(`gemini HTTP ${res.status}: ${err.slice(0, 400)}`);
   }
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-  if (!text) return [];
+  const data = await res.json();
+  const { text, reason } = geminiText(data);
+  if (!text) {
+    console.error(`[gov] gemini no text (${reason})`);
+    return [];
+  }
   const parsed = JSON.parse(text) as { items?: ClassifiedResult[] };
   return Array.isArray(parsed.items) ? parsed.items : [];
 }

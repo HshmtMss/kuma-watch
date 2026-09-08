@@ -24,7 +24,7 @@ import { jstToday } from "@/lib/jst-date";
 import { isRealCalendarDate } from "./date-utils";
 import { incidentKey, normalizeSection } from "@/lib/incident-key";
 import { snapToRiver } from "@/lib/river-snap";
-import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
@@ -441,10 +441,9 @@ async function callGeminiBatch(
       console.error(`[news] gemini ${r.status}`);
       return null;
     }
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[news] gemini no text (${reason})`);
     if (!text) return null;
     try {
       const parsed = JSON.parse(text) as { sightings?: ExtractedDraft[] };
@@ -499,7 +498,13 @@ export async function fetchNewsSightings(
   console.log(`[news] feeding ${items.length} articles to gemini`);
   const drafts = await callGeminiBatch(apiKey, items);
   if (!drafts || drafts.length === 0) {
-    console.log("[news] gemini returned 0 sightings");
+    // null = 呼び出しが失敗した (直前に理由をログ済み)。
+    // [] = 呼び出しは成功して「該当なし」だった。区別が付かないと原因を追えない。
+    console.log(
+      drafts === null
+        ? `[news] gemini call produced nothing for ${items.length} articles`
+        : `[news] gemini found no sightings in ${items.length} articles`,
+    );
     memo = { at: now, data: [] };
     return [];
   }

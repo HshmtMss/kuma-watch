@@ -2,7 +2,7 @@ import type { DataSourceEntry } from "@/data/data-sources";
 import { inJapanBounds, type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
 import { incidentKey, normalizeSection } from "@/lib/incident-key";
-import { GEMINI_BULK_MODEL, geminiEndpoint } from "@/lib/gemini-models";
+import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
@@ -161,10 +161,9 @@ async function callGeminiExtract(
       console.error(`[llm-html ${source.id}] gemini ${r.status}`, await r.text());
       return null;
     }
-    const data = (await r.json()) as {
-      candidates?: { content?: { parts?: { text?: string }[] } }[];
-    };
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const data = await r.json();
+    const { text, reason } = geminiText(data);
+    if (reason) console.error(`[llm-html] gemini no text (${reason})`);
     if (!text) return null;
     let parsed: { sightings?: SightingDraft[] } | null = null;
     try {
