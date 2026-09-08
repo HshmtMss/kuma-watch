@@ -265,52 +265,75 @@ function SubmissionsContent({
 
   return (
     <>
-      <div className="mb-3 flex justify-end">
-        <button
-          type="button"
-          onClick={() => load(status)}
-          disabled={loading}
-          className="rounded-full border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
-        >
-          {loading ? "更新中…" : "更新"}
-        </button>
-      </div>
-
-      {/* ステータス絞り込みタブ */}
-      <div className="mb-3 flex flex-wrap gap-1.5">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => changeTab(t.key)}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium ${
-              status === t.key
-                ? "bg-stone-900 text-white"
-                : "border border-stone-300 text-stone-700 hover:bg-stone-50"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 優先度の受信箱。承認待ちのときだけ出す。
-          ①今すぐ見る = 緊急度「至急」(信ぴょう性は問わない)
-          ②順に見る   = 通常・低 かつ 信ぴょう性 高/中
-          ③後で見る   = 信ぴょう性 低。捨てずに沈めるだけ */}
-      {status === "pending" && (
-        <div className="mb-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
-          <div className="mb-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="text-base font-bold text-stone-900">
-              未処理 {searched.length} 件
-            </span>
-            {oldestPending && (
-              <span className="text-sm text-stone-500">
-                いちばん古いもの {sinceLabel(oldestPending)}
-              </span>
-            )}
+      {/* いちばん上は地図。どこに集まっているかを掴んでから、絞り込んで下の一覧へ */}
+      <div className="mb-3">
+        {shown.length > 0 ? (
+          <>
+            <AdminSubmissionsMap
+              items={mapItems}
+              onModerate={moderate}
+              onSelect={setFocusId}
+            />
+            <p className="mt-1.5 text-xs text-stone-500">
+              ピンを押すと下の一覧の該当する投稿に移動します。色は優先度
+              <span className="mx-1 inline-block h-2 w-2 rounded-full bg-rose-500 align-middle" />
+              高
+              <span className="mx-1 inline-block h-2 w-2 rounded-full bg-amber-400 align-middle" />
+              中
+              <span className="mx-1 inline-block h-2 w-2 rounded-full bg-stone-300 align-middle" />
+              低 ／ 📷 は写真の撮影位置
+            </p>
+          </>
+        ) : (
+          <div className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-10 text-center text-sm text-stone-500">
+            {loading
+              ? "読み込み中…"
+              : query.trim()
+                ? "検索に一致する投稿はありません"
+                : "表示する投稿はありません"}
           </div>
-          <div className="flex flex-wrap gap-2">
+        )}
+      </div>
+
+      {/* 絞り込みは 1 枚にまとめる。箱が縦に積み上がると、どれが何の操作か分かりにくい */}
+      <div className="mb-3 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2.5">
+          <div className="inline-flex overflow-hidden rounded-lg border border-stone-300">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => changeTab(t.key)}
+                className={`px-3 py-1.5 text-sm font-medium ${
+                  status === t.key
+                    ? "bg-stone-900 text-white"
+                    : "bg-white text-stone-600 hover:bg-stone-50"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <span className="text-sm text-stone-500">
+            {shown.length} 件
+            {query.trim() && (
+              <span className="text-stone-400">（全 {items.length} 件中）</span>
+            )}
+          </span>
+          <button
+            type="button"
+            onClick={() => load(status)}
+            disabled={loading}
+            className="ml-auto rounded-lg border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+          >
+            {loading ? "更新中…" : "更新"}
+          </button>
+        </div>
+
+        {/* 優先度。承認待ちのときだけ出す */}
+        {status === "pending" && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-stone-100 bg-stone-50/60 px-3 py-2.5">
+            <span className="text-sm font-semibold text-stone-700">優先度</span>
             {BUCKET_ORDER.map((b) => {
               const on = bucket === b;
               const n = bucketCounts[b];
@@ -320,14 +343,15 @@ function SubmissionsContent({
                   type="button"
                   onClick={() => setBucket(on ? null : b)}
                   aria-pressed={on}
-                  className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition ${
+                  disabled={n === 0 && !on}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                     on ? BUCKET_ON[b] : BUCKET_OFF[b]
-                  } ${n === 0 && !on ? "opacity-50" : ""}`}
+                  } ${n === 0 && !on ? "opacity-45" : ""}`}
                 >
                   <span>{BUCKET_NO[b]}</span>
                   <span
-                    className={`min-w-[1.5rem] rounded-full px-1.5 py-0.5 text-center text-xs tabular-nums ${
-                      on ? "bg-white/25" : "bg-white/70"
+                    className={`min-w-[1.25rem] rounded px-1 text-center text-xs tabular-nums ${
+                      on ? "bg-white/25" : "bg-white/80"
                     }`}
                   >
                     {n}
@@ -339,65 +363,34 @@ function SubmissionsContent({
               <button
                 type="button"
                 onClick={() => setBucket(null)}
-                className="rounded-xl px-3 py-2 text-sm text-stone-500 hover:bg-stone-100"
+                className="rounded-lg px-2.5 py-1.5 text-sm text-stone-500 hover:bg-stone-200/60"
               >
-                すべて表示
+                絞り込みを解除
               </button>
             )}
+            {oldestPending && (
+              <span className="ml-auto text-sm text-stone-500">
+                いちばん古いもの {sinceLabel(oldestPending)}
+              </span>
+            )}
           </div>
-          {bucketCounts.now === 0 && !bucket && (
-            <p className="mt-2.5 text-sm text-stone-500">
-              優先度「高」の投稿はありません。「中」から順に確認してください。
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* 自由検索（地名・地区・コメント・連絡先） */}
-      <div className="mb-3">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="地名・地区・コメント・連絡先で検索"
-          className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
-        />
-      </div>
-
-      <div className="mb-2 text-sm text-stone-500">
-        {shown.length} 件
-        {query.trim() && (
-          <span className="text-stone-400">（全 {items.length} 件中）</span>
         )}
+
+        <div className="border-t border-stone-100 px-3 py-2.5">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="地名・地区・コメント・連絡先で検索"
+            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+          />
+        </div>
       </div>
 
       {error && (
         <p className="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800">
           {error}
         </p>
-      )}
-
-      {shown.length === 0 && !loading && (
-        <p className="rounded-xl border border-stone-200 bg-white px-4 py-6 text-center text-sm text-stone-500">
-          {query.trim()
-            ? "検索に一致する投稿はありません。"
-            : "該当する投稿はありません。"}
-        </p>
-      )}
-
-      {/* 地図を先に出す。どこに集まっているかを見てから、下の一覧を順に捌く */}
-      {shown.length > 0 && (
-        <div className="mb-3">
-          <AdminSubmissionsMap
-            items={mapItems}
-            onModerate={moderate}
-            onSelect={setFocusId}
-          />
-          <p className="mt-1 text-xs text-stone-500">
-            ピンを押すと、下の一覧の該当する投稿に移動します。色は優先度
-            (赤=高 / 橙=中 / 灰=低)。📷 は写真の撮影位置です。
-          </p>
-        </div>
       )}
 
       {shown.length > 0 && (
