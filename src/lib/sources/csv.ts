@@ -142,8 +142,15 @@ export async function fetchCsvSightings(
     const r = await fetch(csvUrl, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
       next: { revalidate: 3600 },
+      // タイムアウトが無いと、相手が黙り込んだときにランごと引きずられる。
+      // 2026-09-08 の refresh は tokyo が 0 件になり 4 回とも失敗したが、
+      // 1 回あたり約 7 分かかっており取得のハングが疑われた。
+      signal: AbortSignal.timeout(20000),
     });
-    if (!r.ok) return [];
+    if (!r.ok) {
+      console.error(`[csv:${entry.id}] ${csvUrl} HTTP ${r.status}`);
+      return [];
+    }
     const buf = await r.arrayBuffer();
     const text = stripBom(
       new TextDecoder(csv.encoding === "sjis" ? "shift-jis" : "utf-8").decode(buf),
@@ -151,7 +158,12 @@ export async function fetchCsvSightings(
       .replace(/\r\n/g, "\n")
       .replace(/\r/g, "\n");
     const lines = text.split("\n").filter((l) => l.length > 0);
-    if (lines.length < 2) return [];
+    if (lines.length < 2) {
+      console.error(
+        `[csv:${entry.id}] ${csvUrl} returned ${lines.length} line(s) — not a CSV?`,
+      );
+      return [];
+    }
 
     const header = parseCsvRow(lines[0], delim);
     const idx = (name?: string) =>
@@ -210,7 +222,8 @@ export async function fetchCsvSightings(
     }
     memo.set(entry.id, { at: now, data: sightings });
     return sightings;
-  } catch {
+  } catch (e) {
+    console.error(`[csv:${entry.id}] ${csvUrl} failed`, e);
     return [];
   }
 }
