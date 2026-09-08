@@ -11,6 +11,8 @@ import type { LayerGroup, Map as LMap, PopupEvent } from "leaflet";
 
 export type MapItem = {
   id: string;
+  /** 優先度。承認待ちは全部 pending なので、色はこちらで分けたほうが役に立つ */
+  priority?: "high" | "medium" | "low";
   lat: number;
   lon: number;
   situation: string;
@@ -26,6 +28,13 @@ export type MapItem = {
 };
 
 type Decision = "approve" | "reject" | "delete";
+
+/** 一覧の左端の帯と同じ色。地図と一覧で優先度の見え方を揃える */
+const PRIORITY_COLOR: Record<"high" | "medium" | "low", string> = {
+  high: "#e11d48",
+  medium: "#f59e0b",
+  low: "#a8a29e",
+};
 
 const STATUS_COLOR: Record<MapItem["status"], string> = {
   pending: "#f59e0b",
@@ -55,15 +64,20 @@ function esc(s: string): string {
 export default function AdminSubmissionsMap({
   items,
   onModerate,
+  onSelect,
 }: {
   items: MapItem[];
   onModerate: (id: string, decision: Decision) => void;
+  /** ピンを押したとき、一覧の該当行へ移動させる */
+  onSelect?: (id: string) => void;
 }) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LMap | null>(null);
   const layerRef = useRef<LayerGroup | null>(null);
   const onModRef = useRef(onModerate);
   onModRef.current = onModerate;
+  const onSelRef = useRef(onSelect);
+  onSelRef.current = onSelect;
 
   useEffect(() => {
     let cancelled = false;
@@ -107,7 +121,9 @@ export default function AdminSubmissionsMap({
           radius: 8,
           color: "#ffffff",
           weight: 2,
-          fillColor: STATUS_COLOR[s.status],
+          fillColor: s.priority
+            ? PRIORITY_COLOR[s.priority]
+            : STATUS_COLOR[s.status],
           fillOpacity: 0.9,
         });
         const sit = SITUATION_LABEL[s.situation] ?? s.situation;
@@ -129,6 +145,7 @@ export default function AdminSubmissionsMap({
           </div>
         </div>`;
         marker.bindPopup(html, { maxWidth: 260 });
+        marker.on("click", () => onSelRef.current?.(s.id));
         marker.addTo(layer);
         bounds.push([s.lat, s.lon]);
 

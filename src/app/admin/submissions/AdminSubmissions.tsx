@@ -25,31 +25,7 @@ import {
  * server コードを client に取り込まないよう、型はこのファイル内で定義する。
  */
 
-type Situation = "sight" | "trace" | "damage" | "injury";
-type Status = "pending" | "approved" | "rejected";
 
-const SITUATION_LABEL: Record<Situation, string> = {
-  sight: "目撃",
-  trace: "痕跡",
-  damage: "物損被害",
-  injury: "人身被害",
-};
-const SITUATION_STYLE: Record<Situation, string> = {
-  sight: "bg-amber-100 text-amber-900",
-  trace: "bg-stone-100 text-stone-700",
-  damage: "bg-orange-100 text-orange-900",
-  injury: "bg-rose-100 text-rose-900",
-};
-const STATUS_LABEL: Record<Status, string> = {
-  pending: "承認待ち",
-  approved: "公開中",
-  rejected: "却下",
-};
-const STATUS_STYLE: Record<Status, string> = {
-  pending: "bg-amber-100 text-amber-900",
-  approved: "bg-emerald-100 text-emerald-900",
-  rejected: "bg-rose-100 text-rose-900",
-};
 
 const TABS: { key: string; label: string }[] = [
   { key: "pending", label: "承認待ち" },
@@ -58,21 +34,6 @@ const TABS: { key: string; label: string }[] = [
   { key: "all", label: "すべて" },
 ];
 
-// 2点間の距離(km)。写真の撮影位置とピン位置のズレ確認用。
-function distanceKm(
-  aLat: number,
-  aLon: number,
-  bLat: number,
-  bLon: number,
-): number {
-  const toR = (d: number) => (d * Math.PI) / 180;
-  const dLat = toR(bLat - aLat);
-  const dLon = toR(bLon - aLon);
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toR(aLat)) * Math.cos(toR(bLat)) * Math.sin(dLon / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(s));
-}
 
 type Decision = "approve" | "reject" | "delete";
 
@@ -104,12 +65,6 @@ function sinceLabel(ms: number): string {
   return `${Math.floor(h / 24)}日前`;
 }
 
-function fmtDateTime(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-}
 
 export default function AdminSubmissions() {
   return (
@@ -133,8 +88,8 @@ function SubmissionsContent({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState("pending");
-  // 既定は一覧。自治体職員が上から順に捌く画面なので、表計算より一覧を先に出す
-  const [view, setView] = useState<"list" | "table" | "map">("list");
+  // 地図のピンから選ばれた投稿。一覧の該当行までスクロールさせる
+  const [focusId, setFocusId] = useState<string | null>(null);
   // 一括操作の選択状態（リスト表示のチェックボックス）。
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // 自由検索（地名・地区・コメント・連絡先）。ステータス絞り込みの内側で効く。
@@ -293,6 +248,7 @@ function SubmissionsContent({
 
   const mapItems: MapItem[] = shown.map((s) => ({
     id: s.id,
+    priority: s.assessment?.priority,
     lat: s.lat,
     lon: s.lon,
     situation: s.situation,
@@ -408,30 +364,11 @@ function SubmissionsContent({
         />
       </div>
 
-      {/* 表 / カード / 地図 切替 */}
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-stone-500">
-          {shown.length} 件
-          {query.trim() && (
-            <span className="text-stone-400">（全 {items.length} 件中）</span>
-          )}
-        </span>
-        <div className="inline-flex overflow-hidden rounded-full border border-stone-300">
-          {(["list", "table", "map"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => setView(v)}
-              className={`px-3 py-1.5 text-sm font-medium ${
-                view === v
-                  ? "bg-stone-900 text-white"
-                  : "bg-white text-stone-700 hover:bg-stone-50"
-              }`}
-            >
-              {v === "list" ? "一覧" : v === "table" ? "表" : "地図"}
-            </button>
-          ))}
-        </div>
+      <div className="mb-2 text-sm text-stone-500">
+        {shown.length} 件
+        {query.trim() && (
+          <span className="text-stone-400">（全 {items.length} 件中）</span>
+        )}
       </div>
 
       {error && (
@@ -448,11 +385,22 @@ function SubmissionsContent({
         </p>
       )}
 
-      {view === "map" && shown.length > 0 && (
-        <AdminSubmissionsMap items={mapItems} onModerate={moderate} />
+      {/* 地図を先に出す。どこに集まっているかを見てから、下の一覧を順に捌く */}
+      {shown.length > 0 && (
+        <div className="mb-3">
+          <AdminSubmissionsMap
+            items={mapItems}
+            onModerate={moderate}
+            onSelect={setFocusId}
+          />
+          <p className="mt-1 text-xs text-stone-500">
+            ピンを押すと、下の一覧の該当する投稿に移動します。色は優先度
+            (赤=高 / 橙=中 / 灰=低)。📷 は写真の撮影位置です。
+          </p>
+        </div>
       )}
 
-      {(view === "table" || view === "list") && shown.length > 0 && (
+      {shown.length > 0 && (
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm">
               <label className="flex items-center gap-1.5 text-stone-600">
                 <input
@@ -509,18 +457,7 @@ function SubmissionsContent({
         </div>
       )}
 
-      {view === "table" && shown.length > 0 && (
-        <SubmissionTable
-          items={shown}
-          selected={selected}
-          toggleSelect={toggleSelect}
-          moderate={moderate}
-          onReject={setRejecting}
-          busy={busy}
-        />
-      )}
-
-      {view === "list" && shown.length > 0 && (
+      {shown.length > 0 && (
         <SubmissionList
           items={shown}
           selected={selected}
@@ -528,6 +465,7 @@ function SubmissionsContent({
           moderate={moderate}
           onReject={setRejecting}
           busy={busy}
+          highlightId={focusId}
         />
       )}
 
@@ -583,211 +521,3 @@ function SubmissionsContent({
 }
 
 // エクセル風の一覧表。取得できる全項目を横並びの列で見せる（横スクロール）。
-function SubmissionTable({
-  items,
-  selected,
-  toggleSelect,
-  moderate,
-  onReject,
-  busy,
-}: {
-  items: Submission[];
-  selected: Set<string>;
-  toggleSelect: (id: string) => void;
-  moderate: (id: string, decision: Decision, reason?: RejectReason) => void;
-  onReject: (id: string) => void;
-  busy: string | null;
-}) {
-  const HEADERS = [
-    "",
-    "優先度",
-    "状態",
-    "状況",
-    "発生",
-    "受信",
-    "都道府県",
-    "市区町村",
-    "字",
-    "頭数",
-    "コメント",
-    "連絡先",
-    "写真",
-    "ピン座標",
-    "写真位置",
-    "操作",
-  ];
-  return (
-    <div className="overflow-x-auto rounded-2xl border border-stone-200">
-      <table className="w-full min-w-[84rem] border-collapse text-xs">
-        <thead>
-          <tr className="bg-stone-50 text-left text-stone-500">
-            {HEADERS.map((h, i) => (
-              <th
-                key={i}
-                className={`whitespace-nowrap px-2 py-2 font-medium ${
-                  h === "優先度" ? "w-56 min-w-[14rem]" : ""
-                }`}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((s) => (
-            <tr
-              key={s.id}
-              className={`border-t border-stone-100 align-top ${
-                selected.has(s.id) ? "bg-amber-50/50" : ""
-              }`}
-            >
-              <td className="px-2 py-2">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4"
-                  checked={selected.has(s.id)}
-                  onChange={() => toggleSelect(s.id)}
-                  aria-label="選択"
-                />
-              </td>
-              <td className="w-56 min-w-[14rem] px-2 py-2">
-                {s.assessment && (
-                  <>
-                    <span
-                      className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-bold ${
-                        s.assessment.priority === "high"
-                          ? "bg-rose-600 text-white"
-                          : s.assessment.priority === "medium"
-                            ? "bg-amber-100 text-amber-900"
-                            : "bg-stone-100 text-stone-600"
-                      }`}
-                    >
-                      {s.assessment.priority === "high"
-                        ? "高"
-                        : s.assessment.priority === "medium"
-                          ? "中"
-                          : "低"}
-                    </span>
-                    <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-500">
-                      {s.assessment.reason}
-                    </div>
-                  </>
-                )}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2">
-                <span
-                  className={`rounded px-1.5 py-0.5 font-semibold ${STATUS_STYLE[s.status]}`}
-                >
-                  {STATUS_LABEL[s.status]}
-                </span>
-              </td>
-              <td className="whitespace-nowrap px-2 py-2">
-                <span
-                  className={`rounded px-1.5 py-0.5 font-semibold ${SITUATION_STYLE[s.situation]}`}
-                >
-                  {SITUATION_LABEL[s.situation]}
-                </span>
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 tabular-nums text-stone-600">
-                {fmtDateTime(s.occurredAt)}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 tabular-nums text-stone-400">
-                {fmtDateTime(new Date(s.receivedAt).toISOString())}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 text-stone-800">
-                {s.prefectureName || "—"}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 text-stone-800">
-                {s.cityName || ""}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 text-stone-600">
-                {s.sectionName || ""}
-              </td>
-              <td className="px-2 py-2 text-center tabular-nums">
-                {s.headCount}
-              </td>
-              <td className="min-w-[12rem] max-w-[18rem] px-2 py-2 text-stone-700">
-                <div className="line-clamp-3 whitespace-pre-wrap">
-                  {s.comment || "—"}
-                </div>
-              </td>
-              <td className="whitespace-nowrap px-2 py-2 text-stone-700">
-                {s.contact || "—"}
-              </td>
-              <td className="px-2 py-2">
-                {s.photoUrl ? (
-                  <a href={s.photoUrl} target="_blank" rel="noopener noreferrer">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={s.photoUrl}
-                      alt="投稿写真"
-                      className="h-12 w-12 rounded bg-stone-100 object-cover"
-                    />
-                  </a>
-                ) : (
-                  "—"
-                )}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2">
-                <a
-                  href={`https://www.google.com/maps?q=${s.lat},${s.lon}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="tabular-nums text-blue-700 underline"
-                >
-                  {s.lat.toFixed(4)}, {s.lon.toFixed(4)}
-                </a>
-              </td>
-              <td className="whitespace-nowrap px-2 py-2">
-                {s.photoLat != null && s.photoLon != null ? (
-                  <a
-                    href={`https://www.google.com/maps?q=${s.photoLat},${s.photoLon}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tabular-nums text-blue-700 underline"
-                  >
-                    📷 {s.photoLat.toFixed(4)}, {s.photoLon.toFixed(4)}{" "}
-                    <span className="text-stone-400">
-                      ({distanceKm(s.lat, s.lon, s.photoLat, s.photoLon).toFixed(1)}
-                      km)
-                    </span>
-                  </a>
-                ) : (
-                  "—"
-                )}
-              </td>
-              <td className="whitespace-nowrap px-2 py-2">
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "approve")}
-                    disabled={busy === s.id || s.status === "approved"}
-                    className="rounded bg-emerald-600 px-2 py-1 font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
-                  >
-                    承認
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onReject(s.id)}
-                    disabled={busy === s.id || s.status === "rejected"}
-                    className="rounded border border-stone-300 px-2 py-1 font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
-                  >
-                    却下
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "delete")}
-                    disabled={busy === s.id}
-                    className="rounded px-1.5 py-1 font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-40"
-                  >
-                    削除
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Assessment,
   Priority,
@@ -137,6 +137,7 @@ export default function SubmissionList({
   moderate,
   onReject,
   busy,
+  highlightId,
 }: {
   items: Submission[];
   selected: Set<string>;
@@ -144,8 +145,17 @@ export default function SubmissionList({
   moderate: (id: string, decision: "approve" | "reject" | "delete") => void;
   onReject: (id: string) => void;
   busy: string | null;
+  /** 地図のピンから選ばれた投稿。その行までスクロールして目立たせる */
+  highlightId?: string | null;
 }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
+  const rowRefs = useRef<Map<string, HTMLLIElement>>(new Map());
+
+  useEffect(() => {
+    if (!highlightId) return;
+    const el = rowRefs.current.get(highlightId);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightId]);
   const toggleOpen = (id: string) =>
     setOpen((prev) => {
       const next = new Set(prev);
@@ -168,7 +178,15 @@ export default function SubmissionList({
         return (
           <li
             key={s.id}
-            className="flex overflow-hidden rounded-xl border border-stone-200 bg-white"
+            ref={(el) => {
+              if (el) rowRefs.current.set(s.id, el);
+              else rowRefs.current.delete(s.id);
+            }}
+            className={`flex overflow-hidden rounded-xl border bg-white transition ${
+              highlightId === s.id
+                ? "border-sky-400 ring-2 ring-sky-200"
+                : "border-stone-200"
+            }`}
           >
             {/* 左端の帯。色だけで優先度を追える */}
             <div
