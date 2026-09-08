@@ -2997,12 +2997,16 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "福井県 あわら市 クマ出没情報",
     bearStatus: "present",
     urls: [
-      { url: "https://www.city.awara.lg.jp/mokuteki/industry/industry03/industry0304/p014736.html", role: "list", hint: "あわら市 クマ出没情報" },
+      { url: "https://www.city.awara.lg.jp/mokuteki/industry/industry03/industry0304/", role: "list", hint: "あわら市 鳥獣害対策室 (個別の出没ページが年付きで並ぶ)" },
     ],
     extractor: "llm-html",
     defaultCity: "あわら市",
-    notes: "下見時 20 件 (最新 2026-06-20)",
-    verifiedAt: "2026-09-04",
+    // 年度別の一覧ページ (旧 p014736) は本文の日付に年が無く、抽出器が拾えるのは
+    // サイドバーの「最近見られたページ」3 件だけだった。そのため 2026-06-20 で
+    // 止まって見えていた。2026 年度の一覧ページは作られておらず、個別ページが
+    // 親カテゴリに年付きで並ぶ形なので、親カテゴリを見る。
+    notes: "下見時 41 件 (2026-04-18〜2026-08-18)",
+    verifiedAt: "2026-09-08",
   },
   {
     id: "fukui-ikeda",

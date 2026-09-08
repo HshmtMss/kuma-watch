@@ -66,10 +66,24 @@ async function fetchPdfBase64(url: string): Promise<string | null> {
       },
       next: { revalidate: 21600 },
     });
-    if (!r.ok) return null;
-    const buf = await r.arrayBuffer();
-    return Buffer.from(buf).toString("base64");
-  } catch {
+    if (!r.ok) {
+      console.error(`[pdf-llm] ${url} HTTP ${r.status}`);
+      return null;
+    }
+    const buf = Buffer.from(await r.arrayBuffer());
+    // 自治体サイトは公開終了した PDF に HTTP 200 でエラーページ (HTML) を返す
+    // ことがある。そのまま Gemini に渡すと 400 になり、理由も残らないまま
+    // 4 時間ごとに課金だけ発生する。中身が PDF かどうかを先に見る。
+    if (buf.subarray(0, 5).toString("latin1") !== "%PDF-") {
+      const head = buf.subarray(0, 200).toString("utf8").replace(/\s+/g, " ");
+      console.error(
+        `[pdf-llm] ${url} is not a PDF (${buf.length} bytes) — ${head.slice(0, 80)}`,
+      );
+      return null;
+    }
+    return buf.toString("base64");
+  } catch (e) {
+    console.error(`[pdf-llm] ${url} fetch failed`, e);
     return null;
   }
 }
