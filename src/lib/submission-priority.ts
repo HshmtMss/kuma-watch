@@ -26,9 +26,21 @@
 
 export type SubmissionSituationKey = "sight" | "trace" | "damage" | "injury";
 
+/**
+ * 承認者が見る唯一の指標。緊急度・信ぴょう性・状況をすべて畳んだもの。
+ * 職員に 2 つの軸を読ませない。「上から順に見る」だけで運用できる形にする。
+ */
+export type Priority = "high" | "medium" | "low";
+
 export type Urgency = "urgent" | "normal" | "low";
 export type Credibility = "high" | "medium" | "low";
 export type PriorityBucket = "now" | "queue" | "later";
+
+export const PRIORITY_LABEL: Record<Priority, string> = {
+  high: "高",
+  medium: "中",
+  low: "低",
+};
 
 export const URGENCY_LABEL: Record<Urgency, string> = {
   urgent: "至急",
@@ -50,6 +62,9 @@ export const BUCKET_LABEL: Record<PriorityBucket, string> = {
 
 /** 投稿に添える判定結果。投稿時に 1 回だけ計算して保存する */
 export type Assessment = {
+  /** 画面に出す唯一の指標。緊急度・信ぴょう性・状況を畳んだ結果 */
+  priority: Priority;
+  /** 以下は priority の内訳。詳細を開いたときの説明に使う */
   urgency: Urgency;
   credibility: Credibility;
   /** 承認者に見せる 1 行。数値スコアは出さない */
@@ -283,6 +298,53 @@ function thinEvidenceOf(input: {
   return missing.length >= 3 ? missing : [];
 }
 
+/**
+ * 緊急度・信ぴょう性・状況を 1 つの優先度に畳む。
+ *
+ * 承認者に 2 つの軸を読ませない。「高から順に見る」だけで運用できるようにする。
+ *
+ *   高 … いま人が動くべきもの
+ *        人身被害 (裏付けが乏しいものを除く) / 24時間以内の確かな目撃・物損
+ *   中 … 順に確認するもの
+ *        裏付けの乏しい人身被害 / 3日以内の目撃・物損 / 新しい痕跡
+ *   低 … 後回しでよいもの
+ *        古い情報 / 裏付けの無いもの / 痕跡のみ
+ *
+ * 裏付けの乏しい人身被害を「高」から落とすのは、機械が人身被害を沈めるのとは
+ * 違う。消しも隠しもせず「中」に置き、理由を添えて必ず人の目に触れさせる。
+ * ここを「高」のままにすると、悪ふざけが毎回先頭に来て「高」が信用を失う。
+ */
+export function computePriority(input: {
+  situation: SubmissionSituationKey;
+  hoursAgo: number;
+  credibility: Credibility;
+  hasThinEvidence: boolean;
+}): { priority: Priority; reason: string } {
+  const { situation, hoursAgo, credibility, hasThinEvidence } = input;
+
+  if (situation === "injury")
+    return hasThinEvidence
+      ? { priority: "medium", reason: "人身被害の申告だが裏付けが乏しい" }
+      : { priority: "high", reason: "人身被害の申告" };
+
+  const what = situation === "damage" ? "物損被害" : "目撃";
+
+  if (situation === "damage" || situation === "sight") {
+    if (hoursAgo <= 24 && credibility === "high")
+      return { priority: "high", reason: `24時間以内の${what}・裏付けあり` };
+    if (hoursAgo <= 72 && credibility !== "low")
+      return { priority: "medium", reason: `3日以内の${what}` };
+    if (hoursAgo <= 72)
+      return { priority: "low", reason: `${what}だが裏付けが乏しい` };
+    return { priority: "low", reason: `3日より前の${what}` };
+  }
+
+  // 痕跡
+  if (hoursAgo <= 24 && credibility === "high")
+    return { priority: "medium", reason: "新しい痕跡・裏付けあり" };
+  return { priority: "low", reason: "痕跡のみ" };
+}
+
 /** 投稿 1 件から判定をまとめて作る */
 export function assessSubmission(input: {
   situation: SubmissionSituationKey;
@@ -301,15 +363,27 @@ export function assessSubmission(input: {
   cityName?: string;
   now?: number;
 }): Assessment {
-  const u = assessUrgency(input);
+  const now = input.now ?? Date.now();
+  const u = assessUrgency({ ...input, now });
   const c = assessCredibility(input);
   const thin = thinEvidenceOf(input);
+  const occurred = new Date(input.occurredAt).getTime();
+  const hoursAgo = Number.isFinite(occurred)
+    ? (now - occurred) / HOUR
+    : Number.POSITIVE_INFINITY;
+  const p = computePriority({
+    situation: input.situation,
+    hoursAgo,
+    credibility: c.credibility,
+    hasThinEvidence: thin.length > 0,
+  });
   return {
+    priority: p.priority,
     urgency: u.urgency,
     credibility: c.credibility,
-    reason: `${u.reason}。${c.reason}`,
+    reason: p.reason,
     flags: c.flags,
-    assessedAt: input.now ?? Date.now(),
+    assessedAt: now,
     source: "rule",
     thinEvidence: thin.length > 0 ? thin : undefined,
   };
@@ -321,29 +395,23 @@ export function assessSubmission(input: {
 
 export function priorityBucket(a: Assessment | undefined): PriorityBucket {
   if (!a) return "queue"; // 判定前の古い投稿は真ん中に置く (隠さない)
-  if (a.urgency === "urgent") return "now";
-  return a.credibility === "low" ? "later" : "queue";
+  return a.priority === "high" ? "now" : a.priority === "medium" ? "queue" : "later";
 }
 
-const URGENCY_RANK: Record<Urgency, number> = { urgent: 0, normal: 1, low: 2 };
+const PRIORITY_RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 const CREDIBILITY_RANK: Record<Credibility, number> = {
   high: 0,
   medium: 1,
   low: 2,
 };
 
-/**
- * 箱の中の並び順: 緊急度 → 信ぴょう性 → 新しい順。
- * ①の中でも信ぴょう性の高いものが上に来る。裏付けの無い人身被害の申告を
- * ①から外すことはしない (機械が人身被害を沈めてはいけない) が、
- * 確かなものより下に置くことで、①の先頭が信用できる状態を保つ。
- */
+/** 並び順: 優先度 → 信ぴょう性 → 新しい順 */
 export function compareByPriority(
   a: { assessment?: Assessment; occurredAt: string },
   b: { assessment?: Assessment; occurredAt: string },
 ): number {
-  const ua = URGENCY_RANK[a.assessment?.urgency ?? "normal"];
-  const ub = URGENCY_RANK[b.assessment?.urgency ?? "normal"];
+  const ua = PRIORITY_RANK[a.assessment?.priority ?? "medium"];
+  const ub = PRIORITY_RANK[b.assessment?.priority ?? "medium"];
   if (ua !== ub) return ua - ub;
   const ca = CREDIBILITY_RANK[a.assessment?.credibility ?? "medium"];
   const cb = CREDIBILITY_RANK[b.assessment?.credibility ?? "medium"];

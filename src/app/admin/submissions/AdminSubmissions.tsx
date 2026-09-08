@@ -5,13 +5,9 @@ import AdminSubmissionsMap, { type MapItem } from "./AdminSubmissionsMap";
 import SubmissionList, { type Submission } from "./SubmissionList";
 import AdminShell from "@/components/admin/AdminShell";
 import {
-  BUCKET_LABEL,
-  CREDIBILITY_LABEL,
   REJECT_REASONS,
-  URGENCY_LABEL,
   compareByPriority,
   priorityBucket,
-  type Assessment,
   type PriorityBucket,
   type RejectReason,
 } from "@/lib/submission-priority";
@@ -81,10 +77,11 @@ function distanceKm(
 type Decision = "approve" | "reject" | "delete";
 
 const BUCKET_ORDER: PriorityBucket[] = ["now", "queue", "later"];
+/** 優先度の 3 段階。職員が読むのはこれだけ */
 const BUCKET_NO: Record<PriorityBucket, string> = {
-  now: "①",
-  queue: "②",
-  later: "③",
+  now: "優先度 高",
+  queue: "中",
+  later: "低",
 };
 /** 選択中のチップの色。至急は赤、通常は琥珀、低は石 */
 const BUCKET_ON: Record<PriorityBucket, string> = {
@@ -98,16 +95,6 @@ const BUCKET_OFF: Record<PriorityBucket, string> = {
   later: "border border-stone-300 bg-white text-stone-700 hover:bg-stone-50",
 };
 
-const URGENCY_STYLE: Record<string, string> = {
-  urgent: "bg-rose-600 text-white",
-  normal: "bg-amber-100 text-amber-900",
-  low: "bg-stone-100 text-stone-600",
-};
-const CREDIBILITY_STYLE: Record<string, string> = {
-  high: "bg-emerald-100 text-emerald-900",
-  medium: "bg-sky-100 text-sky-900",
-  low: "bg-stone-200 text-stone-700",
-};
 
 /** 経過時間を「4時間前」「3日前」の形で返す */
 function sinceLabel(ms: number): string {
@@ -115,49 +102,6 @@ function sinceLabel(ms: number): string {
   if (h < 1) return "1時間以内";
   if (h < 24) return `${h}時間前`;
   return `${Math.floor(h / 24)}日前`;
-}
-
-/**
- * 優先度のバッジ。承認者が最初に見る 2 つ (緊急度・信ぴょう性) と、
- * その理由 1 行だけを出す。数値スコアは出さない。
- */
-function PriorityBadges({
-  a,
-  compact = false,
-}: {
-  a?: Assessment;
-  /** 表など幅が取れない場所では文言を詰める */
-  compact?: boolean;
-}) {
-  if (!a)
-    return (
-      <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-500">
-        未判定
-      </span>
-    );
-  return (
-    <div className="flex flex-wrap items-center gap-1">
-      <span
-        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-bold ${URGENCY_STYLE[a.urgency]}`}
-      >
-        {URGENCY_LABEL[a.urgency]}
-      </span>
-      <span
-        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${CREDIBILITY_STYLE[a.credibility]}`}
-      >
-        {compact ? "信" : "信ぴょう性"} {CREDIBILITY_LABEL[a.credibility]}
-      </span>
-      {a.flags.map((f) => (
-        <span
-          key={f}
-          className="whitespace-nowrap rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-900"
-          title={f}
-        >
-          ⚑ {f}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 function fmtDateTime(iso: string): string {
@@ -424,9 +368,7 @@ function SubmissionsContent({
                     on ? BUCKET_ON[b] : BUCKET_OFF[b]
                   } ${n === 0 && !on ? "opacity-50" : ""}`}
                 >
-                  <span>
-                    {BUCKET_NO[b]} {BUCKET_LABEL[b]}
-                  </span>
+                  <span>{BUCKET_NO[b]}</span>
                   <span
                     className={`min-w-[1.5rem] rounded-full px-1.5 py-0.5 text-center text-xs tabular-nums ${
                       on ? "bg-white/25" : "bg-white/70"
@@ -449,7 +391,7 @@ function SubmissionsContent({
           </div>
           {bucketCounts.now === 0 && !bucket && (
             <p className="mt-2.5 text-sm text-stone-500">
-              至急の対応が必要な投稿はありません。②から順に確認してください。
+              優先度「高」の投稿はありません。「中」から順に確認してください。
             </p>
           )}
         </div>
@@ -709,11 +651,27 @@ function SubmissionTable({
                 />
               </td>
               <td className="w-56 min-w-[14rem] px-2 py-2">
-                <PriorityBadges a={s.assessment} compact />
                 {s.assessment && (
-                  <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-500">
-                    {s.assessment.reason}
-                  </div>
+                  <>
+                    <span
+                      className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-bold ${
+                        s.assessment.priority === "high"
+                          ? "bg-rose-600 text-white"
+                          : s.assessment.priority === "medium"
+                            ? "bg-amber-100 text-amber-900"
+                            : "bg-stone-100 text-stone-600"
+                      }`}
+                    >
+                      {s.assessment.priority === "high"
+                        ? "高"
+                        : s.assessment.priority === "medium"
+                          ? "中"
+                          : "低"}
+                    </span>
+                    <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-stone-500">
+                      {s.assessment.reason}
+                    </div>
+                  </>
                 )}
               </td>
               <td className="whitespace-nowrap px-2 py-2">

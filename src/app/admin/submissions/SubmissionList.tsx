@@ -1,15 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import type { Assessment, RejectReason } from "@/lib/submission-priority";
+import type {
+  Assessment,
+  Priority,
+  RejectReason,
+} from "@/lib/submission-priority";
 
 /**
  * 投稿の一覧 (受信箱)。表計算ではなく「上から順に捌く」ための画面。
  *
  * 近い将来この画面は自治体職員が使う。表計算のように 16 列を横スクロールさせると、
  * 状況を見ようとすると場所が画面外に出るなど、判断に必要な組が同時に見えない。
- * そこで 1 件 1 行に畳み、判断に要る 5 つ (優先度・状況・場所・いつ・本文) だけを
- * 常に見える位置に置く。写真や座標・EXIF は「詳細」を開いたときだけ出す。
+ *
+ * 先頭に出すのは 5 つだけ: 優先度・日付・場所・写真・本文。
+ * 状況 (目撃/人身被害) や信ぴょう性は優先度に畳み込んであるので、独立したバッジ
+ * としては出さず、優先度の下に理由 1 行として添える。残りは「詳細」を開いたとき。
+ *
+ * 公開は地図に出る操作なので確認を挟む。公開後も「公開を取り消す」で戻せる。
  */
 
 export type Situation = "sight" | "trace" | "damage" | "injury";
@@ -49,12 +57,6 @@ const SITUATION_LABEL: Record<Situation, string> = {
   damage: "物損被害",
   injury: "人身被害",
 };
-const SITUATION_STYLE: Record<Situation, string> = {
-  sight: "bg-amber-100 text-amber-900",
-  trace: "bg-stone-100 text-stone-700",
-  damage: "bg-orange-100 text-orange-900",
-  injury: "bg-rose-100 text-rose-900",
-};
 const STATUS_LABEL: Record<Status, string> = {
   pending: "承認待ち",
   approved: "公開中",
@@ -65,20 +67,15 @@ const STATUS_STYLE: Record<Status, string> = {
   approved: "bg-emerald-100 text-emerald-900",
   rejected: "bg-rose-100 text-rose-900",
 };
-const URGENCY_STYLE: Record<string, string> = {
-  urgent: "bg-rose-600 text-white",
-  normal: "bg-amber-100 text-amber-900",
-  low: "bg-stone-100 text-stone-600",
-};
-const URGENCY_LABEL: Record<string, string> = {
-  urgent: "至急",
-  normal: "通常",
-  low: "低",
-};
-const CREDIBILITY_STYLE: Record<string, string> = {
-  high: "bg-emerald-100 text-emerald-900",
-  medium: "bg-sky-100 text-sky-900",
+const PRIORITY_STYLE: Record<Priority, string> = {
+  high: "bg-rose-600 text-white",
+  medium: "bg-amber-500 text-white",
   low: "bg-stone-200 text-stone-700",
+};
+const PRIORITY_LABEL: Record<Priority, string> = {
+  high: "優先度 高",
+  medium: "中",
+  low: "低",
 };
 const CREDIBILITY_LABEL: Record<string, string> = {
   high: "高",
@@ -188,30 +185,21 @@ export default function SubmissionList({
               )}
 
               <div className="min-w-0 flex-1">
-                {/* 1 行目: 優先度と種類。ここだけ見て捌く順が分かるようにする */}
-                <div className="flex flex-wrap items-center gap-1.5">
+                {/* 1 行目: 優先度と日付。捌く順と鮮度がここで分かる */}
+                <div className="flex flex-wrap items-center gap-2">
                   {a && (
-                    <>
-                      <span
-                        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-bold ${URGENCY_STYLE[a.urgency]}`}
-                      >
-                        {URGENCY_LABEL[a.urgency]}
-                      </span>
-                      <span
-                        className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${CREDIBILITY_STYLE[a.credibility]}`}
-                      >
-                        信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
-                      </span>
-                    </>
+                    <span
+                      className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-bold ${PRIORITY_STYLE[a.priority]}`}
+                    >
+                      {PRIORITY_LABEL[a.priority]}
+                    </span>
                   )}
-                  <span
-                    className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${SITUATION_STYLE[s.situation]}`}
-                  >
-                    {SITUATION_LABEL[s.situation]}
+                  <span className="text-sm tabular-nums text-stone-700">
+                    {fmtDateTime(s.occurredAt)}
                   </span>
-                  {s.headCount > 0 && (
-                    <span className="text-xs text-stone-500">{s.headCount}頭</span>
-                  )}
+                  <span className="text-sm text-stone-400">
+                    ({sinceLabel(s.occurredAt)})
+                  </span>
                   {s.status !== "pending" && (
                     <span
                       className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[s.status]}`}
@@ -221,36 +209,34 @@ export default function SubmissionList({
                   )}
                 </div>
 
-                {/* 2 行目: 場所といつ */}
-                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 text-sm">
-                  <span className="font-semibold text-stone-900">{place}</span>
-                  <span className="tabular-nums text-stone-500">
-                    {fmtDateTime(s.occurredAt)}
-                  </span>
-                  <span className="text-stone-400">
-                    ({sinceLabel(s.occurredAt)})
-                  </span>
+                {/* 2 行目: 場所 */}
+                <div className="mt-1 text-base font-semibold text-stone-900">
+                  {place}
                 </div>
 
-                {/* 3 行目: 本文。ここが一番の判断材料なので省略しない */}
-                {s.comment && (
+                {/* 3 行目: 本文。一番の判断材料なので省略しない */}
+                {s.comment ? (
                   <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-stone-700">
                     {s.comment}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm text-stone-400">（コメントなし）</p>
+                )}
+
+                {/* 優先度の内訳。状況・信ぴょう性はここに畳む */}
+                {a && (
+                  <p className="mt-1.5 text-xs text-stone-500">
+                    {SITUATION_LABEL[s.situation]}
+                    {s.headCount > 0 ? ` ${s.headCount}頭` : ""} ・ {a.reason}
                   </p>
                 )}
 
                 {/* 裏付けの乏しさ。決めつけず、欠けているものを並べる */}
                 {a?.thinEvidence && (
                   <p className="mt-1.5 rounded-lg bg-orange-50 px-2 py-1 text-xs text-orange-900">
-                    裏付けが乏しい: {a.thinEvidence.join("・")}
-                    <span className="ml-1 text-orange-700">
-                      内容をよく確かめてください
-                    </span>
+                    裏付けが乏しい: {a.thinEvidence.join("・")} —
+                    内容をよく確かめてください
                   </p>
-                )}
-
-                {a && (
-                  <p className="mt-1 text-xs text-stone-500">{a.reason}</p>
                 )}
                 {a?.flags && a.flags.length > 0 && (
                   <div className="mt-1 flex flex-wrap gap-1">
@@ -272,22 +258,51 @@ export default function SubmissionList({
 
                 {/* 操作 */}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => moderate(s.id, "approve")}
-                    disabled={busy === s.id || s.status === "approved"}
-                    className="rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
-                  >
-                    承認して公開
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onReject(s.id)}
-                    disabled={busy === s.id || s.status === "rejected"}
-                    className="rounded-full border border-stone-300 px-4 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
-                  >
-                    却下…
-                  </button>
+                  {s.status === "approved" ? (
+                    // 公開は取り消せる。地図から下がるだけで投稿は残る
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "この投稿の公開を取り消します。\n地図から下がりますが投稿は残るので、あとで公開し直せます。",
+                          )
+                        )
+                          moderate(s.id, "reject");
+                      }}
+                      disabled={busy === s.id}
+                      className="rounded-full border border-stone-400 px-4 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
+                    >
+                      公開を取り消す
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const where = place;
+                          if (
+                            window.confirm(
+                              `この投稿を地図に公開します。\n\n${where}\n${fmtDateTime(s.occurredAt)}\n${s.comment ?? "（コメントなし）"}\n\n公開すると、地図と通知で誰でも見られる状態になります。\nあとから取り消すこともできます。`,
+                            )
+                          )
+                            moderate(s.id, "approve");
+                        }}
+                        disabled={busy === s.id}
+                        className="rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:bg-stone-300"
+                      >
+                        承認して公開
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onReject(s.id)}
+                        disabled={busy === s.id || s.status === "rejected"}
+                        className="rounded-full border border-stone-300 px-4 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-50 disabled:opacity-40"
+                      >
+                        却下…
+                      </button>
+                    </>
+                  )}
                   <button
                     type="button"
                     onClick={() => toggleOpen(s.id)}
@@ -319,6 +334,17 @@ export default function SubmissionList({
                   />
                 )}
                 <dl className="grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+                  {a && (
+                    <Row label="優先度の内訳">
+                      緊急度 {a.urgency === "urgent" ? "至急" : a.urgency === "normal" ? "通常" : "低"}
+                      {" ・ "}
+                      信ぴょう性 {CREDIBILITY_LABEL[a.credibility]}
+                    </Row>
+                  )}
+                  <Row label="状況">
+                    {SITUATION_LABEL[s.situation]}
+                    {s.headCount > 0 ? ` ・ ${s.headCount}頭` : ""}
+                  </Row>
                   <Row label="受信">
                     {fmtDateTime(new Date(s.receivedAt).toISOString())}
                   </Row>
