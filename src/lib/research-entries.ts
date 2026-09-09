@@ -24,6 +24,14 @@ export type ResearchEntry = {
 
 export const RESEARCH_ENTRIES: ResearchEntry[] = [
   {
+    slug: "2026-09-08-daily-report",
+    title: "2026年9月8日 国内クマ出没事案の時空間分析と分析報告",
+    lead: "2026年9月8日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
+    publishedAt: "2026-09-09",
+    category: "daily-report",
+    regions: ["山形県","青森県","北海道","岩手県","秋田県"],
+  },
+  {
     slug: "2026-09-07-daily-report",
     title: "2026年9月7日 国内クマ出没事案の時空間分析と分析報告",
     lead: "2026年9月7日の出没動向・人身被害・行政対応・生態学的分析を網羅した研究記録。本文はAI集約 → 獣医工学ラボ監修。",
