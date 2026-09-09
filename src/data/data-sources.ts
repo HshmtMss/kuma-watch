@@ -26,6 +26,9 @@ export type ExtractorType =
   | "direct-json"
   | "direct-api"
   | "direct-kml"
+  // 素の GeoJSON (FeatureCollection) をそのまま公開しているソース。
+  // src/lib/sources/geojson.ts
+  | "direct-geojson"
   | "direct-shapefile-zip"
   | "arcgis-dashboard"
   | "higumap-api"
@@ -117,6 +120,22 @@ export type KmlDateFormat =
   | "us-slash"     // M/D/YYYY
   | "ja-slash";    // YYYY/M/D
 
+/**
+ * GeoJSON (FeatureCollection) ソースの読み方。
+ * 座標は geometry から取るので、properties は日付・時刻・場所・備考だけ指定する。
+ */
+export type GeoJsonSource = {
+  geojsonUrl: string;
+  /** 日付が入っている properties のキー。 */
+  dateField: string;
+  /** 時刻 ("18:30" 等) のキー。無ければ省略。 */
+  timeField?: string;
+  /** 住所・地名のキー。市町村と字に割って使う。 */
+  placeField?: string;
+  /** 備考・区分 ("目撃" "足跡" 等) のキー。 */
+  commentField?: string;
+};
+
 export type KmlSource = {
   kmlUrl: string;
   nameFormat: KmlNameFormat;
@@ -156,6 +175,7 @@ export type DataSourceEntry = {
   arcgis?: ArcGisSource;
   csv?: CsvSource;
   kml?: KmlSource;
+  geojson?: GeoJsonSource;
   license?: string;
   notes?: string;
   requiresResearch?: boolean;
@@ -1556,36 +1576,57 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     notes: "紀伊半島中部個体群（三重・奈良共通）。R6 推定 467 頭で 400 頭の管理閾値を超過",
     verifiedAt: "2026-04-26",
   },
+  // 鳥取県は 2026 年に年度別の目撃一覧 PDF を取り下げ、地図 (tottori-geomap) に
+  // 移行した。旧 PDF (R8.3.31kuma.pdf) と旧トップ (item/1143816.htm) はいずれも
+  // 404 を HTTP 200 で返す。地図の裏には点データの GeoJSON がそのまま置かれて
+  // いるので、そちらを直接読む。PDF を LLM に読ませるより正確で安い。
   {
     id: "tottori",
     kind: "prefecture",
     prefCode: "31",
-    regionLabel: "鳥取県 ツキノワグマ出没情報トップ",
+    regionLabel: "鳥取県 クマ出没マップ (令和8年度)",
     bearStatus: "present",
     urls: [
-      { url: "https://www.pref.tottori.lg.jp/item/1143816.htm", role: "list", hint: "県公式 クマ出没情報トップ" },
-      { url: "https://dashboard.cv-dip.tottori.jp/root/asset?id=4&map=true", role: "map", hint: "出没位置図 (Web ダッシュボード、PC 表示)" },
+      { url: "https://www.pref.tottori.lg.jp/280334.htm", role: "list", hint: "県公式 クマ出没状況" },
+      { url: "https://pref-tottori.tottori-geomap.jp/#/?layers=b4o", role: "map", hint: "とっとりジオマップ クマ出没マップ (令和8年度)" },
     ],
-    extractor: "llm-html",
-    notes: "西中国地域個体群、絶滅危惧。R6 272 件、R7 95 件。地域 3 区分（東部・中部・西部）で集計。点データ PDF は tottori-pdf-* で別途取得",
-    verifiedAt: "2026-04-26",
+    extractor: "direct-geojson",
+    geojson: {
+      // 現年度分。年度が変わると中身が入れ替わり、前年度は
+      // BearSightingMap_R<n> として smartcity.geolonia.com 側へ移る。
+      geojsonUrl: "https://tiles.tottori-geomap.jp/geojson/choujutsuhou.geojson",
+      dateField: "日にち",
+      timeField: "時間",
+      placeField: "場所",
+      commentField: "備考",
+    },
+    notes: "西中国地域個体群、絶滅危惧。R8 129 件 (2026-04-07〜)、R7 95 件、R6 272 件",
+    verifiedAt: "2026-09-09",
   },
   {
-    id: "tottori-pdf-r7",
+    id: "tottori-geojson-r7",
     kind: "prefecture",
     prefCode: "31",
-    regionLabel: "鳥取県 R7 (2025) クマ目撃・痕跡情報一覧",
+    regionLabel: "鳥取県 R7 (2025年度) クマ出没マップ",
     bearStatus: "present",
+    periodBounded: true,
     urls: [
       {
-        url: "https://www.pref.tottori.lg.jp/secure/1143816/R8.3.31kuma.pdf",
-        role: "pdf",
-        hint: "令和7年度 クマ目撃・痕跡情報一覧 (76件、R8.3.31 時点)",
+        url: "https://tottori.smartcity.geolonia.com/data/BearSightingMap_R7/latest/geojson/data.geojson",
+        role: "map",
+        hint: "令和7年度 クマ出没マップ GeoJSON (95件)",
       },
     ],
-    extractor: "llm-pdf",
-    notes: "鳥取県公式 PDF。表形式 (日付/時間/地域/地名/区分/要因/出没地/状況)。和暦 (R7.4.19, R8.3.3 等) → 西暦変換が必要",
-    verifiedAt: "2026-04-26",
+    extractor: "direct-geojson",
+    geojson: {
+      geojsonUrl:
+        "https://tottori.smartcity.geolonia.com/data/BearSightingMap_R7/latest/geojson/data.geojson",
+      dateField: "日にち",
+      timeField: "時間",
+      placeField: "場所",
+    },
+    notes: "旧 tottori-pdf-r7 の代替。公開終了した PDF (76件) より多い 95 件で、県公表の R7 件数と一致する",
+    verifiedAt: "2026-09-09",
   },
   {
     id: "shimane",

@@ -28,17 +28,6 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
     checkedAt: "2026-08-23",
   },
   {
-    id: "tottori",
-    reason: "県ページは月別集計の推移 PDF のみ。個別記録は公開していない",
-    checkedAt: "2026-08-23",
-  },
-  {
-    id: "tottori-pdf-r7",
-    reason:
-      "R7 の目撃・痕跡一覧 (76件) は公開終了。PDF の URL は HTML を返すようになった",
-    checkedAt: "2026-08-23",
-  },
-  {
     id: "tokushima",
     reason:
       "県ページは 404。四国のツキノワグマは剣山系に数十頭で、林野庁四国森林管理局に 11 件あるのみ・9 ヶ月更新なし。取り込む価値が薄い",

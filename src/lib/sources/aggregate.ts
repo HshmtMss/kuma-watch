@@ -5,6 +5,7 @@ import { fetchGifuSightings } from "./gifu";
 import { fetchHigumapSightings } from "./higumap";
 import { fetchKemonoteSightings } from "./kemonote";
 import { fetchKmlSightings } from "./kml";
+import { fetchGeoJsonSightings } from "./geojson";
 import { fetchLlmHtmlSightings } from "./llm-html";
 import { fetchNaganoPdfSightings } from "./nagano-pdf";
 import { fetchGifuGisSightings } from "./gifu-gis";
@@ -57,6 +58,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
   const arcgis = DATA_SOURCES.filter((s) => s.arcgis);
   const csv = DATA_SOURCES.filter((s) => s.csv);
   const kml = DATA_SOURCES.filter((s) => s.kml);
+  const geojson = DATA_SOURCES.filter((s) => s.geojson);
   const higumap = DATA_SOURCES.filter((s) => s.extractor === "higumap-api");
   const gifu = DATA_SOURCES.filter((s) => s.extractor === "direct-shapefile-zip");
   const kemonote = DATA_SOURCES.filter((s) => s.extractor === "kemonote-api");
@@ -79,6 +81,7 @@ export async function fetchAllOfficialSightings(): Promise<UnifiedSighting[]> {
     ...arcgis.map((s) => () => fetchArcGisSightings(s).catch(() => [] as UnifiedSighting[])),
     ...csv.map((s) => () => fetchCsvSightings(s).catch(() => [] as UnifiedSighting[])),
     ...kml.map((s) => () => fetchKmlSightings(s).catch(() => [] as UnifiedSighting[])),
+    ...geojson.map((s) => () => fetchGeoJsonSightings(s).catch(() => [] as UnifiedSighting[])),
     ...higumap.map((s) => () => fetchHigumapSightings(s).catch(() => [] as UnifiedSighting[])),
     ...gifu.map((s) => () => fetchGifuSightings(s).catch(() => [] as UnifiedSighting[])),
     ...kemonote.map((s) => () => fetchKemonoteSightings(s).catch(() => [] as UnifiedSighting[])),
