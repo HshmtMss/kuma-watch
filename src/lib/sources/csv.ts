@@ -66,6 +66,27 @@ function cleanNum(v: string | undefined): number {
 }
 
 /**
+ * 字名の先頭に県名・市町村名が重複して入っているのを落とす。
+ *
+ * 山形県の CSV は「地名等」列が "天童市北久野本１丁目" のようにフル住所で、
+ * そのまま入れると地図カードが「天童市 天童市北久野本１丁目」になる。
+ * カードには場所固有の情報だけ出したいので、既に出している県・市町村は削る。
+ */
+function trimRedundantPlace(
+  section: string,
+  prefName: string,
+  cityName: string,
+): string {
+  let out = section.trim();
+  for (const prefix of [prefName, cityName]) {
+    if (prefix && out.startsWith(prefix) && out.length > prefix.length) {
+      out = out.slice(prefix.length).trim();
+    }
+  }
+  return out || section.trim();
+}
+
+/**
  * 一覧ページから現行の CSV URL を探す。
  * pattern はリンクの href に対して当てる正規表現 (最初の一致を採る)。
  */
@@ -80,16 +101,23 @@ async function discoverCsvUrl(
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
       signal: AbortSignal.timeout(20000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`[csv:discover] ${listUrl} HTTP ${res.status}`);
+      return null;
+    }
     const html = await res.text();
     const re = new RegExp(`href="([^"]*${pattern}[^"]*)"`, "i");
     const m = re.exec(html);
-    if (!m) return null;
+    if (!m) {
+      console.error(`[csv:discover] ${listUrl} has no link matching /${pattern}/`);
+      return null;
+    }
     const href = m[1];
     if (href.startsWith("http")) return href;
     const base = new URL(listUrl);
     return `${base.origin}${href.startsWith("/") ? "" : "/"}${href}`;
-  } catch {
+  } catch (e) {
+    console.error(`[csv:discover] ${listUrl} failed`, e);
     return null;
   }
 }
@@ -198,6 +226,7 @@ export async function fetchCsvSightings(
         droppedFuture++;
         continue;
       }
+      const city = (iCity >= 0 && row[iCity]) || "";
       sightings.push({
         id: `${entry.id}-${i}`,
         source: entry.id,
@@ -206,8 +235,12 @@ export async function fetchCsvSightings(
         lon,
         date,
         prefectureName: prefName,
-        cityName: (iCity >= 0 && row[iCity]) || "",
-        sectionName: (iSection >= 0 && row[iSection]) || "",
+        cityName: city,
+        sectionName: trimRedundantPlace(
+          (iSection >= 0 && row[iSection]) || "",
+          prefName,
+          city,
+        ),
         comment: localizeSituation(
           (iSituation >= 0 && row[iSituation]) || "",
         ),

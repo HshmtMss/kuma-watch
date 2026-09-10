@@ -80,8 +80,6 @@ export default async function ProductsPage({
   const audience: "個人" | "自治体" = sp.for === "gov" ? "自治体" : "個人";
 
   const products = getProductsForAudience(audience);
-  // アフィリ製品が1件でもあれば PR 開示を出す (無ければ出さない=誤解を招かない)。
-  const hasAffiliate = products.some((p) => Boolean(p.affiliateUrl));
 
   // シーンフィルタ (農作業・山菜採り / 登山 / キャンプ / 暮らし)。LINE の ?scene= とキー共有。
   const activeScene: string =
@@ -199,14 +197,6 @@ export default async function ProductsPage({
           })),
         ]}
       />
-
-      {hasAffiliate && (
-        <p className="not-prose mt-4 border-l-[3px] border-stone-200 bg-stone-50 px-3 py-2 text-[11px] leading-relaxed text-stone-500">
-          ※「
-          <span className="font-semibold text-stone-600">◯◯で探す（PR）</span>
-          」は広告（アフィリエイトリンク）を含みます（Amazon等のキーワード検索へ移動します）。「公式サイト」は情報として掲載しているリンクです。掲載製品は編集方針にもとづき選定しており、広告の有無は掲載順に影響しません。
-        </p>
-      )}
 
       {/* 定番の対策グッズをAmazonで探す（アフィリエイト・フラグ裏）。
           下のキュレーション製品とは別に、まず手早く探せる導線として上部に置く。

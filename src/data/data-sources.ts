@@ -450,7 +450,13 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://www.pref.yamagata.jp/documents/2414/20260414_kemonote-cleaned.csv",
+      // 県は更新のたびにファイル名の日付を変え、旧ファイルは消える。
+      // 登録が 20260414 のままで 404 になっていた (2026-09-09 に発覚)。
+      // 東京都と同じく一覧ページから現行の URL を辿る。
+      csvUrl: "https://www.pref.yamagata.jp/documents/2414/20260906_kemonote-cleaned.csv",
+      discoverFrom:
+        "https://www.pref.yamagata.jp/050011/kurashi/shizen/seibutsu/about_kuma/kuma_yamagata_top.html",
+      discoverPattern: "\\d+_kemonote-cleaned",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -465,8 +471,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         timeOfDay: "目撃した時間帯（0:00～24:00）",
       },
     },
-    notes: "位置座標付き CSV（2026-04-14 時点で 69 件、16KB）",
-    verifiedAt: "2026-04-20",
+    notes: "位置座標付き CSV（2026-09-06 時点で 201KB）。ファイル名の日付は更新のたびに変わる",
+    verifiedAt: "2026-09-10",
   },
   {
     id: "fukushima",
