@@ -6,8 +6,17 @@ import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-mode
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
+// ページ本文をここまで読ませる。実測した自治体ページはどれも新しい順に
+// 並んでいるので、ここで切り落とされるのは古い年度分だけ (足利市 18,048 字・
+// 富士宮市 8,727 字。いずれも今年度分は先頭に収まっている)。
 const PAGE_BYTES_MAX = 20000;
-const MAX_SIGHTINGS_PER_SOURCE = 50;
+// 1 ソースあたりの抽出上限。
+//
+// 50 件だった頃、那須塩原市のページは今年度分だけで 160 件あり、110 件が
+// 地図に出ていなかった (2026-09-14 に実測)。那須町も 58 件中 8 件を落として
+// いた。出力は maxOutputTokens 65536 で、1 件あたり 100 トークン見ても
+// 200 件で 2 万トークン程度なので上限には当たらない。
+const MAX_SIGHTINGS_PER_SOURCE = 200;
 const SOURCE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 type SightingDraft = {
