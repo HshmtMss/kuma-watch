@@ -176,6 +176,47 @@ async function main(): Promise<void> {
     freshBySource.set(k, (freshBySource.get(k) ?? 0) + 1);
     if (isIsoDate(r.date) && r.date > (freshLatest.get(k) ?? "")) freshLatest.set(k, r.date);
   }
+  const MAX_DATE_REGRESSION_DAYS = 30;
+
+  // LLM に読ませるページ (llm-html) は、返ってくる並び順と件数が実行のたびに揺れる。
+  // 那須町のページは番号付きで新しい順に並び、「新しい順に最大 50 件」と指示して
+  // いるのに、前年度分ばかり 50 件返ってきて最新日が 2026-09-07 → 2025-02-08 と
+  // 575 日巻き戻った回があった (2026-09-05/06 の健全性チェックが検出。翌日には
+  // 自然に戻っており、ページ自体は生きている)。あわら市も同じ形で 80 日戻った。
+  //
+  // 下の後退チェックはビルドごと止めるが、町のお知らせ 1 ページの揺れで全国の
+  // 取り込みを止めるのは釣り合わない。アーカイブの抽出ブレと同じ扱いにして、
+  // 巻き戻ったソースだけ前回分をそのまま使う。
+  const llmHtmlIds = new Set(
+    DATA_SOURCES.filter((s) => s.extractor === "llm-html").map((s) => s.id),
+  );
+  const rolledBack = new Set<string>();
+  for (const [src, before] of prevLatest) {
+    if (!llmHtmlIds.has(src)) continue;
+    // 1 件も取れなかった場合は別の守り (0 件チェック) の担当。ここでは
+    // 「取れてはいるが古い方ばかり返ってきた」だけを見る。
+    if (!freshLatest.has(src)) continue;
+    const after = freshLatest.get(src) as string;
+    if (daysBetweenIso(after, before) <= MAX_DATE_REGRESSION_DAYS) continue;
+    rolledBack.add(src);
+  }
+  if (rolledBack.size > 0) {
+    const detail = [...rolledBack]
+      .map((src) => `${src}(最新 ${freshLatest.get(src)}→前回 ${prevLatest.get(src)})`)
+      .join(", ");
+    console.log(
+      `[build-sightings] LLM 抽出が古い方に振れたため前回分を使います: ${detail}`,
+    );
+    fresh = fresh.filter((r) => !rolledBack.has(r.source ?? ""));
+    fresh.push(...prevRecords.filter((r) => rolledBack.has(r.source ?? "")));
+    // 以降の守り (0 件チェック・後退チェック) は差し替え後の姿で判定する。
+    for (const src of rolledBack) {
+      freshBySource.set(src, prevBySource.get(src) ?? 0);
+      const before = prevLatest.get(src);
+      if (before) freshLatest.set(src, before);
+    }
+  }
+
   const vanished: string[] = [];
   const retired: string[] = [];
   for (const [src, n] of prevBySource) {
@@ -211,7 +252,6 @@ async function main(): Promise<void> {
   // 件数の目減りは神奈川で 8% しかなく、割合で見張っても拾えない。
   // 一方「最新の出没日が月単位で戻る」のは取得漏れ以外にまず起きないので、
   // そこを見る。
-  const MAX_DATE_REGRESSION_DAYS = 30;
   const regressed: string[] = [];
   for (const [src, n] of prevBySource) {
     if (n < MIN_TO_GUARD) continue;
