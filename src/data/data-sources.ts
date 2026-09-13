@@ -171,7 +171,12 @@ export type DataSourceEntry = {
   regionLabel: string;
   bearStatus: BearStatus;
   urls: DataSourceUrl[];
-  extractor: ExtractorType;
+  /**
+   * 取り込み器。省略したものは「登録は残すが取り込まない」= 公開先を追う
+   * 手がかりとしてだけ持つソース (個別記録が無いページ等)。健全性チェックの
+   * 対象からも外れる。
+   */
+  extractor?: ExtractorType;
   arcgis?: ArcGisSource;
   csv?: CsvSource;
   kml?: KmlSource;
@@ -1412,9 +1417,17 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.wmi-hyogo.jp/index.php/database_search", role: "map", hint: "兵庫県森林動物研究センター データベース検索" },
       { url: "https://web.pref.hyogo.lg.jp/nk20/r7hokyochosa.html", role: "list", hint: "ドングリ類 豊凶調査結果（堅果類凶作補正に活用可）" },
     ],
-    extractor: "llm-html",
-    notes: "県研究機関ベースでデータ精度高。ドングリ豊凶データも同機関から入手可",
-    verifiedAt: "2026-04-20",
+    // 取り込まない。ここに並ぶ 3 ページはどれも個別の出没記録を持たない
+    // (10km 集約の色分けマップ・データベースの目次・ドングリ豊凶の注意喚起)。
+    // llm-html で読ませると Gemini が 0 件を返す日と、ページに無い事案を
+    // 1 件でっち上げる日が交互に出て、健全性チェックが鳴ったり鳴らなかったり
+    // していた (2026-09-14 時点で「民家の裏山で男性が遭遇し負傷」という、
+    // どのページにも書かれていない 1 件が入っていた。llm-html は毎回作り直す
+    // 種別なので、取り込みを外せば次のビルドでスナップショットから消える)。
+    // 兵庫県の個別記録は下の市町ページ (hyogo-*) から取る。
+    notes:
+      "県研究機関ベースでデータ精度は高いが、公開されるのは 10km 集約マップと市町別の年次集計のみで 1 件ずつの記録が無い。ドングリ豊凶データ (堅果類凶作補正) の参照先としてだけ登録を残す",
+    verifiedAt: "2026-09-14",
   },
 
   // --- 兵庫県の市町村ページ (2026-09-02 追加) ---
