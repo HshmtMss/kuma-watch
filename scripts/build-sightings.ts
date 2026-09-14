@@ -187,12 +187,21 @@ async function main(): Promise<void> {
   // 下の後退チェックはビルドごと止めるが、町のお知らせ 1 ページの揺れで全国の
   // 取り込みを止めるのは釣り合わない。アーカイブの抽出ブレと同じ扱いにして、
   // 巻き戻ったソースだけ前回分をそのまま使う。
+  //
+  // ただし件数の多いページに限る。数件しか載らない小さなページでは、最新日が
+  // 下がるのは揺れではなく訂正であることの方が多い。和束町のページは 1,410 字
+  // で「更新日：2025年07月18日 / 7月17日の18時10分頃に」とあり、正しい出没日は
+  // 2025-07-17 だが、スナップショットには過去に年を取り違えた 2026-07-17 が
+  // 残っていた。件数を見ずに守ると、正しく訂正された側を捨てて誤った日付を
+  // 永久に抱え込み、そのソースが二度と更新されなくなる (2026-09-14 に実際に
+  // 越前市・和束町・沼津市・平生町・井手町で毎回発火していた)。
   const llmHtmlIds = new Set(
     DATA_SOURCES.filter((s) => s.extractor === "llm-html").map((s) => s.id),
   );
   const rolledBack = new Set<string>();
   for (const [src, before] of prevLatest) {
     if (!llmHtmlIds.has(src)) continue;
+    if ((prevBySource.get(src) ?? 0) < MIN_TO_GUARD) continue;
     // 1 件も取れなかった場合は別の守り (0 件チェック) の担当。ここでは
     // 「取れてはいるが古い方ばかり返ってきた」だけを見る。
     if (!freshLatest.has(src)) continue;
