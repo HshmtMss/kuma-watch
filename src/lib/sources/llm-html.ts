@@ -42,7 +42,9 @@ const RESPONSE_SCHEMA = {
           date: {
             type: "string",
             description:
-              "出没日 YYYY-MM-DD。年が無い場合 (例: 8月27日) は今日より前の最も近い年を採用",
+              "出没日 YYYY-MM-DD。和暦は 令和N年 = 西暦 2018+N (令和6年=2024、令和7年=2025、令和8年=2026)。" +
+              "年が書かれていない場合 (例: 8月27日) は、同じページの最終更新日・掲載日と同じ年を使う。" +
+              "ページの最終更新日より後の日付にはしない。手がかりが何も無いときだけ今日より前の最も近い年を採用",
           },
           cityName: {
             type: "string",
@@ -113,6 +115,15 @@ async function fetchPage(url: string): Promise<string | null> {
 
 function buildPrompt(source: DataSourceEntry, pageText: string): string {
   const todayIso = new Date().toISOString().split("T")[0];
+  // 「過去 12 ヶ月以内」と書くだけでは、年の決め方を細かく指示した分だけ
+  // 期間の指示が弱まり、古い年度分まで返ってくることがある (平生町で実測)。
+  // 境界の日付そのものを渡して、判断の余地を無くす。
+  //
+  // なお、これはあくまで LLM への指示であって、抽出後にコードで切り落とすことは
+  // しない。遵守は完全ではなく数件はみ出すが (那須塩原市で実測)、現に取り込めて
+  // いる 12 ヶ月より古い 77 件は日付自体は正しい実際の出没記録で、消す理由が無い。
+  // 2026-09-15 に切るかどうかを検討したうえで「切らない」と決めた。
+  const oldestIso = new Date(Date.now() - 365 * 86_400_000).toISOString().split("T")[0];
   const cityHint = source.defaultCity
     ? `このページは「${source.defaultCity}」のサイトです。本文で市町村名が省略されている場合は cityName="${source.defaultCity}" を使ってください。`
     : "";
@@ -123,7 +134,10 @@ ${cityHint}
 
 抽出ルール:
 - 集計表・管理計画・政策文書は対象外。個別の出没 1 件ごとに 1 オブジェクト。
-- 過去 12 ヶ月以内のもののみ。最大 ${MAX_SIGHTINGS_PER_SOURCE} 件、新しい順。
+- 年は本文の表記に従う。年が書かれていない日付は、そのページの最終更新日・掲載日の年とみなす。
+  ページの最終更新日より後の出没日はありえない。古い記事を今年のものとして扱わないこと。
+- 年を決めたうえで期間で絞る。${oldestIso} 以降の出没だけを出力し、それより古いものは
+  1 件も含めないこと。最大 ${MAX_SIGHTINGS_PER_SOURCE} 件、新しい順。
 - 個別出没リストが本文に無いなら sightings は空配列。
 - 各フィールドの形式は responseSchema の description を厳守。推測禁止。
 - responseSchema の説明文や本ルール文を、出力の値として絶対にコピーしないこと。
