@@ -791,18 +791,33 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     notes: "トップページの隠しフィールド hdnKumaData に地図描画用 JSON が埋まっており、そこから直接取れる (追加リクエスト不要)。埋め込みは直近3か月ほど。緯度経度・字・時刻・種別・頭数つき",
     verifiedAt: "2026-04-21",
   },
+  // --- 山梨県 CKAN (dataplatform-yamanashi) ---
+  //
+  // dataset の kuma1〜kuma6 は年度そのものではなく「新しい順のスロット」で、
+  // 毎年 4 月に各スロットの中身が 1 つずつ繰り下がる。リソース UUID は
+  // スロットに固定されていて、CKAN は URL 末尾のファイル名を見ずに
+  // UUID で現在の中身を返す (2026-09-17 に実測。2025kumadata.csv を要求すると
+  // 令和8年度の 173 行が返ってきた)。
+  //
+  // そのため登録 ID に年度を書くと毎年ずれる。実際 2026-04 に登録した
+  // yamanashi-r7 は 2026-09 時点で令和8年度を指しており、ラベルと中身が
+  // 1 年ずれたまま半年動いていた。さらに r\d を含む ID は
+  // isArchivedSource() が「年度で完結した過去データ」と判定するため、
+  // 現役の最新スロットが健全性チェックの監視対象から外れていた。
+  //
+  // ID を順位で持てば繰り下がりに追随する。実年度は notes に書く。
   {
-    id: "yamanashi-r7",
+    id: "yamanashi-latest",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R7 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 最新年度（CKAN CSV kuma1）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma1", role: "csv", hint: "令和7年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma1", role: "csv", hint: "最新年度のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/bed5301d-75b2-4976-8687-2b2721ae143a/resource/89d2478e-e29e-46e3-9ad3-19bf44822d4d/download/2025kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/bed5301d-75b2-4976-8687-2b2721ae143a/resource/89d2478e-e29e-46e3-9ad3-19bf44822d4d/download/2026kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -816,21 +831,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    notes: "令和7年度 CSV。一部レコードは座標欠損（地点ぼかし）",
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和8年度 (2026年度)。一部レコードは座標欠損（地点ぼかし）",
+    verifiedAt: "2026-09-17",
   },
   {
-    id: "yamanashi-r6",
+    // 過去年度のスロット。中身は確定済みで更新されないので健全性チェックの
+    // 対象から外す (ID から年度表記を外したため isArchivedSource では拾えない)。
+    periodBounded: true,
+    id: "yamanashi-prev1",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R6 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 1年前（CKAN CSV kuma2）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma2", role: "csv", hint: "令和6年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma2", role: "csv", hint: "1年前のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/3ecf27d0-72f6-417a-a1ad-5cbe3bd4200c/resource/b4eb262f-07e0-4417-b24f-6b15844b4ac1/download/2024kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/3ecf27d0-72f6-417a-a1ad-5cbe3bd4200c/resource/b4eb262f-07e0-4417-b24f-6b15844b4ac1/download/2025kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -844,20 +862,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和7年度 (2025年度)",
+    verifiedAt: "2026-09-17",
   },
   {
-    id: "yamanashi-r5",
+    // 過去年度のスロット。中身は確定済みで更新されないので健全性チェックの
+    // 対象から外す (ID から年度表記を外したため isArchivedSource では拾えない)。
+    periodBounded: true,
+    id: "yamanashi-prev2",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R5 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 2年前（CKAN CSV kuma3）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma3", role: "csv", hint: "令和5年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma3", role: "csv", hint: "2年前のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/06810006-6903-477e-87e8-411e433c2442/resource/f8d0e060-7802-413f-a201-66d5aa1a70e8/download/2023kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/06810006-6903-477e-87e8-411e433c2442/resource/f8d0e060-7802-413f-a201-66d5aa1a70e8/download/2024kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -871,20 +893,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和6年度 (2024年度)",
+    verifiedAt: "2026-09-17",
   },
   {
-    id: "yamanashi-r4",
+    // 過去年度のスロット。中身は確定済みで更新されないので健全性チェックの
+    // 対象から外す (ID から年度表記を外したため isArchivedSource では拾えない)。
+    periodBounded: true,
+    id: "yamanashi-prev3",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R4 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 3年前（CKAN CSV kuma4）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma4", role: "csv", hint: "令和4年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma4", role: "csv", hint: "3年前のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/712baddf-61ec-44d4-9ec2-653223911a02/resource/d4a6a51d-52f9-476a-aa74-0c27b87c748c/download/2022kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/712baddf-61ec-44d4-9ec2-653223911a02/resource/d4a6a51d-52f9-476a-aa74-0c27b87c748c/download/2023kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -898,20 +924,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和5年度 (2023年度)",
+    verifiedAt: "2026-09-17",
   },
   {
-    id: "yamanashi-r3",
+    // 過去年度のスロット。中身は確定済みで更新されないので健全性チェックの
+    // 対象から外す (ID から年度表記を外したため isArchivedSource では拾えない)。
+    periodBounded: true,
+    id: "yamanashi-prev4",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R3 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 4年前（CKAN CSV kuma5）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma5", role: "csv", hint: "令和3年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma5", role: "csv", hint: "4年前のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/8b93f225-6f90-4eb6-8e4f-f984ea246bbd/resource/0a66378c-bf8d-4614-9816-3d41d88797f4/download/2021kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/8b93f225-6f90-4eb6-8e4f-f984ea246bbd/resource/0a66378c-bf8d-4614-9816-3d41d88797f4/download/2022kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -925,20 +955,24 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和4年度 (2022年度)",
+    verifiedAt: "2026-09-17",
   },
   {
-    id: "yamanashi-r2",
+    // 過去年度のスロット。中身は確定済みで更新されないので健全性チェックの
+    // 対象から外す (ID から年度表記を外したため isArchivedSource では拾えない)。
+    periodBounded: true,
+    id: "yamanashi-prev5",
     kind: "prefecture",
     prefCode: "19",
-    regionLabel: "山梨県 R2 クマ出没・目撃（CKAN CSV）",
+    regionLabel: "山梨県 クマ出没・目撃 5年前（CKAN CSV kuma6）",
     bearStatus: "present",
     urls: [
-      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma6", role: "csv", hint: "令和2年度" },
+      { url: "https://catalog.dataplatform-yamanashi.jp/dataset/kuma6", role: "csv", hint: "5年前のスロット" },
     ],
     extractor: "direct-csv",
     csv: {
-      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/e25bc05d-75c4-4a54-b3c6-ea6395f23f70/resource/1c00f67e-1270-4a73-b46f-e046357fa43b/download/2020kumadata.csv",
+      csvUrl: "https://catalog.dataplatform-yamanashi.jp/dataset/e25bc05d-75c4-4a54-b3c6-ea6395f23f70/resource/1c00f67e-1270-4a73-b46f-e046357fa43b/download/2021kumadata.csv",
       encoding: "utf-8",
       delimiter: ",",
       dateFormat: "ja-slash",
@@ -952,7 +986,8 @@ export const DATA_SOURCES: DataSourceEntry[] = [
         headCount: "目撃頭数",
       },
     },
-    verifiedAt: "2026-04-21",
+    notes: "2026-09-17 時点の中身は令和3年度 (2021年度)",
+    verifiedAt: "2026-09-17",
   },
   {
     id: "nagano",
