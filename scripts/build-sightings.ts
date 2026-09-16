@@ -265,6 +265,14 @@ async function main(): Promise<void> {
   for (const [src, n] of prevBySource) {
     if (n < MIN_TO_GUARD) continue;
     if (!definedSourceIds.has(src)) continue; // 定義ごと消えた ID は引退扱い
+    // 年度で完結するアーカイブは対象外。範囲が確定していて新しい行が増える
+    // ことは無いので、最新日が下がるのは取得漏れではなく訂正でしかありえない。
+    // 静岡県の令和5年度 PDF は年を 2 年読み違えた日付で取り込まれており、
+    // LLM が正しく 2024-03-20 を返すようになったとたん、このチェックが
+    // 「730 日後退」と判定して 2026-09-15 から取り込み全体を止めていた。
+    // 守りたいのは神奈川・奈良のような「複数 PDF のうち今年度分だけ 404」で、
+    // どちらも periodBounded ではない。
+    if (archiveIds.has(src)) continue;
     const before = prevLatest.get(src);
     const after = freshLatest.get(src);
     if (!before || !after) continue;

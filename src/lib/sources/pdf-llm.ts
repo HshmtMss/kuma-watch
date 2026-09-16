@@ -88,10 +88,27 @@ async function fetchPdfBase64(url: string): Promise<string | null> {
   }
 }
 
+/** 「静岡県 R5 (2023) ツキノワグマ目撃情報」「令和5年度」から年度の開始年を取る。 */
+function fiscalYearOf(source: DataSourceEntry): number | null {
+  const hay = `${source.regionLabel} ${(source.urls ?? []).map((u) => u.hint ?? "").join(" ")}`;
+  const reiwa = /令和\s*(\d{1,2})\s*年度/.exec(hay) ?? /\bR(\d{1,2})\b/.exec(hay);
+  if (reiwa) return 2018 + Number(reiwa[1]);
+  const west = /\b(20\d{2})\b/.exec(hay);
+  return west ? Number(west[1]) : null;
+}
+
 function buildPrompt(source: DataSourceEntry): string {
   const todayIso = new Date().toISOString().split("T")[0];
+  // 年度が分かっている PDF では、年の推定に迷わせない。静岡県の令和5年度 PDF が
+  // 2 年ずれて取り込まれ、2023 年度の 121 件が 2025〜2026 年の出没として地図に
+  // 載っていた (2026-09-17 に発覚)。「今日より前の最も近い年」は最後の手段。
+  const fy = fiscalYearOf(source);
+  const fyRule = fy
+    ? `\n\nこの PDF は ${fy} 年度 (${fy}-04-01 〜 ${fy + 1}-03-31) のものです。` +
+      `date はこの範囲に必ず収めてください。範囲外になる行は年の読み違いなので、年を補正してください。`
+    : "";
   return `添付 PDF は ${source.regionLabel} のクマ出没・目撃情報の表 (PDF) です。
-今日: ${todayIso}
+今日: ${todayIso}${fyRule}
 
 PDF 内の表から個別の出没・目撃行を 1 件 1 オブジェクトで抽出してください。
 PDF は都道府県・年度ごとに列構成が異なるため、列見出しから意味を推定して埋めてください:
