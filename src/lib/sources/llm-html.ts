@@ -243,6 +243,16 @@ export async function fetchLlmHtmlSightings(
     if (combined.length >= PAGE_BYTES_MAX) break;
   }
   const text = combined.slice(0, PAGE_BYTES_MAX);
+  // 切り詰めが起きたことは、そのままでは誰にも見えない。実測した自治体ページは
+  // どれも新しい順に並んでいるので落ちるのは古い年度分だけだが、並びが変わった
+  // ページや、1 ページで上限を超えるほど育ったページでは今年度分が落ちうる。
+  // 足利市は 18,048 字と上限に迫っている (2026-09-16 実測)。
+  if (combined.length > PAGE_BYTES_MAX) {
+    console.warn(
+      `[llm-html ${source.id}] 本文 ${combined.length} 字を ${PAGE_BYTES_MAX} 字で切り詰めた` +
+        ` (ページが新しい順でないと最近の分が落ちる)`,
+    );
+  }
   if (text.length < 200) {
     // 1 ページも取れなかったのか、取れたが中身が薄いのかを分けて書く。
     // 前者は公開先が消えた可能性が高く、後者は JS 描画の可能性が高い。
