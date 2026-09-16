@@ -671,14 +671,16 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "神奈川県 ツキノワグマ情報",
     bearStatus: "present",
     urls: [
-      // 注意: 県は更新のたびにファイル名の日付を変える (kuma_r8_0824.pdf)。
-      // シーズン中は月1回 list ページで確認して差し替えること。
-      { url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r8_0831.pdf", role: "pdf", hint: "令和8年度 目撃等情報 (R8.8.31 時点)" },
+      // 県は更新のたびにファイル名の日付を変え、旧 URL は 404 になる
+      // (kuma_r8_0824 → 0831 → 0915)。取り込みは下の list ページから
+      // 「目撃等情報」のリンクを拾うのが主で、この登録はそれが失敗したときの
+      // 保険。古いままだと毎回 404 を叩くので、気づいたときに差し替える。
+      { url: "https://www.pref.kanagawa.jp/documents/15077/kuma_r8_0915.pdf", role: "pdf", hint: "令和8年度 目撃等情報 (R8.9.15 時点)" },
       { url: "https://www.pref.kanagawa.jp/docs/t4i/cnt/f3813/index.html", role: "list", hint: "神奈川県ツキノワグマ情報" },
     ],
     extractor: "kanagawa-pdf-table",
     notes: "丹沢・道志山系に少数個体群。第二種特定鳥獣管理計画の対象",
-    verifiedAt: "2026-09-01",
+    verifiedAt: "2026-09-17",
   },
   {
     id: "niigata",
@@ -1574,12 +1576,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     bearStatus: "present",
     urls: [
       { url: "https://www.pref.nara.lg.jp/n118/p043003.html", role: "list", hint: "県 ツキノワグマ出没情報" },
-      { url: "https://www.pref.nara.lg.jp/documents/22870/20260901133554.pdf", role: "pdf", hint: "令和8年度 目撃情報一覧 (R8.9.1 現在)" },
+      { url: "https://www.pref.nara.lg.jp/documents/22870/20260916150053.pdf", role: "pdf", hint: "令和8年度 目撃情報一覧 (R8.9.16 現在)" },
       { url: "https://www.pref.nara.lg.jp/documents/22870/20260710180023.pdf", role: "pdf", hint: "令和7年度 目撃情報一覧 (155件)" },
     ],
     extractor: "nara-pdf-table",
     notes: "表形式 (No / 日時 / 市町村 / 大字)。日付は和暦。「大台ヶ原」は市町村ではなく県も別枠集計なので取り込めない",
-    verifiedAt: "2026-09-01",
+    verifiedAt: "2026-09-17",
   },
   {
     id: "wakayama",
@@ -1717,17 +1719,18 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.pref.yamaguchi.lg.jp/soshiki/41/20698.html", role: "list", hint: "自然保護課 ツキノワグマ被害防止ページ" },
       { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208249.xlsx", role: "excel", hint: "過去からの月別クマ目撃情報 (H9-R6)" },
-      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/208250.xlsx", role: "excel", hint: "令和6年度 市町別・月別クマ目撃情報" },
-      // 注意: 県は更新のたびに attachment 番号を振り直し、旧ファイルを消す。
-      // 登録していた 238451/238452 は 404 になり、山口県は 1 件も取れていなかった。
-      // シーズン中は月1回、下記 list ページで番号を確認して差し替えること。
-      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/248466.pdf", role: "pdf", hint: "令和8年度 目撃情報詳細 (R8.8.21 現在・242件)" },
+      // 県は更新のたびに attachment 番号を振り直し、旧ファイルを消す
+      // (238451/238452 → 248466 → 251105)。取り込みは上の list ページから
+      // 「目撃情報」のリンクを拾うのが主で、以下の登録はそれが失敗したときの
+      // 保険。古いままだと毎回 404 を叩くので、気づいたときに差し替える。
+      // 令和6年度の集計 Excel (208250) は県が消したため登録から外した。
+      { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/251105.pdf", role: "pdf", hint: "令和8年度 目撃情報詳細 (R8.9.15 現在)" },
       { url: "https://www.pref.yamaguchi.lg.jp/uploaded/attachment/239822.pdf", role: "pdf", hint: "令和7年度 目撃情報詳細 (405件)" },
       { url: "https://www.pref.yamaguchi.lg.jp/site/police/212182.html", role: "map", hint: "YPくまっぷ（山口県警察、R7 地点マップ）" },
     ],
     extractor: "yamaguchi-pdf-table",
-    notes: "西中国地域個体群、絶滅危惧。R6 799 件（岩国・周南中心）、R7 確定 PDF 未公表（県警 YPくまっぷで点データ公開）。Excel は市町別×月別×目撃/捕獲の集計表形式",
-    verifiedAt: "2026-04-21",
+    notes: "西中国地域個体群、絶滅危惧。R6 799 件（岩国・周南中心）、R7 確定 PDF 未公表（県警 YPくまっぷで点データ公開）。Excel は市町別×月別×目撃/捕獲の集計表形式で、取り込みには使っていない",
+    verifiedAt: "2026-09-17",
   },
   {
     id: "tokushima",
