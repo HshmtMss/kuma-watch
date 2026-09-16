@@ -1269,7 +1269,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.pref.shizuoka.jp/kurashikankyo/shizenkankyo/wild/1017680.html", role: "list", hint: "県自然保護課 ツキノワグマトップ" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 県トップページ。個別記録は shizuoka-gmap / shizuoka-r7-gmap / shizuoka-pdf-* から取る。登録は公開先を追う手がかりとして残す
     notes: "県自然保護課が年度毎に地図＋通し番号リスト PDF を公開。R7 200件、R6 156件、R5 以降急増中。座標は PDF 上の地図のみで点データ API 未公開。R8 版は shizuoka-gmap、PDF データは shizuoka-pdf-* で別途取得",
     verifiedAt: "2026-04-26",
   },
@@ -1591,7 +1591,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.wakayama.lg.jp/prefg/032600/yasei/kuma.html", role: "list", hint: "県公式 ツキノワグマ" },
       { url: "https://www.pref.wakayama.lg.jp/prefg/032600/kanri_d/fil/honbun.pdf", role: "pdf", hint: "和歌山県第二種特定鳥獣（ツキノワグマ）管理計画 R7.10〜R9.3" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 公開されているのは目撃マップ (画像 PDF) と市町村別の年次集計のみ。登録は公開先を追う手がかりとして残す
     notes: "紀伊半島中部個体群（三重・奈良共通）。R6 推定 467 頭で 400 頭の管理閾値を超過",
     verifiedAt: "2026-04-26",
   },
@@ -1704,7 +1704,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.hiroshima.lg.jp/site/wildlife-management/wm-bear02-attention.html", role: "list", hint: "活動期注意喚起" },
       { url: "https://www.pref.hiroshima.lg.jp/uploaded/attachment/599189.pdf", role: "pdf", hint: "令和6年度 ツキノワグマ出没状況" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 県は市町別・月別の集計 PDF のみ。個別記録は市町ページ (hiroshima-otake 等) から取る。登録は公開先を追う手がかりとして残す
     notes: "西中国地域個体群（島根・山口と共通）、絶滅危惧。R6 (2024) 4-10月 639 件",
     verifiedAt: "2026-04-26",
   },
@@ -1739,7 +1739,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
       { url: "https://www.pref.tokushima.lg.jp/ippannokata/kurashi/shizen/7241461/", role: "list", hint: "県公式 【目撃情報あり】ツキノワグマについて" },
       { url: "https://www.pref.tokushima.lg.jp/file/attachment/1015220.pdf", role: "pdf", hint: "令和7年度改正 徳島県ツキノワグマ対応指針" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 県ページ・PDF とも 404。四国の個体群は林野庁四国森林管理局に 11 件あるのみ。登録は公開先を追う手がかりとして残す
     notes: "四国個体群（剣山系中心、推定 20 数頭、絶滅危惧）。年計 R3:1→R4:2→R5:2→R6:7→R7:7 と微増傾向。主な出没は美馬市・那賀町・三好市。捕獲時は学習放獣対応",
     verifiedAt: "2026-04-21",
   },
@@ -2140,7 +2140,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.town.takatori.nara.jp/contents_detail.php?co=new&frmId=2183", role: "list", hint: "高取町 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 本文 903 字・日付 1 個 (更新日のみ) で個別記録が無い。登録は公開先を追う手がかりとして残す
     defaultCity: "高取町",
     notes: "下見時 1 件 (最新 2024-06-22)",
     verifiedAt: "2026-09-02",
@@ -2226,7 +2226,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.city.wakayama.wakayama.jp/kurashi/sangyo_koyo_roudou/nougyou/1066381.html", role: "list", hint: "和歌山市 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 本文 4,030 字・日付 2 個で個別記録が無い。登録は公開先を追う手がかりとして残す
     defaultCity: "和歌山市",
     notes: "下見時 1 件 (最新 2025-11-11)",
     verifiedAt: "2026-09-02",
@@ -2398,7 +2398,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.city.shiga-konan.lg.jp/soshiki/kankyou_keizai/norin_hozen/4/34892.html", role: "list", hint: "湖南市 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 本文 1,278 字・日付 2 個で個別記録が無い。登録は公開先を追う手がかりとして残す
     defaultCity: "湖南市",
     notes: "下見時 1 件 (最新 2024-10-04)",
     verifiedAt: "2026-09-02",
@@ -2671,12 +2671,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "静岡県 御殿場市 クマ出没情報",
     bearStatus: "present",
     urls: [
-      { url: "https://www.city.gotemba.lg.jp/kurashi/b-p-info/b-p-info-01/17098.html", role: "list", hint: "御殿場市 クマ出没情報" },
+      { url: "https://www.city.gotemba.lg.jp/sangyou/f-2/f-2-5/7520.html", role: "list", hint: "御殿場市 クマに関する情報(目撃・対策等)" },
     ],
     extractor: "llm-html",
     defaultCity: "御殿場市",
-    notes: "下見時 6 件 (最新 2026-05-13)",
-    verifiedAt: "2026-09-04",
+    notes: "旧 URL (kurashi/b-p-info/.../17098.html) が 404 になり 0 件に落ちていた。2026-09-16 に産業・ビジネス > 鳥獣被害対策 の下へ移転しているのを見つけて差し替え",
+    verifiedAt: "2026-09-16",
   },
   {
     id: "shizuoka-kikugawa",
@@ -3091,7 +3091,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.city.echizen.lg.jp/office/kankyounourin/030/kumachuui.html", role: "list", hint: "越前市 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 本文 1,036 字。「6月6日に文室町で目撃された」の 1 文だけで一覧が無い。登録は公開先を追う手がかりとして残す
     defaultCity: "越前市",
     notes: "下見時 1 件 (最新 2024-06-06)",
     verifiedAt: "2026-09-04",
@@ -3121,7 +3121,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.city.fujiyoshida.yamanashi.jp/page/1531.html", role: "list", hint: "富士吉田市 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): ページが 404 (2026-05 収集時の page/1531.html)。市サイトを辿っても後継が見つからない。富士吉田市は県 CSV (yamanashi-r*) が今年度 11 件＋news 13 件を持っているのでカバレッジは維持される。登録は公開先を追う手がかりとして残す
     defaultCity: "富士吉田市",
     notes: "下見時 14 件 (最新 2026-09-03)",
     verifiedAt: "2026-09-04",
@@ -3149,7 +3149,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.city.minami-alps.yamanashi.jp/docs/11054.html", role: "list", hint: "南アルプス市 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): URL は生きているが、中身が「クマの被害を防ぎましょう！」の注意喚起だけになり個別記録が消えた (2026-09-04 の下見では 3 件あった)。南アルプス市も県 CSV でカバーされる。登録は公開先を追う手がかりとして残す
     defaultCity: "南アルプス市",
     notes: "下見時 3 件 (最新 2026-08-21)",
     verifiedAt: "2026-09-04",
@@ -3265,7 +3265,7 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     urls: [
       { url: "https://www.town.hakone.kanagawa.jp/www/contents/1100000000465/index.html", role: "list", hint: "箱根町 クマ出没情報" },
     ],
-    extractor: "llm-html",
+    // 取り込まない (2026-09-16 実測): 本文 2,717 字・日付 2 個で個別記録が無い。登録は公開先を追う手がかりとして残す
     defaultCity: "箱根町",
     notes: "下見時 1 件 (最新 2024-04-02)",
     verifiedAt: "2026-09-04",

@@ -10,6 +10,11 @@
  * ソースが落ちたら「新しく壊れた」ということで、そのときだけ通知が飛ぶ。
  *
  * 復旧できたらこの一覧から消すこと。
+ *
+ * 取り込み自体をやめたもの (data-sources.ts で extractor を省略したもの) はここに
+ * 書かない。健全性チェックの対象からそもそも外れるので登録しても効果が無く、
+ * 理由が 2 箇所に散るだけになる。理由は data-sources.ts のそのエントリに書く。
+ * 2026-09-16 に静岡・和歌山・広島・徳島の 4 本をそちらへ移した。
  */
 export type SourceGap = {
   id: string;
@@ -20,27 +25,6 @@ export type SourceGap = {
 };
 
 export const KNOWN_SOURCE_GAPS: SourceGap[] = [
-  // --- 県が個別の目撃記録を公開していない (集計のみ) ---
-  {
-    id: "hiroshima",
-    reason:
-      "県は市町別・月別の集計 PDF しか公開しておらず、1 件ずつの記録が存在しない。取り込める形が無い",
-    checkedAt: "2026-08-23",
-  },
-  {
-    id: "tokushima",
-    reason:
-      "県ページは 404。四国のツキノワグマは剣山系に数十頭で、林野庁四国森林管理局に 11 件あるのみ・9 ヶ月更新なし。取り込む価値が薄い",
-    checkedAt: "2026-08-23",
-  },
-
-  {
-    id: "wakayama",
-    reason:
-      "県が公開しているのは目撃マップ (画像 PDF) と市町村別の年次集計のみで、1 件ずつの記録が無い。紀伊半島中部個体群は奈良県 (nara-pdf) と共通なので、県境付近はそちらで一部carriedされる",
-    checkedAt: "2026-08-28",
-  },
-
   // --- 自治体側の更新が止まっているだけで、当方の取り込みは正常 ---
   {
     id: "tokyo",
@@ -127,12 +111,6 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
     id: "yamagata",
     reason:
       "この登録 (CSV) は取得できていないが、yamagata-gmap-r7 が同じ県をカバーしている (上記と同じ理由)",
-    checkedAt: "2026-08-30",
-  },
-  {
-    id: "shizuoka",
-    reason:
-      "この登録 (トップページ) からは個別記録が取れない。静岡県は shizuoka-gmap / shizuoka-r7-gmap / shizuoka-pdf-* で直近1年 529 件あり、カバレッジは維持されている",
     checkedAt: "2026-08-30",
   },
   {

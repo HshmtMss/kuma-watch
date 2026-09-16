@@ -435,7 +435,7 @@ export const MUNI_OFFICIAL_LINKS: MuniOfficialLink[] = [
 
   // 山梨県 (27 件) — 2026-05-19 エージェント収集
   { prefName: "山梨県", cityName: "甲府市", homeUrl: "https://www.city.kofu.yamanashi.jp/", bearUrl: "https://www.city.kofu.yamanashi.jp/shinrin/kumasyutubotu.html", verifiedAt: "2026-05-19" },
-  { prefName: "山梨県", cityName: "富士吉田市", homeUrl: "https://www.city.fujiyoshida.yamanashi.jp/", bearUrl: "https://www.city.fujiyoshida.yamanashi.jp/page/1531.html", verifiedAt: "2026-05-19" },
+  { prefName: "山梨県", cityName: "富士吉田市", homeUrl: "https://www.city.fujiyoshida.yamanashi.jp/", verifiedAt: "2026-05-19" },
   { prefName: "山梨県", cityName: "都留市", homeUrl: "https://www.city.tsuru.yamanashi.jp/", bearUrl: "https://www.city.tsuru.yamanashi.jp/soshiki/sangyo/nourin_t/yuugaichoujuu/1328.html", verifiedAt: "2026-05-19" },
   { prefName: "山梨県", cityName: "山梨市", homeUrl: "https://www.city.yamanashi.yamanashi.jp/", bearUrl: "https://www.city.yamanashi.yamanashi.jp/soshiki/18/17191.html", verifiedAt: "2026-05-19" },
   { prefName: "山梨県", cityName: "大月市", homeUrl: "https://www.city.otsuki.yamanashi.jp/", bearUrl: "https://www.city.otsuki.yamanashi.jp/sangyo/2025-1224-1509-15.html", verifiedAt: "2026-05-19" },
@@ -529,7 +529,7 @@ export const MUNI_OFFICIAL_LINKS: MuniOfficialLink[] = [
   { prefName: "静岡県", cityName: "焼津市", homeUrl: "https://www.city.yaizu.lg.jp/", bearUrl: "https://www.city.yaizu.lg.jp/life/pet-animals/wildlife/bear.html", verifiedAt: "2026-05-19" },
   { prefName: "静岡県", cityName: "掛川市", homeUrl: "https://www.city.kakegawa.shizuoka.jp/", bearUrl: "https://www.city.kakegawa.shizuoka.jp/gyosei/docs/786806.html", verifiedAt: "2026-05-19" },
   { prefName: "静岡県", cityName: "藤枝市", homeUrl: "https://www.city.fujieda.shizuoka.jp/", bearUrl: "https://www.city.fujieda.shizuoka.jp/soshiki/sangyoshinko/norinkiban/yaseityoujuu/24133.html", verifiedAt: "2026-05-19" },
-  { prefName: "静岡県", cityName: "御殿場市", homeUrl: "https://www.city.gotemba.lg.jp/", bearUrl: "https://www.city.gotemba.lg.jp/kurashi/b-p-info/b-p-info-01/17098.html", verifiedAt: "2026-05-19" },
+  { prefName: "静岡県", cityName: "御殿場市", homeUrl: "https://www.city.gotemba.lg.jp/", bearUrl: "https://www.city.gotemba.lg.jp/sangyou/f-2/f-2-5/7520.html", verifiedAt: "2026-09-16" },
   { prefName: "静岡県", cityName: "袋井市", homeUrl: "https://www.city.fukuroi.shizuoka.jp/", bearUrl: "https://www.city.fukuroi.shizuoka.jp/soshiki/15/1/ringyo/13819.html", verifiedAt: "2026-05-19" },
   { prefName: "静岡県", cityName: "下田市", homeUrl: "https://www.city.shimoda.shizuoka.jp/", bearUrl: "https://www.city.shimoda.shizuoka.jp/category/060300ringyou/158460.html", verifiedAt: "2026-05-19" },
   { prefName: "静岡県", cityName: "裾野市", homeUrl: "https://www.city.susono.shizuoka.jp/", bearUrl: "https://www.city.susono.shizuoka.jp/soshiki/8/3/2/1/753.html", verifiedAt: "2026-05-19" },
