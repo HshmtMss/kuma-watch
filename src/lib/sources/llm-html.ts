@@ -95,7 +95,10 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-async function fetchPage(url: string): Promise<string | null> {
+// 取得できなかった理由は必ず残す。ここが無言だったせいで、富士吉田市 (下見時
+// 14 件) と御殿場市 (同 6 件) のページが 404 になっても 0 件として素通りし、
+// 「likely JS-rendered」という無関係なログだけが出ていた (2026-09-16 に発覚)。
+async function fetchPage(sourceId: string, url: string): Promise<string | null> {
   try {
     const r = await fetch(url, {
       headers: {
@@ -103,11 +106,16 @@ async function fetchPage(url: string): Promise<string | null> {
         "Accept-Language": "ja",
         Accept: "text/html,application/xhtml+xml",
       },
+      signal: AbortSignal.timeout(25000),
       next: { revalidate: 21600 },
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error(`[llm-html ${sourceId}] HTTP ${r.status} ${url}`);
+      return null;
+    }
     return await r.text();
-  } catch {
+  } catch (e) {
+    console.error(`[llm-html ${sourceId}] fetch failed ${url}`, e);
     return null;
   }
 }
@@ -224,9 +232,11 @@ export async function fetchLlmHtmlSightings(
   if (urlCandidates.length === 0) return [];
 
   let combined = "";
+  let fetched = 0;
   for (const u of urlCandidates) {
-    const html = await fetchPage(u.url);
+    const html = await fetchPage(source.id, u.url);
     if (!html) continue;
+    fetched++;
     const t = stripHtml(html);
     if (t.length < 200) continue;
     combined += `\n\n[${u.hint ?? u.url}]\n${t}`;
@@ -234,7 +244,13 @@ export async function fetchLlmHtmlSightings(
   }
   const text = combined.slice(0, PAGE_BYTES_MAX);
   if (text.length < 200) {
-    console.log(`[llm-html ${source.id}] no usable HTML content (likely JS-rendered)`);
+    // 1 ページも取れなかったのか、取れたが中身が薄いのかを分けて書く。
+    // 前者は公開先が消えた可能性が高く、後者は JS 描画の可能性が高い。
+    console.error(
+      fetched === 0
+        ? `[llm-html ${source.id}] 登録 ${urlCandidates.length} URL のどれも取得できず`
+        : `[llm-html ${source.id}] no usable HTML content (likely JS-rendered)`,
+    );
     sourceCache.set(source.id, { at: now, data: [] });
     return [];
   }
