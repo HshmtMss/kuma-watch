@@ -352,9 +352,16 @@ export async function fetchKmlSightings(
   try {
     const r = await fetch(entry.kml.kmlUrl, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(25000),
       next: { revalidate: 3600 },
     });
-    if (!r.ok) return [];
+    if (!r.ok) {
+      // 無言で 0 件を返すと、取り込み全体が「ソースが丸ごと消えた」で止まった
+      // ときに理由が分からない。岩手県 (Google マイマップ) が CI からだけ
+      // 取れなくなった際、ログに何も出ず原因追跡に時間がかかった (2026-09-18)。
+      console.error(`[kml ${entry.id}] HTTP ${r.status} ${entry.kml.kmlUrl}`);
+      return [];
+    }
     const kml = await r.text();
     const points = extractPointPlacemarks(kml);
     const prefName = entry.regionLabel.split(" ")[0] ?? entry.regionLabel;
@@ -397,7 +404,8 @@ export async function fetchKmlSightings(
 
     memo.set(entry.id, { at: now, data: sightings });
     return sightings;
-  } catch {
+  } catch (e) {
+    console.error(`[kml ${entry.id}] fetch/parse failed ${entry.kml.kmlUrl}`, e);
     return [];
   }
 }

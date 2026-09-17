@@ -78,12 +78,6 @@ export const KNOWN_SOURCE_GAPS: SourceGap[] = [
     checkedAt: "2026-08-30",
   },
   {
-    id: "iwate",
-    reason:
-      "この登録 (県 Google マイマップ) は 2025-10 で停止。岩手県は iwate-morioka-mymap と news で直近1年 1,694 件あり、カバレッジは維持されている",
-    checkedAt: "2026-08-30",
-  },
-  {
     id: "gifu",
     reason:
       "CKAN が「クママップ（過去）」になり 2025-10 で停止。現行分は gifu-gis (県域統合型GIS) から 2,319 件取得しているので実害なし",

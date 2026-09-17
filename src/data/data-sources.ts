@@ -272,6 +272,13 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     verifiedAt: "2026-08-26",
   },
   {
+    // 2025-10 で更新が止まった過去データ。県の Google マイマップは手元からは
+    // 今も 198 件取れるが、CI からだけ 0 件になることがある (2026-09-18 に発生。
+    // Google 側の IP 単位の制限とみられる)。periodBounded にしておくと
+    // build-sightings が「アーカイブの抽出が前回より少ない」として前回分を
+    // そのまま使うので、取れなかった回に 198 件を失わずに済む。
+    // 岩手県の現行分は iwate-morioka-mymap (998 件) と news (1,077 件) が持つ。
+    periodBounded: true,
     id: "iwate",
     kind: "prefecture",
     prefCode: "03",
