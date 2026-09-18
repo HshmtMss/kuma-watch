@@ -153,6 +153,9 @@ async function geocodeQuery(
     schedulePersist();
     return { lat, lon, name };
   } catch {
+    // ジオコードの失敗は 1 件ずつ出すと数万行になるうえ、座標が取れなくても
+    // 市町村どまりとして記録は残る。件数は各抽出器が
+    // 「ピン N / 市町村どまり M」として集計で出しているので、ここは無言でよい。
     return null;
   }
 }

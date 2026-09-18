@@ -116,7 +116,10 @@ async function discoverDetailPdfs(listUrl: string): Promise<string[]> {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
       signal: AbortSignal.timeout(20000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error(`[yamaguchi-pdf:discover] HTTP ${res.status} ${listUrl}`);
+      return [];
+    }
     const html = await res.text();
     const out: string[] = [];
     const re =
@@ -132,7 +135,8 @@ async function discoverDetailPdfs(listUrl: string): Promise<string[]> {
       out.push(href);
     }
     return out;
-  } catch {
+  } catch (e) {
+    console.error(`[yamaguchi-pdf:discover] failed ${listUrl}`, e);
     return [];
   }
 }

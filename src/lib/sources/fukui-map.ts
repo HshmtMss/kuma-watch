@@ -49,7 +49,9 @@ export function extractKumaData(html: string): KumaRow[] {
   try {
     const j = JSON.parse(raw) as KumaRow[];
     return Array.isArray(j) ? j : [];
-  } catch {
+  } catch (e) {
+    // 埋め込み JSON の形が変わると 0 件になる。黙って消えると気づけない。
+    console.error(`[fukui-map] 埋め込み JSON の解析に失敗 (${raw.length} 字)`, e);
     return [];
   }
 }

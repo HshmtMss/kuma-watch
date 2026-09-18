@@ -47,12 +47,19 @@ async function getToken(): Promise<string | null> {
       body: JSON.stringify({ username, password }),
       cache: "no-store",
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error(`[kemonote] 認証 HTTP ${r.status}`);
+      return null;
+    }
     const j = (await r.json()) as { result?: string; token?: string };
-    if (j.result !== "success" || !j.token) return null;
+    if (j.result !== "success" || !j.token) {
+      console.error(`[kemonote] 認証に失敗 (result=${j.result ?? "なし"})`);
+      return null;
+    }
     tokenCache = { token: j.token, at: now };
     return j.token;
-  } catch {
+  } catch (e) {
+    console.error("[kemonote] 認証リクエストが失敗", e);
     return null;
   }
 }
@@ -61,6 +68,8 @@ function parseQa(raw: string): QaContent {
   try {
     return JSON.parse(raw) as QaContent;
   } catch {
+    // 1 レコードごとの補助項目。欠けても本体は取り込めるうえ、件数分だけ
+    // ログが出てしまうので意図的に無言。取得そのものの失敗は上で記録している。
     return { contents: [] };
   }
 }
@@ -109,9 +118,15 @@ export async function fetchKemonoteSightings(
       headers: { ...COMMON_HEADERS, Authorization: `Bearer ${token}` },
       cache: "no-store",
     });
-    if (!r.ok) return cached?.data ?? [];
+    if (!r.ok) {
+      console.error(`[kemonote:${entry.id}] map_points HTTP ${r.status}`);
+      return cached?.data ?? [];
+    }
     const body = (await r.json()) as { result?: string; json?: MapPoint[] };
-    if (body.result !== "success" || !Array.isArray(body.json)) return cached?.data ?? [];
+    if (body.result !== "success" || !Array.isArray(body.json)) {
+      console.error(`[kemonote:${entry.id}] map_points の形が想定と違う (result=${body.result ?? "なし"})`);
+      return cached?.data ?? [];
+    }
 
     const prefName = entry.regionLabel.split(" ")[0] ?? entry.regionLabel;
     const sightings: UnifiedSighting[] = [];
@@ -147,7 +162,8 @@ export async function fetchKemonoteSightings(
 
     memo.set(entry.id, { at: now, data: sightings });
     return sightings;
-  } catch {
+  } catch (e) {
+    console.error(`[kemonote:${entry.id}] 取得に失敗`, e);
     return cached?.data ?? [];
   }
 }

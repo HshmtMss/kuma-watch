@@ -118,11 +118,16 @@ async function fetchBuffer(url: string): Promise<ArrayBuffer | null> {
   try {
     const r = await fetch(url, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(25000),
       next: { revalidate: 3600 },
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error(`[gifu] HTTP ${r.status} ${url}`);
+      return null;
+    }
     return await r.arrayBuffer();
-  } catch {
+  } catch (e) {
+    console.error(`[gifu] fetch failed ${url}`, e);
     return null;
   }
 }

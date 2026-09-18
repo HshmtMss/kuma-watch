@@ -77,7 +77,12 @@ export async function discoverPdfUrls(
       },
       signal: AbortSignal.timeout(20000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      // ここが落ちると登録済み PDF だけにフォールバックする。登録が古いと
+      // 今年度分を丸ごと取りこぼすので、黙って [] を返してはいけない。
+      console.error(`[pdf-table:discover] HTTP ${res.status} ${listUrl}`);
+      return [];
+    }
     const html = await res.text();
     // 同じ PDF が複数の文言で貼られることがあるので、URL ごとに 1 件へ寄せる。
     const byUrl = new Map<string, DiscoveredPdf>();
@@ -97,7 +102,8 @@ export async function discoverPdfUrls(
       byUrl.set(url, { url, label, fiscalYear });
     }
     return [...byUrl.values()];
-  } catch {
+  } catch (e) {
+    console.error(`[pdf-table:discover] failed ${listUrl}`, e);
     return [];
   }
 }

@@ -140,6 +140,8 @@ function salvageTruncatedJson(
       sightings?: SightingDraft[];
     };
   } catch {
+    // ここは「切れた JSON を救えるか試す」処理。救えなかったこと自体は
+    // 異常ではなく、呼び出し側が改めてログを出す。意図的に無言。
     return null;
   }
 }

@@ -34,9 +34,14 @@ let memo: { at: number; data: UnifiedSighting[] } | null = null;
 async function fetchCityList(): Promise<CityEntry[]> {
   const r = await fetch(CITY_LIST_URL, {
     headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+    signal: AbortSignal.timeout(25000),
     next: { revalidate: 3600 },
   });
-  if (!r.ok) return [];
+  if (!r.ok) {
+    // ここが落ちると市町村一覧ごと空になり、ヒグマップ全体が 0 件になる。
+    console.error(`[higumap] 市町村一覧 HTTP ${r.status} ${CITY_LIST_URL}`);
+    return [];
+  }
   const j = (await r.json()) as CityEntry[];
   return Array.isArray(j) ? j.filter((c) => typeof c.id === "number" && c.name) : [];
 }
@@ -45,13 +50,18 @@ async function fetchCityReports(cityId: number, fiscalYear: number): Promise<Rep
   try {
     const r = await fetch(`${REPORTS_URL}?cityId=${cityId}&fiscalYear=${fiscalYear}`, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(25000),
       next: { revalidate: 3600 },
     });
-    if (!r.ok) return [];
+    if (!r.ok) {
+      console.error(`[higumap] cityId=${cityId} fy=${fiscalYear} HTTP ${r.status}`);
+      return [];
+    }
     const body = (await r.json()) as ReportResponse;
     if (Array.isArray(body)) return body;
     return body.list ?? [];
-  } catch {
+  } catch (e) {
+    console.error(`[higumap] cityId=${cityId} fy=${fiscalYear} fetch failed`, e);
     return [];
   }
 }

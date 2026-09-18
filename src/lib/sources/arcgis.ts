@@ -62,11 +62,16 @@ async function fetchPage(
   try {
     const r = await fetch(url.toString(), {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(25000),
       next: { revalidate: 3600 },
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.error(`[arcgis] HTTP ${r.status} ${url.toString()}`);
+      return null;
+    }
     return (await r.json()) as ArcGisQueryResponse;
-  } catch {
+  } catch (e) {
+    console.error(`[arcgis] fetch failed ${url.toString()}`, e);
     return null;
   }
 }

@@ -448,7 +448,9 @@ async function callGeminiBatch(
     try {
       const parsed = JSON.parse(text) as { sightings?: ExtractedDraft[] };
       return Array.isArray(parsed.sightings) ? parsed.sightings : null;
-    } catch {
+    } catch (e) {
+      // llm-html と違って救出処理を持たないので、ここで落ちた分はそのまま失う。
+      console.error(`[news] gemini の JSON 解析に失敗 (${text.length} 字)`, e);
       return null;
     }
   } catch (e) {

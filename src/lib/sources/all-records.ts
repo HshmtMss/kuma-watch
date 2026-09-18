@@ -23,9 +23,14 @@ export async function getSharp9110Sightings(): Promise<UnifiedSighting[]> {
   try {
     const res = await fetch(SHARP9110_URL, {
       headers: { "User-Agent": "KumaWatch/1.0 (+https://kuma-watch.jp)" },
+      signal: AbortSignal.timeout(25000),
       cache: "no-store",
     });
-    if (!res.ok) return sharpCache?.data ?? [];
+    if (!res.ok) {
+      // sharp9110 は秋田 21,000 件超を含む最大級のソース。落ちたら必ず残す。
+      console.error(`[sharp9110] HTTP ${res.status} ${SHARP9110_URL}`);
+      return sharpCache?.data ?? [];
+    }
     const raw = (await res.json()) as Sharp9110Record[];
     const data: UnifiedSighting[] = raw
       .filter(
@@ -56,7 +61,8 @@ export async function getSharp9110Sightings(): Promise<UnifiedSighting[]> {
       }));
     sharpCache = { at: now, data };
     return data;
-  } catch {
+  } catch (e) {
+    console.error("[sharp9110] 取得に失敗", e);
     return sharpCache?.data ?? [];
   }
 }
