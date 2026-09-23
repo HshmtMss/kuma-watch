@@ -70,6 +70,7 @@ const SAMPLE_BASE: Product = {
   scene: "trail",
   imageUrl: "",
   featured: false,
+  ctaLabel: "",
 };
 
 /** 注目掲載(有料枠)のサンプル。写真は生成画像で、実在の製品・ブランドではない。 */
@@ -79,6 +80,7 @@ const SAMPLE_FEATURED: Product = {
   features: "有効射程8m・軽量200g・ホルスター付属。実売価格と入手先も併記します。",
   imageUrl: "/products/sample-featured.jpg",
   featured: true,
+  ctaLabel: "公式サイトで詳しく見る",
 };
 
 // 対象カテゴリ。説明はチップ表示時に hover で出すかページ下部に短くまとめる程度。
@@ -153,8 +155,8 @@ export default function ForVendorsPage() {
       {/* 掲載イメージ。言葉だけだと「どう見えるか」が伝わらないので実物を出す。 */}
       <h2 id="example">掲載されるとこう見えます</h2>
       <p>
-        <strong>注目掲載</strong>は製品写真が入り、幅広のカードでカテゴリの先頭に
-        固定されます。通常掲載は文字のみ・カテゴリ内の通常順です。
+        <strong>注目掲載</strong>は製品写真が入り、幅広のカードで一覧の先頭に
+        固定されます。ボタンの文言も指定できます。通常掲載は文字のみ・カテゴリ内の通常順です。
       </p>
       <div className="not-prose my-4">
         <FeaturedProductCard product={SAMPLE_FEATURED} sample />

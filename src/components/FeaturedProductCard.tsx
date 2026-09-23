@@ -5,7 +5,7 @@ import type { Product } from "@/lib/products";
  * 注目掲載（有料枠）のカード。通常の ProductCard との差は 3 つだけ:
  *   ① 製品写真が入る（通常掲載は文字のみ）
  *   ② 横幅いっぱいで、特長まで書ける
- *   ③ カテゴリの先頭に固定される（呼び出し側の責務）
+ *   ③ 一覧の先頭に固定される（呼び出し側の責務）
  *
  * 差を「目立ち方」に閉じているのは、掲載順や見た目で差をつけても、製品の
  * 選定基準・注意書きの書き方は有料無料で変えないため（読者の判断材料を
@@ -28,6 +28,9 @@ function isExternal(url: string): boolean {
 export default function FeaturedProductCard({ product, sample = false }: Props) {
   const p = product;
   const isAffiliate = Boolean(p.affiliateUrl);
+  // 有料掲載そのものが広告なので、アフィリエイトリンクでなくても PR 表記と
+  // rel="sponsored" を出す。/for-vendors で「有料掲載枠には必ず付ける」と約束している。
+  const isAd = isAffiliate || p.featured;
   const linkHref = isAffiliate ? p.affiliateUrl : p.url;
   const ext = isExternal(linkHref);
 
@@ -71,11 +74,11 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
             <span className="rounded-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-amber-800">
               注目
             </span>
-            {isAffiliate && (
+            {isAd && (
               <span
                 className="rounded-sm bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-stone-600"
-                aria-label="広告（アフィリエイトリンク）"
-                title="広告（アフィリエイトリンク）"
+                aria-label={isAffiliate ? "広告（アフィリエイトリンク）" : "広告（有料掲載）"}
+                title={isAffiliate ? "広告（アフィリエイトリンク）" : "広告（有料掲載）"}
               >
                 PR
               </span>
@@ -129,7 +132,7 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
               {...(ext
                 ? {
                     target: "_blank",
-                    rel: isAffiliate
+                    rel: isAd
                       ? "sponsored noopener noreferrer"
                       : "noopener noreferrer",
                   }
@@ -137,7 +140,7 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
               className="mt-3 inline-flex items-center justify-center gap-1 rounded-full bg-amber-600 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-700"
               style={{ color: "#fff", textDecoration: "none" }}
             >
-              {isAffiliate ? "詳しく見る（PR）" : "公式サイト"}
+              {p.ctaLabel || (isAffiliate ? "詳しく見る（PR）" : "公式サイト")}
               {ext && <span aria-hidden> ↗</span>}
             </a>
           )}

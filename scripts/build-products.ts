@@ -58,6 +58,8 @@ type Product = {
   scene: string;
   imageUrl: string;
   featured: boolean;
+  /** 注目掲載のボタン文言。空なら既定の「公式サイト」。 */
+  ctaLabel: string;
 };
 
 function clean(v: string | undefined): string {
@@ -152,6 +154,7 @@ for (let i = 0; i < parsed.data.length; i++) {
     scene: clean(row.scene),
     imageUrl: clean(row.image_url),
     featured,
+    ctaLabel: clean(row.cta_label),
   });
 }
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T22:49:29.352Z",
+  "generatedAt": "2026-09-23T20:53:54.513Z",
   "total": 133,
   "visibleTotal": 118,
   "products": [
@@ -23,7 +23,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%9E%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%99%E3%82%A2%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20234mL&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-002",
@@ -45,7 +46,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%9E%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%99%E3%82%A2%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20272mL&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-003",
@@ -67,7 +69,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E6%92%83%E9%80%80%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20%E3%82%AB%E3%82%A6%E3%83%B3%E3%82%BF%E3%83%BC%E3%82%A2%E3%82%BD%E3%83%BC%E3%83%AB%E3%83%88%20CA230&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-004",
@@ -89,7 +92,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Counter%20Assault%20CA290%20Stronger&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-005",
@@ -111,7 +115,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=UDAP%2012HP%20Griz%20Guard%20Pepper%20Power&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-006",
@@ -133,7 +138,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E4%B8%80%E7%9B%AE%E6%95%A3&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-007",
@@ -155,7 +161,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=POLICE%20MAGNUM%20B-609%20B-610&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-008",
@@ -177,7 +184,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9%E3%82%B9%E3%83%97%E3%83%AC%E3%83%BC%20234mL&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-009",
@@ -199,7 +207,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%99%E3%83%AB%E3%83%88%E3%83%9B%E3%83%AB%E3%82%B9%E3%82%BF%E3%83%BC&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-010",
@@ -221,7 +230,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-011",
@@ -243,7 +253,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-012",
@@ -265,7 +276,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Bear%20Bell&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-013",
@@ -287,7 +299,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Magic%20Bear%20Bell&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-014",
@@ -309,7 +322,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%A3%AE%E3%81%AE%E9%88%B4%20BEAR%20BELL%20%E3%82%AB%E3%83%90%E3%83%BC%E4%BB%98%20TBKC1&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-015",
@@ -331,7 +345,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%BF%E3%83%8B%E3%82%A6%E3%83%A0%E3%82%A8%E3%83%9E%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%82%B7%E3%83%BC%E3%83%9B%E3%82%A4%E3%83%83%E3%82%B9%E3%83%AB&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-016",
@@ -353,7 +368,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-017",
@@ -375,7 +391,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%83%AD%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A2%E3%83%BC%E3%82%BA%E3%83%9E%E3%83%B3%20%E3%83%99%E3%82%A2%E3%83%9B%E3%83%BC%E3%83%B3%20130dB&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-018",
@@ -397,7 +414,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E3%82%88%E3%81%91%E3%83%9B%E3%83%BC%E3%83%B3%20110dB%20%E5%85%85%E9%9B%BB%E5%BC%8F&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-019",
@@ -419,7 +437,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%82%AC%E3%83%BC%E3%83%89%E3%83%A9%E3%82%A4%E3%83%88%20H-D32&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-020",
@@ -441,7 +460,8 @@
       "affiliateUrl": "",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-021",
@@ -463,7 +483,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A6%E3%83%AB%E3%83%95%E3%83%94%E3%83%BC&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-022",
@@ -485,7 +506,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%9C%A8%E9%85%A2%E6%B6%B2&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-023",
@@ -507,7 +529,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%92%83%E9%80%80%E3%82%AF%E3%83%9E&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-024",
@@ -529,7 +552,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-001",
@@ -551,7 +575,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-002",
@@ -573,7 +598,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-003",
@@ -595,7 +621,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-004",
@@ -617,7 +644,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-005",
@@ -639,7 +667,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-006",
@@ -661,7 +690,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-007",
@@ -683,7 +713,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-008",
@@ -705,7 +736,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-009",
@@ -727,7 +759,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-012",
@@ -749,7 +782,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=MCS-H881%20%E3%83%88%E3%83%AC%E3%82%A4%E3%83%AB%E3%82%AB%E3%83%A1%E3%83%A9&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-013",
@@ -771,7 +805,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-014",
@@ -793,7 +828,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-015",
@@ -815,7 +851,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Bushnell%20%E3%83%88%E3%83%AD%E3%83%95%E3%82%A3%E3%83%BC%E3%82%AB%E3%83%A0%20XLT%2032MP%20NoGlow&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-016",
@@ -837,7 +874,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Ltl%20Acorn%206210MC&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-017",
@@ -859,7 +897,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-018",
@@ -881,7 +920,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-019",
@@ -903,7 +943,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-020",
@@ -925,7 +966,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-021",
@@ -947,7 +989,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-022",
@@ -969,7 +1012,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-001",
@@ -991,7 +1035,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-002",
@@ -1013,7 +1058,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-003",
@@ -1035,7 +1081,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-004",
@@ -1057,7 +1104,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-005",
@@ -1079,7 +1127,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%82%AC%E3%83%BC%E3%83%89&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-006",
@@ -1101,7 +1150,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-007",
@@ -1123,7 +1173,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-008",
@@ -1145,7 +1196,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%A2%E3%83%8B%E3%83%9E%E3%83%AB%E3%83%95%E3%82%A7%E3%83%B3%E3%82%B9%20%E3%83%AF%E3%82%A4%E3%83%A4%E3%83%BC%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-009",
@@ -1167,7 +1219,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=BearVault%20BV500%20Journey&tag=kumawatch-22",
       "scene": "trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-010",
@@ -1189,7 +1242,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=BearVault%20BV450%20Jaunt&tag=kumawatch-22",
       "scene": "trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-011",
@@ -1211,7 +1265,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Counter%20Assault%20Bear%20Keg&tag=kumawatch-22",
       "scene": "trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-012",
@@ -1233,7 +1288,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Ursack%20Major&tag=kumawatch-22",
       "scene": "trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-013",
@@ -1255,7 +1311,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=OPSAK%20%E9%98%B2%E8%87%AD%E8%A2%8B&tag=kumawatch-22",
       "scene": "trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-014",
@@ -1277,7 +1334,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "home-001",
@@ -1299,7 +1357,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%E7%94%A8%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%88%20LED-AC315&tag=kumawatch-22",
       "scene": "home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "home-002",
@@ -1321,7 +1380,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%81%A9%E3%81%93%E3%81%A7%E3%82%82%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%88%20ASL-090&tag=kumawatch-22",
       "scene": "home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "home-003",
@@ -1343,7 +1403,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%E7%94%A8%E5%AF%86%E9%96%89%E3%82%B9%E3%83%88%E3%83%83%E3%82%AB%E3%83%BC&tag=kumawatch-22",
       "scene": "home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "home-004",
@@ -1365,7 +1426,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%94%9F%E3%82%B4%E3%83%9F%E4%BF%9D%E7%AE%A1%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%20%E3%82%B4%E3%83%9F%E3%82%B9%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3&tag=kumawatch-22",
       "scene": "home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-001",
@@ -1387,7 +1449,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-002",
@@ -1409,7 +1472,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-003",
@@ -1431,7 +1495,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-004",
@@ -1453,7 +1518,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-005",
@@ -1475,7 +1541,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-006",
@@ -1497,7 +1564,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-007",
@@ -1519,7 +1587,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-008",
@@ -1541,7 +1610,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-009",
@@ -1563,7 +1633,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-010",
@@ -1585,7 +1656,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-001",
@@ -1607,7 +1679,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Protos%C2%AE%20Integral%20Forest&tag=kumawatch-22",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-002",
@@ -1629,7 +1702,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%95%E3%82%A9%E3%83%AC%E3%82%B9%E3%83%88%E3%83%98%E3%83%AB%E3%83%A1%E3%83%83%E3%83%88%20%E3%83%95%E3%82%A1%E3%83%B3%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%20576412401&tag=kumawatch-22",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-003",
@@ -1651,7 +1725,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3%E3%82%BD%E3%83%BC%E4%BF%9D%E8%AD%B7%E6%89%8B%E8%A2%8B%20MT-C&tag=kumawatch-22",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-004",
@@ -1673,7 +1748,8 @@
       "affiliateUrl": "",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-005",
@@ -1695,7 +1771,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%81%E3%82%A7%E3%83%BC%E3%83%B3%E3%82%BD%E3%83%BC%E3%83%97%E3%83%AD%E3%83%86%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%91%E3%83%B3%E3%83%84&tag=kumawatch-22",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-006",
@@ -1717,7 +1794,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=Garmin%20inReach%20Mini%202%20Messenger&tag=kumawatch-22",
       "scene": "trail,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-007",
@@ -1739,7 +1817,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%9E%E8%A2%AB%E5%AE%B3%E7%94%A8%E6%95%91%E6%80%A5%E3%82%BB%E3%83%83%E3%83%88&tag=kumawatch-22",
       "scene": "trail,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-001",
@@ -1761,7 +1840,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-002",
@@ -1783,7 +1863,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-003",
@@ -1805,7 +1886,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-004",
@@ -1827,7 +1909,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-005",
@@ -1849,7 +1932,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-006",
@@ -1871,7 +1955,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-007",
@@ -1893,7 +1978,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-008",
@@ -1915,7 +2001,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-009",
@@ -1937,7 +2024,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-010",
@@ -1959,7 +2047,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "info-011",
@@ -1981,7 +2070,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-023",
@@ -2003,29 +2093,31 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-025",
       "category": "撃退忌避",
       "subcategory": "撃退装置",
-      "name": "熊撃退用ランチャー 金太郎",
-      "vendor": "株式会社オーストリッチインターナショナル",
-      "url": "https://www.ostrich.co.jp/products/33003/",
-      "price": "要問い合わせ",
-      "purpose": "忌避ボールを発射してクマを安全な距離から追い払う撃退ランチャー（人里のクマ対応）",
-      "features": "忌避ボール発射式、有効射程約15m、命中しなくても近接着弾で効果、軍・警察・自治体向け装備メーカー製、熊撃退スプレーや防護盾・刺股等の現場装備も併売",
-      "targetUse": "自治体・現場でのクマ追い払い、害獣対応",
-      "caveats": "価格非公開・要問い合わせ。取扱いに訓練推奨",
+      "name": "日本初！熊撃退ランチャー「金太郎」特許番号7240058号",
+      "vendor": "株式会社ミスト",
+      "url": "https://kuma-kintaro.com/",
+      "price": "",
+      "purpose": "専用の忌避剤ボールを発射し、熊との距離を保ちながら熊を遠ざける事を目的とした「発射タイプ」の熊対策機器。遠距離から対応可能。発射音による威嚇効果。風の影響を受けにくい。誰でも使える。練習用水ボールによる操作練習が可能。猪や鹿にも効果あり。",
+      "features": "遠距離から対応！有効射程 約15m（最大約20m）／発射音による威嚇効果。風の影響を受けにくい／練習用水ボールで操作練習が可能。誰でも使える",
+      "targetUse": "自治体・現場でのクマ追い払い、農作業・山林での害獣対応",
+      "caveats": "取扱いに練習推奨。価格・仕様はプロダクトサイトでご確認ください",
       "relatedArticle": "",
       "priority": "中",
-      "source": "添付",
-      "notes": "害獣対策用品カテゴリにクマ撃退スプレー(国産/UDAP/カウンターアソールト)も展開。出典:ostrich.co.jp",
+      "source": "掲載内容シート(2026-09-16)",
+      "notes": "注目掲載(有料枠)。株式会社ミスト(長野県長野市)。掲載期間 2026-09(準備完了後〜無料)〜2026-12-31。旧行は販売代理店オーストリッチ扱いだったがメーカー公式に一本化。出典:先方提出の掲載内容シート",
       "audience": "個人,自治体",
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
-      "imageUrl": "",
-      "featured": false
+      "imageUrl": "/products/kintaro-mist.jpg",
+      "featured": true,
+      "ctaLabel": "プロダクトサイトで見る"
     },
     {
       "id": "monitor-024",
@@ -2047,7 +2139,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-026",
@@ -2069,7 +2162,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-027",
@@ -2091,7 +2185,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-011",
@@ -2113,7 +2208,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-028",
@@ -2135,7 +2231,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "capture-012",
@@ -2157,7 +2254,8 @@
       "affiliateUrl": "",
       "scene": "",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-025",
@@ -2179,7 +2277,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-026",
@@ -2201,7 +2300,8 @@
       "affiliateUrl": "",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-029",
@@ -2223,7 +2323,8 @@
       "affiliateUrl": "",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-030",
@@ -2245,7 +2346,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%81%BD%E3%83%A9%E3%82%B8%E3%82%AA%20%E6%89%8B%E5%9B%9E%E3%81%97%20%E5%85%85%E9%9B%BB%20SONY%20%E6%90%BA%E5%B8%AF&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-031",
@@ -2267,7 +2369,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%86%8A%E9%88%B4%20%E3%82%B9%E3%83%86%E3%83%83%E3%82%AD%20%E6%9D%96%20%E3%83%88%E3%83%AC%E3%83%83%E3%82%AD%E3%83%B3%E3%82%B0%E3%83%9D%E3%83%BC%E3%83%AB%20%E5%B1%B1%E8%8F%9C%E6%8E%A1%E3%82%8A&tag=kumawatch-22",
       "scene": "nora,trail,camp",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-008",
@@ -2289,7 +2392,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%98%E3%83%83%E3%83%89%E3%83%A9%E3%82%A4%E3%83%88%20GENTOS%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E7%99%BB%E5%B1%B1&tag=kumawatch-22",
       "scene": "trail,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-032",
@@ -2311,7 +2415,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%98%B2%E7%8A%AF%E3%83%96%E3%82%B6%E3%83%BC%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E6%90%BA%E5%B8%AF%20%E3%82%AD%E3%83%BC%E3%83%9B%E3%83%AB%E3%83%80%E3%83%BC&tag=kumawatch-22",
       "scene": "nora,trail",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-033",
@@ -2333,7 +2438,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E3%82%BD%E3%83%BC%E3%83%A9%E3%83%BC%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%20%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%85%89&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-009",
@@ -2355,7 +2461,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=LED%E3%83%A9%E3%83%B3%E3%82%BF%E3%83%B3%20GENTOS%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
       "scene": "camp,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-010",
@@ -2377,7 +2484,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%AE%89%E5%85%A8%E3%83%99%E3%82%B9%E3%83%88%20%E5%8F%8D%E5%B0%84%20%E9%AB%98%E8%A6%96%E8%AA%8D%20%E4%BD%9C%E6%A5%AD%20%E3%83%A1%E3%83%83%E3%82%B7%E3%83%A5&tag=kumawatch-22",
       "scene": "nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-034",
@@ -2399,7 +2507,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E6%87%90%E4%B8%AD%E9%9B%BB%E7%81%AF%20GENTOS%20%E5%BC%B7%E5%8A%9B%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E9%98%B2%E6%B0%B4&tag=kumawatch-22",
       "scene": "nora,trail",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "gear-011",
@@ -2421,7 +2530,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%A2%E3%83%90%E3%82%A4%E3%83%AB%E3%83%90%E3%83%83%E3%83%86%E3%83%AA%E3%83%BC%20Anker%20%E5%A4%A7%E5%AE%B9%E9%87%8F%20%E9%98%B2%E7%81%BD&tag=kumawatch-22",
       "scene": "trail,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "home-005",
@@ -2443,7 +2553,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E7%94%9F%E3%82%B4%E3%83%9F%E5%87%A6%E7%90%86%E6%A9%9F%20%E5%B1%8B%E5%A4%96%20%E5%AF%86%E9%96%89%20%E3%82%B3%E3%83%B3%E3%83%9D%E3%82%B9%E3%83%88%20%E9%98%B2%E8%87%AD&tag=kumawatch-22",
       "scene": "home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-015",
@@ -2465,7 +2576,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%BC%E3%83%A9%E3%83%BC%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%20%E5%AF%86%E9%96%89%20%E4%BF%9D%E5%86%B7%20%E9%98%B2%E8%87%AD%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
       "scene": "camp,trail",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-035",
@@ -2487,7 +2599,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%82%AF%E3%83%9E%E5%87%BA%E6%B2%A1%E6%B3%A8%E6%84%8F%20%E7%9C%8B%E6%9D%BF%20%E3%83%97%E3%83%AC%E3%83%BC%E3%83%88%20%E3%81%AE%E3%81%BC%E3%82%8A&tag=kumawatch-22",
       "scene": "nora,trail,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-036",
@@ -2509,7 +2622,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E8%B6%85%E9%9F%B3%E6%B3%A2%20%E5%8B%95%E7%89%A9%E6%92%83%E9%80%80%E5%99%A8%20%E6%90%BA%E5%B8%AF%20%E3%83%8F%E3%83%B3%E3%83%87%E3%82%A3&tag=kumawatch-22",
       "scene": "nora,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "repel-037",
@@ -2531,7 +2645,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E9%9B%BB%E5%AD%90%E3%83%9B%E3%83%BC%E3%83%B3%20%E5%85%85%E9%9B%BB%E5%BC%8F%20%E5%A4%A7%E9%9F%B3%E9%87%8F%20%E7%86%8A%E3%82%88%E3%81%91&tag=kumawatch-22",
       "scene": "trail,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "fence-016",
@@ -2553,7 +2668,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E3%83%99%E3%82%A2%E3%83%90%E3%83%83%E3%82%B0%20%E9%A3%9F%E6%96%99%20%E5%90%8A%E3%82%8A%E4%B8%8B%E3%81%92%20%E3%83%AD%E3%83%BC%E3%83%97%20%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%97&tag=kumawatch-22",
       "scene": "camp,trail",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-027",
@@ -2575,7 +2691,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%20%E3%82%BB%E3%83%B3%E3%82%B5%E3%83%BC%E3%82%A2%E3%83%A9%E3%83%BC%E3%83%A0%20%E4%BE%B5%E5%85%A5%E8%AD%A6%E5%A0%B1%20%E4%BA%BA%E6%84%9F&tag=kumawatch-22",
       "scene": "camp,home",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     },
     {
       "id": "monitor-028",
@@ -2597,7 +2714,8 @@
       "affiliateUrl": "https://www.amazon.co.jp/s?k=%E5%B1%8B%E5%A4%96%20%E9%98%B2%E7%8A%AF%E3%82%AB%E3%83%A1%E3%83%A9%20Wi-Fi%20Tapo%20%E4%BA%BA%E6%84%9F&tag=kumawatch-22",
       "scene": "home,nora",
       "imageUrl": "",
-      "featured": false
+      "featured": false,
+      "ctaLabel": ""
     }
   ]
 }

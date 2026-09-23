@@ -99,6 +99,14 @@ export default async function ProductsPage({
       ? grouped
       : grouped.filter((g) => g.category === activeCat);
 
+  // 注目掲載(有料枠)。掲載内容シートで「対策ページのトップ」と条件を出しているため、
+  // カテゴリ見出しの下ではなく一覧の先頭に置く。今の絞り込み(対象/シーン/カテゴリ)を
+  // 通った製品だけを出し、関係のない絞り込み中に広告だけ残ることはしない。
+  const featuredProducts = visibleGroups
+    .flatMap((g) => g.subcategories)
+    .flatMap((sub) => sub.products)
+    .filter((p) => p.featured);
+
   // 各種リンク生成。フィルタ間で他の軸(for/scene/cat)を保持する。
   const buildHref = (opts: { gov: boolean; scene: string; cat?: string }) => {
     const params = new URLSearchParams();
@@ -136,6 +144,12 @@ export default async function ProductsPage({
         <span>›</span>
         <span className="font-semibold text-stone-700">対策製品</span>
       </nav>
+
+      {featuredProducts.map((p) => (
+        <div key={`featured-${p.id}`} className="not-prose mb-6">
+          <FeaturedProductCard product={p} />
+        </div>
+      ))}
 
       <CategoryTiles
         title="対象で絞り込み"
@@ -224,16 +238,6 @@ export default async function ProductsPage({
               {CATEGORY_DESC[group.category]}
             </p>
           )}
-          {/* 注目掲載(有料枠)はカテゴリ先頭に固定。サブカテゴリの並びには混ぜない。 */}
-          {group.subcategories
-            .flatMap((sub) => sub.products)
-            .filter((p) => p.featured)
-            .map((p) => (
-              <div key={`featured-${p.id}`} className="mt-4">
-                <FeaturedProductCard product={p} />
-              </div>
-            ))}
-
           {group.subcategories.map((sub) => (
             <div key={sub.subcategory} className="mt-4">
               {sub.subcategory && (
