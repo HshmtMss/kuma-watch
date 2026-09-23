@@ -123,7 +123,7 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
           )}
 
           {p.purpose && (
-            <p className="mt-2 text-sm leading-relaxed text-stone-700">
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-stone-700">
               {p.purpose}
             </p>
           )}
