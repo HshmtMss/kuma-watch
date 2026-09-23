@@ -66,7 +66,7 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
               <>
                 <Image
                   src={p.imageUrl}
-                  alt={p.name}
+                  alt={p.name.replace(/\n/g, " ")}
                   fill
                   sizes="(max-width: 640px) 100vw, 224px"
                   className="object-contain p-2 sm:p-3"
@@ -115,7 +115,8 @@ export default function FeaturedProductCard({ product, sample = false }: Props) 
         </div>
 
         <div className="min-w-0 flex-1 p-4">
-          <h3 className="m-0 text-lg font-bold leading-snug text-amber-800">
+          {/* 製品名は改行つきで入ることがある(事業者が指定した折り返し位置)。 */}
+          <h3 className="m-0 whitespace-pre-line text-lg font-bold leading-snug text-amber-800">
             {p.name}
           </h3>
           {p.vendor && (
