@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { aggregateAllSightings } from "../src/lib/sightings-cache";
 import { isPrefLevelCity } from "../src/lib/muni-geo-check";
+import { isNewsSuppressedId } from "../src/lib/news-suppression";
 import { jstToday } from "../src/lib/jst-date";
 import { reconcileOfficialRecord } from "../src/lib/muni-reconcile";
 import { loadSourceIssues } from "../src/lib/source-issues";
@@ -299,6 +300,10 @@ async function main(): Promise<void> {
   const carried = prevRecords.filter(
     (r) =>
       !REBUILT_KINDS.has(r.sourceKind) &&
+      // 個別に誤りと判明したレコード(news-suppression の id 指定)は繰り越さない。
+      // 読み取り段でも隠しているが、スナップショット本体・件数からも消さないと
+      // 生ファイルを直接見た人には誤情報が残り続ける。
+      !isNewsSuppressedId(r.id) &&
       (r.sourceKind !== "news" || (r.date ?? "") >= newsCutoff) &&
       // 市区町村が特定できていない news は、旧ジオコーダが県代表点
       // (例: 埼玉県→坂戸市付近) に積み上げた誤ピン。繰り越さず自然に浄化する。

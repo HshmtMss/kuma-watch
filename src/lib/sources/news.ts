@@ -17,14 +17,17 @@
 import { inJapanBounds, type UnifiedSighting } from "./types";
 import { geocodePlace, jitterWithin } from "./geocode";
 import { hasBoundaryData, isInsideMuni, resolveMuni } from "@/lib/muni-boundary";
-import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
-import { isNewsSuppressed } from "@/lib/news-suppression";
+import { latLonMatchesPrefecture, PREFECTURE_BBOX } from "@/lib/prefecture-bbox";
+import { isNewsSuppressed, isNewsSuppressedId } from "@/lib/news-suppression";
 import { isNewsMisplaced } from "@/lib/muni-geo-check";
 import { jstToday } from "@/lib/jst-date";
 import { isRealCalendarDate } from "./date-utils";
 import { incidentKey, normalizeSection } from "@/lib/incident-key";
 import { snapToRiver } from "@/lib/river-snap";
 import { GEMINI_BULK_MODEL, geminiEndpoint, geminiText } from "@/lib/gemini-models";
+
+/** 47 都道府県名 (完全形)。記事本文との県名矛盾チェックに使う。 */
+const PREFECTURE_NAMES = Object.keys(PREFECTURE_BBOX);
 
 const GEMINI_ENDPOINT = geminiEndpoint(GEMINI_BULK_MODEL);
 
@@ -513,6 +516,7 @@ export async function fetchNewsSightings(
 
   const out: UnifiedSighting[] = [];
   let droppedPlaceMismatch = 0;
+  let droppedPrefConflict = 0;
   for (let i = 0; i < drafts.length; i++) {
     const s = drafts[i];
     const article = items[s.index];
@@ -580,6 +584,28 @@ export async function fetchNewsSightings(
       (sectionHead.length >= 2 && hay.includes(sectionHead));
     if (!placeMentioned) {
       droppedPlaceMismatch++;
+      continue;
+    }
+
+    // 県をまたぐ誤帰属の遮断。上の placeMentioned は地区名だけの一致でも通るが、
+    // 「加賀野」「本町」のような字・丁目名は全国に同名が多数ある。2026-09-11 は
+    // 「盛岡市加賀野一丁目」の記事が地区名だけ一致して岐阜県大垣市加賀野1丁目の
+    // ピンになり、大垣市に住民からの問い合わせが相次いだ。
+    // 落とすのは「記事が別の都道府県を名指ししていて、こちらの県・市はどこにも
+    // 出てこない」ときだけ。県名が無くても市町村名があれば残す (「盛岡市でクマ」
+    // のように県を書かない記事は多い)。地区名は根拠に数えない。県名の照合は
+    // 「〜県/都/府」「北海道」の完全形のみ (「三重」「宮城」等の部分一致は
+    // 人名・施設名と衝突するため)。
+    const ourPlaceMentioned =
+      (prefName.length >= 2 && hay.includes(prefName)) ||
+      (prefBare.length >= 2 && hay.includes(prefBare)) ||
+      (cityName.length >= 2 && hay.includes(cityName)) ||
+      (cityBare.length >= 2 && hay.includes(cityBare));
+    const otherPrefMentioned = PREFECTURE_NAMES.some(
+      (name) => name !== prefName && hay.includes(name),
+    );
+    if (otherPrefMentioned && !ourPlaceMentioned) {
+      droppedPrefConflict++;
       continue;
     }
 
@@ -673,6 +699,8 @@ export async function fetchNewsSightings(
       if (hh > 23 || mm > 59) return undefined;
       return `${String(hh).padStart(2, "0")}:${m[2]}`;
     })();
+    // 個別に誤りと分かっているレコードは取り込み段でも落とす。
+    if (isNewsSuppressedId(id)) continue;
     out.push({
       id,
       source: "news",
@@ -695,7 +723,8 @@ export async function fetchNewsSightings(
 
   console.log(
     `[news] extracted ${out.length} sightings from ${items.length} articles` +
-      ` (dropped ${droppedPlaceMismatch} place-mismatch)`,
+      ` (dropped ${droppedPlaceMismatch} place-mismatch,` +
+      ` ${droppedPrefConflict} pref-conflict)`,
   );
   memo = { at: now, data: out };
   return out;
