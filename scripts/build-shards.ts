@@ -20,6 +20,7 @@ import {
   rmSync,
 } from "node:fs";
 import { join } from "node:path";
+import { isNewsSuppressedId } from "../src/lib/news-suppression";
 
 const CELL_DEG = 0.25;
 
@@ -40,7 +41,12 @@ if (!existsSync(inFile)) {
 const blob = JSON.parse(readFileSync(inFile, "utf8")) as {
   records?: Array<Record<string, unknown> & { lat?: number; lon?: number; id?: string }>;
 };
-const records = blob.records ?? [];
+const records = (blob.records ?? []).filter(
+  // 個別に誤りと判明したレコード(news-suppression の id 指定)はシャードにも
+  // 出さない。地図はこのシャードから直接読むため、ここを通すと削除したはずの
+  // ピンが地図にだけ残る(2026-09-24 大垣市の件)。
+  (r) => !isNewsSuppressedId(typeof r.id === "string" ? r.id : undefined),
+);
 
 const cells = new Map<string, typeof records>();
 for (const r of records) {
