@@ -1406,6 +1406,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     verifiedAt: "2026-04-21",
   },
   {
+    // 2018 年度で更新が止まった過去データ (10,225 件)。BODIK が CI からだけ
+    // 20 秒のタイムアウトに落ちる回があり (2026-09-24 に 2 回、4 回の再試行とも)、
+    // 「ソースが丸ごと消えています」で取り込みごと止まった。中身は変わらないので
+    // periodBounded にして、取れなかった回は前回分をそのまま使う (岩手と同じ扱い)。
+    // 京都府の現行分は市町村ページ (kyoto-*) と news が持つ。
+    periodBounded: true,
     id: "kyoto",
     kind: "prefecture",
     prefCode: "26",
