@@ -2019,12 +2019,12 @@ export const DATA_SOURCES: DataSourceEntry[] = [
     regionLabel: "京都府 与謝野町 クマ出没情報",
     bearStatus: "present",
     urls: [
-      { url: "https://www.town.yosano.lg.jp/life/pets/harmful-beast/kuma2021/", role: "list", hint: "与謝野町 クマ出没情報" },
+      { url: "https://www.town.yosano.lg.jp/life/pets/harmful-beast/kuma2021_1/", role: "list", hint: "与謝野町 クマ出没情報" },
     ],
     extractor: "llm-html",
     defaultCity: "与謝野町",
-    notes: "下見時 2 件 (最新 2026-08-31)",
-    verifiedAt: "2026-09-02",
+    notes: "下見時 2 件 (最新 2026-08-31)。2026-09 に kuma2021/ が 404 になり kuma2021_1/ へ移転 (9/17 現在 46 件)",
+    verifiedAt: "2026-09-26",
   },
   {
     id: "kyoto-kizugawa",

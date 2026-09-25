@@ -689,7 +689,7 @@ export const MUNI_OFFICIAL_LINKS: MuniOfficialLink[] = [
   { prefName: "京都府", cityName: "相楽郡南山城村", homeUrl: "https://www.vill.minamiyamashiro.lg.jp/", bearUrl: "https://www.vill.minamiyamashiro.lg.jp/0000002436.html", verifiedAt: "2026-05-19" },
   { prefName: "京都府", cityName: "船井郡京丹波町", homeUrl: "https://www.town.kyotamba.kyoto.jp/", verifiedAt: "2026-05-19" },
   { prefName: "京都府", cityName: "与謝郡伊根町", homeUrl: "https://www.town.ine.kyoto.jp/", verifiedAt: "2026-05-19" },
-  { prefName: "京都府", cityName: "与謝郡与謝野町", homeUrl: "https://www.town.yosano.lg.jp/", bearUrl: "https://www.town.yosano.lg.jp/life/pets/harmful-beast/kuma2021/", verifiedAt: "2026-05-19" },
+  { prefName: "京都府", cityName: "与謝郡与謝野町", homeUrl: "https://www.town.yosano.lg.jp/", bearUrl: "https://www.town.yosano.lg.jp/life/pets/harmful-beast/kuma2021_1/", verifiedAt: "2026-09-26" },
 
   // 愛知県 (69 件) — 2026-05-19 エージェント収集
   // 名古屋市 16 区は市全体サイトを共通指定。多くは平野部で「クマ生息圏外」notes
