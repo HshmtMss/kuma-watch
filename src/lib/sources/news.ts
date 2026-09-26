@@ -710,6 +710,7 @@ export async function fetchNewsSightings(
       date: eventDate,
       ...(time ? { time } : {}),
       ...(dateEstimated ? { dateEstimated: true } : {}),
+      ...(precise ? {} : { approxLocation: true }),
       prefectureName: prefName,
       cityName: cityName.slice(0, 40),
       sectionName: (s.sectionName ?? "").slice(0, 40),

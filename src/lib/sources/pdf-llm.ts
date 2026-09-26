@@ -278,6 +278,7 @@ export async function fetchPdfLlmSightings(
       comment: (s.comment ?? "").slice(0, 80),
       headCount:
         Number.isInteger(s.headCount) && s.headCount! > 0 ? s.headCount! : 1,
+      ...(g.precise ? {} : { approxLocation: true }),
     });
   }
 

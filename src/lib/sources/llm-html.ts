@@ -318,6 +318,7 @@ export async function fetchLlmHtmlSightings(
       comment: (s.comment ?? "").slice(0, 80),
       headCount:
         Number.isInteger(s.headCount) && s.headCount! > 0 ? s.headCount! : 1,
+      ...(precise ? {} : { approxLocation: true }),
     });
   }
 

@@ -27,18 +27,24 @@ export type LocationPrecisionInput = {
   sourceKind?: string;
   source?: string;
   sectionName?: string;
+  approxLocation?: boolean;
 };
 
 /**
  * 場所が市町村までしか分かっていない (= ピンとして打てない) なら true。
  *
- * 判定は「地名から座標を起こす経路」かつ「地区名が場所を特定しない」の AND。
+ * 判定は「地名から座標を起こす経路」かつ「地区名が場所を特定しない、または
+ * 地区まで座標に起こせなかった (approxLocation)」。
  * 地区名の一般語判定 (「市内」「道路」「不明」等) は incidentKey と同じ
  * normalizeSection を使い、規則を二重に持たない。
  */
 export function isApproximateLocation(r: LocationPrecisionInput): boolean {
   const kind = r.sourceKind ?? r.source ?? "";
   if (!GEOCODED_KINDS.has(kind)) return false;
+  // 地区名があっても、その地区を座標に起こせなかったものはピンにできない。
+  // 以前は地区名の有無だけを見ていたため、「緑区長竹」が引けずに相模原市の
+  // 代表点 (駅前) へ丸められた記録がピンとして出ていた (2026-09-27 利用者指摘)。
+  if (r.approxLocation) return true;
   return normalizeSection(r.sectionName) === "";
 }
 

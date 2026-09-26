@@ -7,7 +7,7 @@ import { latLonMatchesPrefecture } from "@/lib/prefecture-bbox";
 import { isNewsSuppressed, isNewsSuppressedId } from "@/lib/news-suppression";
 import { isNewsMisplaced, isPrefLevelCity } from "@/lib/muni-geo-check";
 import { jstToday } from "@/lib/jst-date";
-import { withPinnableLocation } from "@/lib/location-precision";
+import { isApproximateLocation, withPinnableLocation } from "@/lib/location-precision";
 import type { UnifiedSighting } from "@/lib/sources/types";
 
 /**
@@ -590,13 +590,20 @@ function collapseSameNeighborhood(
       (clusters.get(root) ?? clusters.set(root, []).get(root)!).push(i);
     }
     for (const idxs of clusters.values()) {
+      // ただしピンを立てられる記録を優先する。位置があいまいな記録
+      // (isApproximateLocation) が代表になると地図から外されるため、同じ地区に
+      // 地点の分かる記録があってもクラスタごとピンが消えてしまう。
       let repI = idxs[0];
       for (const i of idxs) {
         const a = list[i];
         const b = list[repI];
+        const aPin = !isApproximateLocation(a);
+        const bPin = !isApproximateLocation(b);
         if (
-          a.date > b.date ||
-          (a.date === b.date && (a.ingestedAt ?? 0) > (b.ingestedAt ?? 0))
+          (aPin && !bPin) ||
+          (aPin === bPin &&
+            (a.date > b.date ||
+              (a.date === b.date && (a.ingestedAt ?? 0) > (b.ingestedAt ?? 0))))
         )
           repI = i;
       }

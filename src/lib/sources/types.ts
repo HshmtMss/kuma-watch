@@ -48,6 +48,10 @@ export type UnifiedSighting = {
   // 当社が初めて取り込んだ epoch ms。news-flash の高頻度取り込みで
   // 「新着 ○分前」の表示や「直近24h」フィルタに利用。
   ingestedAt?: number;
+  // 地名から座標を起こしたが、地区まで特定できなかった (市町村の点へ丸めた)。
+  // 地区名が書いてあっても、座標は実際の出没地点ではないので地図には出さない。
+  // 件数には残す (location-precision.ts)。
+  approxLocation?: boolean;
 };
 
 export function inJapanBounds(lat: number, lon: number): boolean {
