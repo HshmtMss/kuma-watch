@@ -535,18 +535,24 @@ export const ALERT_DISPLAY_COLOR: Record<
   elevated: "#fb923c", // orange-400 (橙)
   high: "#ef4444", // red-500 (赤)
 };
+// amber は 1 件から。以前は 3 件からで、1〜2 件のセルは生息域の薄緑で塗って
+// いたため、出没があるのに地図もカードも「生息域」に見えていた (2026-09-27)。
 export const ALERT_SIGHTING_THRESHOLDS = {
-  amber: 3,
+  amber: 1,
   orange: 7,
   red: 15,
 } as const;
 
 /**
- * カードの「この地点の状況」判定区分 (2026-06)。マップのセル色と同じ二軸で決める:
- *  - 直近1年の出没件数 (recentSightingCount = 当該メッシュ・マップと同入力) で
- *    注意(>=3) / 警戒(>=7) / 危険(>=15) を判定。
- *  - 出没が無くても生息域なら「生息域」(中立)。生息域でもなければ「情報なし」。
- * これによりマップが穏やかな所をタップしても、カードが赤い「高い」にならず整合する。
+ * カードの「この地点の状況」判定区分。**マップのセル色と必ず一致させる**:
+ *  - 当該メッシュ (約5km四方) の直近1年の出没件数 (マップと同じ /api/sighting-cells)
+ *    で 出没あり(>=1) / やや多い(>=7) / 多い(>=15)。
+ *  - 出没が無ければ生息域の濃淡、生息域でもなければ「情報なし」。
+ *
+ * 以前はカードだけタップ地点中心の円 (2.9km)・直近7日・周辺10km/90日で格上げして
+ * いたため、地図で白いセルをタップしても「出没あり」と出て食い違っていた
+ * (2026-09-27 ユーザー決定でセル基準に統一)。周辺の出没は区分ではなく、
+ * カードの「最近の目撃 N件 (周辺10km)」と説明文で伝える。
  */
 export type DisplayCategory =
   | "none"
@@ -555,48 +561,18 @@ export type DisplayCategory =
   | "caution"
   | "warning"
   | "danger";
-/**
- * 直近この日数以内に出没があれば、年間件数がしきい値未満でも「出没あり」以上に
- * する。出没から7日間は、その場所の平常時に対して約2.8倍の頻度で再び出没する
- * (14日で2.19倍、30日で1.59倍と減衰) という実測に基づく。
- */
-export const RECENT_ALERT_DAYS = 7;
 
 export function displayCategory(
   habitatLevel: RiskLevel,
-  recentSightingCount: number,
-  /** 直近 RECENT_ALERT_DAYS 日以内の周辺出没件数。省略時は加味しない */
-  lastWeekCount = 0,
-  /** 周辺 10km・90日の出没件数。省略時は加味しない */
-  nearbyCount = 0,
+  /** 当該メッシュの直近1年の出没件数 (マップのセル色と同じ入力) */
+  cellSightingCount: number,
 ): DisplayCategory {
-  // 直近の出没を主軸に。煽る語は使わず「出没あり/やや多い/多い」で表現する。
-  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.red) return "danger";
-  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.orange) return "warning";
-  if (recentSightingCount >= ALERT_SIGHTING_THRESHOLDS.amber) return "caution";
-  // 年間件数がしきい値未満でも、直近に出没があれば「情報なし」にはしない。
-  // 従来は「周囲2.9km・過去1年で3件未満」だけを見ていたため、4日前に
-  // クマが出た地点で「記録は見つかりませんでした」と表示されていた
-  // (実測で直近7日の出没1,111件のうち128件がこの状態)。
-  if (lastWeekCount > 0) return "caution";
-  // 出没が無ければ生息域の濃淡で 2 段階 (生息域 / 主要生息域)。
+  if (cellSightingCount >= ALERT_SIGHTING_THRESHOLDS.red) return "danger";
+  if (cellSightingCount >= ALERT_SIGHTING_THRESHOLDS.orange) return "warning";
+  if (cellSightingCount >= ALERT_SIGHTING_THRESHOLDS.amber) return "caution";
   if (habitatLevel === "high" || habitatLevel === "elevated")
     return "habitatCore";
   if (habitatLevel === "moderate" || habitatLevel === "low") return "habitat";
-  // 生息域にも当たらない地点でも、周辺(10km・90日)に出没があれば「情報なし」
-  // とは言わず「出没あり」にする。「情報なし」は手がかりが無いという意味だが、
-  // 周辺に出没があるならそれは手がかりであり、実測で4.3倍の予兆でもある
-  // (次の30日に2.9km圏で出没する確率 7.46% vs 周辺にも無い地点 1.72%)。
-  // 実際、平野部(宮城県美里町など)では生息域の判定が付かないため、数km先に
-  // 出没があってもグレーの「情報なし」が出ていた。
-  //
-  // 当初は独立した区分「周辺で出没」を設けたが、「出没あり」と語が似ていて
-  // 一般の利用者が違いを読み取れず混乱するため、「出没あり」に統合した。
-  // 足元か数km先かの別は、この下の説明文と、ピンまでの距離表示で伝える。
-  // なお生息域(habitat/habitatCore)側はこの格上げの対象にしていない。
-  // 周辺の出没と生息域のどちらが強い手がかりかを測っていないため、
-  // 測らずに順序を決めない。「情報なし」の是正だけに絞る。
-  if (nearbyCount > 0) return "caution";
   return "none";
 }
 export const DISPLAY_CATEGORY_LABEL: Record<DisplayCategory, string> = {

@@ -29,15 +29,8 @@ type Props = {
   count90d?: number;
   /** 「周辺」の半径 (km) */
   nearbyRadiusKm?: number;
-  /** 当該メッシュの直近1年の目撃件数 (マップのセル色と同入力)。判定の主軸。 */
+  /** 当該メッシュの直近1年の目撃件数 (マップのセル色と同入力)。判定の唯一の入力。 */
   recentSightingCount?: number;
-  /**
-   * 直近7日・周辺約3kmの出没件数。
-   * 年間件数がしきい値(3件)未満でも、直近に出没があれば「情報なし」とは
-   * 表示しない。4日前にクマが出た地点で「記録は見つかりませんでした」と
-   * 出ていたため。
-   */
-  lastWeekCount?: number;
   /** 「最近の目撃」の隣に 2 列で並べる通知タイル (GeoPushButton compact 等)。無ければ 1 列。 */
   notification?: ReactNode;
 };
@@ -47,18 +40,12 @@ export default function RiskHero({
   count90d = 0,
   nearbyRadiusKm = 10,
   recentSightingCount = 0,
-  lastWeekCount = 0,
   notification,
 }: Props) {
   // マップのセル色と同じ二軸 (生息域 / 直近の出没) で「この地点の状況」を判定する。
   // 生息域だけでは赤い「危険」にせず、直近の出没件数で 注意→警戒→危険 を出す。
   const habitatLevel = baseLevel ?? "unknown";
-  const cat = displayCategory(
-    habitatLevel,
-    recentSightingCount,
-    lastWeekCount,
-    count90d,
-  );
+  const cat = displayCategory(habitatLevel, recentSightingCount);
   const style = DISPLAY_CATEGORY_STYLE[cat];
   const hasRecent = count90d > 0;
 
@@ -69,29 +56,12 @@ export default function RiskHero({
 
   // 説明文は「どう行動すべきか」に徹する (件数は繰り返さない)。
   //
-  // 記録の有無は必ず実データから言う。以前は habitat / habitatCore / none に
-  // 「直近1年の出没情報はありません」「記録は見つかりませんでした」を固定で
-  // 出していたが、これらの区分は出没 0 件ではなく「しきい値(3件)未満」で
-  // 選ばれる。1〜2 件でも「ありません」と断言してしまい、さらに真下の
-  // 「最近の目撃 N件」(90日・10km) と正面から矛盾していた。
-  const records =
-    lastWeekCount > 0
-      ? "直近1週間に、この付近で出没が確認されています。"
-      : recentSightingCount > 0
-      ? "この付近では直近1年にわずかながら出没が確認されています。"
-      : hasRecent
-        ? "この地点の記録はありませんが、周辺では出没が確認されています。"
-        : "直近1年の出没情報はありません。";
-
-  // 「出没あり」(caution) は 2 つの状況を束ねる:
-  //   足元 … この地点(2.9km)自体に記録がある (年3件以上 or 直近7日)
-  //   数km先 … 足元には無いが周辺(10km・90日)に出没がある
-  // バッジは同じ「出没あり」に統一し (語が似た区分を並べると混乱するため)、
-  // 足元か数km先かはこの説明文で伝え分ける。
-  const cautionBlurb =
-    recentSightingCount > 0 || lastWeekCount > 0
-      ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
-      : "この地点の記録はありませんが、数km以内で出没が確認されています。近くで出た後は、しばらく同じ範囲で出やすくなります。";
+  // 区分はセル (約5km四方) の直近1年で決まるので、出没あり以上でない区分
+  // (生息域 / 主要生息域 / 情報なし) はそのセルに記録が無い。周辺 (10km・90日)
+  // の出没はここで言葉にして、真下の「最近の目撃 N件」と矛盾させない。
+  const records = hasRecent
+    ? "この付近で直近1年の記録はありませんが、周辺10km以内では最近出没しています。"
+    : "直近1年の出没情報はありません。";
 
   const blurb =
     cat === "danger"
@@ -99,12 +69,12 @@ export default function RiskHero({
       : cat === "warning"
         ? "クマの出没が確認されています。早朝・夕方は特に注意してください。"
         : cat === "caution"
-          ? cautionBlurb
+          ? "クマの出没が確認されています。音を出すなど基本対策を心がけてください。"
           : cat === "habitatCore"
             ? `クマが多くすんでいる地域です。${records}季節により状況は変わります。`
             : cat === "habitat"
               ? `クマがすんでいる地域です。${records}季節により状況は変わります。`
-              : recentSightingCount > 0 || hasRecent
+              : hasRecent
                 ? records
                 : "この場所では、クマの記録は見つかりませんでした。";
 

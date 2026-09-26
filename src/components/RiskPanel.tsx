@@ -124,7 +124,6 @@ type State =
       /** 当該メッシュの直近1年の目撃件数 (ヒートマップのセル色と同入力)。カード判定の主軸。 */
       sCellCount: number;
       /** 直近7日・周辺約3kmの出没件数（区分を「情報なし」にしないため） */
-      lastWeekCount: number;
       /** 最近の目撃で格上げされたか */
       levelEscalated: boolean;
       elevationM: number | null;
@@ -556,20 +555,12 @@ export default function RiskPanel({
       const count365d = history.count365d;
       const count90d = history.count90d;
       const recent90d = history.records;
-      // ヒートマップと完全一致させるため、メッシュ単位の目撃件数で同じ式で
-      // 格上げする。sightingMapRef は KumaClient が /api/sighting-cells から
-      // 取得した「過去 1 年・メッシュ別」の集計マップ。
-      // 区分はタップ地点を中心とした等面積円 (半径2.9km) の直近1年件数で出す。
-      // 以前はメッシュ1個の件数だったため、境界付近では隣のセルに出没が
-      // 固まっていても「情報なし」と表示されていた (実測で13.6%が過小表示、
-      // 過大表示は0%)。面積を揃えてあるのでしきい値の意味は変わらない。
-      // ヒートマップ自体は従来どおりメッシュ単位で塗る (面の粗い表現)。
-      // 取得できなかったときだけ従来のメッシュ集計に落とす (区分を空にしない)
-      const sCellCount = history.ok
-        ? history.countLocal365
-        : (sightingMapRef.current?.get(meshCode) ?? 0);
-      // 直近7日の周辺出没。年間件数がしきい値未満でも「情報なし」にしないために使う
-      const lastWeekCount = history.ok ? history.countLocal7 : 0;
+      // カードの区分はヒートマップのセル色と完全に一致させる (2026-09-27)。
+      // sightingMapRef は KumaClient が /api/sighting-cells から取得した
+      // 「過去 1 年・メッシュ別」の集計で、セルの塗りと同じ入力。
+      // 以前はタップ地点中心の円 (2.9km) で数えていたが、白いセルをタップしても
+      // 「出没あり」と出て地図と食い違うため、セル基準に戻した。
+      const sCellCount = sightingMapRef.current?.get(meshCode) ?? 0;
       const sightingLevel = sightingsToLevel(sCellCount);
       const displayedLevel = maxLevel(baseLevel, sightingLevel);
       breakdown.level = displayedLevel;
@@ -617,7 +608,6 @@ export default function RiskPanel({
         histLastYear: history.lastYear,
         baseLevel,
         sCellCount,
-        lastWeekCount,
         levelEscalated,
         elevationM: elevation.elevationM,
         slopeDeg: elevation.slopeDeg,
@@ -1003,7 +993,6 @@ function RiskDetails({
         count90d={state.count90d}
         nearbyRadiusKm={nearbyRadiusKm}
         recentSightingCount={state.sCellCount}
-        lastWeekCount={state.lastWeekCount}
         notification={
           isGeoNotifyAvailable() && location ? (
             <GeoNotifyTile

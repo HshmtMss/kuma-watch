@@ -15,7 +15,6 @@ import type { KumaRecord } from "@/app/api/kuma/route";
 import {
   DEFAULT_LEVEL_THRESHOLDS,
   kumamoriLevel,
-  maxLevel,
   HABITAT_DISPLAY_COLOR,
   ALERT_DISPLAY_COLOR,
   ALERT_SIGHTING_THRESHOLDS,
@@ -262,8 +261,9 @@ export default function KumaMap({
       const sightingMap = sightingCountByMeshRef.current;
 
       // セルの塗り色を決める (2026-06 改訂)。生息域と「直近の出没」を色で分離:
-      //  - 直近1年の出没が多い → 警戒色 (黄→橙→赤)。生息域より優先 (rank 高)。
-      //  - それ以外 → 生息域を落ち着いた色 (薄緑→ベージュ)。出没1-2件は最低 low に底上げ。
+      //  - 直近1年に出没が1件でもある → 出没の色 (黄→橙→赤)。生息域より優先 (rank 高)。
+      //  - それ以外 → 生息域を落ち着いた色 (薄緑→ベージュ)。
+      // カードの区分 (score.ts displayCategory) はこのセル色と同じ入力で決める。
       // rank は LOD 集約時の「代表色 = 最も深刻なセル」選択に使う。
       // sightingMap は API /api/sighting-cells から取得したもの。
       const paintCell = (
@@ -277,9 +277,7 @@ export default function KumaMap({
           return { color: ALERT_DISPLAY_COLOR.elevated, rank: 8 };
         if (sCount >= ALERT_SIGHTING_THRESHOLDS.amber)
           return { color: ALERT_DISPLAY_COLOR.moderate, rank: 7 };
-        const habitat = kumamoriLevel(s, levelThresholdsRef.current);
-        const lvl = sCount >= 1 ? maxLevel(habitat, "low") : habitat;
-        switch (lvl) {
+        switch (kumamoriLevel(s, levelThresholdsRef.current)) {
           case "high":
             return { color: HABITAT_DISPLAY_COLOR.high, rank: 4 };
           case "elevated":
