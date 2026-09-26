@@ -17,6 +17,7 @@ import {
   isInsideMuni,
   pointInsideMuni,
   resolveMuni,
+  type MuniRef,
 } from "@/lib/muni-boundary";
 import { inJapanBounds } from "./types";
 
@@ -250,8 +251,24 @@ export async function geocodePlace(
   cityName: string | undefined,
   sectionName: string | undefined,
 ): Promise<GeocodeResult | null> {
-  const city = (cityName ?? "").trim();
-  const section = usableSection(sectionName ?? "");
+  let city = (cityName ?? "").trim();
+  let rawSection = (sectionName ?? "").trim();
+
+  // 政令市で区名が地区名の側に入っている場合 (city=相模原市, section=緑区長竹)
+  // は区を市の側へ移す。移さないと、地区名が引けなかったときに「相模原市」の
+  // 代表点 = 中央区の市役所前に落ち、山間の緑区の出没が相模原駅前に立つ
+  // (2026-09-27 に利用者から指摘。長竹・三井の 3 件)。
+  let wardFallback: MuniRef | null = null;
+  const wardMatch = city && !/区$/.test(city) ? rawSection.match(/^(\S{1,4}?区)(.*)$/) : null;
+  if (wardMatch) {
+    const ward = resolveMuni(prefName, city + wardMatch[1]);
+    if (ward && ward.cityName.endsWith(wardMatch[1])) {
+      city = ward.cityName;
+      rawSection = wardMatch[2].trim();
+      wardFallback = ward;
+    }
+  }
+  const section = usableSection(rawSection);
 
   // 都道府県名だけでは「県のどこか」しか分からない。Nominatim は県名クエリに
   // 対して県の代表点を 1 点返す (例: 「埼玉県」→ 35.9754,139.4160 = 坂戸市付近)
@@ -304,6 +321,10 @@ export async function geocodePlace(
         return { ...r3, precise: true };
     }
   }
+
+  // 区を移した場合は区の重心へ丸める。Nominatim の区の点は区役所
+  // (相模原市緑区なら橋本駅前) で、山間の出没を市街地に立ててしまう。
+  if (wardFallback) return { lat: wardFallback.lat, lon: wardFallback.lon, precise: false };
 
   // 市区町村までは特定できたが地区が拾えなかった場合の丸め。市中心点に
   // 落ちるので precise=false とし、呼び出し側で ~3km ジッターを掛ける。
