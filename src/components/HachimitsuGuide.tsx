@@ -109,11 +109,6 @@ export default function HachimitsuGuide() {
               </button>
             </div>
 
-            {/* 過度に怖がらせないための一言（地図の ⓘ から移設・集約）。 */}
-            <p className="mt-2 text-xs leading-relaxed text-stone-500">
-              日本では昔からクマが暮らしています。ふだん遭遇するのはごく稀。
-              こわがりすぎず、落ち着いて備えましょう。
-            </p>
             <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-900">
               クマから身を守る合言葉。<b>「はちみつ」＋「のこさない」</b>の5つを覚えよう。
             </p>
@@ -160,12 +155,6 @@ export default function HachimitsuGuide() {
               </div>
             </div>
 
-            <p className="mt-2.5 flex items-start gap-1.5 px-1 text-xs leading-relaxed text-stone-500">
-              <span aria-hidden>🕕</span>
-              <span>
-                朝と夕方は特に注意。出かける前に出没情報を確認しましょう。
-              </span>
-            </p>
 
             {/* ページ遷移せずアプリ内モーダル(iframe)で開く。PWA(standalone)でも
                 target=_blank が同一画面化して戻れない問題を避け、閉じるとこのまま
