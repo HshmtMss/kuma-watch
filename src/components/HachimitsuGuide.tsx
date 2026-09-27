@@ -90,20 +90,20 @@ export default function HachimitsuGuide() {
             aria-hidden
           />
           <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="text-base font-bold text-stone-600">
-                  クマ対策の合言葉
-                </div>
-                <div className="mt-0.5 flex items-center gap-1.5 text-2xl font-black tracking-wide text-amber-600">
-                  <span aria-hidden>🍯</span>はちみつ、のこさない
-                </div>
+            {/* 見出しはカードの左右中央に置く。閉じるボタンは右上に浮かせて、
+                中央寄せの基準をずらさない。 */}
+            <div className="relative text-center">
+              <div className="text-base font-bold text-stone-600">
+                クマ対策の合言葉
+              </div>
+              <div className="mt-1 flex items-center justify-center gap-1.5 whitespace-nowrap text-[26px] font-black min-[390px]:text-[28px] leading-tight tracking-wide text-amber-600">
+                <span aria-hidden>🍯</span>はちみつ、のこさない
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="閉じる"
-                className="-mr-1 -mt-1 rounded-full p-2 text-2xl leading-none text-stone-400 hover:bg-stone-100"
+                className="absolute -right-1.5 -top-1.5 rounded-full p-1.5 text-xl leading-none text-stone-400 hover:bg-stone-100"
               >
                 ✕
               </button>
