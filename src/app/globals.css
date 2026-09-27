@@ -254,3 +254,15 @@ body[data-map-onscreen] .map-cta-sticky {
     break-inside: avoid;
   }
 }
+
+/* 地図の距離目盛り (KumaMap)。右下の出典表記と同じ高さ・同じくらいの控えめさにそろえる。 */
+.leaflet-bottom.leaflet-left .leaflet-control-scale {
+  margin: 0 0 2px 6px;
+}
+.leaflet-control-scale-line {
+  font-size: 10px;
+  line-height: 1.2;
+  padding: 0 4px;
+  border-color: #57534e;
+  background: rgba(255, 255, 255, 0.85);
+}

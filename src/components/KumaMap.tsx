@@ -1052,6 +1052,13 @@ export default function KumaMap({
       tile.addTo(map);
       tileLayerRef.current = tile;
 
+      // 距離の目盛り。マス (約5km四方) の大きさを読めるように、Google マップと
+      // 同じく画面最下部の帯に小さく出す。右下はズームボタンと出典表記で埋まって
+      // いるので左下 (出典表記と同じ高さ)。
+      L.control
+        .scale({ position: "bottomleft", metric: true, imperial: false, maxWidth: 90 })
+        .addTo(map);
+
       // Canvas レンダラーを 1 度だけ生成し、mesh → pin の順で map に追加して
       // 重なり順 (ピンがヒートマップの上) を固定する。以降の再描画ではこの
       // インスタンスを使い回すため、canvas 要素が増殖しない。
