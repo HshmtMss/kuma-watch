@@ -44,9 +44,9 @@ function main() {
   // 意味を失い、本当の異常が埋もれる。
   //
   // 見落としにはならない。件数が育ったソース (前回 50 件以上) が 0 になる場合は
-  // build-sightings の「ソースが丸ごと消えています」がビルドごと止めるので、
-  // そちらの方がはるかに大きな音で鳴る。ここで拾わないのは、そもそも数件しか
-  // 載らない小さなページだけ。壊れていないかは
+  // build-sightings が前回分を使って GitHub の警告を出し、取れない状態が続けば
+  // 最新日が進まずここで stale として拾う。ここで missing を見ないのは、そもそも
+  // 数件しか載らない小さなページだけ。壊れていないかは
   // scripts/survey-muni-bear-pages.ts を定期的に回して見直す。
   const isMuniPage = (id: string): boolean => {
     const s = DATA_SOURCES.find((x) => x.id === id);

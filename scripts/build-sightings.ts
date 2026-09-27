@@ -227,7 +227,7 @@ async function main(): Promise<void> {
     }
   }
 
-  const vanished: string[] = [];
+  const vanished = new Set<string>();
   const retired: string[] = [];
   for (const [src, n] of prevBySource) {
     if (n < MIN_TO_GUARD) continue;
@@ -237,20 +237,38 @@ async function main(): Promise<void> {
       retired.push(`${src}(前回${n}件)`);
       continue;
     }
-    vanished.push(`${src}(前回${n}件)`);
+    vanished.add(src);
   }
   if (retired.length > 0) {
     console.log(
       `[build-sightings] 定義が消えたソースを引退扱いにしました: ${retired.join(", ")}`,
     );
   }
-  if (vanished.length > 0) {
-    console.error(
-      `[build-sightings] ソースが丸ごと消えています: ${vanished.join(", ")}\n` +
-        `  取得側の障害の可能性が高いのでスナップショットを上書きしません。\n` +
-        `  公開先が本当に無くなったのなら data-sources.ts / source-gaps.ts を更新してください。`,
+  // 丸ごと消えたソースは、そのソースだけ前回分をそのまま使って続行する。
+  //
+  // 以前はここでビルドごと止めていた。欠けたデータで上書きしないためだが、
+  // 県のサイト 1 本の一時的な不調 (京都 BODIK のタイムアウト 2026-09-24、
+  // 東京都の 403 2026-09-27 など。どれも次の回には戻った) で、全国約 160 本の
+  // 取り込みが数時間止まり、その間は他県の新しい出没も地図に入らなかった。
+  // 前回分を使えば「壊れたデータで上書きしない」はそのまま守れる。
+  //
+  // 取れない状態が続いた場合は、そのソースの最新日が進まなくなるので
+  // check-source-health が「止まった」として検出する。GitHub の警告にも残す。
+  if (vanished.size > 0) {
+    const detail = [...vanished]
+      .map((src) => `${src}(前回${prevBySource.get(src)}件)`)
+      .join(", ");
+    console.log(
+      `::warning::[build-sightings] ソースが丸ごと取れなかったため前回分を使います: ${detail}` +
+        ` (続く場合は公開先を確認し、無くなったのなら data-sources.ts / source-gaps.ts を更新)`,
     );
-    process.exit(1);
+    fresh.push(...prevRecords.filter((r) => vanished.has(r.source ?? "")));
+    // 以降の守り (後退チェック) は差し替え後の姿で判定する。
+    for (const src of vanished) {
+      freshBySource.set(src, prevBySource.get(src) ?? 0);
+      const before = prevLatest.get(src);
+      if (before) freshLatest.set(src, before);
+    }
   }
 
   // 最新の出没日が後退していないか。
