@@ -90,15 +90,22 @@ export default function HachimitsuGuide() {
             aria-hidden
           />
           <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
-            {/* 見出しは左寄せのまま、カードの左端から右端までちょうど届く大きさに
-                する (文字サイズをカード幅に比例させる: 9.5cqw ≒ 幅の99%。実測で
-                10cqw がちょうど幅の 103.8%)。閉じるボタンは見出しより上の行に浮かせる。 */}
-            <div className="@container relative">
-              <div className="text-base font-bold text-stone-600">
-                クマ対策の合言葉
-              </div>
-              <div className="mt-1 flex items-center gap-[0.15em] whitespace-nowrap text-[9.5cqw] font-black leading-tight text-amber-600">
-                <span aria-hidden>🍯</span>はちみつ、のこさない
+            {/* 見出し。🍯 を下の「は・ち・み・つ」と同じ丸バッジにし、pl-3 で丸と
+                文字の縦の線を下の項目 (px-3) にそろえる。閉じるボタンは右上に浮かせる。 */}
+            <div className="relative flex items-center gap-3 pl-3">
+              <span
+                aria-hidden
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[26px] leading-none"
+              >
+                🍯
+              </span>
+              <div className="min-w-0">
+                <div className="text-[13px] font-bold tracking-wider text-stone-500">
+                  クマ対策の合言葉
+                </div>
+                <div className="whitespace-nowrap text-2xl font-black leading-tight tracking-wide text-amber-600">
+                  はちみつ、のこさない
+                </div>
               </div>
               <button
                 type="button"
@@ -111,7 +118,7 @@ export default function HachimitsuGuide() {
             </div>
 
 
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-4 space-y-2">
               {ITEMS.map((it) => (
                 <li
                   key={it.kana}
