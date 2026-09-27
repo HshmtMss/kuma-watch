@@ -109,9 +109,6 @@ export default function HachimitsuGuide() {
               </button>
             </div>
 
-            <p className="mt-2 rounded-xl bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-900">
-              クマから身を守る合言葉。<b>「はちみつ」＋「のこさない」</b>の5つを覚えよう。
-            </p>
 
             <ul className="mt-3 space-y-2">
               {ITEMS.map((it) => (
