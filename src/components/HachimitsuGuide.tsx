@@ -90,13 +90,14 @@ export default function HachimitsuGuide() {
             aria-hidden
           />
           <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl">
-            {/* 見出しはカードの左右中央に置く。閉じるボタンは右上に浮かせて、
-                中央寄せの基準をずらさない。 */}
-            <div className="relative text-center">
+            {/* 見出しは左寄せのまま、カードの左端から右端までちょうど届く大きさに
+                する (文字サイズをカード幅に比例させる: 9.5cqw ≒ 幅の99%。実測で
+                10cqw がちょうど幅の 103.8%)。閉じるボタンは見出しより上の行に浮かせる。 */}
+            <div className="@container relative">
               <div className="text-base font-bold text-stone-600">
                 クマ対策の合言葉
               </div>
-              <div className="mt-1 flex items-center justify-center gap-1.5 whitespace-nowrap text-[26px] font-black min-[390px]:text-[28px] leading-tight tracking-wide text-amber-600">
+              <div className="mt-1 flex items-center gap-[0.15em] whitespace-nowrap text-[9.5cqw] font-black leading-tight text-amber-600">
                 <span aria-hidden>🍯</span>はちみつ、のこさない
               </div>
               <button
