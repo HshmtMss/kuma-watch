@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Globe } from "lucide-react";
 import { isLearnHubReleased } from "@/lib/learn-flag";
 
 /**
@@ -291,9 +292,11 @@ export default function HeaderNav({
         <Link
           href="/en"
           hrefLang="en"
-          className="rounded-full px-2 py-1.5 text-stone-400 hover:text-stone-800"
+          aria-label="English"
+          className="flex items-center gap-1 rounded-full px-2 py-1.5 text-stone-500 hover:text-stone-800"
         >
-          English
+          <Globe size={16} strokeWidth={2} aria-hidden />
+          EN
         </Link>
       </nav>
 
@@ -414,6 +417,7 @@ export default function HeaderNav({
                     onClick={close}
                     className="flex items-center gap-2 border-t border-gray-100 px-4 py-2.5 text-[15px] font-semibold text-stone-600 hover:bg-stone-50 active:bg-stone-100"
                   >
+                    <Globe size={18} strokeWidth={2} aria-hidden />
                     English
                   </Link>
                 </nav>
