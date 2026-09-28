@@ -255,9 +255,13 @@ body[data-map-onscreen] .map-cta-sticky {
   }
 }
 
-/* 地図の距離目盛り (KumaMap)。右下の出典表記と同じ高さ・同じくらいの控えめさにそろえる。 */
+/* 地図の距離目盛り (KumaMap)。ボタン列の直下に控えめに出す。 */
 .leaflet-bottom.leaflet-left .leaflet-control-scale {
   margin: 0 0 2px 6px;
+}
+#kw-map-scale-slot .leaflet-control-scale {
+  margin: 0;
+  float: none;
 }
 .leaflet-control-scale-line {
   font-size: 10px;

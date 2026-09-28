@@ -1052,12 +1052,23 @@ export default function KumaMap({
       tile.addTo(map);
       tileLayerRef.current = tile;
 
-      // 距離の目盛り。マス (約5km四方) の大きさを読めるように、Google マップと
-      // 同じく画面最下部の帯に小さく出す。右下はズームボタンと出典表記で埋まって
-      // いるので左下 (出典表記と同じ高さ)。
-      L.control
+      // 距離の目盛り。マス (約5km四方) の大きさを読めるように小さく出す。
+      // 地図の下端は場所カードに隠れる (パソコンでは畳んでも帯が残る) ので、
+      // KumaClient がボタン列の直下に用意した置き場へ移す。置き場が無い画面
+      // (地図を埋め込んだ他ページ等) では Leaflet 既定の左下に残す。
+      const scale = L.control
         .scale({ position: "bottomleft", metric: true, imperial: false, maxWidth: 90 })
         .addTo(map);
+      const scaleEl = scale.getContainer()!;
+      const attachScale = () => {
+        const slot = document.getElementById("kw-map-scale-slot");
+        if (slot && !slot.contains(scaleEl)) slot.appendChild(scaleEl);
+      };
+      attachScale();
+      window.addEventListener("kw-map-scale-slot", attachScale);
+      map.on("unload", () =>
+        window.removeEventListener("kw-map-scale-slot", attachScale),
+      );
 
       // Canvas レンダラーを 1 度だけ生成し、mesh → pin の順で map に追加して
       // 重なり順 (ピンがヒートマップの上) を固定する。以降の再描画ではこの

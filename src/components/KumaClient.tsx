@@ -1001,6 +1001,18 @@ export default function KumaClient() {
                 </div>
               </details>
             </div>
+            {/* 距離の目盛りの置き場。KumaMap が Leaflet の scale コントロールを
+                ここへ移す。地図の下端はカード (パソコンでは畳んでも帯が残る) に
+                隠れるため、常に見えるボタン列の直下に置く。 */}
+            <div
+              id="kw-map-scale-slot"
+              className="mt-1.5 pl-1"
+              // 地点選択モード等でこの枠が作り直されたら、KumaMap に目盛りを
+              // 差し直してもらう (枠と一緒に目盛りの DOM も消えるため)。
+              ref={(el) => {
+                if (el) window.dispatchEvent(new Event("kw-map-scale-slot"));
+              }}
+            />
           </div>
         )}
 
