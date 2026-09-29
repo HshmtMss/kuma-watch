@@ -1,6 +1,16 @@
 {
-  "generatedAt": 1788862929183,
+  "generatedAt": 1790682839051,
   "items": [
+    {
+      "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-21.pdf",
+      "ministry": "maff",
+      "date": "2026-09-29",
+      "title": "農業現場におけるクマ類の出没及び人身被害防止等に対する指導等の徹底について",
+      "url": "https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-21.pdf",
+      "category": "guidance",
+      "summary": "農業現場におけるクマ類の出没件数増加や人身被害の拡大を受け、全国の関係機関に対し注意喚起や被害防止対策の徹底を求める通知。農作物被害の防止と地域住民の安全確保を目的とした行政上の指針である。",
+      "ingestedAt": 1790682839051
+    },
     {
       "id": "env:https://www.env.go.jp/press/press_05540.html",
       "ministry": "env",
