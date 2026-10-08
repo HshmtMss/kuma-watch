@@ -64,7 +64,8 @@ const PERIOD_OPTIONS: PeriodOption[] = [
   { label: "直近1ヶ月", days: 30 },
   { label: "直近3ヶ月", days: 90 },
   { label: "直近1年", days: 365 },
-  { label: "全期間", days: null },
+  // 「全期間」は外した (2026-10-09)。ピンは最長1年まで。古い記録はデータとして
+  // 保持しており、市町村ページの件数・月別グラフなどでは引き続き使う。
 ];
 const DEFAULT_PERIOD_DAYS: number | null = 90;
 
@@ -571,8 +572,10 @@ export default function KumaClient() {
       }
       const rawPeriod = window.sessionStorage.getItem(LAST_PERIOD_KEY);
       if (rawPeriod !== null) {
-        const val = rawPeriod === "null" ? null : Number(rawPeriod);
-        if (val === null || Number.isFinite(val)) setPeriod(val);
+        // 今の選択肢にある値だけ復元する。以前「全期間」(null) を選んでいた人は
+        // 既定 (直近3ヶ月) に戻る。
+        const val = Number(rawPeriod);
+        if (PERIOD_OPTIONS.some((p) => p.days === val)) setPeriod(val);
       }
     } catch {
       // ignore storage errors
