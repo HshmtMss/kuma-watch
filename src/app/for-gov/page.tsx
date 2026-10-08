@@ -3,6 +3,12 @@ import Image from "next/image";
 import PageShell from "@/components/PageShell";
 import ContactForm from "@/components/ContactForm";
 import ReportViewer from "./ReportViewer";
+import {
+  EXHIBITIONS,
+  exhibitionStatus,
+  formatExhibitionDates,
+} from "@/data/exhibitions";
+import { jstToday } from "@/lib/jst-date";
 
 const SITE_URL = "https://kuma-watch.jp";
 const META_DESC =
@@ -86,7 +92,11 @@ const FAQ = [
   },
 ];
 
+// 展示会欄の「出展予定/出展中/出展実績」を日付で切り替えるため、1 時間ごとに作り直す。
+export const revalidate = 3600;
+
 export default function ForGovPage() {
+  const today = jstToday();
   return (
     <PageShell
       title="自治体の方へ"
@@ -291,6 +301,67 @@ export default function ForGovPage() {
       <p className="text-xs leading-relaxed text-stone-500">
         発行：獣医工学ラボ（リサーチコーディネート株式会社）。御自治体の区域に限定した分析、季節・誘引物別の対策カレンダー、出没直後の即応ルール設計、定期レポートのご提供も承ります。
       </p>
+
+      {/* 展示会 — 地図の小さな案内 (ExhibitionNotice) の行き先。予定/開催中と
+          実績を日付で自動に分ける (revalidate で日をまたいで更新)。 */}
+      <h2 id="exhibitions">展示会</h2>
+      <p>
+        くまウォッチを展示会でご紹介しています。会場では導入のご相談を承ります。
+      </p>
+      {(["upcoming", "past"] as const).map((group) => {
+        const list = EXHIBITIONS.filter((e) =>
+          group === "past"
+            ? exhibitionStatus(e, today) === "past"
+            : exhibitionStatus(e, today) !== "past",
+        ).sort((a, b) =>
+          group === "past"
+            ? a.start < b.start ? 1 : -1
+            : a.start < b.start ? -1 : 1,
+        );
+        if (list.length === 0) return null;
+        return (
+          <div key={group} className="not-prose my-4">
+            <p className="mb-2 text-sm font-bold text-stone-700">
+              {group === "past" ? "出展実績" : "出展予定"}
+            </p>
+            <ul className="space-y-2">
+              {list.map((e) => {
+                const status = exhibitionStatus(e, today);
+                return (
+                  <li
+                    key={e.id}
+                    className="rounded-xl border border-stone-200 bg-white p-3"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      {status === "ongoing" && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                          出展中
+                        </span>
+                      )}
+                      <span className="font-semibold text-stone-900">{e.name}</span>
+                    </div>
+                    <p className="m-0 mt-1 text-sm text-stone-600">
+                      {formatExhibitionDates(e)}・{e.venue}
+                      {e.area && `（${e.area}）`}
+                      {e.booth
+                        ? `・小間 ${e.booth}`
+                        : status !== "past" && "・小間番号は決まり次第お知らせします"}
+                    </p>
+                    <a
+                      href={e.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-sm font-medium text-emerald-700 underline"
+                    >
+                      詳しく見る（運営会社のお知らせ）
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
 
       {/* お問い合わせ */}
       <h2 id="contact">お問い合わせ</h2>

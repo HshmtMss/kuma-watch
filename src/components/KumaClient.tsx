@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { MapPin, Settings, CalendarDays, Bell } from "lucide-react";
 import type { Map as LeafletMap } from "leaflet";
 import type { KumaRecord } from "@/app/api/kuma/route";
+import ExhibitionNotice from "@/components/ExhibitionNotice";
 import HeaderNav from "@/components/HeaderNav";
 import KumaMap, { type TileStyle } from "@/components/KumaMap";
 import PlaceSearch from "@/components/PlaceSearch";
@@ -1003,6 +1004,10 @@ export default function KumaClient() {
                   </div>
                 </div>
               </details>
+            </div>
+            {/* 展示会出展の小さな案内 (会期の2週間前〜最終日だけ・✕で閉じられる)。 */}
+            <div className="empty:hidden">
+              <ExhibitionNotice />
             </div>
             {/* 距離の目盛りの置き場。KumaMap が Leaflet の scale コントロールを
                 ここへ移す。地図の下端はカード (パソコンでは畳んでも帯が残る) に
