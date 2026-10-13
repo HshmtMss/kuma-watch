@@ -429,6 +429,8 @@ export const REJECT_REASONS = [
   "クマ以外",
   "情報が古い",
   "いたずら",
+  "テスト投稿",
+  "投稿者の間違い",
 ] as const;
 
 export type RejectReason = (typeof REJECT_REASONS)[number];
