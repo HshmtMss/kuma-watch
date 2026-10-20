@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     getPrefSummary(pref),
     getMuniAggregatesByPref(pref),
   ]);
-  // SEO 強化: /place/[pref]/[muni] と同じテンプレで件数 + 最新日 + 獣医師監修。
+  // SEO 強化: /place/[pref]/[muni] と同じテンプレで件数 + 最新日 + 獣医師開発。
   // muniCount はマスターベースの実市町村数を使う (summary.cityCount は字レベル集計の数)。
   const { title, description } = buildPrefSeo(
     pref,

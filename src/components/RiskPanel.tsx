@@ -1119,7 +1119,7 @@ function RiskDetails({
       <footer className="border-t border-gray-100 px-4 py-3 text-center text-[11px] leading-relaxed text-gray-400">
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
           <span>
-            運営:{" "}
+            獣医師が開発 · 運営:{" "}
             <a
               href="https://www.research-coordinate.co.jp/labs/vet/"
               target="_blank"

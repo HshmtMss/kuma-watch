@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "KumaWatch はどんなサービスですか？",
-    a: "全国のクマ出没情報を 5km メッシュ単位で可視化し、現在地・目的地周辺の警戒レベルを予報する獣医師監修の無料 Web サービスです。登録不要、ブラウザですぐ使えます。",
+    a: "全国のクマ出没情報を 5km メッシュ単位で可視化し、現在地・目的地周辺の警戒レベルを表示する、獣医師が開発した無料の Web サービスです。登録不要、ブラウザですぐ使えます。",
   },
   {
     q: "利用料金はかかりますか？",
@@ -84,7 +84,7 @@ const APP_SCHEMA = {
     priceCurrency: "JPY",
   },
   description:
-    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを予報する獣医師監修の無料 Web サービス。",
+    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを表示する、獣医師が開発した無料の Web サービス。",
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -103,7 +103,7 @@ const APP_SCHEMA = {
       },
     },
   },
-  // 信頼性シグナル: 獣医師監修であることを構造化データでも明示。
+  // 信頼性シグナル: 獣医師主体の組織が開発・確認していることを構造化データでも明示。
   // Google の品質評価 (E-E-A-T) における Expertise / Trust に寄与する。
   reviewedBy: {
     "@type": "Organization",
@@ -367,7 +367,7 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <h2 id="operator">運営体制・監修者</h2>
+      <h2 id="operator">開発・運営体制</h2>
       <div className="not-prose my-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
         <div className="flex flex-col items-center gap-4 px-5 pb-4 pt-5 sm:flex-row sm:gap-6 sm:px-6 sm:py-5">
           <Image
@@ -388,20 +388,20 @@ export default function AboutPage() {
               獣医工学ラボ
             </a>{" "}
             が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
-            <strong>獣医師</strong>がプロジェクトの中心となり、データの集約・分析・公開に至るまで監修しています。
+            <strong>獣医師</strong>が中心となって、警戒レベルの判定方法から地図・対策の情報まで開発しています。
           </p>
         </div>
       </div>
       <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
         <p className="mb-2 flex items-center gap-2 text-base font-semibold">
           <Stethoscope size={18} aria-hidden />
-          <span>獣医師監修プロジェクト</span>
+          <span>獣医師が開発したマップです</span>
         </p>
         <p className="leading-relaxed">
           クマの生態・人獣共通感染症・公衆衛生のリスク評価は、本来「獣医学」の領域です。
-          本サイトでは、データの取り込みから警戒レベル算出、記事の編集に至るまで
-          <strong>獣医師の知見をもって監修</strong>しています。
-          単純な目撃マップではなく、<strong>獣医療の視点で「行動を変えるための情報」</strong>を提供することを目的としています。
+          そのため本サイトは、獣医師が<strong>警戒レベルの判定方法を自ら設計・開発</strong>しています。
+          目撃を並べるだけの地図ではなく、<strong>「その場所で、いま何をすればよいか」</strong>まで分かることを目指しています。
+          AI で集約した記事・レポートは、獣医師が内容を確認したうえで公開しています。
         </p>
       </div>
 

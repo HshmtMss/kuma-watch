@@ -31,11 +31,21 @@ export default function PageShell({ title, lead, children }: Props) {
             alt="KumaWatch"
             className="block h-8 w-auto sm:h-9"
           />
-          <span className="relative top-[2px] truncate text-base font-bold tracking-tight text-stone-900 sm:text-lg">
-            くまウォッチ
-          </span>
-          <span className="relative top-[2px] shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-900">
-            BETA
+          {/* 1 行目: くまウォッチ + BETA / 2 行目: ブランドの一文「獣医師が開発した…」。 */}
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="truncate text-base font-bold tracking-tight text-stone-900 sm:text-lg">
+                くまウォッチ
+              </span>
+              <span className="shrink-0 rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-amber-900">
+                BETA
+              </span>
+            </span>
+            {/* 幅 400px 未満の端末では全文が入らないため「クマ」を省いた短い形にする。 */}
+            <span className="truncate text-[11px] font-medium text-stone-500 sm:text-xs">
+              <span className="text-[10px] min-[400px]:hidden">獣医師が開発した警戒レベルマップ</span>
+              <span className="hidden min-[400px]:inline">獣医師が開発したクマ警戒レベルマップ</span>
+            </span>
           </span>
         </Link>
         <HeaderNav />
@@ -53,7 +63,7 @@ export default function PageShell({ title, lead, children }: Props) {
         <div className="mx-auto max-w-3xl">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span>
-              運営:{" "}
+              獣医師が開発 · 運営:{" "}
               <a
                 href="https://www.research-coordinate.co.jp/labs/vet/"
                 target="_blank"

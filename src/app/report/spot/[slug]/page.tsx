@@ -138,7 +138,7 @@ export default async function ReportPage({ params }: Props) {
         <p className="mt-1 text-sm text-stone-600">
           {landmark.prefName}
           {landmark.muniName ? ` ${landmark.muniName}` : ""} ／ 周辺 {NEAR_RADIUS_KM}km 圏
-          ・獣医師監修（獣医工学ラボ）
+          ・獣医師が開発（獣医工学ラボ）
         </p>
       </header>
 

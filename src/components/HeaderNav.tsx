@@ -75,7 +75,7 @@ const LEARN_LINKS: NavLink[] = isLearnHubReleased()
       {
         href: "/measures",
         label: "クマ対策の総合ガイド",
-        desc: "獣医師監修の対策まとめ",
+        desc: "獣医師がまとめた対策ガイド",
       },
       {
         href: "/articles",

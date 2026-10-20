@@ -8,12 +8,12 @@ import HachimitsuGuide from "@/components/HachimitsuGuide";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "KumaWatch";
-// SITE_TITLE: 検索結果で truncation されても「獣医師監修」が必ず見えるよう前段に配置。
+// SITE_TITLE: 検索結果で truncation されても「獣医師が開発」が必ず見えるよう前段に配置。
 // Google モバイル検索のタイトル表示は ~32〜35 文字なので、ここで切れても訴求が成立する設計。
 const SITE_TITLE =
-  "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch（くまウォッチ）";
+  "獣医師が開発した全国クマ警戒レベルマップ｜KumaWatch（くまウォッチ）";
 const SITE_DESCRIPTION =
-  "獣医師監修・獣医工学ラボ運営の無料 Web アプリ。全国のクマ出没情報をリアルタイム可視化し、5km メッシュ単位で警戒レベルを予報。ツキノワグマ・ヒグマ対応。登山・キャンプ・通勤・山菜採りの前の安全確認に。";
+  "獣医師が開発した無料のクマ警戒レベルマップ。全国のクマ出没情報をリアルタイムで地図にまとめ、5km メッシュ単位で警戒レベルを表示。地域に合った対策まで分かります。ツキノワグマ・ヒグマ対応。運営: 獣医工学ラボ。";
 // GA4 測定 ID。env (NEXT_PUBLIC_GA_ID) で差し替え可能。既定は wild-watch-bear。
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-QX9HZRCXS2";
 // 本番ビルドのみ計測する (ローカル dev では本番プロパティを汚さない)。
@@ -66,6 +66,7 @@ export const metadata: Metadata = {
     "全国 クマ マップ",
     "5kmメッシュ",
     "環境省 クマ データ",
+    "獣医師開発 クマ",
     "獣医師監修 クマ",
     "獣医工学ラボ",
   ],
@@ -105,9 +106,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "獣医師監修｜全国クマ警戒レベルマップ｜KumaWatch",
+    title: "獣医師が開発した全国クマ警戒レベルマップ｜KumaWatch",
     description:
-      "獣医師監修・獣医工学ラボ運営。全国のクマ出没情報をリアルタイム可視化。5km メッシュで警戒レベル予報。登山・キャンプ・通勤前の安全確認に。",
+      "獣医師が開発した無料のクマ警戒レベルマップ。全国の出没情報をリアルタイムで地図に。5km メッシュの警戒レベルと、地域に合った対策が分かります。",
   },
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],
@@ -140,7 +141,7 @@ const webAppSchema = {
   operatingSystem: "Web Browser",
   url: SITE_URL + "/",
   offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
-  // 検索結果リッチカード・ナレッジパネルで「獣医師監修・獣医工学ラボ」が
+  // 検索結果リッチカード・ナレッジパネルで「獣医師開発・獣医工学ラボ」が
   // 一次的に出るよう、author / creator / publisher を明示。
   author: {
     "@type": "Organization",
@@ -168,7 +169,7 @@ const webAppSchema = {
     name: "獣医工学ラボ",
     url: "https://www.research-coordinate.co.jp/labs/vet/",
   },
-  // 監修主体を明示。Google は creator / contributor を補助シグナルとして使う。
+  // 開発主体を明示。Google は creator / contributor を補助シグナルとして使う。
   creator: {
     "@type": "Organization",
     name: "獣医工学ラボ",
