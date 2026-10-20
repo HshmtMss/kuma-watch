@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "くまウォッチはどんなサービスですか？",
-    a: "全国のクマ出没情報を 5km メッシュ単位で可視化し、現在地・目的地周辺の警戒レベルを表示する、獣医師が開発した無料の Web サービスです。登録不要、ブラウザですぐ使えます。",
+    a: "全国のクマ出没情報を 5km メッシュ単位で可視化し、現在地・目的地周辺の警戒レベルを表示する、獣医師開発の無料 Web サービスです。登録不要、ブラウザですぐ使えます。",
   },
   {
     q: "利用料金はかかりますか？",
@@ -84,7 +84,7 @@ const APP_SCHEMA = {
     priceCurrency: "JPY",
   },
   description:
-    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを表示する、獣医師が開発した無料の Web サービス。",
+    "全国のクマ出没情報を 70 以上の公式ソースから集約し、5km メッシュ単位で警戒レベルを表示する、獣医師開発の無料 Web サービス。",
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -367,7 +367,7 @@ export default function AboutPage() {
         ))}
       </div>
 
-      {/* 一般向けの名乗りは「獣医師が開発」に一本化。運営組織名 (獣医工学ラボ) は
+      {/* 一般向けの名乗りは「獣医師開発のクマ警戒レベルマップ」に一本化。運営組織名 (獣医工学ラボ) は
           ここで一度だけ、獣医師が中心のチームとしてつなげる。 */}
       <h2 id="operator">獣医師が開発しています</h2>
       <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm leading-relaxed text-emerald-950">

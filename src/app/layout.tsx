@@ -8,12 +8,12 @@ import HachimitsuGuide from "@/components/HachimitsuGuide";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SITE_NAME = "くまウォッチ";
-// SITE_TITLE: 検索結果で truncation されても「獣医師が開発」が必ず見えるよう前段に配置。
+// SITE_TITLE: 検索結果で truncation されても「獣医師開発」が必ず見えるよう前段に配置。
 // Google モバイル検索のタイトル表示は ~32〜35 文字なので、ここで切れても訴求が成立する設計。
 const SITE_TITLE =
-  "獣医師が開発した全国クマ警戒レベルマップ｜くまウォッチ";
+  "獣医師開発の全国クマ警戒レベルマップ｜くまウォッチ";
 const SITE_DESCRIPTION =
-  "獣医師が開発した無料のクマ警戒レベルマップ。全国のクマ出没情報をリアルタイムで地図にまとめ、5km メッシュ単位で警戒レベルを表示。地域に合った対策まで分かります。ツキノワグマ・ヒグマ対応。運営: 獣医工学ラボ。";
+  "獣医師開発の無料クマ警戒レベルマップ。全国のクマ出没情報をリアルタイムで地図にまとめ、5km メッシュ単位で警戒レベルを表示。地域に合った対策まで分かります。ツキノワグマ・ヒグマ対応。運営: 獣医工学ラボ。";
 // GA4 測定 ID。env (NEXT_PUBLIC_GA_ID) で差し替え可能。既定は wild-watch-bear。
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-QX9HZRCXS2";
 // 本番ビルドのみ計測する (ローカル dev では本番プロパティを汚さない)。
@@ -106,9 +106,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "獣医師が開発した全国クマ警戒レベルマップ｜くまウォッチ",
+    title: "獣医師開発の全国クマ警戒レベルマップ｜くまウォッチ",
     description:
-      "獣医師が開発した無料のクマ警戒レベルマップ。全国の出没情報をリアルタイムで地図に。5km メッシュの警戒レベルと、地域に合った対策が分かります。",
+      "獣医師開発の無料クマ警戒レベルマップ。全国の出没情報をリアルタイムで地図に。5km メッシュの警戒レベルと、地域に合った対策が分かります。",
   },
   icons: {
     icon: [{ url: "/favicon.png", type: "image/png" }],
