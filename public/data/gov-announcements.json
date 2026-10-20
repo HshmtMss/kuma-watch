@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1790682839051,
+  "generatedAt": 1792464679761,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_05739.html",
+      "ministry": "env",
+      "date": "2026-10-20",
+      "title": "令和８年度クマ出没対策コンサルティング実証事業に参加する地方公共団体の決定について",
+      "url": "https://www.env.go.jp/press/press_05739.html",
+      "tag": "自然環境",
+      "category": "budget",
+      "summary": "令和８年度に実施されるクマ出没対策コンサルティング実証事業に参加する地方自治体の選定結果が発表されました。本事業は専門的な知見を活用し、地域ごとの特性に応じた効果的なクマ対策を推進することを目的としており、選定された自治体は専門家による指導や技術的な支援を受けることになります。",
+      "ingestedAt": 1792464679761
+    },
     {
       "id": "maff:https://www.maff.go.jp/j/seisan/tyozyu/higai/tyuuikanki/attach/pdf/index-21.pdf",
       "ministry": "maff",
