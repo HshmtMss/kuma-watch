@@ -60,7 +60,7 @@ export default function Page() {
           { id: "hair", title: "ヘアトラップ（毛 DNA 採取）" },
           { id: "mark", title: "標識再捕獲法" },
           { id: "ai", title: "AI とデータ統合の現在" },
-          { id: "kumawatch", title: "KumaWatch のデータ活用" },
+          { id: "kumawatch", title: "くまウォッチのデータ活用" },
           { id: "faq", title: "よくある質問" },
         ]}
       />
@@ -210,7 +210,7 @@ export default function Page() {
           <strong>衛星リモートセンシング</strong> — 食物資源（堅果類）の広域評価
         </li>
         <li>
-          <strong>住民投稿型データ</strong> — KumaWatch のような市民科学プラットフォーム
+          <strong>住民投稿型データ</strong> — くまウォッチのような市民科学プラットフォーム
         </li>
       </ul>
       <p>
@@ -219,9 +219,9 @@ export default function Page() {
         を参照してください。
       </p>
 
-      <h2 id="kumawatch">KumaWatch のデータ活用</h2>
+      <h2 id="kumawatch">くまウォッチのデータ活用</h2>
       <p>
-        KumaWatch は研究機関ではありませんが、全国の公開データ（自治体・警察・報道）を
+        くまウォッチは研究機関ではありませんが、全国の公開データ（自治体・警察・報道）を
         集約することで、専門家の現場データを補完する <strong>「広域・準リアルタイム」</strong>
         のレイヤーを提供しています。
       </p>
@@ -237,7 +237,7 @@ export default function Page() {
       <h3>研究機関・自治体との関係</h3>
       <p>
         専門研究機関の長期定点観測データは <strong>正確性</strong>に優れ、
-        KumaWatch のような市民科学プラットフォームは <strong>網羅性・即時性</strong>に優れます。
+        くまウォッチのような市民科学プラットフォームは <strong>網羅性・即時性</strong>に優れます。
         両者は競合ではなく補完関係にあり、今後もそれぞれの強みを生かした連携が進む見込みです。
       </p>
 
@@ -271,13 +271,13 @@ export default function Page() {
             q: "市民が観察データを共有することは研究に役立ちますか?",
             a: (
               <>
-                はい。市民科学（Citizen Science）は野生動物研究の重要な手法として確立されています。KumaWatch の{" "}
+                はい。市民科学（Citizen Science）は野生動物研究の重要な手法として確立されています。くまウォッチの{" "}
                 <Link href="/submit">出没情報の投稿</Link>
                 や、各自治体の専用フォームへの投稿は、専門家の現場観察を補完する貴重なデータになります。
               </>
             ),
             aText:
-              "はい。市民科学は野生動物研究の重要手法。KumaWatch の投稿・自治体専用フォーム投稿は専門家観察を補完する貴重データに。",
+              "はい。市民科学は野生動物研究の重要手法。くまウォッチの投稿・自治体専用フォーム投稿は専門家観察を補完する貴重データに。",
           },
         ]}
       />

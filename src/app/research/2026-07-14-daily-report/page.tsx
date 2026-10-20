@@ -154,7 +154,7 @@ export default function ResearchPage() {
         </Link>
       </div>
 
-      <p>2026年7月14日、KumaWatchが収集したデータによると、日本国内におけるクマの出没件数は157件に達した。このうち報道機関から得られた情報が143件と大半を占めている。当日は長野県飯山市の河川敷で住民3名がクマに襲われる人身被害が発生し、事態の深刻さを示している。また、全国で5件の「都市部」キーワードとの一致が確認されており、クマの生息域と人間の生活圏の境界が曖昧になっている現状が浮き彫りとなった。捕獲や銃猟に関する報告は0件であった。出没報告が多かった上位都道府県は以下の通りである。</p>
+      <p>2026年7月14日、くまウォッチが収集したデータによると、日本国内におけるクマの出没件数は157件に達した。このうち報道機関から得られた情報が143件と大半を占めている。当日は長野県飯山市の河川敷で住民3名がクマに襲われる人身被害が発生し、事態の深刻さを示している。また、全国で5件の「都市部」キーワードとの一致が確認されており、クマの生息域と人間の生活圏の境界が曖昧になっている現状が浮き彫りとなった。捕獲や銃猟に関する報告は0件であった。出没報告が多かった上位都道府県は以下の通りである。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
@@ -228,10 +228,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-07-15</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

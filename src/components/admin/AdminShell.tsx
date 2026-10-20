@@ -146,7 +146,7 @@ export default function AdminShell({
     return (
       <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-5">
         <div className="mb-1 flex items-center gap-2 text-stone-900">
-          <span className="text-lg font-bold">🐻 KumaWatch 管理</span>
+          <span className="text-lg font-bold">🐻 くまウォッチ管理</span>
         </div>
         <p className="mb-4 text-sm text-stone-500">
           管理者用。合言葉を入力してください。

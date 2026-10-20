@@ -126,7 +126,7 @@ export default function Page() {
         </li>
         <li>
           <strong>事前に出没情報を確認</strong>:
-          KumaWatch のトップマップ、もしくは目的地の市町村ページで過去 90 日の出没を確認してから出発
+          くまウォッチのトップマップ、もしくは目的地の市町村ページで過去 90 日の出没を確認してから出発
         </li>
       </ol>
 
@@ -151,7 +151,7 @@ export default function Page() {
 
       <h2 id="regional">地域別の最新出没情報</h2>
       <p>
-        KumaWatch では <Link href="/">トップページの 5kmメッシュ警戒レベルマップ</Link>
+        くまウォッチでは <Link href="/">トップページの 5kmメッシュ警戒レベルマップ</Link>
         と、各都道府県・市町村ページから直近の目撃情報を確認できます。
         例えば <Link href="/place/長野県">長野県のページ</Link>
         からは県内 各市町村の傾向を一覧できます。

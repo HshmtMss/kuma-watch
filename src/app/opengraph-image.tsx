@@ -9,7 +9,7 @@ import { jaFontOptions } from "@/lib/og-font";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "KumaWatch｜獣医師が開発したクマ警戒レベルマップ";
+export const alt = "くまウォッチ｜獣医師が開発したクマ警戒レベルマップ";
 
 let bearDataUrl: string | null = null;
 function getBearDataUrl(): string {
@@ -21,7 +21,7 @@ function getBearDataUrl(): string {
 
 export default async function OgImage() {
   const text =
-    "KumaWatchクマウォッチ全国クマ出没警戒レベルマップ地図でひと目でチェックkuma-watch.jp獣医師が開発した、";
+    "くまウォッチクマウォッチ全国クマ出没警戒レベルマップ地図でひと目でチェックkuma-watch.jp獣医師が開発した、";
   const fontOptions = await jaFontOptions(text);
 
   return new ImageResponse(
@@ -57,7 +57,7 @@ export default async function OgImage() {
                 lineHeight: 1,
               }}
             >
-              KumaWatch
+              くまウォッチ
             </div>
             <div
               style={{

@@ -81,7 +81,7 @@ export default function Page() {
 
       <h2 id="examples">実例 — 秋田・盛岡・札幌</h2>
       <p>
-        KumaWatch が集計した出没データと報道情報から、2024〜2025 年の代表的な市街地事案を紹介します。
+        くまウォッチが集計した出没データと報道情報から、2024〜2025 年の代表的な市街地事案を紹介します。
       </p>
       <ul>
         <li>
@@ -212,7 +212,7 @@ export default function Page() {
           自治体の出没情報配信（防災メール・LINE）に登録
         </li>
         <li>
-          <Link href="/">KumaWatch トップマップ</Link>
+          <Link href="/">くまウォッチトップマップ</Link>
           で居住地周辺の出没状況を週次でチェック
         </li>
       </ul>
@@ -242,7 +242,7 @@ export default function Page() {
           イヤホン・スマホ操作で周囲が見えなくなる行動を控える
         </li>
         <li>
-          通勤・通学路の <strong>過去の出没ポイント</strong> を事前確認（KumaWatch の市町村ページの地図で）
+          通勤・通学路の <strong>過去の出没ポイント</strong> を事前確認（くまウォッチの市町村ページの地図で）
         </li>
       </ul>
       <p>
@@ -364,14 +364,14 @@ export default function Page() {
             a: (
               <>
                 自治体の防災メール・LINE 通知に登録するのが基本。
-                加えて <Link href="/">KumaWatch トップマップ</Link>
+                加えて <Link href="/">くまウォッチトップマップ</Link>
                 で全国の出没情報を日次で確認できます。地域別の詳細は{" "}
                 <Link href="/place">都道府県ページ</Link>
                 から市町村単位で閲覧可能です。
               </>
             ),
             aText:
-              "自治体の防災メール・LINE通知が基本。加えて KumaWatch トップマップで全国の出没情報を日次で確認可能。",
+              "自治体の防災メール・LINE通知が基本。加えてくまウォッチトップマップで全国の出没情報を日次で確認可能。",
           },
         ]}
       />

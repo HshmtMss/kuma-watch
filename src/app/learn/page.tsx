@@ -7,7 +7,7 @@ import { isLearnHubReleased } from "@/lib/learn-flag";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "学ぶ・備える｜クマと安全に暮らすために｜KumaWatch",
+  title: "学ぶ・備える｜クマと安全に暮らすために｜くまウォッチ",
   description:
     "獣医師監修。今すぐの安全対策から、クマの生態、最新の出没・研究・政策まで。合言葉「はちみつ、のこさない」で、こわがりすぎず落ち着いて備えるための学びの場。",
   alternates: { canonical: `${SITE_URL}/learn` },
@@ -20,7 +20,7 @@ export default function LearnHub() {
     <>
       <header className="hero">
         <div className="wrap">
-          <span className="eyebrow">獣医師監修</span>
+          <span className="eyebrow">獣医師がまとめました</span>
           <h1>
             知って、<span className="hl">そなえる。</span>
           </h1>

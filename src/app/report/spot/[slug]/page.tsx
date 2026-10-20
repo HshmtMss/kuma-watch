@@ -239,7 +239,7 @@ export default async function ReportPage({ params }: Props) {
           {official?.bearUrl && <> 一次出典: {landmark.muniName} 公式クマ出没情報。</>}
         </p>
         <p className="mt-1">
-          KumaWatch（くまウォッチ）／リサーチコーディネート株式会社 ・ {SITE_URL}
+          くまウォッチ／リサーチコーディネート株式会社 ・ {SITE_URL}
         </p>
       </footer>
     </main>

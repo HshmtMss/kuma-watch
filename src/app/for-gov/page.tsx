@@ -12,14 +12,14 @@ import { jstToday } from "@/lib/jst-date";
 
 const SITE_URL = "https://kuma-watch.jp";
 const META_DESC =
-  "KumaWatch は、クマの情報を調べる人が日常的に使っているサービスです。御地域のクマ出没情報と安全に関する情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページに載せ、探しに来ない人にも届けます。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
+  "くまウォッチは、クマの情報を調べる人が日常的に使っているサービスです。御地域のクマ出没情報と安全に関する情報を、住民のスマホ・観光客の検索結果・訪日外国人向けの英語ページに載せ、探しに来ない人にも届けます。御自治体のご対応は情報を出すだけ。まず 3 ヶ月無料。";
 
 export const metadata: Metadata = {
   title: "自治体の方へ｜地域の情報を住民・観光客・訪日客へ届ける",
   description: META_DESC,
   alternates: { canonical: `${SITE_URL}/for-gov` },
   openGraph: {
-    title: "自治体の方へ｜KumaWatch",
+    title: "自治体の方へ｜くまウォッチ",
     description: META_DESC,
     url: `${SITE_URL}/for-gov`,
     type: "website",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "自治体の方へ｜KumaWatch",
+    title: "自治体の方へ｜くまウォッチ",
     description: META_DESC,
     images: [`${SITE_URL}/lp/og.jpg`],
   },
@@ -138,7 +138,7 @@ export default function ForGovPage() {
             本文は課題を繰り返さず答えだけを書く。「発信/届く/浸透」を重ねると
             3 文で同じ語が 2 回ずつ出て読みにくくなる。 */}
         <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
-          KumaWatch は、クマの情報を調べる人が日常的に使っているサービスです。御地域の情報を
+          くまウォッチは、クマの情報を調べる人が日常的に使っているサービスです。御地域の情報を
           <strong>住民のスマホ</strong>・<strong>観光客の検索結果</strong>・
           <strong>訪日外国人向けの英語ページ</strong>に載せ、
           <strong>探しに来ない人にも届けます</strong>。

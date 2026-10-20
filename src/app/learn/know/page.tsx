@@ -21,7 +21,7 @@ import { isLearnHubReleased } from "@/lib/learn-flag";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "クマを知る｜生態・季節・地域の解説記事｜学ぶ｜KumaWatch",
+  title: "クマを知る｜生態・季節・地域の解説記事｜学ぶ｜くまウォッチ",
   description:
     "獣医師監修。クマの生態・季節ごとの行動・地域別の事情・出没が増えた背景・世界の研究まで。知れば、むやみに恐れず落ち着いて備えられます。",
   alternates: { canonical: `${SITE_URL}/learn/know` },

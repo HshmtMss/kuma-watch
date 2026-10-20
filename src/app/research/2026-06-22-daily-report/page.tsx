@@ -155,7 +155,7 @@ export default function ResearchPage() {
       </div>
 
       <h2>概況</h2>
-      <p>2026年6月22日、KumaWatchが収集した国内のクマ出没関連情報は総計207件であった。情報の内訳は報道由来が186件と大半を占め、自治体等の公式情報は0件であった。人身被害を示唆するキーワードを含む事案が4件、都市部での出没が16件、捕獲または銃猟に関する事案が4件確認されている。都道府県別では長野県が31件と最も多く、次いで青森県（18件）、群馬県（17件）、福島県（17件）と続いている。</p>
+      <p>2026年6月22日、くまウォッチが収集した国内のクマ出没関連情報は総計207件であった。情報の内訳は報道由来が186件と大半を占め、自治体等の公式情報は0件であった。人身被害を示唆するキーワードを含む事案が4件、都市部での出没が16件、捕獲または銃猟に関する事案が4件確認されている。都道府県別では長野県が31件と最も多く、次いで青森県（18件）、群馬県（17件）、福島県（17件）と続いている。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
@@ -229,10 +229,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-06-23</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

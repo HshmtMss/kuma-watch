@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "全国のクマ（熊）出没・目撃情報を新着順に速報。報道・自治体発表をもとに随時更新。最新のクマ出没ニュースとリアルタイムに近い警戒情報、日次分析レポート・国の発表もまとめて確認できます。獣医師監修・無料。",
   alternates: { canonical: `${SITE_URL}/news` },
   openGraph: {
-    title: "全国クマ出没 最新情報・速報｜KumaWatch",
+    title: "全国クマ出没 最新情報・速報｜くまウォッチ",
     description:
       "全国のクマ（熊）出没・目撃情報を新着順に速報。報道・自治体発表をもとに随時更新。",
     url: `${SITE_URL}/news`,

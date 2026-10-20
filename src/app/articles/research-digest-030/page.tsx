@@ -265,7 +265,7 @@ export default function Page() {
       <h2 id="where">私たちはどこにいるのか</h2>
       <p>
         2025〜2026 年、日本では <strong>クマ出没・人身被害が記録的なレベル</strong>に達しました。
-        2025 年の全国出没は <strong>39,801 件</strong>（KumaWatch 集計）、過去最高水準です。
+        2025 年の全国出没は <strong>39,801 件</strong>（くまウォッチ集計）、過去最高水準です。
       </p>
       <p>
         この状況は、これまでの <strong>「20 世紀型」管理</strong>の限界を物語っています。
@@ -337,7 +337,7 @@ export default function Page() {
           <strong>装備と知識を備える</strong> — スプレー・鈴・遭遇時の対処を学習
         </li>
         <li>
-          <strong>地域でデータを共有</strong> — KumaWatch・自治体への目撃情報投稿
+          <strong>地域でデータを共有</strong> — くまウォッチ・自治体への目撃情報投稿
         </li>
         <li>
           <strong>世代を超えた教育</strong> — 子供・若者にクマの知識を伝える
@@ -372,7 +372,7 @@ export default function Page() {
         ご愛読ありがとうございました。
       </p>
       <p className="text-right text-sm text-stone-600">
-        — KumaWatch / 獣医工学ラボ 編集部
+        — くまウォッチ / 獣医工学ラボ 編集部
       </p>
 
       <h2 id="list">シリーズ Vol.1〜30 のリスト</h2>
@@ -466,7 +466,7 @@ export default function Page() {
       <Callout label="シリーズ完結" tone="amber">
         全 30 本の研究ダイジェスト、お読みいただきありがとうございました。
         世界の最前線研究を引き続きキャッチアップし、新シリーズ「Vol.31〜」も予定しています。
-        ご意見・取り上げてほしい論文は KumaWatch の{" "}
+        ご意見・取り上げてほしい論文はくまウォッチの{" "}
         <Link href="/credits" className="text-amber-700 underline">
           運営情報
         </Link>

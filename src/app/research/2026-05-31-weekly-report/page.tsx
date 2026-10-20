@@ -52,17 +52,17 @@ const SCHEMA = {
 
 const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
-      "title": "クマが網戸破り住宅に侵入 岩手 釜石（※タイトルは KumaWatch による推定）",
+      "title": "クマが網戸破り住宅に侵入 岩手 釜石（※タイトルはくまウォッチによる推定）",
       "url": "http://www3.nhk.or.jp/news/html/20260601/k10015137341000.html",
       "site": "NHK"
     },
     {
-      "title": "秋田県仙北市 西木町桧木内小波内でクマ出没（※タイトルは KumaWatch による推定）",
+      "title": "秋田県仙北市 西木町桧木内小波内でクマ出没（※タイトルはくまウォッチによる推定）",
       "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQVmVJeW5HcVlHbktQM1BPdDdZdUJyb1dIMmJiLTJDU3BWck0tN3kyOUR1TUtkTVRSQ3BUVm1mNzV0Y3ludE5vWXBxUHVZZ1VNVVgxeUgwUVUtUlYyUmh2TGdRRVlrSG5IVUF0UHpfVWhXWExDeC04Tmp0ZVFOX1hPa3FpQ193azgwaTNfMFFwNmZxcVhhNE1ucENObW1kUFBHWTdXbWhaMVdoUEgzMEln0gGiAUFVX3lxTE9WR1NlbDlISnI3NXFlZDkzRG44Skx0QmMxSlRDdFdiNEU4OHp2Z2ZvRTU2UExkWjZCUjhkOFpWaTBWTHRHQnhaLXVzc2wya2NkSXRjbFJUY2Z6TFRCcDZoa0lmcWlpYVlacUNxQjk2WFptSm5PUzZaNUZrRjNjRXBHOTEwb3JrREQwTFU1TjdSai1QWWxKeEd1RGo4OVZsNnZhZw?oc=5",
       "site": "Google News"
     },
     {
-      "title": "北海道旭川市 西神楽南でクマ出没の可能性（※タイトルは KumaWatch による推定）",
+      "title": "北海道旭川市 西神楽南でクマ出没の可能性（※タイトルはくまウォッチによる推定）",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPZnAzVEZwM3hhbFRCM1pXQXVOVkh2akxWbUNkdmJGM1JwMHktcUxnMnN2OUltM1VyZGtyd2RrekZZT21fZEtoN3lBc2hMQU9wbFR4VktBaEhZb2piZldqY2c0bGMzMktobDFMMVFNWFM1bnRRaTJwNzRuR0Vab3NORnpKZ2hxeU4yOEpvdEhla0lkNWcwdlpqbndleEbSAaIBQVVfeXFMTk1OZXlpeDNoVzF2LS16NndmUUhkV0pVcDJwUk1YX0dvWVEyaUFuZHRmVTR2RE5ZU1ZzY1JKSFNYaGNndDVZSDU3a1ZWVUktbVRuU3JSNDRubVJFeFl5cVN0VjFTeV9PN0k4WHIwRlpyemNGV0ZQTENUTE1ub25FNjZiak13R2ZfTWhKYVY5anV2WmlxNnNKLTdoZEtabTdnV1Bn?oc=5",
       "site": "Google News"
     }
@@ -89,7 +89,7 @@ export default function ResearchPage() {
         </Link>
       </div>
 
-      <p>2026年5月24日から5月31日までの期間、KumaWatchが収集したクマの出没情報は全国で159件にのぼった。都道府県別では新潟県が45件と最も多く、次いで島根県が34件、富山県と栃木県が各15件、群馬県が14件と続いた。これら上位5県で総件数の約78%（123件）を占めており、特定の地域への集中傾向が見られる。本期間において、人身被害が疑われるキーワードとの一致は0件であった。しかし、岩手県で住宅にクマが侵入する事案が発生したほか、島根県では小中学校の敷地内で目撃されるなど、市民の安全を直接脅かす可能性のある危険な事案が複数報告されており、極めて高い緊張状態が続いている。</p>
+      <p>2026年5月24日から5月31日までの期間、くまウォッチが収集したクマの出没情報は全国で159件にのぼった。都道府県別では新潟県が45件と最も多く、次いで島根県が34件、富山県と栃木県が各15件、群馬県が14件と続いた。これら上位5県で総件数の約78%（123件）を占めており、特定の地域への集中傾向が見られる。本期間において、人身被害が疑われるキーワードとの一致は0件であった。しかし、岩手県で住宅にクマが侵入する事案が発生したほか、島根県では小中学校の敷地内で目撃されるなど、市民の安全を直接脅かす可能性のある危険な事案が複数報告されており、極めて高い緊張状態が続いている。</p>
       <h2>主要トピック</h2>
       <h3>新潟県と島根県における出没の集中</h3>
       <p>本期間の出没は、新潟県（45件）と島根県（34件）に著しく集中した。両県だけで合計79件となり、全国の総件数の約半数を占める。新潟県では、5月27日に阿賀町で散歩中に小グマが目撃されたり、5月29日には村上市で農作業中に体長1.2mほどのクマが田んぼの畦道を歩いているのが目撃されたりと、住民の日常生活のすぐそばで出没が確認されている。島根県では、より人の生活空間に踏み込んだ事案が目立つ。5月27日には浜田市の小学校校庭に、28日には益田市の中学校正門前に、29日には雲南市の道の駅付近にそれぞれクマが出現しており、公共施設や商業施設周辺での出没が際立っている。これらの地域では、住民の活動時間帯や行動範囲とクマのそれが重複しつつあり、偶発的な遭遇のリスクが高まっている。</p>
@@ -175,10 +175,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-06-01</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

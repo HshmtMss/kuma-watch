@@ -11,7 +11,7 @@ import { jstDaysAgo } from "@/lib/jst-date";
 // - 「くまウォッチ」(ひらがな) を末尾の brand cue として固定。
 
 // BRAND ("くまウォッチ") は layout.tsx の metadata.title.template が
-// 自動で末尾「｜KumaWatch」を付与するため、本ファイル内では title から外して
+// 自動で末尾「｜くまウォッチ」を付与するため、本ファイル内では title から外して
 // セグメント数を減らしている。
 const SUPERVISION = "獣医師開発";
 
@@ -155,7 +155,7 @@ export function buildMuniSeo(
   // 「熊」(漢字) は SC 検索クエリで「クマ」(カナ) より圧倒的多数。
   // 「マップ」キーワードも検索クエリで多用されるため title に含める。
   // {pref} は文脈として `{stat}` の後ろに移動。layout.tsx 側で末尾に
-  // 「｜KumaWatch」が template 付与されるので、ここでは 「くまウォッチ」 を
+  // 「｜くまウォッチ」が template 付与されるので、ここでは 「くまウォッチ」 を
   // 省きセグメント数を 4 → 3 に削って ｜ で区切られる項目を減らす。
   const title = stat
     ? `${muni}の熊出没情報マップ${stat}｜${pref}・${SUPERVISION}`
@@ -197,7 +197,7 @@ export function buildPrefSeo(
   const md = formatMonthDay(summary.latestDate);
   // muni 同様、累計ではなく直近1年の件数をタイトル指標に。
   // 累計には古い source の歪み (例: 京都府は 2018 年で凍結) があるため。
-  // BRAND は layout.tsx の template で末尾「｜KumaWatch」が自動付与される
+  // BRAND は layout.tsx の template で末尾「｜くまウォッチ」が自動付与される
   // ので、ここでは省きセグメント重複を避ける。
   // 「熊出没情報マップ」表記は SC 上位クエリ「{県名} 熊 出没マップ」を狙う。
   const fresh = isFresh(summary.latestDate);

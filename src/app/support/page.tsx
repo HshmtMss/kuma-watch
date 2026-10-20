@@ -21,7 +21,7 @@ export function generateMetadata(): Metadata {
     alternates: { canonical: SITE_URL + "/support" },
     robots: { index: released, follow: released },
     openGraph: {
-      title: "くまウォッチをサポートする｜KumaWatch",
+      title: "くまウォッチをサポートする｜くまウォッチ",
       description:
         "情報と地図は無料のまま。運営を支える月額サポーターを募集しています。任意・いつでも解約可。",
       url: SITE_URL + "/support",

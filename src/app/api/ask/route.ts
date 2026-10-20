@@ -131,7 +131,7 @@ export async function POST(req: Request) {
   }
 
   const systemInstruction = [
-    "あなたは KumaWatch のクマ出没対策ガイドです。",
+    "あなたはくまウォッチのクマ出没対策ガイドです。",
     "日本語で、2〜4 文以内の簡潔な回答を返します。",
     "過度に恐怖を煽らず、実用的な対策を 1〜2 つ含めます。",
     "",

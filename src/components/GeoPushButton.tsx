@@ -128,7 +128,7 @@ export default function GeoPushButton({
     setMessage("");
     try {
       const reg = await navigator.serviceWorker.ready;
-      await reg.showNotification("お試し通知 — KumaWatch", {
+      await reg.showNotification("お試し通知 — くまウォッチ", {
         body: "この通知が見えれば設定は OK です。実際のクマ出没情報ではありません。",
         icon: "/icons/Icon-192.png",
         badge: "/icons/Icon-192.png",

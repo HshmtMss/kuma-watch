@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     "獣医師監修・獣医工学ラボ運営。クマ対策に必要な情報・装備を一箇所に整理。遭遇時の対処、音・スプレー・電気柵などの装備、住まいの備えまで、目的別に分かりやすくご案内します。",
   alternates: { canonical: `${SITE_URL}/measures` },
   openGraph: {
-    title: "クマ対策の総合ガイド｜KumaWatch",
+    title: "クマ対策の総合ガイド｜くまウォッチ",
     description:
       "記事・装備をまとめた、クマ対策の総合ガイド。遭遇時の対処から装備・住まいの備えまで、目的別に整理しています。",
     url: `${SITE_URL}/measures`,

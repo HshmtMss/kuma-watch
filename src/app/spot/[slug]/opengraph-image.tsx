@@ -10,7 +10,7 @@ import { JAPAN_LANDMARKS } from "@/data/japan-landmarks";
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "KumaWatch｜地点周辺のクマ情報";
+export const alt = "くまウォッチ｜地点周辺のクマ情報";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -33,7 +33,7 @@ export default async function OgImage({ params }: Props) {
   const landmark = JAPAN_LANDMARKS.find((l) => l.slug === slug);
   const label = (landmark?.name ?? slug).slice(0, 24) || "この地点";
 
-  const text = `${label}周辺のクマ出没情報KumaWatchクマウォッチkuma-watch.jp`;
+  const text = `${label}周辺のクマ出没情報くまウォッチクマウォッチkuma-watch.jp`;
   const fontOptions = await jaFontOptions(text);
 
   const labelFontSize =
@@ -77,7 +77,7 @@ export default async function OgImage({ params }: Props) {
                 lineHeight: 1,
               }}
             >
-              KumaWatch
+              くまウォッチ
             </div>
             <div
               style={{

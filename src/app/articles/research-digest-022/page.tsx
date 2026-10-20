@@ -91,7 +91,7 @@ export default function Page() {
           { id: "seasonal", title: "季節で変わる行動圏のサイズ" },
           { id: "habitat", title: "クマが選ぶ「良い場所」とは" },
           { id: "japan", title: "日本のクマの行動圏" },
-          { id: "kumawatch", title: "KumaWatch データへの応用" },
+          { id: "kumawatch", title: "くまウォッチデータへの応用" },
           { id: "action", title: "今日からあなたができる 3 つのこと" },
           { id: "references", title: "参考文献" },
         ]}
@@ -333,12 +333,12 @@ export default function Page() {
       <p>
         市街地隣接エリアで GPS 追跡されたクマは、<strong>行動圏に都市域を含む</strong>パターンを示し、
         従来の <strong>「奥山と街は別」</strong>という前提が崩れつつあります。
-        この変化は KumaWatch のような市民科学プラットフォームでも観察可能になりました。
+        この変化はくまウォッチのような市民科学プラットフォームでも観察可能になりました。
       </p>
 
-      <h2 id="kumawatch">KumaWatch データへの応用</h2>
+      <h2 id="kumawatch">くまウォッチデータへの応用</h2>
       <p>
-        KumaWatch では、全国の出没情報を集約することで、間接的にクマの行動圏推定に寄与しています。
+        くまウォッチでは、全国の出没情報を集約することで、間接的にクマの行動圏推定に寄与しています。
       </p>
       <ul>
         <li>
@@ -356,7 +356,7 @@ export default function Page() {
       </ul>
       <p>
         個別個体の正確な行動圏は専門研究機関の GPS データに依存しますが、
-        KumaWatch のような <strong>「人による目撃情報の集約」</strong>もデータとしては
+        くまウォッチのような <strong>「人による目撃情報の集約」</strong>もデータとしては
         十分に貴重な情報源になっています。詳細は{" "}
         <Link href="/articles/bear-monitoring">クマ研究のモニタリング技術</Link>
         を参照。
@@ -367,7 +367,7 @@ export default function Page() {
         <li>
           <strong>「自分の住む市町村のクマ行動圏」を意識する</strong> —
           市街地から 30〜100 km の山岳エリアに住むクマは、状況次第で街に下りる可能性があります。
-          KumaWatch の{" "}
+          くまウォッチの{" "}
           <Link href="/place">都道府県別ページ</Link>{" "}
           で周辺市町村の出没情報を確認。
         </li>

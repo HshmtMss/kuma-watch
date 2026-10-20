@@ -328,7 +328,7 @@ const html = `<title>${esc(MUNI)}クマ出没レポート</title>
 <div class="cover">
   <p class="eyebrow">${esc(PREF)} ${esc(MUNI)}｜クマ出没データ分析</p>
   <h1>${esc(MUNI)}のクマ出没分析レポート</h1>
-  <p class="meta">対象期間 ${esc(firstDate)} 〜 ${esc(lastDate)}／記録 ${num(muni.length)} 件／作成日 ${esc(today)}<br>作成: KumaWatch（くまウォッチ）</p>
+  <p class="meta">対象期間 ${esc(firstDate)} 〜 ${esc(lastDate)}／記録 ${num(muni.length)} 件／作成日 ${esc(today)}<br>作成: くまウォッチ</p>
 </div>
 
 <h2><span class="n">01</span>${esc(MUNI)}の位置づけ</h2>
@@ -509,7 +509,7 @@ ${rankTable(
 <p>一次情報は各自治体の公式発表をご確認ください。本レポートの数値と異なる場合は、公式情報を優先してください。</p>
 
 <footer>
-  ${esc(title)}／作成 ${esc(today)}／KumaWatch（くまウォッチ） https://kuma-watch.jp<br>
+  ${esc(title)}／作成 ${esc(today)}／くまウォッチ https://kuma-watch.jp<br>
   本レポートに関するお問い合わせ・記載内容の訂正のご依頼は https://kuma-watch.jp/for-gov から承ります。
 </footer>
 </div>`;

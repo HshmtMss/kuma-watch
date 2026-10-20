@@ -296,7 +296,7 @@ function buildPrompt(
 - "主要トピック" を 5〜8 件抽出 (時系列または地域単位)
 - 末尾に "月次評価と展望" 節として、季節要因・前年比 (※前年比は推測不可なので「データ累計から見ると」程度に留める)`;
 
-  return `あなたは野生動物管理の専門家として、KumaWatch (獣医工学ラボ) が公開する研究レポートを執筆します。
+  return `あなたは野生動物管理の専門家として、くまウォッチ (獣医工学ラボ) が公開する研究レポートを執筆します。
 本データ以外の外部知識は使わないこと。日付・地点・件数は与えられたデータのみを根拠にすること。
 
 === 期間 ===
@@ -604,10 +604,10 @@ ${bodyJsx}
           <dt className="text-stone-500">最終更新</dt>
           <dd>${publishedAt}</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

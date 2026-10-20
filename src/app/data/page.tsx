@@ -16,10 +16,10 @@ const SITE_URL = "https://kuma-watch.jp";
 export const metadata: Metadata = {
   title: "データの透明性 — 出典・更新頻度・カバレッジ・方法論",
   description:
-    "KumaWatch がどのデータを、どの頻度で、どう処理して掲載しているかを公開します。総レコード数・出典別内訳・都道府県別カバレッジ・既知の制約・引用方法まで、研究者・記者・自治体担当者が参照できる形でまとめています。",
+    "くまウォッチがどのデータを、どの頻度で、どう処理して掲載しているかを公開します。総レコード数・出典別内訳・都道府県別カバレッジ・既知の制約・引用方法まで、研究者・記者・自治体担当者が参照できる形でまとめています。",
   alternates: { canonical: `${SITE_URL}/data` },
   openGraph: {
-    title: "データの透明性｜KumaWatch",
+    title: "データの透明性｜くまウォッチ",
     description:
       "70+ ソース・7 万件超のクマ出没データの内訳、更新頻度、方法論、既知の制約を公開。",
     url: `${SITE_URL}/data`,
@@ -72,7 +72,7 @@ export default async function DataPage() {
   return (
     <PageShell
       title="データの透明性"
-      lead="KumaWatch がどのデータを、どの頻度で、どう処理して掲載しているかを公開します。数字は約 5 分のキャッシュで更新されるので、研究者・記者・自治体の方は引用前に最終更新時刻をご確認ください。"
+      lead="くまウォッチがどのデータを、どの頻度で、どう処理して掲載しているかを公開します。数字は約 5 分のキャッシュで更新されるので、研究者・記者・自治体の方は引用前に最終更新時刻をご確認ください。"
     >
       {/* === ライブ数値 === */}
       <h2>データ概況</h2>
@@ -297,7 +297,7 @@ export default async function DataPage() {
         メディア・研究・自治体資料での引用を歓迎します。可能であれば以下の形式でクレジットをお願いします:
       </p>
       <blockquote className="rounded-xl border-l-4 border-emerald-400 bg-emerald-50/50 px-4 py-3 text-sm">
-        KumaWatch (獣医工学ラボ) — kuma-watch.jp ({formatDate(stats.newestDate)}{" "}
+        くまウォッチ (獣医工学ラボ) — kuma-watch.jp ({formatDate(stats.newestDate)}{" "}
         時点のデータ)
       </blockquote>
       <p>

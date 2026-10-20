@@ -23,7 +23,7 @@ import { isLearnHubReleased } from "@/lib/learn-flag";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "身を守る｜今すぐの安全対策と、とっさの対処｜学ぶ｜KumaWatch",
+  title: "身を守る｜今すぐの安全対策と、とっさの対処｜学ぶ｜くまウォッチ",
   description:
     "獣医師監修。もしもの前に知っておく、クマから身を守る備え。遭遇時の距離別の対処、シーン別(登山・キャンプ・通学・農作業・車)の注意、スプレー・鈴・電気柵・通報のしかた。",
   alternates: { canonical: `${SITE_URL}/learn/safety` },

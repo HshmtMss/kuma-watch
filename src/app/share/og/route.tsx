@@ -31,7 +31,7 @@ export async function GET(req: Request) {
   const labelRaw = geo ?? url.searchParams.get("label") ?? "";
   const label = labelRaw.slice(0, 24) || "この地点";
 
-  const text = `${label}のクマ警戒レベルKumaWatchクマウォッチ全国マップkumawatchjp1234567890.-`;
+  const text = `${label}のクマ警戒レベルくまウォッチクマウォッチ全国マップkumawatchjp1234567890.-`;
   const fontOptions = await jaFontOptions(text);
 
   // 地点名サイズは文字数で段階調整。
@@ -86,7 +86,7 @@ export async function GET(req: Request) {
                 lineHeight: 1,
               }}
             >
-              KumaWatch
+              くまウォッチ
             </div>
             <div
               style={{

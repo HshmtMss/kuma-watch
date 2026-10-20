@@ -7,7 +7,7 @@ const SLUG = "nut-crop-map";
 const TITLE =
   "ブナ・ナラ結実マップ 2025–2026 — 各都道府県の調査機関と凶作年の検証";
 const DESCRIPTION =
-  "ブナ・ミズナラ・コナラの結実状況はクマの秋の出没を強く左右する。各都道府県の林業研究機関による豊凶調査の公式ソースを集約し、過去の凶作年（2020・2023）と KumaWatch 出没件数の対応を検証。獣医工学ラボ運営。";
+  "ブナ・ミズナラ・コナラの結実状況はクマの秋の出没を強く左右する。各都道府県の林業研究機関による豊凶調査の公式ソースを集約し、過去の凶作年（2020・2023）とくまウォッチ出没件数の対応を検証。獣医工学ラボ運営。";
 
 export const revalidate = 86400; // 1日
 
@@ -208,7 +208,7 @@ const HISTORICAL: HistoricalRow[] = [
   {
     year: 2025,
     status: "東北で並凶作〜やや凶作（速報）",
-    events: "KumaWatch 集計で 39,801 件（10 月時点）",
+    events: "くまウォッチ集計で 39,801 件（10 月時点）",
     note: "アーバンベア化と凶作の複合要因で再び急増",
   },
 ];
@@ -239,7 +239,7 @@ export default function NutCropMapPage() {
       <p className="lead">
         <strong>要旨</strong>: ブナ・ミズナラ・コナラの結実状況は、その年の秋以降のクマ出没件数を強く左右します。
         本ページでは、各都道府県の林業研究機関が公表する豊凶調査の<strong>一次ソース</strong>を集約し、
-        過去の凶作年と KumaWatch 出没件数の対応を検証します。
+        過去の凶作年とくまウォッチ出没件数の対応を検証します。
       </p>
 
       <h2 id="why">なぜブナ・ナラの結実が重要か</h2>
@@ -261,7 +261,7 @@ export default function NutCropMapPage() {
 
       <h2 id="historical">過去の結実状況とクマ出没件数の対応</h2>
       <p>
-        環境省の統計値・各機関の豊凶調査・KumaWatch の集計値を突き合わせると、
+        環境省の統計値・各機関の豊凶調査・くまウォッチの集計値を突き合わせると、
         凶作年と出没件数のピークがほぼ一致することが分かります。
       </p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
@@ -350,9 +350,9 @@ export default function NutCropMapPage() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先までお寄せください。
       </p>
 
-      <h2 id="kumawatch-usage">KumaWatch のリスクスコアへの組み込み</h2>
+      <h2 id="kumawatch-usage">くまウォッチのリスクスコアへの組み込み</h2>
       <p>
-        KumaWatch では、各都道府県の最新の豊凶情報を{" "}
+        くまウォッチでは、各都道府県の最新の豊凶情報を{" "}
         <code className="rounded bg-stone-100 px-1 py-0.5 text-xs">
           src/data/nut-crop.ts
         </code>
@@ -397,7 +397,7 @@ export default function NutCropMapPage() {
         </table>
       </div>
       <p>
-        係数は環境省・各機関の長期統計と KumaWatch の集計値の比から経験的に設定しています。
+        係数は環境省・各機関の長期統計とくまウォッチの集計値の比から経験的に設定しています。
         実際のリスクは凶作度合いだけでなく、<strong>人口分布・誘引物・前年度の個体数</strong>などにも左右されるため、補正は目安としてご利用ください。
       </p>
 

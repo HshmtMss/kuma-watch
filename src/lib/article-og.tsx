@@ -22,7 +22,7 @@ export async function makeArticleOg(slug: string): Promise<ImageResponse> {
   const article = getArticle(slug);
   const title = (article?.title ?? "クマ解説記事").slice(0, 60);
 
-  const text = `${title}KumaWatchクマ解説記事kuma-watch.jp`;
+  const text = `${title}くまウォッチクマ解説記事kuma-watch.jp`;
   const fontOptions = await jaFontOptions(text);
 
   // タイトルは長文になりうるので、文字数で段階的に縮小し折り返しで収める。
@@ -62,7 +62,7 @@ export async function makeArticleOg(slug: string): Promise<ImageResponse> {
                 letterSpacing: "-0.5px",
               }}
             >
-              KumaWatch
+              くまウォッチ
             </div>
             <div
               style={{

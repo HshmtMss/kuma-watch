@@ -51,7 +51,7 @@ export default function OenCard({
       </a>
 
       <p className="mt-2 text-[11px] leading-snug text-stone-400">
-        ※ ふるさと納税サイトへ移動します。KumaWatch は紹介手数料を受け取る場合があります（PR）。{" "}
+        ※ ふるさと納税サイトへ移動します。くまウォッチは紹介手数料を受け取る場合があります（PR）。{" "}
         <a href="/oen" className="underline hover:text-stone-600">
           この取り組みについて
         </a>

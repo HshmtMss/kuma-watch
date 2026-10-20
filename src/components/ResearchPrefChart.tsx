@@ -71,7 +71,7 @@ export default function ResearchPrefChart({
         <span className="font-semibold tabular-nums text-stone-700">
           {total}
         </span>{" "}
-        件（KumaWatch 収集データに基づく集計・単位: 件）
+        件（くまウォッチ収集データに基づく集計・単位: 件）
       </p>
     </figure>
   );

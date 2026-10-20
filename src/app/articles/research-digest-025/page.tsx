@@ -304,7 +304,7 @@ export default function Page() {
         Vol.3（{" "}
         <Link href="/articles/research-digest-003">AI 顔認識</Link>
         ）の音声版とも言える展開で、近未来のクマモニタリングを変える可能性があります。
-        KumaWatch を運営する獣医工学ラボでも、関連研究を進めています（{" "}
+        くまウォッチを運営する獣医工学ラボでも、関連研究を進めています（{" "}
         <Link href="/articles/bear-detection-ai">クマ検知 AI とは</Link>
         を参照）。
       </p>

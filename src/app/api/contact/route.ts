@@ -34,7 +34,7 @@ async function sendEmail(msg: ContactMessage): Promise<boolean> {
   if (!key) return false;
   const label = KIND_LABEL[msg.kind];
   const lines = [
-    `KumaWatch ${label}のお問い合わせが届きました。`,
+    `くまウォッチ ${label}のお問い合わせが届きました。`,
     "",
     `■ご担当者お名前: ${msg.name}`,
     `■${msg.kind === "gov" ? "自治体名・ご担当部署" : "会社名・部署"}: ${msg.org}`,
@@ -54,7 +54,7 @@ async function sendEmail(msg: ContactMessage): Promise<boolean> {
         from: FROM,
         to: [TO],
         reply_to: msg.email,
-        subject: `【KumaWatch ${label}】${msg.org}`,
+        subject: `【くまウォッチ ${label}】${msg.org}`,
         text: lines.join("\n"),
       }),
     });

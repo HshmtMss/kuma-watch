@@ -203,12 +203,12 @@ export default function KumaClient() {
       lon: loc.lon.toFixed(5),
     });
     const shareLink = `${origin}/share?${params.toString()}`;
-    const title = `${labelText}のクマ警戒レベルをチェック｜KumaWatch`;
+    const title = `${labelText}のクマ警戒レベルをチェック｜くまウォッチ`;
     const text =
-      `🐻 ${labelText} のクマ警戒レベルを KumaWatch でチェック。\n` +
+      `🐻 ${labelText} のクマ警戒レベルをくまウォッチでチェック。\n` +
       `散策・登山前のひと確認に。\n` +
       `${shareLink}\n` +
-      `#KumaWatch #クマ警戒レベル`;
+      `#くまウォッチ #クマ警戒レベル`;
 
     // Web Share API があれば優先 (モバイルで LINE/X/メール 等のシェアシートが開く)。
     // text を渡すと iMessage 等で「本文テキスト + リッチカード」が二重に出るため、
@@ -846,7 +846,7 @@ export default function KumaClient() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/logo.png"
-                    alt="KumaWatch"
+                    alt="くまウォッチ"
                     className="block h-full w-auto drop-shadow-md"
                   />
                 </Link>

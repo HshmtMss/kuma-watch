@@ -7,7 +7,7 @@ import PageShell from "@/components/PageShell";
 const SITE_URL = "https://kuma-watch.jp";
 
 export const metadata: Metadata = {
-  title: "KumaWatch（くまウォッチ）— 全国クマ出没予報・警戒レベルマップ",
+  title: "くまウォッチ — 全国クマ出没予報・警戒レベルマップ",
   description:
     "全国 47 都道府県のクマ出没情報を 70 以上の公式ソースから自動集約し、5km メッシュ単位の警戒レベルマップで予報する無料 Web サービス。登山・キャンプ・通勤前の安全確認に。登録不要・スマホ対応。",
   keywords: [
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "KumaWatch はどんなサービスですか？",
+    q: "くまウォッチはどんなサービスですか？",
     a: "全国のクマ出没情報を 5km メッシュ単位で可視化し、現在地・目的地周辺の警戒レベルを表示する、獣医師が開発した無料の Web サービスです。登録不要、ブラウザですぐ使えます。",
   },
   {
@@ -117,7 +117,7 @@ const APP_SCHEMA = {
 export default function AboutPage() {
   return (
     <PageShell
-      title="KumaWatch（くまウォッチ）について"
+      title="くまウォッチについて"
       lead="全国のクマ出没情報を 1 つの地図に。登山・キャンプ・通勤前の「行く前 30 秒チェック」を支える無料の予報サービスです。"
     >
       <script
@@ -134,7 +134,7 @@ export default function AboutPage() {
         <div className="relative aspect-[16/10] w-full bg-stone-100">
           <Image
             src="/lp/hero.jpg"
-            alt="KumaWatch のメイン画面。日本地図上に5km メッシュの警戒レベルが色分けで表示されている。"
+            alt="くまウォッチのメイン画面。日本地図上に5km メッシュの警戒レベルが色分けで表示されている。"
             fill
             sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover"
@@ -367,41 +367,44 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <h2 id="operator">開発・運営体制</h2>
-      <div className="not-prose my-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-        <div className="flex flex-col items-center gap-4 px-5 pb-4 pt-5 sm:flex-row sm:gap-6 sm:px-6 sm:py-5">
-          <Image
-            src="/labs/vet-eng-lab.jpeg"
-            alt="獣医工学ラボ ロゴ"
-            width={480}
-            height={267}
-            className="h-auto w-36 shrink-0 sm:w-44"
-          />
-          <p className="m-0 text-center text-sm leading-relaxed text-stone-700 sm:border-l sm:border-stone-200 sm:pl-6 sm:text-left">
-            本サイトは{" "}
-            <a
-              href="https://www.research-coordinate.co.jp/labs/vet/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-blue-700 underline"
-            >
-              獣医工学ラボ
-            </a>{" "}
-            が運営しています。獣医療・野生動物・公衆衛生領域の技術プロジェクトとして、
-            <strong>獣医師</strong>が中心となって、警戒レベルの判定方法から地図・対策の情報まで開発しています。
-          </p>
-        </div>
-      </div>
-      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        <p className="mb-2 flex items-center gap-2 text-base font-semibold">
+      {/* 一般向けの名乗りは「獣医師が開発」に一本化。運営組織名 (獣医工学ラボ) は
+          ここで一度だけ、獣医師が中心のチームとしてつなげる。 */}
+      <h2 id="operator">獣医師が開発しています</h2>
+      <div className="not-prose my-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm leading-relaxed text-emerald-950">
+        <p className="mb-3 flex items-center gap-2 text-base font-semibold">
           <Stethoscope size={18} aria-hidden />
-          <span>獣医師が開発したマップです</span>
+          <span>なぜ獣医師がつくるのか</span>
         </p>
-        <p className="leading-relaxed">
-          クマの生態・人獣共通感染症・公衆衛生のリスク評価は、本来「獣医学」の領域です。
-          そのため本サイトは、獣医師が<strong>警戒レベルの判定方法を自ら設計・開発</strong>しています。
+        <p className="mb-3">
+          クマの生態や、人との距離、感染症・公衆衛生のリスクを見立てるのは、獣医学の領域です。
+          くまウォッチは、獣医師が<strong>警戒レベルの判定方法を自ら設計・開発</strong>しています。
+        </p>
+        <p className="mb-3">
           目撃を並べるだけの地図ではなく、<strong>「その場所で、いま何をすればよいか」</strong>まで分かることを目指しています。
+        </p>
+        <p className="m-0 text-xs text-emerald-900/80">
           AI で集約した記事・レポートは、獣医師が内容を確認したうえで公開しています。
+        </p>
+      </div>
+      <div className="not-prose my-4 flex flex-col items-center gap-4 rounded-2xl border border-stone-200 bg-white px-5 py-4 sm:flex-row sm:gap-6">
+        <Image
+          src="/labs/vet-eng-lab.jpeg"
+          alt="獣医工学ラボ ロゴ"
+          width={480}
+          height={267}
+          className="h-auto w-32 shrink-0 sm:w-40"
+        />
+        <p className="m-0 text-center text-sm leading-relaxed text-stone-700 sm:border-l sm:border-stone-200 sm:pl-6 sm:text-left">
+          開発・運営は、獣医師が中心のチーム{" "}
+          <a
+            href="https://www.research-coordinate.co.jp/labs/vet/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-700 underline"
+          >
+            獣医工学ラボ
+          </a>
+          です。
         </p>
       </div>
 

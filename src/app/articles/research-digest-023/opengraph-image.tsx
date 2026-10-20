@@ -4,7 +4,7 @@ import { makeArticleOg, OG_SIZE } from "@/lib/article-og";
 export const runtime = "nodejs";
 export const size = OG_SIZE;
 export const contentType = "image/png";
-export const alt = "KumaWatch｜クマ解説記事";
+export const alt = "くまウォッチ｜クマ解説記事";
 
 export default function Image() {
   return makeArticleOg("research-digest-023");

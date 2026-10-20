@@ -65,7 +65,7 @@ export default function OenView({
   return (
     <PageShell
       title="クマの出没は、地域の課題の入り口です。"
-      lead="出没の裏では、自治体が対応に追われ、農業や観光、里山の自然も揺らいでいます。KumaWatch は「知る・備える」に、地域を応援する選択肢を添えます。"
+      lead="出没の裏では、自治体が対応に追われ、農業や観光、里山の自然も揺らいでいます。くまウォッチは「知る・備える」に、地域を応援する選択肢を添えます。"
     >
       {/* この地域を応援（pref/city 指定時のみ） */}
       {target && city && (
@@ -186,7 +186,7 @@ export default function OenView({
 
         <p className="mt-3 border-t border-stone-100 pt-3 text-xs leading-relaxed text-stone-500">
           ※ リンクはふるさと納税サイト（楽天ふるさと納税）へ移動します。手続きと寄付は
-          各サイトで完結します。KumaWatch
+          各サイトで完結します。くまウォッチ
           は紹介手数料を受け取る場合があり、運営費に充てています（PR）。
         </p>
         <p className="mt-2 text-xs text-stone-400">

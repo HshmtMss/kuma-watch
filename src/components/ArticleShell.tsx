@@ -264,7 +264,7 @@ export default function ArticleShell({ meta, children }: Props) {
       <hr className="my-8" />
 
       <p className="not-prose text-xs text-gray-500">
-        この記事は KumaWatch 編集部が執筆しました。実際のクマ対策にあたっては、各自治体の最新情報・専門家の指示・現地ガイドの判断にも従ってください。
+        この記事はくまウォッチ編集部が執筆しました。実際のクマ対策にあたっては、各自治体の最新情報・専門家の指示・現地ガイドの判断にも従ってください。
       </p>
     </PageShell>
   );

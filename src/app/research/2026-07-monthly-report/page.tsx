@@ -168,7 +168,7 @@ export default function ResearchPage() {
       />
 
       <h2>月次サマリー</h2>
-      <p>2026年7月における国内のクマ出没情報の総件数は5514件であった。情報の内訳は、報道由来が4443件、自治体等の情報源が1071件であり、KumaWatchが分類する公式発表は0件であった。人身被害に関連するキーワードを含む情報は37件、都市部での出没キーワードを含む情報が242件、捕獲や銃猟に関連するキーワードを含む情報が78件確認された。</p>
+      <p>2026年7月における国内のクマ出没情報の総件数は5514件であった。情報の内訳は、報道由来が4443件、自治体等の情報源が1071件であり、くまウォッチが分類する公式発表は0件であった。人身被害に関連するキーワードを含む情報は37件、都市部での出没キーワードを含む情報が242件、捕獲や銃猟に関連するキーワードを含む情報が78件確認された。</p>
       <h3>出没件数上位都道府県</h3>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
@@ -253,10 +253,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-08-01</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

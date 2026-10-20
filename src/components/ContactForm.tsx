@@ -41,13 +41,13 @@ const VENDOR_FIELDS: FieldSpec[] = [
 const CONFIG: Record<ContactKind, { fields: FieldSpec[]; subject: string; intro: string }> = {
   gov: {
     fields: GOV_FIELDS,
-    subject: "KumaWatch 自治体連携のご相談",
-    intro: "いつもお世話になっております。\nKumaWatch（くまウォッチ）の自治体連携についてご相談させていただきます。",
+    subject: "くまウォッチ自治体連携のご相談",
+    intro: "いつもお世話になっております。\nくまウォッチの自治体連携についてご相談させていただきます。",
   },
   vendor: {
     fields: VENDOR_FIELDS,
-    subject: "KumaWatch 製品掲載のご相談",
-    intro: "いつもお世話になっております。\nKumaWatch（くまウォッチ）への製品・サービス掲載についてご相談させていただきます。",
+    subject: "くまウォッチ製品掲載のご相談",
+    intro: "いつもお世話になっております。\nくまウォッチへの製品・サービス掲載についてご相談させていただきます。",
   },
 };
 

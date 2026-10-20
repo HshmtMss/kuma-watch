@@ -12,20 +12,20 @@ const CONTACT_MAILTO =
 export const metadata: Metadata = {
   title: "製品・サービスの掲載｜広告掲載のご案内",
   description:
-    "クマ対策の製品・サービスを KumaWatch に掲載できます。スプレー・電気柵・センサー機器・専門サービスなど、住民・自治体・登山者の安全を支える製品の紹介枠をご用意。",
+    "クマ対策の製品・サービスをくまウォッチに掲載できます。スプレー・電気柵・センサー機器・専門サービスなど、住民・自治体・登山者の安全を支える製品の紹介枠をご用意。",
   alternates: { canonical: `${SITE_URL}/for-vendors` },
   openGraph: {
-    title: "製品・サービスの掲載｜KumaWatch",
+    title: "製品・サービスの掲載｜くまウォッチ",
     description:
-      "クマ対策の製品・サービスを KumaWatch に掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
+      "クマ対策の製品・サービスをくまウォッチに掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
     url: `${SITE_URL}/for-vendors`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "製品・サービスの掲載｜KumaWatch",
-    description: "クマ対策の製品・サービスを KumaWatch に掲載。詳細はお問い合わせください。",
+    title: "製品・サービスの掲載｜くまウォッチ",
+    description: "クマ対策の製品・サービスをくまウォッチに掲載。詳細はお問い合わせください。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
@@ -98,7 +98,7 @@ export default function ForVendorsPage() {
   return (
     <PageShell
       title="製品・サービスの掲載"
-      lead="クマ対策の製品・サービスを KumaWatch に掲載いただけます。"
+      lead="クマ対策の製品・サービスをくまウォッチに掲載いただけます。"
     >
       {/* Hero — 3 メッセージで即決 */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">

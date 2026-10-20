@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "お住まいの地域や登山・キャンプの目的地でクマの新しい出没情報が入ったら、LINE またはブラウザ通知でお届けします。アカウント登録は不要・無料。iPhone でも設定は要りません。解除はいつでもできます。",
   alternates: { canonical: SITE_URL + "/notify" },
   openGraph: {
-    title: "クマ出没の通知を受け取る｜KumaWatch",
+    title: "クマ出没の通知を受け取る｜くまウォッチ",
     description:
       "地域や目的地で新しいクマ出没情報が入ったら LINE・ブラウザ通知でお届け。無料・iPhone 設定不要・いつでも解除。",
     url: SITE_URL + "/notify",

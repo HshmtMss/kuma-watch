@@ -222,7 +222,7 @@ export default function Page() {
         </li>
         <li>
           <strong>近隣地域の出没情報</strong>を{" "}
-          <Link href="/">KumaWatch トップマップ</Link>
+          <Link href="/">くまウォッチトップマップ</Link>
           で日々確認
         </li>
       </ul>
@@ -380,7 +380,7 @@ export default function Page() {
             q: "周辺地域の出没情報を継続的に追うには?",
             a: (
               <>
-                <Link href="/">KumaWatch のトップマップ</Link>
+                <Link href="/">くまウォッチのトップマップ</Link>
                 で全国の出没情報を日次更新で表示しています。
                 自分の地域については{" "}
                 <Link href="/place">都道府県別ページ</Link>
@@ -390,7 +390,7 @@ export default function Page() {
               </>
             ),
             aText:
-              "KumaWatch トップマップで全国の日次更新を表示。地域別は都道府県別ページから市町村単位で確認可能。",
+              "くまウォッチトップマップで全国の日次更新を表示。地域別は都道府県別ページから市町村単位で確認可能。",
           },
         ]}
       />

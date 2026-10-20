@@ -15,7 +15,7 @@ import { ARTICLES } from "@/lib/articles-meta";
 import { RESEARCH_ENTRIES } from "@/lib/research-entries";
 
 const SITE_URL = "https://kuma-watch.jp";
-const SITE_NAME = "KumaWatch（くまウォッチ）";
+const SITE_NAME = "くまウォッチ";
 const FEED_DESCRIPTION =
   "獣医師監修・獣医工学ラボ運営。クマの生態・遭遇対処・装備・季節・地域のクマ対策解説記事。";
 const MAX_ITEMS = 50;

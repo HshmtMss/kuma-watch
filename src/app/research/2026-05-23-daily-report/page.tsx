@@ -120,7 +120,7 @@ export default function ResearchPage() {
       </div>
 
       <h2>概要</h2>
-      <p>2026年5月23日にKumaWatchが収集した国内のクマ出没情報は、総計16件であった。都道府県別では新潟県と栃木県が各5件と最も多く、次いで島根県と秋田県が各2件、岩手県と滋賀県が各1件と続く。これらの情報は、東北、関東、中部、関西、中国の5地方にわたり、広域でクマの活動が確認されたことを示している。情報源の内訳は、自治体のマイマップ由来が5件（すべて栃木県）、新潟県の公式情報が4件、報道が4件、その他自治体からの情報が3件であった。当日は人身被害や捕獲・銃猟に至る事案は報告されていない。</p>
+      <p>2026年5月23日にくまウォッチが収集した国内のクマ出没情報は、総計16件であった。都道府県別では新潟県と栃木県が各5件と最も多く、次いで島根県と秋田県が各2件、岩手県と滋賀県が各1件と続く。これらの情報は、東北、関東、中部、関西、中国の5地方にわたり、広域でクマの活動が確認されたことを示している。情報源の内訳は、自治体のマイマップ由来が5件（すべて栃木県）、新潟県の公式情報が4件、報道が4件、その他自治体からの情報が3件であった。当日は人身被害や捕獲・銃猟に至る事案は報告されていない。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
@@ -199,10 +199,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-05-24</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

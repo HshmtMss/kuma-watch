@@ -19,7 +19,7 @@ const SITE_URL = "https://kuma-watch.jp";
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: "最新を追う｜出没速報・研究・政策の動き｜学ぶ｜KumaWatch",
+  title: "最新を追う｜出没速報・研究・政策の動き｜学ぶ｜くまウォッチ",
   description:
     "全国のクマ出没速報、獣医工学ラボの研究レポート、環境省・農水省・林野庁の政策動向を、ひと目でまとめて。獣医師監修・出典明記。",
   alternates: { canonical: `${SITE_URL}/learn/latest` },

@@ -207,7 +207,7 @@ function buildPromptFromAggregate(
 4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
 
 制約:
-- summary: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。最後に "（${prefName}公式資料より KumaWatch が要約）" を付けること。
+- summary: 3 文以内、日本語、冷静で実用的、対策を 1 つ含める。最後に "（${prefName}公式資料よりくまウォッチが要約）" を付けること。
 ${NOTICES_INSTRUCTION}
 
 対象地域: ${prefName}
@@ -244,7 +244,7 @@ function buildPrompt(
 4. 公式記録・集計とも0件の場合のみ「公式公開データは確認できません」と明示する。
 
 制約:
-- summary: 3 文以内、日本語、過度に恐怖を煽らず冷静で実用的、具体的な対策を 1 つ含める。最後に "（${entry.prefNameJa}公式サイトより KumaWatch が要約）" を付けること。
+- summary: 3 文以内、日本語、過度に恐怖を煽らず冷静で実用的、具体的な対策を 1 つ含める。最後に "（${entry.prefNameJa}公式サイトよりくまウォッチが要約）" を付けること。
 ${NOTICES_INSTRUCTION}
 
 対象地域: ${entry.prefNameJa}

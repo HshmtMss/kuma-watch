@@ -3,7 +3,7 @@
  * 日次サマリーを X (Twitter) に投稿する。
  * GitHub Actions の social-x-daily.yml から朝 7:00 JST に呼ばれる想定。
  *
- * 投稿内容: 直近 24h の全国出没件数 + 警戒トップ 3 県 + KumaWatch リンク。
+ * 投稿内容: 直近 24h の全国出没件数 + 警戒トップ 3 県 + くまウォッチリンク。
  *
  * 必要環境変数:
  *   X_CONSUMER_KEY / X_CONSUMER_SECRET / X_ACCESS_TOKEN / X_ACCESS_TOKEN_SECRET

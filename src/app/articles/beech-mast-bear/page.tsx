@@ -154,7 +154,7 @@ export default function Page() {
 
       <h2 id="history">過去の凶作年と出没件数の関係</h2>
       <p>
-        KumaWatch が集計した近年の出没データを、各県のブナ結実状況と並べると、
+        くまウォッチが集計した近年の出没データを、各県のブナ結実状況と並べると、
         凶作年と大量出没年の一致がはっきりわかります。
       </p>
       <ul>
@@ -284,7 +284,7 @@ export default function Page() {
           ）
         </li>
         <li>
-          <Link href="/for-gov">KumaWatch との情報連携</Link>
+          <Link href="/for-gov">くまウォッチとの情報連携</Link>
           で住民・観光客への発信チャネル強化
         </li>
       </ul>

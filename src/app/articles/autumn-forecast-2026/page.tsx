@@ -32,7 +32,7 @@ export default function Page() {
     <ArticleShell meta={meta}>
       <p className="lead">
         <strong>結論</strong>: 秋（9〜11月）は年間出没件数の <strong>6 割</strong> が集中する季節。
-        2025 年秋は全国で <strong>24,609 件</strong>（KumaWatch 集計）と歴史的大量年でした。
+        2025 年秋は全国で <strong>24,609 件</strong>（くまウォッチ集計）と歴史的大量年でした。
         2026 年秋がどう転ぶかは <strong>ブナ・ミズナラの結実</strong> で決まりますが、
         春の進行を見るかぎり「平年並み〜やや高め」の備えを推奨します。
       </p>
@@ -67,7 +67,7 @@ export default function Page() {
 
       <h2 id="data">過去3年の秋（9〜11月）出没データ</h2>
       <p>
-        KumaWatch が全国 47 都道府県の公開情報を統合した集計結果です。
+        くまウォッチが全国 47 都道府県の公開情報を統合した集計結果です。
         2023〜2025 年の秋 3 ヶ月は、年間総数の半数以上を占める年が大半でした。
       </p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
@@ -207,7 +207,7 @@ export default function Page() {
         </li>
       </ol>
       <p>
-        KumaWatch では各都道府県・市町村ページで月別件数を可視化していますので、
+        くまウォッチでは各都道府県・市町村ページで月別件数を可視化していますので、
         夏が進んだら各地域の <Link href="/place">都道府県別マップ</Link> で実況をご確認ください。
       </p>
 
@@ -294,7 +294,7 @@ export default function Page() {
           公式 HP の出没情報ページの更新運用を再点検（更新が止まると住民への通知が遅れる）
         </li>
         <li>
-          KumaWatch の{" "}
+          くまウォッチの{" "}
           <Link href="/for-gov">自治体連携</Link>
           で、住民・観光客に届く情報チャネルを確保
         </li>
@@ -351,14 +351,14 @@ export default function Page() {
             q: "出没情報をリアルタイムで知りたい",
             a: (
               <>
-                <Link href="/">KumaWatch のトップマップ</Link>
+                <Link href="/">くまウォッチのトップマップ</Link>
                 では全国の出没情報を日次更新で表示しています。
                 自分の地域については <Link href="/place">都道府県別ページ</Link>
                 から市町村単位の詳細を確認できます。
               </>
             ),
             aText:
-              "KumaWatch トップマップで全国の出没情報を日次更新。地域別の詳細は都道府県別ページから市町村単位で確認可能。",
+              "くまウォッチトップマップで全国の出没情報を日次更新。地域別の詳細は都道府県別ページから市町村単位で確認可能。",
           },
         ]}
       />

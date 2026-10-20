@@ -232,7 +232,7 @@ function ContactList({ secret }: { secret: string }) {
                 <dd>
                   <a
                     href={`mailto:${c.email}?subject=${encodeURIComponent(
-                      "Re: KumaWatch お問い合わせ",
+                      "Re: くまウォッチお問い合わせ",
                     )}`}
                     className="text-amber-700 underline"
                   >

@@ -262,7 +262,7 @@ export default function Page() {
       <h3>② すでに国内でも研究が進行中</h3>
       <p>
         環境省・各都道府県の研究機関で、ツキノワグマの個体識別 AI の開発が進められています。
-        KumaWatch を運営する獣医工学ラボでも、関連技術の研究を進めています（{" "}
+        くまウォッチを運営する獣医工学ラボでも、関連技術の研究を進めています（{" "}
         <Link href="/articles/bear-detection-ai">クマ検知 AI とは</Link>{" "}
         を参照）。
       </p>
@@ -321,7 +321,7 @@ export default function Page() {
       <ol className="my-4 list-decimal space-y-3 pl-5">
         <li>
           <strong>クマの目撃情報を「写真付き」で投稿する</strong> — 個体識別 AI の学習に貢献できます。
-          KumaWatch の{" "}
+          くまウォッチの{" "}
           <Link href="/submit">出没情報の投稿</Link>
           や、各自治体の専用フォームから写真投稿が可能。
         </li>

@@ -7,7 +7,7 @@ const SITE_URL = "https://kuma-watch.jp";
 export const metadata: Metadata = {
   title: "データ出典・ライセンス",
   description:
-    "KumaWatch が利用している全データソースとライセンス（CC BY 4.0、ODbL 1.0 等）の一覧。クマ出没情報・気象・地図・位置情報の各提供元への正式なクレジット表示。",
+    "くまウォッチが利用している全データソースとライセンス（CC BY 4.0、ODbL 1.0 等）の一覧。クマ出没情報・気象・地図・位置情報の各提供元への正式なクレジット表示。",
   alternates: { canonical: `${SITE_URL}/credits` },
   robots: { index: true, follow: true },
 };
@@ -16,7 +16,7 @@ export default function CreditsPage() {
   return (
     <PageShell
       title="データ出典・ライセンス"
-      lead="KumaWatch は、複数のオープンデータと公的情報を組み合わせて警戒レベルを算出しています。各提供元への正式なクレジットと利用ライセンスを以下にまとめます。"
+      lead="くまウォッチは、複数のオープンデータと公的情報を組み合わせて警戒レベルを算出しています。各提供元への正式なクレジットと利用ライセンスを以下にまとめます。"
     >
       <h2>クマ出没・分布情報</h2>
       <ul>
@@ -113,7 +113,7 @@ export default function CreditsPage() {
 
       <h2>データの正規化・処理について</h2>
       <p>
-        各ソースから取得したデータは、KumaWatch
+        各ソースから取得したデータは、くまウォッチ
         側で以下のような正規化・処理を行ったうえで表示しています。
       </p>
       <ul>

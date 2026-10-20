@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "獣医師監修・獣医工学ラボ運営。環境省・農林水産省・林野庁が公表するクマ対策・鳥獣保護管理に関する政策・予算・通知・統計レポートを集約して時系列で表示。最新の指定管理鳥獣化・補助金・審議会動向を 1 ページで確認できます。",
   alternates: { canonical: `${SITE_URL}/policy` },
   openGraph: {
-    title: "クマ対策の政府発表・政策動向｜KumaWatch",
+    title: "クマ対策の政府発表・政策動向｜くまウォッチ",
     description:
       "環境省・農水省・林野庁のクマ対策・鳥獣保護管理に関する最新アナウンスを集約。",
     url: `${SITE_URL}/policy`,

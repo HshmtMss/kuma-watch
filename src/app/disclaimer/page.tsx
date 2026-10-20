@@ -3,7 +3,7 @@ import PageShell from "@/components/PageShell";
 
 export const metadata: Metadata = {
   title: "免責事項・利用規約",
-  description: "KumaWatch の免責事項と利用規約について。",
+  description: "くまウォッチの免責事項と利用規約について。",
   alternates: { canonical: "/disclaimer" },
   robots: { index: true, follow: true },
 };
@@ -12,7 +12,7 @@ export default function DisclaimerPage() {
   return (
     <PageShell
       title="免責事項・利用規約"
-      lead="KumaWatch（以下「当サービス」）のご利用にあたっては、以下の内容にご同意いただいたものとみなします。"
+      lead="くまウォッチ（以下「当サービス」）のご利用にあたっては、以下の内容にご同意いただいたものとみなします。"
     >
       {/* β 表記をページ冒頭でも目立たせる。ヘッダーの BETA バッジから遷移してきた
           ユーザーがそのまま「今ベータ版運用中である」事実を読めるよう、

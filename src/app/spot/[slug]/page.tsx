@@ -877,7 +877,7 @@ export default async function SpotPage({ params }: Props) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-xs font-bold text-stone-900">
-                    KumaWatch｜{landmark.name}周辺
+                    くまウォッチ｜{landmark.name}周辺
                   </span>
                   <span className="shrink-0 text-xs text-stone-400">今</span>
                 </div>

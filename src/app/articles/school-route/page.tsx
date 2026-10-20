@@ -99,7 +99,7 @@ export default function Page() {
 
       <h2 id="parents">保護者にできる対策</h2>
       <ul>
-        <li><strong>毎朝の出没情報チェック</strong>: 自治体の防災アプリ・LINE グループ・<Link href="/">KumaWatch</Link></li>
+        <li><strong>毎朝の出没情報チェック</strong>: 自治体の防災アプリ・LINE グループ・<Link href="/">くまウォッチ</Link></li>
         <li><strong>登校時の付き添い</strong>: 出没情報がある日は親が同行</li>
         <li><strong>遭遇時の対処を家庭で繰り返し教える</strong>: 詳細は <Link href="/articles/encounter">クマに遭遇したら</Link></li>
         <li><strong>家の周りの餌場を排除</strong>: <Link href="/articles/home-protection">自宅・果樹園のクマ対策</Link></li>

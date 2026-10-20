@@ -255,7 +255,7 @@ export default function PushSubscribeButton({
     try {
       const reg = await navigator.serviceWorker.ready;
       await reg.showNotification(
-        en ? "Test notification — KumaWatch" : "お試し通知 — KumaWatch",
+        en ? "Test notification — KumaWatch" : "お試し通知 — くまウォッチ",
         {
           body: en
             ? "If you can see this, notifications are working. This is not a real bear sighting."

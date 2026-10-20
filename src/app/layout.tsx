@@ -7,11 +7,11 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import HachimitsuGuide from "@/components/HachimitsuGuide";
 
 const SITE_URL = "https://kuma-watch.jp";
-const SITE_NAME = "KumaWatch";
+const SITE_NAME = "くまウォッチ";
 // SITE_TITLE: 検索結果で truncation されても「獣医師が開発」が必ず見えるよう前段に配置。
 // Google モバイル検索のタイトル表示は ~32〜35 文字なので、ここで切れても訴求が成立する設計。
 const SITE_TITLE =
-  "獣医師が開発した全国クマ警戒レベルマップ｜KumaWatch（くまウォッチ）";
+  "獣医師が開発した全国クマ警戒レベルマップ｜くまウォッチ";
 const SITE_DESCRIPTION =
   "獣医師が開発した無料のクマ警戒レベルマップ。全国のクマ出没情報をリアルタイムで地図にまとめ、5km メッシュ単位で警戒レベルを表示。地域に合った対策まで分かります。ツキノワグマ・ヒグマ対応。運営: 獣医工学ラボ。";
 // GA4 測定 ID。env (NEXT_PUBLIC_GA_ID) で差し替え可能。既定は wild-watch-bear。
@@ -106,7 +106,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "獣医師が開発した全国クマ警戒レベルマップ｜KumaWatch",
+    title: "獣医師が開発した全国クマ警戒レベルマップ｜くまウォッチ",
     description:
       "獣医師が開発した無料のクマ警戒レベルマップ。全国の出没情報をリアルタイムで地図に。5km メッシュの警戒レベルと、地域に合った対策が分かります。",
   },
@@ -195,10 +195,10 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "KumaWatch（くまウォッチ）とはどんなサービスですか？",
+      name: "くまウォッチとはどんなサービスですか？",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "KumaWatch は、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没警戒レベルを予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
+        text: "くまウォッチは、全国のクマ出没情報を 5km メッシュ単位で集約し、過去実績・季節・気象・時間帯を組み合わせて現在地のクマ出没警戒レベルを予報する Web アプリです。登山・キャンプ・ハイキング・山菜採りなどアウトドア活動前の安全確認に利用できます。登録不要・無料です。",
       },
     },
     {
@@ -214,7 +214,7 @@ const faqSchema = {
       name: "データの出典と信頼性はどうなっていますか？",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "KumaWatch は環境省の公開情報、各自治体の公式オープンデータ、ニュース報道を統合して表示しています。各ピンには出典自治体名を併記しています。データはあくまで参考情報であり、現地の最新情報も必ずご確認ください。",
+        text: "くまウォッチは環境省の公開情報、各自治体の公式オープンデータ、ニュース報道を統合して表示しています。各ピンには出典自治体名を併記しています。データはあくまで参考情報であり、現地の最新情報も必ずご確認ください。",
       },
     },
     {
@@ -239,10 +239,10 @@ const breadcrumbSchema = {
 const howToSchema = {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  name: "KumaWatch でクマ出没警戒レベルを確認する方法",
+  name: "くまウォッチでクマ出没警戒レベルを確認する方法",
   description: "登山・キャンプ前にクマの出没警戒レベルを確認する手順",
   step: [
-    { "@type": "HowToStep", name: "アクセス", text: "KumaWatch（kuma-watch.jp）にアクセスします。登録不要・無料です。" },
+    { "@type": "HowToStep", name: "アクセス", text: "くまウォッチ（kuma-watch.jp）にアクセスします。登録不要・無料です。" },
     { "@type": "HowToStep", name: "場所を指定", text: "検索バーに目的地を入力するか、GPS で現在地を取得します。" },
     { "@type": "HowToStep", name: "警戒レベルを確認", text: "地図上のメッシュ色分けで 5 段階の警戒レベルを確認します。" },
     { "@type": "HowToStep", name: "詳細と予報", text: "メッシュをタップしてスコアの根拠、時間帯別予報、気象条件を確認します。" },

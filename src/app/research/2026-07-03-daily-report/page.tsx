@@ -224,7 +224,7 @@ export default function ResearchPage() {
         </Link>
       </div>
 
-      <p>2026年7月3日、KumaWatchが収集したクマの出没情報は全国で341件に達した。都道府県別の出没件数は岩手県（59件）、北海道（42件）、秋田県（39件）が上位を占め、東北地方と北海道に報告が集中する傾向が顕著である。本レポートでは、当日の主要事案と地域別動向を分析し、リスク評価を行う。</p>
+      <p>2026年7月3日、くまウォッチが収集したクマの出没情報は全国で341件に達した。都道府県別の出没件数は岩手県（59件）、北海道（42件）、秋田県（39件）が上位を占め、東北地方と北海道に報告が集中する傾向が顕著である。本レポートでは、当日の主要事案と地域別動向を分析し、リスク評価を行う。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
@@ -304,10 +304,10 @@ export default function ResearchPage() {
           <dt className="text-stone-500">最終更新</dt>
           <dd>2026-07-04</dd>
           <dt className="text-stone-500">データ範囲</dt>
-          <dd>KumaWatch sightings.json (内部集計データのみ)</dd>
+          <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
         <p className="mt-3 text-xs text-stone-600">
-          本記事は、KumaWatch が収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
+          本記事は、くまウォッチが収集した出没データを LLM が分析・文章化した内容を、獣医工学ラボの獣医師が確認・編集の上で公開しています。事実関係に誤りを発見された場合は{" "}
           <a
             href="mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20研究記事の訂正"
             className="text-blue-700 underline"

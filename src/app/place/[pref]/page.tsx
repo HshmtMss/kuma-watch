@@ -165,7 +165,7 @@ export default async function PrefPage({ params }: Props) {
     url: canonicalPrefUrl,
     name: `${pref}の熊出没情報マップ`,
     about: { "@id": `${canonicalPrefUrl}#area` },
-    isPartOf: { "@type": "WebSite", name: "KumaWatch", url: SITE_URL },
+    isPartOf: { "@type": "WebSite", name: "くまウォッチ", url: SITE_URL },
     inLanguage: "ja",
   };
 
@@ -306,7 +306,7 @@ export default async function PrefPage({ params }: Props) {
             予定している場合は、出発前の参考にご活用ください。
           </p>
           <p>
-            KumaWatch のデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
+            くまウォッチのデータは、環境省の公開情報および各自治体の公式オープンデータを統合したものです。
             あくまで参考情報であり、最新かつ正確な情報は各自治体の公式発表をご確認ください。
           </p>
         </div>

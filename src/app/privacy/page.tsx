@@ -3,7 +3,7 @@ import PageShell from "@/components/PageShell";
 
 export const metadata: Metadata = {
   title: "プライバシーポリシー",
-  description: "KumaWatch のプライバシーポリシー。アクセス解析と位置情報の扱いについて。",
+  description: "くまウォッチのプライバシーポリシー。アクセス解析と位置情報の扱いについて。",
   alternates: { canonical: "/privacy" },
 };
 
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
   return (
     <PageShell
       title="プライバシーポリシー"
-      lead="KumaWatch（以下「当サービス」）における個人情報・利用情報の取り扱いを以下のとおり定めます。"
+      lead="くまウォッチ（以下「当サービス」）における個人情報・利用情報の取り扱いを以下のとおり定めます。"
     >
       <h2>1. 取得する情報</h2>
       <h3>1.1 位置情報</h3>

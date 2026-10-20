@@ -43,8 +43,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       : null;
   // 解決順: 逆ジオコーディング > 旧リンクの label > 「この地点」。
   const label = geo ?? sp.label?.slice(0, 40) ?? "この地点";
-  const title = `${label}周辺のクマ情報｜KumaWatch`;
-  const description = `${label}周辺のクマ警戒レベル・最新の出没情報を KumaWatch でチェック。散策・登山前のひと確認に。`;
+  const title = `${label}周辺のクマ情報｜くまウォッチ`;
+  const description = `${label}周辺のクマ警戒レベル・最新の出没情報をくまウォッチでチェック。散策・登山前のひと確認に。`;
 
   const q = latLonQuery(sp);
   const sharePath = `/share${q}`;
