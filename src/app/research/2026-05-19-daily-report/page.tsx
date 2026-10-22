@@ -301,9 +301,15 @@ export default function ResearchPage() {
           <ol className="text-sm">
             {REFERENCES.map((r, idx) => (
               <li key={idx}>
-                <a href={r.url} target="_blank" rel="noopener noreferrer">
-                  {r.title}
-                </a>
+                {r.url.startsWith("http") ? (
+                  <a href={r.url} target="_blank" rel="noopener noreferrer">
+                    {r.title}
+                  </a>
+                ) : (
+                  // 取り込み元 ID (例: iwate-morioka-mymap) は URL ではないのでリンクにしない
+                  // (相対リンク /research/<id> になり 404 を生むため)。
+                  r.title
+                )}
                 {r.site && <span className="text-stone-500"> — {r.site}</span>}
               </li>
             ))}
