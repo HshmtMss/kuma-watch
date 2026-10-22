@@ -16,6 +16,11 @@ export default function robots(): MetadataRoute.Robots {
         //   /data/sightings.json   … 30MB の出没スナップショット。UI からは辿れず、地図は
         //                             /api/kuma 経由で取得する。直接クロールされると Fast
         //                             Data Transfer を大量消費するため除外 (実遮断は proxy.ts)。
+        //   /?lat=                 … スポット・市町村ページなどの「地図で見る」リンク
+        //                             (/?lat=..&lon=..&label=..&from=..)。中身は地図アプリで
+        //                             canonical もトップなのに、地点数ぶん (数千) クロールされ
+        //                             Search Console で「ソフト 404」になっていた。トップ "/" と
+        //                             共有用 /share?lat= は前方一致しないので巻き込まない。
         // 注: /_next/static (JS/CSS) と /place/*/opengraph-image は意図的に許可のまま。
         //   前者はレンダリングに必要、後者は SNS シェア時のプレビュー取得に必要なため。
         disallow: [
@@ -23,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
           "/design-preview",
           "/data/boundaries/",
           "/data/sightings.json",
+          "/?lat=",
         ],
       },
     ],
