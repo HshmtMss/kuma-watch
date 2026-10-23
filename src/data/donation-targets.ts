@@ -139,7 +139,7 @@ export function resolveDonationTarget(
       label: `${city}を、ふるさと納税で応援`,
       steps: [
         `${city}に寄付する`,
-        "使い道で「鳥獣被害対策」や「自然環境」などを選ぶ（選べる項目は市町村ごとに違います）",
+        "使い道で「鳥獣被害対策」「野生動物の保護」「自然環境の保全」などを選ぶ（選べる項目は市町村ごとに違います）",
         "返礼品と、税金の控除が受けられる",
       ],
       targetUrl: rakutenSearch(`ふるさと納税 ${pref} ${city}`),
@@ -152,7 +152,7 @@ export function resolveDonationTarget(
     label: "クマと向き合う地域を、ふるさと納税で応援",
     steps: [
       "応援したい市町村に寄付する",
-      "使い道で「鳥獣被害対策」などを選ぶ",
+      "使い道で「鳥獣被害対策」「野生動物の保護」「自然環境の保全」などを選ぶ",
       "返礼品と、税金の控除が受けられる",
     ],
     targetUrl: rakutenSearch("ふるさと納税 鳥獣被害対策"),
