@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Heart, ArrowRight } from "lucide-react";
 import { resolveDonationTarget } from "@/data/donation-targets";
 import { isOenReleased } from "@/lib/oen-flag";
@@ -36,9 +37,16 @@ export default function OenCard({
         この地域を応援
       </div>
       <h3 className="mt-2 text-base font-bold text-stone-900">{target.label}</h3>
-      <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
-        {target.note}
-      </p>
+      <ol className="mt-2 flex flex-col gap-1.5">
+        {target.steps.map((s, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm leading-snug text-stone-700">
+            <span className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-700 text-[11px] font-bold text-white">
+              {i + 1}
+            </span>
+            {s}
+          </li>
+        ))}
+      </ol>
 
       <a
         href={href}
@@ -46,15 +54,15 @@ export default function OenCard({
         rel="sponsored noopener noreferrer"
         className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
       >
-        応援する（ふるさと納税）
+        {target.tier !== 3 ? "寄付して応援する" : city ? `${city}を応援する` : "応援する"}
         <ArrowRight size={15} />
       </a>
 
       <p className="mt-2 text-[11px] leading-snug text-stone-400">
         ※ ふるさと納税サイトへ移動します。くまウォッチは紹介手数料を受け取る場合があります（PR）。{" "}
-        <a href="/oen" className="underline hover:text-stone-600">
+        <Link href="/oen" className="underline hover:text-stone-600">
           この取り組みについて
-        </a>
+        </Link>
       </p>
     </section>
   );

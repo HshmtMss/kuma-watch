@@ -16,13 +16,6 @@ import {
   resolveDonationTarget,
 } from "@/data/donation-targets";
 
-/** ティア別の「この地域は？」ひとこと見出し（クマ対策枠の有無を明示）。 */
-const TIER_STATUS: Record<1 | 2 | 3, string> = {
-  1: "この地域には「クマ被害対策支援」の専用枠があります。",
-  2: "この地域には、自然環境や野生動物を守る寄付枠があります。",
-  3: "この地域にクマ専用の枠は見つかりませんでした。ただし、ふるさと納税は寄付の「使い道」を選べます。",
-};
-
 /** カテゴリ key → アイコン（データ側は JSX を持たせない）。 */
 const CAT_ICON: Record<string, ReactNode> = {
   kuma: <Footprints size={18} />,
@@ -64,8 +57,8 @@ export default function OenView({
 
   return (
     <PageShell
-      title="クマの出没は、地域の課題の入り口です。"
-      lead="出没の裏では、自治体が対応に追われ、農業や観光、里山の自然も揺らいでいます。くまウォッチは「知る・備える」に、地域を応援する選択肢を添えます。"
+      title="ふるさと納税で、クマと向き合う地域を応援できます。"
+      lead="寄付するときに、使い道として「鳥獣被害対策」などを選べます。選べば、その町のクマ対策に役立てられます。"
     >
       {/* この地域を応援（pref/city 指定時のみ） */}
       {target && city && (
@@ -76,25 +69,23 @@ export default function OenView({
           </div>
           <div className="mt-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
             <h2 className="text-lg font-bold text-stone-900">{target.label}</h2>
-            <p
-              className={`mt-2 text-sm font-bold ${
-                target.tier === 1 ? "text-emerald-800" : "text-stone-700"
-              }`}
-            >
-              {TIER_STATUS[target.tier]}
-            </p>
-            <p className="mt-1.5 text-xs leading-relaxed text-stone-600">
-              {target.note}
-            </p>
+            <ol className="mt-3 flex flex-col gap-2">
+              {target.steps.map((s, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm leading-snug text-stone-800">
+                  <span className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-700 text-[11px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  {s}
+                </li>
+              ))}
+            </ol>
             <a
               href={`/oen/go?pref=${encodeURIComponent(pref!)}&city=${encodeURIComponent(city)}`}
               target="_blank"
               rel="sponsored noopener noreferrer"
               className="mt-3 flex items-center justify-center gap-1.5 rounded-full bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800"
             >
-              {target.tier === 1
-                ? "クマ対策を応援する（ふるさと納税）"
-                : "使い道を選んで応援する（ふるさと納税）"}
+              {target.tier === 3 ? `${city}を応援する` : "寄付して応援する"}
               <ArrowRight size={15} />
             </a>
           </div>

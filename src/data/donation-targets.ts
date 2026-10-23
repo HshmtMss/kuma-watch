@@ -20,8 +20,9 @@ const MAP = DONATIONS as Record<string, Entry>;
 export type DonationTarget = {
   /** カード見出し（着地テーマと一致）。 */
   label: string;
-  /** しっかりした説明（何の寄付か＋クマとの関係）。 */
-  note: string;
+  /** 応援のしかたを 3 行で（何に寄付し、何に使われ、何が受け取れるか）。
+   *  長い説明文は読まれないので、短い手順に分けて「地域を支える」ことを伝える。 */
+  steps: [string, string, string];
   /** 楽天の着地 URL（アフィリ未変換）。 */
   targetUrl: string;
   tier: 1 | 2 | 3;
@@ -106,8 +107,12 @@ export function resolveDonationTarget(
   // Tier1: クマ対策の専用寄付枠（返礼品なし）
   if (e && e.tier === 1 && city) {
     return {
-      label: `${city}のクマ対策を応援`,
-      note: `${city}の「クマ被害対策支援」への寄付です（返礼品なし）。捕獲・見回り・電気柵・人身被害の防止などに使われます。`,
+      label: `${city}のクマ対策を、ふるさと納税で応援`,
+      steps: [
+        `${city}の「クマ被害対策支援」に寄付する`,
+        "見回り・電気柵・人身被害の防止などに使われる",
+        "税金の控除が受けられる（返礼品はありません）",
+      ],
       targetUrl: e.url,
       tier: 1,
     };
@@ -117,8 +122,12 @@ export function resolveDonationTarget(
   if (e && e.tier === 2 && city) {
     const tl = THEME_LABEL[e.theme] ?? "自然環境";
     return {
-      label: `${city}の${tl}を応援`,
-      note: `${city}の${tl}への寄付です（返礼品なし）。野生動物や自然環境の保全は、人とクマが共生していく土台になります。`,
+      label: `${city}の${tl}を、ふるさと納税で応援`,
+      steps: [
+        `${city}の「${tl}」に寄付する`,
+        "人とクマのすみ分けを支える取り組みに使われる",
+        "税金の控除が受けられる（返礼品はありません）",
+      ],
       targetUrl: e.url,
       tier: 2,
     };
@@ -127,8 +136,12 @@ export function resolveDonationTarget(
   // Tier3: 専用枠なし → その市町村の一般ふるさと納税＋使い道の説明
   if (pref && city) {
     return {
-      label: `${city}を応援`,
-      note: `${city}のふるさと納税です。この地域には現在クマ専用の寄付枠がありませんが、寄付時に「使い道」で鳥獣・クマ対策／自然環境の保全／観光・産業の振興などを選べます。クマ被害は農業・観光・里山の自然にも及ぶため、この地域を支えることがクマとの共生にもつながります（返礼品も受け取れます）。`,
+      label: `${city}を、ふるさと納税で応援`,
+      steps: [
+        `${city}に寄付する`,
+        "使い道で「鳥獣被害対策」や「自然環境」などを選ぶ（選べる項目は市町村ごとに違います）",
+        "返礼品と、税金の控除が受けられる",
+      ],
       targetUrl: rakutenSearch(`ふるさと納税 ${pref} ${city}`),
       tier: 3,
     };
@@ -136,8 +149,12 @@ export function resolveDonationTarget(
 
   // 全国フォールバック（pref 不明時）
   return {
-    label: "獣害に向き合う地域を応援",
-    note: "クマ・獣害に向き合う地域を、ふるさと納税で応援できます。",
+    label: "クマと向き合う地域を、ふるさと納税で応援",
+    steps: [
+      "応援したい市町村に寄付する",
+      "使い道で「鳥獣被害対策」などを選ぶ",
+      "返礼品と、税金の控除が受けられる",
+    ],
     targetUrl: rakutenSearch("ふるさと納税 鳥獣被害対策"),
     tier: 3,
   };
