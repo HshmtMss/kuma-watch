@@ -21,7 +21,7 @@ import { jstToday } from "@/lib/jst-date";
 
 const SITE_URL = "https://kuma-watch.jp";
 const META_DESC =
-  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師が中心のチームが、地域に絞った出没傾向の分析から具体的な対策の立案、専門家のご紹介、実行の伴走までお手伝いします。自治体・企業・団体の方へ。";
+  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師が中心のチームが、地域の出没傾向を分析し、具体的な対策を立て、実行まで伴走します。必要に応じて専門家もご紹介します。自治体・企業・団体の方へ。";
 
 export const metadata: Metadata = {
   title: "法人・自治体の方へ｜クマ・野生動物対策のご相談",
@@ -153,12 +153,12 @@ export default function ForGovPage() {
     >
       <section className="not-prose mb-9 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">
         <p className="m-0 text-sm leading-relaxed text-stone-700">
-          獣医師が中心のチームが、
-          <strong className="text-emerald-800">地域に絞った出没傾向の分析</strong>から
-          <strong className="text-emerald-800">具体的な対策の立案</strong>、
-          <strong className="text-emerald-800">専門家のご紹介</strong>、
-          <strong className="text-emerald-800">実行までの伴走</strong>
-          まで、一緒に進めます。自治体・企業・団体のどなたでもご相談いただけます。
+          獣医師が中心のチームが、地域の
+          <strong className="text-emerald-800">出没傾向を分析</strong>し、
+          <strong className="text-emerald-800">具体的な対策</strong>を立て、
+          <strong className="text-emerald-800">実行まで伴走</strong>します。
+          必要に応じて<strong className="text-emerald-800">専門家もご紹介</strong>します。
+          自治体・企業・団体のどなたでもご相談いただけます。
         </p>
         <a
           href="#contact"
