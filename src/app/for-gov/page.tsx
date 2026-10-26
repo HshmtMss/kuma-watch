@@ -248,9 +248,6 @@ export default function ForGovPage() {
         ページをそのまま掲載しています。
       </p>
       <ReportViewer />
-      <p className="text-xs leading-relaxed text-stone-500">
-        発行：獣医工学ラボ（リサーチコーディネート株式会社）。ご相談の地域に絞った分析、季節・誘引物別の対策カレンダー、出没直後の対応ルールの設計、定期レポートも承ります。
-      </p>
 
       <h2 id="faq">よくあるご質問</h2>
       <div className="not-prose my-4 space-y-2">
