@@ -222,7 +222,7 @@ const faqSchema = {
       name: "自治体ですが、詳細データを提供したいのですが？",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "はい、自治体からのデータ連携を歓迎しています。「自治体の方へ」ページのフォームまたは contact@research-coordinate.co.jp までご連絡ください。CSV/JSON などのオープンデータ形式であれば取り込み可能です。",
+        text: "はい、自治体からのデータ連携を歓迎しています。「法人・自治体の方へ」ページのフォームまたは contact@research-coordinate.co.jp までご連絡ください。CSV/JSON などのオープンデータ形式であれば取り込み可能です。",
       },
     },
   ],

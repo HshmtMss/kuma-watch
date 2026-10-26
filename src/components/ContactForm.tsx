@@ -24,10 +24,10 @@ type FieldSpec = {
 
 const GOV_FIELDS: FieldSpec[] = [
   { key: "name", label: "ご担当者お名前", required: true, placeholder: "山田 太郎" },
-  { key: "org", label: "自治体名・ご担当部署", required: true, placeholder: "○○市 環境課" },
+  { key: "org", label: "自治体名・会社名・ご担当部署", required: true, placeholder: "○○市 環境課 / 株式会社○○ 総務部" },
   { key: "email", label: "メールアドレス", required: true, type: "email", placeholder: "name@city.example.lg.jp" },
   { key: "phone", label: "お電話番号 (任意)", type: "tel", placeholder: "03-1234-5678" },
-  { key: "message", label: "ご相談内容", required: true, type: "textarea", placeholder: "現状の運用 / 連携で実現したいこと / その他ご質問など" },
+  { key: "message", label: "ご相談内容", required: true, type: "textarea", placeholder: "お困りのことをそのままお書きください（例：○○地区で出没が続いていて、何から手をつければよいか知りたい）" },
 ];
 
 const VENDOR_FIELDS: FieldSpec[] = [
@@ -41,8 +41,8 @@ const VENDOR_FIELDS: FieldSpec[] = [
 const CONFIG: Record<ContactKind, { fields: FieldSpec[]; subject: string; intro: string }> = {
   gov: {
     fields: GOV_FIELDS,
-    subject: "くまウォッチ自治体連携のご相談",
-    intro: "いつもお世話になっております。\nくまウォッチの自治体連携についてご相談させていただきます。",
+    subject: "くまウォッチ クマ・野生動物対策のご相談",
+    intro: "いつもお世話になっております。\nクマ・野生動物対策についてご相談させていただきます。",
   },
   vendor: {
     fields: VENDOR_FIELDS,

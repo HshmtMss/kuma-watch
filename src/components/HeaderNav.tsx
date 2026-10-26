@@ -97,8 +97,8 @@ const LEARN_LINKS: NavLink[] = isLearnHubReleased()
 const BUSINESS_LINKS: NavLink[] = [
   {
     href: "/for-gov",
-    label: "自治体・観光協会の方",
-    desc: "出没情報の連携・配信を無料で",
+    label: "法人・自治体の方",
+    desc: "クマ・野生動物対策のご相談",
   },
   {
     href: "/for-vendors",

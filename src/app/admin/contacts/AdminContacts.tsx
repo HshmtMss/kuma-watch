@@ -6,7 +6,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import type { ContactMessage } from "@/lib/contact-store";
 
 const KIND_LABEL: Record<string, string> = {
-  gov: "自治体連携",
+  gov: "法人・自治体",
   vendor: "製品掲載",
 };
 

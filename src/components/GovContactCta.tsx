@@ -37,7 +37,7 @@ export default function GovContactCta({
           </h2>
           <p className="mt-1.5 mb-0 text-[13px] leading-relaxed text-stone-600">
             このページは公表されている情報をもとに自動で作成しています。掲載内容の訂正、
-            公式ページの追加、住民・観光客への情報配信について承ります。
+            公式ページの追加のほか、地域のクマ対策のご相談も承ります。
           </p>
           <Link
             href={`/for-gov?from=${encodeURIComponent(from)}`}

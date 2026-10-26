@@ -249,7 +249,7 @@ export default function ForVendorsPage() {
         <div className="border-t border-stone-200 px-4 py-3 text-sm leading-relaxed text-stone-700">
           自治体さま向けには{" "}
           <Link href="/for-gov" className="text-amber-700 underline">
-            自治体の方へ
+            法人・自治体の方へ
           </Link>
           をご用意しています。
         </div>
