@@ -335,9 +335,6 @@ export default function ForGovPage() {
 
       {/* お問い合わせ */}
       <h2 id="contact">お問い合わせ</h2>
-      <p>
-        お困りのことを、そのままお書きください。送信ボタンを押すと、そのまま運営に届きます。担当より 3 営業日以内にご返信いたします。
-      </p>
       <ContactForm kind="gov" />
     </PageShell>
   );
