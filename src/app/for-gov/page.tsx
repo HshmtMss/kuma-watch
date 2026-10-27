@@ -98,7 +98,7 @@ const STEPS = [
   },
 ];
 
-// 分析サンプルの数字はレポート (2026 年 7 月 26 日時点・78,029 件) の値そのまま。
+// 分析例の数字はレポート (2026 年 7 月 26 日時点・78,029 件) の値そのまま。
 // 今のデータで更新しない (レポート本文とずれるため)。
 const FINDINGS = [
   {
@@ -173,7 +173,7 @@ export default function ForGovPage() {
               支援の流れ
             </a>
             <a className="t" href="#sample">
-              分析サンプル
+              分析例
             </a>
             <a className="t" href="#faq">
               よくあるご質問
@@ -257,10 +257,8 @@ export default function ForGovPage() {
 
         <section id="sample">
           <div className="head">
-            <p className="label">分析サンプル</p>
-            <h2>
-              <Wbr text="分析レポートの｜サンプル" />
-            </h2>
+            <p className="label">データ分析</p>
+            <h2>分析例</h2>
             <p>
               <Wbr text="全国の出没データ｜（78,029 件・｜2026 年 7 月 26 日時点）で｜作成した例です。" />
             </p>
@@ -284,7 +282,7 @@ export default function ForGovPage() {
             </div>
             <ReportViewer />
             <p className="note">
-              <Wbr text="このページの数字とレポートは｜サンプルです。｜実際のご相談では、｜地域に絞って分析します。" />
+              <Wbr text="実際のご相談では、｜地域に絞って分析します。" />
             </p>
           </div>
         </section>
