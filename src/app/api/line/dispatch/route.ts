@@ -24,12 +24,7 @@ import {
   isQuietHours,
   notifyMapUrl,
 } from "@/lib/notify-freshness";
-import { lineProductCtaSuffix } from "@/lib/line-product-cta";
-import {
-  isLineOenCtaEnabled,
-  lineOenCtaSuffix,
-  shouldUseOenCta,
-} from "@/lib/line-oen-cta";
+import { lineSupportCtaSuffix } from "@/lib/line-support-cta";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -230,14 +225,7 @@ export async function POST(req: Request) {
       `/place/${pathSegment(g.pref)}/${pathSegment(g.city)}`,
       top.id,
     );
-    const cta =
-      isLineOenCtaEnabled() && shouldUseOenCta(top.id)
-        ? lineOenCtaSuffix(base, g.pref, g.city)
-        : lineProductCtaSuffix(base, {
-            kind: "muni",
-            pref: g.pref,
-            city: g.city,
-          });
+    const cta = lineSupportCtaSuffix(base);
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}${cta}`);
     const { sent, error } = await multicast(userIds, [msg]);
     sentCount += sent;
@@ -275,14 +263,7 @@ export async function POST(req: Request) {
       const top = g.records[0];
       const line = snippet(top, `${top.date ?? ""} ${g.name}周辺`.trim());
       const url = `${base}/spot/${pathSegment(g.slug)}`;
-      const cta =
-        isLineOenCtaEnabled() && shouldUseOenCta(top.id)
-          ? lineOenCtaSuffix(base, top.prefectureName, top.cityName)
-          : lineProductCtaSuffix(base, {
-              kind: "spot",
-              slug: g.slug,
-              name: g.name,
-            });
+      const cta = lineSupportCtaSuffix(base);
       const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}${cta}`);
       const { sent, error } = await multicast(userIds, [msg]);
       sentCount += sent;
@@ -330,10 +311,7 @@ export async function POST(req: Request) {
     );
     // 登録地点そのものではなく、実際に出た地点(top)にズームして見せる。
     const url = notifyMapUrl(base, top.lat, top.lon, place, "/", top.id);
-    const cta =
-      isLineOenCtaEnabled() && shouldUseOenCta(top.id)
-        ? lineOenCtaSuffix(base, top.prefectureName, top.cityName)
-        : lineProductCtaSuffix(base, { kind: "geo", label: place });
+    const cta = lineSupportCtaSuffix(base);
     const msg = text(`${head}\n${line}\n\n▼ 地図で見る\n${url}${cta}`);
     const { ok, error } = await pushMessage(gsub.userId, [msg]);
     if (ok) sentCount += 1;
