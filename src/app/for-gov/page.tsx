@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Factory, Landmark, Sprout, Tent } from "lucide-react";
+import { ChevronLeft, Factory, Landmark, Sprout, Tent } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import LegalLinks from "@/components/LegalLinks";
 import ReportViewer from "./ReportViewer";
@@ -155,9 +155,19 @@ export default function ForGovPage() {
           名乗りを「野生動物対策支援」1 つにして、くまウォッチの名乗りと重ねないため。 */}
       <header className="bar">
         <div className="wrap">
-          <a className="name" href="#top">
-            野生動物対策支援
-          </a>
+          {/* くまウォッチから来た人がすぐ戻れるよう、パンくずの形で左上に置く。 */}
+          <div className="crumb">
+            <Link href="/" className="home">
+              <ChevronLeft size={16} aria-hidden />
+              くまウォッチ
+            </Link>
+            <span className="sep" aria-hidden>
+              /
+            </span>
+            <a className="name" href="#top">
+              野生動物対策支援
+            </a>
+          </div>
           <nav aria-label="ページ内">
             <a className="t" href="#support">
               支援の流れ
@@ -389,7 +399,7 @@ export default function ForGovPage() {
                 <a href={COMPANY_URL} target="_blank" rel="noopener noreferrer">
                   リサーチコーディネート株式会社 ↗
                 </a>
-                <Link href="/">くまウォッチ</Link>
+                <Link href="/">くまウォッチに戻る</Link>
               </div>
             </div>
           </div>
