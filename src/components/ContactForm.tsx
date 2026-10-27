@@ -120,9 +120,6 @@ export default function ContactForm({ kind }: { kind: ContactKind }) {
         <p className="text-base font-semibold text-emerald-900">
           送信しました。ありがとうございます。
         </p>
-        <p className="mt-2 text-sm text-emerald-800">
-          担当より 3 営業日以内にご返信いたします。
-        </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
@@ -188,7 +185,7 @@ export default function ContactForm({ kind }: { kind: ContactKind }) {
         </p>
       )}
       <p className="text-[11px] leading-relaxed text-stone-500">
-        送信ボタンを押すと、この内容が運営に届きます。担当より 3 営業日以内にご返信いたします。
+        送信ボタンを押すと、この内容が運営に届きます。
         うまく送れない場合は{" "}
         <a href={`mailto:${TO}`} className="font-semibold text-amber-700 underline">
           {TO}
