@@ -1,0 +1,200 @@
+/* 法人・自治体ページ (野生動物対策支援) 専用のデザイン。すべて .fg 配下にスコープし、
+   サイトの他の部分 (一般向けの stone/amber) に影響を与えない。
+   夜の出没地図で始まり、昼の紙面で上から順に読ませる。見出しも中身も 1 本の列に
+   そろえ、左右の幅を全節で一致させる。 */
+.fg {
+  --paper: #f4f6f2;
+  --surface: #ffffff;
+  --ink: #18241e;
+  --muted: #5a6860;
+  --line: #dde3dd;
+  --pine: #1f4d3a;
+  --pine-soft: #e3ece6;
+  --honey: #b87a0c;
+  --night: #151c25; /* 地図画像 (hero-map.webp) の地色と合わせる */
+  --night-line: #2a3442;
+  --night-ink: #eef1f4;
+  --night-muted: #9aa6b4;
+  --glow: #f2b33d;
+  --content: 1040px;
+  --f-display: "Hiragino Kaku Gothic StdN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+  --f-num: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.85;
+  /* 日本語の改行: 文節の途中で折り返さない。<wbr> を置いた所だけで折る。
+     word-break: auto-phrase は「お困り｜ごと」のように語の途中で切るので使わない。 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+.fg h1, .fg h2, .fg h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+.fg p { margin: 0; text-wrap: pretty; }
+.fg a:focus-visible, .fg button:focus-visible, .fg summary:focus-visible {
+  outline: 3px solid var(--glow); outline-offset: 3px; border-radius: 8px;
+}
+.fg .wrap {
+  max-width: var(--content); margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+.fg .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  text-decoration: none; white-space: nowrap;
+  font-family: var(--f-display); font-weight: 700; font-size: 16px; min-height: 52px;
+  padding: 0 30px; border-radius: 999px; background: var(--glow); color: var(--night);
+  transition: transform .15s ease, filter .15s ease;
+}
+.fg .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.fg .btn.sm { min-height: 40px; padding: 0 18px; font-size: 14px; }
+
+/* ── 上部バー (常設) ── */
+.fg .bar {
+  position: sticky; top: 0; z-index: 30;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--night) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--night-line); color: var(--night-ink);
+}
+.fg .bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 60px; }
+.fg .bar .name { font-family: var(--f-display); font-weight: 800; font-size: 17px; letter-spacing: .04em; text-decoration: none; color: inherit; }
+.fg .bar nav { display: flex; align-items: center; gap: 22px; font-size: 14px; }
+.fg .bar nav a.t { color: var(--night-muted); text-decoration: none; }
+.fg .bar nav a.t:hover { color: var(--night-ink); }
+
+/* ── 最初の画面 ── */
+.fg .hero { background: var(--night); color: var(--night-ink); position: relative; overflow: hidden; }
+.fg .hero .body { position: relative; z-index: 2; padding-block: 72px 96px; max-width: 36rem; }
+.fg .hero .who { font-size: 14px; font-weight: 700; letter-spacing: .12em; color: var(--glow); }
+.fg .hero h1 { font-size: clamp(32px, 5vw, 50px); font-weight: 800; line-height: 1.34; margin-top: 14px; }
+.fg .hero h1 em { font-style: normal; color: var(--glow); }
+.fg .hero .lead { margin-top: 22px; color: #c9d1da; font-size: 17px; }
+.fg .hero .actions { margin-top: 34px; }
+.fg .hero .map {
+  position: absolute; z-index: 1; top: 0; bottom: 0;
+  right: max(-40px, calc((100vw - var(--content)) / 2 - 60px));
+  width: min(520px, 52vw);
+  background: url("/for-gov/hero-map.webp") center / contain no-repeat;
+}
+.fg .hero .map::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--night) 0%, transparent 35%); }
+
+/* ── 節 ── */
+.fg section { padding-block: 88px; display: grid; gap: 36px; scroll-margin-top: 60px; }
+.fg section + section { border-top: 1px solid var(--line); }
+.fg .head { display: grid; gap: 10px; max-width: 44rem; }
+.fg .label { font-size: 13px; font-weight: 700; letter-spacing: .14em; color: var(--pine); }
+.fg .head h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 800; line-height: 1.45; }
+.fg .head p { color: var(--muted); font-size: 16px; line-height: 1.8; }
+.fg .stack { min-width: 0; display: grid; gap: 20px; }
+
+.fg .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.fg .icon { width: 44px; height: 44px; padding: 11px; border-radius: 12px; background: var(--pine-soft); color: var(--pine); flex: none; }
+
+/* お困りごと */
+.fg .troubles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.fg .troubles .card { padding: 22px; display: grid; gap: 12px; align-content: start; }
+.fg .troubles .top { display: grid; gap: 12px; justify-items: start; }
+.fg .troubles b { font-family: var(--f-display); font-size: 17px; }
+.fg .troubles p { font-size: 15px; color: var(--muted); line-height: 1.75; }
+
+/* 支援の流れ (番号は実際の順番) */
+.fg .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; counter-reset: s; }
+.fg .steps li { position: relative; display: grid; gap: 10px; align-content: start; padding: 24px 22px; }
+.fg .steps li::before {
+  counter-increment: s; content: counter(s);
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--pine); color: var(--paper); font-family: var(--f-num); font-weight: 700;
+}
+.fg .steps li:not(:last-child)::after {
+  content: ""; position: absolute; top: 40px; right: -13px; width: 10px; height: 10px; z-index: 1;
+  border-top: 2px solid var(--muted); border-right: 2px solid var(--muted); transform: rotate(45deg);
+}
+.fg .steps h3 { font-size: 18px; font-weight: 700; }
+.fg .steps p { font-size: 15px; color: var(--muted); line-height: 1.8; }
+
+/* 分析サンプル */
+.fg .finds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fg .finds .card { padding: 22px; display: grid; gap: 10px; align-content: start; }
+.fg .finds .v { font-family: var(--f-num); font-weight: 700; font-size: 40px; line-height: 1; color: var(--honey); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fg .finds .v small { font-family: var(--f-display); font-size: 17px; margin-left: 4px; }
+.fg .finds p { font-size: 15px; line-height: 1.7; }
+.fg .finds .act { font-size: 14px; font-weight: 700; color: var(--pine); border-top: 1px solid var(--line); padding-top: 10px; }
+.fg .note { font-size: 13px; color: var(--muted); }
+
+/* レポートビューア */
+.fg .report { background: var(--night); border-radius: 16px; padding: 16px; display: grid; gap: 12px; color: var(--night-muted); }
+.fg .report .frame { border-radius: 10px; overflow: hidden; touch-action: pan-y; }
+.fg .report .frame img { display: block; width: 100%; height: auto; }
+.fg .report .ctl { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
+.fg .report .ttl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fg .report .nav { display: flex; align-items: center; gap: 8px; flex: none; }
+.fg .report button {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  color: var(--night-ink); background: transparent; cursor: pointer; border: 1px solid var(--night-line);
+}
+.fg .report button:hover:not(:disabled) { border-color: var(--night-muted); }
+.fg .report button:disabled { opacity: .35; cursor: default; }
+.fg .report .count { font-family: var(--f-num); color: var(--night-ink); min-width: 4.5em; text-align: center; font-variant-numeric: tabular-nums; }
+.fg .report .pdf { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--night-ink); text-decoration: none; border-bottom: 1px solid var(--night-line); }
+
+/* よくあるご質問 */
+.fg .faq { display: grid; gap: 12px; }
+.fg .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.fg .faq summary { cursor: pointer; min-height: 60px; padding: 16px 22px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.fg .faq summary::-webkit-details-marker { display: none; }
+.fg .faq summary::after { content: ""; flex: none; width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-3px); transition: transform .2s ease; }
+.fg .faq details[open] summary::after { transform: rotate(-135deg) translateY(-3px); }
+.fg .faq details p { padding: 0 22px 20px; color: var(--muted); font-size: 15px; }
+
+/* 展示会 */
+.fg .expo { display: grid; gap: 12px; }
+.fg .expo .card { padding: 18px 22px; display: grid; gap: 4px; }
+.fg .expo .when { font-size: 14px; color: var(--muted); }
+.fg .expo .tag { justify-self: start; font-size: 12px; font-weight: 700; color: var(--pine); background: var(--pine-soft); border-radius: 999px; padding: 0 10px; }
+.fg .expo a { font-size: 14px; color: var(--pine); font-weight: 700; }
+.fg .expo .group { font-size: 14px; font-weight: 700; color: var(--muted); }
+
+/* ご相談 (フォームは白いカードに載せる) */
+.fg .contact { background: var(--night); color: var(--night-ink); scroll-margin-top: 60px; }
+.fg .contact .wrap { padding-block: 80px; display: grid; gap: 28px; }
+.fg .contact .label { color: var(--glow); }
+.fg .contact h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 800; line-height: 1.45; }
+.fg .contact .form { background: var(--surface); color: var(--ink); border-radius: 18px; padding: 28px; }
+
+/* 運営 (組織へのリンクはここ 1 か所にまとめる) */
+.fg .org { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 24px; align-items: center; padding: 24px; }
+.fg .org img { width: 100%; height: auto; border-radius: 8px; }
+.fg .org .txt { display: grid; gap: 10px; }
+.fg .org b { font-family: var(--f-display); font-size: 18px; }
+.fg .org p { font-size: 15px; color: var(--muted); }
+.fg .org .links { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+.fg .org .links a { color: var(--pine); font-weight: 700; text-decoration: none; border-bottom: 1px solid currentColor; }
+
+.fg footer { border-top: 1px solid var(--line); }
+.fg footer .wrap { padding-block: 8px max(32px, env(safe-area-inset-bottom, 0px)); }
+
+@media (max-width: 900px) {
+  .fg .troubles, .fg .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fg .steps li:nth-child(2)::after { display: none; }
+  .fg .finds { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .fg .bar nav a.t { display: none; }
+  .fg .hero .map { opacity: .35; width: 90vw; right: -30vw; }
+  .fg .hero .body { padding-block: 44px 64px; }
+  .fg .hero .actions .btn { width: 100%; }
+  .fg section { padding-block: 60px; gap: 28px; }
+  .fg .troubles, .fg .steps { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .fg .troubles .top { display: flex; align-items: center; }
+  .fg .steps li:not(:last-child)::after { display: block; top: auto; bottom: -14px; right: auto; left: 34px; transform: rotate(135deg); }
+  .fg .report { padding: 10px; }
+  .fg .report .ttl { display: none; }
+  .fg .report .ctl { justify-content: center; }
+  .fg .contact .form { padding: 20px 16px; }
+  .fg .org { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .fg .org img { width: 140px; }
+}
+@media (prefers-reduced-motion: reduce) { .fg * { transition: none !important; } }

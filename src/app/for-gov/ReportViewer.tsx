@@ -13,7 +13,7 @@ import { ChevronLeft, ChevronRight, Download } from "lucide-react";
  * 環境差なくめくれるようにする。PDF 本体はダウンロードで別途渡す。
  *
  * スライドは文字が細かいので、画像タップで原寸 (1680px) を別タブに開ける。
- * スマホではそこでピンチ拡大して読む導線になる。
+ * スマホではそこでピンチ拡大して読む導線になる。左右スワイプでもめくれる。
  */
 
 const PDF_HREF = "/for-gov/kumawatch-report-2026.pdf";
@@ -67,8 +67,9 @@ export default function ReportViewer() {
     }
   };
 
+  // 見た目は for-gov.css の .report (夜の地色) に合わせる。
   return (
-    <div className="not-prose my-5">
+    <div className="report">
       <div
         tabIndex={0}
         onKeyDown={onKeyDown}
@@ -81,7 +82,7 @@ export default function ReportViewer() {
           touchX.current = null;
           if (Math.abs(dx) > 45) go(dx < 0 ? i + 1 : i - 1);
         }}
-        className="overflow-hidden rounded-xl border border-stone-300 bg-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        className="frame"
         aria-roledescription="スライドビューア"
         aria-label={`データ分析レポート ${i + 1} / ${TOTAL} ページ`}
       >
@@ -97,72 +98,40 @@ export default function ReportViewer() {
             width={1680}
             height={946}
             priority={i === 0}
-            className="h-auto w-full"
-            sizes="(max-width: 768px) 100vw, 768px"
+            sizes="(max-width: 1040px) 100vw, 1000px"
           />
         </a>
       </div>
 
-      {/* 操作 */}
-      <div className="mt-2 flex items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={() => go(i - 1)}
-          disabled={i === 0}
-          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 disabled:opacity-40 hover:bg-stone-50"
-        >
-          <ChevronLeft size={14} aria-hidden />前へ
-        </button>
-        <div className="min-w-0 text-center">
-          <div className="text-xs font-semibold text-stone-900">
-            {i + 1} / {TOTAL}
-          </div>
-          <div className="truncate text-[11px] text-stone-500">{PAGES[i]}</div>
-        </div>
-        <button
-          type="button"
-          onClick={() => go(i + 1)}
-          disabled={i === TOTAL - 1}
-          className="inline-flex items-center gap-1 rounded-full border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 disabled:opacity-40 hover:bg-stone-50"
-        >
-          次へ<ChevronRight size={14} aria-hidden />
-        </button>
-      </div>
-
-      {/* ページ番号で直接飛ぶ */}
-      <div className="mt-2 flex flex-wrap justify-center gap-1">
-        {PAGES.map((t, n) => (
+      <div className="ctl">
+        <span className="ttl">{PAGES[i]}</span>
+        <div className="nav">
           <button
-            key={t}
             type="button"
-            onClick={() => go(n)}
-            aria-label={`${n + 1} ページ目へ：${t}`}
-            aria-current={n === i ? "true" : undefined}
-            className={`h-6 w-6 rounded text-[11px] font-semibold ${
-              n === i
-                ? "bg-emerald-700 text-white"
-                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
-            }`}
+            onClick={() => go(i - 1)}
+            disabled={i === 0}
+            aria-label="前のページ"
           >
-            {n + 1}
+            <ChevronLeft size={18} aria-hidden />
           </button>
-        ))}
+          <span className="count" aria-live="polite">
+            {i + 1} / {TOTAL}
+          </span>
+          <button
+            type="button"
+            onClick={() => go(i + 1)}
+            disabled={i === TOTAL - 1}
+            aria-label="次のページ"
+          >
+            <ChevronRight size={18} aria-hidden />
+          </button>
+        </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-        <a
-          href={PDF_HREF}
-          download
-          className="inline-flex items-center gap-1.5 rounded-full bg-stone-800 px-4 py-2 text-xs font-semibold text-white hover:bg-stone-900"
-          style={{ color: "#fff", textDecoration: "none" }}
-        >
-          <Download size={14} aria-hidden />
-          PDF をダウンロード（全 {TOTAL} ページ・約 0.7MB）
-        </a>
-      </div>
-      <p className="mt-2 text-center text-[11px] text-stone-500">
-        画像をタップすると、そのページを原寸で開きます
-      </p>
+      <a href={PDF_HREF} download className="pdf">
+        <Download size={14} aria-hidden />
+        PDF をダウンロード（全 {TOTAL} ページ・約 0.7MB）
+      </a>
     </div>
   );
 }
