@@ -97,12 +97,14 @@
 .fg .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .fg .icon { width: 44px; height: 44px; padding: 11px; border-radius: 12px; background: var(--pine-soft); color: var(--pine); flex: none; }
 
-/* お困りごと */
-.fg .troubles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.fg .troubles .card { padding: 22px; display: grid; gap: 12px; align-content: start; }
-.fg .troubles .top { display: grid; gap: 12px; justify-items: start; }
-.fg .troubles b { font-family: var(--f-display); font-size: 17px; }
-.fg .troubles p { font-size: 15px; color: var(--muted); line-height: 1.75; }
+/* お困りごと: 立場ごとのカードに、短い具体例をチェック付きで並べる */
+.fg .troubles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.fg .troubles .card { padding: 22px 24px; display: grid; gap: 14px; align-content: start; }
+.fg .troubles .top { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.fg .troubles b { font-family: var(--f-display); font-size: 18px; }
+.fg .troubles ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fg .troubles li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; align-items: start; font-size: 15px; line-height: 1.6; }
+.fg .troubles li svg { width: 18px; height: 18px; margin-top: 3px; color: var(--honey); stroke-width: 3; }
 
 /* 支援の流れ (番号は実際の順番) */
 .fg .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; counter-reset: s; }
@@ -184,7 +186,7 @@
 .fg footer .wrap { padding-block: 8px max(32px, env(safe-area-inset-bottom, 0px)); }
 
 @media (max-width: 900px) {
-  .fg .troubles, .fg .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fg .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fg .steps li:nth-child(2)::after { display: none; }
   .fg .finds { grid-template-columns: minmax(0, 1fr); }
 }
@@ -196,7 +198,6 @@
   .fg .hero .actions .btn { width: 100%; }
   .fg section { padding-block: 60px; gap: 28px; }
   .fg .troubles, .fg .steps { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .fg .troubles .top { display: flex; align-items: center; }
   .fg .steps li:not(:last-child)::after { display: block; top: auto; bottom: -14px; right: auto; left: 34px; transform: rotate(135deg); }
   .fg .report { padding: 10px; }
   .fg .report .ttl { display: none; }

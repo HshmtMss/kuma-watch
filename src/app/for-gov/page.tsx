@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChevronLeft, Factory, Landmark, Sprout, Tent } from "lucide-react";
+import { Check, ChevronLeft, Factory, Landmark, Sprout, Tent } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import LegalLinks from "@/components/LegalLinks";
 import ReportViewer from "./ReportViewer";
@@ -55,26 +55,48 @@ function Wbr({ text }: { text: string }) {
   );
 }
 
-const TROUBLES: { icon: ReactNode; who: string; text: string }[] = [
+// 立場ごとの具体例。1 行を短く (おおむね 20 字前後) して、文字の塊にしない。
+const TROUBLES: { icon: ReactNode; who: string; items: string[] }[] = [
   {
     icon: <Landmark aria-hidden />,
     who: "自治体",
-    text: "出没が増え、｜何から｜手をつければよいか｜分からない",
+    items: [
+      "出没が増え、｜何から手をつければ｜よいか分からない",
+      "対策予算の｜優先順位を決めたい",
+      "住民への注意喚起が｜届いているか不安",
+      "出没直後の｜対応ルールを整えたい",
+      "住民説明会で｜何を伝えればよいか",
+    ],
   },
   {
     icon: <Tent aria-hidden />,
     who: "観光・レジャー施設",
-    text: "出没があったとき、｜営業するかどうかの｜判断に迷う",
+    items: [
+      "出没時に｜営業するかの｜判断基準がない",
+      "キャンプ場・登山道の｜見回りや看板を｜どうするか",
+      "お客様・スタッフへの｜注意の伝え方",
+      "ゴミや食べ物の｜管理を見直したい",
+    ],
   },
   {
     icon: <Factory aria-hidden />,
     who: "企業",
-    text: "山間部の現場や巡視で、｜従業員の安全を｜守りたい",
+    items: [
+      "山間部の現場・巡視で｜従業員を守りたい",
+      "作業の中止・再開の｜ルールを作りたい",
+      "工場・倉庫の敷地に｜出没した",
+      "従業員向けの｜安全研修をしたい",
+    ],
   },
   {
     icon: <Sprout aria-hidden />,
     who: "農林業・地域団体",
-    text: "作物の被害を、｜集落ぐるみで｜減らしたい",
+    items: [
+      "果樹や作物の｜被害を減らしたい",
+      "電気柵の張り方や｜効果を見直したい",
+      "放置された柿・栗を｜どうするか",
+      "集落ぐるみで｜取り組む進め方",
+    ],
   },
 ];
 
@@ -227,9 +249,16 @@ export default function ForGovPage() {
                   <span className="icon">{t.icon}</span>
                   <b>{t.who}</b>
                 </div>
-                <p>
-                  <Wbr text={t.text} />
-                </p>
+                <ul>
+                  {t.items.map((it) => (
+                    <li key={it}>
+                      <Check aria-hidden />
+                      <span>
+                        <Wbr text={it} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
