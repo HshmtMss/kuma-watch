@@ -18,7 +18,7 @@ const SITE_URL = "https://kuma-watch.jp";
 const LAB_URL = "https://www.research-coordinate.co.jp/labs/vet/";
 const COMPANY_URL = "https://www.research-coordinate.co.jp";
 const META_DESC =
-  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師が中心のチームが、地域の出没傾向を分析し、具体的な対策を立て、実行まで伴走します。自治体・企業・団体の方へ。";
+  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師中心のチームが、地域の出没傾向を分析し、具体的な対策を立て、実行まで伴走します。自治体・企業・団体の方へ。";
 
 export const metadata: Metadata = {
   title: "野生動物対策支援｜法人・自治体の方へ",
@@ -79,18 +79,20 @@ const TROUBLES: { icon: ReactNode; who: string; text: string }[] = [
 ];
 
 // 支援の流れ。番号は実際の順番だが、どの段階からでも受ける (見出し下の一文で伝える)。
-const STEPS = [
+// optional の段 (専門家の紹介) は必須ではないので、枠を点線にして「必要に応じて」を添える。
+const STEPS: { title: string; body: string; optional?: boolean }[] = [
   {
     title: "分析する",
-    body: "出没データを｜場所・季節・誘引物などで｜分析し、｜どこで・いつ・なぜ出るのかを｜明らかにします。",
+    body: "出没データを｜場所・季節・｜誘引物などで｜分析し、｜どこで・いつ・｜なぜ出るのかを｜明らかにします。",
   },
   {
     title: "対策を立てる",
-    body: "刈り払い、｜電気柵、｜誘引物の管理、｜出没直後の対応ルールまで、｜何を・どこに・いつ行うかを｜ご提案します。",
+    body: "刈り払い、｜電気柵、｜誘引物の管理、｜出没直後の｜対応ルールまで、｜何を・どこに・｜いつ行うかを｜ご提案します。",
   },
   {
     title: "専門家につなぐ",
-    body: "獣医師・研究者・｜捕獲の担い手・｜対策機器のメーカーなど、｜必要な専門家を｜ご紹介します。",
+    body: "必要な場面では、｜獣医師・｜研究者・｜捕獲の担い手・｜対策機器の｜メーカーなどを｜ご紹介します。",
+    optional: true,
   },
   {
     title: "実行に伴走する",
@@ -199,7 +201,7 @@ export default function ForGovPage() {
               ご相談ください。
             </h1>
             <p className="lead">
-              <Wbr text="獣医師が中心のチームが、｜地域の出没傾向を分析し、｜具体的な対策を立て、｜実行まで伴走します。" />
+              <Wbr text="獣医師中心のチームが、｜地域の出没傾向を分析し、｜具体的な対策を立て、｜実行まで伴走します。" />
             </p>
             <div className="actions">
               <a className="btn" href="#contact">
@@ -245,8 +247,14 @@ export default function ForGovPage() {
           </div>
           <ol className="steps">
             {STEPS.map((s) => (
-              <li key={s.title} className="card">
-                <h3>{s.title}</h3>
+              <li
+                key={s.title}
+                className={s.optional ? "card optional" : "card"}
+              >
+                <h3>
+                  {s.title}
+                  {s.optional && <span className="opt">必要に応じて</span>}
+                </h3>
                 <p>
                   <Wbr text={s.body} />
                 </p>
@@ -388,7 +396,7 @@ export default function ForGovPage() {
             <div className="txt">
               <b>獣医工学ラボ</b>
               <p>
-                <Wbr text="リサーチコーディネート株式会社の、｜獣医師が中心のチームです。｜獣医師開発のクマ警戒レベルマップ｜「くまウォッチ」を｜開発・運営しています。" />
+                <Wbr text="リサーチコーディネート株式会社の、｜獣医師中心のチームです。｜獣医師開発のクマ警戒レベルマップ｜「くまウォッチ」を｜開発・運営しています。" />
               </p>
               <div className="links">
                 <a href={LAB_URL} target="_blank" rel="noopener noreferrer">

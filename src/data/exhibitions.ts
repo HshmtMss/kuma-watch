@@ -50,6 +50,7 @@ export const EXHIBITIONS: Exhibition[] = [
     end: "2026-11-27",
     venue: "東京ビッグサイト 東展示棟",
     area: "害獣対策パビリオン",
+    booth: "4-67",
     url: "https://www.research-coordinate.co.jp/post/leisure-japan-2026",
   },
 ];

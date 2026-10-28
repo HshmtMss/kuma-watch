@@ -116,7 +116,10 @@
   content: ""; position: absolute; top: 40px; right: -13px; width: 10px; height: 10px; z-index: 1;
   border-top: 2px solid var(--muted); border-right: 2px solid var(--muted); transform: rotate(45deg);
 }
-.fg .steps h3 { font-size: 18px; font-weight: 700; }
+.fg .steps h3 { font-size: 18px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.fg .steps .optional { border-style: dashed; border-color: #b9c4bc; }
+.fg .steps .optional::before { background: var(--surface); color: var(--pine); border: 2px dashed var(--pine); }
+.fg .steps .opt { font-size: 12px; font-weight: 700; color: var(--pine); background: var(--pine-soft); border-radius: 999px; padding: 0 10px; line-height: 1.8; }
 .fg .steps p { font-size: 15px; color: var(--muted); line-height: 1.8; }
 
 /* 分析サンプル */
