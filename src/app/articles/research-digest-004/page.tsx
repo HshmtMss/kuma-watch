@@ -369,7 +369,7 @@ export default function Page() {
 
       <NextIssue label="次号予告 — Vol.5">
         <strong>「クマは何を嗅いで人里に来るのか？」</strong> —
-        ヒグマの嗅覚は犬の 7 倍、人の 2,100 倍。匂いだけで数 km 先の食物を見つけられる
+        クマの嗅覚は「犬の 7 倍」とも言われ、匂いだけで数 km 先の食物を見つけられる
         という驚異の感覚を、行動学・解剖学・心理学の最新研究から精読します。
       </NextIssue>
     </ArticleShell>

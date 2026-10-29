@@ -36,7 +36,7 @@ export default function Page() {
       </p>
       <p>
         北極圏ではこんな話も。<strong>ホッキョクグマが厚さ 1m の氷の下のアザラシの巣穴を、嗅覚だけで発見する</strong>。
-        伝説のように聞こえるこの話、実は遺伝学とテレメトリーが裏付ける科学的事実です。
+        伝説のように聞こえますが、野外の追跡調査からも、クマが匂いを頼りに遠くの獲物を探していることが分かっています。
       </p>
 
       {/* 論文カード */}
@@ -72,7 +72,7 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            ヒグマの嗅覚受容体遺伝子は <strong>約 1,600 個</strong>（人の 5 倍、犬の 7 倍）
+            クマの嗅覚は <strong>「犬の 7 倍」</strong>とよく言われる（実験で測った値ではなく、鋭さを伝える目安）
           </>,
           <>
             ホッキョクグマは <strong>16 km 先のアザラシ</strong>を風向きから嗅ぎつけられる
@@ -86,7 +86,7 @@ export default function Page() {
       <ArticleToc
         items={[
           { id: "intro", title: "私たちは視覚の世界、クマは嗅覚の世界" },
-          { id: "genes", title: "遺伝子レベルで見るクマの嗅覚力" },
+          { id: "genes", title: "遺伝子で見る、動物ごとの嗅覚の違い" },
           { id: "compared", title: "犬・象・人と比べてどうなのか" },
           { id: "polar", title: "ホッキョクグマは 16 km 先を嗅ぐ" },
           { id: "how", title: "クマは匂いをどう「使って」いるのか" },
@@ -106,12 +106,12 @@ export default function Page() {
         食物の場所、他の個体の存在、危険の有無、繁殖期の相手 — そのほとんどを<strong>嗅覚で把握</strong>しています。
       </p>
       <p>
-        これは比喩でも誇張でもなく、<strong>遺伝子レベルで証明された生物学的事実</strong>です。
-        2014 年、東京大学の <strong>新村芳人</strong>博士らが世界 13 種の哺乳類のゲノムを比較し、
-        その差を初めて定量化しました。
+        嗅覚の鋭さは、動物によってどれほど違うのでしょうか。
+        2014 年、東京大学の <strong>新村芳人</strong>博士らは 13 種の哺乳類のゲノムを比べ、
+        嗅覚に関わる遺伝子の数を数えました。
       </p>
 
-      <h2 id="genes">遺伝子レベルで見るクマの嗅覚力</h2>
+      <h2 id="genes">遺伝子で見る、動物ごとの嗅覚の違い</h2>
       <p>
         嗅覚は、鼻の中の <strong>嗅覚受容体</strong>というセンサータンパク質によって担われます。
         それぞれの受容体は、特定の匂い分子を認識する「鍵と鍵穴」の関係。
@@ -119,7 +119,7 @@ export default function Page() {
       </p>
       <p>
         この受容体を作る遺伝子の数を、新村らは哺乳類 13 種で比較しました。
-        結果は驚くべきものでした。
+        主な動物の結果は次のとおりです。
       </p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
         <table className="w-full text-sm">
@@ -135,11 +135,6 @@ export default function Page() {
               <td className="px-3 py-2 font-semibold">アフリカゾウ</td>
               <td className="px-3 py-2 tabular-nums">約 2,000</td>
               <td className="px-3 py-2 tabular-nums">×5.0</td>
-            </tr>
-            <tr className="bg-amber-50/50">
-              <td className="px-3 py-2 font-semibold">ヒグマ</td>
-              <td className="px-3 py-2 text-amber-800 font-bold tabular-nums">約 1,600</td>
-              <td className="px-3 py-2 text-amber-800 font-bold tabular-nums">×4.0</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">イヌ</td>
@@ -160,38 +155,24 @@ export default function Page() {
         </table>
       </div>
       <p>
-        ヒグマは <strong>ヒトの約 4 倍、犬の約 2 倍</strong>の嗅覚受容体遺伝子を持っていました。
-        ただし注意すべきは、これは <strong>「識別できる匂いの種類」</strong>の話。
-        微小な匂い分子を「検出する感度」と組み合わせると、その差はさらに広がります。
+        最も多かったのはアフリカゾウで、<strong>ヒトの約 5 倍、イヌの約 2.5 倍</strong>でした。
+        なお、この研究で比べた 13 種に <strong>クマは含まれていません</strong>。
+        また、遺伝子の数は「識別できる匂いの種類」の目安で、匂いを感じる感度そのものではありません。
       </p>
 
       <h2 id="compared">犬・象・人と比べてどうなのか</h2>
       <p>
-        遺伝子の数だけでなく、<strong>嗅覚に使う脳の領域の大きさ</strong>も加味すると、
-        クマの嗅覚力は様々な指標で次のように見積もられています。
-      </p>
-      <ul>
-        <li>
-          🐶 イヌ: 人の <strong>10,000 倍</strong>の感度
-        </li>
-        <li>
-          🐻 ヒグマ: 犬の <strong>7 倍</strong>、人の <strong>約 7 万倍</strong>
-        </li>
-        <li>
-          ❄️ ホッキョクグマ: ヒグマと同等またはそれ以上
-        </li>
-        <li>
-          🐘 ゾウ: 人の <strong>5 倍</strong>の遺伝子だが、距離 km 級の探知能力
-        </li>
-      </ul>
-      <p>
-        「ヒグマは犬の 7 倍」というのは <strong>北米の野生動物管理機関で広く使われる指標</strong>で、
-        その根拠の一つが本論文（および後続の比較研究）です。
+        クマの嗅覚は、鼻の奥で匂いを受け取る粘膜の広さや、脳で匂いを処理する部分の大きさなどから、
+        <strong>イヌに並ぶか、それ以上に鋭い</strong>と考えられています。
       </p>
       <p>
-        この嗅覚を、私たちの感覚で想像するのは難しい。でも、こう考えてみてください。
-        私たちが「コーヒーの香り」を感じる距離が 1m だとすれば、クマは <strong>70 km 先のコーヒーを嗅ぎ取れる</strong>計算になります。
-        実際にはそこまで届かないにせよ、私たちと彼らが見ている「世界の解像度」がまるで違うのは確かです。
+        「クマの嗅覚は犬の 7 倍」という言い方は、<strong>北米の国立公園などで広く使われています</strong>。
+        ただし、これは実験で測った数字ではなく、鋭さを分かりやすく伝えるための目安です。
+        上の新村らの研究から導かれた数字でもありません。
+      </p>
+      <p>
+        数字の大小はともかく、私たちと彼らが見ている「匂いの世界の解像度」がまるで違うのは確かです。
+        次の節では、それを野外で確かめた研究を紹介します。
       </p>
 
       <h2 id="polar">ホッキョクグマは 16 km 先を嗅ぐ</h2>
@@ -325,6 +306,11 @@ export default function Page() {
           クマには「人の食物がある」という強力なシグナルになります。
         </li>
       </ol>
+
+      <p className="text-sm text-stone-500">
+        2026 年 10 月 30 日 訂正：読者の方からのご指摘を受け、クマの嗅覚受容体遺伝子の数と、
+        新村ら（2014）の研究結果の紹介に誤りがあったため修正しました。
+      </p>
 
       <h2 id="references">参考文献</h2>
       <References

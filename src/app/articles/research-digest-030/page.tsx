@@ -382,7 +382,7 @@ export default function Page() {
           ["02", "都市型クマの夜行性化（Beckmann 2003）", "research-digest-002"],
           ["03", "AI 顔認識で個体識別（Clapham 2020）", "research-digest-003"],
           ["04", "気候変動と冬眠（Pigeon 2016）", "research-digest-004"],
-          ["05", "嗅覚は犬の 7 倍（Niimura 2014）", "research-digest-005"],
+          ["05", "クマの嗅覚と匂いの世界（Niimura 2014）", "research-digest-005"],
           ["06", "栄養バランス食選好（Erlenbach 2014）", "research-digest-006"],
           ["07", "長野リンゴ園電気柵（Huygens 2001）", "research-digest-007"],
           ["08", "冬眠生理と医学応用（Tøien 2011）", "research-digest-008"],

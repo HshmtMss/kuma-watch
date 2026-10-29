@@ -73,7 +73,7 @@ export default function Page() {
         日本のキャンプ場でも、生ゴミ・残飯・調味料の匂いが個体を呼び寄せて常習化させる事例が多数。
       </p>
       <ul>
-        <li>クマの嗅覚は犬の 7 倍 (<Link href="/articles/bear-senses">クマの感覚</Link>)</li>
+        <li>クマの嗅覚は犬の 7 倍とも言われる (<Link href="/articles/bear-senses">クマの感覚</Link>)</li>
         <li>密閉してもジップロック程度では数百 m 先から検知される</li>
         <li>一度味を覚えた個体は同じテン場に再来訪する習性</li>
       </ul>
