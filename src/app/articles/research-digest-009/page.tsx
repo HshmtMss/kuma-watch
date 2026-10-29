@@ -28,404 +28,173 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const mainCitation = (
+    <>
+      Linnell, J. D. C., Aanes, R., Swenson, J. E., Odden, J., &amp; Smith, M. E. (1997).{" "}
+      <em className="not-italic">Biodiversity and Conservation</em> 6(9): 1245–1257.
+    </>
+  );
+
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        ニュースでクマの捕獲事案が報じられるたびに、SNS で必ず見かけるコメントがあります。
-      </p>
-      <p className="text-center text-sm italic text-stone-600">
-        「殺さずに、山奥に放してあげればいいのに」
-      </p>
-      <p>
-        感情としてはよく分かります。実際、世界中の野生動物管理機関も同じことを考え、
-        過去 50 年間で <strong>何千頭ものクマ</strong>を捕獲して別の場所に放してきました。
-        その結果、何が分かったのか —
-        ノルウェーの研究者 John Linnell が、この問いに正面から向き合った
-        論文があります。1997 年発表、今も世界中で引用される野生動物管理の必修文献です。
+        クマが人里に出て捕まったというニュースが流れると、「殺さずに山奥へ放せばいいのに」という声がよく上がります。
+        では、問題を起こした肉食動物を捕まえて別の場所へ運ぶ方法（捕獲移動・奥山放獣）は、実際にどのくらい役に立ってきたのでしょうか。
+        1997 年に発表された、この方法についての研究をまとめて見直した論文（レビュー）を紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 1 本の論文"
+        label="今号で紹介する論文"
         title="Translocation of carnivores as a method for managing problem animals: a review"
-        citation={
-          <>
-            Linnell, J. D. C., Aanes, R., Swenson, J. E., Odden, J., &amp; Smith, M. E. (1997).{" "}
-            <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
-          </>
-        }
-        href="https://doi.org/10.1023/A:1018392013758"
-        linkText="DOI: 10.1023/A:1018392013758 →"
+        citation={mainCitation}
+        href="https://doi.org/10.1023/B:BIOC.0000034011.05412.cd"
+        linkText="DOI: 10.1023/B:BIOC.0000034011.05412.cd →"
       />
 
       <KeyPoints
-        label="時間がない人向けの 3 行"
+        label="3 行まとめ"
         items={[
           <>
-            食肉目 12 種・100 件以上の捕獲移動事例をレビューし、その結果を集約
+            北米とアフリカ南部で行われてきた、問題を起こした肉食動物の「捕獲移動」の研究をまとめて見直した論文です
           </>,
           <>
-            クマでは <strong>50% 以上が元の場所に戻る</strong>、<strong>30% は死亡</strong>
+            クマでは、11 件の研究のうち 10 件で、運ばれた個体の <strong>45〜100%</strong> が元の場所へ戻っていました（最大 <strong>229 km</strong>）
           </>,
           <>
-            問題行動の解消率は <strong>30% 程度</strong>。「捕獲移動」だけで解決はほぼ不可能
+            運んだ後の追跡や被害の記録がほとんどなく、<strong>本当に被害が減ったのかは確かめられていない</strong>のが実情でした
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intuition", title: "「捕獲して山奥へ」という直感の落とし穴" },
-          { id: "review", title: "12 種・100 件超のレビューが示したこと" },
-          { id: "return", title: "なぜクマは元の場所に戻ってくるのか" },
-          { id: "mortality", title: "30% の死亡率 — その理由" },
-          { id: "success", title: "成功する 30% は何が違うのか" },
-          { id: "alternatives", title: "代替策 — 何が本当に効くのか" },
-          { id: "japan", title: "日本では捕獲移動が採用されにくい理由" },
-          { id: "oso", title: "OSO18 が示した「移動できない個体」の壁" },
-          { id: "ethics", title: "それでも考えるべき倫理の問題" },
-          { id: "action", title: "今日からあなたができる 3 つのこと" },
+          { id: "background", title: "なぜこの研究が大事なのか" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intuition">「捕獲して山奥へ」という直感の落とし穴</h2>
+      <h2 id="background">なぜこの研究が大事なのか</h2>
       <p>
-        クマを「殺さずに移動させる」という発想は、世界中の市民から支持されてきました。
-        野生動物保護団体、SNS の声、メディアの論調、そして政治家の声明 —
-        どれもが「<strong>非致死的解決</strong>」を求めます。
+        捕獲移動は、動物を殺さずに済むため、多くの人に受け入れられやすい方法です。
+        北米やアフリカ南部では、家畜を襲う個体や人の生活圏に出てくる個体への対応として、長く使われてきました。
       </p>
       <p>
-        野生動物管理機関も、これに応える形で各地で実験を行いました。
-        米国・カナダ・ノルウェー・スウェーデン・ロシア・日本でも、
-        過去半世紀で <strong>数千頭のクマが捕獲・移動</strong>されてきました。
-      </p>
-      <p>
-        しかし、その結果はあまり報道されません。Linnell らはこのギャップに気づき、
-        過去 40 年間の論文・行政記録を <strong>世界中から集約</strong>して、
-        ようやく事実を明らかにしました。
+        一方で、「運んだ後、その動物がどうなったのか」「被害は本当に減ったのか」は、あまり確かめられてきませんでした。
+        著者らはノルウェーの研究者を中心とするグループで、ヨーロッパでクマなどの大型肉食動物が増えつつあり、
+        今後トラブルも増えると考えられることから、この方法を取り入れる前に、これまでの経験を整理しておく必要があると考えました。
       </p>
 
-      <h2 id="review">12 種・100 件超のレビューが示したこと</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        Linnell らは食肉目（カーニボラ）12 種の捕獲移動事例 <strong>116 件</strong>を集めました。
+        この論文は、新しく野外調査をしたものではなく、すでに発表されていた捕獲移動の研究や記録を集めて見直したものです。
+        対象は主に北米と中南米、アフリカ南部の事例で、クマについてはアメリカクロクマの研究 7 件とヒグマの研究 4 件が含まれていました。
+        ほかにヒョウ（3 件）、ライオン（2 件）、ジャガー（2 件）などの研究も取り上げられています。
+      </p>
+      <p>
+        見ているのは、主に次のような点です。
       </p>
       <ul>
-        <li>クマ類（ヒグマ・クロクマ・ホッキョクグマ）</li>
-        <li>大型ネコ科（ピューマ・ヒョウ・ジャガー）</li>
-        <li>イヌ科（オオカミ・コヨーテ・ハイイロギツネ）</li>
-        <li>その他（カワウソ・タヌキ・ワシントンクマアライグマ等）</li>
+        <li>運ばれた個体が、元の捕獲場所へ戻ってきたか</li>
+        <li>運ばれた後、家畜を襲う・人の生活圏に出るといった行動を再び起こしたか</li>
+        <li>運ばれた個体が生き延びたか</li>
       </ul>
+
+      <h2 id="findings">分かったこと</h2>
+      <h3>多くのクマが元の場所へ戻っていた</h3>
       <p>
-        各事例について、移動距離・移動後の追跡期間・帰巣行動・死亡・問題行動の再発を集約しました。
-        結論は、種を超えて似たパターンを示しました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">事後の結末</th>
-              <th className="px-3 py-2 text-left">クマでの割合（平均）</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">元の捕獲地点に戻った</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">50% 以上</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">死亡（移動後 1 年以内）</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">30%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">追跡不能（行方不明）</td>
-              <td className="px-3 py-2 text-amber-700 tabular-nums">10〜20%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">問題行動が解消した「成功」</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">30% 程度</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        ここで重要なのは <strong>「捕獲移動の成功」をどう定義するか</strong>。
-        Linnell らは「移動後 1 年以上、元の場所での問題行動が再発しなかった」を基準にしました。
-        これでも 30% 程度しか成功していない。一般的な対策手段としての効果は限定的、というのが冷徹な結論でした。
+        クマ（アメリカクロクマとヒグマ）の研究 11 件のうち 10 件で、運ばれた個体の <strong>45〜100%</strong> が元の捕獲場所へ戻っていました。
+        戻ってきた距離は、最大で <strong>229 km</strong> にのぼります。
+        論文の要旨では、大型の肉食動物全体として、<strong>最大 400 km</strong> 離れた場所からでも捕獲場所へ戻る力がくり返し示されている、と述べられています。
       </p>
 
-      <h2 id="return">なぜクマは元の場所に戻ってくるのか</h2>
+      <h3>ほかの肉食動物でも、問題行動がくり返された</h3>
       <p>
-        クマが戻ってくる理由は、複数あります。
-      </p>
-      <h3>① 強力な帰巣本能</h3>
-      <p>
-        クマは <strong>「生まれた場所」「育った場所」</strong>に強い愛着を持ち、
-        移動先からでも自力で戻ろうとします。GPS テレメトリーで追跡された個体の中には、
-        <strong>500 km 以上を歩いて帰った</strong>ヒグマが記録されています。
-      </p>
-      <h3>② 嗅覚で「自分の縄張りの匂い」を辿る</h3>
-      <p>
-        Vol.5（{" "}
-        <Link href="/articles/research-digest-005">クマの嗅覚</Link>
-        ）で見たように、クマの嗅覚は人間の数万倍。自分の糞・尿・体臭の痕跡を遠方からでも辿れます。
-        移動先で迷子になっても、徐々に「自分の匂い」の方向に戻る行動が観察されています。
-      </p>
-      <h3>③ 移動先での食料・住処の不足</h3>
-      <p>
-        移動先は <strong>「他のクマの縄張り」</strong>であることが多く、新参のクマは追い出されます。
-        食料も住処も確保できないため、馴染みのある元の場所に戻る方が生存戦略として有利になる。
-      </p>
-      <h3>④ 学習済みの「食物源」の魅力</h3>
-      <p>
-        市街地で人為的食料を学習した個体は、元の場所の <strong>「楽な食物源」</strong>を覚えています。
-        奥山で苦労して採餌するより、街のゴミ箱に戻る方が効率が高い、と判断する個体が多い。
+        クマ以外でも似た結果が報告されています。
+        国立公園へ運ばれたヒョウ 8 頭はすぐに公園の外へ出て、一部は再び家畜を襲いました。
+        5〜300 km 運ばれたライオン 25 頭（2 件の研究の合計）では、少なくとも 6 頭が再び家畜を襲っています。
       </p>
 
-      <h2 id="mortality">30% の死亡率 — その理由</h2>
+      <h3>「うまくいったか」を判断する材料が足りなかった</h3>
       <p>
-        さらに悲しい数字が、移動後 1 年以内の死亡率 <strong>30%</strong>。
+        この論文でとくに大事なのは、運んだ後の追跡がほとんど行われておらず、
+        移動させた後に被害がどう変わったかのデータがほぼ無かった、という指摘です。
+        つまり、捕獲移動で被害が減ったのかどうかは、そもそも評価できない状態でした。
+        また、運ばれた個体の生存率が低かったと示された例もあると述べています。
       </p>
+
+      <h3>著者らの提案</h3>
+      <p>
+        著者らは、人とのトラブルが起きにくい適当な放獣先が無い場合には、
+        捕獲移動に頼るのではなく、そもそもトラブルが起きにくい状態をつくること、
+        それが難しい場合は捕獲して処分することも含めて考えるべきだ、としています。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
       <ul>
         <li>
-          <strong>他個体との競合</strong>: 移動先の縄張り個体に攻撃される
+          新しい調査ではなく、既存の研究をまとめたものです。元になった研究の多くは追跡期間や記録の取り方がそろっておらず、
+          数字は研究ごとにばらつきがあります。
         </li>
         <li>
-          <strong>未知の環境でのストレス</strong>: 食物が見つからず餓死
+          対象は主に北米とアフリカ南部の事例で、日本のツキノワグマやヒグマを調べたものではありません。
+          地形や人の住み方、クマの密度が違うため、数字をそのまま日本に当てはめることはできません。
         </li>
         <li>
-          <strong>長距離移動による疲弊</strong>: 帰巣中に体力を使い果たす
+          1997 年の論文で、その後の研究の積み重ねは含まれていません。
         </li>
         <li>
-          <strong>自動車衝突</strong>: 知らない地形で道路に出てしまう
-        </li>
-        <li>
-          <strong>他のハンターに撃たれる</strong>: 移動先で「新顔のクマ」として駆除対象に
+          「捕獲移動は絶対に効かない」と結論づけた論文ではありません。分かったのは、
+          戻ってくる例が多いこと、そして効果を確かめるデータが足りなかったことです。
         </li>
       </ul>
-      <p>
-        皮肉なことに、<strong>「殺さずに移動させる」が、結果的にクマを死なせる</strong>ことになるケースが
-        相当多い、というのが本論文の重要な指摘でした。
-        市民の感情と、科学的事実が真逆の結果を示すという、複雑な現実です。
-      </p>
 
-      <h2 id="success">成功する 30% は何が違うのか</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        では、捕獲移動が成功するクマと失敗するクマの違いは何でしょうか。Linnell らは複数の要因を挙げています。
+        この論文から言えるのは、問題を起こしたクマを別の場所へ運ぶだけでは、
+        長く続く解決にならないことが多い、ということです。
+        クマが戻ってくれば、同じ場所で同じことがくり返されるおそれがあります。
       </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">要因</th>
-              <th className="px-3 py-2 text-left">成功しやすい条件</th>
-              <th className="px-3 py-2 text-left">失敗しやすい条件</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">年齢</td>
-              <td className="px-3 py-2 text-stone-700">若い個体（1〜3 歳）</td>
-              <td className="px-3 py-2 text-stone-700">成獣（5 歳以上）</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">学習度</td>
-              <td className="px-3 py-2 text-stone-700">人為的食料未経験</td>
-              <td className="px-3 py-2 text-stone-700">「都市型クマ」</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">移動距離</td>
-              <td className="px-3 py-2 text-stone-700">100 km 以上</td>
-              <td className="px-3 py-2 text-stone-700">数十 km</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">移動先</td>
-              <td className="px-3 py-2 text-stone-700">他クマが少ない奥山</td>
-              <td className="px-3 py-2 text-stone-700">既存縄張りに重なる</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">季節</td>
-              <td className="px-3 py-2 text-stone-700">春〜初夏（食料豊富）</td>
-              <td className="px-3 py-2 text-stone-700">秋〜冬眠前</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
       <p>
-        つまり、<strong>若くて学習が浅い個体を、十分遠くの低密度地帯に、適切な季節に放す</strong>と
-        成功率が上がる。条件はかなり限定的です。
-      </p>
-
-      <h2 id="alternatives">代替策 — 何が本当に効くのか</h2>
-      <p>
-        では「捕獲移動」が万能でないなら、何が効くのか。本論文と後続研究が示す効果的な対策は次の通り。
-      </p>
-      <ol className="my-4 list-decimal space-y-2 pl-5">
-        <li>
-          <strong>誘引物管理</strong>: 都市型クマの根本原因は「街の食物」。除去できれば来なくなる。
-          {" "}<Link href="/articles/research-digest-006">Erlenbach 2014（Vol.6）</Link>{" "}と{" "}
-          <Link href="/articles/research-digest-005">Niimura 2014（Vol.5）</Link>を参照。
-        </li>
-        <li>
-          <strong>電気柵</strong>: 物理的バリアと痛みによる学習で「来ない」を作る。
-          {" "}<Link href="/articles/research-digest-007">Huygens 2001（Vol.7）</Link>。
-        </li>
-        <li>
-          <strong>非致死的撃退</strong>: ベアドッグ・ゴム弾・大音響で「街に来ると嫌な目に遭う」を学習させる。
-        </li>
-        <li>
-          <strong>住民教育</strong>: 個別対策ではなく地域全体での誘引物排除を実現する。
-        </li>
-        <li>
-          <strong>計画的捕獲（致死含む）</strong>: 学習しきった個体は移動しても戻るので、最終的にやむを得ない場合も。
-        </li>
-      </ol>
-      <p>
-        Linnell らの本論文は、<strong>「捕獲移動を全否定する」</strong>ものではありません。
-        ただし「単独の解決策にはならない」「条件が揃った場合の限定的な手段」と位置づける必要がある、
-        というのが結論です。
-      </p>
-
-      <h2 id="japan">日本では捕獲移動が採用されにくい理由</h2>
-      <p>
-        実は日本でも、過去にクマの捕獲移動が試されたケースはあります。
-        しかし、現在は <strong>ほとんど採用されていません</strong>。
+        クマが人里に来る理由の一つは、生ごみ、収穫しない果樹、放置された農作物など、
+        そこに食べ物があることです。運ぶかどうかの前に、クマを引き寄せるもの（誘引物）を減らすことが大切になります。
       </p>
       <ul>
-        <li>
-          <strong>地形的制約</strong>: 国土が狭く、「十分遠くの低密度地帯」が現実的に存在しにくい
-        </li>
-        <li>
-          <strong>個体群密度の高さ</strong>: 移動先が必ず別の個体群と重なってしまう
-        </li>
-        <li>
-          <strong>追跡コスト</strong>: GPS 首輪・調査体制の維持に大きな予算が必要
-        </li>
-        <li>
-          <strong>事後の責任問題</strong>: 移動したクマが別地域で人身被害を起こした場合の責任所在が不明
-        </li>
-        <li>
-          <strong>住民感情</strong>: 「自分の地域に放されては困る」という反発
-        </li>
+        <li>生ごみは収集日の朝に出し、屋外に置きっぱなしにしない</li>
+        <li>収穫しない柿や栗は早めに取り除く</li>
+        <li>畑や家畜の周りには電気柵など、クマを近づけない工夫をする</li>
       </ul>
       <p>
-        2024 年 4 月のクマ「指定管理鳥獣」化（{" "}
+        日本では 2024 年 4 月にクマ類が「指定管理鳥獣」に加わり、国の支援を受けながら地域で計画的に管理を進める仕組みになりました（{" "}
         <Link href="/articles/designated-management-2026">解説記事</Link>
-        ）では、捕獲移動より <strong>「現地での捕獲駆除 + 誘引物管理 + 電気柵」</strong>を中心に据えています。
-        Linnell ら 1997 の論文が示した知見が、日本の政策設計にも反映されていると言えます。
+        ）。捕獲をどうするかの判断は自治体が行いますが、誘引物を減らすことは、私たち一人ひとりにもできる対策です。
+      </p>
+      <p>
+        もしクマに出会ってしまったときの行動（走らない・背を向けない・ゆっくり離れる など）は{" "}
+        <Link href="/learn/safety">クマ対策の基本</Link>
+        にまとめています。
       </p>
 
-      <h2 id="oso">OSO18 が示した「移動できない個体」の壁</h2>
-      <p>
-        日本で最も有名な「移動できなかった個体」が、北海道標茶町の <strong>OSO18</strong> です。
-      </p>
-      <p>
-        2019〜2023 年に乳牛 66 頭を襲い続けたこの巨大ヒグマは、何度も追跡され、捕獲を試みられました。
-        当時、SNS や一部メディアでは「捕獲して山奥に放すべき」という意見も出ましたが、
-        実務的には選択肢として検討されませんでした。理由は明白です。
-      </p>
-      <ul>
-        <li>
-          OSO18 は <strong>大型成獣（推定 400kg 超）</strong>で、移動条件「若い個体」を満たさない
-        </li>
-        <li>
-          <strong>「乳牛 = 食物」の強烈な学習</strong>を完了していた（成功条件「学習浅い」を満たさない）
-        </li>
-        <li>
-          北海道のヒグマ密度が高く、十分遠くの低密度地帯がない
-        </li>
-        <li>
-          再発した場合、別地域の畜産業に致命的被害が出るリスクが高い
-        </li>
-      </ul>
-      <p>
-        結局 OSO18 は 2023 年 7 月に駆除されました。
-        この決断には議論がありましたが、Linnell らの研究を踏まえれば、
-        <strong>「捕獲移動でも解決しなかった可能性が高い」</strong>事案だったと言えます。
-      </p>
-
-      <h2 id="ethics">それでも考えるべき倫理の問題</h2>
-      <p>
-        Linnell らの論文が冷徹に「捕獲移動はあまり効かない」と示しても、
-        それで「では駆除すべき」という結論には直結しません。
-        ここには <strong>科学を超えた倫理の問題</strong>があります。
-      </p>
-      <ul>
-        <li>
-          人間と動物の <strong>生命価値の比較</strong>
-        </li>
-        <li>
-          地域固有個体群の <strong>保全価値</strong>
-        </li>
-        <li>
-          人と野生動物の <strong>共存可能性</strong>
-        </li>
-        <li>
-          子グマ・母グマへの <strong>個別の配慮</strong>
-        </li>
-      </ul>
-      <p>
-        これらは科学だけでは答えが出ない問いです。
-        捕獲移動を「効くか効かないか」のレイヤーで議論することと、
-        「するかしないか」の倫理的レイヤーで議論することは別物だと、
-        本論文を読み終えて改めて感じます。
-      </p>
-      <p>
-        詳しくは{" "}
-        <Link href="/articles/culling-debate">駆除をめぐる議論</Link>
-        も合わせてご覧ください。
-      </p>
-
-      <h2 id="action">今日からあなたができる 3 つのこと</h2>
-      <ol className="my-4 list-decimal space-y-3 pl-5">
-        <li>
-          <strong>「捕獲移動 = 簡単な解決」と思い込まない</strong> — SNS で「殺さずに山奥へ」と
-          意見を述べる前に、その手段の効果と副作用を理解する。
-        </li>
-        <li>
-          <strong>「予防」に投資する</strong> — 誘引物管理・電気柵が、捕獲移動より遥かに効きます。
-          特に農家・畜舎経営者・果樹園所有者は{" "}
-          <Link href="/articles/research-digest-007">電気柵研究（Vol.7）</Link>{" "}
-          を参考に。
-        </li>
-        <li>
-          <strong>「学習させない」を最優先</strong> — 一度ゴミに味を覚えたクマは、その後どんな
-          手段でも管理が難しい。最初の接触を「させない」ことが、結局は人にもクマにも優しい。
-        </li>
-      </ol>
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
             title:
-              "Translocation of carnivores as a method for managing problem animals: a review（本号メイン）",
-            citation: (
-              <>
-                Linnell, J. D. C., et al. (1997).{" "}
-                <em className="not-italic">Biodiversity &amp; Conservation</em> 6: 1245–1257.
-              </>
-            ),
-            href: "https://doi.org/10.1023/A:1018392013758",
-            linkText: "DOI: 10.1023/A:1018392013758 →",
+              "Translocation of carnivores as a method for managing problem animals: a review（本号で紹介した論文）",
+            citation: mainCitation,
+            href: "https://doi.org/10.1023/B:BIOC.0000034011.05412.cd",
+            linkText: "DOI: 10.1023/B:BIOC.0000034011.05412.cd →",
           },
           {
-            title: "Translocation of grizzly bears in British Columbia",
-            citation: (
-              <>
-                Milligan, S., et al. (2018).{" "}
-                <em className="not-italic">Ursus</em> 29(1).
-              </>
-            ),
-          },
-          {
-            title: "Predator translocation outcomes review",
-            citation: (
-              <>
-                Massei, G., et al. (2010).{" "}
-                <em className="not-italic">Wildlife Research</em> 37(5): 428–439.
-              </>
-            ),
+            title: "Conservation Evidence による本論文の要約（英語）",
+            citation: <>Conservation Evidence, individual study 863.</>,
+            href: "https://conservationevidencejournal.com/individual-study/863",
+            linkText: "要約ページを見る →",
           },
         ]}
       />
@@ -436,11 +205,7 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.10">
-        <strong>「クマは『数』を理解している」</strong> —
-        アメリカクロクマ 3 頭にタッチスクリーンで「多い方を選ぶ」課題を出した動物認知研究。
-        クマがイルカやサル並みの数量理解能力を持つことを示した Vonk &amp; Beran 2012 を精読します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }

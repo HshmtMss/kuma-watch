@@ -31,370 +31,173 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        山を歩いていて、樹皮が剥がれて茶色い毛が付着した木を見たことがあるでしょうか。
-        その木は <strong>「ベアラブツリー（bear rub tree）」</strong>と呼ばれ、クマがわざわざ選んで
-        背中をこすりつけている <strong>「クマだけの社会的メッセージボード」</strong>です。
+        クマは木に背中をこすりつけたり、かじったり、爪を立てたりして、においの印（マーキング）を残します。
+        では、森にたくさんある木のうち、どの木が選ばれているのでしょうか。
       </p>
       <p>
-        森に無数にある木の中から、クマは特定の数本だけを選んで使い続けます。
-        どんな基準で？ なぜ？ Clapham ら（2014）の論文がこの謎を解き明かしました。
+        今号は、カナダ西海岸のヒグマを対象に「マーキングに使われる木」と「周りにある木」を比べた
+        Clapham ら（2013）の論文を読みます。著者らは、ヒグマのマーキング用の木の選び方を調べた研究は
+        これが最初だと述べています。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
         label="今号で読み解く 1 本の論文"
         title="The function of strategic tree selectivity in the chemical signalling of brown bears"
         citation={
           <>
-            Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
-            <em className="not-italic">Animal Behaviour</em> 87: 151–156.
+            Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2013).{" "}
+            <em className="not-italic">Animal Behaviour</em> 85(6): 1351–1357.
           </>
         }
-        href="https://doi.org/10.1016/j.anbehav.2013.10.024"
-        linkText="DOI: 10.1016/j.anbehav.2013.10.024 →"
+        href="https://doi.org/10.1016/j.anbehav.2013.03.026"
+        linkText="DOI: 10.1016/j.anbehav.2013.03.026 →"
       />
 
       <KeyPoints
         label="時間がない人向けの 3 行"
         items={[
           <>
-            クマは森に無数にある木の中から <strong>特定の数本だけ</strong>を選んで擦りつける
+            マーキングに使われた 50 本の木は、<strong>すべて獣道の上</strong>にあり、河口や川の周り（食べ物が多い場所）に集まっていた
           </>,
           <>
-            選ばれる木は <strong>道沿い・直径 30cm 以上・樹皮の質感が独特</strong>
+            クマは周りにある木をそのまま使うのではなく、<strong>その場所では少なめの樹種</strong>や、<strong>平均より太い木</strong>を選んでいた
           </>,
           <>
-            これは <strong>「化学メッセージ」</strong>を残す行動で、性別・繁殖状態などを通信
+            著者らは、よく通る場所の目立つ木を選ぶことで、<strong>においの印を効率よく他のクマに届けている</strong>と考えている
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "what", title: "「ベアラブツリー」とは何か" },
-          { id: "researcher", title: "クマの BearID Project を率いた研究者" },
-          { id: "method", title: "60 本の木と 200 頭のクマ — 試験方法" },
-          { id: "selection", title: "クマが選ぶ「特別な木」の条件" },
-          { id: "message", title: "クマは何を伝えているのか" },
-          { id: "who", title: "誰が、いつ、なぜ擦るのか" },
-          { id: "japan", title: "日本の山でもラブツリーを見かける" },
-          { id: "monitoring", title: "保護研究での活用 — DNA 採取拠点として" },
-          { id: "social", title: "クマの「社会性」を再考する" },
-          { id: "action", title: "山でラブツリーを見つけたら" },
+          { id: "background", title: "なぜ「どの木か」を調べるのか" },
+          { id: "method", title: "研究の概要 — どこで、どう調べたか" },
+          { id: "results", title: "分かったこと" },
+          { id: "related", title: "関連研究 — 誰がどのくらい時間をかけるか" },
+          { id: "limits", title: "限界・注意" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="what">「ベアラブツリー」とは何か</h2>
+      <h2 id="background">なぜ「どの木か」を調べるのか</h2>
       <p>
-        ベアラブツリー（bear rub tree）とは、クマが <strong>背中・首・お尻を擦りつけることを繰り返している木</strong>。
-        北米・欧州・アジアの森林で広く観察される現象です。
+        多くの哺乳類は、目立つものににおいの印を残します。においを作って残すには時間とエネルギーがかかるため、
+        「相手に気づかれやすい場所・ものを選べば、その手間を減らせるのではないか」という考え方があります。
       </p>
       <p>
-        実際にラブツリーを見ると、次のような特徴があります。
+        ヒグマについては、マーキングされた木がどのような木なのか、はっきりしていませんでした。
+        著者らは「ヒグマはマーキングに使う木を選んでいて、その木はクマがよく訪れる場所にあるはずだ」という仮説を立て、
+        実際に周りの木と比べて確かめました。
+      </p>
+
+      <h2 id="method">研究の概要 — どこで、どう調べたか</h2>
+      <ul>
+        <li>
+          <strong>場所</strong>: カナダ・ブリティッシュコロンビア州、ナイト・インレット（Knight Inlet）の
+          グレンデール・コーブ（Glendale Cove）。秋にはおよそ 40〜50 頭のヒグマがサケの産卵水路を主な食料源として使う地域です。
+        </li>
+        <li>
+          <strong>期間</strong>: 2009〜2011 年の 5〜10 月。
+        </li>
+        <li>
+          <strong>マーキング用の木の見つけ方</strong>: 長年くり返し使われている跡がある木だけを対象にしました。
+          一度こすっただけの木は含めていません。カメラトラップで、跡がツキノワグマではなくヒグマのものであることも確かめています。
+        </li>
+        <li>
+          <strong>比べ方</strong>: 森の中をまっすぐ歩いて木を数える調査（13 本、計 2.6 km）と、
+          獣道に沿って木を数える調査（16 本、計約 2.2 km）を行い、さらにマーキング用の木の周りの木も記録しました。
+          樹種と幹の太さ（胸高直径）を、マーキングされた木とされていない木で比べています。
+        </li>
+      </ul>
+
+      <h2 id="results">分かったこと</h2>
+      <h3>場所: すべて獣道の上</h3>
+      <p>
+        記録された 50 本のマーキング用の木は、すべて獣道の上にありました。
+        森の中をまっすぐ歩く調査で見つかったのは 50 本中 2 本だけで、残りは獣道の調査や探索で見つかっています。
+        よく使われる獣道ほど、よく使われる木がある傾向でした。
+      </p>
+      <p>
+        木は河口や川の周りの森の縁に集まっていました。春はスゲの生える湿地、秋はサケの遡上する川という、
+        食べ物の多い場所の近くです。山の斜面にも跡のある木はありましたが、間隔が広く、
+        くり返し使われる木とは言えない程度でした。
+      </p>
+
+      <h3>樹種: 少なめの樹種を選ぶ</h3>
+      <p>
+        この地域で最も多い木はアメリカツガ（Western hemlock）です。
+        ところがマーキングに使われた木の内訳は、アマビリスモミ 23 本、シトカトウヒ 11 本、アメリカツガ 8 本、
+        ベイスギ 7 本、レッドアルダー 1 本でした。
+        周りの木の構成と比べると、アマビリスモミなどは期待より多く、アメリカツガは期待より少なく選ばれていました。
+        著者らは、アマビリスモミやシトカトウヒは傷つくとにおいの強い樹脂を出すことに触れ、
+        樹脂がにおいの印を長持ちさせたり、相手を引きつけたりしているのかもしれないと推測しています（推測であり、検証はされていません）。
+      </p>
+
+      <h3>太さ: 平均より太い木</h3>
+      <p>
+        マーキング用の木の胸高直径は平均 42.5 cm で、近くのマーキングされていない木（平均 31.7 cm）より太いものでした。
+        樹種による太さの違いはなく、樹種に関係なく太い木が選ばれていました。
+        一方、木の傾きには差がありませんでした。
+      </p>
+
+      <h3>その他</h3>
+      <ul>
+        <li>
+          30 本で測った跡の一番高い位置は、平均約 2.0 m でした。
+        </li>
+        <li>
+          ぬれた毛でこすった跡は 2 時間もたたずに見えなくなる一方、かじった跡や爪の跡はその年のうちは新しいまま残っていました。
+        </li>
+        <li>
+          マーキング用の木に向かって、足を踏みしめた跡のくぼみが続いている木もありました。
+        </li>
+      </ul>
+
+      <h2 id="related">関連研究 — 誰がどのくらい時間をかけるか</h2>
+      <p>
+        同じ著者らは、同じ地域でマーキング用の木の前に設置したカメラトラップの画像を使い、
+        年齢や性別による違いも報告しています（Clapham ら 2014）。抄録によると、
+        おとなのオスはおとなのメスや若いクマより長い時間をマーキングにかけ、より複雑な一連の動きを見せました。
+        おとなのオスの行動は繁殖期の外でも変わらず、著者らはオス同士の競争に関わる行動だと考えています。
+        また、幼い子グマは母グマの動きをまねることが多く、少し大きな子グマは自分からマーキングをする傾向がありました。
+      </p>
+
+      <h2 id="limits">限界・注意</h2>
+      <ul>
+        <li>
+          調べたのはカナダ西海岸の 1 か所の河口周辺だけで、マーキング用の木は 50 本です。
+          森の樹種構成が違えば、選ばれる樹種も変わると考えられます。
+        </li>
+        <li>
+          対象はヒグマです。日本のツキノワグマや北海道のヒグマで同じ傾向になるかは、この論文からは分かりません。
+        </li>
+        <li>
+          樹脂のにおいの役割や、においの印が何を伝えているかは、この論文では直接は測っておらず、著者らの解釈・推測の部分です。
+        </li>
+      </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
+      <p>
+        この研究で、マーキング用の木はクマがよく通る獣道の上にあり、食べ物の多い場所の近くに集まっていました。
+        日本でそのまま当てはまるとは限りませんが、山の中で樹皮がこすれたりかじられたりした木や、毛の付いた木を見かけたら、
+        「この辺りはクマが通る道かもしれない」と考えるきっかけになります。
       </p>
       <ul>
         <li>
-          🌳 <strong>樹皮が剥がれ</strong>、つるつるになっている（高さ 1〜2 m の範囲）
+          そうした木や獣道の周りでは、写真を撮るために長くとどまったりせず、周りに気を配りながら通り過ぎましょう。
         </li>
         <li>
-          🐻 <strong>茶色や黒い毛</strong>が大量に付着している
+          クマに出会ったときは、走らない・背を向けない・ゆっくり離れる、が基本です。
+          突進されたら、5〜10 m まで引きつけてクマスプレーを顔に向けて 1〜2 秒ずつ噴射します
+          （詳しくは <Link href="/articles/bear-spray">クマスプレーの使い方</Link>）。
         </li>
         <li>
-          🪵 <strong>爪痕</strong>（バークスクラブ）も併存することが多い
-        </li>
-        <li>
-          🌊 <strong>木が斜めに傾く・幹が窪む</strong>（長年使われた結果）
-        </li>
-        <li>
-          🦴 周囲に <strong>クマの糞・足跡</strong>が頻繁
+          クマの痕跡の見分け方は <Link href="/articles/bear-tracks">クマの痕跡を見分ける</Link> にまとめています。
         </li>
       </ul>
-      <p>
-        昔から「クマが背中をかゆがって木に擦りつけている」と思われがちですが、
-        実はもっと <strong>戦略的な意味</strong>を持つ行動であることが、近年の研究で明らかになりました。
-      </p>
 
-      <h2 id="researcher">クマの BearID Project を率いた研究者</h2>
-      <p>
-        筆頭著者 <strong>Melanie Clapham</strong>は、Vol.3（{" "}
-        <Link href="/articles/research-digest-003">AI 顔認識</Link>
-        ）でも登場した、クマ研究の若き第一人者。
-        本論文発表時はカンブリア大学（イギリス）の博士課程学生で、
-        後にカナダで BearID Project を立ち上げ、AI 個体識別の世界的研究者に成長します。
-      </p>
-      <p>
-        共著者の <strong>Frank Rosell</strong>（ノルウェー・テレマーク大学）は、
-        匂いを使ったコミュニケーションの第一人者で、ビーバーの肛門腺研究で知られます。
-        この 2 人が組んで、クマの「<strong>化学的シグナリング（chemical signalling）</strong>」を本格的に解析した最初の研究の一つが本論文でした。
-      </p>
-
-      <h2 id="method">60 本の木と 200 頭のクマ — 試験方法</h2>
-      <p>
-        舞台はカナダ・ブリティッシュコロンビア州の <strong>クニソンインレット保護区</strong>。
-        ヒグマの密度が高く、トレイルカメラと現地観察が組み合わせやすい場所です。
-      </p>
-      <p>
-        Clapham らの方法は次の通り。
-      </p>
-      <ul>
-        <li>
-          🌳 <strong>60 本</strong>のラブツリー候補（過去に使用痕跡が確認された木）を選定
-        </li>
-        <li>
-          📷 各木の前にトレイルカメラを設置し、24 時間体制で撮影
-        </li>
-        <li>
-          📏 各木の <strong>樹種・直径・樹皮の質感・周囲の植生・道沿いの有無</strong>を測定
-        </li>
-        <li>
-          🐻 撮影された <strong>約 200 頭のヒグマ個体</strong>を識別（後の AI 顔認識研究の前身）
-        </li>
-        <li>
-          🗓️ <strong>2 年間</strong>のデータを蓄積し、季節・年齢・性別との相関を解析
-        </li>
-      </ul>
-      <p>
-        60 本というサンプル数は、当時としては相当な規模。
-        この大規模データセットがあったからこそ、「<strong>クマは無作為に木を選んでいるのではない</strong>」
-        という結論を統計的に主張できるようになりました。
-      </p>
-
-      <h2 id="selection">クマが選ぶ「特別な木」の条件</h2>
-      <p>
-        2 年間の観察で、ラブツリーになる木とならない木の <strong>明確な差</strong>が見えてきました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">特徴</th>
-              <th className="px-3 py-2 text-left">クマが選ぶ条件</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">場所</td>
-              <td className="px-3 py-2">クマの通り道（獣道・林道）沿い</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">樹種</td>
-              <td className="px-3 py-2">針葉樹（モミ・ベイマツ・スプルース）を強く選好</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">幹の太さ</td>
-              <td className="px-3 py-2">直径 30 cm 以上</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">樹皮</td>
-              <td className="px-3 py-2">粗くて剥がれやすい質感（匂いが残りやすい）</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">周辺環境</td>
-              <td className="px-3 py-2">見通しが良く、近くに障害物がない</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">道路との距離</td>
-              <td className="px-3 py-2">「道沿い」を強く選好（無作為より 4 倍頻度高）</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        統計的に最も強い要因は <strong>「道沿いであるかどうか」</strong>。
-        これは別の言い方をすると、<strong>「他のクマが通る確率の高い場所」</strong>に
-        集中していたことを意味します。クマたちが <strong>「メッセージを残す場所」</strong>として、
-        効率的なポストを選んでいる証拠です。
-      </p>
-
-      <h2 id="message">クマは何を伝えているのか</h2>
-      <p>
-        では、何を伝えているのでしょうか？ 残された <strong>毛・体液・皮脂</strong>のサンプルを採取して
-        分析することで、いくつかの「メッセージ」が解読されています。
-      </p>
-      <h3>① 「自分はここにいる」</h3>
-      <p>
-        最も基本的な情報。<strong>クマの個体ID</strong>がフェロモン・体臭から識別されます。
-        別のクマがそれを嗅ぐと、「ここを通ったのは誰か」が分かる。
-      </p>
-      <h3>② 「自分の性別・年齢・体格」</h3>
-      <p>
-        匂いの成分から、雄か雌か、若いか成獣か、体格はどれくらいかが識別できます。
-        繁殖期の雄にとっては、自分の<strong>存在感</strong>をアピールする手段になります。
-      </p>
-      <h3>③ 「繁殖期の状態」</h3>
-      <p>
-        雌の発情期（5〜7 月）には、ホルモン由来の<strong>性フェロモン</strong>がより強く出ます。
-        遠くにいる雄も、ラブツリーの匂いを嗅いで雌の発情状態を察知し、移動を始めます。
-      </p>
-      <h3>④ 「ここは自分の縄張り」</h3>
-      <p>
-        強い雄の匂いがあるラブツリーには、他の雄が近づきにくい傾向。
-        これは <strong>テリトリーの間接的な主張</strong>として機能します。
-      </p>
-      <h3>⑤ 「最近通った時間」</h3>
-      <p>
-        匂いの強さから「<strong>つい最近か、数日前か、数週間前か</strong>」が分かる。
-        クマには鋭い嗅覚があるので（{" "}
-        <Link href="/articles/research-digest-005">Vol.5</Link>{" "}）、時間情報も読み取れるのです。
-      </p>
-
-      <h2 id="who">誰が、いつ、なぜ擦るのか</h2>
-      <p>
-        トレイルカメラのデータから、利用パターンも明らかになりました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">クマの種類</th>
-              <th className="px-3 py-2 text-left">利用頻度</th>
-              <th className="px-3 py-2 text-left">時期のピーク</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">成獣雄</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">最多</td>
-              <td className="px-3 py-2">5〜7 月（繁殖期）</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">単独の若い雄</td>
-              <td className="px-3 py-2 tabular-nums">中程度</td>
-              <td className="px-3 py-2">夏全般</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">発情期の雌</td>
-              <td className="px-3 py-2 tabular-nums">中程度</td>
-              <td className="px-3 py-2">5〜7 月</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">子連れの母グマ</td>
-              <td className="px-3 py-2 text-green-700 tabular-nums">最少</td>
-              <td className="px-3 py-2">稀</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        圧倒的に <strong>「繁殖期の成獣雄」</strong>がラブツリーを多用していました。
-        これは Vol.12 の「致命的襲撃の 88% が成獣雄」（{" "}
-        <Link href="/articles/research-digest-012">Herrero 2011</Link>{" "}
-        ）と整合的で、雄ヒグマが <strong>テリトリーと繁殖機会</strong>を巡って活発に通信していることを示します。
-      </p>
-      <p>
-        逆に、子連れ母グマはラブツリーをほとんど使いません。
-        子を守るために <strong>「自分の存在を匂いで主張しない」</strong>戦略を取っているのでしょう。
-      </p>
-
-      <h2 id="japan">日本の山でもラブツリーを見かける</h2>
-      <p>
-        日本のツキノワグマ・北海道のヒグマでも、ラブツリーは確認されています。
-      </p>
-      <ul>
-        <li>
-          <strong>北海道のヒグマ</strong>: 大雪山系・知床・日高山脈の登山道沿いに多い
-        </li>
-        <li>
-          <strong>本州のツキノワグマ</strong>: 東北・北陸・中部山岳の道沿いに点在
-        </li>
-        <li>
-          <strong>選ばれる木</strong>: 北米と同じく針葉樹（モミ・ツガ・カラマツ）が中心
-        </li>
-        <li>
-          <strong>剥がれた樹皮の高さ</strong>: 1〜1.5 m（ツキノワグマは小型なので低め）
-        </li>
-      </ul>
-      <p>
-        登山中に「あれ、この木だけ樹皮が剥がれているな」と気づいたら、
-        ラブツリーである可能性があります。爪痕や付着毛があればほぼ確定。
-      </p>
-      <p>
-        詳細は{" "}
-        <Link href="/articles/bear-tracks">クマの痕跡を見分ける</Link>
-        と{" "}
-        <Link href="/articles/bear-territory">クマの縄張りと行動圏</Link>
-        を参照してください。
-      </p>
-
-      <h2 id="monitoring">保護研究での活用 — DNA 採取拠点として</h2>
-      <p>
-        ラブツリーは野生動物管理の現場でも <strong>「貴重なデータ取得拠点」</strong>になっています。
-      </p>
-      <ul>
-        <li>
-          🔬 ラブツリーに付着した <strong>毛から DNA を抽出</strong>し、個体識別・性別・血縁解析
-        </li>
-        <li>
-          📸 トレイルカメラを設置して <strong>個体数推定</strong>
-        </li>
-        <li>
-          📊 利用頻度の変化で <strong>地域個体群の活動状況</strong>をモニター
-        </li>
-        <li>
-          🧬 長期的な <strong>遺伝的多様性</strong>の変化を追跡
-        </li>
-      </ul>
-      <p>
-        ラブツリーは <strong>クマが自然に集まる場所</strong>なので、トラップを仕掛けるよりも倫理的負担が少なく、
-        近年の野生動物モニタリングの定番手法になっています。
-      </p>
-      <p>
-        Vol.3 の AI 顔認識（{" "}
-        <Link href="/articles/research-digest-003">Clapham 2020</Link>
-        ）も、ラブツリーで撮影された顔写真を学習データとして活用しています。
-      </p>
-
-      <h2 id="social">クマの「社会性」を再考する</h2>
-      <p>
-        クマは <strong>「単独行動の動物」</strong>として有名です。雄も雌も、繁殖期以外は基本的に
-        単独で森を歩く。だから「クマには社会がない」と長らく考えられてきました。
-      </p>
-      <p>
-        しかし、Clapham らの研究は、この見方を覆します。
-      </p>
-      <p>
-        クマたちは、互いに <strong>顔を合わせなくても</strong>、ラブツリーを介して
-        <strong>非同期的に情報をやり取り</strong>しています。これは
-        <strong>「電子掲示板に書き込みを残す」</strong>のとほぼ同じ仕組み。
-      </p>
-      <p>
-        個別の出会いは少なくても、地域のクマたちは <strong>互いの存在・状態を把握し合い</strong>、
-        テリトリー・繁殖機会・親子関係を調整しています。
-        単独行動の動物にも、独自の <strong>「社会的ネットワーク」</strong>があったのです。
-      </p>
-      <p>
-        詳細は{" "}
-        <Link href="/articles/bear-communication">クマ同士のコミュニケーション</Link>
-        も併読してください。
-      </p>
-
-      <h2 id="action">山でラブツリーを見つけたら</h2>
-      <p>
-        登山・トレッキング中にラブツリーを見つけたら、次のことを意識してください。
-      </p>
-      <ol className="my-4 list-decimal space-y-3 pl-5">
-        <li>
-          <strong>その場所は「クマの通り道」</strong> — 道沿いにラブツリーがあるということは、
-          ここをクマが頻繁に通っている証拠。通過時は鈴・声出し・周囲確認を強化。
-        </li>
-        <li>
-          <strong>樹皮の状態で「最近性」を判断</strong> — 樹皮の剥がれが新しく、毛も乾燥前ならば
-          数日以内にクマがいた可能性。引き返すか、警戒度を上げる。
-        </li>
-        <li>
-          <strong>写真を撮って自治体・くまウォッチに投稿</strong> — 樹幹マーキングは公的データとしても貴重。
-          {" "}<Link href="/submit">出没情報の投稿</Link>{" "}で位置情報付き写真を共有すると、地域の警戒度評価に活用されます。
-        </li>
-        <li>
-          <strong>触らない、近寄って嗅がない</strong> — クマの匂いが付くと、トレッキング中の自分が
-          別のクマに「侵入者」と認識されるリスク。匂いの強い場所は避けて通る。
-        </li>
-        <li>
-          <strong>季節を意識する</strong> — 繁殖期（5〜7 月）はラブツリー周辺のクマ活動が活発。
-          特にこの時期の道沿いの新鮮なラブツリーは警戒最大に。
-        </li>
-      </ol>
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
@@ -404,41 +207,34 @@ export default function Page() {
               "The function of strategic tree selectivity in the chemical signalling of brown bears（本号メイン）",
             citation: (
               <>
-                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
-                <em className="not-italic">Animal Behaviour</em> 87: 151–156.
+                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2013).{" "}
+                <em className="not-italic">Animal Behaviour</em> 85(6): 1351–1357.
               </>
             ),
-            href: "https://doi.org/10.1016/j.anbehav.2013.10.024",
-            linkText: "DOI: 10.1016/j.anbehav.2013.10.024 →",
+            href: "https://doi.org/10.1016/j.anbehav.2013.03.026",
+            linkText: "DOI: 10.1016/j.anbehav.2013.03.026 →",
           },
           {
-            title: "Multi-modal scent communication in brown bears",
+            title: "Scent-marking investment and motor patterns are affected by the age and sex of wild brown bears",
             citation: (
               <>
-                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2012).{" "}
-                <em className="not-italic">PLOS ONE</em> 7(4): e35404.
+                Clapham, M., Nevin, O. T., Ramsey, A. D., &amp; Rosell, F. (2014).{" "}
+                <em className="not-italic">Animal Behaviour</em> 94: 107–116.
               </>
             ),
-          },
-          {
-            title: "BearID Project — Clapham らの非営利開発プロジェクト",
-            href: "https://bearid.org/",
-            linkText: "bearid.org →",
+            href: "https://doi.org/10.1016/j.anbehav.2014.05.017",
+            linkText: "DOI: 10.1016/j.anbehav.2014.05.017 →",
           },
         ]}
       />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.14">
-        <strong>「世界 664 件のヒグマ襲撃メタ解析」</strong> —
-        18 ヶ国 15 年分のヒグマ襲撃事例を統合解析した Bombieri 2019 Scientific Reports を精読。
-        ロシア・東欧での襲撃の多さ、母グマ関与率の地域差、人間側のリスク要因まで網羅。
-      </NextIssue>
+      <NextIssue label="次号予告 — Vol.14">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }
