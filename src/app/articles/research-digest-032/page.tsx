@@ -8,11 +8,12 @@ import {
   NextIssue,
   References,
 } from "@/components/ArticleCards";
-import { getArticle } from "@/lib/articles-meta";
+import { getArticle, reviewRobots } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-032")!;
 
 export const metadata: Metadata = {
+  ...reviewRobots(meta.slug),
   title: meta.title,
   description: meta.description,
   alternates: { canonical: `https://kuma-watch.jp/articles/${meta.slug}` },

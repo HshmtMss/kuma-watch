@@ -37,6 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description: cat.description,
     alternates: { canonical: url },
+    // 公開中の記事が 0 本 (再検証中の研究ダイジェストなど) のカテゴリは検索に載せない。
+    ...(count === 0 ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title,
       description: cat.description,

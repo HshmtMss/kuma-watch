@@ -42,7 +42,10 @@ export default async function ArticlesIndexPage({
   searchParams: SearchParams;
 }) {
   const sp = await searchParams;
-  const sortedCategories = [...CATEGORIES].sort((a, b) => a.order - b.order);
+  // 公開中の記事が 0 本のカテゴリ (再検証中の研究ダイジェストなど) は出さない。
+  const sortedCategories = [...CATEGORIES]
+    .filter((c) => getArticlesByCategory(c.id).length > 0)
+    .sort((a, b) => a.order - b.order);
   const validCategorySlugs = new Set(sortedCategories.map((c) => c.slug));
   const selectedCat: string =
     sp.cat && validCategorySlugs.has(sp.cat) ? sp.cat : "all";

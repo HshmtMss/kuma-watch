@@ -3,11 +3,12 @@ import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
 import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
-import { getArticle } from "@/lib/articles-meta";
+import { getArticle, reviewRobots } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-024")!;
 
 export const metadata: Metadata = {
+  ...reviewRobots(meta.slug),
   title: meta.title,
   description: meta.description,
   alternates: { canonical: `https://kuma-watch.jp/articles/${meta.slug}` },

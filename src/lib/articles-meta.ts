@@ -134,7 +134,7 @@ export type ArticleMeta = {
   heroCreditUrl?: string;
 };
 
-export const ARTICLES: ArticleMeta[] = [
+const ALL_ARTICLES: ArticleMeta[] = [
   {
     slug: "bear-territory",
     title: "クマの縄張りと行動圏 — マーキング・痕跡・移動距離の生態学",
@@ -1976,8 +1976,32 @@ export const ARTICLES: ArticleMeta[] = [
   },
 ];
 
+/**
+ * 研究ダイジェストは 2026-10-30 のファクトチェックで、全号に「論文にない数字・逆の結論・
+ * 実在しない文献」が見つかったため公開を止め、原典と照合して 1 号ずつ書き直している
+ * (docs/fact-check-2026-10-30.md)。書き直して確認が済んだ号の slug をここに足すと公開に戻る。
+ * 再検証中の号は、ページ本体の代わりにお知らせを出し (ArticleShell)、noindex にし、
+ * 一覧・関連記事・タグ・sitemap・フィードから外す (ARTICLES から除く)。
+ */
+const DIGESTS_REVERIFIED = new Set<string>([]);
+
+export function isUnderReview(slug: string): boolean {
+  return slug.startsWith("research-digest-") && !DIGESTS_REVERIFIED.has(slug);
+}
+
+/** 再検証中の号の metadata に足す。検索エンジンに載せない (リンクはたどってよい)。 */
+export function reviewRobots(slug: string): { robots?: { index: boolean; follow: boolean } } {
+  return isUnderReview(slug) ? { robots: { index: false, follow: true } } : {};
+}
+
+/** 公開中の記事。一覧・関連記事・タグ・sitemap・フィードはすべてこれを使う。 */
+export const ARTICLES: ArticleMeta[] = ALL_ARTICLES.filter(
+  (a) => !isUnderReview(a.slug),
+);
+
+/** 再検証中の記事も含めて引く (各記事ページが自分の meta を取るため)。 */
 export function getArticle(slug: string): ArticleMeta | undefined {
-  return ARTICLES.find((a) => a.slug === slug);
+  return ALL_ARTICLES.find((a) => a.slug === slug);
 }
 
 export function getCategory(id: CategoryId): CategoryMeta | undefined {

@@ -56,9 +56,10 @@ export default function KnowPage() {
   for (const a of ARTICLES as Array<{ category: string }>) {
     counts[a.category] = (counts[a.category] ?? 0) + 1;
   }
-  const cats = [...(CATEGORIES as Array<{ id: string; slug: string; name: string; order: number }>)].sort(
-    (a, b) => a.order - b.order,
-  );
+  // 公開中の記事が 0 本のカテゴリ (再検証中の研究ダイジェストなど) は出さない。
+  const cats = [...(CATEGORIES as Array<{ id: string; slug: string; name: string; order: number }>)]
+    .filter((c) => (counts[c.id] ?? 0) > 0)
+    .sort((a, b) => a.order - b.order);
 
   return (
     <>

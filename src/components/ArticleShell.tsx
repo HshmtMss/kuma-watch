@@ -11,6 +11,7 @@ import {
   getCategory,
   getReadingTime,
   getRelatedArticles,
+  isUnderReview,
   tagToSlug,
   type ArticleMeta,
 } from "@/lib/articles-meta";
@@ -33,6 +34,30 @@ function formatDate(d: string): string {
 }
 
 export default function ArticleShell({ meta, children }: Props) {
+  // 再検証中の研究ダイジェストは本文を出さず、お知らせだけを出す (articles-meta の isUnderReview)。
+  if (isUnderReview(meta.slug)) {
+    return (
+      <PageShell title={meta.title}>
+        <div className="not-prose rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-relaxed text-stone-800">
+          <p className="m-0 text-base font-bold text-stone-900">
+            この記事は、内容を見直しています
+          </p>
+          <p className="m-0 mt-2">
+            研究ダイジェストの一部に、紹介した論文の内容と異なる記述が見つかりました。
+            そのため、すべての号を原典と照らし合わせて書き直しています。
+            確認が済んだ号から順に公開を再開します。
+          </p>
+          <p className="m-0 mt-2">ご不便をおかけし、申し訳ありません。</p>
+        </div>
+        <p className="mt-6 text-sm">
+          <Link href="/articles" className="font-semibold text-amber-700 underline">
+            記事一覧へ
+          </Link>
+        </p>
+      </PageShell>
+    );
+  }
+
   const url = `${SITE_URL}/articles/${meta.slug}`;
   const related = getRelatedArticles(meta.slug, 3);
   const category = getCategory(meta.category);

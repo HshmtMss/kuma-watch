@@ -73,7 +73,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  const categoryEntries: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
+  // 公開中の記事が 0 本のカテゴリ (再検証中の研究ダイジェストなど) は載せない。
+  const categoryEntries: MetadataRoute.Sitemap = CATEGORIES.filter(
+    (c) => ARTICLES.some((a) => a.category === c.id),
+  ).map((c) => ({
     url: `${SITE_URL}/articles/category/${c.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
