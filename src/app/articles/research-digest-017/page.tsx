@@ -31,20 +31,20 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        北米のロッキー山脈で、ある研究者が古いログハウスを発見しました。
-        分厚い丸太の壁に <strong>幅 5 cm の溝</strong>が深く刻まれている。
-        それは何十年も前、1 頭のヒグマが歯と顎の力だけで丸太を <strong>「噛み砕こうと試みた」</strong>痕跡でした。
+        「クマは噛む力がとても強い」とよく言われます。
+        では、ライオンやオオカミと比べると実際はどうなのでしょうか。
+        頭骨の形から噛む力を推定した研究を読むと、クマは
+        <strong>体の大きさの割には、噛む力が強いほうではない</strong>という、
+        少し意外な姿が見えてきます。
       </p>
       <p>
-        クマの咬合力（噛む力）は伝説的に語られてきました。
-        丸太を砕く、頭蓋骨を粉砕する、ヘラジカの大腿骨を二つに割る — どれも事実です。
-        では、ライオンやトラと比べて実際どれだけ強いのか？
-        2007 年、世界中の博物館の標本を測定して定量化した壮大な研究があります。
+        今号では、食肉目（ネコ・イヌ・クマなどのなかま）151 種の噛む力を比べた
+        Christiansen と Wroe の 2007 年の論文を中心に、
+        具体的な数字を示した Wroe らの 2005 年の論文もあわせて紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 1 本の論文"
+        label="今号で読み解く論文"
         title="Bite forces and evolutionary adaptations to feeding ecology in carnivores"
         citation={
           <>
@@ -60,324 +60,196 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            食肉目 <strong>151 種の頭骨</strong>を計測して咬合力をモデル化
+            食肉目 <strong>151 種</strong>の噛む力を頭骨の形から推定し、体の大きさをそろえて比べた
           </>,
           <>
-            ヒグマの咬合力は <strong>約 1,200 N</strong>。ライオン（600 N）の <strong>2 倍</strong>
+            体格の割に噛む力が強いのは<strong>硬い植物を食べる種</strong>と<strong>大きな獲物を狩る種</strong>。雑食の種は中間
           </>,
           <>
-            体格補正でもクマは <strong>上位グループ</strong>。骨や植物繊維も粉砕できる強さ
+            Wroe ら（2005）の推定では、犬歯で噛む力はヒグマ <strong>約 751 N</strong>、ライオン <strong>約 1,768 N</strong>。クマは体格の割に低め
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "「クマは丸太を噛み砕く」は本当か" },
-          { id: "method", title: "151 種の頭骨を世界中から集めた" },
-          { id: "physics", title: "咬合力を「計算」する仕組み" },
-          { id: "result", title: "結果 — クマは食肉目トップクラス" },
-          { id: "lion", title: "ライオンとの比較で見える違い" },
-          { id: "why", title: "なぜクマはこんなに強く噛めるのか" },
-          { id: "anatomy", title: "ヒグマの頭骨と顎の構造" },
-          { id: "diet", title: "「噛む力」が雑食を可能にした" },
-          { id: "japan", title: "日本のクマでも丸太や頭骨を砕ける" },
-          { id: "implications", title: "人クマ遭遇時の意味 — 致死的になる理由" },
+          { id: "method", title: "噛む力を頭骨から推定する" },
+          { id: "result", title: "分かったこと — 食べ物と噛む力の関係" },
+          { id: "numbers", title: "クマの数字 — ライオンより弱く、体格比でも低め" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">「クマは丸太を噛み砕く」は本当か</h2>
+      <h2 id="method">噛む力を頭骨から推定する</h2>
       <p>
-        クマの咬合力に関する逸話は、世界中で数多く伝えられています。
+        野生の大型動物に力のセンサーを噛ませて測ることは、ほとんどできません。
+        そこで研究者は、博物館などに保管されている<strong>頭骨の寸法</strong>から、
+        あごを動かす筋肉の太さ（断面積）を推定し、あごを「てこ」とみなして
+        噛む力を計算する方法を使ってきました。
+        Wroe らの論文では、これを「ドライスカル（乾燥頭骨）法」と呼んでいます。
+      </p>
+      <p>
+        Christiansen と Wroe（2007）は、この考え方を使って
+        <strong>現生の食肉目 151 種</strong>の噛む力を推定しました。
+        食肉目の 8 つの科すべてを含み、小さな動物から大きな動物まで、
+        食べ物の種類もさまざまな種がそろっています。
+      </p>
+      <p>
+        噛む力は、体が大きいほど強くなります。そのまま比べると「大きい動物ほど強い」
+        という当たり前の結果になるため、研究では<strong>体の大きさの影響を取り除いて</strong>
+        比べました。Wroe ら（2005）は、この体格補正後の値を
+        「咬合力指数（BFQ）」と呼び、平均を 100 としています。
+        100 より大きければ体格の割に噛む力が強く、小さければ弱い、という意味です。
+      </p>
+
+      <h2 id="result">分かったこと — 食べ物と噛む力の関係</h2>
+      <p>
+        論文の要旨によると、体の大きさをそろえて比べたとき、噛む力は
+        <strong>食べ物の種類（食性）のグループによってはっきり違って</strong>いました。
       </p>
       <ul>
         <li>
-          🪵 <strong>蜂蜜を求めて木の幹に穴を開ける</strong>（数センチ厚の樹皮を噛み剥がす）
+          <strong>体格の割に強い</strong>：硬い植物の繊維を食べる種と、大きな獲物を狩る種
         </li>
         <li>
-          🦴 <strong>ヘラジカ・トナカイの大腿骨を割る</strong>（直径 5 cm の骨を中で割って骨髄を食べる）
+          <strong>中間</strong>：雑食の種と、小さな獲物を食べる種
         </li>
         <li>
-          🥜 <strong>クルミ・栗を殻ごと食べる</strong>（人間の手では割れない硬さ）
-        </li>
-        <li>
-          🥩 <strong>凍ったアザラシ・サケを噛み砕く</strong>（北極圏のヒグマ・ホッキョクグマ）
-        </li>
-        <li>
-          🏠 <strong>木造小屋に侵入</strong>（壁・扉・窓枠を破壊して侵入）
+          <strong>体格の割に弱い</strong>：昆虫食に特化した種
         </li>
       </ul>
       <p>
-        これらは「逸話」だけでなく <strong>実証された行動</strong>です。
-        でも、なぜそんなことが可能なのか。具体的に <strong>何ニュートン</strong>の力で、
-        他の肉食動物と比べてどう違うのか — 2007 年までこれは科学的に未測定でした。
-      </p>
-      <p>
-        この問いに、デンマーク・コペンハーゲン動物博物館の <strong>Per Christiansen</strong>と、
-        オーストラリア・ニューサウスウェールズ大学の <strong>Stephen Wroe</strong>が挑みました。
+        著者らは、噛む力の違いは食肉目が進化するなかで<strong>食べ物に合わせて形づくられてきた</strong>
+        と結論づけ、化石の動物が何を食べていたかを考える手がかりにもなると述べています。
       </p>
 
-      <h2 id="method">151 種の頭骨を世界中から集めた</h2>
+      <h2 id="numbers">クマの数字 — ライオンより弱く、体格比でも低め</h2>
       <p>
-        Christiansen らの方法は、極めて地道でした。世界中の自然史博物館を訪ね、
-        <strong>食肉目 151 種、計 700 個以上の頭骨標本</strong>を実測したのです。
-      </p>
-      <ul>
-        <li>
-          🐯 大型ネコ科: ライオン・トラ・ヒョウ・チーター・ジャガー
-        </li>
-        <li>
-          🐺 イヌ科: オオカミ・コヨーテ・ジャッカル・キツネ
-        </li>
-        <li>
-          🐻 クマ科: ヒグマ・クロクマ・ホッキョクグマ・ツキノワグマ・パンダ
-        </li>
-        <li>
-          🦝 アライグマ・イタチ・ハイエナ・ジャコウネコ系
-        </li>
-        <li>
-          🐧 海棲食肉目: アザラシ・アシカ・セイウチ
-        </li>
-      </ul>
-      <p>
-        各頭骨について、咀嚼筋の付着位置・顎の長さ・歯の形状などを 3D 計測しました。
-        この膨大なデータベースを使って、各動物の <strong>咬合力</strong>を計算式で推定する研究でした。
-      </p>
-
-      <h2 id="physics">咬合力を「計算」する仕組み</h2>
-      <p>
-        生きた動物の咬合力を測るには、本人に <strong>「専用の力センサー」を噛ませる</strong>方法があります。
-        実験室の犬や、麻酔した野生動物では実測例があります。
-      </p>
-      <p>
-        しかし、ヒグマやホッキョクグマで実測は危険すぎる。そこで Christiansen らは
-        <strong>「頭骨の形から咬合力を物理計算する」</strong>手法を使いました。
-      </p>
-      <p>
-        基本原理はシンプルです。咬合力は次の 3 要素で決まります。
-      </p>
-      <ul>
-        <li>
-          <strong>咀嚼筋の量</strong>: 頭骨の咀嚼筋付着部の大きさで推定
-        </li>
-        <li>
-          <strong>テコの原理（顎の長さ）</strong>: 顎の支点・力点・作用点の距離関係
-        </li>
-        <li>
-          <strong>歯の位置</strong>: 犬歯か臼歯か、奥か手前か
-        </li>
-      </ul>
-      <p>
-        これらを統合的に計算するモデルが、当時最新の <strong>「動物生体力学（biomechanics）」</strong>として確立されていました。
-        Christiansen らはこれを 151 種に適用し、初めて種横断的な比較を可能にしたのです。
-      </p>
-
-      <h2 id="result">結果 — クマは食肉目トップクラス</h2>
-      <p>
-        ヒグマと他の代表的食肉目の咬合力（犬歯位置で噛んだ時）を比較すると、こうなりました。
+        クマについて具体的な数字を示しているのが、同じ方法を使った Wroe ら（2005）の論文です。
+        この論文は 39 種（現生 31 種・絶滅種 8 種）、49 個の頭骨標本から、
+        犬歯で噛んだときの力と BFQ を推定しています。表の一部を抜き出すと次のとおりです。
       </p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
         <table className="w-full text-sm">
           <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
             <tr>
               <th className="px-3 py-2 text-left">動物</th>
-              <th className="px-3 py-2 text-left">咬合力（N、犬歯位置）</th>
+              <th className="px-3 py-2 text-right">推定体重（kg）</th>
+              <th className="px-3 py-2 text-right">犬歯で噛む力（N）</th>
+              <th className="px-3 py-2 text-right">BFQ</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
             <tr>
-              <td className="px-3 py-2 font-semibold">ヒト</td>
-              <td className="px-3 py-2 tabular-nums">~150</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">家畜イヌ（中型）</td>
-              <td className="px-3 py-2 tabular-nums">~250</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">大型イヌ（マスティフ）</td>
-              <td className="px-3 py-2 tabular-nums">~552</td>
-            </tr>
-            <tr>
               <td className="px-3 py-2 font-semibold">ライオン</td>
-              <td className="px-3 py-2 tabular-nums">~600</td>
+              <td className="px-3 py-2 text-right tabular-nums">294.6</td>
+              <td className="px-3 py-2 text-right tabular-nums">1,768</td>
+              <td className="px-3 py-2 text-right tabular-nums">112</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">トラ</td>
-              <td className="px-3 py-2 tabular-nums">~1,050</td>
+              <td className="px-3 py-2 text-right tabular-nums">186.9</td>
+              <td className="px-3 py-2 text-right tabular-nums">1,525</td>
+              <td className="px-3 py-2 text-right tabular-nums">127</td>
             </tr>
             <tr>
-              <td className="px-3 py-2 font-semibold">ハイエナ</td>
-              <td className="px-3 py-2 tabular-nums">~1,100</td>
+              <td className="px-3 py-2 font-semibold">ブチハイエナ</td>
+              <td className="px-3 py-2 text-right tabular-nums">69.1</td>
+              <td className="px-3 py-2 text-right tabular-nums">773</td>
+              <td className="px-3 py-2 text-right tabular-nums">117</td>
+            </tr>
+            <tr>
+              <td className="px-3 py-2 font-semibold">オオカミ</td>
+              <td className="px-3 py-2 text-right tabular-nums">34.7</td>
+              <td className="px-3 py-2 text-right tabular-nums">593</td>
+              <td className="px-3 py-2 text-right tabular-nums">136</td>
             </tr>
             <tr className="bg-amber-50/50">
               <td className="px-3 py-2 font-semibold">ヒグマ</td>
-              <td className="px-3 py-2 text-amber-800 font-bold tabular-nums">~1,200</td>
+              <td className="px-3 py-2 text-right tabular-nums">128.8</td>
+              <td className="px-3 py-2 text-right tabular-nums">751</td>
+              <td className="px-3 py-2 text-right tabular-nums">78</td>
             </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">ホッキョクグマ</td>
-              <td className="px-3 py-2 text-amber-800 font-bold tabular-nums">~1,200</td>
+            <tr className="bg-amber-50/50">
+              <td className="px-3 py-2 font-semibold">アメリカクロクマ</td>
+              <td className="px-3 py-2 text-right tabular-nums">105.2</td>
+              <td className="px-3 py-2 text-right tabular-nums">541</td>
+              <td className="px-3 py-2 text-right tabular-nums">64</td>
             </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">ジャイアントパンダ</td>
-              <td className="px-3 py-2 tabular-nums">~1,300</td>
+            <tr className="bg-amber-50/50">
+              <td className="px-3 py-2 font-semibold">ツキノワグマ（Ursus thibetanus）</td>
+              <td className="px-3 py-2 text-right tabular-nums">77.2</td>
+              <td className="px-3 py-2 text-right tabular-nums">312</td>
+              <td className="px-3 py-2 text-right tabular-nums">44</td>
             </tr>
           </tbody>
         </table>
+        <p className="border-t border-stone-100 px-3 py-2 text-xs text-stone-500">
+          出典：Wroe ら（2005）Table 1。体重・噛む力はいずれも頭骨からの推定値。BFQ は体格補正後の値で、平均を 100 とする。
+        </p>
       </div>
       <p>
-        ヒグマの咬合力は <strong>約 1,200 ニュートン</strong>。
-        これは人間の <strong>8 倍</strong>、ライオンの <strong>2 倍</strong>、トラより少し強い、という結果でした。
+        この推定では、ヒグマが犬歯で噛む力はライオンの<strong>半分弱</strong>でした。
+        体格補正後の BFQ も、クマ 3 種は 44〜78 と、ネコ科やオオカミ、ハイエナ（100 以上）より低い値です。
+        論文は、クマの BFQ が低いことについて、クマが
+        <strong>比較的小さな獲物しか狙わない</strong>こととあわせて述べています。
       </p>
       <p>
-        驚くべきは <strong>ジャイアントパンダ</strong>が 1,300 N でクマ科最大級。
-        肉食しないのに咬合力は最強級 — 竹の硬い繊維を噛み砕くために特化した結果と考えられています。
+        つまり「クマは噛む力が飛び抜けて強い」というイメージは、少なくともこの推定方法で見るかぎり当てはまりません。
+        大きな獲物を仕留めることに特化したネコ科やイヌ科とは、体のつくりの方向性が違うと考えられます。
       </p>
 
-      <h2 id="lion">ライオンとの比較で見える違い</h2>
-      <p>
-        「クマがライオンの 2 倍」と聞いて意外に思う方もいるでしょう。
-        ライオンは <strong>百獣の王</strong>のイメージがあり、噛む力も最強と思いがちです。
-      </p>
-      <p>
-        しかし、Christiansen らの解析では、ネコ科は <strong>咬合力よりスピード・俊敏さ</strong>に
-        特化した進化を遂げており、絶対的な噛む力ではクマ科に及びません。
-      </p>
+      <h2 id="limits">限界と注意点</h2>
       <ul>
         <li>
-          🐯 <strong>ネコ科</strong>: 細長い顎、長い犬歯、素早い噛みつき。獲物の喉を素早く絞める用途
+          数字はすべて<strong>頭骨の形からの推定値</strong>で、生きたクマで測った値ではありません。
+          また、犬歯の位置で静かに噛みしめたときの理論的な最大値で、奥歯で噛む力とは別です。
         </li>
         <li>
-          🐻 <strong>クマ科</strong>: 短く太い顎、強い咬筋、ゆっくりだが破壊的な噛む力。骨・植物繊維も砕く
-        </li>
-      </ul>
-      <p>
-        ライオン・トラは <strong>瞬間最大力</strong>でクマに劣るが、<strong>狩りに最適化</strong>されています。
-        クマは <strong>幅広い食性</strong>に対応できる「万能型」の咬合力を持ちます。
-      </p>
-
-      <h2 id="why">なぜクマはこんなに強く噛めるのか</h2>
-      <p>
-        クマの咬合力の強さには、3 つの解剖学的な理由があります。
-      </p>
-      <h3>① 巨大な咬筋・側頭筋</h3>
-      <p>
-        頭骨の側面と頬骨に付着する咬筋・側頭筋が、他の食肉目と比べて <strong>2〜3 倍</strong>の体積。
-        頭骨の頂部（矢状稜）も発達しており、強力な咀嚼筋を支える構造を持ちます。
-      </p>
-      <h3>② 短く太い顎</h3>
-      <p>
-        テコの原理として「<strong>力点（顎関節）から作用点（歯）までの距離が短いほど力が出る</strong>」。
-        クマの顎はネコ科より <strong>明らかに短く太い</strong>。これによりてこ比が有利になり、強力な咬合力が出ます。
-      </p>
-      <h3>③ 大きな顎関節と頭蓋固定</h3>
-      <p>
-        強く噛むためには <strong>顎関節がガッチリ固定</strong>される必要があります。
-        ヒグマの顎関節は周囲の頭骨と強固に連結しており、力を逃さない設計。
-      </p>
-
-      <h2 id="anatomy">ヒグマの頭骨と顎の構造</h2>
-      <p>
-        実際にヒグマの頭骨を観察すると、以下の特徴が分かります。
-      </p>
-      <ul>
-        <li>
-          🦷 <strong>歯の構成</strong>: 切歯 12 本・犬歯 4 本・前臼歯 16 本・後臼歯 10 本（合計 42 本）
+          Wroe ら（2005）の表は、1 種あたり 1〜数個の頭骨にもとづきます。
+          個体の大きさや年齢で値は変わるため、「ヒグマは 751 N」と決まっているわけではありません。
         </li>
         <li>
-          🦴 <strong>犬歯の長さ</strong>: 5〜7 cm（人の犬歯の 5〜7 倍）
+          表のツキノワグマの標本がどの地域の個体かは、本文からは分かりません。
+          日本のツキノワグマにそのまま当てはまるとは限りません。
         </li>
         <li>
-          ⚪ <strong>臼歯の幅</strong>: ネコ科の <strong>2 倍以上</strong>。植物・骨を砕くために発達
-        </li>
-        <li>
-          ⚙️ <strong>顎関節</strong>: 大きく頑丈、横方向の動きが制限される（噛み下げに特化）
-        </li>
-        <li>
-          🏔️ <strong>頭蓋骨の厚み</strong>: 強い咬合力で割れないよう、ネコ科より厚い
-        </li>
-      </ul>
-      <p>
-        この構造は <strong>「骨を割って骨髄を食べる」</strong>「<strong>堅果・植物繊維を粉砕する</strong>」
-        「<strong>木をかじる</strong>」といった行動を可能にします。
-      </p>
-
-      <h2 id="diet">「噛む力」が雑食を可能にした</h2>
-      <p>
-        進化的に見ると、クマの強力な咬合力は <strong>「食性の幅広さ」</strong>を生むための適応です。
-      </p>
-      <p>
-        多くの肉食動物は、特定の食物にしか対応できません。
-        ライオンは大型獲物の喉笛を絞めるのに特化し、それ以外の餌（堅果・骨・植物の根）は食べにくい。
-        逆に植物食動物は、強い咀嚼力を持つが <strong>肉を噛みちぎる</strong>力は弱い。
-      </p>
-      <p>
-        クマは咬合力を「<strong>強くしすぎず弱すぎず、幅広い食物に対応</strong>」する設計を選びました。
-        この結果、ベリー・草・堅果・キノコ・魚・小型哺乳類・骨髄・蜂蜜まで、ほぼ何でも食べられます。
-      </p>
-      <p>
-        Vol.6 の食選好研究（{" "}
-        <Link href="/articles/research-digest-006">Erlenbach 2014</Link>
-        ）で見たように、クマは栄養バランスを最適化するために <strong>多様な食物を選択</strong>します。
-        その「選べる幅」を支えているのが、強力で汎用的な咬合力なのです。
-      </p>
-
-      <h2 id="japan">日本のクマでも丸太や頭骨を砕ける</h2>
-      <p>
-        日本のツキノワグマ（成獣 80〜150kg）も、ヒグマほどではないが <strong>強力な咬合力</strong>を持ちます。
-      </p>
-      <p>
-        推定咬合力は <strong>約 800〜1,000 N</strong>。
-        体格はヒグマの 半分程度ですが、咬合力は <strong>3 割減程度</strong>に留まります。
-        これは小型クマでも <strong>「噛む力に特化した進化」</strong>が保たれている証拠です。
-      </p>
-      <p>
-        日本のツキノワグマができることの実例：
-      </p>
-      <ul>
-        <li>
-          🌰 <strong>クリ・トチ・クルミの殻を割る</strong>
-        </li>
-        <li>
-          🦴 <strong>シカ・イノシシの大腿骨を割って骨髄を食べる</strong>（屍肉採食時）
-        </li>
-        <li>
-          🌳 <strong>ブナ・ナラの樹皮を剥がす</strong>（マーキング時、Vol.13 参照）
-        </li>
-        <li>
-          🐝 <strong>養蜂場の巣箱を破壊</strong>（蜂蜜を求めて）
-        </li>
-        <li>
-          🚪 <strong>木造の納屋・倉庫の扉を破壊して侵入</strong>
+          Christiansen と Wroe（2007）については、今回は要旨を確認しました。
+          151 種それぞれの数値は本記事では扱っていません。
         </li>
       </ul>
 
-      <h2 id="implications">人クマ遭遇時の意味 — 致死的になる理由</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        この咬合力の知識は、人クマ遭遇時の <strong>致死性</strong>を理解するために重要です。
+        「体格の割に噛む力が強くない」といっても、ツキノワグマの推定値（約 312 N）は
+        人を大けがさせるには十分な力です。クマの被害では、かまれる・爪で引っかかれるけがが起きており、
+        噛む力が平均より低いことは「安全」を意味しません。
       </p>
       <p>
-        人間の頭蓋骨の厚さは約 6〜7 mm、強度は約 500 N で破壊されると推定されます。
-        ヒグマの犬歯一噛みは <strong>1,200 N</strong>。クロクマでも <strong>700〜900 N</strong>。
-        ツキノワグマでも <strong>800〜1,000 N</strong>。
+        大切なのは、噛む力の強さではなく、<strong>そもそも襲われない行動</strong>です。
       </p>
+      <ul>
+        <li>クマに出会ったら、走らない・背を向けない。クマを見ながらゆっくり離れる</li>
+        <li>
+          突進してきたらクマスプレーを使う。5〜10 m まで近づいたら、顔に向けて 1〜2 秒ずつ噴射する
+          （環境省は、噴射距離 7.5 m 程度以上・噴射時間 6 秒程度以上・カプサイシン類 CRC 1〜2% 程度の製品を目安としています）
+        </li>
+        <li>
+          防衛的な攻撃で接触が避けられないときは、うつ伏せになり両手で首の後ろを守る。
+          しつこく続く攻撃や、捕食目的と思われる攻撃には反撃する
+        </li>
+      </ul>
       <p>
-        つまり、<strong>クマが頭部を本気で噛めば、人の頭蓋骨はほぼ確実に破壊される</strong>。
-        日本でも過去のクマ被害事案で、頭蓋骨損傷による致命傷の報告は少なくありません。
-      </p>
-      <p>
-        だからこそ、Vol.1（{" "}
-        <Link href="/articles/research-digest-001">Smith 2008 クマスプレー</Link>
-        ）で見たように、<strong>「噛まれないための予防」</strong>が最も重要。
-        噛まれてからの治療は極めて困難で、致死率も高くなります。
-      </p>
-      <p>
-        遭遇時の対処は{" "}
-        <Link href="/articles/encounter">クマに遭遇したらどうする</Link>
-        と{" "}
+        くわしくは{" "}
+        <Link href="/articles/encounter">クマに遭遇したらどうする</Link>、{" "}
+        <Link href="/articles/bear-spray">クマよけスプレーの使い方と選び方</Link>、{" "}
         <Link href="/articles/first-aid">クマに襲われた後の応急処置</Link>
-        を参照してください。
+        をご覧ください。
       </p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
@@ -394,22 +266,16 @@ export default function Page() {
             linkText: "DOI link →",
           },
           {
-            title: "The dietary specializations of the giant panda from a biomechanical perspective",
-            citation: (
-              <>
-                Tseng, Z. J., &amp; Wang, X. (2010).{" "}
-                <em className="not-italic">Journal of Vertebrate Paleontology</em>.
-              </>
-            ),
-          },
-          {
-            title: "Biomechanical evidence of bone-crushing capability in dire wolves",
+            title:
+              "Bite club: comparative bite force in big biting mammals and the prediction of predatory behaviour in fossil taxa",
             citation: (
               <>
                 Wroe, S., McHenry, C., &amp; Thomason, J. (2005).{" "}
-                <em className="not-italic">Proc. Royal Society B</em>.
+                <em className="not-italic">Proceedings of the Royal Society B</em> 272(1563): 619–625.
               </>
             ),
+            href: "https://doi.org/10.1098/rspb.2004.2986",
+            linkText: "DOI link →",
           },
         ]}
       />
@@ -420,12 +286,7 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.18">
-        <strong>「クマは森に『サケの栄養』を運んでいた」</strong> —
-        ブリティッシュコロンビアの 50 川を調査した Hocking 2011 Science。
-        クマがサケを森に運ぶことで、植物の多様性と樹木の成長が大きく変わる
-        「生態系エンジニア」としてのクマの役割を解説します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }

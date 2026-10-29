@@ -28,422 +28,183 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const mainCitation = (
+    <>
+      Sommer, F., Ståhlman, M., Ilkayeva, O., Arnemo, J. M., Kindberg, J., Josefsson, J., Newgard, C. B., Fröbert, O., &amp; Bäckhed, F. (2016).{" "}
+      <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
+    </>
+  );
+
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        クマの冬眠の謎は、まだ解けていません。
-        Vol.8（{" "}
-        <Link href="/articles/research-digest-008">Tøien 2011</Link>
-        ）では「<strong>心拍が 14 bpm まで落ちる</strong>」「<strong>体温は 5°C しか下がらない</strong>」
-        という驚異の生理学を見ました。
-        しかし、なぜそれが <strong>5 ヶ月も持続できる</strong>のか、根本原因は分からないままでした。
-      </p>
-      <p>
-        2016 年、北欧の研究チームがこの謎に <strong>意外な角度</strong>からアプローチしました。
-        彼らが目を付けたのは、クマの <strong>「腸の中にいる細菌」</strong>。
-        その後の実験は、生物学の常識を覆すものでした。
+        ヒグマは夏から秋にかけてたくさん食べて脂肪を大きく増やし、冬眠中はその脂肪を使って過ごします。
+        人なら体に負担がかかりそうな「季節ごとの太り方」をしても、クマは代謝の面で健康を保っているとされます。
+        2016 年の論文は、この仕組みに「腸内細菌」が関わっているのではないかと考え、野生のヒグマと実験用のマウスで調べました。
+        論文の要旨（抄録）と、出版元の発表資料に書かれている内容をもとに紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 1 本の論文"
-        title="The gut microbiota modulates energy metabolism in the hibernating brown bear Ursus arctos"
-        citation={
-          <>
-            Sommer, F., Ståhlman, M., Ilkayeva, O., Arnemo, J. M., Kindberg, J., Josefsson, J., Newgard, C. B., Fröbert, O., &amp; Bäckhed, F. (2016).{" "}
-            <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
-          </>
-        }
+        label="今号で紹介する論文"
+        title="The Gut Microbiota Modulates Energy Metabolism in the Hibernating Brown Bear Ursus arctos"
+        citation={mainCitation}
         href="https://doi.org/10.1016/j.celrep.2016.01.026"
         linkText="DOI: 10.1016/j.celrep.2016.01.026 →"
       />
 
       <KeyPoints
-        label="時間がない人向けの 3 行"
+        label="3 行まとめ"
         items={[
           <>
-            ヒグマの<strong>腸内細菌が冬眠中と活動期で大きく変化</strong>することを発見
+            野生のヒグマの腸内細菌を、活動期（夏）と冬眠中で比べた研究です
           </>,
           <>
-            クマの腸内細菌を <strong>無菌マウス</strong>に移植 → マウスの代謝も同じく変化
+            冬眠中は細菌の<strong>多様性が下がり</strong>、フィルミクテス門とアクチノバクテリア門が<strong>減り</strong>、バクテロイデス門が<strong>増えて</strong>いました
           </>,
           <>
-            <strong>細菌が宿主の代謝を制御</strong>している直接的証拠 — 肥満・糖尿病研究にも示唆
+            夏のクマの腸内細菌を無菌マウスに移すと、<strong>脂肪が増えやすくなりましたが、血糖の処理（耐糖能）は悪くなりませんでした</strong>
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "冬眠の謎を「腸」から解こうとした研究者たち" },
-          { id: "team", title: "スウェーデンの長期ヒグマプロジェクトと胃腸学者" },
-          { id: "method", title: "16 頭のヒグマを 2 度捕獲する執念" },
-          { id: "discovery1", title: "冬眠中 vs 活動期で別物の腸内細菌叢" },
-          { id: "transfer", title: "クマの細菌をマウスに移植する大胆な実験" },
-          { id: "shocking", title: "マウスがクマと「同じ代謝」を始めた" },
-          { id: "mechanism", title: "腸内細菌が代謝を制御するメカニズム" },
-          { id: "obesity", title: "肥満・糖尿病研究への直接的な示唆" },
-          { id: "japan", title: "日本のクマでも研究は進んでいる" },
-          { id: "lifestyle", title: "私たちの腸内細菌に応用できるか" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">冬眠の謎を「腸」から解こうとした研究者たち</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        クマの冬眠について、長らく研究者たちは「<strong>脳</strong>」「<strong>ホルモン</strong>」「<strong>脂肪細胞</strong>」
-        に注目してきました。代謝を制御するのは、当然これらの「<strong>動物自身の組織</strong>」だと考えられてきたから。
+        研究を率いたのは、スウェーデン・イェーテボリ大学の Fredrik Bäckhed のグループです。
+        腸内細菌と肥満・2 型糖尿病の関係を調べてきたチームで、スカンジナビアのヒグマ研究プロジェクトの研究者も共著者に加わっています。
       </p>
       <p>
-        ところが 2010 年代に入って、生物学界に革命が起きていました。
-        <strong>「腸内細菌（マイクロバイオーム）」</strong>が宿主の健康・代謝・行動・感情にまで
-        影響を与えるという発見が次々と報告されたのです。
-      </p>
-      <p>
-        スウェーデン・イェーテボリ大学の <strong>Fredrik Bäckhed</strong> は、その第一人者の一人。
-        肥満・糖尿病と腸内細菌の関係を研究していた彼が、ある日こう考えました。
-      </p>
-      <p className="text-center text-sm italic text-stone-600">
-        「冬眠中のクマと活動中のクマで、腸内細菌は違うんじゃないか？」
-      </p>
-      <p>
-        この素朴な仮説が、後にクマ研究と腸内細菌科学を結ぶ画期的な研究に発展します。
-      </p>
-
-      <h2 id="team">スウェーデンの長期ヒグマプロジェクトと胃腸学者</h2>
-      <p>
-        研究の舞台は、Vol.4（{" "}
-        <Link href="/articles/research-digest-004">気候変動と冬眠</Link>
-        ）でも登場した <strong>「スカンジナビアン・ベア・プロジェクト」</strong>。
-        ヒグマに GPS 首輪を付け、毎年捕獲して採血・採検していた長期研究です。
-      </p>
-      <p>
-        Bäckhed のチームと、このプロジェクトの研究者 <strong>Jon Arnemo</strong>・
-        <strong>Jonas Kindberg</strong> が連携。さらに米国デューク大学の代謝研究者
-        <strong>Christopher Newgard</strong>、北欧のクリニカル研究者も加わり、
-        <strong>動物生態学 + 微生物学 + 代謝医学</strong>のクロスオーバー研究が始まりました。
-      </p>
-
-      <h2 id="method">16 頭のヒグマを 2 度捕獲する執念</h2>
-      <p>
-        研究の最大の困難は <strong>「同じヒグマを冬眠中と活動期に 2 回採検する」</strong>ことでした。
-        野生のヒグマを年に 2 回捕獲して採血・採便するのは、世界中でもこのプロジェクトだけが実現可能でした。
-      </p>
-      <p>
-        2015 年、Sommer らは次のような大変な作業を行いました。
+        調べたのは、野外で暮らす野生のヒグマ（<em>Ursus arctos</em>）です。研究チームは次の 2 段階で調べました。
       </p>
       <ul>
         <li>
-          🐻 GPS で追跡している ヒグマ <strong>16 頭</strong>を対象選定
+          <strong>クマでの観察</strong>：冬眠中と活動期にクマのふんを集めて腸内細菌の顔ぶれを調べ、あわせて血液中の脂質などの代謝物を比べた
         </li>
         <li>
-          ❄️ <strong>冬眠中（2 月）</strong>に巣穴を特定 → 鎮静薬で採血・採便
-        </li>
-        <li>
-          🌞 <strong>覚醒後（6 月）</strong>に同じ個体を再捕獲 → 同じく採血・採便
-        </li>
-        <li>
-          🧬 採取された便から <strong>腸内細菌の全 DNA</strong>を解読（メタゲノミクス）
-        </li>
-        <li>
-          ⚗️ 血液から <strong>500 種類以上の代謝物</strong>を測定（メタボロミクス）
+          <strong>マウスでの実験</strong>：夏（活動期）と冬（冬眠中）のクマの腸内細菌を、腸内細菌をまったく持たない「無菌マウス」に移し、体重・脂肪・血糖の処理などを比べた
         </li>
       </ul>
       <p>
-        これだけの作業を野生のヒグマ 16 頭で実施する研究は、世界的にも極めて稀。
-        スカンジナビアン・ベア・プロジェクトの長年の蓄積があってこそ可能でした。
+        2 段階目の実験は、「季節で変わる腸内細菌そのものが、体の代謝を変える力を持つのか」を確かめるためのものです。
       </p>
 
-      <h2 id="discovery1">冬眠中 vs 活動期で別物の腸内細菌叢</h2>
+      <h2 id="findings">分かったこと</h2>
+      <h3>1. 冬眠中は腸内細菌の顔ぶれが変わる</h3>
       <p>
-        分析結果は、研究者たちを驚かせました。
-      </p>
-      <p>
-        ヒグマの腸内細菌は、<strong>冬眠中と活動期でほとんど別物</strong>と言えるほど劇的に変化していました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">細菌グループ</th>
-              <th className="px-3 py-2 text-left">活動期</th>
-              <th className="px-3 py-2 text-left">冬眠中</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">フィルミクテス</td>
-              <td className="px-3 py-2 tabular-nums">少なめ</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">大幅増</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">バクテロイデス</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">多め</td>
-              <td className="px-3 py-2 tabular-nums">大幅減</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">細菌の多様性</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">高い</td>
-              <td className="px-3 py-2 tabular-nums">大幅低下</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        フィルミクテスとバクテロイデスは、人間の肥満研究でも有名な細菌グループ。
-        フィルミクテスが多いと <strong>「カロリーを効率よく吸収・脂肪に蓄える」</strong>傾向、
-        バクテロイデスが多いと <strong>「カロリーを排泄しやすい」</strong>傾向、と知られています。
-      </p>
-      <p>
-        ヒグマの冬眠中は <strong>「フィルミクテス優位」</strong> = エネルギーを最大限蓄える設定に
-        切り替わっていたのです。これは身体が「飢餓モード」に入った時のヒトの腸でも見られるパターンで、
-        生物学的に整合的でした。
-      </p>
-
-      <h2 id="transfer">クマの細菌をマウスに移植する大胆な実験</h2>
-      <p>
-        ここで研究は <strong>「観察」から「介入」</strong>へ進みます。Sommer らは大胆な実験を行いました。
-      </p>
-      <p>
-        無菌マウス（腸内に細菌が一切いない実験動物）に、ヒグマの便を移植するというものです。
+        活動期と比べて、冬眠中の腸内細菌には次の違いがありました。
       </p>
       <ul>
+        <li>細菌の<strong>多様性が低下</strong>していた</li>
         <li>
-          🐭 <strong>無菌マウス 2 グループ</strong>を準備
+          <strong>フィルミクテス門</strong>と<strong>アクチノバクテリア門</strong>の割合が<strong>減っていた</strong>
         </li>
         <li>
-          ❄️ グループ A: <strong>冬眠中ヒグマ</strong>の便を移植
-        </li>
-        <li>
-          🌞 グループ B: <strong>活動期ヒグマ</strong>の便を移植
-        </li>
-        <li>
-          🍽️ 両グループに <strong>同じ高脂肪食</strong>を 2 週間与える
-        </li>
-        <li>
-          ⚖️ 体重・脂肪量・血糖値・代謝物を測定
+          <strong>バクテロイデス門</strong>の割合が<strong>増えていた</strong>
         </li>
       </ul>
       <p>
-        マウスは普段は冬眠しません。だから「<strong>冬眠中ヒグマの細菌</strong>」がマウスの体で
-        どう振る舞うかは予想がつかない。これは <strong>「細菌が単独で代謝を変えられるか」</strong>を
-        直接的に試すための、生物学の世界では古典的な実験デザインでした。
+        冬眠中のクマはほとんど食べないため、腸に入ってくる食べものが大きく変わります。
+        腸内細菌の顔ぶれが季節で変わること自体は、この状況を考えると自然なことといえます。
       </p>
 
-      <h2 id="shocking">マウスがクマと「同じ代謝」を始めた</h2>
+      <h3>2. 脂質に関わる代謝物も季節で変わる</h3>
       <p>
-        結果は、誰もが予想しなかったレベルのものでした。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">指標</th>
-              <th className="px-3 py-2 text-left">グループ A（冬眠中の細菌）</th>
-              <th className="px-3 py-2 text-left">グループ B（活動期の細菌）</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">体重増加</td>
-              <td className="px-3 py-2 text-stone-700">少ない</td>
-              <td className="px-3 py-2 text-red-700 font-bold">大幅増</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">体脂肪率</td>
-              <td className="px-3 py-2 text-stone-700">少ない</td>
-              <td className="px-3 py-2 text-red-700 font-bold">高い</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">耐糖能（血糖値の制御）</td>
-              <td className="px-3 py-2 text-green-700 font-bold">良好</td>
-              <td className="px-3 py-2 text-stone-700">悪化</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">脂質代謝</td>
-              <td className="px-3 py-2 text-green-700 font-bold">健全</td>
-              <td className="px-3 py-2 text-stone-700">高脂血状態</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        驚くべきことに、<strong>「冬眠中のヒグマの細菌」を移植されたマウスは、
-        高脂肪食を食べても太りにくく、血糖値も健全</strong>だったのです。
-      </p>
-      <p>
-        対して「活動期ヒグマの細菌」を移植されたマウスは、同じ食事で <strong>大幅に太った</strong>。
-        まるで <strong>「マウスがクマと同じ代謝パターンを取った」</strong>かのような結果でした。
-      </p>
-      <p>
-        これは生物学界に大きな衝撃を与えました。<strong>「細菌が宿主の代謝を制御できる」</strong>ことの
-        直接的な証拠が、ここまで明確に出た例は珍しかったからです。
+        クマの血液では、<strong>中性脂肪（トリグリセリド）・コレステロール・胆汁酸</strong>など、脂質の代謝に関わるいくつかの物質が、冬眠によって変化していました。
       </p>
 
-      <h2 id="mechanism">腸内細菌が代謝を制御するメカニズム</h2>
+      <h3>3. 夏の腸内細菌を移したマウスは脂肪が増えやすかった</h3>
       <p>
-        では、細菌は具体的にどうやって宿主の代謝を変えていたのか。
-        Sommer らはマウスの代謝物プロファイルを詳しく解析しました。
+        夏のクマの腸内細菌を移したマウスは、冬のクマの腸内細菌を移したマウスより、<strong>体重と脂肪が多く増えました</strong>。
+        一方で、血糖の処理（耐糖能）は<strong>悪くならず</strong>、出版元の発表資料では「差がないか、わずかに良いくらい」と説明されています。
+        マウスの血液中の代謝物にもクマと似た点が見られ、季節ごとの代謝の特徴の<strong>一部</strong>が、腸内細菌を通じてマウスに移ったと考えられています。
       </p>
       <p>
-        冬眠中ヒグマの細菌は、次のような変化を引き起こしました。
+        著者らはここから、夏の腸内細菌は食べものからエネルギーをより多く取り込む方向に働いている可能性があり、
+        季節による腸内細菌の変化が、冬眠するヒグマのエネルギー代謝に<strong>関わっているかもしれない</strong>、と結論づけています。
       </p>
+      <p>
+        冬眠中の体の働き（体温や代謝の下がり方）については、{" "}
+        <Link href="/articles/research-digest-008">Vol.8</Link>
+        {" "}でも取り上げています。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
       <ul>
         <li>
-          <strong>胆汁酸の組成変化</strong>: 脂肪吸収を制限する
+          <strong>「関わっているかもしれない」段階の結果です</strong>。著者らも「寄与しうる（may contribute）」という表現にとどめており、腸内細菌が冬眠の代謝を決めていると示したわけではありません。
         </li>
         <li>
-          <strong>短鎖脂肪酸の減少</strong>: 余剰カロリーの蓄積を抑える
+          <strong>マウスに移ったのは特徴の一部</strong>です。マウスは冬眠しない動物で、クマと体のつくりも暮らし方も違います。
         </li>
         <li>
-          <strong>分岐鎖アミノ酸の増加</strong>: タンパク質代謝を維持
+          <strong>人の医療にすぐ結びつく話ではありません</strong>。研究を率いた Bäckhed 自身も、発表時に「とても基礎的な研究で、人の肥満対策について言うのは早すぎる」と話しています。
         </li>
         <li>
-          <strong>炎症性物質の抑制</strong>: 全身性炎症を防ぐ
+          <strong>対象はスカンジナビアのヒグマ</strong>です。日本のツキノワグマや北海道のヒグマは、食べものも冬眠の環境も違うため、同じ結果になるかは分かりません。
         </li>
         <li>
-          <strong>インスリン抵抗性の改善</strong>: 血糖制御を改善
+          この記事は論文の要旨と出版元の発表資料をもとにしています。調べたクマの頭数やマウスの実験条件など、細かい数字は原典でご確認ください。
         </li>
       </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        これらは <strong>「冬眠している動物が必要とする代謝環境」</strong>を、細菌がマウスの体内で
-        再現したという解釈になります。クマだけでなくマウスでも、細菌が同じことを「指示」できた、
-        という驚きの結果でした。
+        この研究は、クマの体が季節に合わせて大きく切り替わることを、腸内細菌という新しい角度から示したものです。
+        クマが夏から秋にかけて脂肪をためこむのは、冬眠を乗り切るための体の仕組みの一部です。
+        秋にクマが食べものを求めて動き回ることが多いのも、この「冬に備える時期」と関係しています。
+      </p>
+      <p>
+        人の生活圏では、生ごみや収穫しない果樹、ペットフードなどがクマを引き寄せることがあります。
+        こうした誘引物を片づけておくことは、季節を問わず大切な対策です。
+        万一クマに出会ったときは、走らず、背を向けず、ゆっくりその場を離れてください。
+        詳しい行動は{" "}
+        <Link href="/learn/safety">クマ対策の基本</Link>
+        {" "}にまとめています。
       </p>
 
-      <h2 id="obesity">肥満・糖尿病研究への直接的な示唆</h2>
-      <p>
-        この発見は、人間の医学研究にも大きな波紋を投げかけました。
-      </p>
-      <p>
-        現代の人類が直面する <strong>「肥満」「2 型糖尿病」「メタボリックシンドローム」</strong>は、
-        高脂肪・高糖質の食生活で起きる代謝病です。Sommer らの研究が示したのは、
-        <strong>「腸内細菌を変えれば、同じ食事でも代謝病になりにくい」</strong>可能性。
-      </p>
-      <p>
-        本論文以降、次のような研究が進められています。
-      </p>
-      <ul>
-        <li>
-          <strong>糞便移植による代謝改善</strong>: 痩せた人の便を肥満患者に移植する治療法
-        </li>
-        <li>
-          <strong>プロバイオティクス開発</strong>: 「太りにくい」細菌を含む製品
-        </li>
-        <li>
-          <strong>食物繊維によるバランス調整</strong>: 細菌を「冬眠モード」に誘導
-        </li>
-        <li>
-          <strong>断食療法と腸内細菌</strong>: 一時的な飢餓が細菌叢を変える効果
-        </li>
-      </ul>
-      <p>
-        クマの冬眠研究が、未来の糖尿病治療に直接つながる可能性が、この論文によって開かれました。
-      </p>
-
-      <h2 id="japan">日本のクマでも研究は進んでいる</h2>
-      <p>
-        日本でも、ツキノワグマの腸内細菌研究は始まっています。
-      </p>
-      <p>
-        東京農業大学・京都大学・北海道大学の研究グループが、ツキノワグマとヒグマの腸内細菌を解析。
-        スウェーデンのヒグマと共通する特徴も、独自の特徴も発見されつつあります。
-      </p>
-      <ul>
-        <li>
-          ツキノワグマも冬眠中・活動期で <strong>細菌叢が大きく変化</strong>
-        </li>
-        <li>
-          日本のクマには <strong>独自の細菌種</strong>が存在（食物・地域性の影響）
-        </li>
-        <li>
-          ハイパーフェイジア期（秋）には <strong>特殊な発酵能</strong>を持つ細菌が増加
-        </li>
-      </ul>
-      <p>
-        これらの研究は、まだ初期段階。今後 10 年間で、日本のクマからも医学への示唆が
-        出てくる可能性が大いにあります。
-      </p>
-
-      <h2 id="lifestyle">私たちの腸内細菌に応用できるか</h2>
-      <p>
-        本論文を読み終えて、私たちは自分の腸内細菌について考えさせられます。
-      </p>
-      <p>
-        クマは、冬眠という極端な状況に体を最適化するために、腸内細菌を「<strong>季節ごとに入れ替える</strong>」
-        進化的な工夫を持っていました。私たちには冬眠はないけれど、生活習慣・食事・運動で
-        腸内細菌は <strong>常に変化</strong>しています。
-      </p>
-      <p>
-        現在の腸内細菌科学では、人間の細菌叢を改善する一般的な提案として次が知られています。
-      </p>
-      <ul>
-        <li>
-          🥬 <strong>食物繊維を多めに</strong>: 野菜・全粒穀物で多様な細菌を育てる
-        </li>
-        <li>
-          🥛 <strong>発酵食品を取り入れる</strong>: ヨーグルト・キムチ・納豆など
-        </li>
-        <li>
-          💊 <strong>抗生物質の濫用を避ける</strong>: 細菌叢を一時的に破壊する
-        </li>
-        <li>
-          🏃 <strong>運動の継続</strong>: 細菌叢の健全性に直結
-        </li>
-        <li>
-          😴 <strong>規則正しい睡眠</strong>: 体内時計と細菌叢は連動
-        </li>
-      </ul>
-      <p>
-        クマの冬眠の知見が、私たちの健康作りにも応用される時代が来るかもしれません。
+      <p className="text-sm text-stone-500">
+        2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。
       </p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
-            title: "The gut microbiota modulates energy metabolism in the hibernating brown bear（本号メイン）",
-            citation: (
-              <>
-                Sommer, F., Ståhlman, M., et al. (2016).{" "}
-                <em className="not-italic">Cell Reports</em> 14(7): 1655–1661.
-              </>
-            ),
+            title: "The Gut Microbiota Modulates Energy Metabolism in the Hibernating Brown Bear Ursus arctos（本号で紹介した論文）",
+            citation: mainCitation,
             href: "https://doi.org/10.1016/j.celrep.2016.01.026",
             linkText: "DOI: 10.1016/j.celrep.2016.01.026 →",
           },
           {
-            title: "Annual fluctuations in the gut microbiome of brown bears",
-            citation: (
-              <>
-                Stenvinkel, P., et al. (2018).{" "}
-                <em className="not-italic">Hibernation Reports</em>.
-              </>
-            ),
-          },
-          {
-            title: "Hibernation and the gut microbiome: lessons for human health",
+            title: "The Hibernator Microbiome: Host-Bacterial Interactions in an Extreme Nutritional Symbiosis（冬眠動物と腸内細菌の総説）",
             citation: (
               <>
                 Carey, H. V., &amp; Assadi-Porter, F. M. (2017).{" "}
-                <em className="not-italic">Annual Review of Animal Biosciences</em>.
+                <em className="not-italic">Annual Review of Nutrition</em> 37: 477–500.
               </>
             ),
+            href: "https://doi.org/10.1146/annurev-nutr-071816-064740",
+            linkText: "DOI: 10.1146/annurev-nutr-071816-064740 →",
           },
         ]}
       />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.17">
-        <strong>「クマの『噛む力』はライオンの 2 倍だった」</strong> —
-        食肉目 50 種以上の咬合力を比較解析した Christiansen &amp; Wroe 2007 を精読。
-        クマがなぜそんなに強く噛めるのか、骨を砕けるのか、進化的な背景まで解説します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }
