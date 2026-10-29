@@ -308,7 +308,7 @@ export default function Page() {
         </li>
       </ul>
       <p>
-        2026 年 4 月のクマ「指定管理鳥獣」化（{" "}
+        2024 年 4 月のクマ「指定管理鳥獣」化（{" "}
         <Link href="/articles/designated-management-2026">解説記事</Link>
         ）では、捕獲移動より <strong>「現地での捕獲駆除 + 誘引物管理 + 電気柵」</strong>を中心に据えています。
         Linnell ら 1997 の論文が示した知見が、日本の政策設計にも反映されていると言えます。

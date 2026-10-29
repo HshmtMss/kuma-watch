@@ -341,7 +341,7 @@ export default function Page() {
         </li>
       </ol>
       <p>
-        日本でも 2026 年 4 月のクマ「指定管理鳥獣」化（{" "}
+        日本でも 2024 年 4 月のクマ「指定管理鳥獣」化（{" "}
         <Link href="/articles/designated-management-2026">解説記事</Link>
         ）に伴い、こうした多層アプローチが各自治体で検討されつつあります。
       </p>

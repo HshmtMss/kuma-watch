@@ -262,7 +262,7 @@ const PLANS: PlanEntry[] = [
     planName: "クマ類保護及び管理に関する基本指針（環境省）",
     url: "https://www.env.go.jp/nature/choju/plan/plan3-2c.html",
     period: "随時改訂",
-    note: "2026 年 4 月、クマが新たに「指定管理鳥獣」に追加",
+    note: "2024 年 4 月、クマ（四国を除く）が新たに「指定管理鳥獣」に追加",
   },
 ];
 
@@ -323,7 +323,7 @@ export default function WildlifePlansPage() {
         <li>5 年後の計画見直し</li>
       </ol>
       <p>
-        2026 年 4 月、環境省はクマを <strong>「指定管理鳥獣」</strong>に追加しました。
+        2024 年 4 月、環境省はクマ（四国の個体群を除く）を <strong>「指定管理鳥獣」</strong>に追加しました。
         これによりイノシシ・ニホンジカと同様に、国の交付金で集中的に管理事業を実施できる体制となりました。
         詳細は{" "}
         <Link href="/articles/bear-laws">クマと関わる法律</Link>

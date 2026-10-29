@@ -391,7 +391,7 @@ export default function Page() {
         詳細は{" "}
         <Link href="/research/wildlife-plans">都道府県別 クマ管理計画</Link>
         と{" "}
-        <Link href="/articles/designated-management-2026">2026 年指定管理鳥獣化</Link>
+        <Link href="/articles/designated-management-2026">2024 年の指定管理鳥獣化</Link>
         を参照してください。
       </p>
 

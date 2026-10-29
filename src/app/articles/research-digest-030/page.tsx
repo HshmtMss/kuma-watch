@@ -294,7 +294,7 @@ export default function Page() {
         一朝一夕には変わらない。でも、世界各国の事例は <strong>「達成可能」</strong>であることも証明しています。
       </p>
       <p>
-        日本の場合、2026 年 4 月の <strong>クマ「指定管理鳥獣」化</strong>（{" "}
+        日本の場合、2024 年 4 月の <strong>クマ「指定管理鳥獣」化</strong>（{" "}
         <Link href="/articles/designated-management-2026">解説記事</Link>
         ）は、共進化への重要な一歩と位置づけられます。
         国の交付金で予防・誘引物管理・教育に投資できる体制が整いつつあります。

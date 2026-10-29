@@ -32,7 +32,7 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        <strong>結論</strong>: 早朝・夕方の山行はクマ遭遇率が日中の数倍。
+        <strong>結論</strong>: クマは早朝・夕方に活発になりやすく、この時間帯の山行は遭遇に特に注意が必要。
         装備の核は <strong>メイン 300〜500 ルーメンのヘッドライト + サブライト + 反射材 + 腰スプレー</strong>。
         夕方の下山遅れは「装備不十分の夜山行」を強いるため、装備で安全マージンを取っておきましょう。
       </p>
@@ -41,7 +41,7 @@ export default function Page() {
         label="3行でわかる"
         items={[
           <>
-            <strong>早朝・夕方の山行は遭遇率が日中の数倍</strong>。薄明薄暮が活動ピーク。
+            <strong>早朝・夕方はクマが活発になりやすい</strong>。この時間帯の山行は特に注意。
           </>,
           <>
             装備の核は<strong>メイン300〜500lmヘッドライト＋サブライト＋反射材＋腰スプレー</strong>。
@@ -54,7 +54,7 @@ export default function Page() {
 
       <ArticleToc
         items={[
-          { id: "why", title: "薄明薄暮は遭遇ピーク" },
+          { id: "why", title: "朝夕はクマが活発になりやすい" },
           { id: "headlamp", title: "ヘッドライトの選び方" },
           { id: "sub-light", title: "サブライト・予備電源" },
           { id: "reflective", title: "反射材・視認性ウェア" },
@@ -64,14 +64,14 @@ export default function Page() {
         ]}
       />
 
-      <h2 id="why">薄明薄暮は遭遇ピーク</h2>
+      <h2 id="why">朝夕はクマが活発になりやすい</h2>
       <p>
         多くのクマは日没前後と夜明け前後 (薄明薄暮 = crepuscular) に活動が活発化します。
       </p>
       <ul>
-        <li>朝 4:00〜7:00 の山行は遭遇率が日中の 3〜5 倍とする調査も</li>
-        <li>夕 17:00〜20:00 も同様にピーク</li>
-        <li>夜間は捕食型攻撃の確率が日中より高い (<Link href="/articles/playing-dead">死んだふりは効くのか</Link>)</li>
+        <li>夜明け前後の早朝は活動が活発になりやすい</li>
+        <li>日没前後の夕方も同様</li>
+        <li>暗い時間帯は互いに気づくのが遅れ、近い距離で出会いやすい</li>
       </ul>
       <p>
         対策の第一は「この時間帯を避ける」。装備は予防策ではなく、避けきれない場面の保険です。
@@ -98,7 +98,7 @@ export default function Page() {
         </li>
         <li>
           <strong>ストロボ機能</strong>:
-          至近距離でクマと目が合った場合の威嚇用。
+          自分の位置を知らせる合図用。クマを追い払う効果は確かめられていないので、至近距離ではスプレーを優先。
         </li>
         <li>
           <strong>代表機種</strong>:
@@ -157,8 +157,8 @@ export default function Page() {
           ザックを下ろしてから 5 秒。間に合いません。
         </li>
         <li>
-          <strong>セーフティの解除確認</strong>:
-          抜き出しと同時に親指でセーフティを上げる動作を反復練習。
+          <strong>安全クリップの外し方を確認</strong>:
+          抜き出して安全クリップを外す動作を、練習用スプレーで反復練習。外し方は製品によって違う。
         </li>
         <li>
           <strong>使い方は</strong><Link href="/articles/bear-spray">クマよけスプレーの使い方</Link>。
@@ -224,7 +224,7 @@ export default function Page() {
 
       <ArticleSummary
         points={[
-          "薄明薄暮はクマ活動ピーク。可能な限り早朝・夕方の山行は避ける。",
+          "早朝・夕方はクマが活発になりやすい。可能な限りこの時間帯の山行は避ける。",
           "メインヘッドライト 300〜500 ルーメン + サブライトの二段構え。",
           "予備電池 / モバイルバッテリーで電源冗長化を。",
           "蛍光色シェル + 反射材で他人からの視認性を確保 (狩猟期は特に重要)。",

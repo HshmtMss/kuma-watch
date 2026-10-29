@@ -250,7 +250,10 @@ export default function Page() {
           <strong>追跡・追払い・捕獲の判断</strong>: 自治体・猟友会・警察の三者協議
         </li>
         <li>
-          <strong>必要に応じて自衛隊派遣要請</strong>（2025 年改正法で市街地での猟銃使用が一部容認）
+          <strong>緊急銃猟</strong>: 2025 年 9 月 1 日施行の改正鳥獣保護管理法により、条件を満たせば市町村長の判断で、ハンターに市街地での銃猟を委託できるようになった
+        </li>
+        <li>
+          <strong>自衛隊の後方支援</strong>: 緊急銃猟とは別の枠組みで、わなの運搬などの後方支援のために自衛隊が派遣された例もある
         </li>
       </ol>
       <p>
@@ -271,10 +274,7 @@ export default function Page() {
           <strong>各都道府県の専用フォーム</strong>: 「{`{県名}`} クマ 目撃情報 投稿」で検索
         </li>
         <li>
-          <strong>市町村の LINE 公式アカウント</strong>: 札幌市など複数自治体で運用
-        </li>
-        <li>
-          <strong>くまっぷ・くまMap など民間アプリ</strong>: 住民投稿型
+          <strong>市町村の LINE 公式アカウントなど</strong>: 自治体によっては LINE 等で受け付けている場合がある
         </li>
         <li>
           <strong>くまウォッチの投稿機能</strong>:{" "}

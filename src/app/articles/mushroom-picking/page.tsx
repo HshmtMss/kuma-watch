@@ -183,7 +183,7 @@ export default function Page() {
           匂いを残せばクマの関心は人間からカゴに移りやすい。命は最優先、収穫物は捨てる前提で。
         </li>
         <li>
-          <strong>子グマを見たら 0.5 秒で離れる</strong>:
+          <strong>子グマを見たらすぐに離れる</strong>:
           可愛いから写真は絶対 NG。母グマが必ず近くにいます
           (<Link href="/articles/cub-handling">子グマを見たら</Link>)。
         </li>
