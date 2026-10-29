@@ -31,12 +31,12 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        「最近のクマは夜に出る」 — 秋田や盛岡、札幌の住民から、ここ数年よく聞くようになった声です。
-        昔のクマは早朝や夕方に出るものだったはず。
-        本当に夜行性に変わりつつあるのか？ あるいは私たちの気のせいなのか。
+        人の暮らしのそばで食べ物が手に入るようになると、クマの暮らし方はどれくらい変わるのでしょうか。
+        しかも、その変化はどれくらいの速さで起きるのでしょうか。
       </p>
       <p>
-        この問いに、米国・タホ湖のクロクマで <strong>20 年かけて答えを出した研究</strong>があります。
+        今号は、米国西部のアメリカクロクマで、街の近くに住むクマと森に住むクマを比べ、
+        さらに同じ地域の 10〜15 年前のデータとも見比べた研究を読みます。
       </p>
 
       {/* 論文カード */}
@@ -57,343 +57,148 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            タホ湖周辺のクロクマは <strong>30 年で「昼型」から「夜型」へ</strong>大変化
+            街の近くのクマは、森のクマより <strong>1 日に活動する時間が短かった</strong>（8.5 時間 対 13.3 時間）
           </>,
           <>
-            街のクマは <strong>体が大きく、冬眠期間が短く、子をたくさん産む</strong>
+            街の近くのクマは <strong>活動が夜に寄り</strong>、<strong>冬ごもりに入るのが遅く、期間も短かった</strong>
           </>,
           <>
-            原因は「人のゴミ」。一度学習すると <strong>子グマにも伝わる</strong>
+            著者らは、人由来の食べ物（ごみ）があると <strong>クマの生態は思っていたより短い期間で変わりうる</strong>と述べています
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "story", title: "タホ湖のクロクマたちが変わってしまった" },
-          { id: "method", title: "20 年間の追跡で何を調べたか" },
-          { id: "shift", title: "数字で見る「昼型 → 夜型」シフト" },
-          { id: "fatter", title: "街のクマは大きく、太り、冬眠しない" },
-          { id: "why-night", title: "なぜ夜行性になったのか" },
-          { id: "learning", title: "母から子へ「街での生き方」が伝わる" },
-          { id: "ecology", title: "これは進化なのか、学習なのか" },
-          { id: "japan", title: "日本でも同じことが起きているのか" },
-          { id: "action", title: "今日からあなたができる 4 つのこと" },
-          { id: "reversibility", title: "都市型クマは元に戻せるのか？" },
+          { id: "method", title: "どこで・何を・どう調べたか" },
+          { id: "results", title: "分かったこと" },
+          { id: "followup", title: "同じ地域のその後の研究" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="story">タホ湖のクロクマたちが変わってしまった</h2>
+      <h2 id="method">どこで・何を・どう調べたか</h2>
       <p>
-        アメリカ・ネバダ州とカリフォルニア州にまたがる <strong>タホ湖</strong>。
-        サウスタホ・インクライン・ビレッジなど、湖畔には人口数千〜数万人の街が並びます。
-        そのすぐ裏は、シエラネバダ山脈の深い森です。
+        調査地は米国西部、<strong>シエラネバダ山脈とグレートベースン砂漠の境目</strong>にあたる地域です。
+        この地域では人口が増え、住宅地が昔からクマのいた場所へ広がってきました。
+        住宅地にはごみなど、クマにとって新しい食べ物があります。
       </p>
       <p>
-        この街と森の境界線で起きていた変化に、最初に気づいたのは
-        <strong>ジョン・ベックマン（Jon Beckmann）</strong>という若い研究者でした。
-        1996 年、ベックマンがクマの研究を始めたとき、地元のレンジャーたちは口を揃えて言いました。
-      </p>
-      <p className="text-center text-sm italic text-stone-600">
-        「昔のクマは昼にしか見なかった。最近のクマは、夜にゴミ箱を漁る」
-      </p>
-      <p>
-        ベックマンは、これを科学的に検証することにしました。
-        指導教官は野生動物保全の世界的権威 <strong>ジョエル・バーガー（Joel Berger）</strong>。
-        2 人は <strong>1996 年から 2002 年までの 6 年間、計 30 頭以上のクロクマに VHF / GPS 首輪を装着</strong>
-        し、24 時間体制で行動を追跡しました。
-      </p>
-      <p>
-        さらに過去のデータ（1980 年代の記録）と比較することで、
-        <strong>「過去 30 年でクマたちの行動はどう変わったのか」</strong>という
-        長期的な視点での解析を実現しました。それが 2003 年に発表された本論文です。
-      </p>
-
-      <h2 id="method">20 年間の追跡で何を調べたか</h2>
-      <p>
-        ベックマンらが比較したのは、ざっくり言うと <strong>「街に住むクマ」と「森に住むクマ」</strong>です。
+        著者らはこれを「自然の実験」と見立て、次の 2 つのグループのアメリカクロクマを比べました。
       </p>
       <ul>
         <li>
-          🏘️ <strong>都市隣接群（urban interface）</strong>: 街から 1km 以内をうろつくクロクマ群
+          <strong>街と森の境目（urban–wildland interface）に住むクマ</strong>: 人由来の食べ物にふれられるグループ
         </li>
         <li>
-          🌲 <strong>奥山群（wildland）</strong>: 街から離れた森の奥に生息するクロクマ群
+          <strong>森（wildland）に住むクマ</strong>: 比較の基準となるグループ
         </li>
       </ul>
       <p>
-        この 2 群について、次の指標を 6 年間追跡し、1980 年代のベースラインデータと比較しました。
-      </p>
-      <ul>
-        <li>
-          <strong>活動時間帯</strong>（昼か夜か、それとも全時間帯か）
-        </li>
-        <li>
-          <strong>体重・体格</strong>
-        </li>
-        <li>
-          <strong>冬眠期間</strong>（いつ冬眠して、いつ起きるか）
-        </li>
-        <li>
-          <strong>繁殖成功率</strong>（何頭の子グマが生まれたか）
-        </li>
-        <li>
-          <strong>行動範囲</strong>（テリトリーの広さ）
-        </li>
-      </ul>
-
-      <h2 id="shift">数字で見る「昼型 → 夜型」シフト</h2>
-      <p>
-        最も衝撃的だったのが、活動時間の変化です。
-        本来クロクマは <strong>「薄明薄暮性」</strong>と呼ばれる、早朝と夕方に活動が集中するパターンが基本。
-        ところが、街に住むクマたちは見事に「夜型」へと変わっていました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">活動時間帯</th>
-              <th className="px-3 py-2 text-left">奥山のクマ</th>
-              <th className="px-3 py-2 text-left">街のクマ</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">昼間（明るい時間）</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">90%</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">10%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">夜間（暗い時間）</td>
-              <td className="px-3 py-2 text-stone-700 tabular-nums">10%</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">90%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        ものの見事に <strong>真逆</strong>です。同じ「クロクマ」なのに、街に近い個体は
-        <strong>活動の 9 割を夜に行う</strong>ようになっていました。
-      </p>
-      <p>
-        さらに 1980 年代のデータと比較すると、その変化は明らかに最近のもの。
-        1980 年代の街周辺のクマは奥山群とほぼ同じ昼型だったのに、
-        <strong>たった 20 年で逆転</strong>していたのです。
+        さらに時間の比較として、<strong>同じ個体群の 10〜15 年前のデータ</strong>（まだ人の住宅地が広がっていなかった頃のもの）とも見比べています。
+        調べた項目は、1 日の時間の使い方、活動する時間帯、冬ごもり（巣穴に入る・出る時期）です。
       </p>
 
-      <h2 id="fatter">街のクマは大きく、太り、冬眠しない</h2>
-      <p>
-        変わったのは時間だけではありませんでした。街のクマは <strong>体つきまで変わっていた</strong>のです。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">指標</th>
-              <th className="px-3 py-2 text-left">奥山のクマ</th>
-              <th className="px-3 py-2 text-left">街のクマ</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">体重</td>
-              <td className="px-3 py-2 tabular-nums">基準値</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">+30%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">体脂肪率</td>
-              <td className="px-3 py-2 tabular-nums">普通</td>
-              <td className="px-3 py-2 text-red-700 font-bold">明らかに高い</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">冬眠期間</td>
-              <td className="px-3 py-2 tabular-nums">5〜7 ヶ月</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">0〜2 ヶ月</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">子グマの数（1 回出産あたり）</td>
-              <td className="px-3 py-2 tabular-nums">2 頭</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">3 頭</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        いちばん衝撃的だったのは <strong>冬眠期間</strong>です。
-        本来、クロクマは秋から春先まで 5〜7 ヶ月も穴ごもりするのが普通。
-        ところが街のクマの一部は <strong>「ほぼ冬眠しない」</strong>個体まで現れていました。
-      </p>
-      <p>
-        理由は単純です。<strong>冬の間も食料が手に入る</strong>から。
-        街のゴミ箱、ペットフード、放置された果樹、釣り餌、レストラン裏の生ごみ。
-        年中食べ放題なら、体力を温存するために冬眠する必要がないのです。
-      </p>
-      <p>
-        さらに <strong>体が大きいほど子グマがたくさん産まれ、生存率も高い</strong>。
-        街のクマは生物学的にも「成功」していました。
-        これは保全としては良いことのように見えますが、実は別の問題を引き起こします（後述）。
-      </p>
-
-      <h2 id="why-night">なぜ夜行性になったのか</h2>
-      <p>
-        ここで本論文の核心。クマは進化的にも文化的にも昼行性〜薄明薄暮性なのに、
-        <strong>なぜわざわざ夜に活動するように変わった</strong>のでしょうか？
-      </p>
-      <p>
-        答えは「<strong>人間との接触を避けるため</strong>」です。
-      </p>
-      <p>
-        ベックマンらは興味深い観察を記録しています。街のクマたちは決して人を襲おうとはせず、
-        むしろ <strong>「人がいない時間」を選んで街に降りてくる</strong>。
-        昼間は近くの森に潜み、人通りが減る夜 9 時以降に行動を始め、夜明け前に森へ戻る。
-      </p>
-      <p>
-        これは <strong>「人嫌い・餌好き」のジレンマを最適化した戦略</strong>と言えます。
-        街のクマは人を避けたいが、街の食物は捨てがたい。
-        この相反する要求のバランスを取るために、活動時間帯を <strong>「人がいない時間」</strong>にシフトさせたのです。
-      </p>
-      <p>
-        この戦略は世界中の都市環境に住む大型哺乳類で確認されており、
-        <strong>「人為的夜行性化（anthropogenic nocturnality）」</strong>と呼ばれます。
-        その代表事例として、Beckmann &amp; Berger の論文は今も引用され続けています。
-      </p>
-
-      <h2 id="learning">母から子へ「街での生き方」が伝わる</h2>
-      <p>
-        さらに衝撃的なのは、この行動が <strong>母から子へ受け継がれていく</strong>ことです。
-      </p>
-      <p>
-        ベックマンらは GPS データから、街のクマの子グマが
-        <strong>2 歳で母グマから独立した後も、街周辺に留まる傾向</strong>を見出しました。
-        奥山で生まれた子グマは奥山で暮らし続け、街で生まれた子グマは街で暮らし続ける。
-        まるで <strong>「街の住人」</strong>として代替わりしているかのように。
-      </p>
-      <p>
-        これは遺伝ではなく <strong>学習による伝達</strong>です。
-        母グマと一緒に過ごす最初の 2 年間で、子グマは
-        「ゴミ箱はどこにあるか」「人が活動する時間帯」「車を避ける方法」など、
-        街での生き方の <strong>マニュアル</strong>を母から教わってしまうのです。
-      </p>
-      <p>
-        これは「<strong>都市型クマは一過性の現象ではなく、世代を超えて続く</strong>」ことを意味します。
-        一度形成された「都市型クマ個体群」は、その地域で安定して存在し続ける可能性が高い。
-      </p>
-
-      <h2 id="ecology">これは進化なのか、学習なのか</h2>
-      <p>
-        この発見をめぐって、当時の生物学者たちは大きな議論を始めました。
-      </p>
-      <p>
-        「クマは進化的に夜行性に変わりつつあるのか？」
-        「それとも、その世代だけの学習行動なのか？」
-      </p>
-      <p>
-        現時点（2026 年）の理解では、両方の要素が混じった
-        <strong>「行動の可塑性（behavioral plasticity）」</strong>として解釈されています。
-        つまり、遺伝子のセットは同じでも、環境と学習に応じて活動時間を柔軟に変えられる
-        柔軟性がクマ科の動物にはもともと備わっており、それが今、北米都市部で発現している、
-        という見方です。
-      </p>
-      <p>
-        ベックマン自身、2008 年の続編論文で「<strong>これは文化的な変化に近い</strong>」
-        と表現しています。子グマが母グマから学ぶ知識が世代を超えて蓄積される様子は、
-        進化というより、文化伝達の方が近いという解釈です。
-      </p>
-
-      <h2 id="japan">日本でも同じことが起きているのか</h2>
-      <p>
-        では、日本のツキノワグマでも同じことが起きているのでしょうか？
-      </p>
-      <p>
-        日本では北米ほど大規模な GPS テレメトリー研究は行われていませんが、
-        間接的なデータから <strong>「ほぼ確実に起きている」</strong>ことが推測できます。
-      </p>
-      <h3>① 出没データの時間帯シフト</h3>
-      <p>
-        秋田・盛岡・札幌・富山などで近年急増している「住宅地クマ目撃」の通報時刻は、
-        圧倒的に <strong>夜 20 時〜深夜 2 時</strong>に集中しています。
-        2025 年の秋田市内の事案では、住宅街での出没の <strong>7 割以上が夜間</strong>でした。
-      </p>
-      <h3>② 体格の大型化傾向</h3>
-      <p>
-        2026 年 4 月、北海道苫前町で <strong>330kg のヒグマ</strong>が捕獲されました。
-        これは過去 30 年の平均より明らかに大型で、専門家からは「人為的食料への依存」が指摘されています。
-        ツキノワグマでも、果樹園・サイレージ・廃棄食品にアクセスできる個体は大型化傾向があります。
-      </p>
-      <h3>③ 冬眠の不全</h3>
-      <p>
-        近年、<strong>「冬眠しないクマ」</strong>の事例が日本でも報告されています。
-        北海道のヒグマ「OSO18」（2018〜2023 年に乳牛襲撃を続けたヒグマ）は、
-        冬眠していない可能性が議論されていました。
-        ツキノワグマでも、雪の少ない地域・人為的食料源がある地域で同様の現象が見られます。
-      </p>
-      <h3>④ 親子伝達</h3>
-      <p>
-        市街地に出る母グマが子グマを連れているケースが増えており、
-        2025 年秋田・新潟では市街地への母子グマ出没事案が複数報告されました。
-        Beckmann が指摘した「親子伝達」が日本でも進行中である可能性があります。
-      </p>
-      <p>
-        詳細は{" "}
-        <Link href="/articles/urban-bear">アーバン・ベア — 市街地に出るクマと住民の備え</Link>
-        を参照してください。
-      </p>
-
-      <h2 id="action">今日からあなたができる 4 つのこと</h2>
-      <p>
-        この論文の知見を、日本の生活レベルで生かせるアクションは次の通りです。
-      </p>
+      <h2 id="results">分かったこと</h2>
+      <p>論文の要旨には、森のクマと比べた街の近くのクマの特徴として、次の 3 点が示されています。</p>
       <ol className="my-4 list-decimal space-y-3 pl-5">
         <li>
-          <strong>夜の出歩きを「リスク管理」する</strong> — 市街地近隣の山間部居住地では、
-          夜 20 時〜深夜の散歩・ジョギング・ペット散歩は最大の警戒時間帯です。明かりが多い時間帯に時間をずらす。
+          <strong>1 日に活動する時間が短い</strong> — 平均 <strong>8.5 時間</strong>。森のクマは <strong>13.3 時間</strong>でした。
+          ごみのようにまとまった食べ物があると、食べ物を探して歩き回る時間が少なくて済むと考えられます。
         </li>
         <li>
-          <strong>誘引物を徹底排除する</strong> — クマが街を「居場所」に選ぶ最大の要因は<strong>食べ物</strong>です。
-          生ごみは収集日まで密閉、果樹は完熟前に収穫、ペットフード屋外保管禁止、コンポスト堆肥は野生動物に触らせない。
+          <strong>活動が夜の時間帯に移っている</strong> — 統計的にはっきりした差がありました。
         </li>
         <li>
-          <strong>「親子クマ」目撃に最大警戒</strong> — 母グマは攻撃性が極めて高いだけでなく、
-          子グマに「街での生き方」を教えている真っ最中。<strong>すぐ自治体に通報</strong>することで、
-          世代を超える定着を防げます（{" "}
-          <Link href="/articles/bear-report">通報マニュアル</Link>{" "}参照）。
-        </li>
-        <li>
-          <strong>「一度来たクマは何度も来る」と理解する</strong> — 学習したクマは数年単位で同じ場所を訪れます。
-          1 回の目撃で対策を打ち、誘引物管理と通報を徹底することが、長期的な住みつきを防ぐ最良の方法です。
+          <strong>冬ごもりに入るのが遅く、巣穴にいる日数が短い</strong>。
         </li>
       </ol>
+      <p>
+        著者らは、こうした変化をほかの肉食動物の例とも比べたうえで、
+        <strong>人の活動による環境の変化にともなう肉食動物の生態の変化は、それまで考えられていたより短い期間で起こりうる</strong>
+        と結論づけています。
+      </p>
+      <p>
+        つまりこの研究が示したのは「クマが別の動物になった」ということではなく、
+        <strong>同じ種類のクマでも、食べ物の条件が変わると、時間の使い方や冬ごもりがすぐに変わりうる</strong>ということです。
+      </p>
 
-      <h2 id="reversibility">都市型クマは元に戻せるのか？</h2>
+      <h2 id="followup">同じ地域のその後の研究</h2>
       <p>
-        この論文の最も重い問いは、「<strong>一度都市型化したクマを、再び奥山型に戻せるか</strong>」です。
+        ベックマンらは、その後もこの地域（タホ湖周辺を含むシエラネバダ山脈北部）で調査を続けました。
+        2008 年の論文（Beckmann &amp; Lackey 2008）では、1997〜2006 年に、街に住むメス 12 頭と森に住むメス 10 頭を追跡しています。
       </p>
       <p>
-        ベックマンらは続編研究（Beckmann &amp; Lackey 2008）で、いくつかの介入実験を行いました。
-        ゴミ箱の <strong>クマ対策化（bear-proof container）</strong>、住宅地の<strong>果樹伐採</strong>、
-        コンポスト管理の徹底、罰金つきの<strong>「ごみ管理条例」</strong>などです。
+        その結果、街のメスは年齢あたりの繁殖成績が森のメスより高い一方で、<strong>年齢あたりの死亡率も高く</strong>、
+        街のクマの集団は数が減っていく「吸い込み（シンク）」の状態にあると推定されました。
+        著者らは、タホ湖周辺の街のクマが、空いた森の生息地を埋め直す供給源にはなれないと述べています。
       </p>
       <p>
-        結果はある程度ポジティブでした。<strong>個体群レベルで誘引物を徹底排除した地域では、
-        次世代のクマが再び奥山型の生活に戻る兆しが観察された</strong>のです。
-        ただし、これには年単位の時間と地域住民全員の協力が必要でした。
+        食べ物が多い場所は、クマにとって一見「得」に見えます。しかし人の近くで暮らすことは、
+        クマ自身にとっても危険の多い暮らし方である、という見方を補う結果です。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
+      <ul>
+        <li>
+          対象は <strong>北米のアメリカクロクマ</strong>で、日本のツキノワグマやヒグマとは種も環境も違います。
+          同じことが日本でそのまま起きているとは言えません。
+        </li>
+        <li>
+          調べたのは <strong>米国西部の 1 つの地域</strong>です。ごみの出し方や住宅地の形、冬の厳しさなどが違えば、結果も変わりえます。
+        </li>
+        <li>
+          本記事は論文の要旨と、同じ研究チームの続報の要旨にもとづいています。調べた頭数や詳しい数字の多くは、ここでは紹介していません。
+        </li>
+        <li>
+          「街の近くに住むこと」と「ごみを食べること」以外の違い（地形や人の多さなど）も結果に影響している可能性があります。
+        </li>
+      </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
+      <p>
+        この研究から日本にそのまま数字を当てはめることはできません。それでも、次のことは参考になります。
+      </p>
+      <ul>
+        <li>
+          <strong>人由来の食べ物は、クマの暮らし方を変えうる</strong> — 生ごみ、収穫しない果樹、屋外に置いたペットフードなどは、
+          クマを人の近くに引き寄せる原因になります。片付けておくことが、人にとってもクマにとっても事故を減らす基本です
+          （{" "}
+          <Link href="/articles/urban-bear">市街地に出るクマと住民の備え</Link>{" "}
+          も参考にしてください）。
+        </li>
+        <li>
+          <strong>人の少ない時間帯にも注意する</strong> — この研究では街の近くのクマの活動が夜に寄っていました。
+          クマが出ている地域では、早朝・夕方・夜の外出時に周りをよく確かめましょう。
+        </li>
+        <li>
+          <strong>見かけたら知らせる</strong> — 人の近くで食べ物を覚えたクマは、同じ場所に来る可能性があります。
+          見かけたら自治体や警察に連絡してください（{" "}
+          <Link href="/articles/bear-report">通報のしかた</Link>{" "}）。
+        </li>
+      </ul>
+      <p>
+        もしクマに出会ったら、<strong>走らない・背を向けない・ゆっくり離れる</strong>が基本です。
+        突進されたらクマスプレー（環境省が示す目安は、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上・有効成分 CRC 1〜2% 程度）を、
+        5〜10m の距離で顔に向けて 1〜2 秒ずつ噴射します。
+        防衛的な攻撃で接触が避けられないときは、うつ伏せになって首の後ろを両手で守る防御姿勢をとります。
+        執拗に襲ってくる、捕食しようとするような攻撃のときは反撃します。
       </p>
       <p>
-        日本では今後、同様の介入が <strong>自治体・警察・住民の三者連携</strong>で
-        進められる必要があります。クマが市街地に来る根本原因の多くは「誘引物の存在」であり、
-        それを断つことなしには夜行性化・大型化・繁殖成功率の上昇は止まりません。
-        2024 年 4 月のクマ「指定管理鳥獣」化（{" "}
-        <Link href="/articles/designated-management-2026">解説記事</Link>{" "}）は、
-        この方向への大きな一歩と言えます。
+        なお日本では 2024 年 4 月に、クマ類（四国の個体群を除く）が「指定管理鳥獣」に追加されました（{" "}
+        <Link href="/articles/designated-management-2026">解説記事</Link>{" "}）。
       </p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
             title:
-              "Rapid ecological and behavioural changes in carnivores: the responses of black bears to altered food（本号メイン）",
+              "Rapid ecological and behavioural changes in carnivores: the responses of black bears (Ursus americanus) to altered food（本号メイン）",
             citation: (
               <>
                 Beckmann, J. P., &amp; Berger, J. (2003).{" "}
@@ -404,43 +209,26 @@ export default function Page() {
             linkText: "DOI: 10.1017/S0952836903004126 →",
           },
           {
-            title:
-              "Carnivores, urban landscapes, and longitudinal studies: a case history of black bears",
+            title: "Carnivores, urban landscapes, and longitudinal studies: a case history of black bears",
             citation: (
               <>
                 Beckmann, J. P., &amp; Lackey, C. W. (2008).{" "}
-                <em className="not-italic">Human-Wildlife Conflicts</em> 2(2): 168–174.
+                <em className="not-italic">Human–Wildlife Conflicts</em> 2(2): 168–174.
               </>
             ),
-            href: "https://digitalcommons.unl.edu/hwi/55/",
-            linkText: "全文（DigitalCommons） →",
-          },
-          {
-            title:
-              "The influence of human disturbance on wildlife nocturnality（夜行性化のメタ解析）",
-            citation: (
-              <>
-                Gaynor, K. M., Hojnowski, C. E., Carter, N. H., &amp; Brashares, J. S. (2018).{" "}
-                <em className="not-italic">Science</em> 360(6394): 1232–1235.
-              </>
-            ),
-            href: "https://doi.org/10.1126/science.aar7121",
-            linkText: "DOI: 10.1126/science.aar7121 →",
+            href: "https://digitalcommons.usu.edu/hwi/vol2/iss2/10",
+            linkText: "論文ページ（Utah State University） →",
           },
         ]}
       />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.3">
-        <strong>「カメラトラップ × 深層学習 — AI はクマを見分けられるか？」</strong> —
-        年間 320 万枚の動物画像を学習し、種同定 96.6% を達成した深層学習研究（Norouzzadeh et al. 2018, PNAS）
-        を精読します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }

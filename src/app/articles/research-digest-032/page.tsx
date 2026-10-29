@@ -2,12 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
-import {
-  PaperCard,
-  KeyPoints,
-  NextIssue,
-  References,
-} from "@/components/ArticleCards";
+import { PaperCard, KeyPoints, References } from "@/components/ArticleCards";
 import { getArticle, reviewRobots } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-032")!;
@@ -32,19 +27,17 @@ export const metadata: Metadata = {
   },
 };
 
+const SOURCE_URL = "https://conservationevidencejournal.com/individual-study/8101";
+
 export default function Page() {
   return (
     <ArticleShell meta={meta}>
-      {/* オープニングフック */}
       <p className="lead">
-        登山口でよく見かける「クマ鈴」。
-        多くの人が<strong>「鳴らしていれば安心」</strong>と思っています。
-        でも——その効果を示す科学的な根拠は、実は<strong>驚くほど薄い</strong>のです。
-        今回は、鈴を扱った数少ない古典 Jope 1985 を起点に、
-        「音でクマに人の存在を知らせる」という対策の<strong>本当の有効性と限界</strong>を冷静に見ていきます。
+        登山口でよく見かける「クマ鈴」。鈴が実際にクマの行動を変えるのかを、野外の記録で調べた研究は多くありません。
+        今号は、その数少ない例としてよく引用される Jope（1985）を取り上げ、
+        <strong>論文で分かったこと</strong>と<strong>分からないこと</strong>を分けて読みます。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
         label="今号で読み解く 1 本の論文"
         title="Implications of grizzly bear habituation to hikers"
@@ -52,167 +45,130 @@ export default function Page() {
           <>
             Jope, K. L. (1985).{" "}
             <em className="not-italic">Wildlife Society Bulletin</em> 13(1):
-            32–37.（米国グレイシャー国立公園のハイカーとグリズリーの遭遇観察）
+            32–37.（米国の国立公園で、ハイカーとグリズリー〔ハイイログマ〕の遭遇を調べた研究）
           </>
         }
-        href="https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers"
-        linkText="Google Scholar で原典を探す →"
+        href={SOURCE_URL}
+        linkText="Conservation Evidence の要約を見る →"
       />
 
       <KeyPoints
         label="時間がない人向けの 3 行"
         items={[
           <>
-            Jope は<strong>「鈴を鳴らすハイカーの方がクマに突進されにくい」</strong>傾向を観察した
+            ハイカーが 150 m 以内でグリズリーを見た報告 <strong>97 件</strong>を集め、鈴を付けていたかどうかで比べた
           </>,
           <>
-            ただし古い観察研究で、<strong>「鈴そのものの効果」を厳密に検証した実験ではない</strong>
+            鈴ありでは、止まっていたクマが離れていった割合が<strong>67%</strong>（鈴なし 26%）、突進は<strong>0%</strong>（鈴なし 14%）だった
           </>,
           <>
-            大事なのは鈴より<strong>「早めに・確実に人の存在を伝える」</strong>こと。声・スプレーの方が頼れる
+            ただし鈴ありの遭遇は<strong>20 数件と少なく</strong>、北米のグリズリーの結果。日本のツキノワグマで同じ効果があるかは確かめられていない
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "「鈴があれば安心」という思い込み" },
-          { id: "jope", title: "Jope が見たもの — 鳴らす人、鳴らさない人" },
-          { id: "principle", title: "効くのは「鈴」ではなく「予告」" },
-          { id: "limits-bell", title: "なぜ小さな鈴では足りないのか" },
-          { id: "habituation", title: "慣れの問題 — 鈴が「背景音」になる" },
-          { id: "japan", title: "日本のツキノワグマと鈴" },
-          { id: "action", title: "結論 — 鈴をどう位置づけるか" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">「鈴があれば安心」という思い込み</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        クマ鈴は、日本でもっとも普及したクマ対策グッズの一つです。
-        しかし「どれくらい効くのか」を真正面から測った研究は、世界的にもごくわずか。
-        メーカーの宣伝や登山者の体験談は山ほどある一方で、
-        <strong>査読を通った厳密なデータはほとんど存在しない</strong>——これが正直な現状です。
+        調査は米国の国立公園内の森林で、約 154 km² の範囲を対象に、
+        1980 年（6 月 3 日〜9 月 15 日）と 1981 年（6 月 14 日〜9 月 22 日）の夏に行われました。
       </p>
+      <ul>
+        <li>15 日おきに時間を決めて登山道の利用者を数え、そのときにクマ鈴を付けているかどうかも記録した</li>
+        <li>ハイカーに聞き取りをして、クマとの遭遇の様子（クマがどう動いたか）を集めた</li>
+      </ul>
       <p>
-        そんな中で、繰り返し引用される古典が Jope 1985 です。
-        米国グレイシャー国立公園で、ハイカーとグリズリーの遭遇を地道に観察した研究です。
+        つまり、研究者がクマの前で鈴を鳴らして比べた「実験」ではなく、
+        <strong>ハイカーの報告をもとにした観察研究</strong>です。
       </p>
 
-      <h2 id="jope">Jope が見たもの — 鳴らす人、鳴らさない人</h2>
+      <h2 id="findings">分かったこと</h2>
       <p>
-        Jope は、日帰り登山者が多い区域で、人とクマの遭遇がどう推移するかを記録しました。
-        その中で、<strong>クマ鈴を装着していたハイカー</strong>と
-        <strong>していなかったハイカー</strong>で、遭遇の「結末」に差があることに気づきます。
+        ハイカーから集まった、150 m 以内でクマを見たという報告は 97 件でした。
+        そのうち、ハイカーが鈴を付けていたのは<strong>24%</strong>です。
       </p>
       <KeyPoints
-        label="観察された傾向（要約）"
+        label="鈴の有無で比べた結果"
         tone="stone"
         items={[
           <>
-            🔔 <strong>鈴あり</strong> → クマはその場を<strong>立ち去る</strong>か、距離を保って通過する傾向
+            はじめ<strong>止まっていたクマ</strong>のうち、ハイカーから離れていった割合：
+            鈴あり <strong>67%</strong> ／ 鈴なし <strong>26%</strong>
           </>,
           <>
-            🚶 <strong>鈴なし</strong> → クマがその場に<strong>とどまる・近づく・突進する</strong>事例が相対的に多い
+            クマがハイカーに<strong>突進した</strong>割合：
+            鈴あり <strong>0%</strong> ／ 鈴なし <strong>14%</strong>
           </>,
         ]}
       />
       <p>
-        Jope の解釈はこうです。
-        鈴は<strong>「人間が近づいているよ」という事前の予告</strong>として働く。
-        クマは不意打ちを最も嫌う動物で、至近距離で突然人と鉢合わせると、
-        驚いて防御的に攻撃することがある。鈴が先に存在を知らせれば、
-        クマは<strong>気づかれる前に静かに離れる</strong>余裕を持てる——というわけです。
+        数字だけを見ると、鈴を付けていたハイカーの前では、クマが離れていきやすく、突進は起きなかったことになります。
+        「人が近づいていることを、クマが早めに知る」ことと矛盾しない結果です。
       </p>
 
-      <h2 id="principle">効くのは「鈴」ではなく「予告」</h2>
-      <p>
-        ここが本質です。Jope の研究が支持しているのは、厳密には
-        <strong>「鈴という道具」そのものではなく、「人の接近を事前に伝える」という原理</strong>です。
-      </p>
-      <p>
-        クマの事故の多くは「至近距離での不意の遭遇」で起きます
-        （世界のヒグマ襲撃を解析した
-        <Link href="/articles/research-digest-014">Bombieri 2019（Vol.14）</Link>でも、
-        不意の遭遇と母子グマが主要因でした）。
-        だから、<strong>音であれ声であれ、先に存在を知らせれば事故は減る</strong>。
-        鈴はその手段の一つにすぎません。
-      </p>
+      <h2 id="limits">限界と注意点</h2>
+      <ul>
+        <li>
+          <strong>件数が少ない</strong>：97 件の 24% なので、鈴ありの遭遇は単純計算で 20 数件です。
+          「止まっていたクマ」に限った比較はさらに少なくなります。
+          1〜2 件の違いで割合が大きく動く大きさです。
+        </li>
+        <li>
+          <strong>観察研究である</strong>：鈴を付ける人と付けない人では、歩く場所や人数、話し声の大きさなど、
+          ほかの条件も違っていたかもしれません。差がすべて鈴のおかげとは言い切れません。
+        </li>
+        <li>
+          <strong>報告はハイカーの記憶にもとづく</strong>：遭遇の様子は聞き取りで集めたもので、
+          見落としや思い違いが入る余地があります。
+        </li>
+        <li>
+          <strong>北米のグリズリーの結果</strong>：日本にいるツキノワグマやヒグマとは、種・地形・人の利用の仕方が違います。
+          <strong>日本のクマに鈴が同じように効くかは、この研究では確かめられていません。</strong>
+        </li>
+      </ul>
 
-      <h2 id="limits-bell">なぜ小さな鈴では足りないのか</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        問題は、<strong>典型的なクマ鈴の音が、実は遠くまで届かない</strong>ことです。
-        Jope 以降に蓄積された知見や、クマ研究者（クマスプレー研究で知られる Tom Smith ら）の
-        指摘をまとめると、次のような限界が見えてきます。
+        この研究だけで「鈴を付ければ安全」とは言えません。一方で、環境省や各地の自治体は、
+        山に入るときに<strong>鈴やラジオ、声などで人の存在をクマに知らせる</strong>ことを勧めています。
+        Jope の結果は、その考え方と食い違うものではありません。
       </p>
       <ul>
         <li>
-          <strong>沢の音・風・密な藪</strong>にかき消される。沢沿いや風の強い稜線では、数十 m 先のクマにも届かないことがある
+          鈴は「人がいることを知らせる手段の一つ」と考え、見通しの悪い場所や沢沿いなど音が届きにくい場所では、ときどき声を出すなども組み合わせる
         </li>
         <li>
-          <strong>音量が小さい</strong>。小さな金属音は、クマにとって「人間」と結びつく強い信号になりにくい
+          クマに出会ってしまったら、<strong>走らない・背を向けない・ゆっくり離れる</strong>
         </li>
         <li>
-          <strong>断続的で機械的</strong>。人の声のように「明確に人間」と分かる情報量が乏しい
+          突進されたらクマスプレーを使う（5〜10 m で顔に向けて 1〜2 秒ずつ噴射。環境省が示す目安は、噴射距離 7.5 m 程度以上・噴射時間 6 秒程度以上・CRC 1〜2% 程度）
+        </li>
+        <li>
+          防衛的な攻撃で接触が避けられないときは、うつ伏せになって首の後ろを手で守る。執拗に襲ってくる・捕食的な攻撃なら反撃する
         </li>
       </ul>
       <p>
-        つまり鈴は「鳴らさないよりはマシ」だが、
-        <strong>これ一つで安全が確保できる装備ではない</strong>、というのが現代の評価です。
-      </p>
-
-      <h2 id="habituation">慣れの問題 — 鈴が「背景音」になる</h2>
-      <p>
-        もう一つの落とし穴が<strong>「慣れ（馴化）」</strong>です。
-        人の出入りが多い場所では、クマが鈴の音を何度も聞くうちに
-        <strong>「害のない背景音」</strong>として無視するようになることがあります。
-        とくに、鈴の音の先に<strong>食べ物（生ゴミ・残飯）</strong>がある経験を重ねたクマは、
-        鈴を「人＝危険」ではなく、最悪の場合<strong>「人＝餌のサイン」</strong>と学習しかねません。
-      </p>
-      <p>
-        人馴れ・餌付けがクマと人の双方にとっていかに危険かは、次号 Vol.33 で
-        知床のヒグマ研究をもとに深掘りします。
-      </p>
-
-      <h2 id="japan">日本のツキノワグマと鈴</h2>
-      <p>
-        Jope の対象は北米のグリズリーで、日本のツキノワグマとは種も環境も違います。
-        とはいえ「不意の遭遇を避ける」という原理は共通です。
-        ツキノワグマは基本的に臆病で、人の存在に早く気づけば自ら離れることがほとんど。
-        だからこそ<strong>「先に気づかせる」</strong>対策には意味があります。
-      </p>
-      <p>
-        ただし日本でも、鈴を過信するのは禁物です。
-        とくに<strong>沢沿い・早朝夕方・見通しの悪い藪・出没多発地</strong>では、
-        鈴だけに頼らず、複数の手段を重ねるのが安全です。
-      </p>
-
-      <h2 id="action">結論 — 鈴をどう位置づけるか</h2>
-      <p>
-        Jope 1985 から導ける、現実的な使い方はこうです。
-      </p>
-      <ol className="my-4 list-decimal space-y-3 pl-5">
-        <li>
-          <strong>鈴は「補助」と割り切る</strong> — 鳴らさないよりは良い。だが「鈴があるから大丈夫」とは考えない。
-        </li>
-        <li>
-          <strong>声・手拍子を併用する</strong> — 見通しの悪い場所・沢沿いでは、ときどき声を出す・手を叩く。
-          人の声は鈴より「人間」と伝わりやすく、遠くまで届く。
-        </li>
-        <li>
-          <strong>複数人で・日中に・音を立てて歩く</strong> — 単独・早朝夕方・無音が最もリスクが高い組み合わせ。
-        </li>
-        <li>
-          <strong>最後の砦はクマよけスプレー</strong> — 「気づかせる」対策をすり抜けて至近で遭遇したときの、
-          実証された最終手段。
-          <Link href="/articles/research-digest-001">Vol.1（Smith 2008）</Link>で詳述。
-        </li>
-      </ol>
-      <p>
-        鈴を含む遭遇回避の基本は{" "}
+        遭遇を避ける基本は{" "}
         <Link href="/measures">クマ対策の総合ガイド</Link>
         にもまとめています。
       </p>
+
+      <p className="text-xs text-stone-500">
+        ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
+        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
+      </p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
@@ -226,36 +182,11 @@ export default function Page() {
                 32–37.
               </>
             ),
-            href: "https://scholar.google.com/scholar?q=Jope+Implications+of+grizzly+bear+habituation+to+hikers",
-            linkText: "Google Scholar で原典を探す →",
-          },
-          {
-            title: "Efficacy of bear deterrent spray in Alaska（最終手段としてのスプレー）",
-            citation: (
-              <>
-                Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp;
-                Johnson, K. R. (2008).{" "}
-                <em className="not-italic">Journal of Wildlife Management</em>{" "}
-                72(3): 640–645.
-              </>
-            ),
-            href: "https://doi.org/10.2193/2006-452",
-            linkText: "DOI: 10.2193/2006-452 →",
+            href: SOURCE_URL,
+            linkText: "Conservation Evidence の要約を見る →",
           },
         ]}
       />
-
-      <p className="text-xs text-stone-500">
-        ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
-        <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
-      </p>
-
-      <NextIssue label="次号予告 — Vol.33">
-        <strong>「人に慣れた母グマの息子は早死にする」</strong> —
-        知床のヒグマを追った日本発の研究（Shimozuru 2020）から、
-        餌付け・人慣れがなぜ世代を超えてクマを殺すのかを読み解きます。
-      </NextIssue>
     </ArticleShell>
   );
 }

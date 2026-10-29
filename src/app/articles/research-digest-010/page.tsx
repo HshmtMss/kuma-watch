@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
-import { PaperCard, KeyPoints, NextIssue, References } from "@/components/ArticleCards";
+import { PaperCard, KeyPoints, References } from "@/components/ArticleCards";
 import { getArticle, reviewRobots } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-010")!;
@@ -28,385 +28,163 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const mainCitation = (
+    <>
+      Vonk, J., &amp; Beran, M. J. (2012).{" "}
+      <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
+    </>
+  );
+
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        オハイオ州の動物園で、ある日 3 頭のアメリカクロクマが小さなタッチスクリーンの前に座らされました。
-        画面には <strong>「ドットが 2 個」と「ドットが 5 個」</strong>。クマが多い方を選んだら、ご褒美。
-      </p>
-      <p>
-        結果、クマたちは <strong>はっきりと多い方を選び続けました</strong>。
-        当時の動物認知学者たちは衝撃を受けます。
-        「クマって、サルやイルカと同じくらい賢いんじゃないか？」
+        クマは食肉目（ネコ目）の中で、体の大きさに対する脳の大きさがとくに大きい動物です。
+        それなのに、クマの「考える力」を実験で調べた研究はほとんどありませんでした。
+        今号では、アメリカクロクマが「数の多い・少ない」を見分けられるかを、タッチスクリーンを使って調べた 2012 年の論文を紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 1 本の論文"
-        title={
-          <>
-            Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus
-          </>
-        }
-        citation={
-          <>
-            Vonk, J., &amp; Beran, M. J. (2012).{" "}
-            <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
-          </>
-        }
+        label="今号で紹介する論文"
+        title={<>Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus</>}
+        citation={mainCitation}
         href="https://doi.org/10.1016/j.anbehav.2012.05.001"
         linkText="DOI: 10.1016/j.anbehav.2012.05.001 →"
       />
 
       <KeyPoints
-        label="時間がない人向けの 3 行"
+        label="3 行まとめ"
         items={[
           <>
-            アメリカクロクマ <strong>3 頭</strong>にタッチスクリーンで「多い数を選ぶ」課題
+            米国の動物園で飼われている <strong>アメリカクロクマ 3 頭</strong>に、タッチスクリーンで点（ドット）の数を比べる課題を出しました
           </>,
           <>
-            正答率は <strong>サル並み（~75% 以上）</strong>。クマが数量を理解することを実証
+            点が止まっている課題では、<strong>3 頭とも偶然より高い確率</strong>で正しい方を選べました
           </>,
           <>
-            クマの賢さが「<strong>学習する都市型クマ問題</strong>」の根本原因
+            点が動く課題は難しく、どの条件でも偶然より上だったのは <strong>1 頭だけ</strong>。クマは「面積」も手がかりにしていましたが、「数」も使えていました
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "why-cognition", title: "なぜクマの「賢さ」を研究するのか" },
-          { id: "experiment", title: "オハイオの動物園で行われた認知実験" },
-          { id: "what-they-did", title: "クマに何を見せ、何を選ばせたか" },
-          { id: "result", title: "結果 — サル並みの正答率" },
-          { id: "discrimination", title: "数だけでなく「面積」も理解" },
-          { id: "transfer", title: "学習が新しい問題にも応用される" },
-          { id: "what-this-means", title: "クマの認知能力、想像以上に高い" },
-          { id: "wild", title: "野生で、この知能はどう発揮されるか" },
-          { id: "urban", title: "「学習するクマ」の脅威 — 都市型化の認知基盤" },
-          { id: "japan", title: "日本のツキノワグマでも同じか" },
-          { id: "ethics", title: "賢いと知ったら、私たちはどう向き合うか" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="why-cognition">なぜクマの「賢さ」を研究するのか</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        クマ研究の世界で、長らくクマは <strong>「身体能力で生きる動物」</strong>と考えられてきました。
-        強い握力、鋭い嗅覚、巨大な体。これだけで森を生き抜けると思われていたのです。
+        研究したのは、米国オークランド大学の Jennifer Vonk と、ジョージア州立大学の Michael J. Beran です。
+        実験は米国アラバマ州ウィルマーの <strong>Mobile Zoo（モービル動物園）</strong>で、展示エリアの裏にあるクマの飼育スペースを使って行われました。
       </p>
       <p>
-        ところが現代の野生動物学では、クマの<strong>認知（学習・記憶・問題解決能力）</strong>に
-        対する関心が急速に高まっています。理由は明白です。
+        参加したのは、きょうだいの成獣 <strong>3 頭（メス 1 頭・オス 2 頭）</strong>で、名前は Brutus、Bella、Dusty です。
+        クマは自分の飼育スペースを自由に動ける状態で、課題に参加するかどうかはクマ次第でした。
+      </p>
+      <p>
+        金網越しに 19 インチのタッチスクリーンを置き、画面に左右 2 つの点の集まりを表示しました。
+        1 つの集まりの点の数は <strong>1〜10 個</strong>です。正しい方に触れると音が鳴って食べ物がもらえ、
+        間違えるとブザーが鳴って少し待たされます。Brutus は鼻先で、Bella と Dusty は主に前足で画面に触れました。
+      </p>
+      <p>
+        訓練のしかたは 3 頭で違いました。
       </p>
       <ul>
-        <li>
-          🏘️ <strong>市街地に出るクマ</strong>は明らかに「ゴミ箱の開け方」を学習している
-        </li>
-        <li>
-          🚗 <strong>道路を渡るクマ</strong>は信号や車の動きを観察している
-        </li>
-        <li>
-          🍯 <strong>養蜂場を襲うクマ</strong>は柵の弱点を覚えて再侵入する
-        </li>
-        <li>
-          🐻 <strong>母グマから子グマへ</strong>「街の暮らし方」が伝わる
-        </li>
+        <li><strong>Brutus</strong>：点の数が <strong>多い方</strong>を選ぶように訓練</li>
+        <li><strong>Bella と Dusty</strong>：点の数が <strong>少ない方</strong>を選ぶように訓練</li>
       </ul>
       <p>
-        これらは <strong>「単純な本能」では説明できない</strong>行動です。
-        クマには、人間が想像する以上の認知能力があるのかもしれない。
-        この問いに、米国の 2 人の研究者がタッチスクリーン実験で挑みました。
+        点の大きさはばらばらにしてあり、「点の数が多い方が、点の合計面積も大きい」問題（一致）と、
+        「点の数が多い方が、合計面積は小さい」問題（不一致）を混ぜました。
+        こうすると、クマが「数」を見ているのか「面積（黒い部分の広さ）」を見ているのかを区別できます。
+      </p>
+      <p>
+        テストは約 6 か月間、1 回 100 試行のセッションで行われ、次の 3 種類の課題が順に出されました。
+      </p>
+      <ol>
+        <li>点が止まっている課題</li>
+        <li>点が画面の中で動き回る課題</li>
+        <li>黒い点と赤い点が混ざって動き回り、黒い点だけの数を比べる課題（点は 1〜12 個）</li>
+      </ol>
+
+      <h2 id="findings">分かったこと</h2>
+      <h3>点が止まっている課題：3 頭とも偶然より上</h3>
+      <p>
+        3 頭とも、「一致」の問題でも「不一致」の問題でも、<strong>偶然より高い確率で正しい方を選べました</strong>（統計検定で p &lt; .001）。
+        不一致の問題でも成功したことから、面積だけでなく数も手がかりにできていたと考えられます。
+      </p>
+      <p>
+        ただし、くわしく見ると 3 頭の傾向は違いました。Brutus は一致の問題の方が成績がよく、
+        Bella と Dusty は面積を手がかりにする傾向がみられました。
       </p>
 
-      <h2 id="experiment">オハイオの動物園で行われた認知実験</h2>
+      <h3>点が動く課題：どの条件でも偶然より上だったのは 1 頭</h3>
       <p>
-        実験を行ったのは、米国オークランド大学の <strong>Jennifer Vonk</strong>と
-        ジョージア州立大学の <strong>Michael Beran</strong>。
-        2 人とも動物認知の権威で、Vonk はオランウータン、Beran はチンパンジーの数量認識研究で有名でした。
+        点が動くと、どのクマも成績が下がりました。Bella は 20 セッションたっても改善がみられなかったため、ここで動く課題のテストから外れています。
       </p>
       <p>
-        実験の舞台は、米国オハイオ州の <strong>「Bear Hollow Wildlife Trail」</strong>という動物保護施設。
-        ここで飼育されている <strong>アメリカクロクマ 3 頭（Brutus、Bella、Dusty）</strong>が
-        被験者として協力しました。
-      </p>
-      <p>
-        被験者を選ぶには、まずクマたちが <strong>タッチスクリーンを操作できるよう訓練</strong>する必要があります。
-        鼻先でガラスに触れると報酬が出る、という単純な仕組みを覚えてもらうのに数週間。
-        この訓練を完了できたのは 3 頭の中の 1 頭、Brutus（推定 16 歳の雄）が中心でした。
+        最も難しい「赤と黒が混ざって動く中で、黒い点だけを比べる」課題では、
+        <strong>Brutus だけが一致・不一致の両方で偶然より高い成績</strong>でした（どちらも p &lt; .001）。
+        Dusty は不一致の問題だけ偶然より上で、一致の問題では偶然と区別できませんでした（p = .14）。
       </p>
 
-      <h2 id="what-they-did">クマに何を見せ、何を選ばせたか</h2>
+      <h3>比べる数の比率の影響</h3>
       <p>
-        Brutus のタッチスクリーンには、毎回 2 つの図形が表示されました。
-        例えばこんな組み合わせ。
-      </p>
-      <ul>
-        <li>● ● vs ● ● ● ● ● （ドット 2 個と 5 個）</li>
-        <li>■ ■ ■ vs ■ ■ ■ ■ ■ ■ ■ ■ （3 個と 8 個）</li>
-        <li>★ ★ ★ ★ ★ ★ vs ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ （6 個と 10 個）</li>
-      </ul>
-      <p>
-        Brutus は「<strong>多い方を選ぶ</strong>」ことを徐々に学習しました。
-        正解すれば食べ物の報酬、不正解なら次の問題。これを 1 日数十回、数週間繰り返しました。
-      </p>
-      <p>
-        さらに研究者たちは、より難しい条件を加えました。
-      </p>
-      <ul>
-        <li>
-          <strong>サイズが異なるドット</strong>: 「大きい 2 個」vs「小さい 5 個」（数 vs サイズの分離）
-        </li>
-        <li>
-          <strong>動くドット</strong>: ドットが画面上で動き、瞬時にカウントが必要
-        </li>
-        <li>
-          <strong>近い数の比較</strong>: 6 vs 7、8 vs 9（差が小さい判別）
-        </li>
-        <li>
-          <strong>逆順での学習</strong>: 一度「少ない方を選ぶ」と教え直してから再テスト
-        </li>
-      </ul>
-
-      <h2 id="result">結果 — サル並みの正答率</h2>
-      <p>
-        Brutus と他のクマ 2 頭の正答率は次の通りでした。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">課題</th>
-              <th className="px-3 py-2 text-left">正答率</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">差が大きい（例: 2 vs 8）</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">90%+</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">中程度の差（例: 4 vs 7）</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">75%+</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">小さい差（例: 6 vs 7）</td>
-              <td className="px-3 py-2 text-amber-700 font-bold tabular-nums">60〜70%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">動くドット</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">70%+</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        これは <strong>チンパンジー・オランウータン・ネズミ・イルカ</strong>などの過去の実験結果と比較しても遜色なく、
-        哺乳類全般の中で <strong>「上位グループに匹敵する数量認識能力」</strong>を示すものでした。
-      </p>
-      <p>
-        特に驚いたのが、<strong>動くドットの認識</strong>。これは「数量を瞬時に推定」する高度な認知が必要で、
-        ヒトの幼児や霊長類でも難しい課題です。クマはこれを 70% 以上で正解していました。
+        2 つの数が近いほど見分けにくくなる傾向がみられました（イメージとしては、1 対 2 より 9 対 10 の方が難しい、ということです。この組み合わせは説明のための例です）。
+        著者らは、この傾向がこれまでにサルなどの霊長類で報告されてきたものと似ていると述べています。
+        また、少ない方を選ぶより多い方を選ぶ方がやさしかったことも、霊長類の研究と似た点として挙げています。
       </p>
 
-      <h2 id="discrimination">数だけでなく「面積」も理解</h2>
+      <h3>著者らのまとめ</h3>
       <p>
-        実験ではさらに、<strong>「数」と「総面積」の関係</strong>も検証されました。
-      </p>
-      <p>
-        例えば「大きいドット 2 個（総面積大）」と「小さいドット 5 個（総面積小）」を見せたとき、
-        クマが選ぶのは「数の多い 5 個」なのか「面積の大きい 2 個」なのか。
-      </p>
-      <p>
-        結果、クマは <strong>「数」と「面積」を別の概念として識別</strong>できることが分かりました。
-        指示によって「数を比べる」「面積を比べる」を切り替えることが可能だった、というのは
-        動物認知としては非常に高度な能力です。
+        著者らは、「クマは面積を手がかりに使っていたが、数を手がかりに使うこともできた」とまとめています。
+        また、群れで暮らさないクマでもこうした能力がみられたことから、数を見分ける力は群れ生活がなくても持ちうる、と考察しています。
       </p>
 
-      <h2 id="transfer">学習が新しい問題にも応用される</h2>
-      <p>
-        もう一つの重要な発見が <strong>「転移学習」</strong>。
-      </p>
-      <p>
-        ドットで「多い方を選ぶ」を学んだクマに、次にバナナの絵・木の絵・幾何学模様で同じ課題を出すと、
-        <strong>初見の図形でも正解できる</strong>。これは「数量という抽象概念」を理解していることを示します。
-      </p>
-      <p>
-        「ドットの多さ」を覚えただけのクマなら、別の絵では使えないはず。
-        でも実際には、Brutus は <strong>「目の前にある『個数』という概念</strong>」自体を内在化していました。
-      </p>
-
-      <h2 id="what-this-means">クマの認知能力、想像以上に高い</h2>
-      <p>
-        Vonk &amp; Beran の研究の意義は、単に「クマが数を理解した」ことだけではありません。
-        <strong>クマの認知能力の枠組み</strong>を、霊長類学の延長線上に位置づけられたことです。
-      </p>
-      <p>
-        現在のクマ認知研究では、Vonk &amp; Beran 2012 以降に次の能力も確認されています。
-      </p>
+      <h2 id="limits">限界と注意点</h2>
       <ul>
         <li>
-          <strong>因果推論</strong>: 「これを動かすとこうなる」という因果関係の理解
+          対象は <strong>3 頭だけ</strong>で、著者ら自身も標本数が小さいことを認めています。
         </li>
         <li>
-          <strong>道具使用</strong>: 北米のヒグマで石を使ったセルフグルーミングが観察
+          「多い方を選ぶ」訓練を受けたのは Brutus 1 頭だけなので、「多い方を選ぶ方がやさしい」という結果が、課題の違いなのか個体の違いなのかは切り分けられていません。
         </li>
         <li>
-          <strong>長期記憶</strong>: 数年単位で「食物がある場所」「危険な場所」を覚える
+          動く課題では 3 頭のうち 2 頭が最後までテストを終えていません。
         </li>
         <li>
-          <strong>社会的学習</strong>: 母から子へ「街での生き方」が伝わる（{" "}
-          <Link href="/articles/research-digest-002">Vol.2 参照</Link>{" "}）
+          1 か所の動物園で飼われているクマの実験で、野生のクマが山の中で同じように数を使っているかどうかは調べていません。
         </li>
         <li>
-          <strong>個体識別</strong>: 他のクマ・人間・特定の場所を識別
+          調べたのはアメリカクロクマで、日本のツキノワグマやヒグマでの実験ではありません。
         </li>
       </ul>
 
-      <h2 id="wild">野生で、この知能はどう発揮されるか</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        飼育下の実験結果が、野生でどう活きるか。それを観察すると、クマの知能の真の意味が見えてきます。
+        この研究は飼育下の 3 頭で「数や量を見分ける力」を調べたもので、出没対策の効果を直接確かめたものではありません。
+        ただ、クマが画面上の課題を訓練で覚え、手がかりを使い分けられることは、クマを「本能だけで動く動物」とみなさない方がよいことを示しています。
       </p>
-      <h3>① 食物源の記憶</h3>
       <p>
-        クマは <strong>「去年、あそこの果樹が美味しかった」</strong>を 1 年以上覚えています。
-        翌年同じシーズンに同じ場所に現れる事例は、野外調査で頻繁に観察されます。
-      </p>
-      <h3>② 「人がいない時間」の学習</h3>
-      <p>
-        Vol.2 で見た都市型クマの夜行性化（{" "}
-        <Link href="/articles/research-digest-002">Beckmann 2003</Link>
-        ）は、<strong>「いつ人がいないか」を学習した結果</strong>です。
-        単純な本能では、これだけ精緻な行動シフトはあり得ません。
-      </p>
-      <h3>③ 電気柵の「弱点」探索</h3>
-      <p>
-        Vol.7（{" "}
-        <Link href="/articles/research-digest-007">Huygens 2001</Link>
-        ）で見たように、電気柵の <strong>角や出入口の死角</strong>を探すクマが報告されています。
-        これは試行錯誤での問題解決能力を示します。
-      </p>
-      <h3>④ 「危険なクマ」になる学習過程</h3>
-      <p>
-        OSO18 のように <strong>「人を恐れず畜舎を襲う」</strong>個体は、複数回の試行で
-        徐々に「家畜を襲う = 楽な食料」という認知を獲得していきます。
-        これは数量理解と同じく、抽象化された学習の一つです。
+        日常の対策としては、生ごみや収穫しない果実など、クマを引き寄せるものを人里に残さないことが基本です。
+        山でクマに出会ったときは、走らず、背を向けず、ゆっくり離れてください。
+        詳しくは <Link href="/learn/safety">クマ対策の基本</Link> をご覧ください。
       </p>
 
-      <h2 id="urban">「学習するクマ」の脅威 — 都市型化の認知基盤</h2>
-      <p>
-        Vonk &amp; Beran 論文の重要な含意は、現代の <strong>「都市型クマ問題」</strong>の根本に
-        クマの認知能力があるという点。
-      </p>
-      <p>
-        都市型クマがゴミ箱を漁る、ペットフードを探す、養蜂場を狙う、これらは全て
-        <strong>「概念の理解と学習」</strong>を前提とした行動です。
-        単なる嗅覚やランダム行動ではなく、クマは <strong>「ここに来れば何があるか」</strong>を
-        論理的に予測しているのです。
-      </p>
-      <p>
-        さらに恐ろしいのは、この能力が <strong>世代を超えて伝わる</strong>こと。
-        母グマが「街で生き延びる方法」を子グマに教えるのは、子グマがその知識を吸収する
-        <strong>認知能力</strong>を持っているからです。
-      </p>
-      <p>
-        だから「誘引物管理」を中途半端にやると逆効果。クマは <strong>「半分の確率で食物がある」</strong>
-        と学習し、より粘り強く街に通うようになります。やるなら徹底、です。
-      </p>
-
-      <h2 id="japan">日本のツキノワグマでも同じか</h2>
-      <p>
-        日本のツキノワグマでも、認知能力の高さは多くの状況で観察されています。
-      </p>
-      <ul>
-        <li>
-          長野県のリンゴ農家が「<strong>同じクマが毎年同じ時期に同じ畑に来る</strong>」と報告
-        </li>
-        <li>
-          秋田・盛岡の住宅地で「<strong>夜の決まった時間にゴミ集積所を漁る</strong>」個体
-        </li>
-        <li>
-          学校近くの果樹林で「<strong>子供がいない時間帯を選んで採餌</strong>」する事例
-        </li>
-        <li>
-          軽井沢のベアドッグ事業で「<strong>追払いを経験した個体は再度近づかない</strong>」効果
-        </li>
-      </ul>
-      <p>
-        ツキノワグマは体格こそアメリカクロクマより小さいですが、認知能力は同等以上である可能性が高い、
-        と推測する研究者は少なくありません。実験的検証はまだ不十分ですが、現場の観察事例が裏付けつつあります。
-      </p>
-
-      <h2 id="ethics">賢いと知ったら、私たちはどう向き合うか</h2>
-      <p>
-        「クマは賢い」と知ることは、私たち人間の対応にも責任を要求します。
-      </p>
-      <p>
-        知能の高い動物への対応は、本能で動く動物への対応とは違うべきだ、というのが
-        多くの動物倫理学者の見解です。クマは「<strong>学習する存在</strong>」だからこそ、
-        私たちは <strong>「教えない」</strong>選択ができる。
-      </p>
-      <ul>
-        <li>
-          ゴミを徹底管理することは、クマに「街には食物がない」と教えること
-        </li>
-        <li>
-          電気柵を一度設置することは、クマに「ここは痛い場所」と教えること
-        </li>
-        <li>
-          ベアドッグの追払いは、クマに「ここは怖い場所」と教えること
-        </li>
-        <li>
-          逆に放置・中途半端な対応は、クマに「ここは食べ物がある場所」と教えること
-        </li>
-      </ul>
-      <p>
-        クマの知能を侮ることが、結果的に <strong>クマと人の双方を不幸にする</strong>。
-        Vonk &amp; Beran の論文を読み終えて、改めてそう感じます。
-      </p>
-      <p>
-        関連記事として{" "}
-        <Link href="/articles/bear-learning">クマの学習と記憶</Link>
-        と{" "}
-        <Link href="/articles/research-digest-002">Vol.2 都市型クマの夜行性化</Link>
-        も合わせてご覧ください。
-      </p>
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
-            title: (
-              <>
-                Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus（本号メイン）
-              </>
-            ),
-            citation: (
-              <>
-                Vonk, J., &amp; Beran, M. J. (2012).{" "}
-                <em className="not-italic">Animal Behaviour</em> 84(1): 231–238.
-              </>
-            ),
+            title: <>Bears &apos;count&apos; too: quantity estimation and comparison in black bears, Ursus americanus（本号メイン）</>,
+            citation: mainCitation,
             href: "https://doi.org/10.1016/j.anbehav.2012.05.001",
             linkText: "DOI: 10.1016/j.anbehav.2012.05.001 →",
-          },
-          {
-            title: "Levels of abstraction in orangutan (Pongo pygmaeus) and human cognition",
-            citation: (
-              <>
-                Vonk, J., &amp; MacDonald, S. E. (2002).{" "}
-                <em className="not-italic">Animal Cognition</em> 5(4): 225–238.
-              </>
-            ),
-          },
-          {
-            title: "Recent advances in bear behavior and cognition research",
-            citation: (
-              <>
-                Stirling, I., &amp; Derocher, A. E. (2020).{" "}
-                <em className="not-italic">Annual Review of Ecology, Evolution, and Systematics</em>.
-              </>
-            ),
           },
         ]}
       />
@@ -416,12 +194,6 @@ export default function Page() {
         学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
-
-      <NextIssue label="次号予告 — Vol.11">
-        <strong>「クマの妊娠には『着床遅延』という奇跡がある」</strong> —
-        夏に交尾しても、受精卵が動き出すのは半年後の秋。母体の栄養状態次第で
-        妊娠そのものをキャンセルできるクマ独自の繁殖戦略を、Spady ら 2007 ほかで精読します。
-      </NextIssue>
     </ArticleShell>
   );
 }
