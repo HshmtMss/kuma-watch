@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ArticleShell from "@/components/ArticleShell";
 import ArticleToc from "@/components/ArticleToc";
-import { PaperCard, KeyPoints, Callout, NextIssue, StatCallout, References } from "@/components/ArticleCards";
+import { PaperCard, KeyPoints, References } from "@/components/ArticleCards";
 import { getArticle, reviewRobots } from "@/lib/articles-meta";
 
 const meta = getArticle("research-digest-001")!;
@@ -28,454 +28,186 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const mainCitation = (
+    <>
+      Smith, T. S., Herrero, S., DeBruyn, T. D., &amp; Wilder, J. M. (2008).{" "}
+      <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
+    </>
+  );
+
   return (
     <ArticleShell meta={meta}>
-      {/* オープニングフック */}
       <p className="lead">
-        ある研究者が <strong>21 年間</strong>、アラスカ中を駆け回って集めたものがあります。
-        それは <strong>175 件の「クマに襲われた・襲われそうになった」事案の記録</strong>でした。
-        うち <strong>72 件</strong>は、明らかに人を狙って向かってきた攻撃事案。
-        この 72 件のうち、ほぼ全員が <strong>無傷で帰宅</strong>しています。
-        その鍵となった「ある道具」の話から始めましょう。
+        クマスプレーは「持っていると安心」と言われますが、実際に使った場面でどのくらい役に立ったのでしょうか。
+        アラスカで実際にスプレーが使われた事例を集めて整理した 2008 年の論文を、抄録（論文の要旨）に書かれている数字をもとに紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 1 本の論文"
-        title="Efficacy of bear deterrent spray in Alaska"
-        citation={
-          <>
-            Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
-            <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
-          </>
-        }
+        label="今号で紹介する論文"
+        title="Efficacy of Bear Deterrent Spray in Alaska"
+        citation={mainCitation}
         href="https://doi.org/10.2193/2006-452"
         linkText="DOI: 10.2193/2006-452 →"
       />
 
       <KeyPoints
-        label="時間がない人向けの 3 行"
+        label="3 行まとめ"
         items={[
           <>
-            攻撃してきたクマに対し、スプレーは <strong>10 回中 9 回</strong>「逃がす」結果に
+            アラスカで 1985〜2006 年に起きた <strong>83 件</strong>のクマスプレー使用例を分析した研究です
           </>,
           <>
-            <strong>3 種類のクマ全部</strong>で、ほぼ同じくらい効いた（生物学的に重要）
+            スプレーでクマの困った行動が止まった割合は、ヒグマ <strong>92%</strong>・アメリカクロクマ <strong>90%</strong>・ホッキョクグマ <strong>100%</strong>（2 件）でした
           </>,
           <>
-            ただし<strong>「噴射 = 完全勝利」ではない</strong>。14% は同じクマが戻ってくる
+            一方で、使った人の <strong>14%</strong> が自分にも刺激などの影響を受けたと報告しています
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "story", title: "クマの研究者が 21 年集め続けたもの" },
-          { id: "headline", title: "「で、結局スプレーって効くの？」" },
-          { id: "three-species", title: "驚くべき発見 — 3 種類のクマ、みんな苦手だった" },
-          { id: "after-spray", title: "スプレーをかけた後、クマは何をしたか" },
-          { id: "back-14", title: "「14% は戻ってくる」が意味すること" },
-          { id: "no-death", title: "死者ゼロという数字、どう受け止めるか" },
-          { id: "weak-points", title: "とはいえ、この研究にも弱点はある" },
-          { id: "vs-firearm", title: "意外な続編 — 実銃 vs スプレー" },
-          { id: "japan", title: "日本のツキノワグマでも、これは効くのか？" },
-          { id: "action", title: "今日からあなたができる 4 つのこと" },
-          { id: "why-classic", title: "20 年経っても引用され続ける理由" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="story">クマの研究者が 21 年集め続けたもの</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        1985 年のアラスカ。
-        当時 USGS（米国地質調査所）でクマの研究を始めたばかりだった <strong>Tom Smith</strong> は、
-        ある違和感を抱えていました。
+        この論文は、米国アラスカ州で <strong>1985 年から 2006 年</strong>までに起きたクマスプレーの使用例を集め、
+        まとめて分析したものです。実験ではなく、実際の出来事の記録をあとから整理した研究です。
       </p>
       <p>
-        「<strong>クマスプレーは効くらしい</strong>」 — そんな噂は北米全土に広がっていました。
-        メーカーは「90% 以上が撃退できる」と宣伝し、登山ガイドはそれを信じて客に勧める。
-        でも、その<strong>「90% 以上」の根拠は何だったのか？</strong>
+        分析の対象は <strong>83 件</strong>。クマの種類ごとの内訳は次のとおりです。
       </p>
+      <ul>
+        <li>ヒグマ：61 件（74%）</li>
+        <li>アメリカクロクマ：20 件（24%）</li>
+        <li>ホッキョクグマ：2 件（2%）</li>
+      </ul>
       <p>
-        実は当時、まともな科学的検証は存在しませんでした。あるのはメーカーの自社調査と、
-        ハンターや観光客の体験談だけ。<strong>査読を通った論文</strong>はゼロでした。
-      </p>
-      <p>
-        「<strong>誰かがちゃんと数えなきゃダメだろう</strong>」
-      </p>
-      <p>
-        そう考えた Smith は、北米のクマ研究の重鎮 <strong>Stephen Herrero</strong>（カナダ・カルガリー大学）と組み、
-        アラスカ中を回り始めます。国立公園レンジャーに、ハンターに、写真家に、観光客に。
-        「クマスプレーを使ったことがある人を知りませんか？」と尋ねて回った 21 年間。
-      </p>
-      <p>
-        集まった事案は <strong>175 件</strong>。
-        2008 年、Smith らはこの記録を <em>Journal of Wildlife Management</em> 誌に投稿しました。
-        それが今でもクマ対策の<strong>世界中の公式ガイドラインで引用され続ける伝説の論文</strong>です。
+        このうち、人が<strong>自分の身を守るために</strong>クマへスプレーを使った例は <strong>72 件</strong>で、
+        ヒグマ 50 件（69%）、アメリカクロクマ 20 件（28%）、ホッキョクグマ 2 件（3%）でした。
       </p>
 
-      <h2 id="headline">「で、結局スプレーって効くの？」</h2>
+      <h2 id="findings">分かったこと</h2>
+      <h3>クマの行動が止まった割合</h3>
       <p>
-        結論から言います。<strong>効きます</strong>。それも、想像以上に。
+        論文では、唐辛子成分のスプレーがクマの「困った行動」（人に向かってくる、近づいてくるなど）を止めた割合を種類ごとに示しています。
       </p>
+      <ul>
+        <li>ヒグマ：<strong>92%</strong></li>
+        <li>アメリカクロクマ：<strong>90%</strong></li>
+        <li>ホッキョクグマ：<strong>100%</strong>（ただし 2 件のみ）</li>
+      </ul>
+
+      <h3>けがをした人</h3>
       <p>
-        175 件のうち、特に厳密な分析対象になったのは <strong>「クマが明らかに人を狙って接近してきた」72 件</strong>。
-        この最悪のシナリオで、スプレーがどれだけクマを退けられたかというと —
-      </p>
-      <StatCallout
-        label="攻撃してきたクマへの撃退成功率"
-        value="92%"
-        note="72 件中 66 件で、クマがその場から離れた"
-      />
-      <p>
-        さらに、好奇心で近づいてきたクマには <strong>90%</strong>、
-        スプレーを使った人の <strong>98%</strong>が無傷で帰宅、
-        <strong>死亡例はゼロ</strong>。
-      </p>
-      <p>
-        この数字は当時の業界が宣伝していた「90% 以上」とほぼ一致しました。
-        違いは、これが <strong>査読を通った公的な統計</strong>だという点。
-        メーカーの宣伝コピーから、世界中のレンジャーが教科書として参照できる根拠データへと、
-        クマスプレーの地位が一気に変わった瞬間でした。
+        スプレーを持っていた人のうち <strong>98%</strong> は、近い距離でクマと出会った場面でもクマによるけがをしませんでした。
+        身を守るためにスプレーを使った場面でクマにけがをさせられた例は <strong>3 件</strong>で、
+        いずれもヒグマによるもの、入院を必要としない比較的軽いけがだったと報告されています。
       </p>
 
-      <h2 id="three-species">驚くべき発見 — 3 種類のクマ、みんな苦手だった</h2>
+      <h3>風の影響と、使った人への影響</h3>
       <p>
-        この論文が革新的だったもう一つの理由は、調査対象に <strong>3 種類の異なるクマ</strong>が
-        含まれていたことです。
+        使用例 71 件のうち <strong>5 件（7%）</strong>で、風がスプレーの狙いを妨げたと報告されました。
+        ただし、どの例でもスプレーはクマに届いていました。
       </p>
       <p>
-        アラスカは世界でも珍しく、<strong>ヒグマ・ホッキョクグマ・アメリカクロクマ</strong>の
-        3 種が同じ地域に生息する場所。普通なら 1 種類でも貴重なデータなのに、Smith らは
-        3 種類すべてを集めることに成功しました。
-      </p>
-      <p>結果はこうです。</p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">クマの種</th>
-              <th className="px-3 py-2 text-left">事案数</th>
-              <th className="px-3 py-2 text-left">撃退成功率</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">ヒグマ</td>
-              <td className="px-3 py-2 tabular-nums">133</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">92%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">ホッキョクグマ</td>
-              <td className="px-3 py-2 tabular-nums">32</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">100%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">クロクマ</td>
-              <td className="px-3 py-2 tabular-nums">10</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">90%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        体重 600kg のホッキョクグマも、わずか 100kg のクロクマも、唐辛子成分（カプサイシン）の前では
-        ほぼ同じく逃げ出した。これは「カプサイシンへの嫌悪反応はクマ科で共通する仕組みらしい」
-        という生物学的な発見でもあります。
+        また、71 件のうち <strong>10 件（14%）</strong>では、使った人自身がスプレーの影響を受けたと報告しています。
+        内訳は、軽い刺激が 8 件（11%）、ほとんど動けなくなるほどの影響が 2 件（3%）でした。
       </p>
       <p>
-        そして、これは <strong>日本のツキノワグマにも同じスプレーが効く可能性が高い</strong>ことを
-        強く示唆します（詳しくは後述）。
+        著者らは、クマスプレーは銃などで殺傷する方法に代わる有効な手段であり、クマのいる地域で遊んだり働いたりする人の身を守る選択肢として考えるべきだとまとめています。
       </p>
 
-      <h2 id="after-spray">スプレーをかけた後、クマは何をしたか</h2>
+      <h3>別の研究：銃を使った場合</h3>
       <p>
-        論文がもう一つ丁寧に調べたのは、<strong>噴射後にクマがどう振る舞ったか</strong>。
-        これは「使い終わったあと、自分はどうすべきか」を考えるうえでとても大事な情報です。
+        同じ研究グループの一部は、2012 年に<strong>別の論文</strong>で、アラスカで銃が使われたクマとのトラブル 269 件（1883〜2009 年）を分析しています。
+        そこでは、クマの攻撃的な行動を止められた割合はライフルや散弾銃などの長い銃で 76%、拳銃で 84% でした。
       </p>
-      <p>分類してみると、こんなパターンがありました。</p>
+      <p>
+        ただし、この 2 本は対象の年代も事例の集め方も違う別々の調査です。数字を並べて「どちらが何ポイント上」と単純に比べることはできません。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
       <ul>
         <li>
-          🐻💨 <strong>即座にダッシュで逃走</strong> — 最も多いパターン。噴射の数秒以内に向きを変えて走り去る
+          <strong>事例の数が多くない</strong>：全体で 83 件、種類ごとではアメリカクロクマ 20 件、ホッキョクグマは 2 件だけです。特にホッキョクグマの「100%」は、2 件とも止まったという意味にすぎません。
         </li>
         <li>
-          🐻💧 <strong>その場で苛立ち → ゆっくり離れる</strong> — クマが顔をこすりながら、徐々に後退
+          <strong>実際の出来事を後から集めた研究</strong>です。スプレーを使わなかった場合と同じ条件で比べたものではありません。
         </li>
         <li>
-          🐻↩️ <strong>一度離れて、戻ってくる</strong> — 全体の <strong>14%</strong> でこのパターンが観察された
+          <strong>地域と種類が違う</strong>：対象はアラスカのヒグマ・アメリカクロクマ・ホッキョクグマで、日本のツキノワグマや北海道のヒグマを直接調べたものではありません。
         </li>
         <li>
-          🐻🚶 <strong>ほぼ無視 → 通過</strong> — 稀。クマが無関心で人の横を通り過ぎる
+          <strong>使った製品や状況はさまざま</strong>です。手元のスプレーで同じ結果になるとは限りません。
         </li>
       </ul>
 
-      <h2 id="back-14">「14% は戻ってくる」が意味すること</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        「<strong>14% は戻ってくる</strong>」— これ、地味だけど重要な数字です。
+        この論文は日本のクマを調べたものではありませんが、「実際に使われた場面で、多くの場合クマの行動が止まった」という記録は、クマスプレーを持つ意味を考える材料になります。
+        同時に、風や、使った人自身への影響があったことも示しています。
       </p>
-      <p>
-        スプレーは<strong>「クマを倒す道具」ではない</strong>。
-        あくまで <strong>「自分が安全圏に逃げ込むための時間を稼ぐ道具」</strong>です。
-        噴射 → ホッとして座り込む、ではなく、噴射 → 即座に方角を変えて落ち着いて離れる、が正解。
-      </p>
-      <Callout label="現場での教訓" tone="red">
-        スプレーを使ったあと、「<strong>クマが本当に去ったか</strong>」を確認しながら
-        <strong>静かに後退</strong>するのが原則。決して走らない（追跡本能を刺激する）、
-        背中を見せない、そして<strong>遠くまで離れる</strong>。
-      </Callout>
-
-      <h2 id="no-death">死者ゼロという数字、どう受け止めるか</h2>
-      <p>
-        175 件全体で <strong>死亡例ゼロ、重傷例ほぼゼロ、98% が無傷で帰宅</strong>。
-        これは強烈な数字です。
-      </p>
-      <p>
-        ただし、ここで一歩立ち止まる必要があります。175 件で死亡ゼロは
-        「<strong>スプレー使用時の死亡確率がゼロ</strong>」を意味するわけではありません。
-        統計の言葉で言うと、「真の死亡確率は <strong>0〜1% 程度</strong>と推定される」が正確な解釈です。
-      </p>
-      <p>
-        とはいえ、参考までに比較しましょう。
-        スプレーを持っていなかった人が <strong>「攻撃された」</strong>事例の北米統計では、
-        <strong>死亡率は数 %、重傷率は 30〜40%</strong>と推定されています。
-        スプレーの「ほぼゼロ」と比較すると、その差は歴然です。
-      </p>
-      <p>
-        要は、<strong>「持っていれば死なないかも」ではなく「持っていれば死亡リスクが大きく下がる」</strong>
-        と理解するのが、この論文の正しい読み方です。
-      </p>
-
-      <h2 id="weak-points">とはいえ、この研究にも弱点はある</h2>
-      <p>
-        ここまで読むと「スプレー最強！」という気分になるかもしれませんが、
-        論文には正直に向き合うべき<strong>限界</strong>もあります。
-        Smith 自身も論文中で次の点を率直に認めています。
-      </p>
+      <p>日本での基本的な行動は、次のとおりです。</p>
       <ul>
+        <li>クマに出会ったら、<strong>走らない・背を向けない</strong>で、クマを見ながら<strong>ゆっくり離れます</strong>。</li>
         <li>
-          <strong>失敗した人は記録に残りにくい</strong>: 噴射に失敗してクマに襲われた人が
-          そのまま亡くなった場合、データに入ってこない可能性
+          突進してきたら、クマスプレーを使います。目安は <strong>5〜10m</strong> まで近づいたところで、クマの<strong>顔に向けて 1〜2 秒ずつ</strong>噴射します。
         </li>
         <li>
-          <strong>「使わなかった対照群」がない</strong>: 同じ状況でスプレーを使わなかった場合と
-          直接比較する設計ではない
+          環境省はスプレーの目安として、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上・カプサイシン類（CRC）1〜2% 程度を挙げています。
         </li>
         <li>
-          <strong>クロクマのサンプルが少ない</strong>: 10 件しかないので、90% という数字の精度は荒い
+          防衛的な攻撃で接触が避けられないときは、<strong>うつ伏せになり首の後ろを手で守る</strong>防御姿勢をとります。執拗に襲ってくる、捕食しようとするような攻撃のときは反撃します。
         </li>
-        <li>
-          <strong>風向き・距離・タイミング</strong>の細かい分析は浅い
-        </li>
+        <li>風上に向けて噴射すると自分にかかりやすいことも、頭に入れておきましょう。</li>
       </ul>
       <p>
-        要するに <strong>「効く」という方向の主張は強固だが、「常に効く」とは言っていない</strong>。
-        これは Smith 論文の誠実さでもあり、後続研究の余地を残した点でもあります。
-      </p>
-
-      <h2 id="vs-firearm">意外な続編 — 実銃 vs スプレー</h2>
-      <p>
-        Smith らは 2008 年の論文の 4 年後、続編を出しました。タイトルはこう。
-      </p>
-      <p className="text-center text-sm italic text-stone-600">
-        「アラスカにおける実銃でのクマ撃退の効果」<br />
-        Smith et al. (2012) — 同じく <em>Journal of Wildlife Management</em>
-      </p>
-      <p>
-        同じ手法で、今度は <strong>銃を使った 269 件</strong>を分析。
-        さて、銃とスプレーではどちらが効いたでしょうか？
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">対策</th>
-              <th className="px-3 py-2 text-left">撃退成功率</th>
-              <th className="px-3 py-2 text-left">使用者の負傷</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">クマスプレー</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">92%</td>
-              <td className="px-3 py-2 text-stone-600">少ない</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">実銃</td>
-              <td className="px-3 py-2 text-amber-700 font-bold tabular-nums">76%</td>
-              <td className="px-3 py-2 text-stone-600">多い</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        意外なことに、<strong>銃を持っていてもスプレーよりも撃退率は低かった</strong>のです。
-      </p>
-      <p>
-        理由は単純です。銃は「構える → 狙う → 撃つ」までに数秒かかる。
-        装填不全や故障も起きる。至近距離では狙えない。さらに、命中しても急所を外せばクマは逆上する。
-        対してスプレーは <strong>「向けて、噴射」</strong>だけ。
-      </p>
-      <p>
-        この研究の結果、現在のアメリカ国立公園局・カナダのパークスカナダの公式ガイドラインは
-        いずれも <strong>「クマスプレーを最優先装備として推奨」</strong>に統一されています。
-      </p>
-
-      <h2 id="japan">日本のツキノワグマでも、これは効くのか？</h2>
-      <p>
-        さて、肝心の日本での話。アラスカのクマで効くのは分かったが、
-        ツキノワグマでも同じだろうか？
-      </p>
-      <p>
-        答えは <strong>「ほぼ確実に効くと考えられる」</strong>です。理由は次の通り。
-      </p>
-      <h3>① 生物学的に、クマ科共通の弱点</h3>
-      <p>
-        カプサイシン（唐辛子の辛味成分）への嫌悪反応は、嗅覚・粘膜に依存します。
-        この仕組みは哺乳類でほぼ共通で、<strong>3 種類のクマで一斉に効いた事実</strong>は
-        「クマ科で共通の現象」を強く示唆します。ツキノワグマも例外ではないはず。
-      </p>
-      <h3>② むしろ、ツキノワグマの方が撃退しやすいかも</h3>
-      <p>
-        ツキノワグマは成獣でも <strong>体重 80〜150kg</strong>。
-        ヒグマ（200〜400kg）と比べてかなり小型で、性格も<strong>「驚き反応で逃げる」</strong>傾向が強い。
-        スプレーの効果はむしろ高い可能性すらあります。
-      </p>
-      <h3>③ ただし、日本ならではの課題も</h3>
-      <p>
-        日本でのスプレー普及を妨げているのは、<strong>生物学ではなく制度・流通の問題</strong>です。
-      </p>
-      <ul>
-        <li>登山用品店・専門店・ネットで購入は可能だが、<strong>認知度が低い</strong></li>
-        <li>航空機への持込不可（容量制限あり）</li>
-        <li><strong>空撃ち訓練の機会が少ない</strong>ので、初使用がリアル遭遇</li>
-        <li>人に対して使えば暴行罪（クマには合法）</li>
-      </ul>
-      <p>
-        具体的な選び方・携帯ルールは{" "}
-        <Link href="/articles/bear-spray">クマよけスプレーの使い方と選び方</Link>
-        と{" "}
+        スプレーの選び方・持ち方は{" "}
+        <Link href="/articles/bear-spray">クマよけスプレーの使い方と選び方</Link>、
+        持ち運びのルールは{" "}
         <Link href="/articles/spray-travel">クマスプレーの持ち運び</Link>
         にまとめています。
       </p>
 
-      <h2 id="action">今日からあなたができる 4 つのこと</h2>
-      <p>
-        この論文を読んで、明日から実践できることをまとめます。
-      </p>
-      <ol className="my-4 list-decimal space-y-3 pl-5">
-        <li>
-          <strong>登山・トレッキングには必ず携帯する</strong> — リュック内ではなく、
-          <strong>腰のホルスター</strong>か胸ポケットへ。バッグの中ではクマと遭遇したとき
-          数秒間に間に合いません。
-        </li>
-        <li>
-          <strong>家で空撃ちを試す</strong> — メーカーが訓練用のダミー（中身が水）を販売しています。
-          実物の重さ・噴射音・反動を経験しておくと、本番で動揺しません。
-        </li>
-        <li>
-          <strong>「噴射 = 安全 ではない」を理解する</strong> — 14% は戻ってくる。
-          噴射したら<strong>静かに後退</strong>、走らず、背中を見せず、遠くへ。
-        </li>
-        <li>
-          <strong>有効期限を確認する</strong> — クマスプレーには 3〜4 年の使用期限があります。
-          いざという時に噴射圧が落ちていたら本末転倒。買い替えサイクルを忘れずに。
-        </li>
-      </ol>
-
-      <h2 id="why-classic">20 年経っても引用され続ける理由</h2>
-      <p>
-        2026 年の今、Smith 2008 はクマ研究分野で <strong>250 件以上に引用</strong>される伝説の論文になりました。
-        後続研究はたくさん出たのに、なぜこの 1 本が今も第一線で読まれるのか。
-      </p>
-      <p>
-        筆者らの考えはこうです。
-      </p>
-      <ul>
-        <li>
-          <strong>結論が明快</strong>: 「90% 効く」という一義的な数字
-        </li>
-        <li>
-          <strong>サンプルが立派</strong>: 21 年・175 件は容易に超えられない蓄積
-        </li>
-        <li>
-          <strong>続編で銃と比較できた</strong>: 業界の議論を一段落させた
-        </li>
-        <li>
-          <strong>政策が動いた</strong>: NPS・パークスカナダの公式装備に
-        </li>
-        <li>
-          <strong>命を救った</strong>: スプレー装備がスタンダードになり、人身被害が減った
-        </li>
-      </ul>
-      <p>
-        Smith 2008 を読むということは、ただ「90% 効く」を記憶することではありません。
-        <strong>「<em>どうやって</em> その 90% を導いたか」「<em>何が分かって何が分かっていないか</em>」</strong>
-        を理解することで、初めてその知識が現場で使えるものになります。
-      </p>
-      <p>
-        次号 Vol.2 では、もっと最近の研究 —
-        <strong>GPS テレメトリーで明らかになった「都市型クマの夜行性化」</strong> —
-        を取り上げます。市街地に出るクマは、本当に夜行性になりつつあるのか？
+      <p className="text-sm text-stone-500">
+        2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。
       </p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
-            title: "Efficacy of bear deterrent spray in Alaska（本号メイン）",
-            citation: (
-              <>
-                Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2008).{" "}
-                <em className="not-italic">Journal of Wildlife Management</em> 72(3): 640–645.
-              </>
-            ),
+            title: "Efficacy of Bear Deterrent Spray in Alaska（本号で紹介した論文）",
+            citation: mainCitation,
             href: "https://doi.org/10.2193/2006-452",
             linkText: "DOI: 10.2193/2006-452 →",
           },
           {
-            title: "Efficacy of firearms for bear deterrence in Alaska（実銃比較編）",
+            title: "Efficacy of firearms for bear deterrence in Alaska（銃についての別の研究）",
             citation: (
               <>
-                Smith, T. S., Herrero, S., DeBruyn, T. D., &amp; Wilder, J. M. (2012).{" "}
+                Smith, T. S., Herrero, S., Layton, C. S., Larsen, R. T., &amp; Johnson, K. R. (2012).{" "}
                 <em className="not-italic">Journal of Wildlife Management</em> 76(5): 1021–1027.
               </>
             ),
             href: "https://doi.org/10.1002/jwmg.342",
             linkText: "DOI: 10.1002/jwmg.342 →",
           },
-          {
-            title:
-              "Brown bear attacks on humans: a worldwide perspective（世界のヒグマ襲撃メタ解析）",
-            citation: (
-              <>
-                Bombieri, G., Naves, J., Penteriani, V., et al. (2019).{" "}
-                <em className="not-italic">Scientific Reports</em> 9: 8573.
-              </>
-            ),
-            href: "https://doi.org/10.1038/s41598-019-44341-w",
-            linkText: "DOI: 10.1038/s41598-019-44341-w →",
-          },
-          {
-            title: (
-              <>
-                <em className="not-italic">Bear Attacks: Their Causes and Avoidance</em>（古典書籍）
-              </>
-            ),
-            citation: <>Herrero, S. (1985, revised 2018). Lyons Press.</>,
-          },
         ]}
       />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
-
-      <NextIssue label="次号予告 — Vol.2">
-        <strong>「市街地のクマは、本当に夜型になりつつあるのか？」</strong> —
-        世界中の GPS テレメトリー研究を横断し、人慣れクマの行動時間帯シフトを精読します。
-      </NextIssue>
     </ArticleShell>
   );
 }
