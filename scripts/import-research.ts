@@ -40,6 +40,7 @@ import {
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { parse, HTMLElement } from "node-html-parser";
+import { WITHDRAWN_RESEARCH_SLUGS } from "../src/lib/research-withdrawn";
 
 const ROOT = process.cwd();
 
@@ -108,6 +109,8 @@ async function main() {
   const toGenerate: { doc: DocMeta; parsed: ParsedDoc; hash: string; isNew: boolean }[] = [];
   let unchangedCount = 0;
   for (const doc of allDocs) {
+    // 取り下げたレポートは Drive に Doc が残っていても再公開しない。
+    if (WITHDRAWN_RESEARCH_SLUGS.has(doc.slug)) continue;
     let parsed: ParsedDoc;
     try {
       const html = await fetchDocHtml(doc.id);

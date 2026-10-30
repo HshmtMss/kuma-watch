@@ -11,6 +11,8 @@
  *   npx tsx scripts/generate-research-report.ts --mode=weekly --date=2026-05-25 --apply
  *   # 月次
  *   npx tsx scripts/generate-research-report.ts --mode=monthly --month=2026-04 --apply
+ *   # 既存ページを今のデータで作り直す (公開日は元のまま、改訂日と改訂の注記を付ける)
+ *   npx tsx scripts/generate-research-report.ts --mode=daily --date=2026-06-15 --apply --regenerate
  *
  * 設計方針 (B 案):
  *   - 出力品質を担保するため、Web を grounding させず、自前で集約済みの
@@ -20,16 +22,29 @@
  *   - 既存の手作業 / Drive 経由 import-research.ts と共存できるように、
  *     ファイル先頭マーカーを `// auto-generated: research-report v1` に
  *     することで Drive import と区別する。
+ *
+ * 2026-10-31 の抜き取り点検で見つかった誤りへの対策 ([[article-fact-check]]):
+ *   - 同じ事案の重複記録 (複数社の報道) を incidentKey で束ねてから集計・抜粋する。
+ *     束ねないと件数が膨らみ、同じ事案を別件として書いてしまう。
+ *   - 「人身被害キーワード一致 N 件」のような照合件数を渡すと、事案数として書かれた
+ *     (週次で多発)。照合件数はプロンプトに入れない。
+ *   - 出典は LLM に URL を選ばせず、本文の [S3] 形式の記録 ID から機械的に作る。
+ *     架空の ※ 番号・「サンプル[7]」の残骸が出なくなる。
+ *   - 報道日しか分からない記録 (dateEstimated) は、その旨を添えて渡す。
+ *   - 引用・個人名・データにない数字・中国語や数式記号を禁止し、出力を検査して
+ *     違反があれば 1 回だけ生成し直す。直らなければ公開しない (CI を失敗させる)。
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { GEMINI_REPORT_MODEL } from "../src/lib/gemini-models";
+import { incidentKey } from "../src/lib/incident-key";
 
 type CliArgs = {
   mode: "daily" | "weekly" | "monthly";
   date?: string;
   month?: string;
   apply: boolean;
+  regenerate: boolean;
 };
 
 type Sighting = {
@@ -46,6 +61,8 @@ type Sighting = {
   headCount: number;
   isOfficial?: boolean;
   sourceUrl?: string;
+  /** 発生日が分からず、報道日・取り込み日を date に入れた記録 */
+  dateEstimated?: boolean;
 };
 
 type Snapshot = { generatedAt: number; records: Sighting[] };
@@ -67,6 +84,9 @@ type ResearchPayload = {
   references: Reference[];
 };
 
+/** LLM が返す形。出典は返させず、本文の [S3] 形式の記録 ID から後で組み立てる。 */
+type GeneratedPayload = Omit<ResearchPayload, "references">;
+
 const ROOT = process.cwd();
 const MARKER = "// auto-generated: research-report v1";
 
@@ -79,12 +99,12 @@ const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models
 const MAX_RECORDS_DAILY = 500;
 const MAX_RECORDS_WEEKLY = 300;
 const MAX_RECORDS_MONTHLY = 200;
-const MAX_REFERENCE_URLS = 30;
 
 function parseArgs(): CliArgs {
-  const out: CliArgs = { mode: "daily", apply: false };
+  const out: CliArgs = { mode: "daily", apply: false, regenerate: false };
   for (const arg of process.argv.slice(2)) {
     if (arg === "--apply") out.apply = true;
+    else if (arg === "--regenerate") out.regenerate = true;
     else if (arg.startsWith("--mode=")) {
       const v = arg.slice("--mode=".length);
       if (v !== "daily" && v !== "weekly" && v !== "monthly") {
@@ -270,7 +290,7 @@ function buildPrompt(
 ): string {
   const sampleLines = samples.map(
     (r, i) =>
-      `[${i}] ${r.date} ${r.prefectureName} ${r.cityName} ${r.sectionName ? "/ " + r.sectionName : ""}\n    comment: ${(r.comment ?? "").slice(0, 160)}\n    source: ${r.source}${r.sourceUrl ? " / " + r.sourceUrl : ""}${r.isOfficial ? " (公式)" : ""}`,
+      `[S${i + 1}] ${r.date}${r.dateEstimated ? " (報道日。発生日は不明)" : ""} ${r.prefectureName} ${r.cityName} ${r.sectionName ? "/ " + r.sectionName : ""}\n    内容: ${(r.comment ?? "").slice(0, 160)}\n    出所: ${r.isOfficial ? "自治体・警察の公表" : r.source === "news" ? "報道" : r.source}`,
   );
 
   const topPrefs = agg.byPref
@@ -299,17 +319,23 @@ function buildPrompt(
   return `あなたは野生動物管理の専門家として、くまウォッチ (獣医工学ラボ) が公開する研究レポートを執筆します。
 本データ以外の外部知識は使わないこと。日付・地点・件数は与えられたデータのみを根拠にすること。
 
+=== 厳守事項 ===
+- 総件数は「同じ事案の重複を束ねた後の事案数」である。都道府県別の件数もそのまま使い、自分で足し引きしない。
+- 地名の紹介や背景知識 (観光地としての説明・過去の事例など) を足さない。データの出所の内訳 (報道・自治体など) も書かない。
+- 記録にない数字・人数・頭数・年齢・時刻・固有名詞 (個人名・施設名・団体名) を書かない。「〜名が負傷」などは、その記録の内容に書かれている場合だけ書く。
+- 複数の記録をまとめて「1 日に 2 度の襲撃」「計 4 名が負傷」のように 1 つの事件として書かない。記録ごとに別の事案として扱う。
+- 記録の内容に対象期間より前の日付の出来事が書かれている場合 (例: 過去の事件の続報・判決・検証)、それを対象期間に起きた出来事として書かない。
+- 「(報道日。発生日は不明)」の記録は、発生日を断定せず「〜と報じられた」と書く。
+- 人の発言を「」で引用しない。個人の氏名は書かない (被害者・目撃者・職員・研究者のいずれも)。
+- 日本語だけで書く。中国語の語・英語の語・数式記号 ($ や \\ など) を使わない。
+- 本文で記録に触れるときは、文末に [S3] の形で記録 ID を付ける (複数なら [S3][S7])。「サンプル」「記録[3]」「※」などの別の書き方はしない。ID は上の一覧にあるものだけを使う。
+
 === 期間 ===
 ${period.label} (${period.category})
 
 === 集計 ===
 総件数: ${agg.total}
 上位都道府県: ${topPrefs}
-ソース内訳: ${agg.bySource.map((s) => `${s.source} ${s.count}`).join(" / ")}
-公式情報: ${agg.officialRecords.length} 件 / 報道由来 (URL あり): ${agg.newsRecords.length} 件
-人身被害キーワード一致: ${agg.humanInjuryRecords.length} 件
-都市部キーワード一致: ${agg.urbanRecords.length} 件
-捕獲・銃猟キーワード一致: ${agg.notableComments.length} 件
 
 === 代表サンプル (${samples.length} 件) ===
 ${sampleLines.join("\n")}
@@ -328,14 +354,10 @@ JSON のみを返す。以下のスキーマに従うこと:
     { "type": "h3", "text": "..." },
     { "type": "ul", "items": ["...", "..."] },
     { "type": "table", "rows": [["列1ヘッダ","列2ヘッダ"],["セル","セル"]] }
-  ],
-  "references": [
-    { "title": "引用記事タイトル", "url": "https://...", "site": "媒体名 (任意)" }
   ]
 }
 
-- references は data に含まれる sourceUrl から重要事案のものを最大 ${MAX_REFERENCE_URLS} 件抜粋
-- body 内で参照する場合は文末に「（※1）」のように番号を付ける (1-indexed, references 配列の順)
+- 出典の一覧は返さない (本文の [S3] から自動で作る)
 - table は 4-6 列が読みやすい
 - 本文は **である調** で論理的に。煽情的表現は避ける
 `;
@@ -362,23 +384,11 @@ const RESPONSE_SCHEMA = {
         required: ["type"],
       },
     },
-    references: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          url: { type: "string" },
-          site: { type: "string" },
-        },
-        required: ["title", "url"],
-      },
-    },
   },
-  required: ["title", "lead", "body", "references"],
+  required: ["title", "lead", "body"],
 };
 
-async function callGemini(prompt: string): Promise<ResearchPayload> {
+async function callGemini(prompt: string): Promise<GeneratedPayload> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is required");
   const res = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
@@ -402,8 +412,91 @@ async function callGemini(prompt: string): Promise<ResearchPayload> {
   };
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
   if (!text) throw new Error("gemini returned empty");
-  const parsed = JSON.parse(text) as ResearchPayload;
+  const parsed = JSON.parse(text) as GeneratedPayload;
   return parsed;
+}
+
+function blockTexts(b: ResearchBlock): string[] {
+  if (b.type === "ul" || b.type === "ol") return b.items;
+  if (b.type === "table") return b.rows.flat();
+  return [b.text];
+}
+
+/** 簡体字にしかない字。ここに当たれば中国語が混ざっている。 */
+const SIMPLIFIED_ONLY = /[们这说发现时间对应该给关环让处见从车门马鸟鱼东为过还进运开头书长问]/;
+
+/**
+ * 生成結果の機械検査。違反の説明を返す (空なら合格)。
+ * 抜き取り点検で実際に見つかった生成の残骸だけを対象にしている。
+ */
+function lintPayload(p: GeneratedPayload, sampleCount: number): string[] {
+  const issues: string[] = [];
+  const texts = [p.title, p.lead, ...p.body.flatMap(blockTexts)];
+  for (const t of texts) {
+    if (/サンプル|※\s*\d|相当\]/.test(t)) issues.push(`記録の参照の書き方が違う: ${t.slice(0, 60)}`);
+    if (/\$|\\[a-zA-Z]/.test(t)) issues.push(`数式記号: ${t.slice(0, 60)}`);
+    if (SIMPLIFIED_ONLY.test(t)) issues.push(`中国語の混入: ${t.slice(0, 60)}`);
+    if (/高爾夫|球場的/.test(t)) issues.push(`中国語の混入: ${t.slice(0, 60)}`);
+    for (const m of t.matchAll(/\[S(\d+)\]/g)) {
+      const n = Number(m[1]);
+      if (n < 1 || n > sampleCount) issues.push(`存在しない記録 ID [S${n}]`);
+    }
+  }
+  return issues;
+}
+
+/**
+ * 本文の [S3] を ※1 形式に振り直し、参照された記録から参考文献を作る。
+ * 番号は本文に初めて出た順。URL を持たない記録も一覧には載せる (リンクにはしない)。
+ */
+function attachReferences(p: GeneratedPayload, samples: Sighting[]): ResearchPayload {
+  const order = new Map<number, number>(); // sample index (0-based) -> ref number
+  const renumber = (t: string): string =>
+    t
+      .replace(/(?:\[S\d+\])+/g, (group) => {
+        const nums: number[] = [];
+        for (const m of group.matchAll(/\[S(\d+)\]/g)) {
+          const idx = Number(m[1]) - 1;
+          if (!samples[idx]) continue;
+          if (!order.has(idx)) order.set(idx, order.size + 1);
+          const n = order.get(idx)!;
+          if (!nums.includes(n)) nums.push(n);
+        }
+        return nums.length > 0 ? `（※${nums.join("・")}）` : "";
+      })
+      .replace(/\s+（※/g, "（※")
+      .replace(/(（※[^）]*）)\s+/g, "$1");
+  const mapBlock = (b: ResearchBlock): ResearchBlock => {
+    if (b.type === "ul" || b.type === "ol") return { ...b, items: b.items.map(renumber) };
+    if (b.type === "table") return { ...b, rows: b.rows.map((r) => r.map(renumber)) };
+    return { ...b, text: renumber(b.text) };
+  };
+  const body = p.body.map(mapBlock);
+  const lead = renumber(p.lead).replace(/（※[^）]*）/g, "");
+  const references: Reference[] = [...order.entries()]
+    .sort((a, b) => a[1] - b[1])
+    .map(([idx]) => {
+      const r = samples[idx];
+      const place = `${r.prefectureName}${r.cityName}${r.sectionName ? " " + r.sectionName : ""}`;
+      return {
+        title: `${jpDate(r.date.slice(0, 10))} ${place}の出没情報`,
+        url: r.sourceUrl && /^https?:\/\//.test(r.sourceUrl) ? r.sourceUrl : "",
+        site: r.isOfficial ? "自治体・警察の公表" : r.source === "news" ? "報道" : undefined,
+      };
+    });
+  return { title: p.title, lead, body, references };
+}
+
+/** 同じ事案の重複記録を束ねる。代表には URL と内容の長い記録を残す。 */
+function dedupeIncidents(records: Sighting[]): Sighting[] {
+  const best = new Map<string, Sighting>();
+  const score = (r: Sighting) => (r.isOfficial ? 1000 : 0) + (r.sourceUrl ? 500 : 0) + (r.comment?.length ?? 0);
+  for (const r of records) {
+    const key = incidentKey(r.date?.slice(0, 10), r.prefectureName, r.cityName, r.sectionName);
+    const cur = best.get(key);
+    if (!cur || score(r) > score(cur)) best.set(key, r);
+  }
+  return [...best.values()];
 }
 
 function escapeJsxText(s: string): string {
@@ -466,7 +559,14 @@ function renderPage(
   payload: ResearchPayload,
   publishedAt: string,
   agg: Aggregated,
+  modifiedAt: string = publishedAt,
 ): string {
+  const revisionNote =
+    modifiedAt !== publishedAt
+      ? `
+      <p className="text-sm text-stone-500">${jpDate(modifiedAt).replace(/(\d+)/g, " $1 ").replace(/^ | $/g, "")} 改訂：同じ出没の重複を束ね、その後に集まった記録も含めて、本文を作り直しました。件数は公開時と異なることがあります。</p>
+`
+      : "";
   const categoryLabel =
     period.category === "daily-report"
       ? "日次レポート"
@@ -523,7 +623,7 @@ const SCHEMA = {
   headline: TITLE,
   description: DESCRIPTION,
   datePublished: ${JSON.stringify(publishedAt)},
-  dateModified: ${JSON.stringify(publishedAt)},
+  dateModified: ${JSON.stringify(modifiedAt)},
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -569,7 +669,7 @@ export default function ResearchPage() {
       />
 
 ${bodyJsx}
-
+${revisionNote}
       {REFERENCES.length > 0 && (
         <>
           <h2>参考文献</h2>
@@ -608,7 +708,7 @@ ${bodyJsx}
           <dt className="text-stone-500">公開日</dt>
           <dd>${publishedAt}</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>${publishedAt}</dd>
+          <dd>${modifiedAt}</dd>
           <dt className="text-stone-500">データ範囲</dt>
           <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
@@ -706,9 +806,19 @@ async function main() {
 
   const pageDir = join(ROOT, "src", "app", "research", period.slug);
   const pagePath = join(pageDir, "page.tsx");
+  // 作り直しのときは元の公開日を引き継ぐ
+  let originalPublishedAt: string | null = null;
   if (existsSync(pagePath)) {
-    console.log(`[generate-research] ${pagePath} already exists, skipping`);
-    return;
+    const existing = readFileSync(pagePath, "utf8");
+    if (!args.regenerate) {
+      console.log(`[generate-research] ${pagePath} already exists, skipping`);
+      return;
+    }
+    if (!existing.startsWith(MARKER)) {
+      throw new Error(`${pagePath} is not an auto-generated page; refusing to regenerate`);
+    }
+    originalPublishedAt = /publishedTime: "(\d{4}-\d{2}-\d{2})"/.exec(existing)?.[1] ?? null;
+    if (!originalPublishedAt) throw new Error(`publishedTime not found in ${pagePath}`);
   }
 
   const sightings = loadSightings();
@@ -728,8 +838,10 @@ async function main() {
         ? MAX_RECORDS_WEEKLY
         : MAX_RECORDS_MONTHLY;
 
-  const agg = aggregate(filtered);
-  const samples = pickSamples(filtered, cap);
+  const incidents = dedupeIncidents(filtered);
+  console.log(`[generate-research] incidents after dedupe: ${incidents.length}`);
+  const agg = aggregate(incidents);
+  const samples = pickSamples(incidents, cap);
   const prompt = buildPrompt(period, agg, samples);
 
   console.log(
@@ -742,18 +854,33 @@ async function main() {
     return;
   }
 
-  const payload = await callGemini(prompt);
+  let generated = await callGemini(prompt);
+  let issues = lintPayload(generated, samples.length);
+  if (issues.length > 0) {
+    console.warn(`[generate-research] lint failed, retrying once:\n  ${issues.join("\n  ")}`);
+    generated = await callGemini(prompt);
+    issues = lintPayload(generated, samples.length);
+    if (issues.length > 0) {
+      throw new Error(`generated report failed lint:\n  ${issues.join("\n  ")}`);
+    }
+  }
+  const payload = attachReferences(generated, samples);
   console.log(
     `[generate-research] gemini OK: ${payload.body.length} blocks, ${payload.references.length} refs`,
   );
 
-  const publishedAt = isoDate(new Date());
-  const pageJs = renderPage(period, payload, publishedAt, agg);
+  const today = isoDate(new Date());
+  const publishedAt = originalPublishedAt ?? today;
+  const pageJs = renderPage(period, payload, publishedAt, agg, today);
 
   if (!existsSync(pageDir)) mkdirSync(pageDir, { recursive: true });
   writeFileSync(pagePath, pageJs);
   console.log(`[generate-research] wrote ${pagePath}`);
 
+  if (originalPublishedAt) {
+    console.log("[generate-research] regenerated (index entry kept as is). done.");
+    return;
+  }
   const regions = extractRegionsFromBody(payload.body);
   appendToIndex(period.slug, period.category, period.rangeLabel, publishedAt, regions);
   console.log(
