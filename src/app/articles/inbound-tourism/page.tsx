@@ -31,9 +31,9 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        <strong>結論</strong>: 訪日外国人観光客のクマ遭遇リスクは <strong>増加傾向</strong>です。
+        <strong>結論</strong>: 訪日外国人観光客がクマの生息域を訪れる機会は <strong>増えています</strong>。
         高尾山・上高地・知床・熊野古道・白川郷など人気観光地にもクマが生息していますが、
-        多言語の注意喚起・装備案内・遭遇時対応の情報提供が追いついていません。
+        多言語の注意喚起・装備案内・遭遇時対応の情報提供は、まだ十分とはいえません。
         本記事は観光業・宿泊施設・ガイド事業者・自治体が提供すべき情報を整理し、
         日本人向けに「外国人客にどう伝えるか」をまとめます。
       </p>
@@ -42,10 +42,10 @@ export default function Page() {
         label="3行でわかる"
         items={[
           <>
-            訪日客の遭遇リスクは<strong>増加傾向</strong>。高尾山・上高地・知床など人気観光地にもクマは生息する。
+            訪日客が<strong>クマの生息域を訪れる機会が増加</strong>。高尾山・上高地・知床など人気観光地にもクマは生息する。
           </>,
           <>
-            <strong>多言語の注意喚起・装備案内・遭遇時対応</strong>の情報提供が追いついていない。
+            <strong>多言語の注意喚起・装備案内・遭遇時対応</strong>の情報提供はまだ十分とはいえない。
           </>,
           <>
             観光業・宿泊・ガイド・自治体が<strong>「外国人客にどう伝えるか」</strong>が課題。
@@ -61,14 +61,14 @@ export default function Page() {
           { id: "guideline", title: "観光業・宿泊施設・ガイドが提供すべき情報" },
           { id: "languages", title: "多言語化の優先順位" },
           { id: "messaging", title: "外国人向けの効果的な伝え方" },
-          { id: "case", title: "海外（北米・欧州）の参考例" },
+          { id: "case", title: "海外（北米）の参考例" },
           { id: "faq", title: "よくある質問" },
         ]}
       />
 
       <h2 id="context">なぜ今、インバウンド対策が必要か</h2>
       <p>
-        2024 年の訪日外国人数は約 3,500 万人と過去最高を更新し、
+        日本政府観光局（JNTO）によると、訪日外国人数は 2024 年に約 3,687 万人、2025 年に約 4,268 万人と過去最高を更新し、
         2030 年には 6,000 万人を目指す観光戦略が進んでいます。
         定番の都市観光だけでなく、<strong>「日本の自然」「日本の田舎」</strong>を体験する
         観光客が増えており、これらの目的地の多くはクマ生息域と重なります。
@@ -77,11 +77,10 @@ export default function Page() {
         <li>登山・トレッキング目的の訪日客が増加</li>
         <li>地方創生・サスティナブルツーリズム促進で、これまで観光客が少なかった山間部に誘致</li>
         <li>パウダースノー目的の冬季観光（春先のクマ覚醒期に重なる）</li>
-        <li>Studio Ghibli の世界観を求めて訪れる「里山ツーリズム」</li>
-        <li>日本の「安全」イメージで装備を持たずに山に入る観光客が多い</li>
+        <li>日本の「安全」イメージから、装備を持たずに山に入る観光客もいる</li>
       </ul>
       <p>
-        実際、近年は登山中の外国人観光客がクマと遭遇する報道も増えています。
+        2025 年 10 月には、白川郷で外国人観光客がクマにひっかかれてけがをしたと報じられました。
         多言語化された注意喚起・装備案内は <strong>もはや「あれば良い」ではなく「必須」</strong>です。
       </p>
 
@@ -93,7 +92,6 @@ export default function Page() {
               <th className="px-3 py-2 text-left">観光地</th>
               <th className="px-3 py-2 text-left">エリア</th>
               <th className="px-3 py-2 text-left">クマ種</th>
-              <th className="px-3 py-2 text-left">遭遇リスク</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
@@ -101,55 +99,46 @@ export default function Page() {
               <td className="px-3 py-2 font-semibold">高尾山</td>
               <td className="px-3 py-2">東京都八王子市</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">上高地</td>
               <td className="px-3 py-2">長野県松本市</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">知床</td>
               <td className="px-3 py-2">北海道斜里町</td>
               <td className="px-3 py-2">ヒグマ</td>
-              <td className="px-3 py-2 text-red-700">高</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">熊野古道</td>
               <td className="px-3 py-2">和歌山・三重</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">白川郷・五箇山</td>
               <td className="px-3 py-2">岐阜・富山</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">屋久島</td>
               <td className="px-3 py-2">鹿児島県</td>
               <td className="px-3 py-2">なし</td>
-              <td className="px-3 py-2 text-green-700">低（クマ生息なし）</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">立山・剱岳</td>
               <td className="px-3 py-2">富山県</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中〜高</td>
             </tr>
             <tr>
               <td className="px-3 py-2 font-semibold">日光・奥日光</td>
               <td className="px-3 py-2">栃木県</td>
               <td className="px-3 py-2">ツキノワグマ</td>
-              <td className="px-3 py-2 text-amber-700">中</td>
             </tr>
             <tr>
-              <td className="px-3 py-2 font-semibold">大雪山・利尻</td>
+              <td className="px-3 py-2 font-semibold">大雪山</td>
               <td className="px-3 py-2">北海道</td>
               <td className="px-3 py-2">ヒグマ</td>
-              <td className="px-3 py-2 text-red-700">高</td>
             </tr>
           </tbody>
         </table>
@@ -162,9 +151,9 @@ export default function Page() {
 
       <h2 id="gap">情報提供の現状ギャップ</h2>
       <p>
-        多くの観光地でクマ注意喚起は <strong>日本語のみ</strong>です。
+        クマの注意喚起が <strong>日本語のみ</strong>の観光地は少なくありません。
         英語・中国語・韓国語の表示があっても「BEAR WARNING」程度の簡単な看板で、
-        具体的な対処法・装備案内・通報先までは案内されていないのが現状です。
+        具体的な対処法・装備案内・通報先までは案内されていない場所もあります。
       </p>
       <h3>現状の主な問題</h3>
       <ul>
@@ -212,10 +201,10 @@ export default function Page() {
           <strong>英語</strong> — 国際語、欧米・アジア全域でカバー
         </li>
         <li>
-          <strong>中国語（簡体字・繁体字）</strong> — 訪日客最多
+          <strong>中国語（簡体字・繁体字）</strong> — 中国・台湾・香港からの訪日客が多い
         </li>
         <li>
-          <strong>韓国語</strong> — 訪日客 2 位、登山客も多い
+          <strong>韓国語</strong> — 2024 年の国・地域別訪日客数で 1 位
         </li>
         <li>
           <strong>ベトナム語・タイ語</strong> — 東南アジア観光客の増加
@@ -242,39 +231,34 @@ export default function Page() {
           <strong>逆に「日本にクマがいる」事自体を知らない人も</strong> — アジア・オセアニアでは知識ゼロの場合も
         </li>
         <li>
-          <strong>遭遇時対応の常識が国で異なる</strong> — 北米のヒグマ対応（プレイデッド）と日本のツキノワグマ対応（離れる）は同じではない
+          <strong>教わってきた対処法が国で異なることがある</strong> — 日本ではツキノワグマでもヒグマでも、走らず・背を向けず、クマを見ながらゆっくり離れるのが基本と伝える
         </li>
         <li>
-          <strong>クマスプレーは多くの国で銃刀法的に規制対象</strong> — 海外では入手・携帯ルールが日本と異なる
+          <strong>クマスプレーの扱いは国によって異なる</strong> — 所持や持ち込みが規制されている国もあり、日本のルールとは違う
         </li>
       </ul>
       <h3>伝えるべき重要メッセージ</h3>
       <ol>
         <li>「日本にもクマがいます（種類）」</li>
-        <li>「特に夕方〜早朝・秋に注意」</li>
+        <li>「特に明け方・夕方、秋に注意」</li>
         <li>「装備リスト：鈴・ホーン・スプレー」</li>
-        <li>「遭遇時の行動：走らない・後退する・大きく見せる」</li>
+        <li>「遭遇時の行動：走らない・背を向けない・クマを見ながらゆっくり離れる」</li>
         <li>「攻撃された場合の対応（種別）」</li>
         <li>「緊急連絡先：110（警察）・119（救急）」</li>
         <li>「目撃情報は宿泊施設・自治体に報告」</li>
       </ol>
 
-      <h2 id="case">海外（北米・欧州）の参考例</h2>
+      <h2 id="case">海外（北米）の参考例</h2>
       <h3>米国国立公園局（NPS）</h3>
       <p>
-        Yellowstone・Yosemite・Grand Teton 等のクマ生息域国立公園は、
-        多言語の <strong>「Bear Safety」</strong>パンフレットを完備し、
-        入園時に必ず手渡しで配布されています。
+        Yellowstone・Yosemite・Grand Teton 等のクマ生息域の国立公園は、
+        <strong>「Bear Safety」</strong>として、クマとの遭遇を避ける方法や遭遇時の対応を
+        公式サイトや園内の案内で発信しています。
       </p>
       <h3>カナダ・パークス・カナダ</h3>
       <p>
-        Banff・Jasper 等の山岳国立公園では、レンタカー会社で「Bear Aware」
-        パンフレットが配布され、ベアスプレーのレンタル制度もあります。
-      </p>
-      <h3>欧州（フィンランド・スウェーデン）</h3>
-      <p>
-        ツーリストインフォメーション・国立公園で多言語版安全ガイドを配布。
-        商用ガイドツアーには専門訓練を義務化している国もあります。
+        Banff・Jasper 等の山岳国立公園でも、公式サイトなどでクマへの注意を発信しており、
+        Banff などではベアスプレーのレンタルサービスもあります。
       </p>
       <p>
         これらの取り組みは、日本のインバウンド観光地でも段階的に導入する価値があります。
@@ -284,15 +268,15 @@ export default function Page() {
         items={[
           {
             q: "観光業者として、何から始めればいいですか?",
-            a: "まずは英語版のクマ注意喚起から。1 枚の A4 サイズで「日本にもクマがいる」「装備」「遭遇時対応」「緊急連絡」をまとめてチェックイン時に手渡せば、最低限の責任は果たせます。中国語・韓国語版は QR コード経由でリンクするのが効率的。",
+            a: "まずは英語版のクマ注意喚起から。1 枚の A4 サイズで「日本にもクマがいる」「装備」「遭遇時対応」「緊急連絡」をまとめてチェックイン時に手渡すのが第一歩になります。中国語・韓国語版は QR コード経由でリンクするのが効率的。",
             aText:
               "英語版 A4 注意喚起から。クマの存在・装備・遭遇時対応・緊急連絡をまとめてチェックインで手渡し。中国語・韓国語は QR コード経由。",
           },
           {
             q: "ガイドツアーでクマスプレーをガイドが携帯するべき?",
-            a: "強く推奨。ガイドは複数の参加者の安全を担うため、最低限クマスプレー（450g）の携帯が必要です。同時に使用法の研修も必須で、空撃ち訓練を定期的に実施することが望ましいです。",
+            a: "強く推奨。ガイドは複数の参加者の安全を担うため、クマスプレーの携帯が望ましいです。容量ではなく、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上（環境省の推奨要件）を目安に選びます。使用法の研修も必須で、練習用（無害）スプレーで取り出しと構え方を練習しておきましょう。",
             aText:
-              "強く推奨。ガイドは複数参加者の安全を担うため最低 450g スプレー携帯。使用法研修必須、空撃ち訓練も定期実施。",
+              "強く推奨。容量ではなく噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上を目安に選ぶ。使用法研修は必須で、練習用スプレーで取り出しと構えを練習する。",
           },
           {
             q: "外国人観光客に「日本は安全」と伝えすぎていませんか?",
@@ -302,9 +286,9 @@ export default function Page() {
           },
           {
             q: "クマスプレーは外国人観光客に売っていいですか?",
-            a: "国内では一般販売されており購入可能。ただし航空機・新幹線への持ち込み制限があるため、観光客が帰国時に困らないよう「使い切り or 宿泊施設に置いていく」を案内する必要があります。詳細は《クマスプレーの持ち運び》を参照。",
+            a: "国内では一般販売されており購入可能。ただし飛行機は機内持ち込み・預け入れとも不可で、鉄道でも持ち込みに制限がある場合があります。帰国時に困らないよう、宿泊施設などで処分・回収する方法を案内しておきましょう。人に向けないこと、山へ行く目的なく街中で持ち歩くと軽犯罪法に触れるおそれがあることも伝えてください。",
             aText:
-              "国内で購入可能。ただし航空機・新幹線持込制限あり。帰国時に困らないよう「使い切り or 宿に置く」を案内。",
+              "国内で購入可能。飛行機は持ち込み・預け入れとも不可、鉄道にも制限あり。帰国前の処分方法を案内し、人に向けない・街中で理由なく持ち歩かないことも伝える。",
           },
           {
             q: "民泊運営でクマ対策はどこまで責任があるのか?",
@@ -314,6 +298,8 @@ export default function Page() {
           },
         ]}
       />
+
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：内容を出典と照らし合わせ、事実と異なっていた記述を修正しました。</p>
     </ArticleShell>
   );
 }
