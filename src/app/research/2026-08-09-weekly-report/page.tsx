@@ -10,7 +10,7 @@ import ResearchPrefChart from "@/components/ResearchPrefChart";
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-08-09-weekly-report";
 const TITLE = "2026年8月3日〜2026年8月9日 国内クマ出没事案の週次総括レポート";
-const DESCRIPTION = "2026年8月3日から8月9日までの期間において、国内では合計818件のクマ出没事案が記録された。青森県および北海道を中心に目撃が多数確認されたほか、福島県や岐阜県では人身被害が発生しており、市街地や教育施設周辺への出没リスクに対する厳重な警戒が求められる。";
+const DESCRIPTION = "2026年8月3日から8月9日までの期間における全国のクマ出没総件数は818件に達した。福島県および岐阜県で人身被害が確認されたほか、学校や住宅街、家屋敷地への侵入など生活空間に近接した出没が多発しており、厳重な警戒が求められる。";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -63,18 +63,13 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
-      "title": "2026年8月7日 岐阜県高山市 高山市の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9tU2FIY25VT0htOHVhbFFFZUN1VjI2YVQyZUw4WENVQ19xanFsRjdDeUVQOUp3OHBrV3FEUzFUV3FDa3JhRFpiOUw5d0hDaWJ3MzM1OHdJbVhEaEhpMEcxUThORXJMaGpoNkI0LTdn?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月7日 岐阜県高山市 高山の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5DUXhtMXNGN3g1VUR3QU1jZWkxaGxfeU5NSzI4YWpWdV9UYTlqY1pUUlpiV2RTbndoRTVxUjR1MnJERTBRTTFBQzVfNlh0RXBpb094MHVKQ3hhMlAxZnduNXdIWjJHeVp1?oc=5",
-      "site": "報道"
-    },
-    {
       "title": "2026年8月7日 岐阜県高山市の出没情報",
       "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9QcEpFaE9pOE1ERHBZQXRoSXdxanJ1WmU3X1gzQ3c2TDVNSmRTMzBxZFVzSzQtU21kNWRDLW9HU1pEa2hZeUJhU1NHcXJzV0xWUDJpWXlmVERPOWZEM2hpREJTTW5yMGJ4b3BPV1Rn?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月7日 岐阜県高山市 高山市の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9tU2FIY25VT0htOHVhbFFFZUN1VjI2YVQyZUw4WENVQ19xanFsRjdDeUVQOUp3OHBrV3FEUzFUV3FDa3JhRFpiOUw5d0hDaWJ3MzM1OHdJbVhEaEhpMEcxUThORXJMaGpoNkI0LTdn?oc=5",
       "site": "報道"
     },
     {
@@ -85,6 +80,11 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
       "title": "2026年8月8日 岐阜県高山市の出没情報",
       "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1SWVJRNTM4Um5UMzR0VFdtUFJxUVAwMEttelFzYkVEdURDQXRTVlVvN1d0dFBhMHg4aXlabWJVR2l0anQzbTktQURDRG1YUFJRR2RRY2lYUUQ4VV9GX1V3V0xEVU1vNjR1bmM2cUNRU21xUFFyaUdUYTZxS0cyLUU?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月7日 岐阜県高山市 高山の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5DUXhtMXNGN3g1VUR3QU1jZWkxaGxfeU5NSzI4YWpWdV9UYTlqY1pUUlpiV2RTbndoRTVxUjR1MnJERTBRTTFBQzVfNlh0RXBpb094MHVKQ3hhMlAxZnduNXdIWjJHeVp1?oc=5",
       "site": "報道"
     },
     {
@@ -113,16 +113,6 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
-      "title": "2026年8月4日 新潟県村上市 村上小学校付近の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5ERnNyV21DOTZWMnktNk1iRHgwMmFUNk9VMG5BV1Y1cUJaOTluZF8wSmUtVVRnUEFMQkRaTnFUX3QybDVKcHFjWWdBSQ?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月4日 新潟県村上市 村上小学校近くの出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5qNXhOUEwwLXV1WUdQMXpLU3hnOVZETjJHeUt4a1I3N254eVdqaFJzdjh2UWYwdlVTRlFaY1ZYTFB2Mks2V0k3ZTBwTEVSWndMQWhRUUZFTTBNaEFmeUE?oc=5",
-      "site": "報道"
-    },
-    {
       "title": "2026年8月5日 北海道函館市 小学校のグラウンドの出没情報",
       "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9MMWJoaVZyMlBKbk9nTHh3OHJ3NnVqU1JEaUZWdjJmVWZRV0tSZ09LTF9QdUxiQ2o5N0gtNFpzMlFwdjRoaXdDRHJTXzJ6WDJZTFdjS21pY2xSc2p3N1BfSDZUdFFXa0NmV3g1d3dNdDU2VnJXUDV0OHZTN3EwaTA?oc=5",
       "site": "報道"
@@ -138,88 +128,13 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
-      "title": "2026年8月5日 長野県松本市 安曇の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9rbF95NGdRM2JYYlE5OTNsR0dpbGVyZWpaek9XYktJUEZCc09QandSRG9zVk5nUmp4U1drdjA2dVdwQ3NQNGlPc0ZoYUpLS0doSUt4TGttZUhtUV9ORkZrZXVBZ2ZVdUZOM0o0ZzhwX3o?oc=5",
+      "title": "2026年8月4日 新潟県村上市 村上小学校付近の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE5ERnNyV21DOTZWMnktNk1iRHgwMmFUNk9VMG5BV1Y1cUJaOTluZF8wSmUtVVRnUEFMQkRaTnFUX3QybDVKcHFjWWdBSQ?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月8日 青森県六戸町 上北郡六戸町柳町１８−１の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月4日 山形県鶴岡市 住宅敷地内の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9tMGl4bjJWb2tIVkhmUHJadWpCWGYzWHN0eXp4Tmd3Qmg1aUVWbG1zVWNLaG53LUQ2Ykh1QlYtZ1VHVHNuTzBUZS1MaGR3emxkazEzbnY2b2piTFpBZ3ZUMEw3THJOTVJWZElVbVJYSdIBdEFVX3lxTE1ENEg1TjIzX0dSRHF6Qkw4QzNXUlMtOEV4bmU1NE9FQ1lyUmxVcWlyd1hRSHRILW1mMUhIVWE5WFpMN0NVdnpMTWdYWk5uX2w0c0JDbHR4QUNsLWRWdklKU1pDNGwxV19GMGxCSHoycW1VelZN?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 群馬県桐生市 相生町五丁目の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1FRDAyRUVzdVFfTC1zX0FORDVJMWJiUmNvd3dZWDc2d1hvOGNnbjB3Uy1VbFpkUEd0UHQ0TkZGeGVMaEJ6cmViX2l4R3RVQU1va3NGdHV5Z0lfUkRNUlE?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月7日 群馬県桐生市 住宅地の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9IcGVDdUZpcmVmUEhnVktLRldobFRYdWVvSmNOQnQzVFJ3bHFTWlZpWVdhMHJRNUg2U0NFZVFHUFR4S3FfeS1KUDNORDhqd2RpRW5wQnE1eTU?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月9日 北海道札幌市清田区 住宅街の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBkNTVfWTdjQU84emZPcUNLeXVPQVU3QWRnbmMzaVd0bVBVQVhYWV9zc0phLXA3cV85RklQRFRadzNNRTd1b2hGZF9lZVUydGJzZncxSXhJTmtCSmp6SFlvd0tDTFdvV0ZQMGRyTdIBckFVX3lxTE1GRjVMQ0NybHg3SW5wMTRwQWMteEUtU09BNVgxUkp4OVpWeTAydnZIbWVzVzg3NFczUXVMNWZYb2RHMjNudnBXWk9vTUJ0NXJhSjBKYTQyMmRrdkxEck1LbUgxQl81OXk2NVg2RkNIN3FEZw?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月9日 北海道札幌市 清田区住宅街の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPLXJQem5SU21NRkxKdE8tYzRHX2ZpaDVLa05iRERHWEdfeHdxUEowSWZJbmEtakJ3UFgxcm16cU5KbEpQY3UtVjFaM1RpazFxVURYWE9ma3BXak1WSVlUX2YzNUQtRDFTcy1DRy1UUFdTTGxEZURBZGY0SUVURV8xTjVfQWwtQTlJU1lNTDRB?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月5日 宮城県気仙沼市 市役所近くの住宅地の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFA2V0ZLekQ3NVREcjVsV1JkdVFlSy1mUFhMbGFMbzRQb3pZdXRqbEowM2h4UmFocml0Wlo3dHdqMnluelNOa2w5QWhHODBUNjRiN0JKMExfUVhWOV9zX2dmY2VYVVBQUmFfWmZ6ekRFYWhycWx3REllTTFwajJIaFk?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月5日 宮城県気仙沼市 気仙沼市役所近くの出没情報",
-      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPWnFSTng4eXJfV3lyaUFUWS1aV0dTclZ3eVprLUNrRWtTNkpUY3FXak1oTEtXZ2hUaXhCZElkUnF1allWSTZUYUJwNFJ5WWpESnBjUy11Y0pUXzctWGpEeU5fNkRyaVdaUW1TR2NNSGtRdDFDN3JqVnlsYk5GYTJ6dnJQWFZCYzEya0tZbkt3?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 鳥取県鳥取市 佐治町の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFB6eXpYOWNqaWxaUUlEaGFnZ1o0dmk0b1JSRzM0cFJEeWthUW5CSTBKMTNQZ3p2LXVvX2hRcVNpMVFROEowazFlX1VHQnNzOUho?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 鳥取県鳥取市 佐治の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFAtTWgwLW9pX2J1NW9nVVZRMEd2OVl3MDBRMlVhRmJ3ZXB5VnpIME05bzFhY3I0Q2dkQ3ppd2V0U1kzNENOUlVfUzFjX0xYUUdX?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月4日 山口県周南市 大字八代の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月4日 山口県周南市 小学校から約1kmの出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBac0gwOE1UcnFRQ2tnVU5Fb3lNaGVaTkNaZmhleVRjZTVuS0tWUHdpM3c0cVlLenQ2VGJremVfLTFVMGZFTW5WMmd6c1BUQQ?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月4日 山口県周南市 小学校から1kmの山の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9sN3ZpRFpHSi1xWjkyaHRqMEg2eVBmTUFUWnRTME5kVEt3OGx5MlRMaEJKSmFlcWNlcTRER2lKRlhLZ09YR1pZQ05EU1BzVEZyTFkxYjhOOWJneFBPeTlhem1rSUlZbm1qdmJCQlJLcDFqMjVFZGh6VUdBaFd5ZzQ?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月8日 山口県周南市 大字鹿野上の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月3日 長野県佐久市 駒込区の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月7日 山口県岩国市 美和町生見の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月6日 京都府宇治田原町の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9keXVtU1VrYU1xNFl4cldIOElVN1NxQTAybEZCX0pYbmFKcGstWVFDdG1KanN0UFpGaDg2T3lMblVCRTdRNkFYNkFGN0dxQlpLdllRTzNNRVE1MkNrdkNEeE8wWnc1Y0VrSTNsUTdIZzVBZTdLSVE?oc=5",
+      "title": "2026年8月4日 新潟県村上市 村上小学校近くの出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5qNXhOUEwwLXV1WUdQMXpLU3hnOVZETjJHeUt4a1I3N254eVdqaFJzdjh2UWYwdlVTRlFaY1ZYTFB2Mks2V0k3ZTBwTEVSWndMQWhRUUZFTTBNaEFmeUE?oc=5",
       "site": "報道"
     },
     {
@@ -243,6 +158,115 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
+      "title": "2026年8月6日 群馬県桐生市 相生町五丁目の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1FRDAyRUVzdVFfTC1zX0FORDVJMWJiUmNvd3dZWDc2d1hvOGNnbjB3Uy1VbFpkUEd0UHQ0TkZGeGVMaEJ6cmViX2l4R3RVQU1va3NGdHV5Z0lfUkRNUlE?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 秋田県秋田市 浜田の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE52aWJUUGkySHExXzhNUGN1RVU3YWRUMkxPcGFSbDJsZFdGY25wcUdPT3gySlFEVlJXWW1hWjR6U0xrdjBNc19fb2VCcjN5X2xkNDBTQlZIZm1wSng0ZUt5T2h5dG5MQ3JKb2dXamJ3eGVrbXVhWkV0c0xWRdIBgAFBVV95cUxNc005SGdXV1RDTWhvWEtOdGFjbzdoVVFSaENhSDNkbzdwZ25qaFl3ZjFvMzVHSnpZNHFDM1VnQndEZkN2U3lFaUdlb0pQSERUbzZjRUpZRnNFcTVhTTA4b1ROdllHY01DQlFBd3hUa0RZR292MTc1Q1VYYmdsS0cxWA?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 秋田県秋田市 浜田 桂浜海水浴場の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE03Zm05Mk5IbjlkelpLY1lJbWJucDNLdXh6MmE3VmRvUmhMUG5WOTQzcGZ0cTZsYzlaMzBRSHFiUkJlbkhUVGotSTMyYzVrOEFKTDdMeXdYX1d6LVNQMDJOc1B3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 長野県松本市 安曇の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9rbF95NGdRM2JYYlE5OTNsR0dpbGVyZWpaek9XYktJUEZCc09QandSRG9zVk5nUmp4U1drdjA2dVdwQ3NQNGlPc0ZoYUpLS0doSUt4TGttZUhtUV9ORkZrZXVBZ2ZVdUZOM0o0ZzhwX3o?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月8日 青森県六戸町 上北郡六戸町柳町１８−１の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月4日 山形県鶴岡市 住宅敷地内の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9tMGl4bjJWb2tIVkhmUHJadWpCWGYzWHN0eXp4Tmd3Qmg1aUVWbG1zVWNLaG53LUQ2Ykh1QlYtZ1VHVHNuTzBUZS1MaGR3emxkazEzbnY2b2piTFpBZ3ZUMEw3THJOTVJWZElVbVJYSdIBdEFVX3lxTE1ENEg1TjIzX0dSRHF6Qkw4QzNXUlMtOEV4bmU1NE9FQ1lyUmxVcWlyd1hRSHRILW1mMUhIVWE5WFpMN0NVdnpMTWdYWk5uX2w0c0JDbHR4QUNsLWRWdklKU1pDNGwxV19GMGxCSHoycW1VelZN?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月9日 北海道札幌市清田区 住宅街の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBkNTVfWTdjQU84emZPcUNLeXVPQVU3QWRnbmMzaVd0bVBVQVhYWV9zc0phLXA3cV85RklQRFRadzNNRTd1b2hGZF9lZVUydGJzZncxSXhJTmtCSmp6SFlvd0tDTFdvV0ZQMGRyTdIBckFVX3lxTE1GRjVMQ0NybHg3SW5wMTRwQWMteEUtU09BNVgxUkp4OVpWeTAydnZIbWVzVzg3NFczUXVMNWZYb2RHMjNudnBXWk9vTUJ0NXJhSjBKYTQyMmRrdkxEck1LbUgxQl81OXk2NVg2RkNIN3FEZw?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月9日 北海道札幌市 清田区住宅街の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPLXJQem5SU21NRkxKdE8tYzRHX2ZpaDVLa05iRERHWEdfeHdxUEowSWZJbmEtakJ3UFgxcm16cU5KbEpQY3UtVjFaM1RpazFxVURYWE9ma3BXak1WSVlUX2YzNUQtRDFTcy1DRy1UUFdTTGxEZURBZGY0SUVURV8xTjVfQWwtQTlJU1lNTDRB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 宮城県気仙沼市 市役所近くの住宅地の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFA2V0ZLekQ3NVREcjVsV1JkdVFlSy1mUFhMbGFMbzRQb3pZdXRqbEowM2h4UmFocml0Wlo3dHdqMnluelNOa2w5QWhHODBUNjRiN0JKMExfUVhWOV9zX2dmY2VYVVBQUmFfWmZ6ekRFYWhycWx3REllTTFwajJIaFk?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 宮城県気仙沼市 気仙沼市役所近くの出没情報",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPWnFSTng4eXJfV3lyaUFUWS1aV0dTclZ3eVprLUNrRWtTNkpUY3FXak1oTEtXZ2hUaXhCZElkUnF1allWSTZUYUJwNFJ5WWpESnBjUy11Y0pUXzctWGpEeU5fNkRyaVdaUW1TR2NNSGtRdDFDN3JqVnlsYk5GYTJ6dnJQWFZCYzEya0tZbkt3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 山梨県中央市 道の駅や住宅街近くの出没情報",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNNjdGLVN0TERlc1p0a0ROTmQ3U3A5VGhUWGs0LTNZR0pfV09PaUFGWndLNi0yMzduNURuUFlSa0Z4ZU05QXA5YjRrWHJZOERlU1Nqd1Z5QzVCM05mUjdJN2k5ZzZpQWhXTUhWRzJxdFh3b1FaZDQ0Z3lLbU5jU0RtTDR1SnRMdWc?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 山梨県中央市 高部地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月7日 群馬県桐生市 住宅地の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9IcGVDdUZpcmVmUEhnVktLRldobFRYdWVvSmNOQnQzVFJ3bHFTWlZpWVdhMHJRNUg2U0NFZVFHUFR4S3FfeS1KUDNORDhqd2RpRW5wQnE1eTU?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 京都府宇治田原町の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9keXVtU1VrYU1xNFl4cldIOElVN1NxQTAybEZCX0pYbmFKcGstWVFDdG1KanN0UFpGaDg2T3lMblVCRTdRNkFYNkFGN0dxQlpLdllRTzNNRVE1MkNrdkNEeE8wWnc1Y0VrSTNsUTdIZzVBZTdLSVE?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月8日 広島県広島市 安佐動物公園の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFA4eTRzcUZwZjhtMWNoWlVXUnRuUzY1cFNwUS1OcFdib2YtTHU4eWlBdk1feW9UVk9ZMHM4ZVhNNGlJdllDYzBZNXlGSkFBU09GYnBobXlLdDlVUXAwSHhR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 鳥取県鳥取市 佐治町の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFB6eXpYOWNqaWxaUUlEaGFnZ1o0dmk0b1JSRzM0cFJEeWthUW5CSTBKMTNQZ3p2LXVvX2hRcVNpMVFROEowazFlX1VHQnNzOUho?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 鳥取県鳥取市 佐治の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFAtTWgwLW9pX2J1NW9nVVZRMEd2OVl3MDBRMlVhRmJ3ZXB5VnpIME05bzFhY3I0Q2dkQ3ppd2V0U1kzNENOUlVfUzFjX0xYUUdX?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 長野県佐久市 駒込区の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月4日 山口県周南市 小学校から約1kmの出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTFBac0gwOE1UcnFRQ2tnVU5Fb3lNaGVaTkNaZmhleVRjZTVuS0tWUHdpM3c0cVlLenQ2VGJremVfLTFVMGZFTW5WMmd6c1BUQQ?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 山口県周南市 小学校から1kmの山の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9sN3ZpRFpHSi1xWjkyaHRqMEg2eVBmTUFUWnRTME5kVEt3OGx5MlRMaEJKSmFlcWNlcTRER2lKRlhLZ09YR1pZQ05EU1BzVEZyTFkxYjhOOWJneFBPeTlhem1rSUlZbm1qdmJCQlJLcDFqMjVFZGh6VUdBaFd5ZzQ?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 山口県周南市 大字八代の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月8日 山口県周南市 大字鹿野上の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月7日 山口県岩国市 美和町生見の出没情報",
+      "url": ""
+    },
+    {
       "title": "2026年8月3日 福島県会津若松市 阿賀川河川敷の出没情報",
       "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBTTFByS1dKUnIyckh2X295MGVBNmRybE9JbEhxT2tPYXpmNHpQb0VHekU3anBDOEd2QUptOGZoVmkzUGd0Ry1IdnQ1Z0xuTFJ3OXBCc3FxMjlfVWlHR2lQZ3RrOVlRaXRjS2lSZUUtTGVHQVBDSVBpZmxxTjR5T0E?oc=5",
       "site": "報道"
@@ -263,18 +287,13 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
-      "title": "2026年8月8日 宮城県富谷市の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5rQ0NoQkVySkVSZ1ZsM0V3VDhaNHRRMEI4dVZVQ2JPRl9Ld2NvdHJUejhDT29neVlUTmxpOFBMZkJrUHpFTV9DZFNRbmFhbkpMZC1zWVNKekVNMWpiS2xFZGhlUS0zNTFWeWIwUm95RGlGRVRsWlpFcEVIdjVzUXM?oc=5",
-      "site": "報道"
-    },
-    {
       "title": "2026年8月3日 宮城県仙台市 泉区福岡照岡の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPTW05TlB2VW1TdVJRWVRpOGg2bGpMZ2FFRTZxYTRYaWNGNlF6SUdFWWMwV1RoQjluWkpNb09jZXhFX1JVbE5SOWpDWm9YZnhhMkM1dlRUQzFtc0w3WlNOaWRqajBGZVhQSmFBS0h0U3BaUmZyUkdWUVBiWWxkUnFBdFo0M2JJZkhabXFFOUVuZ0FORko1b0FxN0FzcnHSAaIBQVVfeXFMTTlJWktSQmxWZmlFRmJ5cHRHRkl1bkdmSGczWWg5QjFQckxPZlZsRElOT0s1NmQ5OFZ5RmdlODF3RlROZVVJRzVRSFRCQjYtSjIxa3F0RkVZdFJJdmhlSmlvd2VielRwWmk1ejlhQk1YOWhySW1pQUwxdFg4MWZHWHdCZVJUa2pHcml3V1hKSEVDTUlYcUxiNm1JRURzekFWSFZ3?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月8日 山形県山形市 蔵王温泉の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNb0NzM3l3SnRnTGdVMmpCN0RMSWtCSUVNMlhZa2o3WEh6ZHhVRWUzOXY0MDRiNWU5SFBUN2hRcllXT203S2UybmJpYjJndmIwTnlZWGdUR1FLZHBYaDc5NllOWEZxVFpvXzludmlhYzBmNWpLZUk2bE1zb05IVnMtNmY2ZmR5eXhGajQtcnA2cUVGSlBPNUppdjR3bULSAaIBQVVfeXFMTU9HalB1NDNGVGRhak15UEoyM0dseWNHZlhmWk42YS1qX2UtczJkV1Uxb2ZDYXREbl93WTRNbXhwN3BhVUo0dkpXRnJyaXhDQkpfYk9UTXhOR09UVWtmcF90OU5hWUNWQ3ctMzNsVTgzM0NvZ1FUVmJ2V2w5YzVOanl5ejZtZ3BCcGFFNFZPVk5wZWpuY2xsTENPWURNRDhyd29R?oc=5",
+      "title": "2026年8月8日 宮城県富谷市の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE5rQ0NoQkVySkVSZ1ZsM0V3VDhaNHRRMEI4dVZVQ2JPRl9Ld2NvdHJUejhDT29neVlUTmxpOFBMZkJrUHpFTV9DZFNRbmFhbkpMZC1zWVNKekVNMWpiS2xFZGhlUS0zNTFWeWIwUm95RGlGRVRsWlpFcEVIdjVzUXM?oc=5",
       "site": "報道"
     },
     {
@@ -288,18 +307,13 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
+      "title": "2026年8月8日 山形県山形市 蔵王温泉の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNb0NzM3l3SnRnTGdVMmpCN0RMSWtCSUVNMlhZa2o3WEh6ZHhVRWUzOXY0MDRiNWU5SFBUN2hRcllXT203S2UybmJpYjJndmIwTnlZWGdUR1FLZHBYaDc5NllOWEZxVFpvXzludmlhYzBmNWpLZUk2bE1zb05IVnMtNmY2ZmR5eXhGajQtcnA2cUVGSlBPNUppdjR3bULSAaIBQVVfeXFMTU9HalB1NDNGVGRhak15UEoyM0dseWNHZlhmWk42YS1qX2UtczJkV1Uxb2ZDYXREbl93WTRNbXhwN3BhVUo0dkpXRnJyaXhDQkpfYk9UTXhOR09UVWtmcF90OU5hWUNWQ3ctMzNsVTgzM0NvZ1FUVmJ2V2w5YzVOanl5ejZtZ3BCcGFFNFZPVk5wZWpuY2xsTENPWURNRDhyd29R?oc=5",
+      "site": "報道"
+    },
+    {
       "title": "2026年8月9日 山形県南陽市 川樋の出没情報",
       "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBjdlRuaDZBbm1XSW94TXFEc3RfZ1NYRTV6S3dWZURVNFZGLWdlTTlPZnVNQ0loTVlKTXRxajl5UDlOTUdoT3NURUhHdUVTQWxsOTV3WEtJU0JFQ19maGNMZHBMa2EySElJSF84d0tKcw?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 秋田県秋田市 浜田の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMie0FVX3lxTE52aWJUUGkySHExXzhNUGN1RVU3YWRUMkxPcGFSbDJsZFdGY25wcUdPT3gySlFEVlJXWW1hWjR6U0xrdjBNc19fb2VCcjN5X2xkNDBTQlZIZm1wSng0ZUt5T2h5dG5MQ3JKb2dXamJ3eGVrbXVhWkV0c0xWRdIBgAFBVV95cUxNc005SGdXV1RDTWhvWEtOdGFjbzdoVVFSaENhSDNkbzdwZ25qaFl3ZjFvMzVHSnpZNHFDM1VnQndEZkN2U3lFaUdlb0pQSERUbzZjRUpZRnNFcTVhTTA4b1ROdllHY01DQlFBd3hUa0RZR292MTc1Q1VYYmdsS0cxWA?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 秋田県秋田市 浜田 桂浜海水浴場の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE03Zm05Mk5IbjlkelpLY1lJbWJucDNLdXh6MmE3VmRvUmhMUG5WOTQzcGZ0cTZsYzlaMzBRSHFiUkJlbkhUVGotSTMyYzVrOEFKTDdMeXdYX1d6LVNQMDJOc1B3?oc=5",
       "site": "報道"
     },
     {
@@ -323,13 +337,53 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
+      "title": "2026年8月6日 長野県安曇野市 畑の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE81RExhYy1zWUkzb3d4OFl2dDhlbTBjakVDMWFnNEZPSGJmSkpVMld1cC10aGFEVzc1X3ZRZ2tWUE54cmRDZTFkN2FIWHpmZw?oc=5",
+      "site": "報道"
+    },
+    {
       "title": "2026年8月4日 長野県安曇野市 穂高有明の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPSndVNFdwLTA5VUlLa2lpb1ZaeHBOc2o1cXBKR2VqdF9Id0dyeWVvNFp2Z3EwNGd3cGMwVEFTd2l6RzdlMzgyTHdXOHNEY2R2ODdWU0ROMXZaTW9DOVZ1cndzajQxUTdiaTg3V0w2My1TQnBDLXhwTnRfeHQ4SDZURXlpVXVYTG5nQXZGaGxNLTJEbzlYanFYSUNCZ2_SAaIBQVVfeXFMUEJpNmhnV1VqcFB2dVp0Q05oanphbG90OGJGRThVeXRpM2FsYXh0TlFJbGo3M1pvNWRDR0djRzVMV3cwVnpEWmNwdTcyMUJhN05aX3Etc25FTXN4OVRvRWFpSzJrRXlIOWxfQkw0bUw0QVJVR04yZnk5RXEwX2wwVjBJX2RCNG1IaDBuSmJwVG91RWR2UWxsc3pPZ0JubnZJV3h3?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月6日 長野県安曇野市 畑の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiTkFVX3lxTE81RExhYy1zWUkzb3d4OFl2dDhlbTBjakVDMWFnNEZPSGJmSkpVMld1cC10aGFEVzc1X3ZRZ2tWUE54cmRDZTFkN2FIWHpmZw?oc=5",
+      "title": "2026年8月4日 群馬県渋川市 伊香保町伊香保の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOODctSTdWNXN2b2c3T0ZNWFZsSUtBMjdFQ2ZQYjFYRlFfZlc5T1JwdVk5M1RNMkIzU2tWOWtpNDZQNGJ6dV9PdFl1eXFMNTF3UW1xdV9IazRZOHZrYUJkR2J1VUdBa180YTFhazRvX1BBeEhUVHpxdy1ES0Y2NU9FV0VnRmNETFdwZjF4WjAzbUV1dE5EUE9MYVhZMFnSAaIBQVVfeXFMTnkwSWtQOHM5ZHd5eEM1bGxOaUFKeEJ6SFpSZnFtZklGamFXZHFqMTV3ZUNwUTR5X3hhMW83TVpOWG1KNWxaODJETG1IZ1NfWW9rSFp4QnNWX0ZEX2UyNVlELU9menhzaFJMN1haQnhLRm05WDRfcHc0ZEdLS0hJMWRUVnVhUXpmNFRoUTBXUmpDM3B6bUVTdmE0SkNHam9xajJB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 群馬県沼田市 利根町老神の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQNVdqZTV4T2tjbFhxWEN3MlliUGk0eU5BaEZ6OHlyb3VFdGc1TG5Ta1pvREgxYzFmZnFzaGw1X29RYkR6WXlKYV9ZWlZXaXJwNGRmZVRfVS1uQXdCQzZ4dDREYUN5NmM0dkY3ampXUm5iaTMtVkZISzd2N2VPZHdscGJjdjU0V1ZiLUlFSC13RWNJeEQzNVduWXJVRFjSAaIBQVVfeXFMTmpJNHZWdWtmMmZDUnFPMFpxVm5XdEJ0TUhmelVsZzBaeEQ5blZ0c3E5ZzFoNlFUX2xkM1hWUk40X2c5cHlHNlE1ZnkyYkkxckhGRG50V21ldXN5YnJuMDBrS3lwdzVFaVVrdTEyRE9pcnJtdm8zSHFxMEw4M1RUbWxFNjgzZ1Y1czVtQTQ2bG1rOUZCX1pIM1d5Vm9oV2RuTDhR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 群馬県嬬恋村 大笹の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQSnBNTEdmaGxJc19MZ1Zsckc1MTQ1MnJQTlY4MlE1MTZGOGEwMTFUX0Q0bm9UcnFoOG85NmhpOUdPWWJJZ29IYmhqdlIyMFktcEVmZnZ0SmNCS0VFSjZqa1poNEw5Ql9hOFFSM1hhazVKbU5YTWFvZGxIWDc1c21sQk56MVcwZDV4ZFdGcFVXZ0h2WTNacC1aSFdYWDHSAaIBQVVfeXFMT0lqalZSWHVpWXZkM1YwVnQ5RDJwb1Q0M28tM1V6ZkRLNl9BdlJmNlpyS2d4VXhtRWtXQ0ZBQlhyYjlBdHpzczJIOW5MTG95b0xRTUZzaUhwUk5OQURwbTdyUFg4c25fSU5JMmhFUDJvQ0dFTEZtVzgxbENIWHp0UmJxZTJGd3hmUTZHY0Q3RzNzcHpxb29pMFVpWC1WeWpRYlNB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 栃木県日光市 路上の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9TRDhTSmROMXFhcW1VQ2l1bkVCZUZhRUJnVGVjc0xnTG1ES2ZFREhjNHJEU2FiTTBVa0pDMmZnOWd3T2RnblFEMEpDc1BrcERYdW43YjllczJYYUk?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 栃木県那須町の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1ldVBQX3VrdVozVXIzT0R5NW1ka25iZ005NUprVk1nSWE5WlNaVEh4S2xOTkFEc3E5WFk1bFZIdzNDdXQ1WE1FbWRCWQ?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 栃木県那須町 湯本の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQWjdDcndSVGU4bUpRbnR5TnplaFViTHQxdE1SVXo4dzNBTEtDb19YRE5sdUFyczc1akhyT1M3dG5TazJKVXI4QjBBeUdSbHQ5YUFPN3dOYzVTeTIyZmlQekhKckN1bmw2UU42NE92bTAybVhYeWZJUUw2aWxNWFJtSVZoazg4RTl0TW9uWkhjRjd0Q0FIT1JnenE2VGzSAaIBQVVfeXFMTWJuczBGYVlLZ1FvT2xnZEVXVGlzMHE4MTc5TW5EYi1ueDNOZFd1eE5PdFE5bjhsSzRTYnFjcDJ1VFJTSDE1cmZ1TFB6RmxBX21RM0huYnE2a3ZWM3UyYUpkdjYtOU5tMFlWTVdmS0JLUmtaVDM4Z082NEFFbWNGZk11dndVU2tjWktTZU9FVDFHcVhBNUt6cHRGZENXdm5rSEJn?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月7日 栃木県那須塩原市の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1PbUd3SGI4S0tpZUFuSXlaLVlQXzRqTWpCX2syZlJLNy1WNEVEdXNTY2pvQnF2bnl0bEhqaHp2eGV5YlZjVDhKNTBXUFhySzZRa25uRFVJZzJ3RUk?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月7日 栃木県那須塩原市 戸田の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPT2xjQl82cFUxNEk4OVlEWkZORVhZSDlBdEZlaGcyY000T05QbC1lWmcyRksxdXYyWHNNSE9sdjFpT0lHbXRyb0xRWkw1SHE1aUVIWUJMSkZ3Q1BlMmN0WjFlc0U5OUl5WkZ6QzI2cDFSNU84NzhCRHUzbEUxcGIyMThtNlU3d0hWbFl4WEZCcElaTDYzMnJDeEI5dWzSAaIBQVVfeXFMT0RsdTREVkFEOHR6RlJTRkxYTWVCWjdUc1BEWUVTTE1DNU1ZOGdYWnlLWEozSE9pbVl1ejRJX2IxZi1FTFp5YUFLUHQ1QmlHeEtmaHloampiU0ZMa0xWZC00UE5CeHhFN2doNDM1V2ViTkFXelEtMWFJbjJ5SGRyRERRTzR5NEEzQnk5N2NVcG1CZXp3dTBBczNLX1VhRDZqMDZ3?oc=5",
       "site": "報道"
     },
     {
@@ -347,13 +401,17 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
-      "title": "2026年8月4日 富山県高岡市 石堤の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOREtKYVZ4RVNyR0RRZm1PMENwZHFjc05ibHpWWnE5R3NaRFEtdHNtN2tMbW16UTB1X0RzYjVodERMd0tLZXB6Y1pEX1NWSnN1TkJ3dGlXczVJckdfdmF5V05RVUNDbEI1R0Y2Zkd1RFFsMTRyTjVGbVRjbDBqaVU4LUNjY2FBYlFJaS1BM3VONGVPRW1hTVhIUTA5N2bSAaIBQVVfeXFMT2tTRlRBZ3p5NTA2QnFZYS1jU3lwNlM2VldGNVRrYk0xRVlQRFZsYzZDbjktZEJaejgxaTZZNW5vU2Nvbi1HRWhXam5GNG5RQVFQbVVLX1l3cExVZ0k3dXo1d0U0bjk5V3pCdGE1bXdQR2hWYTcyM2tBbnZiRmNuTUhVbkNSZTlLVmdsQnkzT21uYldTZ3RadWdJVWJCODJkWGJB?oc=5",
-      "site": "報道"
+      "title": "2026年8月3日 富山県小矢部市 横谷の出没情報",
+      "url": ""
     },
     {
       "title": "2026年8月6日 富山県小矢部市 嘉例谷の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOai04UUFUTTN4SGF2aFdRV3cwSUhQcWFXc3FiaXV4aE9nTkdyUjBlazV1TUQzLU1YOUpxdW9rR1VzbWFxOWY2SHJnTHkxdmNiSWc3b0ZGWmQ3MGdrMmllbXE0NUlzMVdSdURpUFVvWmR2VnB0eEZjdk94c203QzhWc1RtVlIxNnZrRzk0b0tSdmFfWUg0LUxnbm9aNFbSAaIBQVVfeXFMUDJIU3FzUFJFa3VPbVczVkd2R25hSHA4X1l5QUJxZE5wMXB2RWYxZmZXRkRNb0g1RVhPTDNuQ19fSWlVczVCV0RvWTMyaklBN3Bqd3BiaVB1cDJXYkZqaUJTYUc0RkZsR2xMeWZsUGVTa2V0TEhQeENxUDZRVGlONnJ3Qkd3RWJxMUdIN1ZmcDYwR3pTQWZPMTdxUjZIbEtUS2t3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 富山県高岡市 石堤の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOREtKYVZ4RVNyR0RRZm1PMENwZHFjc05ibHpWWnE5R3NaRFEtdHNtN2tMbW16UTB1X0RzYjVodERMd0tLZXB6Y1pEX1NWSnN1TkJ3dGlXczVJckdfdmF5V05RVUNDbEI1R0Y2Zkd1RFFsMTRyTjVGbVRjbDBqaVU4LUNjY2FBYlFJaS1BM3VONGVPRW1hTVhIUTA5N2bSAaIBQVVfeXFMT2tTRlRBZ3p5NTA2QnFZYS1jU3lwNlM2VldGNVRrYk0xRVlQRFZsYzZDbjktZEJaejgxaTZZNW5vU2Nvbi1HRWhXam5GNG5RQVFQbVVLX1l3cExVZ0k3dXo1d0U0bjk5V3pCdGE1bXdQR2hWYTcyM2tBbnZiRmNuTUhVbkNSZTlLVmdsQnkzT21uYldTZ3RadWdJVWJCODJkWGJB?oc=5",
       "site": "報道"
     },
     {
@@ -364,15 +422,6 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
       "title": "2026年8月9日 富山県射水市 南太閤山の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQVlZ4SnN1MlJ6Z1REYktuWFBncElUSkpLekZuakJTSGF6eVdmU1pjY3RRYkVYYU9YSmZLdjRhM2VqbXFnbURIM3l1UnVDdTh1ZzR6R09HN3lBT2NHajZEcmZMVmVzMDdZN0ZkbnVreXdYWnAyTW1PNDgwOXJrUVJMbVZZdk9nbG9ITTdhWWV2UHZvcEZBcEVaaGxBRm7SAaIBQVVfeXFMT3pvLWlMZno3UkQ2WktzWkdHS3J4S1FpOFVWX3V4MU0wZERSQlpyZk5va2tYaTE0bWgwRUlod0UxTVBENzc2TTNrVUpWWHVaUXJzc0lVWFc2RG9pOHQ4UWxJMmFCeGVtbWZNZWJ0TVhOTWtYbklReE1XS2NweDM5WXBOd0poY1BOaHlMbHpBV09hRkNMclVhNEdIdExHYXBRQ3FR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 富山県小矢部市 横谷の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月6日 石川県津幡町 上河合の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPNV9PQWNGWGZOUG1STFgtMm9RUXRCYmhTanhOOWVfWTZ3bTRaWWpFZUxkZkhzM0VsLTh0Vmx0QmJMMVNUM0VPOXdaS0hUQ1NKVUpYQTdQa3U2eC1XMXFsbWw0UUtLQ3RES0FjLUNfZXFUbkRLVl9DSWZxMHF6WUcxbk5pQkppMHpPVlNhZFFMR0c2aGVQRlE1U2F6dknSAaIBQVVfeXFMTTA2SkVMOXpPSHNhWWg4V2sxUlZ4dnF0amdtSWZ0MVJ4aVNHcC1takxFdy1EMjVHVkE3Zm5GZ0RGNFlfZ191UTBrOGRoWld6SS1XTEh6T3RNNHhsMnlhUXFSeFQ1X1BIamVDVGdhQk9yYVAya0hEYkljdTVwOTRlUUo0RWRXVmRfbXM0S0tfZ05jdWI5cEF3UXFBVnBRTkYxUVN3?oc=5",
       "site": "報道"
     },
     {
@@ -392,37 +441,12 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
-      "title": "2026年8月6日 福井県越前町 大樟の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNWWVlV2RYcHlwMmI5VUM0X1BlQVhTQ2tySi1EQjBoOGJ1YXBwb3VoOXE5ZVlKTE1yMllvT29DWlpMUDZzcVozM0kybk1tbnVxVWY0UnFYMkxqZXp1cG53WUVlYjd6Wl9OdTc2QXFZOFdfUDdmcnBaOVZZYkpkc29EZkdkVERQcVFTWmZOTDFneVZpUm9Ha0NiNkZHZnTSAaIBQVVfeXFMTWRSOEUxbW1FMnhDa1dNT2ZjN3NTOGQ3cVVaQmVDSW9GNUx1OUo5eEJoNEZDem5HWW45Smx0c1Ffel9zenVGbzJkcEZUSGx2U2c4TWJsV0xPZW5RQ2VwS3JsOGxfeXotVWJDNlNyelJ6cnlTY3Z2aUZaZDg3SHp2aHZQTklpZFJoZzRfSWlxSm1jdGV1OTd3bDh6UDdiMlFGbE5R?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月5日 福井県あわら市 桜の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月8日 福井県鯖江市 寺中町の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月7日 福井県高浜町 鎌倉の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月6日 福井県鯖江市 寺中町の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月5日 山梨県中央市 道の駅や住宅街近くの出没情報",
-      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxNNjdGLVN0TERlc1p0a0ROTmQ3U3A5VGhUWGs0LTNZR0pfV09PaUFGWndLNi0yMzduNURuUFlSa0Z4ZU05QXA5YjRrWHJZOERlU1Nqd1Z5QzVCM05mUjdJN2k5ZzZpQWhXTUhWRzJxdFh3b1FaZDQ0Z3lLbU5jU0RtTDR1SnRMdWc?oc=5",
+      "title": "2026年8月6日 石川県津幡町 上河合の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPNV9PQWNGWGZOUG1STFgtMm9RUXRCYmhTanhOOWVfWTZ3bTRaWWpFZUxkZkhzM0VsLTh0Vmx0QmJMMVNUM0VPOXdaS0hUQ1NKVUpYQTdQa3U2eC1XMXFsbWw0UUtLQ3RES0FjLUNfZXFUbkRLVl9DSWZxMHF6WUcxbk5pQkppMHpPVlNhZFFMR0c2aGVQRlE1U2F6dknSAaIBQVVfeXFMTTA2SkVMOXpPSHNhWWg4V2sxUlZ4dnF0amdtSWZ0MVJ4aVNHcC1takxFdy1EMjVHVkE3Zm5GZ0RGNFlfZ191UTBrOGRoWld6SS1XTEh6T3RNNHhsMnlhUXFSeFQ1X1BIamVDVGdhQk9yYVAya0hEYkljdTVwOTRlUUo0RWRXVmRfbXM0S0tfZ05jdWI5cEF3UXFBVnBRTkYxUVN3?oc=5",
       "site": "報道"
     },
     {
       "title": "2026年8月3日 山梨県早川町 雨畑の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月4日 山梨県中央市 高部地内の出没情報",
       "url": ""
     },
     {
@@ -434,11 +458,24 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
-      "title": "2026年8月5日 静岡県川根本町 下泉の出没情報",
+      "title": "2026年8月5日 福井県あわら市 桜の出没情報",
       "url": ""
     },
     {
-      "title": "2026年8月7日 静岡県静岡市葵区 中平の出没情報",
+      "title": "2026年8月6日 福井県越前町 大樟の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNWWVlV2RYcHlwMmI5VUM0X1BlQVhTQ2tySi1EQjBoOGJ1YXBwb3VoOXE5ZVlKTE1yMllvT29DWlpMUDZzcVozM0kybk1tbnVxVWY0UnFYMkxqZXp1cG53WUVlYjd6Wl9OdTc2QXFZOFdfUDdmcnBaOVZZYkpkc29EZkdkVERQcVFTWmZOTDFneVZpUm9Ha0NiNkZHZnTSAaIBQVVfeXFMTWRSOEUxbW1FMnhDa1dNT2ZjN3NTOGQ3cVVaQmVDSW9GNUx1OUo5eEJoNEZDem5HWW45Smx0c1Ffel9zenVGbzJkcEZUSGx2U2c4TWJsV0xPZW5RQ2VwS3JsOGxfeXotVWJDNlNyelJ6cnlTY3Z2aUZaZDg3SHp2aHZQTklpZFJoZzRfSWlxSm1jdGV1OTd3bDh6UDdiMlFGbE5R?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月8日 福井県鯖江市 寺中町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月6日 福井県鯖江市 寺中町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月7日 福井県高浜町 鎌倉の出没情報",
       "url": ""
     },
     {
@@ -446,48 +483,12 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
-      "title": "2026年8月9日 愛知県豊田市 牛地町吉原の出没情報",
+      "title": "2026年8月5日 静岡県川根本町 下泉の出没情報",
       "url": ""
     },
     {
-      "title": "2026年8月4日 群馬県渋川市 伊香保町伊香保の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOODctSTdWNXN2b2c3T0ZNWFZsSUtBMjdFQ2ZQYjFYRlFfZlc5T1JwdVk5M1RNMkIzU2tWOWtpNDZQNGJ6dV9PdFl1eXFMNTF3UW1xdV9IazRZOHZrYUJkR2J1VUdBa180YTFhazRvX1BBeEhUVHpxdy1ES0Y2NU9FV0VnRmNETFdwZjF4WjAzbUV1dE5EUE9MYVhZMFnSAaIBQVVfeXFMTnkwSWtQOHM5ZHd5eEM1bGxOaUFKeEJ6SFpSZnFtZklGamFXZHFqMTV3ZUNwUTR5X3hhMW83TVpOWG1KNWxaODJETG1IZ1NfWW9rSFp4QnNWX0ZEX2UyNVlELU9menhzaFJMN1haQnhLRm05WDRfcHc0ZEdLS0hJMWRUVnVhUXpmNFRoUTBXUmpDM3B6bUVTdmE0SkNHam9xajJB?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 群馬県沼田市 利根町老神の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQNVdqZTV4T2tjbFhxWEN3MlliUGk0eU5BaEZ6OHlyb3VFdGc1TG5Ta1pvREgxYzFmZnFzaGw1X29RYkR6WXlKYV9ZWlZXaXJwNGRmZVRfVS1uQXdCQzZ4dDREYUN5NmM0dkY3ampXUm5iaTMtVkZISzd2N2VPZHdscGJjdjU0V1ZiLUlFSC13RWNJeEQzNVduWXJVRFjSAaIBQVVfeXFMTmpJNHZWdWtmMmZDUnFPMFpxVm5XdEJ0TUhmelVsZzBaeEQ5blZ0c3E5ZzFoNlFUX2xkM1hWUk40X2c5cHlHNlE1ZnkyYkkxckhGRG50V21ldXN5YnJuMDBrS3lwdzVFaVVrdTEyRE9pcnJtdm8zSHFxMEw4M1RUbWxFNjgzZ1Y1czVtQTQ2bG1rOUZCX1pIM1d5Vm9oV2RuTDhR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月5日 群馬県嬬恋村 大笹の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQSnBNTEdmaGxJc19MZ1Zsckc1MTQ1MnJQTlY4MlE1MTZGOGEwMTFUX0Q0bm9UcnFoOG85NmhpOUdPWWJJZ29IYmhqdlIyMFktcEVmZnZ0SmNCS0VFSjZqa1poNEw5Ql9hOFFSM1hhazVKbU5YTWFvZGxIWDc1c21sQk56MVcwZDV4ZFdGcFVXZ0h2WTNacC1aSFdYWDHSAaIBQVVfeXFMT0lqalZSWHVpWXZkM1YwVnQ5RDJwb1Q0M28tM1V6ZkRLNl9BdlJmNlpyS2d4VXhtRWtXQ0ZBQlhyYjlBdHpzczJIOW5MTG95b0xRTUZzaUhwUk5OQURwbTdyUFg4c25fSU5JMmhFUDJvQ0dFTEZtVzgxbENIWHp0UmJxZTJGd3hmUTZHY0Q3RzNzcHpxb29pMFVpWC1WeWpRYlNB?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月4日 栃木県那須町の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE1ldVBQX3VrdVozVXIzT0R5NW1ka25iZ005NUprVk1nSWE5WlNaVEh4S2xOTkFEc3E5WFk1bFZIdzNDdXQ1WE1FbWRCWQ?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 栃木県日光市 路上の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9TRDhTSmROMXFhcW1VQ2l1bkVCZUZhRUJnVGVjc0xnTG1ES2ZFREhjNHJEU2FiTTBVa0pDMmZnOWd3T2RnblFEMEpDc1BrcERYdW43YjllczJYYUk?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月7日 栃木県那須塩原市の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1PbUd3SGI4S0tpZUFuSXlaLVlQXzRqTWpCX2syZlJLNy1WNEVEdXNTY2pvQnF2bnl0bEhqaHp2eGV5YlZjVDhKNTBXUFhySzZRa25uRFVJZzJ3RUk?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月7日 栃木県那須塩原市 戸田の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPT2xjQl82cFUxNEk4OVlEWkZORVhZSDlBdEZlaGcyY000T05QbC1lWmcyRksxdXYyWHNNSE9sdjFpT0lHbXRyb0xRWkw1SHE1aUVIWUJMSkZ3Q1BlMmN0WjFlc0U5OUl5WkZ6QzI2cDFSNU84NzhCRHUzbEUxcGIyMThtNlU3d0hWbFl4WEZCcElaTDYzMnJDeEI5dWzSAaIBQVVfeXFMT0RsdTREVkFEOHR6RlJTRkxYTWVCWjdUc1BEWUVTTE1DNU1ZOGdYWnlLWEozSE9pbVl1ejRJX2IxZi1FTFp5YUFLUHQ1QmlHeEtmaHloampiU0ZMa0xWZC00UE5CeHhFN2doNDM1V2ViTkFXelEtMWFJbjJ5SGRyRERRTzR5NEEzQnk5N2NVcG1CZXp3dTBBczNLX1VhRDZqMDZ3?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 栃木県那須町 湯本の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQWjdDcndSVGU4bUpRbnR5TnplaFViTHQxdE1SVXo4dzNBTEtDb19YRE5sdUFyczc1akhyT1M3dG5TazJKVXI4QjBBeUdSbHQ5YUFPN3dOYzVTeTIyZmlQekhKckN1bmw2UU42NE92bTAybVhYeWZJUUw2aWxNWFJtSVZoazg4RTl0TW9uWkhjRjd0Q0FIT1JnenE2VGzSAaIBQVVfeXFMTWJuczBGYVlLZ1FvT2xnZEVXVGlzMHE4MTc5TW5EYi1ueDNOZFd1eE5PdFE5bjhsSzRTYnFjcDJ1VFJTSDE1cmZ1TFB6RmxBX21RM0huYnE2a3ZWM3UyYUpkdjYtOU5tMFlWTVdmS0JLUmtaVDM4Z082NEFFbWNGZk11dndVU2tjWktTZU9FVDFHcVhBNUt6cHRGZENXdm5rSEJn?oc=5",
-      "site": "報道"
+      "title": "2026年8月7日 静岡県静岡市葵区 中平の出没情報",
+      "url": ""
     },
     {
       "title": "2026年8月7日 埼玉県深谷市 武蔵野の出没情報",
@@ -497,21 +498,6 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
       "title": "2026年8月7日 埼玉県深谷市 深谷市武蔵野の出没情報",
       "url": ""
-    },
-    {
-      "title": "2026年8月3日 東京都青梅市 御岳2丁目の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPX3R3STVBNE8wUGxrQ28zTHJaVU9kemtZRldzd3dLeDgwUkZJNjV4UW94NDE0ODNNNUF1YXVjcTZpV2Z3NkpIbjI3MEdwMXI4Wk04dmRHMG9TXzFaMUtIOXpLVm1sbVRFWk5Jd1ZsYmFrTGtNMVV5OWZWeXh5c29USGVRZ1VDMkVEZHhvM3pEQUt1eVpaajNiUXNOVkTSAaIBQVVfeXFMTlRtUW9yTU5HWTVjZl9pbEYwMFI5TjFDei1ONThNNTNpMmI2bXBDZWZycUlnNGdmdks4ZlhhbGsyckNrV01MWGkzNlltdFRMa1Bxc01QeUhIdTlrV0pQbmZUXzlPejFLZEN0X0MwRzkzblZlZXg4Z0xnQWxudFZhblRXYmJNdk1ySkxWSGdvRTdDdlptZ0VhSHBkdnRyUDM3SXlR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月9日 東京都檜原村 藤原の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQUzdqYmFUUS1FVjM5Ym93aktIUWRBdkZzWmpBSExQUWtZbC0tUzYwZk9Ca3p3VzBKTHRXdW1Vbk15aWFIN1NrWm43RnBHRC1LYWtRelNfRHdzVGVyczdMWHViZ3dQV2pPY2QwanBYTVBuN1lnaGo4YVo0WlllZURrQkI3NDNXY3J4WURjaXBqNHlWTE5QZTBhMldXUkrSAaIBQVVfeXFMT3lOeThjTHB4VndaZWNZalVPd1R0dERjYl94NnBDZlB4dGZiaXhjQ3RXTDRaclktY19IWDRIRmJjSmNJcmVMdFZPaFJ0S2ExLUE4YVRqdTZQOTM0QnNxZjRILUJxZ2JQUGN5bVp1bEtZSFNBRmVKWHhrTG9hT0ljZE1EY1JMMW8zTlVNQl9IaFExdE11YVV5MFJiZkxRbFVkYXBn?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月9日 東京都青梅市 御岳２丁目の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPTlFqRmN1LWo1UVBpWk85eEtrTFM0Yk9ITVk1TWltcXVETENnVWhIRDU2WDhhQXhoejFXVUVhWEJNdk1qanlKb1oxaTBZMmtQN21uS2Z3aU5oSmM5am9pUXBMWG5STWhXOW9Rb0xRV2Z0WDg4bGFpeWJTNXg3Z1pXdTB6MnE0d1JqdW81bWx5NHFkTVpEOTJtcW5oNm3SAaIBQVVfeXFMT29YY0hvRXNBZklkUUg3dUZ3M3I3WDR6SmRrSmQ4ejVBUkVJYkNuMFZnYm5PVHJSSVRYVnNTSkd4bTNYSEVGNERYdFJBLVNYYzZGTjBaTm1Cdk9ZUTZ3V1NsVGR3RElPMTZwNFIxT2dFOE5TczlqNktlY0dHRG5sVEdrNlBfLV9vOVhaZHRYV0p4YUN3NHY4aTJTclZ1dy1zZEFB?oc=5",
-      "site": "報道"
     },
     {
       "title": "2026年8月3日 神奈川県南足柄市 内山の出没情報",
@@ -527,29 +513,23 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
-      "title": "2026年8月3日 兵庫県上郡町 神明寺の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNMzRNX0M0MTRJVVVTZlZvQ3hHSF9pcnRrSEp6U3JJdnlfVEFEUjRJMUtkS0kxbFRCbXBCY3J6WGNUeTNRMEZ6bUhvTDFOQTNaZF81OEQ4TEFKeUI1anhqOG91UUVpWEZYRkVrdjJMdHFJRDlNakVWZGI3NTFDYUpXRVVGU3NGbWNGYjFza09UdjByZEZOX3N1RUE1NEtLbkxzd3fSAaIBQVVfeXFMTTM0TV9DNDE0SVVVU2ZWb0N4R0hfaXJ0a0hKelNySXZ5X1RBRFI0STFLZEtJMWxUQm1wQmNyelhjVHkzUTBGem1Ib0wxTkEzWmRfNThEOExBSnlCNWp4ajhvdVFFaVhGWEZFa3YyTHRxSUQ5TWpFVmRiNzUxQ2FKV0VVRlNzRm1jRmIxc2tPVHYwcmRGTl9zdUVBNTRLS25Mc3d3?oc=5",
+      "title": "2026年8月3日 東京都青梅市 御岳2丁目の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPX3R3STVBNE8wUGxrQ28zTHJaVU9kemtZRldzd3dLeDgwUkZJNjV4UW94NDE0ODNNNUF1YXVjcTZpV2Z3NkpIbjI3MEdwMXI4Wk04dmRHMG9TXzFaMUtIOXpLVm1sbVRFWk5Jd1ZsYmFrTGtNMVV5OWZWeXh5c29USGVRZ1VDMkVEZHhvM3pEQUt1eVpaajNiUXNOVkTSAaIBQVVfeXFMTlRtUW9yTU5HWTVjZl9pbEYwMFI5TjFDei1ONThNNTNpMmI2bXBDZWZycUlnNGdmdks4ZlhhbGsyckNrV01MWGkzNlltdFRMa1Bxc01QeUhIdTlrV0pQbmZUXzlPejFLZEN0X0MwRzkzblZlZXg4Z0xnQWxudFZhblRXYmJNdk1ySkxWSGdvRTdDdlptZ0VhSHBkdnRyUDM3SXlR?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月3日 兵庫県多可町 中区東安田の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQckpPS1l0aEh4RzFtUE1ib2xSbm1KNDFpOXBMZnFTQzdCWFNOeTV4VEs2WUx1enh3WklqYTZrR29lTWJIY3dENXNLRHRGbVh5UFJuTkhuN2lOUmlCczVZZzNIbW5PaXdobGhkOTNZNFFKcU1jcHJtc1hTSFktVFhJempiMFdydzBFcE5peWtidDhYZTllUnE2anBERThROHFmNnfSAaIBQVVfeXFMUHJKT0tZdGhIeEcxbVBNYm9sUm5tSjQxaTlwTGZxU0M3QlhTTnk1eFRLNllMdXp4d1pJamE2a0dvZU1iSGN3RDVzS0R0Rm1YeVBSbk5IbjdpTlJpQnM1WWczSG1uT2l3aGxoZDkzWTRRSnFNY3BybXNYU0hZLVRYSXpqYjBXcncwRXBOaXlrYnQ4WGU5ZVJxNmpwREU4UThxZjZ3?oc=5",
+      "title": "2026年8月9日 東京都青梅市 御岳２丁目の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPTlFqRmN1LWo1UVBpWk85eEtrTFM0Yk9ITVk1TWltcXVETENnVWhIRDU2WDhhQXhoejFXVUVhWEJNdk1qanlKb1oxaTBZMmtQN21uS2Z3aU5oSmM5am9pUXBMWG5STWhXOW9Rb0xRV2Z0WDg4bGFpeWJTNXg3Z1pXdTB6MnE0d1JqdW81bWx5NHFkTVpEOTJtcW5oNm3SAaIBQVVfeXFMT29YY0hvRXNBZklkUUg3dUZ3M3I3WDR6SmRrSmQ4ejVBUkVJYkNuMFZnYm5PVHJSSVRYVnNTSkd4bTNYSEVGNERYdFJBLVNYYzZGTjBaTm1Cdk9ZUTZ3V1NsVGR3RElPMTZwNFIxT2dFOE5TczlqNktlY0dHRG5sVEdrNlBfLV9vOVhaZHRYV0p4YUN3NHY4aTJTclZ1dy1zZEFB?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月4日 兵庫県丹波篠山市 今田町四斗谷の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPV2ZiNjQ1NnBfZXhQanZhd25qN0cwUzFSMFhzaFZGTUdlYUdjeU9wdGR5QlNnQzFaVGNLM0hSaG5KU1FMX0FEY3owa2pEM0Y4dEJXaGZTU2hyYXgyd0FKNXJ4MmJfeGNZV0tjcUc4d2ZfZjZseUdkaWFKZ2ExeUVKcDd2bUhzaTVWUzE5aV9vUldvalZUQzRDdWhNVnFHTk0xYkHSAaIBQVVfeXFMT1dmYjY0NTZwX2V4UGp2YXduajdHMFMxUjBYc2hWRk1HZWFHY3lPcHRkeUJTZ0MxWlRjSzNIUmhuSlNRTF9BRGN6MGtqRDNGOHRCV2hmU1NocmF4MndBSjVyeDJiX3hjWVdLY3FHOHdmX2Y2bHlHZGlhSmdhMXlFSnA3dm1Ic2k1VlMxOWlfb1JXb2pWVEM0Q3VoTVZxR05NMWJB?oc=5",
+      "title": "2026年8月9日 東京都檜原村 藤原の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQUzdqYmFUUS1FVjM5Ym93aktIUWRBdkZzWmpBSExQUWtZbC0tUzYwZk9Ca3p3VzBKTHRXdW1Vbk15aWFIN1NrWm43RnBHRC1LYWtRelNfRHdzVGVyczdMWHViZ3dQV2pPY2QwanBYTVBuN1lnaGo4YVo0WlllZURrQkI3NDNXY3J4WURjaXBqNHlWTE5QZTBhMldXUkrSAaIBQVVfeXFMT3lOeThjTHB4VndaZWNZalVPd1R0dERjYl94NnBDZlB4dGZiaXhjQ3RXTDRaclktY19IWDRIRmJjSmNJcmVMdFZPaFJ0S2ExLUE4YVRqdTZQOTM0QnNxZjRILUJxZ2JQUGN5bVp1bEtZSFNBRmVKWHhrTG9hT0ljZE1EY1JMMW8zTlVNQl9IaFExdE11YVV5MFJiZkxRbFVkYXBn?oc=5",
       "site": "報道"
     },
     {
-      "title": "2026年8月5日 兵庫県神戸市 北区道場町の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBiZUdtUlFYak5MZVRLR0xQQVFoek0zUDVOWi1mUFBEWmsyd2hWM3VFOENHejE3UjlDeTJQSXZ5TFU5QnVuUnQ1WDluMElxTFZFWlg2d1lsRUFKajQxa1Jj?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 兵庫県上郡町 旭日乙の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQOVFvWWQxXzZuekluVEVwT1hDVHduQ0ZYLWlIYUdKMXhueVFJV0piRzg4RVFOZFYtcmU0cjZmRnBIOHlzLWtuRk9LYWNyek5iYy1vTnJJbV9haEl2Vkxaa1VVSVRCUGdPYkpmejVkX3dzRFdXOUUxanVsVFA1SmJlZnhab0c1R1B3WTRiNGliRGdiTEEzVEhvZy1TM1F0VFl3dVHSAaIBQVVfeXFMUDlRb1lkMV82bnpJblRFcE9YQ1R3bkNGWC1pSGFHSjF4bnlRSVdKYkc4OEVRTmRWLXJlNHI2ZkZwSDh5cy1rbkZPS2FjcnpOYmMtb05ySW1fYWhJdlZMWmtVVUlUQlBnT2JKZno1ZF93c0RXVzlFMWp1bFRQNUpiZWZ4Wm9HNUdQd1k0YjRpYkRnYkxBM1RIb2ctUzNRdFRZd3VR?oc=5",
-      "site": "報道"
+      "title": "2026年8月9日 愛知県豊田市 牛地町吉原の出没情報",
+      "url": ""
     },
     {
       "title": "2026年8月3日 京都府舞鶴市 城屋の出没情報",
@@ -572,22 +552,34 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
+      "title": "2026年8月3日 兵庫県上郡町 神明寺の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNMzRNX0M0MTRJVVVTZlZvQ3hHSF9pcnRrSEp6U3JJdnlfVEFEUjRJMUtkS0kxbFRCbXBCY3J6WGNUeTNRMEZ6bUhvTDFOQTNaZF81OEQ4TEFKeUI1anhqOG91UUVpWEZYRkVrdjJMdHFJRDlNakVWZGI3NTFDYUpXRVVGU3NGbWNGYjFza09UdjByZEZOX3N1RUE1NEtLbkxzd3fSAaIBQVVfeXFMTTM0TV9DNDE0SVVVU2ZWb0N4R0hfaXJ0a0hKelNySXZ5X1RBRFI0STFLZEtJMWxUQm1wQmNyelhjVHkzUTBGem1Ib0wxTkEzWmRfNThEOExBSnlCNWp4ajhvdVFFaVhGWEZFa3YyTHRxSUQ5TWpFVmRiNzUxQ2FKV0VVRlNzRm1jRmIxc2tPVHYwcmRGTl9zdUVBNTRLS25Mc3d3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 兵庫県上郡町 旭日乙の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQOVFvWWQxXzZuekluVEVwT1hDVHduQ0ZYLWlIYUdKMXhueVFJV0piRzg4RVFOZFYtcmU0cjZmRnBIOHlzLWtuRk9LYWNyek5iYy1vTnJJbV9haEl2Vkxaa1VVSVRCUGdPYkpmejVkX3dzRFdXOUUxanVsVFA1SmJlZnhab0c1R1B3WTRiNGliRGdiTEEzVEhvZy1TM1F0VFl3dVHSAaIBQVVfeXFMUDlRb1lkMV82bnpJblRFcE9YQ1R3bkNGWC1pSGFHSjF4bnlRSVdKYkc4OEVRTmRWLXJlNHI2ZkZwSDh5cy1rbkZPS2FjcnpOYmMtb05ySW1fYWhJdlZMWmtVVUlUQlBnT2JKZno1ZF93c0RXVzlFMWp1bFRQNUpiZWZ4Wm9HNUdQd1k0YjRpYkRnYkxBM1RIb2ctUzNRdFRZd3VR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 兵庫県多可町 中区東安田の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQckpPS1l0aEh4RzFtUE1ib2xSbm1KNDFpOXBMZnFTQzdCWFNOeTV4VEs2WUx1enh3WklqYTZrR29lTWJIY3dENXNLRHRGbVh5UFJuTkhuN2lOUmlCczVZZzNIbW5PaXdobGhkOTNZNFFKcU1jcHJtc1hTSFktVFhJempiMFdydzBFcE5peWtidDhYZTllUnE2anBERThROHFmNnfSAaIBQVVfeXFMUHJKT0tZdGhIeEcxbVBNYm9sUm5tSjQxaTlwTGZxU0M3QlhTTnk1eFRLNllMdXp4d1pJamE2a0dvZU1iSGN3RDVzS0R0Rm1YeVBSbk5IbjdpTlJpQnM1WWczSG1uT2l3aGxoZDkzWTRRSnFNY3BybXNYU0hZLVRYSXpqYjBXcncwRXBOaXlrYnQ4WGU5ZVJxNmpwREU4UThxZjZ3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月4日 兵庫県丹波篠山市 今田町四斗谷の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPV2ZiNjQ1NnBfZXhQanZhd25qN0cwUzFSMFhzaFZGTUdlYUdjeU9wdGR5QlNnQzFaVGNLM0hSaG5KU1FMX0FEY3owa2pEM0Y4dEJXaGZTU2hyYXgyd0FKNXJ4MmJfeGNZV0tjcUc4d2ZfZjZseUdkaWFKZ2ExeUVKcDd2bUhzaTVWUzE5aV9vUldvalZUQzRDdWhNVnFHTk0xYkHSAaIBQVVfeXFMT1dmYjY0NTZwX2V4UGp2YXduajdHMFMxUjBYc2hWRk1HZWFHY3lPcHRkeUJTZ0MxWlRjSzNIUmhuSlNRTF9BRGN6MGtqRDNGOHRCV2hmU1NocmF4MndBSjVyeDJiX3hjWVdLY3FHOHdmX2Y2bHlHZGlhSmdhMXlFSnA3dm1Ic2k1VlMxOWlfb1JXb2pWVEM0Q3VoTVZxR05NMWJB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月5日 兵庫県神戸市 北区道場町の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFBiZUdtUlFYak5MZVRLR0xQQVFoek0zUDVOWi1mUFBEWmsyd2hWM3VFOENHejE3UjlDeTJQSXZ5TFU5QnVuUnQ1WDluMElxTFZFWlg2d1lsRUFKajQxa1Jj?oc=5",
+      "site": "報道"
+    },
+    {
       "title": "2026年8月4日 滋賀県大津市 山百合の丘の出没情報",
       "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQd2dUZUdiVnVQSkhraTlObVlWdWZFWlVnZjJmWnNJUlExM0VmaXB6OTg0VG1OVzIyLXRyRWVDZkY2aE1qbnlXbkRPNmI5dXVMWkxSYVd0SUF6bFpxZ2dSek9yWjN6TkdnZHVHQURET0FMMjRuSm1ZZWJYWUQxMUppNFlsLWlpU1lTLXdtdEpLZTdGblh4MmVEQ1YxNzNTWlJMVXfSAaIBQVVfeXFMUHdnVGVHYlZ1UEpIa2k5Tm1ZVnVmRVpVZ2YyZlpzSVJRMTNFZmlwejk4NFRtTlcyMi10ckVlQ2ZGNmhNam55V25ETzZiOXV1TFpMUmFXdElBemxacWdnUnpPclozek5HZ2R1R0FERE9BTDI0bkptWWViWFlEMTFKaTRZbC1paVNZUy13bXRKS2U3Rm5YeDJlRENWMTczU1pSTFV3?oc=5",
       "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 和歌山県田辺市 長野の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPb0NIMXkweHdYY2N2WEt0TWswUWhXSkZBMDNCNDBIVzhxb3l3N3lxcXFfb0ViWHAwQzdiLXdhTzVFMHlTNG01RU1teWhSd2pmaDRxS3VtbUtqeVlad1hBamQzY1Frb09ETjlIaVk4VThCeC1BUFhNbnlCYWV0ZERZYVdEREwtUFdtdzlNMEVHR0VUZzduMDVqWmlUdktQaDRHZVHSAaIBQVVfeXFMT29DSDF5MHh3WGNjdlhLdE1rMFFoV0pGQTAzQjQwSFc4cW95dzd5cXFxX29FYlhwMEM3Yi13YU81RTB5UzRtNUVNbXloUndqZmg0cUt1bW1LanlZWndYQWpkM2NRa29PRE45SGlZOFU4QngtQVBYTW55QmFldGREWWFXRERMLVBXbXc5TTBFR0dFVGc3bjA1alppVHZLUGg0R2VR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月3日 三重県紀北町 紀北町上里（山際）の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月4日 三重県紀北町 紀北町船津（集落際）の出没情報",
-      "url": ""
     },
     {
       "title": "2026年8月8日 滋賀県大津市 関津三丁目の出没情報",
@@ -606,6 +598,27 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "url": ""
     },
     {
+      "title": "2026年8月3日 三重県紀北町 紀北町上里（山際）の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月4日 三重県紀北町 紀北町船津（集落際）の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月3日 和歌山県田辺市 長野の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPb0NIMXkweHdYY2N2WEt0TWswUWhXSkZBMDNCNDBIVzhxb3l3N3lxcXFfb0ViWHAwQzdiLXdhTzVFMHlTNG01RU1teWhSd2pmaDRxS3VtbUtqeVlad1hBamQzY1Frb09ETjlIaVk4VThCeC1BUFhNbnlCYWV0ZERZYVdEREwtUFdtdzlNMEVHR0VUZzduMDVqWmlUdktQaDRHZVHSAaIBQVVfeXFMT29DSDF5MHh3WGNjdlhLdE1rMFFoV0pGQTAzQjQwSFc4cW95dzd5cXFxX29FYlhwMEM3Yi13YU81RTB5UzRtNUVNbXloUndqZmg0cUt1bW1LanlZWndYQWpkM2NRa29PRE45SGlZOFU4QngtQVBYTW55QmFldGREWWFXRERMLVBXbXc5TTBFR0dFVGc3bjA1alppVHZLUGg0R2VR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月3日 鳥取県鳥取市 福部町箭溪の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年8月6日 鳥取県八頭郡八頭町 横田の出没情報",
+      "url": ""
+    },
+    {
       "title": "2026年8月9日 島根県益田市 益田市のJR山陰線沿線付近の出没情報",
       "url": ""
     },
@@ -615,33 +628,18 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
       "site": "報道"
     },
     {
-      "title": "2026年8月8日 島根県安来市 農道沿いの川付近の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPUkN5d3ZPbWJRWDhlSWliNXY3ckFYZkZ4LU1lbmsxdTNxVk0teE16emM2MGwyNDBBYmZQVUl0SUVaZnVFS2VWR3RNZHZlQjM4by1kbEZTMEdDeGpRdWVZY3ZNa2RaZVdOMTBoTUZiY2tGNTZxZFBPSEtfS2d1MDRMM19acVBjTTNw0gGOAUFVX3lxTE5heTV5Y1U4VFlBU1JjamNKMS01U01ybl9JR3hldzdjQzZoVDdabWJFcW5CV1BQZWZOUHJpYkZGaWRyWEViTHUxWEI3eGxEZ2ZOOXRaVGkxdTdTOEVmV2p4d2F4R1lpMUloNnl4bGNNZnRhUG9VYjlJdXlib3Q2LVFMV2lhWUlGNXBZN0RiSnc?oc=5",
-      "site": "報道"
-    },
-    {
       "title": "2026年8月9日 島根県浜田市 旭町丸原の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNM1hYaVpIcWZxNVVSYzhmb2NmWEVqQ1U2RHN5N1hEWkI4R0JHYTZwUTlLcm9CRUZYbUpCRWxfT05NWENETGZNaHllU0xXMnROVW9NNEhVRzFxMWRuTlRNQi1vLVVXc1NPdzZLRnVCTGgxZHIzbG1PZVd6eTdTcDdqb1JIUkkxWjdsUWVVQnc4NXVEdWU4SFRiMXc4VnPSAaIBQVVfeXFMTWMydkI4WWVOSm5TWFgzaE1GOGNEbFc2b0hQVzZJZFlrOFZ0WkM4OC1oSlYxS3R5ZHdXNmNiVmkyd3dGTGdSSFVIRW9QUFh6cFhtTXJTbmxEeFkwQ2JCZDZmSUxzMG9keEFfXzdXSDZCcU5WQWlvNzVaMFMzd0M1M00tSG1uNS10QzRHalppRmd1ZUxtYVhjQjhKQWYyQWpqY2tR?oc=5",
       "site": "報道"
     },
     {
+      "title": "2026年8月8日 島根県安来市 農道沿いの川付近の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPUkN5d3ZPbWJRWDhlSWliNXY3ckFYZkZ4LU1lbmsxdTNxVk0teE16emM2MGwyNDBBYmZQVUl0SUVaZnVFS2VWR3RNZHZlQjM4by1kbEZTMEdDeGpRdWVZY3ZNa2RaZVdOMTBoTUZiY2tGNTZxZFBPSEtfS2d1MDRMM19acVBjTTNw0gGOAUFVX3lxTE5heTV5Y1U4VFlBU1JjamNKMS01U01ybl9JR3hldzdjQzZoVDdabWJFcW5CV1BQZWZOUHJpYkZGaWRyWEViTHUxWEI3eGxEZ2ZOOXRaVGkxdTdTOEVmV2p4d2F4R1lpMUloNnl4bGNNZnRhUG9VYjlJdXlib3Q2LVFMV2lhWUlGNXBZN0RiSnc?oc=5",
+      "site": "報道"
+    },
+    {
       "title": "2026年8月9日 島根県大田市 温泉津町湯里願城寺の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNY1hqM1ZHaWx5a1VSd2pBdVZQczF5eHlrNnBVVy1QeFFIWm1vZmYyU2pXUUZjY3Bwb3ItTmRnUkJlODNjMXhLc1UxdzBsQllFbWNOZjluWkc1Mkg2WFlUeG9WTU9hVVRvZXBfQ1dnYXgtcW00V3NKYWRpMW1tQmcxXzlMVlppZ3pGUk1xN1E0X1dCdDYzZzVIWndrX1XSAaIBQVVfeXFMTm1rbF9sV0lkV081X3BaTmZzQ3l4SzBVQloyTFQ1aWRoYlNZV2xKTDVvUFpuLXFnNTFENVBzeW5iaGNZY3M0U3ZUODNNamRXR1hTamJyYTQ3MElmZTVmb25rdmxLeldSbTRjN2taTHp2UXVoTjVVd3FINFU0QXdMS2l2M041bEZJMU1aX2tYQ3R3OFB0dlNrZTJzU1hUNmdpUFN3?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月8日 広島県広島市 安佐動物公園の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTFA4eTRzcUZwZjhtMWNoWlVXUnRuUzY1cFNwUS1OcFdib2YtTHU4eWlBdk1feW9UVk9ZMHM4ZVhNNGlJdllDYzBZNXlGSkFBU09GYnBobXlLdDlVUXAwSHhR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月4日 広島県世羅町 川尻の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNYjBpczVqTExRS2tJZG5GR2REQ0Y1WE1MUks1eVRMTUVkRl9tYmdOMXBuMUVldHFOZkpjaE95NEJENFJLbk1DQTMwa193amVnWjhLNFRuNEpHZ1JsY24wOTVKb21OVkVCeFZ1WXptNjIxUmJXMmFuX2tNNC1rMUdET3B1dElFRnJUU1lnMzhLaERrR0JhV2VtU21MRGRhWGt2a1HSAaIBQVVfeXFMTWIwaXM1akxMUUtrSWRuRkdkRENGNVhNTFJLNXlUTE1FZEZfbWJnTjFwbjFFZXRxTmZKY2hPeTRCRDRSS25NQ0EzMGtfd2plZ1o4SzRUbjRKR2dSbGNuMDk1Sm9tTlZFQnhWdVl6bTYyMVJiVzJhbl9rTTQtazFHRE9wdXRJRUZyVFNZZzM4S2hEa0dCYVdlbVNtTERkYVhrdmtR?oc=5",
-      "site": "報道"
-    },
-    {
-      "title": "2026年8月6日 広島県安芸太田町 上筒賀の出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNTVRnanZ2SzRTaWdmOFdrSll4ZU9WamNKX3pYYkl6T1ZaQlZ0T3ljdzZYOVRQeW5BbTFadVJWN1IyRkJzVmlfbjAwUTd1SVlEcldvOWZWRGhPd1UybGRQVGw5RHFWV2lIaHV4WGlSMzBJOFpBNVFmZVZYaFg2ZUVUZjFZb01SVW9pZDhpdjRuLXNoNERmcU84Yl9Ub05Oc1hCYmfSAaIBQVVfeXFMTU1UZ2p2dks0U2lnZjhXa0pZeGVPVmpjSl96WGJJek9WWkJWdE95Y3c2WDlUUHluQW0xWnVSVjdSMkZCc1ZpX24wMFE3dUlZRHJXbzlmVkRoT3dVMmxkUFRsOURxVldpSGh1eFhpUjMwSThaQTVRZmVWWGhYNmVFVGYxWW9NUlVvaWQ4aXY0bi1zaDREZnFPOGJfVG9OTnNYQmJn?oc=5",
       "site": "報道"
     },
     {
@@ -652,6 +650,16 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
       "title": "2026年8月7日 広島県大竹市 比作の出没情報",
       "url": ""
+    },
+    {
+      "title": "2026年8月4日 広島県世羅町 川尻の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNYjBpczVqTExRS2tJZG5GR2REQ0Y1WE1MUks1eVRMTUVkRl9tYmdOMXBuMUVldHFOZkpjaE95NEJENFJLbk1DQTMwa193amVnWjhLNFRuNEpHZ1JsY24wOTVKb21OVkVCeFZ1WXptNjIxUmJXMmFuX2tNNC1rMUdET3B1dElFRnJUU1lnMzhLaERrR0JhV2VtU21MRGRhWGt2a1HSAaIBQVVfeXFMTWIwaXM1akxMUUtrSWRuRkdkRENGNVhNTFJLNXlUTE1FZEZfbWJnTjFwbjFFZXRxTmZKY2hPeTRCRDRSS25NQ0EzMGtfd2plZ1o4SzRUbjRKR2dSbGNuMDk1Sm9tTlZFQnhWdVl6bTYyMVJiVzJhbl9rTTQtazFHRE9wdXRJRUZyVFNZZzM4S2hEa0dCYVdlbVNtTERkYVhrdmtR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年8月6日 広島県安芸太田町 上筒賀の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNTVRnanZ2SzRTaWdmOFdrSll4ZU9WamNKX3pYYkl6T1ZaQlZ0T3ljdzZYOVRQeW5BbTFadVJWN1IyRkJzVmlfbjAwUTd1SVlEcldvOWZWRGhPd1UybGRQVGw5RHFWV2lIaHV4WGlSMzBJOFpBNVFmZVZYaFg2ZUVUZjFZb01SVW9pZDhpdjRuLXNoNERmcU84Yl9Ub05Oc1hCYmfSAaIBQVVfeXFMTU1UZ2p2dks0U2lnZjhXa0pZeGVPVmpjSl96WGJJek9WWkJWdE95Y3c2WDlUUHluQW0xWnVSVjdSMkZCc1ZpX24wMFE3dUlZRHJXbzlmVkRoT3dVMmxkUFRsOURxVldpSGh1eFhpUjMwSThaQTVRZmVWWGhYNmVFVGYxWW9NUlVvaWQ4aXY0bi1zaDREZnFPOGJfVG9OTnNYQmJn?oc=5",
+      "site": "報道"
     },
     {
       "title": "2026年8月4日 岡山県美作市 右手の出没情報",
@@ -667,14 +675,6 @@ const REFERENCES: { title: string; url: string; site?: string }[] = [
     },
     {
       "title": "2026年8月9日 岡山県津山市 加茂原口の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月6日 鳥取県八頭郡八頭町 横田の出没情報",
-      "url": ""
-    },
-    {
-      "title": "2026年8月3日 鳥取県鳥取市 福部町箭溪の出没情報",
       "url": ""
     }
   ];
@@ -708,88 +708,87 @@ export default function ResearchPage() {
         periodLabel={"2026年8月3日〜2026年8月9日"}
       />
 
-      <h2>期間内の概要および集計データ</h2>
-      <p>2026年8月3日から2026年8月9日までの1週間において、記録された出没等の総件数は818件であった。この総件数は同じ事案の重複を束ねた後の事案数に基づいている。最も件数が多かったのは青森県で124件、次いで北海道が112件、福島県が73件、宮城県が58件、長野県が56件となった。上位都道府県の出没傾向を見ると、北日本および東日本を中心に広範囲で活動が継続している。</p>
+      <h2>集計概要と全国動向</h2>
+      <p>2026年8月3日から2026年8月9日までの1週間に報告されたクマの出没件数は、重複を整理した集計で全国合計818件であった。地域別の傾向を見ると、北日本および東日本を中心に高い出没頻度が記録されている。最も報告数が多かったのは青森県の124件であり、次いで北海道が112件と、この2道県で全体の4分の1以上を占める結果となった。これに福島県の73件、宮城県の58件、長野県の56件、岩手県の54件、山形県の50件が続いており、東北各県と中部山岳地域において活動の活発化が顕著である。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
             <tr>
               <th className="px-3 py-2">順位</th>
-              <th className="px-3 py-2">都道府県</th>
-              <th className="px-3 py-2">件数</th>
+              <th className="px-3 py-2">都道府県名</th>
+              <th className="px-3 py-2">出没件数</th>
+              <th className="px-3 py-2">地域的特徴</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-800">
-            <tr><td className="px-3 py-2 text-xs">1</td><td className="px-3 py-2 text-xs">青森県</td><td className="px-3 py-2 text-xs">124件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2</td><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">112件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">3</td><td className="px-3 py-2 text-xs">福島県</td><td className="px-3 py-2 text-xs">73件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">4</td><td className="px-3 py-2 text-xs">宮城県</td><td className="px-3 py-2 text-xs">58件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">5</td><td className="px-3 py-2 text-xs">長野県</td><td className="px-3 py-2 text-xs">56件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">6</td><td className="px-3 py-2 text-xs">岩手県</td><td className="px-3 py-2 text-xs">54件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">7</td><td className="px-3 py-2 text-xs">山形県</td><td className="px-3 py-2 text-xs">50件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">8</td><td className="px-3 py-2 text-xs">群馬県</td><td className="px-3 py-2 text-xs">33件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">8</td><td className="px-3 py-2 text-xs">山口県</td><td className="px-3 py-2 text-xs">33件</td></tr>
-            <tr><td className="px-3 py-2 text-xs">10</td><td className="px-3 py-2 text-xs">栃木県</td><td className="px-3 py-2 text-xs">31件</td></tr>
+            <tr><td className="px-3 py-2 text-xs">1位</td><td className="px-3 py-2 text-xs">青森県</td><td className="px-3 py-2 text-xs">124件</td><td className="px-3 py-2 text-xs">県内全域で多発、八戸市や六戸町などで学校・住宅地接近事案</td></tr>
+            <tr><td className="px-3 py-2 text-xs">2位</td><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">112件</td><td className="px-3 py-2 text-xs">函館市の教育施設や札幌市清田区の住宅街での出没情報</td></tr>
+            <tr><td className="px-3 py-2 text-xs">3位</td><td className="px-3 py-2 text-xs">福島県</td><td className="px-3 py-2 text-xs">73件</td><td className="px-3 py-2 text-xs">会津美里町での人身被害、会津若松市や国見町での目撃</td></tr>
+            <tr><td className="px-3 py-2 text-xs">4位</td><td className="px-3 py-2 text-xs">宮城県</td><td className="px-3 py-2 text-xs">58件</td><td className="px-3 py-2 text-xs">気仙沼市役所周辺の住宅地や仙台市、富谷市での連続目撃</td></tr>
+            <tr><td className="px-3 py-2 text-xs">5位</td><td className="px-3 py-2 text-xs">長野県</td><td className="px-3 py-2 text-xs">56件</td><td className="px-3 py-2 text-xs">松本市での台所侵入、安曇野市や佐久市での出没・錯誤捕獲</td></tr>
+            <tr><td className="px-3 py-2 text-xs">6位</td><td className="px-3 py-2 text-xs">岩手県</td><td className="px-3 py-2 text-xs">54件</td><td className="px-3 py-2 text-xs">盛岡市内の複数公園および小中学校隣接地域への出没集中</td></tr>
+            <tr><td className="px-3 py-2 text-xs">7位</td><td className="px-3 py-2 text-xs">山形県</td><td className="px-3 py-2 text-xs">50件</td><td className="px-3 py-2 text-xs">鶴岡市の住宅敷地や山形市、南陽市、遊佐町での出没</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8位</td><td className="px-3 py-2 text-xs">群馬県</td><td className="px-3 py-2 text-xs">33件</td><td className="px-3 py-2 text-xs">桐生市の市街地・小学校周辺、伊香保町や嬬恋村での目撃</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8位</td><td className="px-3 py-2 text-xs">山口県</td><td className="px-3 py-2 text-xs">33件</td><td className="px-3 py-2 text-xs">周南市でのわな逃走・錯誤捕獲、岩国市での捕獲事案</td></tr>
+            <tr><td className="px-3 py-2 text-xs">10位</td><td className="px-3 py-2 text-xs">栃木県</td><td className="px-3 py-2 text-xs">31件</td><td className="px-3 py-2 text-xs">那須町、那須塩原市、日光市など県北部を中心とした目撃</td></tr>
           </tbody>
         </table>
       </div>
       <h2>主要トピック</h2>
-      <h3>人身被害および身体接触事案の発生</h3>
-      <p>当期間中、福島県および岐阜県において人身被害事案が確認された。福島県会津美里町では、2026年8月3日に80代女性が熊に襲われてけがを負った事案が発生した（※1）。また会津美里町では同日に人的被害が記録されている（※2）。岐阜県高山市では、2026年8月7日に男性がクマに襲われて腕をかまれる被害が発生した（※3）。同市ではランニング中の男性が襲われて負傷した記録が複数報告されている（※4）。また発生日は不明ながら、ランニング中に襲われ男性が負傷した、あるいは噛まれたとする報道が2026年8月7日および8月8日に相次いで確認された（※5・6・7）。運動や日常行動の動線上でクマと突発的に遭遇する危険性が浮き彫りとなっている。</p>
-      <h3>学校施設および公園周辺への接近事案</h3>
-      <p>児童・生徒が利用する教育施設や公共公園の近傍における出没や痕跡確認が多発した。岩手県盛岡市では、2026年8月3日に公園の野球場内を子グマが徘徊する様子が記録された（※8）。8月5日には小学校に隣接する公園に親子のクマが出没し（※9）、発生日は不明ながら8月6日には公園周辺に小中学校が存在する環境での目撃や松園中央公園でのクマ2頭の目撃が報じられた（※10・11）。さらに発生日不明として8月8日に山岸小学校北側の道路上で成獣1頭の目撃が報じられている（※12）。新潟県村上市でも8月4日に村上小学校のすぐ近くでクマの目撃が重なった（※13・14）。北海道函館市では、発生日は不明ながら8月5日に小学校のグラウンドでヒグマのフンと爪痕が発見されたと報じられた（※15・16・17）。</p>
-      <h3>住宅地・居住空間への侵入事案</h3>
-      <p>市街地や住宅敷地、さらには家屋の内部にまで及ぶ侵入事案が複数確認された。長野県松本市安曇では、発生日は不明ながら2026年8月5日に住宅の台所でクマ1頭を目撃したと報じられた（※18）。青森県六戸町柳町では、8月8日に住宅の擁壁をよじ登って敷地内に侵入するクマが目撃された（※19）。山形県鶴岡市でも、発生日不明として8月4日に住宅敷地内でのクマ目撃が報じられている（※20）。群馬県桐生市相生町五丁目では、発生日は不明ながら8月6日に市街地・小学校北での目撃が報じられ、翌8月7日にも住宅地での目撃情報が報じられた（※21・22）。北海道札幌市清田区の住宅街でも、発生日は不明ながら8月9日に黒い動物の目撃やクマ出没の可能性が報じられた（※23・24）。宮城県気仙沼市では市役所近くの住宅地でクマが目撃されたと報じられている（※25・26）。</p>
-      <h3>罠捕獲および駆除・逃走の動向</h3>
-      <p>捕獲や防除活動に伴う事案も記録された。鳥取県鳥取市佐治町では、発生日は不明ながら梨の食害などの出没地点でクマが捕獲されたと8月6日に報じられ、同日に同地区でクマ1頭が駆除された（※27・28）。山口県周南市では、8月4日にアナグマ用くくりわなにかかったクマが逃げた事案が記録された（※29）。同市内では罠にかかるも姿を消した、あるいは小学校から1kmの山で逃走した事案として報じられている（※30・31）。また周南市大字鹿野上では8月8日にイノシシ用箱わなへの錯誤捕獲が記録された（※32）。長野県佐久市でも8月3日に錯誤捕獲の記録がある（※33）。山口県岩国市美和町生見では8月7日に有害鳥獣捕獲許可による捕獲が記録されている（※34）。京都府宇治田原町では、発生日不明ながら約21年ぶりのクマ出没としてハチの巣箱近くで撮影されたと8月6日に報じられた（※35）。</p>
-      <h2>地域別動向</h2>
-      <h3>東北地方（青森県・福島県・宮城県・岩手県・山形県・秋田県）</h3>
-      <p>最多件数を記録した青森県（124件）では、八戸市において8月3日に第二養護学校西や八戸公園第二駐車場南東で目撃され、8月5日にも八戸第一養護学校近くで目撃された（※36・37・38・39）。六戸町では住宅敷地への侵入が確認されている（※19）。福島県（73件）では会津美里町での負傷被害のほか、8月3日に会津若松市の阿賀川河川敷や市内各所、国見町で目撃された（※40・2・41・42）。宮城県（58件）では気仙沼市役所周辺の住宅地での目撃が報じられたほか、8月3日に仙台市泉区福岡照岡、8月5日に川崎町で目撃され、8月8日には仙台市と富谷市での相次ぐ目撃が報じられた（※25・26・43・44・45）。岩手県（54件）では盛岡市の公園や小学校周辺に集中した（※8・10・11・9・12）。山形県（50件）では鶴岡市の住宅敷地（※20）、8月8日の山形市蔵王温泉（※46）に加え、遊佐町、山形市関沢の山林、南陽市川樋での目撃が報じられた（※47・48・49）。秋田県では8月3日に秋田市浜田の小学校や桂浜海水浴場付近で目撃が相次ぎ、海の家近くへの出没も報じられたほか、秋田市上新城小又落合、能代市能代町下浜や浅内でも出没が記録された（※50・51・52・53・54）。</p>
-      <h3>北海道</h3>
-      <p>北海道では112件が記録された。函館市では小学校の敷地内でヒグマのフンや爪痕といった痕跡が相次いで確認されたと8月5日に報じられた（※15・16・17）。また札幌市清田区の住宅街において黒い動物の目撃や出没の可能性が8月9日に報じられた（※23・24）。</p>
-      <h3>中部・信越地方（長野県・新潟県・富山県・石川県・福井県など）</h3>
-      <p>長野県（56件）では松本市安曇の住宅台所への侵入（※18）、佐久市での錯誤捕獲（※33）、8月4日の南箕輪村大芝陸上競技場周辺や安曇野市穂高有明での出没（※55・56）、8月6日に報じられた安曇野市の民家近くの畑での目撃が記録された（※57）。新潟県では村上市小町や小学校近傍での目撃（※13・14・58）、8月5日の妙高市笹ケ峰（※59）、8月9日の小千谷市での運動公園線横断が記録された（※60）。富山県では高岡市石堤、小矢部市嘉例谷および横谷、南砺市砂子谷、射水市南太閤山で出没やその可能性が記録された（※61・62・63・64・65）。石川県では金沢市別所町、能美市仏大寺町や湯屋町、白山市釜清水町、津幡町上河合で記録された（※66・67・68・69・70）。福井県ではあわら市桜、高浜町鎌倉、越前町大樟、鯖江市寺中町での目撃や痕跡が記録された（※71・72・73・74・75）。山梨県では早川町雨畑、中央市高部地内や浅利橋南、丹波山村貝沢の足跡痕跡、都留市大野の県道横断が記録され、中央市の道の駅や住宅街近くではうなり声による威嚇を伴う3頭の出没が報じられた（※76・77・78・79・80）。静岡県でも川根本町、静岡市葵区、富士市大渕で記録された（※81・82・83）。愛知県豊田市牛地町吉原でも出没が確認された（※84）。</p>
-      <h3>関東・近畿・中国地方</h3>
-      <p>群馬県（33件）では桐生市の市街地や住宅地のほか、8月3日に沼田市利根町老神、8月4日に渋川市伊香保町伊香保、8月5日に嬬恋村大笹で出没した（※21・22・85・86・87）。栃木県（31件）では那須町湯本や山林、那須塩原市戸田、日光市の路上で出没が記録された（※88・89・90・91・92）。埼玉県深谷市武蔵野では8月7日にクマ出没の可能性および通行人による目撃が記録された（※93・94）。東京都では青梅市御岳2丁目や西多摩郡檜原村藤原で出没および可能性が記録された（※95・96・97）。神奈川県では南足柄市内山、清川村煤ヶ谷のバス停付近で記録された（※98・99・100）。近畿地方では兵庫県上郡町、多可町、丹波篠山市の痕跡、神戸市北区道場町での2度の出没が記録された（※101・102・103・104・105）。京都府では舞鶴市、福知山市、京丹後市、宇治田原町で記録された（※35・106・107・108・109）。滋賀県大津市、三重県紀北町、大阪府高槻市、奈良県川上村や十津川村、和歌山県田辺市でも出没や痕跡があった（※110・111・112・113・114・115・116・117）。中国地方では山口県（33件）の捕獲や逃走のほか、島根県益田市のJR山陰本線沿線で2頭、浜田市、安来市、大田市で記録された（※118・119・120・121・122）。広島県では世羅町、安芸太田町、大竹市比作の物損被害や痕跡、広島市安佐動物公園のカメラ撮影が記録された（※123・124・125・126・127）。岡山県美作市や津山市、鳥取県鳥取市や八頭町でも記録された（※128・129・130・131・132・133）。</p>
+      <h3>1. 人身被害の発生状況</h3>
+      <p>当期中、人身被害事案が福島県および岐阜県で発生した。福島県会津美里町では、2026年8月3日に80代女性がクマに襲われて負傷する人的被害が確認された（※1・2）。また岐阜県高山市においては、ランニング中だった男性がクマに襲われ、腕を噛まれるなどして負傷したことが8月7日および8日に報じられた（※3・4・5・6・7）。屋外での運動中や日常生活の動線上で突発的に遭遇し受傷に至ったものであり、人間の生活圏とクマの行動域が極めて近接している実態を示している。</p>
+      <h3>2. 教育施設および公共空間周辺への出没</h3>
+      <p>児童生徒や一般市民が利用する学校敷地や公園周辺での目撃が各地で相次いだ。岩手県盛岡市では、8月3日に公園の野球場内を子グマが徘徊したほか（※8）、8月5日には小学校に隣接する公園で親子のクマが目撃された（※9）。盛岡市内ではさらに、松園中央公園で2頭のクマが目撃された件や小中学校周辺の公園での目撃が8月6日に報じられ（※10・11）、8月8日にも山岸小学校北側の道路上で成獣1頭の目撃が報じられている（※12）。</p>
+      <p>また、北海道函館市では小学校のグラウンドでヒグマのフンと爪痕が発見されたと8月5日に報じられた（※13・14・15）。新潟県村上市では8月4日に村上小学校のすぐ近くでクマが目撃された（※16・17）。青森県八戸市でも8月3日に第二養護学校の西および八戸公園第二駐車場の南東で目撃があり（※18・19）、8月5日には八戸第一養護学校の近くで1頭の目撃が確認されている（※20・21）。群馬県桐生市でも小学校北の市街地でクマが目撃されたと8月6日に報じられた（※22）。秋田県秋田市浜田では8月3日に小学校や桂浜海水浴場付近で目撃が相次ぎ（※23）、海の家近くへの出没も報じられた（※24）。</p>
+      <h3>3. 住宅敷地・家屋内および市街地への侵入</h3>
+      <p>家屋の至近距離や屋内へ侵入する事案も記録されている。長野県松本市安曇では、住宅の台所でクマ1頭が目撃されたと8月5日に報じられた（※25）。青森県六戸町柳町では、8月8日の17時00分頃にクマが住宅の擁壁をよじ登って敷地内へ侵入する事態が確認された（※26）。山形県鶴岡市でも住宅敷地内での目撃が8月4日に報じられている（※27）。</p>
+      <p>市街地や住宅街における活動も報告されている。北海道札幌市清田区の住宅街では、8月9日に黒い動物の目撃や出没情報が報じられた（※28・29）。宮城県気仙沼市では、市役所近くの住宅地でクマが目撃されたと8月5日に報じられた（※30・31）。山梨県中央市では道の駅や住宅街近くで3頭が出没してうなり声で威嚇された事案が8月5日に報じられたほか（※32）、8月4日にも中央市高部地内の浅利橋南の土手を南進する姿が目撃された（※33）。群馬県桐生市でも8月7日に住宅地での目撃情報が報じられている（※34）。京都府宇治田原町では、約21年ぶりの出没としてハチの巣箱近くでクマが撮影されたと8月6日に報じられた（※35）。広島県広島市では、安佐動物公園のカメラに野生のクマが映ったことが8月8日に報じられている（※36）。</p>
+      <h3>4. 捕獲・駆除およびわなからの逃走</h3>
+      <p>各地で捕獲や駆除の措置が取られた一方、設置されたわなからの逃走事案も発生した。鳥取県鳥取市佐治町では、梨の食害などの出没地点でクマ1頭が捕獲・駆除されたことが8月6日およびその報道により確認された（※37・38）。長野県佐久市駒込区（志賀地区）では8月3日に錯誤捕獲が発生した（※39）。</p>
+      <p>山口県周南市大字八代では、8月4日に小学校から約1キロメートルの山に設置されたアナグマ用くくりわなにクマがかかったものの、逃走したことが確認された（※40・41・42）。その後、周南市大字鹿野上では8月8日にイノシシ用箱わなへの錯誤捕獲が発生している（※43）。山口県岩国市美和町生見では、8月7日に有害鳥獣捕獲許可による捕獲が行われた（※44）。</p>
+      <h2>地域別の出没動向</h2>
+      <h3>東北・北海道地方</h3>
+      <p>東北地方および北海道では、合計出没数が極めて高く広範囲に事案が分布している。青森県では八戸市での学校周辺における目撃（※18・19・20・21）や六戸町での住宅敷地侵入（※26）など、集落・都市周辺での活動が確認された。福島県では会津美里町での人身被害（※1・2）のほか、会津若松市の阿賀川河川敷や市内（※45・46）、国見町（※47）で目撃された。宮城県では気仙沼市役所周辺の住宅地（※30・31）、川崎町での1頭目撃（※48）、仙台市泉区福岡照岡（※49）や富谷市（※50）での相次ぐ目撃が報告されている。山形県では鶴岡市の住宅敷地（※27）、遊佐町岩川（※51）、山形市関沢の山林や蔵王温泉（※52・53）、南陽市川樋（※54）で記録された。秋田県では秋田市浜田の学校・海水浴場周辺（※23・24）、秋田市上新城小又落合（※55）、能代市能代町下浜や浅内（※56・57）で出没があった。</p>
+      <h3>中部・関東地方</h3>
+      <p>長野県では松本市での台所侵入（※25）、南箕輪村の大芝陸上競技場周辺（※58）、安曇野市穂高有明や民家近くの畑（※59・60）、佐久市での錯誤捕獲（※39）が確認された。群馬県では桐生市の市街地や住宅地（※22・34）、渋川市伊香保町伊香保（※61）、沼田市利根町老神（※62）、嬬恋村大笹（※63）で出没した。栃木県では日光市の路上（※64）、那須町湯本や山林（※65・66）、那須塩原市戸田など（※67・68）で目撃が続いた。新潟県では村上市の村上小学校付近や小町（※16・17・69）、妙高市笹ケ峰（※70）、小千谷市城川地区桜町の市道（※71）で記録されている。</p>
+      <p>富山県では小矢部市横谷の茂みで1頭（※72）や嘉例谷（※73）、高岡市石堤（※74）、南砺市砂子谷（※75）、射水市南太閤山（※76）で目撃や出没の可能性が報じられた。石川県では金沢市別所町（※77）、能美市仏大寺町地内や湯屋町（※78・79）、白山市釜清水町地内（※80）、津幡町上河合（※81）で出没情報があった。山梨県では早川町雨畑の県営林道（※82）、中央市（※32・33）、丹波山村貝沢地内の林道足跡（※83）、都留市大野地内の県道横断（※84）が記録された。福井県ではあわら市桜（※85）、越前町大樟（※86）、鯖江市寺中町での痕跡（※87・88）、高浜町鎌倉での幼獣1頭（※89）が確認された。静岡県では富士市大渕で子グマ（※90）、川根本町下泉（※91）、静岡市葵区中平（※92）で記録された。埼玉県では深谷市武蔵野の通りがかりによる目撃（※93・94）があり、神奈川県では南足柄市内山（※95）や清川村煤ヶ谷のバス停付近（※96・97）、東京都では青梅市御岳2丁目（※98・99）や檜原村藤原（※100）、愛知県では豊田市牛地町吉原（※101）で目撃された。</p>
+      <h3>近畿・中国地方</h3>
+      <p>近畿地方では、京都府舞鶴市城屋（※102）、福知山市大江町南山（※103）、京丹後市網野町浜詰および峰山町鱒留（※104・105）、宇治田原町（※35）で出没や痕跡が記録された。兵庫県では上郡町神明寺や旭日乙（※106・107）、多可町中区東安田（※108）、丹波篠山市今田町四斗谷（※109）、神戸市北区道場町（※110）で出没が相次いだ。滋賀県では大津市山百合の丘や関津三丁目（※111・112）、大阪府では高槻市樫田出灰地区の山中（※113）、奈良県では川上村武木（※114）や十津川村湯ノ原（※115）、三重県では紀北町上里の山際爪痕や船津の集落際（※116・117）、和歌山県田辺市長野（※118）で情報が寄せられた。</p>
+      <p>中国地方では、山口県内で周南市の逃走・錯誤捕獲（※40・41・42・43）や岩国市の有害捕獲（※44）が発生した。鳥取県では鳥取市佐治町の駆除（※37・38）、鳥取市福部町箭溪（※119）、八頭町横田（※120）で目撃された。島根県では益田市の山陰本線沿線付近（本俣賀駅と石見横田駅の間付近）で8月9日午後8時頃に2頭が目撃されたほか（※121）、浜田市三隅町西河内や旭町丸原（※122・123）、安来市農道沿いの川付近で1頭（※124）、大田市温泉津町湯里願城寺（※125）で記録された。広島県では大竹市比作地区での出没痕跡および物損被害（※126・127）、世羅町川尻（※128）、安芸太田町上筒賀（※129）、広島市安佐動物公園（※36）が報告された。岡山県では美作市右手、滝、東青野（※130・131・132）や津山市加茂原口（※133）で出没が確認された。</p>
       <h2>注目事案の時系列整理</h2>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
             <tr>
-              <th className="px-3 py-2">発生・報道日</th>
-              <th className="px-3 py-2">都道府県・地点</th>
-              <th className="px-3 py-2">事案概要</th>
-              <th className="px-3 py-2">記録ID</th>
+              <th className="px-3 py-2">日付</th>
+              <th className="px-3 py-2">都道府県</th>
+              <th className="px-3 py-2">市町村</th>
+              <th className="px-3 py-2">事案内容</th>
+              <th className="px-3 py-2">記録番号</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-800">
-            <tr><td className="px-3 py-2 text-xs">2026-08-03</td><td className="px-3 py-2 text-xs">福島県 会津美里町</td><td className="px-3 py-2 text-xs">80代女性が熊に襲われけがを負う人身被害が発生</td><td className="px-3 py-2 text-xs">（※1・2）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-03</td><td className="px-3 py-2 text-xs">秋田県 秋田市</td><td className="px-3 py-2 text-xs">浜田の小学校や海水浴場、海の家付近で目撃相次ぐ</td><td className="px-3 py-2 text-xs">（※50・51）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-03</td><td className="px-3 py-2 text-xs">岩手県 盛岡市</td><td className="px-3 py-2 text-xs">公園の野球場内を子グマが徘徊</td><td className="px-3 py-2 text-xs">（※8）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-04</td><td className="px-3 py-2 text-xs">新潟県 村上市</td><td className="px-3 py-2 text-xs">村上小学校のすぐ近くでクマが目撃される</td><td className="px-3 py-2 text-xs">（※13・14）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-04</td><td className="px-3 py-2 text-xs">山口県 周南市</td><td className="px-3 py-2 text-xs">罠にかかったクマが逃走する事案が発生</td><td className="px-3 py-2 text-xs">（※30・31・29）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-05 (報)</td><td className="px-3 py-2 text-xs">北海道 函館市</td><td className="px-3 py-2 text-xs">小学校グラウンドでヒグマのフンと爪痕を発見と報道</td><td className="px-3 py-2 text-xs">（※15・16・17）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-05 (報)</td><td className="px-3 py-2 text-xs">長野県 松本市</td><td className="px-3 py-2 text-xs">住宅の台所でクマ1頭を目撃したと報道</td><td className="px-3 py-2 text-xs">（※18）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-05 (報)</td><td className="px-3 py-2 text-xs">山梨県 中央市</td><td className="px-3 py-2 text-xs">道の駅や住宅街近くで3頭出没、威嚇のうなり声と報道</td><td className="px-3 py-2 text-xs">（※76）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-05</td><td className="px-3 py-2 text-xs">岩手県 盛岡市</td><td className="px-3 py-2 text-xs">小学校に隣接する公園に親子のクマが出没</td><td className="px-3 py-2 text-xs">（※9）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-06 (報)</td><td className="px-3 py-2 text-xs">鳥取県 鳥取市</td><td className="px-3 py-2 text-xs">佐治でクマ1頭を駆除、食害地点で捕獲と報道</td><td className="px-3 py-2 text-xs">（※27・28）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-07</td><td className="px-3 py-2 text-xs">岐阜県 高山市</td><td className="px-3 py-2 text-xs">ランニング中の男性が襲われ腕をかまれ負傷</td><td className="px-3 py-2 text-xs">（※5・3・6・7・4）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-08 (報)</td><td className="px-3 py-2 text-xs">広島県 広島市</td><td className="px-3 py-2 text-xs">安佐動物公園のカメラに野生のクマが映ると報道</td><td className="px-3 py-2 text-xs">（※123）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-08</td><td className="px-3 py-2 text-xs">青森県 六戸町</td><td className="px-3 py-2 text-xs">住宅の擁壁をよじ登り敷地内に侵入</td><td className="px-3 py-2 text-xs">（※19）</td></tr>
-            <tr><td className="px-3 py-2 text-xs">2026-08-09 (報)</td><td className="px-3 py-2 text-xs">北海道 札幌市清田区</td><td className="px-3 py-2 text-xs">住宅街で黒い動物の目撃情報、出没の可能性と報道</td><td className="px-3 py-2 text-xs">（※23・24）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月3日</td><td className="px-3 py-2 text-xs">福島県</td><td className="px-3 py-2 text-xs">会津美里町</td><td className="px-3 py-2 text-xs">80代女性がクマに襲われ負傷する人的被害が発生</td><td className="px-3 py-2 text-xs">（※1・2）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月3日</td><td className="px-3 py-2 text-xs">岩手県</td><td className="px-3 py-2 text-xs">盛岡市</td><td className="px-3 py-2 text-xs">公園の野球場内を子グマが徘徊</td><td className="px-3 py-2 text-xs">（※8）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月3日</td><td className="px-3 py-2 text-xs">長野県</td><td className="px-3 py-2 text-xs">佐久市</td><td className="px-3 py-2 text-xs">志賀地区において錯誤捕獲が発生</td><td className="px-3 py-2 text-xs">（※39）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月4日</td><td className="px-3 py-2 text-xs">新潟県</td><td className="px-3 py-2 text-xs">村上市</td><td className="px-3 py-2 text-xs">村上小学校の至近距離でクマを目撃</td><td className="px-3 py-2 text-xs">（※16・17）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月4日</td><td className="px-3 py-2 text-xs">山口県</td><td className="px-3 py-2 text-xs">周南市</td><td className="px-3 py-2 text-xs">大字八代の山中でアナグマ用くくりわなにかかったクマが逃走</td><td className="px-3 py-2 text-xs">（※40・41・42）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月5日</td><td className="px-3 py-2 text-xs">岩手県</td><td className="px-3 py-2 text-xs">盛岡市</td><td className="px-3 py-2 text-xs">小学校に隣接する公園で親子のクマを目撃</td><td className="px-3 py-2 text-xs">（※9）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月5日</td><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">函館市</td><td className="px-3 py-2 text-xs">小学校グラウンドでヒグマのフンと爪痕を発見と報道</td><td className="px-3 py-2 text-xs">（※13・14・15）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月5日</td><td className="px-3 py-2 text-xs">長野県</td><td className="px-3 py-2 text-xs">松本市</td><td className="px-3 py-2 text-xs">安曇地区の住宅台所でクマ1頭を目撃と報道</td><td className="px-3 py-2 text-xs">（※25）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月6日</td><td className="px-3 py-2 text-xs">鳥取県</td><td className="px-3 py-2 text-xs">鳥取市</td><td className="px-3 py-2 text-xs">佐治町において梨の食害地点でクマ1頭を捕獲・駆除</td><td className="px-3 py-2 text-xs">（※37・38）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月7日</td><td className="px-3 py-2 text-xs">岐阜県</td><td className="px-3 py-2 text-xs">高山市</td><td className="px-3 py-2 text-xs">ランニング中の男性が襲われ腕を噛まれて負傷</td><td className="px-3 py-2 text-xs">（※3・4・5・6・7）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月7日</td><td className="px-3 py-2 text-xs">山口県</td><td className="px-3 py-2 text-xs">岩国市</td><td className="px-3 py-2 text-xs">美和町生見において有害鳥獣捕獲許可による捕獲を実施</td><td className="px-3 py-2 text-xs">（※44）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月8日</td><td className="px-3 py-2 text-xs">青森県</td><td className="px-3 py-2 text-xs">六戸町</td><td className="px-3 py-2 text-xs">住宅の擁壁をよじ登り敷地内に侵入した事案を確認</td><td className="px-3 py-2 text-xs">（※26）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月8日</td><td className="px-3 py-2 text-xs">山口県</td><td className="px-3 py-2 text-xs">周南市</td><td className="px-3 py-2 text-xs">大字鹿野上においてイノシシ用箱わなに錯誤捕獲</td><td className="px-3 py-2 text-xs">（※43）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月9日</td><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">札幌市清田区</td><td className="px-3 py-2 text-xs">住宅街において黒い動物および出没情報を報道</td><td className="px-3 py-2 text-xs">（※28・29）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">8月9日</td><td className="px-3 py-2 text-xs">島根県</td><td className="px-3 py-2 text-xs">益田市</td><td className="px-3 py-2 text-xs">山陰本線の本俣賀駅と石見横田駅の間付近でクマ2頭を目撃</td><td className="px-3 py-2 text-xs">（※121）</td></tr>
           </tbody>
         </table>
       </div>
       <h2>週次評価</h2>
-      <h3>リスク全体傾向</h3>
-      <p>総件数818件という高水準な活動が見られるなか、今期の特筆すべきリスク傾向は人身被害の発生と人間活動域への著しい接近である。福島県での高齢女性襲撃（※1）や岐阜県でのランニング中の男性襲撃（※3）に見られるように、日常生活や屋外活動中の突発的な遭遇が身体被害に直結している。さらに、盛岡市や函館市、村上市などで見られた学校・通学路・公園周辺での出没や痕跡の発見（※13・8・9・16）、松本市や六戸町で見られた住宅敷地・家屋台所への侵入（※18・19）は、人間生活圏への警戒心の低下を示唆している。また、罠からの逃走事案（※29）や海水浴場・動物公園といった利用者が集まる施設周辺での出没（※123・51）も確認され、地域を問わず不測の接近リスクが潜在している。</p>
-      <h3>次週の警戒ポイント</h3>
-      <ul>
-        <li>教育施設および通学路の安全確保: 小学校や公園近傍での親子のクマや子グマの徘徊が複数報告されているため、登下校時間帯の見守りや校庭周辺の点検体制を維持・強化すること。</li>
-        <li>屋外運動・早朝夜間活動時の警戒: ランニング中や薄明時間帯における遭遇・負傷事案が確認されたため、見通しの悪い場所や河川敷・山林隣接路での単独行動を控え、鈴などの音響機器携行を徹底すること。</li>
-        <li>居住空間への誘引防止と侵入防止: 住宅敷地や台所内への侵入事案が報告されていることから、家屋の施錠管理、生ごみや果樹等の誘引物の適切な撤去・管理を徹底すること。</li>
-        <li>捕獲用具周辺および逃走時の即時情報共有: 罠からの逃走事案を踏まえ、設置罠の定期見回りと、万一の逃走時における周辺住民への迅速な周知体制を確保すること。</li>
-      </ul>
+      <p>今期は総出没件数が818件と高水準で推移しており、福島県および岐阜県での人身被害が発生したことに加え、生活インフラへの接近が強く意識される1週間となった。特に盛岡市、八戸市、村上市、函館市など、教育施設や公園への出没・痕跡確認が重なっており、昼夜を問わず通学路や運動施設を含む公的空間への立ち入りが常態化している地域が散見される。また、松本市における台所への侵入や六戸町における住宅敷地侵入など、物理的な防障を越えて家屋敷地へ進入する事例が報告されており、遭遇事故の潜在的危険度は高い。</p>
+      <p>次週に向けた警戒ポイントとして、第一に小中学校や通学路、市街地に隣接する緑地・河川敷での動線警戒が挙げられる。第二に、周南市で発生したようにアナグマ用くくりわなからの逃走事案が起きており、錯誤捕獲を含めたわな管理と逃走個体の追跡・安全確保措置が重要である。第三に、鳥取市で報告された果樹食害や宇治田原町でのハチ巣箱付近の撮影に見られる誘引物への対策とともに、屋外でのランニングや作業中における突発的遭遇を回避するため、早朝・夕暮れ時の単独行動の抑制や見通しの悪い茂み周辺での注意喚起が必要とされる。</p>
 
       <p className="text-sm text-stone-500">2026 年 10 月 31 日 改訂：同じ出没の重複を束ね、その後に集まった記録も含めて、本文を作り直しました。件数は公開時と異なることがあります。</p>
 
