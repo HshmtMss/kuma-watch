@@ -28,28 +28,30 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const mainCitation = (
+    <>
+      Pagano, A. M., Durner, G. M., Rode, K. D., Atwood, T. C., Atkinson, S. N., Peacock, E., Costa, D. P., Owen, M. A., &amp;
+      Williams, T. M. (2018).{" "}
+      <em className="not-italic">Science</em> 359(6375): 568–572.
+    </>
+  );
+
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        北極のホッキョクグマに、<strong>小型カメラと加速度センサー</strong>を装着する。
-        そんなクマ目線の研究が、2018 年に Science 誌に掲載されました。
+        野生のクマが 1 日にどれだけのエネルギーを使い、どれだけ食べればやっていけるのか。
+        身近なようでいて、野外で実際に測るのはとても難しい問題です。
       </p>
       <p>
-        11 日間の連続記録から見えてきたのは、ホッキョクグマの <strong>「予想外に高いエネルギー消費」</strong>。
-        従来の想定より <strong>50% も多く</strong>エネルギーを使っていたのです。
-        温暖化で氷が減るなか、これは何を意味するのか？
+        今号は、北極の海氷の上で暮らすホッキョクグマの雌 9 頭について、
+        <strong>1 日のエネルギー消費量（野外代謝量）</strong>と行動、体重の変化を同時に測った研究を紹介します。
+        2018 年に Science 誌に掲載された論文です。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
         label="今号で読み解く 1 本の論文"
         title="High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear"
-        citation={
-          <>
-            Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
-            <em className="not-italic">Science</em> 359(6375): 568–572.
-          </>
-        }
+        citation={mainCitation}
         href="https://doi.org/10.1126/science.aan8677"
         linkText="DOI: 10.1126/science.aan8677 →"
       />
@@ -58,300 +60,174 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            ホッキョクグマ 9 頭にカメラ + 加速度センサー + 同位体追跡で 11 日間記録
+            春の海氷上のホッキョクグマ（雌 9 頭）の野外代謝量は、平均で<strong>それまでの想定の約 1.6 倍</strong>（1 日あたり約 12,300 kcal）でした
           </>,
           <>
-            消費エネルギーは予想の <strong>1.5 倍</strong>、生存にはアザラシ <strong>2 ヶ月毎に 1 頭以上</strong>必要
+            収支を保つだけでも、<strong>10〜12 日ごとに成獣のワモンアザラシ 1 頭</strong>（または亜成獣 3 頭、生まれたての子 19 頭）を食べる必要があると見積もられました
           </>,
           <>
-            気候変動による氷の縮小で <strong>狩猟効率が下がり、種としての将来が危ぶまれる</strong>
+            8〜11 日の調査期間中に<strong>半数を超えるクマが体重を減らし</strong>、うち 4 頭は体重の 10% 以上を失っていました
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "「クマがどれだけ食うか」を測ることの難しさ" },
-          { id: "tech", title: "クマ目線のカメラ + センサーで判明" },
-          { id: "method", title: "9 頭のホッキョクグマで 11 日間" },
-          { id: "findings", title: "結果 — 予想を大きく超えるエネルギー消費" },
-          { id: "seal", title: "アザラシ 1 頭で何日生きられるか" },
-          { id: "fail", title: "9 頭中 5 頭が体重減少 — 飢餓の現実" },
-          { id: "climate", title: "気候変動が決定的なリスク要因" },
-          { id: "implications", title: "ヒグマ・ツキノワグマへの示唆" },
-          { id: "future", title: "ホッキョクグマの将来は?" },
+          { id: "why", title: "なぜエネルギー消費を測るのか" },
+          { id: "method", title: "研究の概要 — 9 頭を 8〜11 日間" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界・注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">「クマがどれだけ食うか」を測ることの難しさ</h2>
+      <h2 id="why">なぜエネルギー消費を測るのか</h2>
       <p>
-        動物の <strong>「1 日に必要なカロリー」</strong>を野外で正確に測るのは、極めて難しい問題でした。
+        ホッキョクグマは、クマの仲間のなかで最も肉食に偏り、海氷の上でアザラシなどの海獣を狩って暮らしています。
+        論文の序論によると、北極の海氷の最小面積は <strong>10 年あたり 14%</strong> の割合で減っており、
+        春の氷の崩壊は早まり、秋の結氷は遅くなっています。
       </p>
       <p>
-        動物園や実験室なら、餌の量を計量して測れます。でも野生では、いつ何を食べているかも分からない。
-        ましてやホッキョクグマのような <strong>北極の頂点捕食者</strong>を追いかけて、
-        食事と運動の全てを記録するのは <strong>これまで不可能</strong>と思われていました。
-      </p>
-      <p>
-        この壁を初めて突破したのが、米国地質調査所（USGS）の <strong>Anthony Pagano</strong>率いる研究チーム。
-        2018 年に Science 誌に掲載された彼らの研究は、ホッキョクグマのエネルギー収支を <strong>初めて野外で精密測定</strong>
-        した画期的な成果でした。
+        海氷の減少がホッキョクグマの体の状態や生存率の低下につながる、という報告はそれまでもありました。
+        ただ、その「しくみ」を説明するのに必要な、<strong>海氷の上で活動しているクマの実際のエネルギー消費量</strong>は、
+        測られたことがありませんでした。それまでのモデルでは、待ち伏せ型の狩りをすることなどから、
+        消費量は比較的低いと仮定されていたと論文は説明しています。
       </p>
 
-      <h2 id="tech">クマ目線のカメラ + センサーで判明</h2>
+      <h2 id="method">研究の概要 — 9 頭を 8〜11 日間</h2>
       <p>
-        Pagano らが使った技術は、当時最先端のものを組み合わせたものでした。
+        米国地質調査所（USGS）などの研究チームは、2014〜2016 年の 4 月に、アラスカ北方の
+        <strong>ボーフォート海</strong>の海氷上で雌のホッキョクグマ 9 頭を調べました。
       </p>
       <ul>
         <li>
-          📹 <strong>クマ目線の HD カメラ</strong>: 首輪に装着、何を食べたか・どこを歩いたかを記録
+          <strong>二重標識水法</strong>：体内に入れた安定同位体の減り方から、8〜11 日間のエネルギー消費量（野外代謝量）を求める方法です。
         </li>
         <li>
-          📊 <strong>加速度センサー</strong>: 歩行・走行・水泳・休息を毎秒記録
+          <strong>GPS とビデオカメラ付きの首輪</strong>：位置と、クマ目線の映像（狩りや食事のようす）を記録しました。
         </li>
         <li>
-          🌐 <strong>GPS テレメトリー</strong>: 位置と移動距離を追跡
+          <strong>加速度センサーなどの記録計</strong>：歩く・泳ぐ・休むといった行動を記録しました。
         </li>
         <li>
-          🧪 <strong>同位体ラベル水（doubly labeled water）</strong>:
-          摂取と排泄の同位体差からエネルギー消費を計算
-        </li>
-        <li>
-          ⚖️ <strong>体重測定</strong>: 開始時と終了時を比較
+          <strong>再捕獲時の測定</strong>：体重、体組成（脂肪と脂肪以外）、血液の成分を調べ、食べられていたかどうかを確かめました。
         </li>
       </ul>
       <p>
-        この組合せにより、<strong>「実際の運動量・体内代謝・食事内容・体重変化」</strong>を
-        統合的に測ることが初めて可能になりました。
+        あわせて、飼育下の成獣の雌 1 頭で、安静時の代謝量も測っています。
       </p>
 
-      <h2 id="method">9 頭のホッキョクグマで 11 日間</h2>
+      <h2 id="findings">分かったこと</h2>
+      <h3>エネルギー消費は想定の約 1.6 倍</h3>
       <p>
-        対象は、北極アラスカの <strong>ボーフォート海</strong>に生息する <strong>ホッキョクグマ 9 頭の雌成獣</strong>。
-        2014〜2016 年の春期（4 月）に捕獲し、上記の装備を装着。11 日間の連続記録の後、
-        再捕獲して機材を回収・体重を測定。
+        9 頭の 1 日あたりの野外代謝量は、平均 <strong>51.6 MJ（約 12,325 kcal）</strong>でした。
+        これは、それまでホッキョクグマについて仮定されていた値の平均 <strong>1.6 倍</strong>（個体によって 1.0〜2.6 倍）にあたります。
+        一方で、同じくらいの体の大きさの肉食哺乳類から予測される値とはおおむね同じ水準でした。
       </p>
       <p>
-        4 月を選んだ理由は明確です。これはホッキョクグマの <strong>「最重要食事シーズン」</strong>。
-        ホッキョクグマの主食は <strong>アザラシ</strong>で、氷の上で狩りをします。氷が広がる 4 月は
-        アザラシ捕獲に最も適した季節です。
-      </p>
-      <p>
-        ここで上手く食べないと、夏期の氷消失期を生き延びられない。
-        9 頭がそれぞれ何を、いつ、どれだけ捕って食べたか、そして体重がどう変化したかを記録しました。
+        消費量は、体重が重いほど、よく動き回るほど大きくなっていました。
+        たとえば、平均の移動速度が時速 1.0 km 以上だった 3 頭は、それより遅い 6 頭に比べて代謝量が約 1.5 倍でした。
+        論文は、基礎的な代謝・移動・活動がエネルギー消費の主な要因だとしています。
       </p>
 
-      <h2 id="findings">結果 — 予想を大きく超えるエネルギー消費</h2>
+      <h3>収支を保つにはアザラシが 10〜12 日ごとに 1 頭</h3>
       <p>
-        分析の結果、ホッキョクグマの <strong>1 日のエネルギー消費</strong>は予想を大きく上回りました。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">指標</th>
-              <th className="px-3 py-2 text-left">従来の予想</th>
-              <th className="px-3 py-2 text-left">Pagano 実測値</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">基礎代謝率</td>
-              <td className="px-3 py-2 tabular-nums">~8,500 kcal/日</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">~12,300 kcal/日</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">予想との比</td>
-              <td className="px-3 py-2 tabular-nums">×1.0</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">×1.5</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">運動量（1 日）</td>
-              <td className="px-3 py-2 tabular-nums">~50 kcal/kg</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">~80 kcal/kg</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        平均体重 175kg のホッキョクグマが <strong>1 日 12,000kcal 以上</strong>を消費していました。
-        これは人間（成人）の <strong>5 倍以上</strong>。
-        従来は同じ大型ネコ科動物のデータから <strong>1.0 倍</strong>と推定されていましたが、
-        実測ではそれを <strong>50% も上回って</strong>いたのです。
-      </p>
-      <p>
-        理由は、ホッキョクグマが <strong>「歩く・泳ぐ・氷を渡る」</strong>動作で
-        想像以上にエネルギーを使っていたから。氷の上を 1 日 30〜40 km 歩くこともあり、
-        その大半が食物探しの「無駄足」になっていることも明らかになりました。
+        測った代謝量から計算すると、春の海氷上で単独で暮らす雌が収支をとんとんに保つには、平均して
+        <strong>10〜12 日ごとに、ワモンアザラシの成獣 1 頭、亜成獣 3 頭、または生まれたての子 19 頭</strong>
+        のいずれかを食べる必要があると見積もられました。
+        これは「やせない」ための量であり、夏に向けて脂肪をたくわえるには、さらに多く食べるか、消費を抑える必要があります。
       </p>
 
-      <h2 id="seal">アザラシ 1 頭で何日生きられるか</h2>
+      <h3>半数を超えるクマが体重を減らした</h3>
       <p>
-        では、これだけのエネルギーをどうやって賄うのか。答えは <strong>「アザラシ」</strong>。
+        映像から、狩りの 90% は待ち伏せ、残り 10% は忍び寄りでした。
+        成獣か亜成獣のワモンアザラシを仕留めて食べたクマは体重を増やすか保っていた一方、
+        死体をあさるだけだったクマや、食べた形跡がなかったクマは体重を減らしていました。
       </p>
       <p>
-        アザラシ 1 頭（体重 30〜100kg）の脂肪・タンパク質含有量から、含まれるカロリーを計算すると：
+        9 頭のうち半数を超えるクマ（USGS などの発表によれば 5 頭）が体重を減らし、
+        <strong>4 頭は 8〜11 日間で体重の 10% 以上</strong>を失っていました。
+        この 4 頭の減り方は平均で 1 日あたり体重の約 1%（約 1.95 kg）で、陸上で絶食しているホッキョクグマについて報告された値の約 4 倍（割合で比較）でした。
+      </p>
+
+      <h3>行動の内訳</h3>
+      <p>
+        加速度センサーの記録（6 頭）では、休息以外の活動に使っていた時間は平均 34%、
+        歩いていた時間は 28%、泳いでいた時間は 0.3% でした。
+      </p>
+
+      <h3>著者らの結論</h3>
+      <p>
+        著者らは、エネルギー需要がもともと高いため、海氷が減って細かく割れることで移動や活動が増えると、
+        エネルギー収支がさらに厳しくなり、繁殖や個体群に悪い影響が及ぶ可能性が高いと述べています。
+        また、ボーフォート海の成獣の雌のうち、2000〜2016 年の春に捕獲された個体の 42% が捕獲前 7 日以上食べていなかったという先行研究を挙げ、
+        夏の開水面期より前の春の時点ですでに、氷の状態が獲物の得やすさに影響している可能性を指摘しています。
+      </p>
+
+      <h2 id="limits">限界・注意点</h2>
+      <ul>
+        <li>
+          対象は <strong>雌 9 頭</strong>、期間は <strong>1 頭あたり 8〜11 日</strong>、季節は <strong>4 月</strong>だけです。
+          雄や子連れの雌、ほかの季節・地域にそのまま当てはまるとは限りません。
+        </li>
+        <li>
+          捕獲後しばらくは活動が落ちる（回復に 2〜3 日かかる可能性がある）ため、著者ら自身が、
+          測った代謝量や活動量は <strong>控えめな値</strong>と考えるべきだとしています。
+        </li>
+        <li>
+          「それまでの想定の 1.6 倍」は、過去にホッキョクグマについて仮定されていた値との比較です。
+          ほかの肉食哺乳類と比べて特別に高いという意味ではありません。
+        </li>
+        <li>
+          ホッキョクグマは海獣を主食とする特殊なクマです。木の実なども食べる日本のツキノワグマ・ヒグマとは、食べ物も暮らし方も大きく異なります。
+        </li>
+      </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
+      <p>
+        この研究は北極のホッキョクグマを調べたもので、日本のクマについて直接何かを示すものではありません。
+        それでも、「クマの行動を、食べ物から得るエネルギーと動き回って使うエネルギーの収支として見る」という視点は、
+        クマを理解するうえで参考になります。首輪型カメラと二重標識水法を組み合わせた手法も、野生動物の暮らしを測る方法の一例です。
+      </p>
+      <p>
+        日本でクマに出会ったときの基本の行動は、次のとおりです。
       </p>
       <ul>
         <li>
-          🦭 <strong>小型のフトワモンアザラシ（30kg）</strong>: 約 180,000 kcal
+          <strong>走らない・背を向けない</strong>。クマを見ながら、<strong>ゆっくりその場を離れます</strong>。
         </li>
         <li>
-          🦭 <strong>標準的なワモンアザラシ（50kg）</strong>: 約 300,000 kcal
+          突進してきたら、クマスプレーを使います。目安は <strong>5〜10m</strong> まで近づいたところで、クマの<strong>顔に向けて 1〜2 秒ずつ</strong>噴射します。
+          環境省はスプレーの目安として、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上・カプサイシン類（CRC）1〜2% 程度を挙げています。
         </li>
         <li>
-          🦭 <strong>大型のヒモアザラシ（100kg）</strong>: 約 600,000 kcal
+          防衛的な攻撃で接触が避けられないときは、<strong>うつ伏せになり首の後ろを手で守る</strong>防御姿勢をとります。
+          執拗に襲ってくる、捕食しようとするような攻撃のときは反撃します。
         </li>
       </ul>
       <p>
-        1 日 12,000 kcal を必要とするホッキョクグマは、<strong>標準的なアザラシ 1 頭で約 25 日</strong>
-        生きられる計算。逆に言うと、<strong>2 ヶ月毎にアザラシを 1 頭以上は確実に捕る</strong>必要があります。
-      </p>
-      <p>
-        Pagano らの研究では、観察期間中に <strong>「アザラシを 1 頭以上捕った個体」</strong>と
-        <strong>「捕れなかった個体」</strong>で体重変化が明確に分かれました。
+        出没を見かけたときの連絡先は{" "}
+        <Link href="/articles/bear-report">通報マニュアル</Link>
+        にまとめています。
       </p>
 
-      <h2 id="fail">9 頭中 5 頭が体重減少 — 飢餓の現実</h2>
-      <p>
-        最も衝撃的だったのは、観察期間 11 日間で <strong>9 頭中 5 頭が体重を減らした</strong>こと。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">アザラシ捕獲状況</th>
-              <th className="px-3 py-2 text-left">11 日間の体重変化</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">1 頭以上捕獲（4 頭）</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">+2〜+5%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">捕獲ゼロ（5 頭）</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">−3〜−10%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        春期の <strong>「最重要食事シーズン」</strong>で、半数以上が <strong>体重を減らしていた</strong>。
-        これは将来の <strong>夏期氷消失時の死亡リスク</strong>に直結します。
-      </p>
-      <p>
-        Pagano らは、これを「<strong>ホッキョクグマの食糧危機の早期警報</strong>」と表現しました。
-      </p>
-
-      <h2 id="climate">気候変動が決定的なリスク要因</h2>
-      <p>
-        ホッキョクグマの狩りには <strong>「氷」</strong>が不可欠です。氷の上で待ち伏せ、
-        浮上したアザラシを捕獲する。氷がなければ、効率的な狩りができません。
-      </p>
-      <p>
-        現在、北極の海氷は <strong>毎年 13% ずつ縮小</strong>しているとされます。
-        ホッキョクグマの主要狩猟期間（春〜夏）の氷被覆も急速に減少しており、
-        従来の狩猟方法が <strong>機能しなくなりつつある</strong>状況です。
-      </p>
-      <p>
-        Pagano らの発見した <strong>「1.5 倍のエネルギー消費」</strong>を組み合わせると、
-        ホッキョクグマの生存方程式は次のようになります。
-      </p>
-      <p className="text-center my-4 text-sm">
-        <strong>「消費エネルギーが想定の 1.5 倍」 × 「氷縮小で狩猟効率半減」 = 生存崩壊</strong>
-      </p>
-      <p>
-        これはホッキョクグマが、種としての <strong>「臨界点」</strong>に近づいていることを示唆します。
-        Vol.15（{" "}
-        <Link href="/articles/research-digest-015">クマ進化</Link>
-        ）で見たように、ホッキョクグマは <strong>「最近のヒグマ」</strong>として 35〜48 万年前に分岐し、
-        氷河期環境に高度に特化しました。その特化が、温暖化下では <strong>致命的な脆弱性</strong>になりつつあります。
-      </p>
-
-      <h2 id="implications">ヒグマ・ツキノワグマへの示唆</h2>
-      <p>
-        本研究はホッキョクグマが対象ですが、知見は <strong>ヒグマ・ツキノワグマにも応用</strong>できます。
-      </p>
-      <h3>① ヒグマも予想以上にエネルギーを使う可能性</h3>
-      <p>
-        ヒグマも GPS 追跡で <strong>1 日 20〜50 km</strong>歩くことが知られています。
-        Pagano らの方法を応用すれば、ヒグマの実際のエネルギー消費が判明し、
-        従来の <strong>「ハイパーフェイジア期に必要なカロリー」</strong>の推定が更新される可能性があります。
-      </p>
-      <h3>② 食物減少の影響は想像以上に大きい</h3>
-      <p>
-        ブナ・ナラ凶作年に <strong>「クマがどれだけ困窮するか」</strong>は、これまで推測でした。
-        Pagano らの手法を本州のツキノワグマに応用すれば、凶作年の <strong>体重損失・繁殖低下の定量化</strong>
-        が可能になります。
-      </p>
-      <h3>③ 「冬眠しないクマ」のエネルギー収支</h3>
-      <p>
-        Vol.4（{" "}
-        <Link href="/articles/research-digest-004">気候変動と冬眠</Link>
-        ）で見た「冬眠期間短縮」と組み合わせると、温暖化下のクマは
-        <strong>年間のエネルギー予算</strong>が厳しくなる可能性があります。
-      </p>
-
-      <h2 id="future">ホッキョクグマの将来は?</h2>
-      <p>
-        Pagano らの研究は、ホッキョクグマの将来について <strong>厳しい予測</strong>を示唆しています。
-      </p>
-      <ul>
-        <li>
-          🌍 IPCC の温暖化シナリオでは、2050 年までに <strong>北極海氷の夏期消失</strong>がほぼ確実
-        </li>
-        <li>
-          🐻‍❄️ アラスカ・北極の個体群は <strong>2050 年までに 30〜50% 減少</strong>と予測
-        </li>
-        <li>
-          🔄 一部の個体群は陸地への <strong>「ヒグマ化」</strong>（陸上採餌・植物食化）も観察される
-        </li>
-        <li>
-          🧬 Vol.15 で見た <strong>「ヒグマとの交雑（グロラベア）」</strong>増加の可能性
-        </li>
-      </ul>
-      <p>
-        野生のホッキョクグマが、22 世紀には <strong>「種としての形を失う」</strong>可能性が
-        生物学者たちから真剣に議論されています。
-      </p>
-      <p>
-        ホッキョクグマだけでなく、温暖化はクマ科全体の生態に影響を及ぼし続けるでしょう。
-        詳細は{" "}
-        <Link href="/articles/research-digest-004">Vol.4 気候変動と冬眠</Link>
-        と{" "}
-        <Link href="/articles/research-digest-015">Vol.15 クマ進化</Link>
-        も併読してください。
-      </p>
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
             title:
-              "High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear（本号メイン）",
-            citation: (
-              <>
-                Pagano, A. M., Durner, G. M., Rode, K. D., et al. (2018).{" "}
-                <em className="not-italic">Science</em> 359(6375): 568–572.
-              </>
-            ),
+              "High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear（本号で紹介した論文）",
+            citation: mainCitation,
             href: "https://doi.org/10.1126/science.aan8677",
             linkText: "DOI: 10.1126/science.aan8677 →",
           },
           {
-            title: "Behavior and energetics of polar bears",
-            citation: (
-              <>
-                Pagano, A. M., et al. (2020).{" "}
-                <em className="not-italic">Journal of Experimental Biology</em>.
-              </>
-            ),
-          },
-          {
-            title: "USGS Polar Bear Research",
-            href: "https://www.usgs.gov/centers/alaska-science-center/science/polar-bear-research",
+            title: "High-energy, high-fat lifestyle challenges an Arctic apex predator, the polar bear（USGS の論文紹介ページ）",
+            citation: <>U.S. Geological Survey, Alaska Science Center.</>,
+            href: "https://www.usgs.gov/publications/high-energy-high-fat-lifestyle-challenges-arctic-apex-predator-polar-bear",
             linkText: "USGS →",
           },
         ]}
@@ -359,15 +235,11 @@ export default function Page() {
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.27">
-        <strong>「クマを見る観光」は世界で年 10 億ドル産業」</strong> —
-        ベアウォッチング・ツーリズムの経済効果と保護への貢献を、
-        世界各国の事例で精読します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }

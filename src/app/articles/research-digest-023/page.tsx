@@ -31,16 +31,14 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        母グマが冬眠中の巣穴で出産する仔グマは、平均 <strong>2 頭</strong>。
-        春に巣穴を出て、可愛らしい姿で母にくっついて歩く子グマたち。
-        でも、その後 1 年で <strong>半分が命を落とす</strong>のが現実です。
+        クマは「ゆっくり増える」動物だとよく言われます。では、実際にはどのくらいの年齢で子を産み、
+        子グマはどのくらい生き残り、何が個体数の増減を左右しているのでしょうか。
       </p>
       <p>
-        北米のイエローストーン国立公園で 20 年以上に渡ってヒグマを追跡した
-        Schwartz らの大規模研究が、クマの繁殖の <strong>厳しい数字</strong>を明らかにしました。
+        今号は、米国イエローストーン周辺のグリズリー（ヒグマ）を、首輪発信機で約 20 年追跡したデータから
+        繁殖と生存を推定した研究をご紹介します。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
         label="今号で読み解く 1 本の論文"
         title={
@@ -50,7 +48,7 @@ export default function Page() {
         }
         citation={
           <>
-            Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
+            Schwartz, C. C., Haroldson, M. A., White, G. C., Harris, R. B., Cherry, S., Keating, K. A., Moody, D., &amp; Servheen, C. (2006).{" "}
             <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
           </>
         }
@@ -62,339 +60,180 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            イエローストーンのヒグマ <strong>20+ 年・数百頭</strong>の繁殖を追跡
+            初めて出産するメスの年齢は平均 <strong>5.81 歳</strong>（4〜7 歳）、1 腹の子は平均 <strong>約 2 頭</strong>
           </>,
           <>
-            <strong>1 年目の仔グマ生存率は 60〜80%</strong>、母グマの生涯出産数は数頭のみ
+            子グマ・1 歳グマの生存は<strong>住んでいる場所</strong>で差があり、保護区の外ほど低かった
           </>,
           <>
-            人為要因（交通事故・密猟・自衛駆除）が <strong>仔の死亡要因の上位</strong>
+            自立したクマの死因が分かった例の <strong>85.5%</strong> は人が原因。個体数を左右するのは<strong>大人のメスの生存</strong>
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "クマの赤ちゃんは、なかなか大人になれない" },
-          { id: "yellowstone", title: "イエローストーンの 20 年研究" },
-          { id: "method", title: "数百頭のヒグマを追跡した統計学" },
-          { id: "litter", title: "1 産あたり何頭生まれるか" },
-          { id: "survival", title: "仔グマの生存率 — 年齢別の冷徹な数字" },
-          { id: "reasons", title: "なぜ仔グマはこんなに死ぬのか" },
-          { id: "lifetime", title: "母グマの生涯出産数" },
-          { id: "human", title: "人為要因の影響 — 街と道路が殺す" },
-          { id: "conservation", title: "個体群維持のための数学" },
-          { id: "japan", title: "日本のクマでも同様の構造" },
+          { id: "overview", title: "研究の概要" },
+          { id: "reproduction", title: "分かったこと 1：繁殖" },
+          { id: "young", title: "分かったこと 2：子グマと 1 歳グマ" },
+          { id: "adults", title: "分かったこと 3：自立したクマの生存" },
+          { id: "population", title: "分かったこと 4：個体数の増減" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">クマの赤ちゃんは、なかなか大人になれない</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        多くの人はクマの繁殖について、こんなイメージを持っています。
-        <strong>「強い動物だから、子供もよく育つ」</strong>。
-      </p>
-      <p>
-        ところが現実は逆です。クマは大型動物の中でも <strong>繁殖力の弱い種</strong>。
-        1 年に 1 産しかせず、子供の数も少なく、しかも生存率が低い。
-      </p>
-      <p>
-        この現実を最も精密に定量化したのが、Schwartz らの 2006 年の大著です。
-        100 頁を超える <strong>Wildlife Monographs</strong> 誌の特別号として発表され、
-        野生動物保全の必読文献となりました。
-      </p>
-
-      <h2 id="yellowstone">イエローストーンの 20 年研究</h2>
-      <p>
-        舞台は世界最古の国立公園、米国 <strong>イエローストーン国立公園</strong>。
-        ワイオミング・モンタナ・アイダホ 3 州にまたがる広大な保護区で、ヒグマの主要生息地です。
-      </p>
-      <p>
-        1973 年から始まった <strong>「Interagency Grizzly Bear Study Team（IGBST）」</strong>
-        という連邦・州横断プロジェクトが、ヒグマの個体群動向を継続的に追跡してきました。
-      </p>
-      <p>
-        Schwartz らは、1983〜2002 年の <strong>20 年分のデータ</strong>を統合解析。
-        対象は <strong>数百頭</strong>のヒグマで、生まれ・育ち・繁殖・死亡を <strong>全てを統計的に追跡</strong>
-        した壮大な研究です。
-      </p>
-      <p>
-        ここから得られたデータは、北米だけでなく <strong>世界中のヒグマ保全</strong>の基礎となっています。
-      </p>
-
-      <h2 id="method">数百頭のヒグマを追跡した統計学</h2>
-      <p>
-        20 年に及ぶ研究では、次のような労力が積み重ねられました。
+        舞台はイエローストーン国立公園とその周辺に広がる「グレーター・イエローストーン生態系（GYE）」です。
+        論文によると、この地域のグリズリーは過去 20 年ほどで数が増え、分布も広がっていました。
+        著者らは、その変化に何が効いていたのかを知るために、首輪発信機を付けたクマのデータを使いました。
       </p>
       <ul>
         <li>
-          🐻 <strong>個体識別</strong>: VHF / GPS 首輪を装着し、生涯追跡
+          <strong>繁殖</strong>：1983〜2002 年。3 歳を超える大人のメス 108 頭を、のべ 329 頭・年にわたって観察
         </li>
         <li>
-          🍼 <strong>母子の確認</strong>: 春の巣穴出時に母グマと一緒の子グマの数を計数
+          <strong>子グマ・1 歳グマの生存</strong>：メス 49 頭が連れていた 65 腹・137 頭の子を追跡
         </li>
         <li>
-          📈 <strong>毎年の再確認</strong>: 翌年も生き残った子グマを照合
-        </li>
-        <li>
-          ⚰️ <strong>死亡確認</strong>: 死体発見・GPS 信号停止での死亡時期と原因の推定
-        </li>
-        <li>
-          🧬 <strong>遺伝子サンプル</strong>: DNA で個体間の親子関係を確認
+          <strong>自立したクマ（亜成獣・成獣）の生存</strong>：1983〜2001 年。323 頭を、のべ 5,989 か月追跡
         </li>
       </ul>
       <p>
-        これらを統計的に統合し、ヒグマ個体群全体の <strong>「人口統計（demographics）」</strong>
-        を明らかにしました。生存率・繁殖率・移動率を年齢・性別ごとに精密推定。
+        これらの推定値を組み合わせ、個体群が年に何倍になるかを表す「λ（ラムダ）」を計算しました。
+        λ が 1 より大きければ増加、小さければ減少を意味します。
       </p>
 
-      <h2 id="litter">1 産あたり何頭生まれるか</h2>
-      <p>
-        まず基本データから。母グマは <strong>4〜5 歳で初めて出産</strong>し、
-        その後 2〜4 年に 1 回のペースで出産します。
-      </p>
-      <p>
-        1 産あたりの仔グマ数（litter size）の分布は次の通り。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">1 産あたりの仔グマ数</th>
-              <th className="px-3 py-2 text-left">割合</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">1 頭</td>
-              <td className="px-3 py-2 tabular-nums">~25%</td>
-            </tr>
-            <tr className="bg-amber-50/50">
-              <td className="px-3 py-2 font-semibold">2 頭</td>
-              <td className="px-3 py-2 text-amber-700 font-bold tabular-nums">~50%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">3 頭</td>
-              <td className="px-3 py-2 tabular-nums">~20%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">4 頭</td>
-              <td className="px-3 py-2 tabular-nums">~5%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        平均は <strong>約 2 頭</strong>。4 頭の双子（四つ子）は稀ですが、発生します。
-        母体の栄養状態が良いほど多く生まれる傾向。Vol.6（{" "}
-        <Link href="/articles/research-digest-006">食選好</Link>{" "}
-        ）と Vol.11（{" "}
-        <Link href="/articles/research-digest-011">着床遅延</Link>{" "}
-        ）で見た栄養 → 妊娠の経路がここに繋がります。
-      </p>
-
-      <h2 id="survival">仔グマの生存率 — 年齢別の冷徹な数字</h2>
-      <p>
-        次に生存率。これがクマ繁殖の <strong>厳しい現実</strong>を物語ります。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">年齢段階</th>
-              <th className="px-3 py-2 text-left">年間生存率</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr className="bg-red-50/50">
-              <td className="px-3 py-2 font-semibold">仔グマ 0〜1 歳</td>
-              <td className="px-3 py-2 text-red-700 font-bold tabular-nums">60〜80%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">幼獣 1〜2 歳</td>
-              <td className="px-3 py-2 tabular-nums">80〜85%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">若獣 2〜5 歳</td>
-              <td className="px-3 py-2 tabular-nums">85〜90%</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">成獣 5〜20 歳</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">90〜95%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        最も死にやすいのが <strong>「0〜1 歳の仔グマ」</strong>。1 年間で 20〜40% が死亡。
-        これを 4 歳までの生存率に積算すると、結果は衝撃的です。
-      </p>
+      <h2 id="reproduction">分かったこと 1：繁殖</h2>
       <ul>
         <li>
-          0 歳から 1 歳まで: 60〜80% 生存
+          初めて子を産んだメスの年齢は平均 <strong>5.81 歳</strong>、範囲は 4〜7 歳でした。
+          未経産のメスが 4・5・6・7 歳で出産した割合は、それぞれ 9.8%・29.4%・56.4%・100% でした。
         </li>
         <li>
-          0 歳から 2 歳まで: 約 50% 生存
+          記録された出産は 104 腹で、そのうち 102 腹で子の数を数えられました。
+          1 腹の子の数は平均 <strong>2.0 頭</strong>（標準誤差 0.1）。1 頭・2 頭・3 頭の割合は
+          0.18・0.61・0.22 でした。
         </li>
         <li>
-          0 歳から 4 歳（独立して繁殖可能になる）まで: <strong>約 40〜50% 生存</strong>
-        </li>
-      </ul>
-      <p>
-        つまり、<strong>「生まれた仔グマの半分は大人になれない」</strong>のがヒグマの世界です。
-      </p>
-
-      <h2 id="reasons">なぜ仔グマはこんなに死ぬのか</h2>
-      <p>
-        Schwartz らは死亡要因も詳しく分析しました。
-      </p>
-      <h3>自然要因</h3>
-      <ul>
-        <li>
-          🐻 <strong>同種雄による殺仔（infanticide）</strong>: 雄が他個体の仔を殺して母を繁殖サイクルに戻す
+          子グマを連れていたメスの割合は年によって 0.05〜0.60 と大きく変わり、平均は 0.316 でした。
+          繁殖率は「メス 1 頭あたり年 0.318 頭のメスの子」と推定されています。
         </li>
         <li>
-          🌪️ <strong>事故・落下・溺死</strong>: 川渡り・崖からの転落
-        </li>
-        <li>
-          🍴 <strong>母グマの食料不足</strong>: ハイパーフェイジア期の凶作年は仔も衰弱
-        </li>
-        <li>
-          ❄️ <strong>冬眠中の死亡</strong>: 巣穴の崩落・極寒・母乳不足
-        </li>
-        <li>
-          🦊 <strong>他種による捕食</strong>: オオカミ・ピューマ（北米）
-        </li>
-      </ul>
-      <h3>人為要因</h3>
-      <ul>
-        <li>
-          🚗 <strong>自動車衝突</strong>: 経験不足な若グマほど道路で事故に遭いやすい
-        </li>
-        <li>
-          🔫 <strong>密猟・違法駆除</strong>: 母グマを撃たれて孤児になった仔
-        </li>
-        <li>
-          ⚖️ <strong>自衛駆除</strong>: 家畜被害などで母グマが駆除される際、仔も連動
-        </li>
-        <li>
-          🚮 <strong>誘引物中毒</strong>: ゴミ・農薬・人為的食物による中毒
-        </li>
-      </ul>
-      <p>
-        分析の結果、人為要因が仔グマ死亡の <strong>30〜50%</strong>を占めていた、というのが
-        Schwartz らの結論の一つでした。これは保全政策に直接影響を与えました。
-      </p>
-
-      <h2 id="lifetime">母グマの生涯出産数</h2>
-      <p>
-        さらに別の角度で見ると、<strong>「母グマが生涯で育て上げる仔の数」</strong>はもっと少なくなります。
-      </p>
-      <ul>
-        <li>
-          🎂 平均寿命: <strong>15〜25 歳</strong>（野生）
-        </li>
-        <li>
-          🍼 初産年齢: <strong>4〜5 歳</strong>
-        </li>
-        <li>
-          📅 出産間隔: <strong>2〜4 年に 1 回</strong>
-        </li>
-        <li>
-          👶 平均 1 産あたり仔: <strong>2 頭</strong>
-        </li>
-        <li>
-          ✅ 仔の成獣到達率: <strong>40〜50%</strong>
-        </li>
-      </ul>
-      <p>
-        これらを掛け合わせると、1 頭の母グマが生涯で繁殖可能年齢まで育て上げる仔は
-        <strong>平均 3〜5 頭</strong>程度。
-      </p>
-      <p>
-        生まれる仔の数は多くても、生き延びるのは少ない。これがクマの繁殖戦略です。
-        Vol.11（{" "}
-        <Link href="/articles/research-digest-011">着床遅延</Link>
-        ）で見た「妊娠キャンセル機能」と組み合わせると、クマは
-        <strong>「無理に生まない、生んでも全部は育てない」</strong>戦略を取っていることが分かります。
-      </p>
-
-      <h2 id="human">人為要因の影響 — 街と道路が殺す</h2>
-      <p>
-        Schwartz らの最も重要な発見は、<strong>「人為要因の累積効果」</strong>でした。
-      </p>
-      <p>
-        個別の自動車事故・密猟・自衛駆除は、それぞれは小さな数字に見えます。
-        でも、これらが <strong>毎年積み重なる</strong>と、母グマの世代交代に追いつかなくなる。
-      </p>
-      <p>
-        モデル計算では、<strong>仔グマ年間生存率が 70% から 60% に下がるだけで、
-        50 年で個体群が半減</strong>するという結果が示されました。
-        わずかな変化が長期的に大きな影響を生む、という事実は保全政策に明確な指針を与えました。
-      </p>
-      <p>
-        その後、イエローストーンでは以下の対策が強化されました。
-      </p>
-      <ul>
-        <li>
-          🚗 <strong>道路への動物用フェンス・横断橋</strong>
-        </li>
-        <li>
-          🚫 <strong>母子クマの密猟厳罰化</strong>
-        </li>
-        <li>
-          🗑️ <strong>キャンプ場のベアプルーフ・ゴミ箱導入</strong>
-        </li>
-        <li>
-          📚 <strong>住民・観光客教育の徹底</strong>
+          1 腹の子の数には、個体数の指標と、ホワイトバークパイン（マツの一種）の球果の実り具合が
+          最も強く関係していました。個体数が多いと子の数が減る「密度効果」の可能性が示されましたが、
+          生まれた直後の死亡で説明できる可能性も残る、と著者らは書いています。
         </li>
       </ul>
 
-      <h2 id="conservation">個体群維持のための数学</h2>
+      <h2 id="young">分かったこと 2：子グマと 1 歳グマ</h2>
       <p>
-        Schwartz らの研究は、<strong>「個体群維持のための数学」</strong>を確立した点で歴史的でした。
+        追跡した 137 頭の子のうち、死亡が確認されたのは 42 頭でした（子グマの年に 32 頭、1 歳で 5 頭、
+        どちらの時期か分からないもの 5 頭）。これは追跡中に確認された数で、生存率そのものではありません。
       </p>
       <p>
-        保全に必要な基本式は、シンプルに表せます。
-      </p>
-      <p className="text-center my-4 text-sm">
-        <strong>「成獣メスの数 × 繁殖率 × 仔生存率 ≥ 成獣メスの死亡率」</strong>
-      </p>
-      <p>
-        この式が崩れると、個体群は減少に向かう。逆に、この式が「&gt;」で大きく成立する限り、個体群は安定または増加します。
-      </p>
-      <p>
-        Schwartz らの数字を当てはめると、ヒグマ個体群は <strong>「絶妙なバランス」</strong>で
-        維持されていることが分かります。仔生存率が少し下がる、または成獣の死亡率が少し上がるだけで、
-        長期的な減少傾向に反転する。これは絶滅危惧個体群（西中国・四国）にも当てはまります。
-      </p>
-
-      <h2 id="japan">日本のクマでも同様の構造</h2>
-      <p>
-        日本のヒグマ・ツキノワグマでも、繁殖の基本構造は同じです。
+        生存に最も影響していたのは、<strong>どこに住んでいるか</strong>でした。
       </p>
       <ul>
+        <li>最も高い：国立公園の外で、米国魚類野生生物局の「回復ゾーン」の内側</li>
+        <li>それより低い：国立公園の内側</li>
+        <li>最も低い：回復ゾーンの外側</li>
+      </ul>
+      <p>
+        また、生存率は個体数の指標が高いほど低く、密度効果がうかがえました。
+        一方、ホワイトバークパインの種子が多い年、冬が厳しい年、1 腹の子が多いとき、
+        母グマの年齢が高いときには生存が良くなっていました。
+        オスが子を殺す「子殺し」の仮説も検証されましたが、結果ははっきりしませんでした。
+      </p>
+
+      <h2 id="adults">分かったこと 3：自立したクマの生存</h2>
+      <ul>
         <li>
-          <strong>ヒグマ（北海道）</strong>: 1 産 1〜3 頭、仔生存率 60〜70%、初産 4〜6 歳
+          死因が分かった死亡のうち <strong>85.5%</strong> が人間によるものでした。
         </li>
         <li>
-          <strong>ツキノワグマ（本州）</strong>: 1 産 1〜2 頭、仔生存率 50〜70%、初産 4〜5 歳
+          通常の調査で捕獲したメスの年間生存率は、行方不明の個体を除いた計算で <strong>0.950</strong>、
+          行方不明を死亡とみなした計算で <strong>0.922</strong> でした。
+        </li>
+        <li>
+          人とのトラブルで捕獲されたクマは、通常の調査個体より生存率が低い結果でした。
+          メスはオスより生存率が高く、季節では秋がいちばん低くなっていました。
+          ホワイトバークパインの実りが良い年は生存率が上がりました。
+        </li>
+        <li>
+          回復ゾーンの外にいることが多いクマほど、生存率が低くなっていました。
         </li>
       </ul>
       <p>
-        日本のクマも <strong>「ゆっくり増える」</strong>動物です。
-        個体数が大きく減ると <strong>回復に 20〜30 年以上</strong>かかる。これは Vol.21（{" "}
-        <Link href="/articles/research-digest-021">トレンティーノ再導入</Link>
-        ）の事例にも整合します。
+        著者らは、1983 年に始まった大人のメスの死亡を減らす取り組みが効果を上げたと考えられる一方、
+        回復ゾーンの外でも同様の対策をとれば、個体群がさらに広がる見込みが高まると述べています。
+      </p>
+
+      <h2 id="population">分かったこと 4：個体数の増減</h2>
+      <p>
+        シミュレーションでは、λ は子グマや 1 歳グマの生存率にはあまり左右されず、
+        <strong>自立したメスの生存率</strong>の不確かさが、減少に転じる確率に大きく影響していました。
+        オスの生存率は λ にほとんど影響しませんでした。
       </p>
       <p>
-        個体数管理の際には、<strong>「過剰捕獲のリスク」</strong>を常に意識する必要があります。
-        詳細は{" "}
-        <Link href="/research/wildlife-plans">都道府県別 クマ管理計画</Link>
-        と{" "}
-        <Link href="/articles/designated-management-2026">2024 年の指定管理鳥獣化</Link>
-        を参照してください。
+        1983〜2002 年の条件のもとで、個体群が減少に転じる確率を 5% 以下に抑えるには、
+        自立したメス（2 歳超）の年間死亡率を <strong>10% 以下</strong>にする必要がある、と試算されています。
+        ただし著者らは、これは当時の平均的な条件にもとづく短期の目安であり、標本が小さいため
+        本当の死亡率を知るのは難しい、とも注意しています。
       </p>
+      <p>
+        さらに場所ごとに λ を計算すると、国立公園と回復ゾーンの内側では λ が 1 以上、
+        回復ゾーンの外側では 1 以下でした。内側で増えたクマが外側に出て死亡が多くなる
+        「ソース・シンク（供給源と吸い込み先）」の構造が示唆され、生態系の縁での人由来の食べ物の除去などを
+        議論する必要がある、と結論づけています。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
+      <ul>
+        <li>
+          首輪発信機を付けたクマのデータにもとづく推定で、子グマの生存の解析はメス 49 頭・137 頭の子が対象です。
+          著者ら自身も、子グマ・1 歳グマの平均生存率には大きな不確かさがあると書いています。
+        </li>
+        <li>
+          対象は 1983〜2002 年ごろのイエローストーン周辺のグリズリーです。
+          同じヒグマでも、地域や時代、食べ物の条件が違えば数字は変わります。
+          たとえば米国モンタナ州の別の地域（2004〜2009 年）では、子グマの生存率 0.612、
+          大人のメスの生存率 0.952、1 腹の平均 2.00 頭（出産直後の死亡を補正して 2.27 頭）と報告されています（Mace ら 2012）。
+        </li>
+        <li>
+          日本の本州・四国のツキノワグマは別の種で、体の大きさも食べ物も違います。
+          この論文の数字をそのまま日本のクマに当てはめることはできません。
+        </li>
+      </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
+      <p>
+        この研究から言えるのは、クマは初めての出産が遅く、1 回に産む子の数も少ない動物だということ、
+        そして個体数の行方は「大人のメスがどれだけ生き残るか」に強く左右される、ということです。
+        日本でも、クマは 2024 年 4 月に指定管理鳥獣に加えられ、捕獲と保護のバランスが議論されています。
+        詳しくは{" "}
+        <Link href="/articles/designated-management-2026">指定管理鳥獣化の解説</Link>
+        をご覧ください。
+      </p>
+      <p>
+        また、イエローストーンでは人が原因の死亡が大半を占め、生態系の縁で人由来の食べ物をなくすことが
+        課題に挙げられていました。日本でも、生ごみや収穫しない果樹などをクマに食べさせないことは、
+        人の安全を守るうえでも大切です。
+      </p>
+      <p>
+        万一クマに出会ったときは、走らず、背を向けず、ゆっくり離れてください。
+        突進されたら、クマスプレーを 5〜10m の距離で顔に向けて 1〜2 秒ずつ噴射します
+        （環境省の推奨要件は、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上・カプサイシン類 CRC 1〜2% 程度）。
+        防衛的な攻撃で接触が避けられなければ、うつ伏せになって首の後ろを手で守る防御姿勢をとります。
+        執拗に襲ってくる捕食的な攻撃の場合は反撃してください。
+        基本の対策は{" "}
+        <Link href="/learn/safety">クマ対策の基本</Link>
+        にまとめています。
+      </p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
@@ -404,25 +243,24 @@ export default function Page() {
               "Temporal, spatial, and environmental influences on the demographics of grizzly bears in the Greater Yellowstone Ecosystem（本号メイン）",
             citation: (
               <>
-                Schwartz, C. C., Haroldson, M. A., White, G. C., et al. (2006).{" "}
+                Schwartz, C. C., Haroldson, M. A., White, G. C., Harris, R. B., Cherry, S., Keating, K. A., Moody, D., &amp; Servheen, C. (2006).{" "}
                 <em className="not-italic">Wildlife Monographs</em> 161: 1–68.
               </>
             ),
-          },
-          {
-            title: "Interagency Grizzly Bear Study Team annual reports",
-            href: "https://www.usgs.gov/centers/norock/science/interagency-grizzly-bear-study-team",
-            linkText: "USGS IGBST →",
+            href: "https://doi.org/10.2193/0084-0173(2006)161%5B1:TSAEIO%5D2.0.CO;2",
+            linkText: "DOI: 10.2193/0084-0173(2006)161[1:TSAEIO]2.0.CO;2 →",
           },
           {
             title:
-              "Estimating population vital rates and viability of an isolated brown bear population",
+              "Grizzly bear population vital rates and trend in the Northern Continental Divide Ecosystem, Montana",
             citation: (
               <>
-                Mace, R. D., et al. (2012).{" "}
-                <em className="not-italic">Journal of Wildlife Management</em>.
+                Mace, R. D., Carney, D. W., Chilton-Radandt, T., et al. (2012).{" "}
+                <em className="not-italic">Journal of Wildlife Management</em> 76(1): 119–128.
               </>
             ),
+            href: "https://doi.org/10.1002/jwmg.250",
+            linkText: "DOI: 10.1002/jwmg.250 →",
           },
         ]}
       />
@@ -433,11 +271,7 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.24">
-        <strong>「クマの冬眠巣穴は『人がいない場所』で選ばれる」</strong> —
-        スウェーデンの 100 巣穴を測定し、人家・道路との距離を解析した Linnell 2000 を精読。
-        冬眠中のクマと仔の脆さを解説します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }

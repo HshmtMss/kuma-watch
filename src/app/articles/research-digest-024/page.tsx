@@ -31,17 +31,15 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        晩秋、クマは <strong>「冬の家」</strong>を探します。
-        次の春まで 5 ヶ月間こもる場所、出産・子育てまで行う場所、自分の命を預ける場所。
-        どこを選ぶかで、生死が分かれます。
+        冬のあいだ、クマは巣穴にこもって過ごします。母グマはその巣穴で出産し、春まで子を育てます。
+        では、巣穴にいるクマは、人の活動にどれくらい影響を受けるのでしょうか。
       </p>
       <p>
-        ノルウェーとスウェーデンの研究チームが、ヒグマの巣穴 <strong>100 か所以上</strong>を実測し、
-        クマがどんな基準で「冬の家」を選んでいるかを解析しました。
-        その結果は、人クマの距離関係について重要な示唆を与えるものでした。
+        今号は、この問いについて当時の研究をまとめた総説（レビュー論文）を読みます。
+        新しく野外で測定した研究ではなく、ヒグマ・アメリカクロクマ・ホッキョクグマについて
+        それまでに報告された観察や研究を集めて整理したものです。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
         label="今号で読み解く 1 本の論文"
         title="How vulnerable are denning bears to disturbance?"
@@ -59,325 +57,151 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            北欧の <strong>100 か所超</strong>のヒグマ巣穴を測定し人家・道路との距離を分析
+            ヒグマ・クロクマ・ホッキョクグマの巣穴と人の活動に関する報告を集めた <strong>総説</strong>
           </>,
           <>
-            クマは <strong>人家から平均 2 km 以上、道路から 200m 以上</strong>離れた場所を選ぶ
+            巣穴から <strong>約 1 km 以内、特に 200 m 以内</strong>の人の活動には、クマの反応がさまざまで、
+            巣穴を捨てる例もある（特に巣ごもりの初めのころ）
           </>,
           <>
-            撹乱で <strong>巣穴放棄</strong>すると母グマと仔が危険にさらされる
+            行動圏の中にほかの巣穴の候補があれば、巣穴を 1 つ失っても必ずしも害になるとは限らない
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "intro", title: "クマにとっての「家選び」" },
-          { id: "team", title: "スカンジナビアン・ベア・プロジェクト" },
-          { id: "method", title: "100 巣穴の現地踏査" },
-          { id: "selection", title: "クマが選ぶ巣穴の条件" },
-          { id: "distance", title: "人家・道路からどれだけ離れるか" },
-          { id: "disturbance", title: "撹乱されたクマはどうなるか" },
-          { id: "mother", title: "母グマと仔の特別な脆弱性" },
-          { id: "ski", title: "スキー場・林業活動との衝突" },
-          { id: "japan", title: "日本のクマの巣穴選定" },
-          { id: "winter", title: "冬期の登山・スノーシューでの配慮" },
+          { id: "why", title: "なぜ巣穴の時期が問題になるのか" },
+          { id: "overview", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "limits", title: "限界と注意点" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="intro">クマにとっての「家選び」</h2>
+      <h2 id="why">なぜ巣穴の時期が問題になるのか</h2>
       <p>
-        クマの冬眠は、Vol.8（{" "}
-        <Link href="/articles/research-digest-008">Tøien 2011</Link>
-        ）と Vol.16（{" "}
-        <Link href="/articles/research-digest-016">Sommer 2016</Link>
-        ）で見たように、生理学的に極めて精密な現象です。
-        この 5 ヶ月間を生き延びるには、適切な <strong>「冬眠地（den site）」</strong>が必要不可欠です。
+        多くの大型の肉食動物は、人が近づいても、少し移動するだけで避けることができます。
+        移動にかかるエネルギーは大きくありません。
       </p>
       <p>
-        巣穴は単なる寝場所ではありません。気温・湿度を一定に保ち、捕食者から身を隠し、
-        母グマの場合は <strong>「出産と子育ての場」</strong>にもなります。
-        間違った選択は、文字通り命取りになる。
+        ところが、巣穴にこもっている時期のクマは事情が違います。
+        この時期のクマは食べ物をとらず、蓄えた脂肪で冬を越します。
+        そのため、人の活動で起こされたり、巣穴を離れたりすると、
+        <strong>エネルギーの面で大きな負担になるおそれ</strong>があります。
+        著者らは、これが「巣穴のクマは人の活動にどれくらい弱いのか」を調べる理由だと述べています。
       </p>
       <p>
-        では、クマはどんな基準で巣穴を選ぶのか？
-        野生動物の習性として極めて重要なこの問いに、Linnell らが初めて系統的な答えを出しました。
-      </p>
-
-      <h2 id="team">スカンジナビアン・ベア・プロジェクト</h2>
-      <p>
-        研究の舞台は、Vol.4（{" "}
-        <Link href="/articles/research-digest-004">気候変動と冬眠</Link>
-        ）でも登場した <strong>「スカンジナビアン・ベア・プロジェクト（SBBRP）」</strong>。
-        スウェーデン中部とノルウェー南東部のヒグマを長期追跡している、欧州最大のクマ研究プロジェクトです。
-      </p>
-      <p>
-        筆頭著者の <strong>John Linnell</strong>（ノルウェー自然研究所、Vol.9 でも登場）は、
-        食肉目の管理研究の世界的権威。
-        この論文では、SBBRP が蓄積した <strong>1985〜1999 年の 100 か所以上の巣穴データ</strong>
-        を体系的に解析しました。
-      </p>
-
-      <h2 id="method">100 巣穴の現地踏査</h2>
-      <p>
-        GPS テレメトリーでクマの位置をフォローし、巣穴と確認された地点を 1 つずつ <strong>現地踏査</strong>。
-        次のデータを記録しました。
-      </p>
-      <ul>
-        <li>
-          🏞️ <strong>地形</strong>: 標高・斜面の方向・傾斜・地質
-        </li>
-        <li>
-          🌳 <strong>植生</strong>: 周囲の樹種・被覆度
-        </li>
-        <li>
-          🏠 <strong>人家との距離</strong>: 最も近い人家まで何 m か
-        </li>
-        <li>
-          🛣️ <strong>道路との距離</strong>: 主要道路・林道・歩道との距離
-        </li>
-        <li>
-          🎿 <strong>レクリエーション施設との距離</strong>: スキー場・キャンプ場・登山道
-        </li>
-        <li>
-          📏 <strong>巣穴の物理的特性</strong>: サイズ・形状・出入口の向き
-        </li>
-        <li>
-          🐻 <strong>使用パターン</strong>: 単独 vs 母子、初冬眠 vs 再利用
-        </li>
-      </ul>
-      <p>
-        積雪期に GPS で巣穴位置を特定し、雪解け後（5〜6 月）に研究者が <strong>徒歩で現地に到達</strong>
-        して測定する地道な作業を 15 年続けたデータでした。
-      </p>
-
-      <h2 id="selection">クマが選ぶ巣穴の条件</h2>
-      <p>
-        分析の結果、ヒグマは <strong>明確な選好</strong>を持って巣穴を選んでいることが分かりました。
-      </p>
-      <h3>地形・植生</h3>
-      <ul>
-        <li>
-          ⛰️ <strong>標高 600〜900m</strong>（中標高山地）
-        </li>
-        <li>
-          🧭 <strong>北向き〜東向きの斜面</strong>（雪が長期間保持される）
-        </li>
-        <li>
-          📐 <strong>斜面傾斜 30〜45°</strong>（巣穴の天井が安定）
-        </li>
-        <li>
-          🌲 <strong>針葉樹林の被覆</strong>（視覚的な遮蔽）
-        </li>
-        <li>
-          🏚️ <strong>岩盤の窪み・倒木の下</strong>（自然の構造物を利用）
-        </li>
-      </ul>
-      <h3>物理的特性</h3>
-      <ul>
-        <li>
-          🚪 <strong>出入口は狭く</strong>（外気の流入を最小化）
-        </li>
-        <li>
-          🏞️ <strong>奥行きは 2〜3m</strong>（体を完全に入れて方向転換できる）
-        </li>
-        <li>
-          ⬇️ <strong>下向き斜面</strong>（雨水が侵入しない）
-        </li>
-        <li>
-          🌿 <strong>内側に枝・草の寝床</strong>（断熱材としてクマ自身が運び込む）
-        </li>
-      </ul>
-
-      <h2 id="distance">人家・道路からどれだけ離れるか</h2>
-      <p>
-        本論文の最も重要な発見が、<strong>「人間活動との距離」</strong>でした。
-      </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">人間活動</th>
-              <th className="px-3 py-2 text-left">巣穴までの平均距離</th>
-              <th className="px-3 py-2 text-left">最低距離</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">人家</td>
-              <td className="px-3 py-2 tabular-nums">2.4 km</td>
-              <td className="px-3 py-2 tabular-nums">300 m</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">主要道路</td>
-              <td className="px-3 py-2 tabular-nums">1.2 km</td>
-              <td className="px-3 py-2 tabular-nums">200 m</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">林道</td>
-              <td className="px-3 py-2 tabular-nums">350 m</td>
-              <td className="px-3 py-2 tabular-nums">50 m</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">スキー場</td>
-              <td className="px-3 py-2 tabular-nums">5.0 km</td>
-              <td className="px-3 py-2 tabular-nums">1.5 km</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        クマは「<strong>人がいる場所から離れた</strong>」場所を明確に選んでいました。
-        この選択は <strong>偶然ではなく統計的に有意</strong>。
-        近隣の利用可能な場所と比較すると、クマは <strong>明らかに人家・道路を避けて</strong>巣穴を作っていました。
-      </p>
-      <p>
-        この知見は、後の野生動物保護政策において <strong>「クマの巣穴周辺の保護バッファ」</strong>を
-        定める根拠となりました。
-      </p>
-
-      <h2 id="disturbance">撹乱されたクマはどうなるか</h2>
-      <p>
-        では、もし冬眠中のクマが <strong>人間に発見・撹乱</strong>されたらどうなるか。
-        Linnell らは過去のデータから、撹乱されたクマの行動を解析しました。
-      </p>
-      <ul>
-        <li>
-          🏃 <strong>巣穴を放棄</strong>: 35% が <strong>新しい巣穴を探す</strong>
-        </li>
-        <li>
-          😨 <strong>冬眠中断・覚醒</strong>: 真冬に活動を始め、エネルギーを消耗
-        </li>
-        <li>
-          👶 <strong>仔グマの放棄</strong>: 母グマが仔を残して逃げる → 仔が死亡
-        </li>
-        <li>
-          ⚠️ <strong>人への攻撃</strong>: 巣穴近くを侵入されると母グマは即攻撃
-        </li>
-        <li>
-          ❄️ <strong>新巣穴で生存リスク</strong>: 真冬に新巣穴を作る余裕はなく、簡素な仮巣穴で過ごす
-        </li>
-      </ul>
-      <p>
-        最も深刻なのが <strong>「母グマの仔グマ放棄」</strong>。
-        母グマがパニックで巣穴を離れた場合、生まれて間もない仔（生後 1〜3 ヶ月）が
-        <strong>1 時間ほどで凍死</strong>します。これは保全的に非常に深刻な事態。
-      </p>
-
-      <h2 id="mother">母グマと仔の特別な脆弱性</h2>
-      <p>
-        Linnell らは、特に <strong>母グマ + 仔グマの巣穴</strong>での撹乱リスクが大きいことを強調しました。
-      </p>
-      <ul>
-        <li>
-          母グマは仔を守るために <strong>攻撃的</strong>になる（人身被害リスク）
-        </li>
-        <li>
-          仔は <strong>低体温・低栄養</strong>に極めて弱い
-        </li>
-        <li>
-          一度母から離れた仔の生存率は <strong>ほぼゼロ</strong>
-        </li>
-        <li>
-          母も冬眠中の体力消耗で <strong>春までに死亡</strong>するリスク
-        </li>
-      </ul>
-      <p>
-        このため、北米・北欧の野生動物管理機関は、<strong>「冬眠中のクマと巣穴は最大限保護」</strong>
-        という原則を確立しています。これは Vol.23（{" "}
-        <Link href="/articles/research-digest-023">仔グマ生存率</Link>
-        ）の研究と整合的で、人為要因が母子に与えるダメージの大きさを物語ります。
-      </p>
-
-      <h2 id="ski">スキー場・林業活動との衝突</h2>
-      <p>
-        北欧・北米では、<strong>「冬期のレクリエーション・林業活動」</strong>とクマ巣穴の衝突が
-        実際の問題になっています。
-      </p>
-      <ul>
-        <li>
-          🎿 <strong>スキー場拡張</strong>: 新しいリフト・コース建設で巣穴が破壊される事案
-        </li>
-        <li>
-          🏂 <strong>バックカントリースキー</strong>: スキーヤーが巣穴の上を滑り、クマを驚かせる
-        </li>
-        <li>
-          🌲 <strong>冬期林業</strong>: 雪深い時期の伐採作業で巣穴を発見・破壊
-        </li>
-        <li>
-          ❄️ <strong>スノーモービル</strong>: 振動・音でクマを覚醒させる
-        </li>
-      </ul>
-      <p>
-        Linnell ら 2000 以降、これらの活動については <strong>「クマ巣穴回避ガイドライン」</strong>が
-        整備されるようになりました。スウェーデン・ノルウェーでは、林業・観光業者に対し
-        <strong>「冬期は既知の巣穴から 500m 以上離れる」</strong>といった指針が公布されています。
-      </p>
-
-      <h2 id="japan">日本のクマの巣穴選定</h2>
-      <p>
-        日本のヒグマ（北海道）・ツキノワグマ（本州）も、巣穴選定の基本パターンは同じです。
-      </p>
-      <h3>ヒグマ（北海道）</h3>
-      <ul>
-        <li>
-          標高 500〜1,000m の中標高山地
-        </li>
-        <li>
-          北向き〜東向きの斜面
-        </li>
-        <li>
-          倒木の下・岩盤の窪み
-        </li>
-        <li>
-          人家から平均 1〜3 km
-        </li>
-      </ul>
-      <h3>ツキノワグマ（本州）</h3>
-      <ul>
-        <li>
-          標高 500〜1,500m の山岳地帯
-        </li>
-        <li>
-          樹洞・岩盤の窪み・倒木の下
-        </li>
-        <li>
-          人家から平均 0.5〜2 km
-        </li>
-      </ul>
-      <p>
-        日本では <strong>「天然の樹洞」</strong>を巣穴として利用するツキノワグマが多いのが特徴です。
-        大木の中の空洞、太い枝の分かれ目、岩棚など、自然の構造物を巧みに利用します。
-        日本のクマの巣穴に関する研究は{" "}
+        クマの冬ごもりの体の仕組みについては{" "}
         <Link href="/articles/bear-hibernation">クマの冬眠</Link>
-        にもまとめています。
+        の記事もご覧ください。
       </p>
 
-      <h2 id="winter">冬期の登山・スノーシューでの配慮</h2>
+      <h2 id="overview">研究の概要</h2>
       <p>
-        本論文の知見を踏まえ、冬期の山岳活動では次の配慮が推奨されます。
+        著者らはノルウェーとスウェーデンの研究者で、筆頭著者の Linnell はノルウェー自然研究所（NINA）に所属しています。
+        この論文は、ヒグマ・アメリカクロクマ・ホッキョクグマについて、巣ごもりの生態と、
+        人の活動に対する反応を報告した文献を集めて整理した <strong>総説</strong>です。
+      </p>
+      <p>
+        もとになったのは、ノルウェーで軍の演習場を新しく設ける計画に関連して作られた報告書
+        （NINA の報告書、1996 年、ノルウェー語・英語要旨つき）で、2000 年に英語の論文として発表されました。
+      </p>
+      <p>
+        著者ら自身も、巣ごもり中の撹乱（人の活動による邪魔）についてのデータは
+        <strong>あちこちに散らばっていて、まとまった量はない</strong>と述べています。
+      </p>
+
+      <h2 id="findings">分かったこと</h2>
+      <h3>距離と反応</h3>
+      <p>
+        集めた報告からは、巣穴から <strong>約 1 km より近い</strong>ところ、
+        特に <strong>200 m 以内</strong>での人の活動に対して、クマの反応はさまざまでした。
+      </p>
+      <ul>
+        <li>人の活動を許容するクマもいて、巣穴の中まで人が入っても留まった例がある</li>
+        <li>
+          一方で、この範囲の活動に反応して <strong>巣穴を捨てる</strong>クマもいる
+        </li>
+        <li>
+          巣穴を捨てる反応は、特に <strong>巣ごもりの初めのころ</strong>に起こりやすい
+        </li>
+      </ul>
+      <p>
+        つまり、「この距離なら必ず逃げる」「この距離なら大丈夫」と一律に決められるものではなく、
+        個体や時期によって反応が違う、というのが論文のまとめ方です。
+      </p>
+
+      <h3>巣穴を 1 つ失うことの意味</h3>
+      <p>
+        同じクマでも、年ごとに使う巣穴は離れていることが多いと報告されています。
+        このことから著者らは、人の活動で巣穴を 1 か所失っても、
+        <strong>行動圏の中にほかの巣穴の候補があれば</strong>、
+        必ずしも悪い影響につながるとは限らないと考えています。
+      </p>
+
+      <h3>管理への提言</h3>
+      <p>
+        もとになった NINA の報告書では、管理上の提言として、
+        <strong>分かっている巣穴から 1 km 以内では人の活動を避ける</strong>ことが挙げられています。
+        あわせて、巣穴の多い場所を地図にまとめること、巣穴に向いた自然の地形がある場所を守ること、
+        決まったルートを外れた予測しにくい活動は影響が大きいことにも触れています。
+      </p>
+
+      <h2 id="limits">限界と注意点</h2>
+      <ul>
+        <li>
+          この論文は総説で、新しい測定データを示したものではありません。
+          もとになった個々の報告は、種・地域・調査方法がばらばらです。
+        </li>
+        <li>
+          「1 km」「200 m」は、反応が見られた範囲の目安であり、
+          その外なら安全、内なら必ず逃げる、という境界線ではありません。
+        </li>
+        <li>
+          扱っているのは北米・北欧のヒグマ、アメリカクロクマ、ホッキョクグマです。
+          日本のツキノワグマやヒグマについて調べたものではなく、
+          日本の山の地形や人の利用のしかたにそのまま当てはまるとは限りません。
+        </li>
+        <li>
+          2000 年の論文で、その後の研究で分かったことは含まれていません。
+        </li>
+      </ul>
+
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
+      <p>
+        日本でも、冬に山へ入る人はいます。冬山登山、スノーシュー、山スキー、林業などです。
+        この論文から、控えめに言えることは次のとおりです。
       </p>
       <ol className="my-4 list-decimal space-y-3 pl-5">
         <li>
-          <strong>「冬は安全」と決めつけない</strong> — Vol.4（{" "}
-          <Link href="/articles/research-digest-004">気候変動と冬眠</Link>
-          ）で見たように、近年は冬眠しない個体も増えています。
+          <strong>巣穴があるかもしれない場所には近づかない</strong> —
+          木の根元や岩の下の穴、雪面の不自然な穴などをのぞき込んだり、そばに長く留まったりしないようにしましょう。
+          巣穴のクマにとって負担になるうえ、人にとっても危険です。
         </li>
         <li>
-          <strong>巣穴と思われる場所には近づかない</strong> — 雪面に「クマが入った穴」を見つけても、
-          覗き込んだり、雪の上を歩いて近くを通ったりしない。
+          <strong>「冬だからクマはいない」と決めつけない</strong> —
+          巣穴にいるクマも、近くの人の活動で目を覚まし、巣穴を出ることがあります。
         </li>
         <li>
-          <strong>母子グマの巣穴近くで撹乱しない</strong> — 春先（3〜4 月）の覚醒期は特に注意。
-          仔連れの母グマと遭遇すれば最も危険な状況の一つです。
+          <strong>クマに出会ったら、走らない・背を向けない・ゆっくり離れる</strong> —
+          突進してきたらクマスプレーを使います。環境省が推奨する目安は、噴射距離 7.5 m 程度以上、
+          噴射時間 6 秒程度以上、カプサイシン類（CRC）1〜2% 程度のもので、
+          5〜10 m まで近づいたら顔に向けて 1〜2 秒ずつ噴射します。
         </li>
         <li>
-          <strong>冬期の山岳活動でも基本装備を</strong> —
-          冬眠していないクマや、覚醒間際のクマと遭遇する可能性があります。
-          スプレー・ホーン・複数人行動が基本。
+          <strong>防衛的な攻撃で接触が避けられないとき</strong>は、うつ伏せになって首の後ろを手で守る防御姿勢をとります。
+          執拗にくり返す攻撃や、人を獲物として狙うような攻撃であれば反撃します。
         </li>
       </ol>
+      <p>
+        基本の対策は <Link href="/learn/safety">クマ対策の基本</Link> にまとめています。
+      </p>
+
+      <p className="text-sm text-stone-500">
+        2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。
+      </p>
 
       <h2 id="references">参考文献</h2>
       <References
@@ -386,39 +210,46 @@ export default function Page() {
             title: "How vulnerable are denning bears to disturbance?（本号メイン）",
             citation: (
               <>
-                Linnell, J. D. C., et al. (2000).{" "}
+                Linnell, J. D. C., Swenson, J. E., Andersen, R., &amp; Barnes, B. (2000).{" "}
                 <em className="not-italic">Wildlife Society Bulletin</em> 28(2): 400–413.
               </>
             ),
+            href: "https://www.jstor.org/stable/3783698",
+            linkText: "JSTOR →",
           },
           {
-            title: "Variation in brown bear (Ursus arctos) den site characteristics",
+            title:
+              "Hvor sårbare er bjørner for forstyrrelser i hiperioden? En litteraturoversikt（上記の元になった報告書）",
+            citation: (
+              <>
+                Linnell, J. D. C., Swenson, J. E., Barnes, B., &amp; Andersen, R. (1996).{" "}
+                <em className="not-italic">NINA Oppdragsmelding</em> 413.
+              </>
+            ),
+            href: "https://nina.no/archive/nina/PppBasePdf/oppdragsmelding/413.pdf",
+            linkText: "NINA（PDF）→",
+          },
+          {
+            title: "Denning behaviour of Scandinavian brown bears Ursus arctos",
             citation: (
               <>
                 Manchi, S., &amp; Swenson, J. E. (2005).{" "}
-                <em className="not-italic">Ursus</em> 16(2): 145–155.
+                <em className="not-italic">Wildlife Biology</em> 11(2): 123–132.
               </>
             ),
-          },
-          {
-            title: "Scandinavian Brown Bear Research Project（プロジェクト公式）",
-            href: "https://www.scandinavianbearproject.org/",
-            linkText: "scandinavianbearproject.org →",
+            href: "https://doi.org/10.2981/0909-6396(2005)11[123:DBOSBB]2.0.CO;2",
+            linkText: "DOI →",
           },
         ]}
       />
 
       <p className="text-xs text-stone-500">
         ※ 本記事の解釈は獣医工学ラボ編集部の責任において行ったもので、原著者の主張を完全に再現したものではありません。
-        学術的に厳密な議論が必要な場合は必ず原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
+        学術的に厳密な議論が必要な場合は原典をご参照ください。本シリーズへのご意見・取り上げてほしい論文のご要望は{" "}
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.25">
-        <strong>「クマの『鳴き声』を AI で識別する」</strong> —
-        クマの 12 種類以上の鳴き声・うなり声を機械学習で分類した
-        最新の音響識別研究を精読します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }
