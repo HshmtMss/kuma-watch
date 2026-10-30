@@ -1,6 +1,17 @@
 {
-  "generatedAt": 1792464679761,
+  "generatedAt": 1793332113045,
   "items": [
+    {
+      "id": "env:https://www.env.go.jp/press/press_05783.html",
+      "ministry": "env",
+      "date": "2026-10-30",
+      "title": "令和８年度市街地等におけるクマ対策に係る技術導入実証事業の実施団体の決定について",
+      "url": "https://www.env.go.jp/press/press_05783.html",
+      "tag": "自然環境",
+      "category": "press",
+      "summary": "環境省が実施する令和8年度市街地等におけるクマ対策に係る技術導入実証事業について、実施団体が決定した旨の公表。本事業はクマの市街地出没問題に対処するため、先端技術の導入や効果的な対策モデルの構築を推進し、被害防止を図ることを目的としている。",
+      "ingestedAt": 1793332113045
+    },
     {
       "id": "env:https://www.env.go.jp/press/press_05739.html",
       "ministry": "env",
