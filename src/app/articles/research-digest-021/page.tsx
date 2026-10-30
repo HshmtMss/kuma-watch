@@ -31,41 +31,31 @@ export default function Page() {
   return (
     <ArticleShell meta={meta}>
       <p className="lead">
-        1990 年代後半、イタリア北部 <strong>トレンティーノ州</strong>のヒグマは
-        絶滅寸前まで追い込まれていました。残ったのは <strong>たった 3 頭</strong>。
-        繁殖能力のある雌が含まれているかも不明という、絶望的状況でした。
+        イタリア北部、アルプス山脈の南側にあるトレンティーノ自治県では、1990 年代の終わりに
+        ヒグマがほとんどいなくなっていました。そこへ隣国スロベニアからヒグマを運んで放す
+        <strong>「Life Ursus（ライフ・ウルスス）」</strong>という事業が行われました。
       </p>
       <p>
-        この危機に対し、EU 主導の壮大な再導入プロジェクト <strong>「Life Ursus」</strong>が動き出します。
-        20 年後の現在、トレンティーノには <strong>100 頭超のヒグマ</strong>が生息するまでに回復しました。
-        でも、新たな課題も生まれています。人クマ共存の最先端実験を読み解きます。
+        クマを「増やす」ための事業ですが、数が増えたあとに何が起きたかは、クマが増えて人里への出没が
+        相次いでいる日本にとっても参考になります。今号では、放獣から約 10 年後の状況をまとめた
+        Tosi ら（2015）の論文を中心に読み解きます。
       </p>
 
-      {/* 論文カード */}
       <PaperCard
-        label="今号で読み解く 2 本の論文"
+        label="今号で読み解く論文"
         papers={[
           {
             title:
-              "① Planning the brown bear (Ursus arctos) reintroduction in the Adamello Brenta Natural Park",
+              "Brown bear reintroduction in the Southern Alps: To what extent are expectations being met?",
             citation: (
               <>
-                Mustoni, A., Carlini, E., Chiarenzi, B., et al. (2003).{" "}
-                <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
-              </>
-            ),
-          },
-          {
-            title:
-              "② Brown bear reintroduction in the southern Alps: To what extent are expectations being met?",
-            citation: (
-              <>
-                Tosi, G., Chirichella, R., Zibordi, F., et al. (2015).{" "}
+                Tosi, G., Chirichella, R., Zibordi, F., Mustoni, A., Giovannini, R., Groff, C.,
+                Zanin, M., &amp; Apollonio, M. (2015).{" "}
                 <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
               </>
             ),
-            href: "https://doi.org/10.1016/j.jnc.2015.04.001",
-            linkText: "DOI: 10.1016/j.jnc.2015.04.001 →",
+            href: "https://doi.org/10.1016/j.jnc.2015.03.007",
+            linkText: "DOI: 10.1016/j.jnc.2015.03.007 →",
           },
         ]}
       />
@@ -74,294 +64,189 @@ export default function Page() {
         label="時間がない人向けの 3 行"
         items={[
           <>
-            残存 <strong>3 頭</strong>のヒグマに、1999〜2002 年でスロベニアから <strong>10 頭</strong>を補強
+            1999〜2002 年に、スロベニアから <strong>10 頭</strong>のヒグマが運ばれ、放たれた
           </>,
           <>
-            20 年後の現在、個体群は <strong>100 頭超</strong>に回復（10 倍以上）
+            2012 年には少なくとも <strong>47 頭</strong>、年 <strong>15.6%</strong> のペースで増加
           </>,
           <>
-            新たな課題は <strong>「人クマ軋轢の急増」</strong>。最近年は襲撃事案も発生
+            一方で養蜂・家畜の被害が増え、住民の受け止め方は<strong>歓迎から反対へ</strong>変わった
           </>,
         ]}
       />
 
       <ArticleToc
         items={[
-          { id: "history", title: "イタリアにヒグマがいたという事実" },
-          { id: "decline", title: "20 世紀末、絶滅寸前の 3 頭" },
-          { id: "life-ursus", title: "EU の「Life Ursus」プロジェクト発足" },
-          { id: "reintro", title: "10 頭のスロベニア産ヒグマを補強" },
-          { id: "recovery", title: "20 年で 10 倍に — 個体群の回復" },
-          { id: "challenges", title: "成功の影 — 軋轢の増加" },
-          { id: "andrea", title: "M49・JJ4 — 個別事案が地域を分断" },
-          { id: "lessons", title: "再導入から日本が学べること" },
-          { id: "japan", title: "日本でクマの再導入はあり得るか" },
-          { id: "ethics", title: "「絶滅させない vs 安全な暮らし」の倫理" },
+          { id: "background", title: "なぜクマを「放す」ことになったのか" },
+          { id: "study", title: "研究の概要" },
+          { id: "findings", title: "分かったこと" },
+          { id: "after", title: "論文のあとに起きたこと" },
+          { id: "limits", title: "限界・注意" },
+          { id: "japan", title: "日本で暮らす私たちへの示唆" },
           { id: "references", title: "参考文献" },
         ]}
       />
 
-      <h2 id="history">イタリアにヒグマがいたという事実</h2>
+      <h2 id="background">なぜクマを「放す」ことになったのか</h2>
       <p>
-        多くの人にとって意外かもしれませんが、<strong>イタリアにもヒグマが生息</strong>します。
-        本州よりやや南の緯度ですが、アルプス山脈の南斜面（ドロミテ・トレンティーノ地方）に
-        歴史的にヒグマの個体群がありました。
+        トレンティーノは北緯 46 度前後にあり、北海道の最北端（北緯 45 度半ば）よりもさらに北に位置します。
+        アルプスの森が広がる山岳地帯です。
       </p>
       <p>
-        中世までは <strong>イタリア中部のアペニン山脈</strong>にも生息し、
-        ローマ時代から人間との関わりが文献に残っています。
-        ところが 19〜20 世紀の狩猟・農地開発・森林伐採で、ヒグマの分布は急激に縮小。
-        20 世紀後半までに、トレンティーノ州ブレンタ山塊（アダメロ・ブレンタ自然公園）の
-        <strong>わずかな個体群</strong>だけが残るまでになりました。
-      </p>
-
-      <h2 id="decline">20 世紀末、絶滅寸前の 3 頭</h2>
-      <p>
-        1990 年代後半の調査で、研究者たちは衝撃の事実を確認します。
+        計画段階の論文（Mustoni ら 2003）によると、ヒグマはかつてイタリアのアルプス一帯に広く
+        分布していましたが、18〜19 世紀からの森林伐採や駆除によって各地で姿を消しました。
+        最後に残ったアダメッロ・ブレンタ山地の集団も、1989 年以降は<strong>繁殖しない 3 頭</strong>だけとなり、
+        生物学的には絶滅した状態とみなされていました。
       </p>
       <p>
-        ブレンタ山塊に残っていたヒグマは <strong>「わずか 3 頭」</strong>。
-        しかも全て高齢で、繁殖能力のある雌が含まれているかも不確実。このままでは
-        <strong>「数年以内に絶滅」</strong>することが避けられない状況でした。
-      </p>
-      <p>
-        単に「数が少ない」だけの問題ではありませんでした。3 頭という個体数は
-        <strong>「遺伝的多様性が崩壊している」</strong>サインでもあり、たとえ繁殖しても
-        近親交配で子孫の生存率が低下するリスクがあった。
-      </p>
-      <p>
-        この絶望的状況を見て、EU・イタリア政府・トレンティーノ州・アダメロ・ブレンタ自然公園が
-        合同で立ち上げたのが <strong>「Life Ursus」プロジェクト</strong>でした。
+        Mustoni らは、外からクマを補う「再導入」が回復に最も適した方法だと結論しました。
+        20 年分の生息記録をもとに地図上で分析したところ、クマは落葉樹林を好み、馬や羊の放牧が盛んな場所・
+        岩場・農地・市街地を避けていました。あわせて、住民の意識調査と教育を広く行う必要性も強調しています。
+        この計画が Life Ursus 事業として実行に移されました。
+        なお、イタリア中部のアペニン山脈には、アルプスとは別のヒグマの集団が今も生き残っています。
       </p>
 
-      <h2 id="life-ursus">EU の「Life Ursus」プロジェクト発足</h2>
-      <p>
-        Life Ursus は 1996 年に始まった EU 環境保全プログラムの一環。
-        プロジェクトの中心目標は明確でした。
-      </p>
-      <ol>
-        <li>
-          🐻 トレンティーノのヒグマ個体群を <strong>絶滅から救う</strong>
-        </li>
-        <li>
-          🧬 遺伝的多様性を <strong>外部から補強</strong>する
-        </li>
-        <li>
-          🌍 アルプス山脈全体への <strong>分布回復</strong>を目指す
-        </li>
-        <li>
-          🤝 地元住民との <strong>共存基盤を整備</strong>する
-        </li>
-      </ol>
-      <p>
-        Mustoni らは、再導入の計画段階で <strong>地形・食物・人口分布・社会受容</strong>を多角的に分析。
-        トレンティーノの地理は人口密度がそれほど高くなく、アルプス南部の森林が広がっており、
-        ヒグマの再導入には十分適していると結論しました。
-      </p>
-
-      <h2 id="reintro">10 頭のスロベニア産ヒグマを補強</h2>
-      <p>
-        補強元として選ばれたのは <strong>スロベニアのヒグマ個体群</strong>。
-        トレンティーノに最も近いヒグマ生息域で、遺伝的にも近縁、生息環境も類似していました。
-      </p>
-      <p>
-        1999〜2002 年の 4 年間で、<strong>10 頭のスロベニア産ヒグマ</strong>（雄 4 頭・雌 6 頭、
-        いずれも若い成獣）が捕獲・輸送・放獣されました。
-      </p>
+      <h2 id="study">研究の概要</h2>
       <ul>
         <li>
-          📦 各個体は GPS 首輪を装着して放獣後の行動を追跡
+          <strong>どこで</strong>：トレンティーノ自治県（アダメッロ・ブレンタ自然公園の周辺）
         </li>
         <li>
-          🚛 輸送中の安全と医療管理を獣医師が担当
+          <strong>何を</strong>：1999〜2002 年にスロベニアから運ばれた 10 頭と、その子孫たち
         </li>
         <li>
-          📍 放獣地点はブレンタ山塊の中心部の自然保護区
+          <strong>どう調べたか</strong>：電波発信器付きの首輪（ラジオテレメトリー）による追跡、
+          目撃や痕跡の記録、被害や捕獲・除去の記録、住民への聞き取り
         </li>
         <li>
-          📚 放獣前後の住民教育プログラムも並行実施
-        </li>
-        <li>
-          💰 EU から <strong>200 万ユーロ規模</strong>の予算
+          <strong>問い</strong>：事業を始めたときの期待（クマが定着して増える、地域に受け入れられる）は
+          どこまで達成されているか
         </li>
       </ul>
 
-      <h2 id="recovery">20 年で 10 倍に — 個体群の回復</h2>
+      <h2 id="findings">分かったこと</h2>
+      <h3>数は順調に増えた</h3>
       <p>
-        プロジェクト開始から 20 年が経った 2020 年代の現在、トレンティーノのヒグマ個体群は
-        確実に回復しました。
+        2002〜2012 年の間に <strong>34 回の出産</strong>が確認され、生まれた子グマは
+        合計 <strong>74 頭</strong>。2012 年時点で少なくとも <strong>47 頭</strong>がいると
+        数えられました。増加率は年 <strong>15.6%</strong> で、死亡も多く、2013 年と 2014 年には
+        少なくとも 2 頭が違法に殺されていたにもかかわらず、高い伸びでした。
       </p>
-      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-stone-200 bg-stone-50 text-xs text-stone-600">
-            <tr>
-              <th className="px-3 py-2 text-left">年</th>
-              <th className="px-3 py-2 text-left">個体数（推定）</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            <tr>
-              <td className="px-3 py-2 font-semibold">1999（プロジェクト開始時）</td>
-              <td className="px-3 py-2 tabular-nums">3 頭（残存個体）</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">2002（再導入完了）</td>
-              <td className="px-3 py-2 tabular-nums">~13 頭</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">2010</td>
-              <td className="px-3 py-2 tabular-nums">~30 頭</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">2015</td>
-              <td className="px-3 py-2 tabular-nums">~50 頭</td>
-            </tr>
-            <tr>
-              <td className="px-3 py-2 font-semibold">2023</td>
-              <td className="px-3 py-2 text-green-700 font-bold tabular-nums">100〜120 頭</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
       <p>
-        20 年で <strong>10 倍以上</strong>の回復。これは生物保全プロジェクトの成功事例として
-        世界的に評価されており、保全生物学の教科書にも掲載される事例となりました。
+        生息密度や、若い雄が遠くへ分散していく様子、繁殖の力は、ヨーロッパの他のヒグマ集団と
+        同じ程度だったと報告されています。このままの傾向なら、2017 年には 60〜94 頭になると
+        見込まれていました。
       </p>
 
-      <h2 id="challenges">成功の影 — 軋轢の増加</h2>
+      <h3>被害と「問題グマ」</h3>
       <p>
-        しかし、個体数の回復には別の側面もありました。
-      </p>
-      <p>
-        個体数が増えるにつれ、<strong>「クマと人の接触」</strong>が増えました。
-        村への出没、養蜂場への侵入、家畜被害、ハイカーとの遭遇 — どれも増加傾向。
-      </p>
-      <p>
-        2014 年以降、地元紙では <strong>「ヒグマ被害」</strong>のニュースが頻繁に取り上げられるように。
-        2017 年・2020 年・2023 年と <strong>人身被害事案</strong>も発生し、地元住民の中には
-        プロジェクトに対する不満が広がってきました。
-      </p>
-      <p>
-        Tosi ら 2015 は、この問題を率直に指摘しています。「<strong>個体群復活は成功したが、
-        共存の社会的基盤整備は遅れた</strong>」と。
-        個体数管理・住民教育・補償制度を <strong>個体群回復と同時並行で進める必要があった</strong>、というのが
-        本研究の重要な教訓です。
+        数が増えるにつれて、ミツバチの巣箱や家畜の被害が増えました。被害の多くは、
+        一部の限られた個体によるものでした。人が軽いけがを負った襲撃が 1 件あり、
+        接触はないものの危険を感じる場面も何度か報告されています。こうした問題を起こした
+        クマのうち 3 頭は、その地域から取り除かれました。
       </p>
 
-      <h2 id="andrea">M49・JJ4 — 個別事案が地域を分断</h2>
+      <h3>住民の受け止め方が変わった</h3>
       <p>
-        この共存課題が爆発的に表面化したのが、<strong>「特定問題個体」</strong>の事案でした。
-      </p>
-      <h3>M49 のケース（2019 年）</h3>
-      <p>
-        7 歳のヒグマ M49 は、繰り返し家畜・養蜂を襲い、<strong>3 度逃走</strong>して全国を騒がせました。
-        トレンティーノ州知事が射殺命令を出すも、SNS で激しい反対運動が起きる。最終的には保護施設へ移送。
-      </p>
-      <h3>JJ4 のケース（2023 年）</h3>
-      <p>
-        17 歳の母グマ JJ4 は、子グマを守るため <strong>26 歳のジョギング中の男性を襲撃して死亡させた</strong>。
-        州は射殺命令を出すが、動物愛護団体が訴訟。司法判断で射殺は停止、捕獲・施設収容となりました。
-      </p>
-      <p>
-        これらの事案は、地元住民・州政府・保護団体・SNS という <strong>分断構造</strong>を生み出し、
-        Life Ursus 全体の評価にも影を落としました。「<strong>絶滅させない</strong>」「<strong>安全な暮らし</strong>」
-        の両立がいかに難しいかが浮き彫りになっています。
+        事業の始まりには住民の多くがクマの復活を受け入れていましたが、数が増え、問題グマの
+        出来事が続くと、反対の声が大きくなっていきました。著者らは、
+        <strong>問題グマをきちんと管理することが、社会の受け入れを取り戻す鍵になる</strong>
+        とまとめています。
       </p>
 
-      <h2 id="lessons">再導入から日本が学べること</h2>
+      <h2 id="after">論文のあとに起きたこと</h2>
       <p>
-        Life Ursus の経験は、日本のクマ管理にも貴重な教訓を与えてくれます。
+        論文の発表後も、トレンティーノでは個々のクマをめぐる出来事が大きく報じられました。
       </p>
       <ul>
         <li>
-          📈 <strong>個体群回復と軋轢増加はセット</strong>: 数が増えれば必ず人クマ接触は増える
+          <strong>M49</strong>：捕獲されたあと、トレント近郊の収容施設カステッレールから 2019 年と
+          2020 年の 2 度逃げ出しました。2020 年 7 月の 2 度目の逃走では、国の研究機関 ISPRA が
+          現地を調べ、金網の一部が破られていたと報告しています。
         </li>
         <li>
-          🏛️ <strong>制度整備は個体群回復と同時並行で</strong>: 補償・教育・特定個体管理の仕組みを先に
+          <strong>JJ4</strong>：2023 年 4 月、ジョギング中の 26 歳の男性が山中でクマに襲われて
+          亡くなりました。DNA 鑑定で雌グマ JJ4 と特定され、同月に捕獲されました。
+          その扱いをめぐっては、県の殺処分の決定に対して裁判で争われるなど、議論が続きました。
+        </li>
+      </ul>
+      <p>
+        どちらも、少数のクマの行動が地域全体の受け止め方を大きく左右する、という論文の指摘と
+        重なる出来事です。
+      </p>
+
+      <h2 id="limits">限界・注意</h2>
+      <ul>
+        <li>
+          数字は 2012 年までの調査にもとづくもので、その後の頭数はこの論文からは分かりません。
         </li>
         <li>
-          📣 <strong>住民教育は永続的に必要</strong>: 一度教育して終わりではなく、世代を超えて継続
+          「少なくとも 47 頭」は確認できた個体を数えた最小値で、実際の頭数はこれより多い可能性があります。
         </li>
         <li>
-          ⚖️ <strong>個別問題個体の対応プロトコル</strong>を明確に: 「いつ・誰が・どう判断するか」を事前に
-        </li>
-        <li>
-          🤝 <strong>地域の利害関係者を巻き込む</strong>: 農家・養蜂・観光・自治体・NGO の連携
+          対象はヨーロッパのヒグマで、数頭からやり直した小さな集団です。日本のツキノワグマや
+          北海道のヒグマとは、種・頭数・土地の使われ方が大きく異なります。
         </li>
       </ul>
 
-      <h2 id="japan">日本でクマの再導入はあり得るか</h2>
+      <h2 id="japan">日本で暮らす私たちへの示唆</h2>
       <p>
-        日本では、ヒグマ・ツキノワグマとも <strong>個体数自体は豊富</strong>な状況で、
-        本格的な再導入の必要性はありません。ただし、絶滅危惧地域個体群はあります。
+        日本ではクマを放して増やす事業は行われていませんが、この研究からは控えめに次のことが読み取れます。
       </p>
       <ul>
         <li>
-          <strong>四国のツキノワグマ</strong>: 推定 16〜24 頭、極めて深刻な絶滅危機
+          クマが増えると、人との軋轢も増えやすい。そして、その多くは一部の個体が起こしている。
         </li>
         <li>
-          <strong>九州のツキノワグマ</strong>: 1957 年に最後の確認、現在はおそらく絶滅
-        </li>
-        <li>
-          <strong>西中国（中国地方西部）</strong>: かつての絶滅危惧個体群（現在は回復傾向）
+          人里に慣れた個体への対応を早めに決めておくことが、地域の安心と受け入れにつながる。
+          日本でもクマは 2024 年 4 月に指定管理鳥獣に加えられ、管理の仕組みづくりが進んでいます。
         </li>
       </ul>
       <p>
-        これらの地域でクマの再導入が検討される可能性はゼロではありません。
-        Life Ursus の経験は、その際の <strong>計画・実施・住民対応・モニタリング</strong>の
-        貴重な参考事例となるでしょう。
+        出会ってしまったときの基本は、どこでも同じです。走らない・背を向けない・ゆっくり離れる。
+        突進してきたらクマスプレー（環境省の推奨要件は、噴射距離 7.5m 程度以上・噴射時間 6 秒程度以上・
+        カプサイシン類 1〜2% 程度。5〜10m まで近づいたら顔に向けて 1〜2 秒ずつ噴射）。
+        身を守るための攻撃で接触が避けられなければ、うつ伏せになって首の後ろを守る防御姿勢をとり、
+        執拗に襲ってくる・捕食しようとする攻撃なら反撃します。詳しくは
+        <Link href="/learn/safety">クマ対策の基本</Link>をご覧ください。
+        駆除をめぐる考え方は<Link href="/articles/culling-debate">駆除をめぐる議論</Link>でまとめています。
       </p>
 
-      <h2 id="ethics">「絶滅させない vs 安全な暮らし」の倫理</h2>
-      <p>
-        Life Ursus が突きつけた最も難しい問いは、<strong>「クマと人、どちらの生命を優先するか」</strong>
-        という倫理問題です。
-      </p>
-      <p>
-        絶滅させたくない、共存したい — これは美しい理想です。
-        でも、共存の代償として <strong>人身被害・農業被害・行動制約</strong>が出るのも事実。
-        誰がその負担を負うのか、どこまでが許容可能か、社会全体での合意形成が必要です。
-      </p>
-      <p>
-        この問いに、Mustoni らは「<strong>科学だけでは答えが出ない</strong>」と認めています。
-        生物学的データを基に、社会的議論・住民参画・倫理的検討を <strong>並行して進める</strong>
-        必要がある、という慎重なメッセージで論文は締められています。
-      </p>
-      <p>
-        日本のクマ管理にとっても、この姿勢は重要です。
-        詳細は{" "}
-        <Link href="/articles/culling-debate">駆除をめぐる議論</Link>
-        も併読してください。
-      </p>
+      <p className="text-sm text-stone-500">2026 年 10 月 30 日 改訂：原典と照らし合わせ、論文の内容と異なっていた記述を全面的に書き直しました。</p>
 
       <h2 id="references">参考文献</h2>
       <References
         items={[
           {
             title:
-              "Planning the brown bear reintroduction in the Adamello Brenta Natural Park（本号メイン①）",
+              "Brown bear reintroduction in the Southern Alps: To what extent are expectations being met?（本号メイン）",
             citation: (
               <>
-                Mustoni, A., et al. (2003).{" "}
-                <em className="not-italic">Hystrix Italian Journal of Mammalogy</em> 14(1-2).
-              </>
-            ),
-          },
-          {
-            title: "Brown bear reintroduction in the southern Alps（本号メイン②）",
-            citation: (
-              <>
-                Tosi, G., et al. (2015).{" "}
+                Tosi, G., Chirichella, R., Zibordi, F., Mustoni, A., Giovannini, R., Groff, C.,
+                Zanin, M., &amp; Apollonio, M. (2015).{" "}
                 <em className="not-italic">Journal for Nature Conservation</em> 26: 9–19.
               </>
             ),
-            href: "https://doi.org/10.1016/j.jnc.2015.04.001",
-            linkText: "DOI: 10.1016/j.jnc.2015.04.001 →",
+            href: "https://doi.org/10.1016/j.jnc.2015.03.007",
+            linkText: "DOI: 10.1016/j.jnc.2015.03.007 →",
           },
           {
-            title: "Trentino Province annual bear reports（自治体公式報告）",
-            href: "https://grandicarnivori.provincia.tn.it/",
-            linkText: "grandicarnivori.provincia.tn.it →",
+            title:
+              "Planning the Brown Bear Ursus arctos reintroduction in the Adamello Brenta Natural Park. A tool to establish a metapopulation in the Central-Eastern Alps",
+            citation: (
+              <>
+                Mustoni, A., Carlini, E., Chiarenzi, B., Chiozzini, S., Lattuada, E., Dupré, E.,
+                Genovesi, P., Pedrotti, L., Martinoli, A., Preatoni, D., Wauters, L. A., &amp; Tosi, G.
+                (2003). <em className="not-italic">Hystrix, the Italian Journal of Mammalogy</em> 14(1-2).
+              </>
+            ),
+            href: "https://doi.org/10.4404/hystrix-14.1-2-4313",
+            linkText: "DOI: 10.4404/hystrix-14.1-2-4313 →",
+          },
+          {
+            title: "Second escape of the M49 bear（ISPRA, 2020 年 7 月）",
+            href: "https://www.isprambiente.gov.it/en/archive/news-and-other-events/ispra-news/2020/07/second-escape-of-the-m49-bear",
+            linkText: "isprambiente.gov.it →",
           },
         ]}
       />
@@ -372,11 +257,7 @@ export default function Page() {
         <Link href="/credits">運営情報</Link>のお問い合わせ先まで。
       </p>
 
-      <NextIssue label="次号予告 — Vol.22">
-        <strong>「クマの行動圏は最大 2,000 km²」</strong> —
-        GPS テレメトリーで初めて精密測定できるようになったクマの行動圏。
-        雄と雌の差、季節変動、地形の影響を Mowat &amp; Heard 2006 ほかで解説します。
-      </NextIssue>
+      <NextIssue label="次号予告">次号も研究ダイジェストをお届けします。</NextIssue>
     </ArticleShell>
   );
 }
