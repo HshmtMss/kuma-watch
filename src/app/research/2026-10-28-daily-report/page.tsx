@@ -10,7 +10,7 @@ import ResearchPrefChart from "@/components/ResearchPrefChart";
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-10-28-daily-report";
 const TITLE = "2026年10月28日 国内クマ出没事案の時空間分析と分析報告";
-const DESCRIPTION = "2026年10月28日に全国で収集されたクマ関連事案は計27件であった。当日は人身被害の報告は確認されなかったものの、北海道登別市における市街地近接での目撃や、広島県広島市安佐北区での捕獲・殺処分事案が記録された。福井県（6件）や北海道（4件）をはじめ、近畿・中部・中国地方など広範囲で出没が確認されている。";
+const DESCRIPTION = "2026年10月28日における全国のクマ出没関連事案は計59件が記録された。京都府の13件を筆頭に、北海道や山口県、福井県、秋田県、兵庫県などで複数件の報告が寄せられ、教育施設周辺の生活圏への侵入や農業被害、くくりわなへの錯誤捕獲および殺処分といった重要事案が確認されている。";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,7 +37,7 @@ const SCHEMA = {
   headline: TITLE,
   description: DESCRIPTION,
   datePublished: "2026-10-29",
-  dateModified: "2026-10-29",
+  dateModified: "2026-10-31",
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -53,108 +53,244 @@ const SCHEMA = {
 
 const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
-      "title": "市街地近くでクマ目撃情報",
-      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFAxRjU1TEdwV1lrbjBZVXRjek5VdG51S1RDOFBoUEtvZE1PTWlkcUhSRng2dTZBN09oMHFBVVFvZ2M5czFIQTVFNmUtaEd6cVhHMk1GYm5PejNvUQ?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 秋田県秋田市 手形の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOcXdwWUxkX0lWR3dUTHlpS1BVVHNRUzNGck5NMkZ0ZTFJUVpPUHNMZUtxdFlRMUQwUlM5ck90U2FzSGdsZmJrY1FhaUVzeEhPckNZZG9tNWlsQ1hpV0RGWHB3MnhIaHJRYkh3M3pHb21BeTdEaVFxNGVuYjdKYWFldFBpWXR6bHNtRERPbW5B0gGAAUFVX3lxTE1GV04wT3otcVlGTVg4N3RzOWxCSjREMFBRb2dkallJSjkyNElqbS05YkNTOFQ1dU40dk5nN09pckVDVnAxcGE4ZnZVcjlNaExKb0RoYktEaEdDVnBlbHNxSzEwM1EtTzIwNnlqRXZDSER5ZHFjMWNOY0dVZnNNaHlv?oc=5",
+      "site": "報道"
     },
     {
-      "title": "安佐北区で捕獲されたクマを殺処分",
-      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNSmdieEs0V3g3MnlMclBhSVFSSDFVOEFSNnJHeWhfV2pnSGtONmVnZHREOXpmVWpsa1lzcjZ1UzJhSWVUX2M4X3p0UnlfME92NF9JY1dzZzdfWVBlaVZFS0FJdGNTUkJTRUlKWjc2SGlsWUVnLXpjcV9NS1JFcmk2RtIBgAFBVV95cUxNSmdieEs0V3g3MnlMclBhSVFSSDFVOEFSNnJHeWhfV2pnSGtONmVnZHREOXpmVWpsa1lzcjZ1UzJhSWVUX2M4X3p0UnlfME92NF9JY1dzZzdfWVBlaVZFS0FJdGNTUkJTRUlKWjc2SGlsWUVnLXpjcV9NS1JFcmk2Rg?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（島根県大田市）",
-      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPODJKT0FVV1gwY2tzV0xYWXJuN3RxMC1wdzJLSUJMbkVpUUpSMzJaa0RqVndXUkVSYnhDdHA1MWJ1VmdEM3RibVMzRkkwN1E4WDJtdW9LVWVMcmdFcy1ma012dUt1R0huX2tYY0VmN2tvZk1lUlNuQXhISGYzM2xSVWhYQ1RHUFNHbjBXbEF1dm5JaWNYX0Q4eHhjYkVKVHZ1LWRyTXhwSjhVUzFGTnI2LUlaR2pXQlM4WW5rSFF0TU1tWWxZamFKajQxUTBzSHdtWWxRQXplQ1N2bFdzZ2N0Q1dsUms5R29WaktYN2FNSFo5Z9IBogFBVV95cUxPNTNYY042X3NDR0NjdjdpOXdEdzV3bmtNc3JnYTRhb1pCeUdHVXFzemlNNE5xekJjQkdQdUh0VnJ4OXVNbXc3cDlrV2d3eWVqc05nbVo4c1FHZk1oZDVFMWN2VHVFZDU5Zm9vc3F1aFkxa3hOZ25rNUVLenhlUkxmNkVlOGJ4bkQxUS1PS3F0NlVkaFYwTklSUlR2MlNaUmdnSkE?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（北海道歌志内市）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQUnJvcnFVWkppUDQ5Q01wcmlsMUNWSWdGektjQ0ZWU3lxcFBmSW5HN0NQVjhuRlpBTklXcy03ZTZzUExGRDBRLXhqYjNhaHl6R3hZa21lQnNOS0pMMFdwLTRCdlJEX2NaWVhLT0tFTkxZNTF2NjZhOGZrRFlINkJVQTRrOXVENGN4TXgwTHRPWmVrRUJ6QU1lX185c1LSAaIBQVVfeXFMTmlIc0wwWTdLOHhuaTJMMm9jNnVOZVRJVXJ4S2ltT0xEaFJORkQ0bGk5RDJManR0UFlpQk5ZVEV1c29xWHQxRlN0OTVSOWpINkkxLU81VGl3ZWVOZUUwRnB6clhqdUcwbk1sNWd6VEpkQUd5cWVNY0N6djc4bWV4WU9la2twZUg0N21PN2pjYU9LaVN3TlZtLXloTEJHcGRzWjRR?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没の可能性（北海道登別市）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQQ0dyYVlGbllZaWthdF9Ca0FxWHdwSjhiOGgydElBSTduclVLQm0tQ2ZoZHNNdlozT1hPcGw2Z2k3X1pZdUQxbDR6bDVPMVJLazMyUUR6aUFuNGh3ZmVtTjFpdGV4T3dqWFV2VFQ5SXFoQmRPQ0hLSFhUekYxOG9qdVhxR2JtU29TR3RkUzNMcjgyOFVnd0E3TXFaMkbSAaIBQVVfeXFMTl8tcWNXQzl0Q3Vhekg3NGY4aFQxaUVfanNxVjlCQlFOTHo4TXpvRk5yVjUzSTF2bzZ2M200QVhPTUpJTkhoWHc3cDM1SVZPTFN6RnhyWS1XeFltazdTR2g1YWRCOE1DNTZZYkZnYVQ1MHBnRUR5ai1WSmFkcFZFMF9XX2NKelktX2tRYlZndUxRUFdoNTFFZ1FkZzdlcUEyUXdn?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（福井県小浜市尾崎）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNenBkZi1YcTEwaTNIenZxTDJwT3kzb1BnZzMtRF9hQkNyNXcwdW5oUmZUdURmSkpfN09jVkxhc29hdkN6ZGl0b0M4ZDRvMWtvSnFrbmV1R3FmZFBDbHR1d0Z4ajFkUEVIbnZXeHRQQ0V2SGxOSW5IbHVqbl8zbDZWRFVDLURKSklkMEhnbzRjTjg4MGpmVHBqN25EZWTSAaIBQVVfeXFMTlQ5UkdlWXlnQjN5UW4wYUw5NkVkcEc3MVRaRDd4M3lTZGxZelE3ck0xcW9Xd2NxNUdvSnBZamtMVDhMZ1UxRWVGakw0RTA0T3ZKMEdhNGoxcFRaVGgwQ0VsYk1JV2RPVzB6U0RTOVJjdnk5YUVzRzVJZUVzbWtxS2wwUmNvUWZ2Yzk1TWNLdDRNVU4wUHFqUU1WclZrYnJtMnF3?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（福井県小浜市須縄）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQZ3h0Tk9tMUg4NS0yWHNSRzJKN1ozYnE3SEgwLUZ4U0Q2T1hTTUxZR050eTlQenhlWHVDSklhTmRrUHBhNjAybU95cTZYODROQTJDVTVnZENKUjR4U0FUVFNnLUdFb1BIbDc3SU16M3RnczAySVRBUjh0UUkzU2NfeDB0NEtxRG9xZHEtRTlqQ010TnVybUxsOWUxNnTSAaIBQVVfeXFMUEFreE1ZTEVoRW1EMnc2VEt4RWJUSFpQem44Q24tWndjWDhaVHg2T0E3V1pCb3ltOVBQNjhkSzhaUUxUbUxBOEhkSWxsU0p1d3p3QXA0aHZGMXpqNHZEU1gxX2w0clg2S0xaWXRJV3ZaVzZmQ2pVbzVoS0Z4bXM2Y1JRaWs1V1d4SEJxRTlBbUpsQmhFVlJ2V0xKcVRHQ21BQUt3?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（京都府綾部市）",
-      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPU1E1dEVmT3dxR0dfc2tVUDM0Q0VuWUFkXzVYWW1PUWMxakdOYWxjcFlaa3N2U2xaSjdDRnJZNk44c21DU0ZHdUh2QlRMZUFYWDZVeld2VURBVXV5WndCY0l4ZzhrT3BudjEzcjJhUEhxODlMMWF2ejcwQ0FzYWtpMXBPRmZORUVWVXA4S1FxMzVZX3NYNm9hLUVNSS1CQTRxdEg1am9EaGVkd042QURj0gGiAUFVX3lxTE1lU0dxWUowVjJsSWFXZjBaSXp2NkJ1cWNxNDRuUjNEbnJ2bHBqYS1KS1pNQVNSSER5UFJOeFdrbzNfOWJfLUF1aXFoOEMwRG5IV1d2R3lVVkpoYTlxSXpqU3JQTnJvWFdqVVdyTGFTTUJzemhKU29XRG1WbmZBUmlJd21IMmpMMEtmS2QwWkJGUGlLZlNQWmZzMDRBUjhSUTR4QQ?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（京都府南丹市美山町内久保）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQRnpLUlhSdkY5MFEtTnJ2NTRZYXpIX2h0VVBKVllwakFSOVZhZnotNEl3cEgwLXlGS1E0dGNobU5Mb19CclNIRlhvS1piN0tmaUtQV0tqUERhRVdidlhtNlJHdnpUS19oTDFWWVhYV29xdnI2Q05HZTNFMENhT3plbm83R1VHenV0MmxOX0R1U1lNdzBMLTc3WXptTUbSAaIBQVVfeXFMTVFDNy10bEdBS0J6MnhwMFhNU01XV3hVdzJRWi1XLWhDR2dOOEt5MG9iTGdfUXJJNkc3cUxZZU01OFJWemhnUWVmREV3Tk05V01nRjlkZDdGeGlVQWFGZWcwdGc5SzdXTWdRRG9qWnJDMm16aUFBanBSUVNZS0FFaEpQR3hnNE0zMlgxY2hJeHBLNTFtWXJzQVBwZk5Kc0JoZzF3?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（京都府南丹市美山町鶴ケ岡）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNOVpkekFPUzBaenZjaGVxQ2kxYWw2SkdjTlhjbTBzbVFDeWRIVGRwZG02UTBGNkRhbTdzbTZEcGF3MVk4MkxpMFA3anFId09UVUc5bVpQR3MySS1KYzFNRjA0NjVLcWRsLU92djJfSjlSaVFROVVmRndwY0tuME8tQTMtZ1FiNlBJVFVpMjZTX3hMT2pFbjJ3VEpwUmfSAaIBQVVfeXFMUEV6bkdKdmxWV2dfOTlWTDVGOEx5cHJzcXI2U2cxQWRfQWlQaW8xbE1UNGVJLVRheFZIbGVrNzNUM0ZYVURSOWRfN3l4TGZCeXRMRExhdklpUzRIRkVObmJlOTNtMm9HMmM2VVlZYVhxWjVycFhldS0ybXp2cWwyLXpEYTFEV3ROdEZ5OG1nNmlUT2lZN3RQcGNYbjNBMUJsUk1n?oc=5",
-      "site": "news"
-    },
-    {
-      "title": "クマ出没（秋田県秋田市手形大沢）",
+      "title": "2026年10月28日 秋田県秋田市 手形大沢の出没情報",
       "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxQZFFadllUVkhwb3l6VldZbEtQOF9xeXdMQlhfc2gzMkt1MmFYTURPQkU0UXctcUpnaDVEUU5iZmZibVBKSGFzM3dvVWZKTDJocEZIaXFlTS1XS1BKNDVUaFJFZjZEb3VhZDh4VTdDbXBUZVBUOS1sdHpDRUdFT3NXU0loTWRXdExoSGJ6ODZYMFlmT1VKR2c4MDJVcnMtRllTWkJ6TFUyRXljQXIyUkFz0gGiAUFVX3lxTE54S2Y5UWhpZ2ZBQ3FhZUdHOHJLY1Utd1V1S2N3U2JnenVvMzJBNHVQYy1WbTVSSUpEcnJLYzFxVkxJSzgyWU5DZWxDMDRJLWlraXdFc29RRVkydU1XMGc0LWFJN0I2dmMxSHdDcnk3Wjh5eG54VGlqRHBhY3BKUTJydlZzQUF3VXFkMmpCR1VJQ2RGeGFNRXBCT3hJMDhnUUxKUQ?oc=5",
-      "site": "news"
+      "site": "報道"
     },
     {
-      "title": "クマ出没（山梨県上野原市鶴島）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPbXdfekZsQXcwTDBXeGtiVkMzVVpJQ080XzhDTFZadTFPaUJPbVVqTkh5YmFXMEhmS0VFeWdOSnU5bnpfTVM3c2YwZll2X0pjSVlUeEZMQnJpYzZUYlJqYTVhZjhwX2diSGZESnE2OTh3QWt3TlA5RGNjZXd2WFpBejI5MkNDVTdsZUNTaVh6UXNjc2psemFJZ1BvMkvSAaIBQVVfeXFMT2ZiUHNpUlRqbUVteElkMEN4OGtzNGpxZEVzTGRqRTJaR244UWU1Z3oydXEwdi1IdXVPVmtnUWQ4eU40SEVnRDc0Y3dVRzZHaldWcEhPQnNrQzhrd1FWX3I1N0pYbEFhcloxYU5GX0x5ekY0RHVpVmZyZy1FaWZYVUQ2WDZlbUhDcUFmbUF0SXo3UTI4STA0RndyV2xUbThPNkhR?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 秋田県秋田市 手形中台の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNa0RKUFQ0VlJNN2FmSjJ1TlhQaUdkTmwxUFd4RHd1TE1MMlgwdUUwdnpCN2hyejdfeVk5TkMyM3VJMUJlZHZFODVhbGQ2X2V3bGVoNHdCWDBYRGJOWHBjbDFHNFRuWUprck1zbVBxUGkwU05wTWVfM1lDdmVJSk1KTVZfbE0xR2p0MmQ0RmVQQ2lRdkw0RER1WGp4UkV4Q0g3S21TM2d2blNhQVBLeVlWWWVnWlFxOE5lSmNBTmJudjFiU1VzUm05UGRCY0hUY2pmSk1FV0themtIMFZYRXJnRHJUaXh3V1BPQno5SjZVVnFjUdIBogFBVV95cUxQX3l5MXdGZkZONlQyR1o1WFZOVWJKNlFGUFpPc3JMWVZQd2tRYURXTXpzWlhJMmVveWYyMEpTeVBiWDlJVTdkM2lXSTFsMUY5azdMTmpITDIyc1QzVU5HMWNCb3ZRb3N1ODlJU0RPdUFpUVJ2SXd2bGFlNmd6UTMwZmRadkhyVzBvOHQyRHRkd19FQ1EwTUZ1dV8teTUyak8wQWc?oc=5",
+      "site": "報道"
     },
     {
-      "title": "クマ出没（山梨県富士吉田市新屋）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPRXZkVnUyMllQeFNPdWVhU0xPUG1FS2IxM3NzX3ZOQnpXd0tNSTFVZmUtZXFwQ1p3eWxaY1p5MnRuY1MzX1Jyb3hZS1JVNVQ4dVo5QWVjWmZxaExCbHktVU9oVVlYa1ZjZ3kzMXJNOEVZMVUtNnZnSDhiLXY5ejR4M1JMaHFLSGpqRlAyTGhVS1FwZm8weXlLVm82ZUnSAaIBQVVfeXFMT0tJczdpaktYaGJiaUpneE96V0J3NEk5MEdKRERQUmRTZW5oN1Foa3ZyM2lHYlpFdkJldzkxZzkzc1BvbWpFOUhad1NZYWZnVFo1cFBSS1JHUkNITGVfVVpxZkpBLW1qZ1B4anZubXpObG9OWEFQeXpIOVpWVjFBVVBndDJVT2l4OExncHdEcko4Y3Zlb0VBaUhhZ1FrbzFRZktB?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 広島県広島市 安佐北区の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNSmdieEs0V3g3MnlMclBhSVFSSDFVOEFSNnJHeWhfV2pnSGtONmVnZHREOXpmVWpsa1lzcjZ1UzJhSWVUX2M4X3p0UnlfME92NF9JY1dzZzdfWVBlaVZFS0FJdGNTUkJTRUlKWjc2SGlsWUVnLXpjcV9NS1JFcmk2RtIBgAFBVV95cUxNSmdieEs0V3g3MnlMclBhSVFSSDFVOEFSNnJHeWhfV2pnSGtONmVnZHREOXpmVWpsa1lzcjZ1UzJhSWVUX2M4X3p0UnlfME92NF9JY1dzZzdfWVBlaVZFS0FJdGNTUkJTRUlKWjc2SGlsWUVnLXpjcV9NS1JFcmk2Rg?oc=5",
+      "site": "報道"
     },
     {
-      "title": "クマ出没（山梨県大月市梁川町塩瀬）",
-      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxOVW1HVS1Fd2o1UUJoMGZZSHJiWnhsVjZVMzZXVVZ1UFo4V1ZnYm85YUNOTjZkRndJYmNnZDRuajJ1dzF5bW5tUVVUaV9YZFI0b2RMZ0c0RVNvT1R6WkY5alBCNXY0VDdhS2FzQ2NGZW9fOS11aUI4MjN5T0NyR3poT1UxX3FQczlMU2c3WWNfaUlaUWVJajU4THI4ckRIc251Y05NWXhfTTQ3NEd2aGVlNFZ4VHFHRk5abmVGZ3BOM1R4dWZDYjR5OWZLenozWklNNkVKS2ltS2dVenBqZXkzS0tINXBNNXRscFI1OFk5anl5UdIBogFBVV95cUxORmtBazV3V3pzMlhkQTVKQ3NzcEI1WUwyQ0VoMWRXU1FURjVkVzNjb2lpQnVuVE4zUHlQWU9zRFU5VDFTMFRGY3FYYjBja1NGNjdtWnlLZHl1amxoWGFUdFpzMWwzd2JKUzlJb3JiaU9WQmJ5Rk9FSGdTSU9xTUtLMHRRNlAyWEZ0LTZ4X01uVXZyaWdaODN1V1V2Vk54alNpR1E?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 山口県岩国市 周東町祖生の出没情報",
+      "url": ""
     },
     {
-      "title": "クマ出没（青森県五戸町切谷内小渡）",
+      "title": "2026年10月28日 山口県岩国市 美和町下畑の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 鳥取県八頭郡八頭町 徳丸の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 北海道登別市 胆振幌別川の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFAxRjU1TEdwV1lrbjBZVXRjek5VdG51S1RDOFBoUEtvZE1PTWlkcUhSRng2dTZBN09oMHFBVVFvZ2M5czFIQTVFNmUtaEd6cVhHMk1GYm5PejNvUQ?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 北海道登別市 新川町3丁目の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQQ0dyYVlGbllZaWthdF9Ca0FxWHdwSjhiOGgydElBSTduclVLQm0tQ2ZoZHNNdlozT1hPcGw2Z2k3X1pZdUQxbDR6bDVPMVJLazMyUUR6aUFuNGh3ZmVtTjFpdGV4T3dqWFV2VFQ5SXFoQmRPQ0hLSFhUekYxOG9qdVhxR2JtU29TR3RkUzNMcjgyOFVnd0E3TXFaMkbSAaIBQVVfeXFMTl8tcWNXQzl0Q3Vhekg3NGY4aFQxaUVfanNxVjlCQlFOTHo4TXpvRk5yVjUzSTF2bzZ2M200QVhPTUpJTkhoWHc3cDM1SVZPTFN6RnhyWS1XeFltazdTR2g1YWRCOE1DNTZZYkZnYVQ1MHBnRUR5ai1WSmFkcFZFMF9XX2NKelktX2tRYlZndUxRUFdoNTFFZ1FkZzdlcUEyUXdn?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 北海道士別市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 北海道歌志内市 神威美山町の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQUnJvcnFVWkppUDQ5Q01wcmlsMUNWSWdGektjQ0ZWU3lxcFBmSW5HN0NQVjhuRlpBTklXcy03ZTZzUExGRDBRLXhqYjNhaHl6R3hZa21lQnNOS0pMMFdwLTRCdlJEX2NaWVhLT0tFTkxZNTF2TjZhOGZrRFlINkJVQTRrOXVENGN4TXgwTHRPWmVrRUJ6QU1lX185c1LSAaIBQVVfeXFMTmlIc0wwWTdLOHhuaTJMMm9jNnVOZVRJVXJ4S2ltT0xEaFJORkQ0bGk5RDJManR0UFlpQk5ZVEV1c29xWHQxRlN0OTVSOWpINkkxLU81VGl3ZWVOZUUwRnB6clhqdUcwbk1sNWd6VEpkQUd5cWVNY0N6djc4bWV4WU9la2twZUg0N21PN2pjYU9LaVN3TlZtLXloTEJHcGRzWjRR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 北海道浜頓別町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 秋田県北秋田市 小森岩ノ目の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNemNnUXF2RDhVX0tBWFkzRGVFWFk4eVNWcXNRYmswRndNeHcwRmd4cTYyX2FabjZQZGFkcWxVN2ZBdHYzNHM0cVZURllMc2lxY2pfWDB0S3NLWGV3czE3NHRnc2ZHV2NQdTIxc0hqYWF6Y0RFblR0bDJNWFlhSGJ6eFdRbThnYzZBY0xrQko2Q1ZuREs4dTMzVmZIWUtnTUlnYnBZdDVlQm1FRjFVT1d5MUFlWURXTnFQNXJQNEFJUEY2QXNvWTFwZks3dWN5TjVrWVRwcjFzeFprZXExQVBYY3p2YXFQTmlmQV9LZDFDWk5nd9IBogFBVV95cUxPRWFCU2Q2OFlHU3k3ZWhjc25xelpUUlh6V0ZPWXJuRG5ndTZpYmNQak1SX0l3a3M5eDNmaDFsRmVza1ZoU2VQY0RyR2Y4VGFrYmI1MnhJS1FMMlU0NV9FUURGYkdRaUlEMUV1cVh4TndDTUpHSWtCTlMtTVE0NHVvbWFVa05HSktMX1hEOE51cEJOWi1lNFdfSm9jdzRWMVlzRWc?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 青森県五戸町 切谷内小渡の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPc25DTmowUnV2a0RWekJCQzBaSkt1bXJwX0tOSFMxZGhHN2x0RjNjaTVsaXVxMXpPdjRPTHdGNmJrWmRaM1ZOWHg5TkVaTV9QNUVxaDJQbGZkVm9nejVPZjBQeDlyRDVYSm1WbmhDc1YzSllLLW5HVi1xMFNGbXVZUTZSQTlQTnYyeTY3a2xlT2l2YURtUEtrMk9nUWjSAaIBQVVfeXFMUDI5WVYwa3c3NktJNEVZeDlBTW0tbm1oVGVadkFlNEFUWklHZ2dEdlNnWlcwbzdpLUJmTVhDOFhrejhBRzhIdDNTdnZqVS1JRnkzYVBJYnB2ajhPbm55b2hUbkhVaC10SXlicThnNURwdDMwbHFIWGFnTEtlZThiaXVnVDhFUUdlQ296dnljZVRDbVFKc0daUU5XSGM0emxKdXdn?oc=5",
-      "site": "news"
+      "site": "報道"
     },
     {
-      "title": "クマ出没（兵庫県新温泉町多子）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPaWIyLUZIUXN3aVc0ZzNTbHZjWDBrZENYTERPRTdiamZaY01qcUFoVEVYakthYnJTV1NwSWM3TVM4V1RXdEF4Y1JJdlUtc1VPSlVjcWJFdW40RUVOM2NZZ2drY0YyeUozT05TenBzMzhja0hnWXJWMUJaTmlxWUd2LVdrQVhiRVM5Y2VUdk1qLU5oaGpyNXlpaV9VNlTSAaIBQVVfeXFMTTRpcGNteGpETE1MQnFja3VhYWYyTFVqN2VMVFFKVVFhZnhuQ0Vlc2NBTC1iNXRqeGRpSVBNZS1aNF9LbnpSbnpVc2tpUEZlRm11V3FjaG00QjlwVV9CWjdvd29HQkFQZ1FRR0VBUjlmNnVHUWxfZ1pnUkZnTHF4bEVGU2hFb2RpTGM0ZHM1TXExRndaaURKcEFPeENaT09ORE13?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 岩手県花巻市 石鳥谷町中寺林の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNajQ0Q1NwYzdiZS1vTFNISHBpTGU0NmFvZW5vNVZUYkhHWnVrSzJHQmJnXzFNYmpEVzJrTUE4YnFzcnR0SldyVFVaME94WTZKVUVOYTdNWk9Nc2FQbkQ3R3FLenp3OEo1MVpCZVhOVnRLOTZLb1N2d3plcWNwdVBxLWgwSDRhd2dVb1FQb0Ezc2F6UGoySGg0SVY2X2MyZUpuS1pNNHdHOW9wTmgzTUhPN0RGQzYwSUtmUnFoekVocFFjQjJYTW1JTTN4Q3VTeUdpd2pITmEtMERaR3BvcTVxNExPU0hqRy1yb19Pd0gxdGpQZ9IBogFBVV95cUxONmdSUjZTRk0xQmZBNHdqY08zZklSaWVCWFQtQXJFVXRjR0YtY29CcXRnOTRGaWxidzEtVjJJTzRub1pyb0dwTlFHOG1RVmw4Q3FIRjY3YWNBN0RuaEhfT0ZObm43MDFWczcyVnJVQTdxTllfSWFWdWszNXU4ek44R1FXMlVBSmlQdWJ3cDZQMkQzYkFzaS1HMGxEUndLeW5hTWc?oc=5",
+      "site": "報道"
     },
     {
-      "title": "クマ出没（兵庫県豊岡市加陽）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPRG9GcUJYczRlT0hKdXZZeFcxbVkzaHpoY0NUZVhnRV9rSW51MllxYUh3V0ZQNzVkX1Z4Wjk1bnJ2N2RWX2dJc2FiaU9aeEt6b0FGYVRfOU92UWlGQmM4TTlpR1NTU290WWJxdVA2OGtSUGhZV0RHR055Ym9Hb3Y2VHl3YWZjZk4yMm1VQnptN3lXVW5paXJQWmd6TEvSAaIBQVVfeXFMT0JlbzY1bHUzb1AxWmlrTFBJZVFsNW5MS3BNblA4b2Zfd2oyeTBfbFdfUWtvOVJJcjBIbWN3Z3BtSm1jSEV1NlVsQ3QybFhJY3RiM0EzcmdOUzM0UHdsXzhGU2hJV2F6cXhHSGhGcFhJX0lVMWJHV1NUV0RhS0FQTUF6c2JObVFKRlkxVFNQN1RocXBCbTNlSmVGR3NtblA1R1RR?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 福島県白河市 市道の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQdEtST3ZFNWtBbEtBbUVtMms0UGZkX3QwODRIckQ5ZTI5OTRRZTlKNnFuMFJEQTZEdXpFa3N0aldaQ1hQRkk0U2dJTUJMUU5NQ3RqLUxBeDFrUmlnYUlGc0pCd2dScXhiZncwd0pjSHJSN09Jd3Z6YUtHVGVjd2l0d1Q1MXJwSDRScDhyaVdR?oc=5",
+      "site": "報道"
     },
     {
-      "title": "クマ出没（兵庫県養父市大屋町樽見）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPNjBIWnZRR01MMDFJRFMzX24zVDFlNlhrWHU4Y1ZGNGpDUjVtUFJITHRKS1hFbVNHVkZHbF90YWgxcm9vemQ5YXhROUJCNGlocVgxbWg4R0t5OFJCdkl3MjFZZGUwMWFaZExHR09fWG9DUzV2U0t2XzBrOWhnSWRuOWZFck9GWmNWZ21HVGJySkRzOTZIV0xxLTVUckPSAaIBQVVfeXFMUGR4dk1HNHhVb250RzV2MU5UOFd1R1Etd0VGTFV2RnR0eVhSV1BuMUNtSmVHUGRxcnVoMldUcVBkRXpLUlA0M1ZBTmhKN2NFQlYzRktVeGtSVG1rWW9KRFJpLTFDSDgxTXotUDl4ZDBjR1ZRR09fdW91dHhSWVhyWHU3ZW9XOVV3VjRXSDdWNU8tZnZJM0x5RF9ib2tPMTNqeFRR?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 宮城県登米市の出没情報",
+      "url": ""
     },
     {
-      "title": "クマ出没の可能性（愛知県設楽町津具泥沢）",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNVERGOW1MRWEtTmlLZ1N4YVZKWDBnS0ViTER1TmVhZko3bXNybEp5YkV3LV9tVTFnVHlVaEFOLUQ3MHBSM3BZMFpjMlgzWUEtVUVkMkFTczlyczdESEZ6QW4zV0ppWVJwbDBzR0R4bl9qYTRKcU12bm00RVRNMjJSUnR5ODZOSmRzLVlVQW5iUzYydVgwLTJ2MmtUX1jSAaIBQVVfeXFMT0d1Ri1kUUdNem5uVWtqd2IwWUo1anpDYV9hVmlXSk42VlJuTkVKeUJubTZUcFV5RlA1SU1nQ21qbUtrdnREWTlzRTZreXNQVldJaVpKcDBuX21UeVNvMWthWlBzRnF1Y1g5TGRDSGRKNWVDY0tFc0hXdXpnR3BoU1k3NzZ3TE1jYTBReWVVZnJGeWJ4OWlEYktyNDFlSHZhMUlR?oc=5",
-      "site": "news"
+      "title": "2026年10月28日 宮城県大和町の出没情報",
+      "url": ""
     },
     {
-      "title": "クマ出没（群馬県沼田市白沢町平出）",
+      "title": "2026年10月28日 群馬県長野原町 民家庭の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 群馬県沼田市 白沢町平出の出没情報",
       "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQNmJhODBScDhFTC04cEdnX3BkUVctMW5JVklJN19CeW1TNllIMVo1eGprRTd2NV9XTzlfeVF4NXFLMGhWY3JYOVRQMmowaEZfMjlMQklVa0FtSkM2UmJTRGtBbHQtWFM0SmdTb2hNTnJWcjM3RGo1X2pHQ3lMYUZreDZRNld6UDQ0aUQ2bDhfLTVHeWJrVWoyLW5tNknSAaIBQVVfeXFMTnJVX1RycmlYYXBZUWlHMXVFdTJodHF0ZUo1S0xtOUFGUVI3R1g2UjRBanNydU5pR29ta0FQa05nQk9UOEJxTE9oelBDTG1GUFFOcFZyeFFBTmdSRlZfVUVwMkdSSjlPNms2bEtkVWpMQXh1MTBfd1VDNTJzM0ZDTUlwNXhBLTVmQlN0STNxOWNJbU1Hck94Y0dpeUUyMVV2T19n?oc=5",
-      "site": "news"
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 山梨県上野原市 鶴島の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPbXdfekZsQXcwTDBXeGtiVkMzVVpJQ080XzhDTFZadTFPaUJPbVVqTkh5YmFXMEhmS0VFeWdOSnU5bnpfTVM3c2YwZll2X0pjSVlUeEZMQnJpYzZUYlJqYTVhZjhwX2diSGZESnE2OTh3QWt3TlA5RGNjZXd2WFpBejI5MkNDVTdsZUNTaVh6UXNjc2psemFJZ1BvMkvSAaIBQVVfeXFMT2ZiUHNpUlRqbUVteElkMEN4OGtzNGpxZEVzTGRqRTJaR244UWU1Z3oydXEwdi1IdXVPVmtnUWQ4eU40SEVnRDc0Y3dVRzZHaldWcEhPQnNrQzhrd1FWX3I1N0pYbEFhcloxYU5GX0x5ekY0RHVpVmZyZy1FaWZYVUQ2WDZlbUhDcUFmbUF0SXo3UTI4STA0RndyV2xUbThPNkhR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 山梨県富士吉田市 新屋の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPRXZkVnUyMllQeFNPdWVhU0xPUG1FS2IxM3NzX3ZOQnpXd0tNSTFVZmUtZXFwQ1p3eWxaY1p5MnRuY1MzX1Jyb3hZS1JVNVQ4dVo5QWVjWmZxaExCbHktVU9oVVlYa1ZjZ3kzMXJNOEVZMVUtNnZnSDhiLXY5ejR4M1JMaHFLSGpqRlAyTGhVS1FwZm8weXlLVm82ZUnSAaIBQVVfeXFMT0tJczdpaktYaGJiaUpneE96V0J3NEk5MEdKRERQUmRTZW5oN1Foa3ZyM2lHYlpFdkJldzkxZzkzc1BvbWpFOUhad1NZYWZnVFo1cFBSS1JHUkNITGVfVVpxZkpBLW1qZ1B4anZubXpObG9OWEFQeXpIOVpWVjFBVVBndDJVT2l4OExncHdEcko4Y3Zlb0VBaUhhZ1FrbzFRZktB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 山梨県大月市 梁川町塩瀬の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxOVW1HVS1Fd2o1UUJoMGZZSHJiWnhsVjZVMzZXVVZ1UFo4V1ZnYm85YUNOTjZkRndJYmNnZDRuajJ1dzF5bW5tUVVUaV9YZFI0b2RMZ0c0RVNvT1R6WkY5alBCNXY0VDdhS2FzQ2NGZW9fOS11aUI4MjN5T0NyR3poT1UxX3FQczlMU2c3WWNfaUlaUWVJajU4THI4ckRIc251Y05NWXhfTTQ3NEd2aGVlNFZ4VHFHRk5abmVGZ3BOM1R4dWZDYjR5OWZLenozWklNNkVKS2ltS2dVenBqZXkzS0tINXBNNXRscFI1OFk5anl5UdIBogFBVV95cUxORmtBazV3V3pzMlhkQTVKQ3NzcEI1WUwyQ0VoMWRXU1FURjVkVzNjb2lpQnVuVE4zUHlQWU9zRFU5VDFTMFRGY3FYYjBja1NGNjdtWnlLZHl1amxoWGFUdFpzMWwzd2JKUzlJb3JiaU9WQmJ5Rk9FSGdTSU9xTUtLMHRRNlAyWEZ0LTZ4X01uVXZyaWdaODN1V1V2Vk54alNpR1E?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 神奈川県松田町 織戸組付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 神奈川県松田町 寄の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 東京都日の出町 大久野の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQZnZKMElBM0poNEtDam9FZ2RZR0JoTExRdXhnejZ3aXFDMzhHeVZRVlVDaFpVSlZIek9lVDBKbzZTb1FnZVJxZXExcmZxandpaXprMi1HeXhRazlIWTR3aFo0VVNONXJNeWNFM0t0RUFiNmlYV0NzYzhDSzNiS213WmpEVUpQdnJCdXJWX3BhazNINDJCaGNLZzJ4NTjSAaIBQVVfeXFMTXVOdlZ2am9YZW5WYUtyeUhrUG95djA0RHhBaHhjeEdQOGpYbjJGeG5YZkRUMHExdUdEZEJONWNtSTNkMzZvNnF3T29kT2R5YUpwOUQ0enotT3dNNUozQmVheEF5RE1jMnMyaEVQYm9rajNhd0ZmMjVia3NjaU9ZQ2lsR1QzRjk4RWVrQVdjb1JYVWdVdFZfUmstcnFrR3FyUlVB?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 福井県小浜市 尾崎の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNenBkZi1YcTEwaTNIenZxTDJwT3kzb1BnZzMtRF9hQkNyNXcwdW5oUmZUdURmSkpfN09jVkxhc29hdkN6ZGl0b0M4ZDRvMWtvSnFrbmV1R3FmZFBDbHR1d0Z4ajFkUEVIbnZXeHRQQ0V2SGxOSW5IbHVqbl8zbDZWRFVDLURKSklkMEhnbzRjTjg4MGpmVHBqN25EZWTSAaIBQVVfeXFMTlQ5UkdlWXlnQjN5UW4wYUw5NkVkcEc3MVRaRDd4M3lTZGxZelE3ck0xcW9Xd2NxNUdvSnBZamtMVDhMZ1UxRWVGakw0RTA0T3ZKMEdhNGoxcFRaVGgwQ0VsYk1JV2RPVzB6U0RTOVJjdnk5YUVzRzVJZUVzbWtxS2wwUmNvUWZ2Yzk1TWNLdDRNVU4wUHFqUU1WclZrYnJtMnF3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 福井県小浜市 須縄の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQZ3h0Tk9tMUg4NS0yWHNSRzJKN1ozYnE3SEgwLUZ4U0Q2T1hTTUxZR050eTlQenhlWHVDSklhTmRrUHBhNjAybU95cTZYODROQTJDVTVnZENKUjR4U0FUVFNnLUdFb1BIbDc3SU16M3RnczAySVRBUjh0UUkzU2NfeDB0NEtxRG9xZHEtRTlqQ010TnVybUxsOWUxNnTSAaIBQVVfeXFMUEFreE1ZTEVoRW1EMnc2VEt4RWJUSFpQem44Q24tWndjWDhaVHg2T0E3V1pCb3ltOVBQNjhkSzhaUUxUbUxBOEhkSWxsU0p1d3p3QXA0aHZGMXpqNHZEU1gxX2w0clg2S0xaWXRJV3ZaVzZmQ2pVbzVoS0Z4bXM2Y1JRaWs1V1d4SEJxRTlBbUpsQmhFVlJ2V0xKcVRHQ21BQUt3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 福井県若狭町 天徳寺の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 福井県高浜町 笠原の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 岐阜県揖斐川町 春日美束の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 岐阜県恵那市 武並町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 長野県中野市 間山の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPM2pRb05ZS1doSHNiRURfRG9kQ3I2alhGeXJiY1d3anM1Z0hxaUVJSzdVUTZaWEl2ZzVsd25PZVhES294c2FuR0VZVFRIUDA4Vm9TazN1eUJRMEFfUFdzTml5cTRySHVtdmJMY21EcFNyeFBMdHZaQU5rRm9BMmJfVTVpUGpsRGsxdmZpUTFuZUJVUmFDVEhKb0pUUXFjOTA5d1FkalVZQk9nYnZiN1N4RzRTc2cwS3VYZGVaWEpYOVM5cDVZMjloaElYODY1MGV6Y1Jnd1BjYXdBZkg5NXFVaFg3a2xWZDFvdzhnU2E3dnQ0Z9IBogFBVV95cUxOTFRydTdHemNZNk1LVXR6RlFXNG5KRWtJeC1iUWtKM1BlQnQxVUJvZGNBUktWenU2eXpwbTlIYWdoZTNFaGNWQTltcktjVVZZYjF6OWRmVmJ3cXpfXy1VeElUWjdOOVVFTkVtZ2QzTTZ1MVpWTm5TUUdHQzk2elpHWHJoU21ZeEk0c1oxYVF2cFkzU2hncVB2ZkRodXVCSlNKdlE?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 新潟県南魚沼市 原小路の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 愛知県設楽町 津具泥沢の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNVERGOW1MRWEtTmlLZ1N4YVZKWDBnS0ViTER1TmVhZko3bXNybEp5YkV3LV9tVTFnVHlVaEFOLUQ3MHBSM3BZMFpjMlgzWUEtVUVkMkFTczlyczdESEZ6QW4zV0ppWVJwbDBzR0R4bl9qYTRKcU12bm00RVRNMjJSUnR5ODZOSmRzLVlVQW5iUzYydVgwLTJ2MmtUX1jSAaIBQVVfeXFMT0d1Ri1kUUdNem5uVWtqd2IwWUo1anpDYV9hVmlXSk42VlJuTkVKeUJubTZUcFV5RlA1SU1nQ21qbUtrdnREWTlzRTZreXNQVldJaVpKcDBuX21UeVNvMWthWlBzRnF1Y1g5TGRDSGRKNWVDY0tFc0hXdXpnR3BoU1k3NzZ3TE1jYTBReWVVZnJGeWJ4OWlEYktyNDFlSHZhMUlR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 京都府南丹市 美山町内久保の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQRnpLUlhSdkY5MFEtTnJ2NTRZYXpIX2h0VVBKVllwakFSOVZhZnotNEl3cEgwLXlGS1E0dGNobU5Mb19CclNIRlhvS1piN0tmaUtQV0tqUERhRVdidlhtNlJHdnpUS19oTDFWWVhYV29xdnI2Q05HZTNFMENhT3plbm83R1VHenV0MmxOX0R1U1lNdzBMLTc3WXptTUbSAaIBQVVfeXFMTVFDNy10bEdBS0J6MnhwMFhNU01XV3hVdzJRWi1XLWhDR2dOOEt5MG9iTGdfUXJJNkc3cUxZZU01OFJWemhnUWVmREV3Tk05V01nRjlkZDdGeGlVQWFGZWcwdGc5SzdXTWdRRG9qWnJDMm16aUFBanBSUVNZS0FFaEpQR3hnNE0zMlgxY2hJeHBLNTFtWXJzQVBwZk5Kc0JoZzF3?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 京都府南丹市 美山町鶴ケ岡の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNOVpkekFPUzBaenZjaGVxQ2kxYWw2SkdjTlhjbTBzbVFDeWRIVGRwZG02UTBGNkRhbTdzbTZEcGF3MVk4MkxpMFA3anFId09UVUc5bVpQR3MySS1KYzFNRjA0NjVLcWRsLU92djJfSjlSaVFROVVmRndwY0tuME8tQTMtZ1FiNlBJVFVpMjZTX3hMT2pFbjJ3VEpwUmfSAaIBQVVfeXFMUEV6bkdKdmxWV2dfOTlWTDVGOEx5cHJzcXI2U2cxQWRfQWlQaW8xbE1UNGVJLVRheFZIbGVrNzNUM0ZYVURSOWRfN3l4TGZCeXRMRExhdklpUzRIRkVObmJlOTNtMm9HMmM2VVlZYVhxWjVycFhldS0ybXp2cWwyLXpEYTFEV3ROdEZ5OG1nNmlUT2lZN3RQcGNYbjNBMUJsUk1n?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 京都府綾部市 青野町出口の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPU1E1dEVmT3dxR0dfc2tVUDM0Q0VuWUFkXzVYWW1PUWMxakdOYWxjcFlaa3N2U2xaSjdDRnJZNk44c21DU0ZHdUh2QlRMZUFYWDZVeld2VURBVXV5WndCY0l4ZzhrT3BudjEzcjJhUEhxODlMMWF2ejcwQ0FzYWtpMXBPRmZORUVWVXA4S1FxMzVZX3NYNm9hLUVNSS1CQTRxdEg1am9EaGVkd042QURj0gGiAUFVX3lxTE1lU0dxWUowVjJsSWFXZjBaSXp2NkJ1cWNxNDRuUjNEbnJ2bHBqYS1KS1pNQVNSSER5UFJOeFdrbzNfOWJfLUF1aXFoOEMwRG5IV1d2R3lVVkpoYTlxSXpqU3JQTnJvWFdqVVdyTGFTTUJzemhKU29XRG1WbmZBUmlJd21IMmpMMEtmS2QwWkJGUGlLZlNQWmZzMDRBUjhSUTR4QQ?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 京都府京都市 左京区広河原の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxONHg3RkxYcU1BOFM5UUY1LXpiSE9ReVVpV2JIWmZFelBwdk1KOGJrbktrQWVpYlhWVnJadWVVV2t2aDNUWDZWZG5mRnpkX2Nvcy0zQ0JJZm5pVDhLYjVJMk14TlJmMG9xTVMxaVNiZEtUZE5wc2tNWEJqMmZnVFRDakxlMFlTZjRWb25PNlVxZi1CejBYR2FXNXNuMDZYRUpKeUhOSkFnMWlWUEMwaENzUGNNQ0xNMHVhcUZZQlJPYjRSV3VvUXhKLUlzY3lyOUg1SDd1c3ltR0lsbE9aSFNTNHhublFZZE04Z0NwNGZlR0xmQdIBogFBVV95cUxOLV9RUmJpTGlReDBuYTJSSVJkc2tkVk9BUnc3ZEtOY3RlTnVqWl9Od3U5ajZsbF8zQjlDWUVzbVhPZkwyQXdha0ZiZHg4Z00ycU14RzN4LWY3aHQ3bTk0TjZnY09aeXFqdDR4RUl5NkZBT1o4Sks0S0ZLTkc3SnNUR010aHFZd2F3LW1PTkdaQ3k0UFE5U1MzbFR0YWxmel8wY3c?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 京都府京都市 左京区八瀬の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQLXl0bWxOdmZVTElxV2JLWHdtMGZTLXcyaUo0UjFBLXVrOVV3UU9yY1ZveFNuMDRpTmdPTnJKb2thdFF0VG1qRzE1eUFHSm9fLWdvdUs1VHd0blAyemhnM21sZDBrTUd4N1IwbVBVSjFMQkhta19sVlNvbFVnUzJGN2Q3NXJYTlpfdmlfWkJZZm9KeFlVck8tY3hQLUzSAaIBQVVfeXFMT29DZ0tXclJ2UklRaVcwT2JrQlVIUFBNU01PWXcwWU1HZEJXa0xrMzlTcDg0dUxzNHhERzlXcGFpQzU1VWlEczYyUWlUa09yR2hwdjU2M0pMeWFVSldrejZKekw3NHdKeHRDMm9XOWs1cDRNenlOUGNKX3I1OFpncEp0T05EdHMwZzdZUVFZUWVSYXpXMXhvb0RlYmdKSEF0OFVn?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 兵庫県新温泉町 多子の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPaWIyLUZIUXN3aVc0ZzNTbHZjWDBrZENYTERPRTdiamZaY01qcUFoVEVYakthYnJTV1NwSWM3TVM4V1RXdEF4Y1JJdlUtc1VPSlVjcWJFdW40RUVOM2NZZ2drY0YyeUozT05TenBzMzhja0hnWXJWMUJaTmlxWUd2LVdrQVhiRVM5Y2VUdk1qLU5oaGpyNXlpaV9VNlTSAaIBQVVfeXFMTTRpcGNteGpETE1MQnFja3VhYWYyTFVqN2VMVFFKVVFhZnhuQ0Vlc2NBTC1iNXRqeGRpSVBNZS1aNF9LbnpSbnpVc2tpUEZlRm11V3FjaG00QjlwVV9CWjdvd29HQkFQZ1FRR0VBUjlmNnVHUWxfZ1pnUkZnTHF4bEVGU2hFb2RpTGM0ZHM1TXExRndaaURKcEFPeENaT09ORE13?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 兵庫県豊岡市 加陽の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPRG9GcUJYczRlT0hKdXZZeFcxbVkzaHpoY0NUZVhnRV9rSW51MllxYUh3V0ZQNzVkX1Z4Wjk1bnJ2N2RWX2dJc2FiaU9aeEt6b0FGYVRfOU92UWlGQmM4TTlpR1NTU290WWJxdVA2OGtSUGhZV0RHR055Ym9Hb3Y2VHl3YWZjZk4yMm1VQnptN3lXVW5paXJQWmd6TEvSAaIBQVVfeXFMT0JlbzY1bHUzb1AxWmlrTFBJZVFsNW5MS3BNblA4b2Zfd2oyeTBfbFdfUWtvOVJJcjBIbWN3Z3BtSm1jSEV1NlVsQ3QybFhJY3RiM0EzcmdOUzM0UHdsXzhGU2hJV2F6cXhHSGhGcFhJX0lVMWJHV1NUV0RhS0FQTUF6c2JObVFKRlkxVFNQN1RocXBCbTNlSmVGR3NtblA1R1RR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 兵庫県養父市 大屋町樽見の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPNjBIWnZRR01MMDFJRFMzX24zVDFlNlhrWHU4Y1ZGNGpDUjVtUFJITHRKS1hFbVNHVkZHbF90YWgxcm9vemQ5YXhROUJCNGlocVgxbWg4R0t5OFJCdkl3MjFZZGUwMWFaZExHR09fWG9DUzV2U0t2XzBrOWhnSWRuOWZFck9GWmNWZ21HVGJySkRzOTZIV0xxLTVUckPSAaIBQVVfeXFMUGR4dk1HNHhVb250RzV2MU5UOFd1R1Etd0VGTFV2RnR0eVhSV1BuMUNtSmVHUGRxcnVoMldUcVBkRXpLUlA0M1ZBTmhKN2NFQlYzRktVeGtSVG1rWW9KRFJpLTFDSDgxTXotUDl4ZDBjR1ZRR09fdW91dHhSWVhyWHU3ZW9XOVV3VjRXSDdWNU8tZnZJM0x5RF9ib2tPMTNqeFRR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 兵庫県香美町 香住区大野の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPMV9UQXFFSzVCaTZIVmhhYWthYVBiaFRMbEJOWjh0OTA4YThTWVZ1cmlGd19UemE5YTIwNzhqNXhHTUZWREphVF9QYUlaLUJRWjItdzIzNVZxckhhclZTdHdxbHZlV2Z4MC00SnAzSWE1cXoyQ1dMUzE1bDdTbEo4NnNZQVVKdnBNd3NYbkd2ZTZkTjM4QTB1empzXzY2bTFiUEhYRDNLcUVfdV9lVUltTEpfY1pPeXRrU1pSTUx0eWxybENWY0o0NjNwem0tVE5VNk9WaXNJQ08yMENqN0hJbW14cUZCYTZBVmFra2N1SUdOd9IBogFBVV95cUxOdGcyRkR6Zkt2cm42MDVPeTRYQmdSbGpMZl9tN0hpT3hTa0ZNMEJJUmNUeFZmTTIyVE5JcDdZR29FcXBPenJxR3g5M2JyUjQxNmZsUmk1cjV0OTdITVFDQXdxODNob2g1ck5MWkdSVHhqcnMyNFdMTHVGcENvTEJYNDliWENXaXZOcW5vWjNwQ0Nya3JvSXV3M2taaGhVRGFWaHc?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 奈良県五條市 大日川の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 和歌山県海南市 九品寺の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxORzVmWEpnR2NVSWI5TFpRc1JIY20tZ0NLa3lEX2tUZU5hcl9TVy13aGdQZkJyY29QRVlHLUNMVUVlcE9fekNYTGgxUXlNRFVETlFxOFRxRjhBUmJ3RTBLd0JUZEUzVTM4WkdpaXZjUUl6U0xscVB1cGRtUHI2SGtXRHJNb1ZJOEJyTk56dUlZNTBUUmJGd1FPQ0tvMTnSAaIBQVVfeXFMUFlnQW9YOHBfamoxN1drdFAxcVo5aUFaTkRJdktGeEJvRFQwY3pHOHQ5QWhOcFNhNXF4X0t2OGFXUmRkWHRQZlNXeVlQWUxWNVd6dDhucDFzSnJkRzBWd0lQSnl1VjZjaU1rZFhJUThIZC1CX1EyUG9FLW9UUWRCX1ZXYU5SUnJpaEpXeVY5N2ZndDZiLU1HRjBqWHY5dUQtc3dR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 山口県周南市 大道理の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOeEMxaTBBbkVBTG9KczlNdWZXYXdFTmVBSG00TU5KUEdWNlFlTWhuT08yT2pjYUhyVzFtUDRKSjZVa1g3aGJrTHJMZ1lLZVVWUGdwdTI5UTZLTy1vWDVmeDYxeFFkcTJtUUFBN2dEbmRoWXlKMmU2Y3NTZWJFX3lqWUNxZzZtMGJqVTZIdnQ1X2RxRnJyWFBwQmM1am1YWU54RVHSAaIBQVVfeXFMTnhDMWkwQW5FQUxvSnM5TXVmV2F3RU5lQUhtNE1OSlBHVjZRZU1obk9PMk9qY2FIclcxbVA0Sko2VWtYN2hia0xyTGdZS2VVVlBncHUyOVE2S08tb1g1Zng2MXhRZHEybVFBQTdnRG5kaFl5SjJlNmNzU2ViRV95allDcWc2bTBialU2SHZ0NV9kcUZyclhQcEJjNWptWFlOeEVR?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 山口県周南市 大字大道理の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 山口県下関市 菊川町大字田部の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年10月28日 島根県大田市 長久町土江の出没情報",
+      "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPODJKT0FVV1gwY2tzV0xYWXJuN3RxMC1wdzJLSUJMbkVpUUpSMzJaa0RqVndXUkVSYnhDdHA1MWJ1VmdEM3RibVMzRkkwN1E4WDJtdW9LVWVMcmdFcy1ma012dUt1R0huX2tYY0VmN2tvZk1lUlNuQXhISGYzM2xSVWhYQ1RHUFNHbjBXbEF1dm5JaWNYX0Q4eHhjYkVKVHZ1LWRyTXhwSjhVUzFGTnI2LUlaR2pXQlM4WW5rSFF0TU1tWWxZamFKajQxUTBzSHdtWWxRQXplQ1N2bFdzZ2N0Q1dsUms5R29WaktYN2FNSFo5Z9IBogFBVV95cUxPNTNYY042X3NDR0NjdjdpOXdEdzV3bmtNc3JnYTRhb1pCeUdHVXFzemlNNE5xekJjQkdQdUh0VnJ4OXVNbXc3cDlrV2d3eWVqc05nbVo4c1FHZk1oZDVFMWN2VHVFZDU5Zm9vc3F1aFkxa3hOZ25rNUVLenhlUkxmNkVlOGJ4bkQxUS1PS3F0NlVkaFYwTklSUlR2MlNaUmdnSkE?oc=5",
+      "site": "報道"
+    },
+    {
+      "title": "2026年10月28日 島根県大田市 大田市長久町の市道稲用線付近の出没情報",
+      "url": ""
     }
   ];
 
-const CHART_DATA: { pref: string; count: number }[] = [{"pref":"福井県","count":6},{"pref":"北海道","count":4},{"pref":"京都府","count":3},{"pref":"山梨県","count":3},{"pref":"兵庫県","count":3},{"pref":"島根県","count":2},{"pref":"神奈川県","count":1},{"pref":"秋田県","count":1},{"pref":"青森県","count":1},{"pref":"愛知県","count":1},{"pref":"群馬県","count":1},{"pref":"広島県","count":1}];
+const CHART_DATA: { pref: string; count: number }[] = [{"pref":"京都府","count":13},{"pref":"北海道","count":5},{"pref":"山口県","count":5},{"pref":"福井県","count":4},{"pref":"秋田県","count":4},{"pref":"兵庫県","count":4},{"pref":"山梨県","count":3},{"pref":"群馬県","count":2},{"pref":"宮城県","count":2},{"pref":"島根県","count":2},{"pref":"神奈川県","count":2},{"pref":"岐阜県","count":2},{"pref":"新潟県","count":1},{"pref":"鳥取県","count":1},{"pref":"奈良県","count":1},{"pref":"青森県","count":1},{"pref":"愛知県","count":1},{"pref":"広島県","count":1},{"pref":"岩手県","count":1},{"pref":"福島県","count":1},{"pref":"東京都","count":1},{"pref":"和歌山県","count":1},{"pref":"長野県","count":1}];
 
 export default function ResearchPage() {
   return (
@@ -179,57 +315,50 @@ export default function ResearchPage() {
 
       <ResearchPrefChart
         data={CHART_DATA}
-        total={27}
+        total={59}
         periodLabel={"2026年10月28日"}
       />
 
-      <h2>当日の主要事案：市街地近接出没および捕獲・殺処分の動向</h2>
-      <p>2026年10月28日の集計データにおいて、人身被害キーワードに合致する事案は0件であった。しかしながら、都市部・市街地周辺への接近や、生活環境防除に関わる重要事案が記録されている。</p>
-      <p>北海道登別市の胆振幌別川付近では、市街地近くでのクマ目撃情報が報告された（※1）。河川沿いは山林から居住区を結ぶ移動ルートとなりやすく、住民生活圏への侵入リスクを高める事象として注視される。また、登別市内では新川町3丁目においてもクマ出没の可能性が報じられており（※5）、同一地域周辺で複数回の兆候が確認されている。</p>
-      <p>一方、中国地方の広島県広島市安佐北区においては、捕獲されたクマを殺処分した事案が報道された（※2）。同区における捕獲・銃猟キーワード一致事案であり、個体管理および危険排除のための具体的な対応が実施された事例となっている。</p>
-      <h2>全国出没状況の地域別分析</h2>
-      <p>本日の総報告件数は27件であり、都道府県別では福井県が6件と最多で、次いで北海道が4件、京都府・山梨県・兵庫県が各3件、島根県が2件、秋田県・青森県・神奈川県・愛知県などが各1件であった。情報ソースの内訳は報道由来（news）が20件、自治体等のオープンデータ（fukui 4件、shimane 1件、hokkaido 1件、kanagawa 1件）が7件となっている。</p>
+      <h2>主要事案の概況：市街地・教育施設接近と捕獲事案</h2>
+      <p>2026年10月28日に収集された全59件の事案のうち、特に人身への危険性や自治体の管理対応が注目される事案として、都市的生活圏への接近および個体の捕獲・殺処分事例が報告された。秋田県秋田市手形では、周辺に秋田大学や秋田高校が位置する市道において体長約1メートルのクマが出没した（※1）。同地区周辺では手形大沢（※2）や手形中台（※3）でも出没が確認されており、文教施設や住宅が集中する空間への継続的な接近がみられる。</p>
+      <p>一方、中国地方では個体の捕獲と処分に関する事案が相次いだ。広島県広島市安佐北区において、捕獲されたクマ1頭の殺処分が執行された（※4）。また、山口県岩国市では周東町祖生（※5）および美和町下畑（※6）の2地点において、イノシシ用くくりわなにクマが誤って捕獲される錯誤捕獲がそれぞれ記録された。これらはいずれも錯誤捕獲時の安全管理や対応手順の重要性を示す事案である。さらに鳥取県八頭町徳丸では、梨に対する食害痕跡および糞が確認されており、果樹を中心とする農業被害も発生している（※7）。</p>
       <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs text-stone-700">
             <tr>
-              <th className="px-3 py-2">地域</th>
-              <th className="px-3 py-2">該当都道府県</th>
-              <th className="px-3 py-2">件数（代表サンプル記載分等）</th>
-              <th className="px-3 py-2">主な発生地点・傾向</th>
+              <th className="px-3 py-2">発生地域</th>
+              <th className="px-3 py-2">事案内容</th>
+              <th className="px-3 py-2">特記事項</th>
+              <th className="px-3 py-2">記録番号</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-gray-800">
-            <tr><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">北海道</td><td className="px-3 py-2 text-xs">4件</td><td className="px-3 py-2 text-xs">登別市（胆振幌別川、新川町）、歌志内市、士別市での目撃および足跡痕跡</td></tr>
-            <tr><td className="px-3 py-2 text-xs">東北</td><td className="px-3 py-2 text-xs">青森県、秋田県</td><td className="px-3 py-2 text-xs">2件</td><td className="px-3 py-2 text-xs">五戸町切谷内、秋田市手形大沢での出没報道</td></tr>
-            <tr><td className="px-3 py-2 text-xs">関東</td><td className="px-3 py-2 text-xs">群馬県、神奈川県</td><td className="px-3 py-2 text-xs">2件</td><td className="px-3 py-2 text-xs">沼田市白沢町での報道、松田町寄での山中目撃情報</td></tr>
-            <tr><td className="px-3 py-2 text-xs">中部</td><td className="px-3 py-2 text-xs">福井県、山梨県、愛知県</td><td className="px-3 py-2 text-xs">10件</td><td className="px-3 py-2 text-xs">福井県小浜市・若狭町での親子熊目撃、山梨県上野原市・富士吉田市・大月市、愛知県設楽町</td></tr>
-            <tr><td className="px-3 py-2 text-xs">近畿</td><td className="px-3 py-2 text-xs">京都府、兵庫県</td><td className="px-3 py-2 text-xs">6件</td><td className="px-3 py-2 text-xs">京都府綾部市・南丹市、兵庫県新温泉町・豊岡市・養父市での出没報道</td></tr>
-            <tr><td className="px-3 py-2 text-xs">中国</td><td className="px-3 py-2 text-xs">広島県、島根県</td><td className="px-3 py-2 text-xs">3件</td><td className="px-3 py-2 text-xs">広島市安佐北区での捕獲殺処分、島根県大田市長久町での市道横断目撃</td></tr>
+            <tr><td className="px-3 py-2 text-xs">秋田県秋田市手形</td><td className="px-3 py-2 text-xs">市道での目撃</td><td className="px-3 py-2 text-xs">周辺に秋田大学・秋田高校、体長約1m</td><td className="px-3 py-2 text-xs">（※1）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">広島県広島市安佐北区</td><td className="px-3 py-2 text-xs">捕獲個体の殺処分</td><td className="px-3 py-2 text-xs">自治体による殺処分対応</td><td className="px-3 py-2 text-xs">（※4）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">山口県岩国市周東町祖生</td><td className="px-3 py-2 text-xs">くくりわなによる錯誤捕獲</td><td className="px-3 py-2 text-xs">イノシシ用わなへの錯誤捕獲</td><td className="px-3 py-2 text-xs">（※5）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">山口県岩国市美和町下畑</td><td className="px-3 py-2 text-xs">くくりわなによる錯誤捕獲</td><td className="px-3 py-2 text-xs">イノシシ用わなへの錯誤捕獲</td><td className="px-3 py-2 text-xs">（※6）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">鳥取県八頭郡八頭町徳丸</td><td className="px-3 py-2 text-xs">農業被害・痕跡確認</td><td className="px-3 py-2 text-xs">梨食害および糞の確認</td><td className="px-3 py-2 text-xs">（※7）</td></tr>
           </tbody>
         </table>
       </div>
-      <h3>北海道ブロック</h3>
-      <p>北海道では計4件の事案が確認された。登別市では胆振幌別川の市街地近接エリアでの目撃（※1）および新川町3丁目における出没の可能性（※5）が報じられた。歌志内市神威美山町でも出没が報道されている（※4）。さらに自治体情報として士別市川西町3033番地付近において、7時10分にクマの足跡が確認された記録がある。市街地近接から河川敷、農山村地域まで多様な環境で痕跡や目撃が確認された。</p>
-      <h3>東北ブロック</h3>
-      <p>東北地方では秋田県秋田市手形大沢（※11）および青森県五戸町切谷内小渡（※15）においてそれぞれ1件の出没が報道された。いずれも人身被害は伴っていないものの、地域住民への警戒喚起を要する出没事例である。</p>
-      <h3>関東ブロック</h3>
-      <p>関東地方では、群馬県沼田市白沢町平出での出没が報道された（※20）。また神奈川県の公式情報として、足柄上郡松田町寄の山中において15時頃にクマ1頭の目撃情報が記録されている。山林域を中心とした生息圏内での確認が主体となっている。</p>
-      <h3>中部ブロック</h3>
-      <p>中部地方は全体で最も報告が集中した地域であり、福井県で6件、山梨県で3件、愛知県で1件が記録されている。</p>
-      <p>福井県では、小浜市尾崎において14:00に成獣1頭・幼獣1頭、16:50に成獣1頭・幼獣2頭の目撃が自治体データに記録されており、同地区で同日に複数回の親子熊の徘徊が捉えられている。さらに若狭町天徳寺でも15:00に成獣1頭・幼獣1頭の目撃があった。また小浜市須縄（※7）や尾崎（※6）での出没が報道でも取り上げられている。</p>
-      <p>山梨県では、上野原市鶴島（※12）、富士吉田市新屋（※13）、大月市梁川町塩瀬（※14）と、JR沿線や主要道路が通る谷筋・盆地周縁の自治体で出没報道が相次いだ。愛知県では北設楽郡設楽町津具泥沢において出没の可能性が報じられている（※19）。</p>
-      <h3>近畿ブロック</h3>
-      <p>近畿地方では京都府で3件、兵庫県で3件の出没が報告された。京都府では綾部市青野町出口（※8）のほか、南丹市美山町内久保（※9）および美山町鶴ケ岡（※10）と美山町地域に集中している。兵庫県では但馬地域に位置する新温泉町多子（※16）、豊岡市加陽（※17）、養父市大屋町樽見（※18）において相次いで出没が確認された。</p>
-      <h3>中国・四国・九州ブロック</h3>
-      <p>中国地方では島根県で2件、広島県で1件が記録された（四国・九州地方の報告は0件）。島根県大田市長久町土江では報道による出没情報（※3）に加え、自治体情報として午後2時半頃に市道稲用線付近を横断する体長約1メートルのクマ1頭の具体的な目撃が記録された。広島県では前述の通り広島市安佐北区で捕獲個体の殺処分が実施されている（※2）。</p>
-      <h2>リスク評価</h2>
-      <p>2026年10月28日の記録に基づき、以下の3つの観点から出没リスクを評価する。</p>
-      <ul>
-        <li>時間帯および個体属性の傾向：福井県小浜市や若狭町の記録では、14時〜16時50分の午後の時間帯に成獣と幼獣を伴う親子の目撃が連続して記録されている。子連れの個体は警戒心が高く、接近時の突発的な事故リスクをはらんでいる。</li>
-        <li>河川・市道等の移動導線と人口圏接近度：北海道登別市の胆振幌別川周辺での市街地近接目撃や、島根県大田市における市道横断事案など、道路や河川周辺での目撃が複数報告されている。線状の地形やインフラを利用して人里近くへ到達している可能性が示唆される。</li>
-        <li>対応措置と継続的警戒：広島県広島市安佐北区において捕獲個体の殺処分が行われたように、生活圏周辺での個体排除が実施されている地域がある一方、各地で同日内に同一地区での連続目撃（福井県小浜市尾崎など）が確認されている。出没が報じられた地点周辺では、依然として遭遇リスクが存在するため継続的な注意が求められる。</li>
-      </ul>
+      <h2>地域別の出没状況と傾向分析</h2>
+      <h3>北海道地域</h3>
+      <p>北海道では計5件が記録された。登別市では胆振幌別川沿いの市街地近郊で目撃情報があったほか（※8）、新川町3丁目においてもクマ出没の可能性が報告された（※9）。また、士別市川西町では早朝7時10分に足跡が確認され（※10）、歌志内市神威美山町での出没（※11）や、浜頓別町において地元酪農家により道道586号線を横断するヒグマが目撃された事案（※12）など、河川敷や道路を移動経路とした出没が広域で確認されている。</p>
+      <h3>東北地域</h3>
+      <p>東北地域では秋田県で4件、宮城県で2件、青森県・岩手県・福島県で各1件が記録された。秋田県では前述の秋田市手形周辺における複数事案（※2・3・1）に加え、北秋田市小森岩ノ目でも出没が報告されている（※13）。青森県五戸町切谷内小渡（※14）、岩手県花巻市石鳥谷町中寺林（※15）、福島県白河市の市道（※16）でも出没や目撃が相次いだ。宮城県内においても登米市（※17）および大和町（※18）で記録されており、幹線道路や市街地近接部への進出傾向が継続している。</p>
+      <h3>関東地域</h3>
+      <p>関東地域では群馬県で2件、山梨県で3件、神奈川県で2件、東京都で1件が記録された。群馬県長野原町では民家の庭に侵入した個体の姿が防犯カメラにより確認されており（※19）、沼田市白沢町平出でも出没があった（※20）。山梨県では上野原市鶴島（※21）、富士吉田市新屋（※22）、大月市梁川町塩瀬（※23）と山間部や居住地に隣接する地域で連続して発生した。また神奈川県松田町では織戸組付近の県道710号での目撃（※24）や寄地区の山中における15時頃の目撃（※25）があり、東京都日の出町大久野でも出没の可能性が報告された（※26）。</p>
+      <h3>中部地域</h3>
+      <p>中部地域では福井県で4件、岐阜県で2件、長野県・新潟県・愛知県で各1件が報告された。福井県では小浜市の尾崎（※27）および須縄（※28）での出没に加え、若狭町天徳寺で15時頃に成獣1頭・幼獣1頭の親子とみられる目撃があり（※29）、高浜町笠原でも18時30分に成獣1頭・幼獣1頭が目撃された（※30）。岐阜県では揖斐川町春日美束の住宅地で23時から24時にかけての出没（※31）や、恵那市武並町での記録（※32）がある。さらに長野県中野市間山での出没（※33）、新潟県南魚沼市原小路での体長不明の足跡発見（※34）、愛知県設楽町津具泥沢での出没の可能性（※35）が記録されている。</p>
+      <h3>関西地域</h3>
+      <p>関西地域では京都府が全国最多となる13件を数え、兵庫県で4件、奈良県および和歌山県で各1件が確認された。京都府内では南丹市美山町の内久保（※36）や鶴ケ岡（※37）、綾部市青野町出口（※38）での出没のほか、京都市左京区の広河原杓子屋町（※39）や八瀬野瀬町（※40）といった山間集落・居住地での出没が目立つ。兵庫県では新温泉町多子（※41）、豊岡市加陽（※42）、養父市大屋町樽見（※43）、香美町香住区大野（※44）と北部地域に事案が集中した。このほか、奈良県五條市大日川で13時に確認された事案（※45）、和歌山県海南市九品寺での出没（※46）が記録されている。</p>
+      <h3>中国地域</h3>
+      <p>中国地域では山口県で5件、島根県で2件、広島県および鳥取県で各1件が記録された。山口県では岩国市での2件の錯誤捕獲（※5・6）に加え、周南市大字大道理での足跡痕跡確認（※47・48）、下関市菊川町大字田部での目撃（※49）が報告されている。島根県大田市長久町土江では市道稲用線付近を午後2時半ごろに体長約1メートルの個体が横断する姿が目撃されたほか（※50・51）、前述の広島市安佐北区での捕獲個体の殺処分（※4）や鳥取県八頭町での果樹食害（※7）など、多様な様相を示している。なお、当日の四国および九州地域における記録は存在しない。</p>
+      <h2>リスク評価：季節要因・餌資源・人口圏接近度からの総括</h2>
+      <p>2026年10月下旬における出没状況の評価として、秋季におけるクマの行動圏拡大と人口集積地域への接近傾向が強く現れている点が挙げられる。群馬県長野原町における民家庭への侵入（※19）や、岐阜県揖斐川町の住宅地における夜間の出没（※31）、秋田市手形の学校周辺市道への出没（※1）など、人間の生活圏と重複する事案が複数発生している。</p>
+      <p>また、鳥取県八頭町で確認された梨の食害（※7）に代表されるように、結実期を迎えた農作物が誘引要因となっていることが確認される。さらに、山口県岩国市において同日に2件の錯誤捕獲が発生していること（※5・6）、福井県若狭町および高浜町で成獣と幼獣の連れ立ちが目撃されていること（※29・30）から、山林近接部や農地周辺での罠の管理および住民の薄暮時・夜間の外出に対する警戒対応が重要であると分析される。</p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 31 日 改訂：同じ出没の重複を束ね、その後に集まった記録も含めて、本文を作り直しました。件数は公開時と異なることがあります。</p>
 
       {REFERENCES.length > 0 && (
         <>
@@ -269,7 +398,7 @@ export default function ResearchPage() {
           <dt className="text-stone-500">公開日</dt>
           <dd>2026-10-29</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>2026-10-29</dd>
+          <dd>2026-10-31</dd>
           <dt className="text-stone-500">データ範囲</dt>
           <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>

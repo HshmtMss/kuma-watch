@@ -5,11 +5,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/PageShell";
 import ResearchPlaceLinks from "@/components/ResearchPlaceLinks";
+import ResearchPrefChart from "@/components/ResearchPrefChart";
 
 const SITE_URL = "https://kuma-watch.jp";
 const SLUG = "2026-06-09-daily-report";
 const TITLE = "2026年6月9日 国内クマ出没事案の時空間分析と分析報告";
-const DESCRIPTION = "2026年6月9日、国内で39件のクマ出没情報が報告された。新潟県（10件）を筆頭に中部地方で多発し、関東、東北でも出没が相次いだ。人身被害はなかったものの、子グマの目撃が複数あり、繁殖期における行動の活発化と人里への接近が顕著に見られる一日であった。";
+const DESCRIPTION = "2026年6月9日における全国のクマ出没関連事案は計144件が記録された。秋田県（45件）を筆頭に東北地方および中部・関東地方での集中が顕著であり、市街地や教育施設への侵入、道路上での作業員接近事例、錯誤捕獲を含む捕獲事例など、人為活動圏との交錯が広範囲で確認されている。";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -36,7 +37,7 @@ const SCHEMA = {
   headline: TITLE,
   description: DESCRIPTION,
   datePublished: "2026-06-10",
-  dateModified: "2026-06-10",
+  dateModified: "2026-10-31",
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
@@ -52,86 +53,321 @@ const SCHEMA = {
 
 const REFERENCES: { title: string; url: string; site?: string }[] = [
     {
-      "title": "群馬県中之条町四万におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQZjRsaDVuLTRYT3VRcldpU3p1aWlxRXpQRWVPaGxHS3lTb1JIWXV6SFFZMV9CZjdDczY1TXExbjhPYUU0aWhFVFVMSDdJNEpNOEhaQ3FJMlotVHF2RWVQbnRZb2Y3eHpOUHEtb0pxSno4MVM2bmc3enNGTDBHMENtdmJ5M2pEUm5NZkJTVkhOU05qQkJCTnZwUUhENzbSAaIBQVVfeXFMT0R4dzAyQW5hNXZXQjBpU0NKVlRfR1lMMkEtUGowSGRiOWs4WDNmNUZCdGc1ekRKTnQyOHlZcE9mTmo2a3FFc0NYbDlJOV9Mc1M1ZUZOV2lXNklWeTdGR1JDX3U1SmoybjJYTG9Kdm1ua1RNa0hvMVVfczdPc0UxU1J1UGM1dnlBN1NhaW8tX0dlUFJhbzRxcHBheGxBU1h3RVJn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 新潟県阿賀町 福取の出没情報",
+      "url": ""
     },
     {
-      "title": "新潟県糸魚川市一ノ宮におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNUU9hSmhyMlpQTXNIQzVnbmR0MUhmSFBPRy12NGFrM00yS3A0VnhXTzAwMUtJWktPd052WkZYODZJbmx6RkZWREVnSTNfeEI3amJTeVZ3UTkxYkZaQkNmTW9zZ01aM1lCRHl3Y2JONlRPclM1M1RfVmZfTmk3a3R6SnhmMkZNeWdNXzZiUE50ZERMTzl1R0pKQmhjWEXSAaIBQVVfeXFMTUowN192VjNYdTZiWWZaODdYYS1iT0Y4UWdDNEdLRDVVTUtjbkppM3RGdmtTUHFIcmdWRzlEWGpROHJ6STdYdjJ4dFg5UXQyWkRKQ3RmVzFtMzlPRXBGdU5MRHJyUHFxTUw1MDRyUE1uckJaZkw5X2V1ZXV4Zm5XenBvbjhBOTRweTVnUjF6YTFQTm51TXVHVmwwUERpdXV1aGpn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 秋田県秋田市 河辺北野田高屋字雷谷地の出没情報",
+      "url": ""
     },
     {
-      "title": "富山県立山町西大森におけるクマ出没の可能性",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPci1Udm5XaHZ4ZTRUdWQ1bEV3RXZScXVua2lOdkZPSzV0akNha0JKWVRNVk9RTHlZZ2J5TUNSTFAwemViNlNUVmZ6SGNZN1VXeDc4d2FJRWZXT1AzOVBWOHd5cG5paXF2ZkY5RmlqNC1mVWg0WDk4MkV5dUdHWnIteDI5TFhBWjZLRWN3ZGFHeWh2R0llTjZMZ1VrdmzSAaIBQVVfeXFMUFdsR2VMN0xVN2tmT2xmNVRIaUVibVdFc2sxMS04YkVnOGEwUjN1amR1ekhRMlVtVk9iOUIwWW05X3ZSWG9VTXlUN1BBTlVqcnk3cFpweUFnRENiWHBBUVk4ZThmYTZ4SHEyUnJTUllJX3dscFNldG9LN0hZSTFPYTAya3lPeTc5LUc0YnBtY2ZnR0F2Vll6cXhXdXQ3TXdVTmlB?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 秋田県大仙市 刈和野字浮島の出没情報",
+      "url": ""
     },
     {
-      "title": "岩手県釜石市甲子町第５地割におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQbWdVbzZERkpiVnQ1emlDLS1Zc2pjeGpaWTZ5V0JtV3dsc3RzSURyYzZ1R2NyOE8xaFItVnhVYXJkTjZkaTVKVW1PclBGZEZ1UDVvd0FsVGJVYzE1Z01uQzVkYmxIQVV5aHA0Y1E2clZlLTR0dW50U1lySTY4U19VMXhJS0ZWZ25CMlNYWUlvN2prRVV6c201cWNJNUXSAaIBQVVfeXFMT2EtbmEyU1YtT1JIaG5ZdnFvbnR2M1pfX19MYnU0VTFDd1RqZ3RlVUszQzk3aWpJeTg1MWxuRXNvUl9QeHpOTHEyUzlIQ3dXeG5PMGxVQ3pITi1seFd3c3hGZ1U3aUIyYWdKSWFWcF9sUWd6R3dZbXpHNDVaaFREZ1RNZWVuNDFaZHNqUDZGM05XMEtFdHVKTmxFNHNsWlE3MTBn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 島根県大田市 大田市駅近くの出没情報",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9WcUhsYUd4SUpGSVNrWHVKQzBCUkU1RGUtSEROR09TTVNkXzBqcmxuOVAxMlM4QXR5UUZkLXpCZGI4UlRxWlU2ekFrV0Z4c3BvVExOTWNwampUa0lCUVVGZkVBYk56d2drQUthRnVsZ0ptV3VaNkU4RlJPNnpuSkE?oc=5",
+      "site": "報道"
     },
     {
-      "title": "岩手県釜石市大只越町１丁目におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxNM29lVDNXQjhqYzN5RE1KOE9ObGhyS1VVRWNNZnoxUUllMFhVZkVucHF1UGxzZ0ExaUFGcHNEQmZxcHJYQlk5Y2wzcnc4OS15ODhhdFVLNDY0TDR3WThGQTh1OWcxd0stckNweWt6VV9CRm9iSmlTeVlJUEhiemgyaF9qUmprdHZ5WXE0cVNuaG9PVTFTRXYtU0hSVTF4LVQ2ck96VUkzM1g2TVFOb2xj0gGiAUFVX3lxTE5wOWRNbDhvbXdULWJManhYeHNNRXNBUzU4UG5FV0ZhejVBTUY1R2ZfcHlYSWhHa284blNwdnNQalNkZlZYSHlINTExbmh0V1BUdW55WWwtdi1tSmxENnVMV0lBU2Q4SlNwTnl4TlhqWjhva2ZNaFdQbURKUmpTRzI4SFlaOG1XaTA2NGthM1JQdFBTZHRBZm1LWUNuRTYtWVNOUQ?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 島根県大田市 大田市仁摩町馬路の空き地の出没情報",
+      "url": ""
     },
     {
-      "title": "岩手県奥州市前沢石田におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPc0JGd195ZUhQZFBXOUZvLWdxM0RKUUktYnlPeUVlSFpEc3BUdWlRaGxZVG1wVzFmX3JuVVhOU2taRDJ3ZEhCMlFzcDJ4cDRQdE0xMmJ4YTdQS3R1cjVLakpVRkNWLVFaM0IwU2puNzJIWjlQNVJrNWVTeUsyT0w3YTFza0Y0cDNRMU5QTW93LUJJMTUzbWFlaWhteTDSAaIBQVVfeXFMT2JvdXJtamFKcl9ITDhZc2ZIZGZNa08zLXVaU3FEa0dMci1fYmFPSEh3ek5oLUZLQ0hJMjNxM2lVX1I3Y1FxTWVkUHRkQ3ZjR21VdUNEdjFKSDFOa1hmNlZnVDdfQm9SWFRjSGg4SW5YT1JuV3I4S3EtcDZteC1kZXpTOHI0d1ZVRFo1OGRTYlVuX1F4dkVybTg5RWJCTVBtSjJn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 栃木県宇都宮市 東簗瀬1丁目の出没情報",
+      "url": ""
     },
     {
-      "title": "栃木県那須塩原市塩原におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPdERic0NuaGQwNE95Vlg2blJVWGFNaUloOUpoOXJFVmJmWU5wVW15eEk4dGwxWmdPbVM4STJrN3NkbjNQQjFncnJxSVdmYkVxNnU3cTNBcTI5OG5JMkkzNXk1N25XdDNQZ2w2blh6OF9VeGV4eGpidjI0UGgxZjBzaHpmOTlzeC1DOUozVVhHNHBLY0JYOFV6OVVZMXDSAaIBQVVfeXFMTzhfTHpyQXVMTkZPZXNaaUUyakZWX08tMkRCZHlYeDhmVmRuYjFHUjFIbElmdTNQd2dsNU1tdmVocExpRmMzZWQ5RmQtbS1FLWMycFFOTUtQb203bnVWVkg0S1NtVEhNZjFOYWxhUVdtQWV4ZkdRSFNGUXpvMWhHZXB0Uk5zVThkeGJyUnF2RWRZYmdSOVpDZkE2N0FqbkU1MFdn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 山口県岩国市 周東町川上の出没情報",
+      "url": ""
     },
     {
-      "title": "京都府綾部市五津合町村前におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPdEladUFZU2FIeERqb1dmUXVESms0YjFnalh6cnVZV2RyLTRhdXA3d3NkZVgyZmxqQktxMzU1cVNXU1lRSGFOVmIzNjVSbHYtWThPUk43dUNhRVB4QVBlQjROdVctVUdjUkZaajJsZUJWX0Y4bG1lTmpqRjdiTWNmYkU1ODhqQTE4dnp4Wjd4VW9PeGdRNFMxcFVndDU2azNlbWfSAaIBQVVfeXFMT3RJWnVBWVNhSHhEam9XZlF1REprNGIxZ2pYenJ1WVdkci00YXVwN3dzZGVYMmZsakJLcTM1NXFTV1NZUUhhTlZiMzY1Umx2LVk4T1JON3VDYUVQeEFQZUI0TnVXLVVHY1JGWmoybGVCVl9GOGxtZU5qakY3Yk1jZmJFNTg4akExOHZ6eFo3eFVvT3hnUTRTMXBVZ3Q1NmszZW1n?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 秋田県北秋田市 阿仁水無字新町の出没情報",
+      "url": ""
     },
     {
-      "title": "京都府綾部市五泉町神子谷におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNRkUxdlpGU0EzTDVUNWlHWWZlQU9LTm5nVlJNMHAwUDNCOWVwU3VZTHZIVWVFVzFlZ0t2WGhlYy1VOENKMDBvalgtcUZsalhzUFNRUlR0azNrTkxHQ2YxdWgtVktzODcxWUd0ZF9pOXQ0YmpaUGk1QXdCaWRsWGRWQXRTMktUWWJUck85ZHJPbmVaOWRxbFppNTdYWU7SAaIBQVVfeXFMTkNJMTI5b1VHeDRrMnoyeXk3d0lBSkx1OUFfUzB2dklVSUh6OWhOb2JOdDNmaG84Wld3ZFZFeHpXRmg3TUwzVzl0eVJmekQ0eWltU2JYYjk3MzRTZ3lCWnlfZ0xibC1pNi04dzBkN1ZXcHVncmpUZHc5MDVBZnIyU3NfTzBnRlRvT2tPZFhCS3J0Tnl5YzhjWVc3ZWtWSW5mLUZ3?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 秋田県鹿角市 十和田錦木の出没情報",
+      "url": ""
     },
     {
-      "title": "京都府京丹後市丹後町袖志におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOZHRMaE5aZmE1T3Z3Vk9PQk01UDd0WUNSWlduckV4Wk9MX2xyN2I4amRhSjY0MGJfTmxvMFdHMEpBbVNaS1JOWDloWWM4QWN5VkY5bVp5SGRkT2V4amZfcFNXbEprSnVZYUlvaUgyNVMyRnBQSFlDR192dFNOQXRHeG5aeVAtU3phSTBXNm5uTzR1ZzRxYTYydWxtSDLSAaIBQVVfeXFMUFBaSVRvRER1Mlc0ai12T3RhWHB5N1BOSDZGOW1RWmF2R0FuLTJhMGNrMjU4NVRfX0p3Szg2cnNhMDVXVm5iUzJQWEhYUHRmTVFZZ3hnVXZTNlBGT3M2ZWJkWXN4V1dpVE9XWVlnSkdQMUh1Q3JMMThPTzE0YlZ3eUQwbFVvdk1rUzhkNVg0S2pqbHRRYmlxYWNNZENRLTR5VjZn?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 秋田県八峰町 峰浜目名潟の出没情報",
+      "url": ""
     },
     {
-      "title": "岐阜県高山市朝日町一之宿におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNUDQ0MWFNakhWdi1jS2ZCaGpfMURZTVliU21wMGJTSHJSLVVucl9XaXg3ZXhodXpZcHFkeWlTUGV6WFVhN3hyWEtxMEd4SkEzeDNhenFMM1ZmZUU4bnc5MFRoQmpxQ2ZKUU1EZkpzM192LVN3bzNrM2NucDl2MEpTUnR3THh5Y2Q0cmo3VHVYSlhjY1JBZ0d5dDFjSl_SAaIBQVVfeXFMUFZFaGtnYTRwcUN3WjdLVUc3dm51NEZrUnhxZEh2OURvUDVNaUU1WHJjWWVLSHZPbFFZM3RtYVh2SEhuUlhueS1LSzlfSWNwZ2ZNdTRZNFdCYzFDQXNpRGQydmNrdXpxM1ZMSThEbHlndzJDNzhqSk9WbU1FREtja1BEeTl3NnN1dzQwSjZocG90cDU3WmlLTG9lTjVIdWdNRXNB?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 岩手県盛岡市 新庄字岩山の出没情報",
+      "url": ""
     },
     {
-      "title": "岐阜県揖斐川町上南方におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPYVF6ODR2bjVFU20xd1o0YU4wRjNWUkRWZWVxTWZMN1hiRngyakZ2eTI3YjlWc1lwT0U0OGEzaGpDdnRENXhHQ0hYemtHLUR1X1RIRXAtaXRsdFpYUF90SjF2MHQzZjA1c0NPZ2FUUTN6MXc2S3RQQjBISVpfWlY0bjhaZDlNV1NCRWJlVkRrTEtfOUVkVGRtaUJOYXbSAaIBQVVfeXFMTUVKZXphQ0ZMWVI1QzNvVlNEZ0pZSkt4cERyZ0pCMk8zRXJOMWZLVUNiY00zZUE5N1NkMW91cjA1RGJXUHh1czZ1cG1yRTVLMGZkZTV1enZTeVZQWXA1QzYxYlkteFFoaHMwWUx6MzdOLUR6STF3ZzR2bmtjY0Nud3Y4dUNIc1pMZFlKbHZTYzBzYVAyaGdTSWxKNnhYNnFna01n?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 岩手県盛岡市 下田字石羽根の出没情報",
+      "url": ""
     },
     {
-      "title": "秋田県由利本荘市松ケ崎宮ノ後におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQeEtRZ0J6eG9uZzdHbEwzb1NyMEUtNUdBUUJMd1ozUW9NeHZVX3RpaFF3V0JOeUpnWXB4eEo3Z3F6RkhtV2xQX2NzeTMxRzBZcnZpTWZaZE4wNjM4bWlFQUVuRjdMY1ZUX2RGNXFhaVNka0hySUdxN1otRE4xakRTdVE1Ylp2elQ4UGQ3SUZDbjdoSFctdjNVLU4yVHbSAaIBQVVfeXFMTXNzbU1iSzZ2dWpPc2RLSnVhMWdqZzhxVnVocTFVaWRlU1dJa244emliQzBFZEIwdGFrNzREVklaMlkwSmFGQ194RGRReHF5N0F5UEFqMmxTTUtieG84QmI3ZTVQWUl2c3l4N3BCNUNCWG5wQ3loOGdQc0JjSk05ejVGNTdyUGNkYkhCQTFILThjZnR3VnVZcjlVSVFHNFFTcjhB?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 岩手県盛岡市 好摩字野中の出没情報",
+      "url": ""
     },
     {
-      "title": "秋田県秋田市浜田石山におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxNWndWWlVsQi0yZTdZNVpjX21vT1dUT2VCTDgwTHJMd08zdkxjcENkNlZVWFdvY2xmQXlidWx2QkxCQk9kelFDamtWS19yNmx0cGI2Y3haR3JYMEhaenhCMjJXbFh3bzYtM0EyMEhjbGlUbzBmUjFYV0lGdkZ2TTZ4Qmh3QTdLVjVnWE5sNFphUE1aQzMxUHZVZkdxS2HSAaIBQVVfeXFMUHdCSkR0X2NURzlkMEVKeTRsRndqNWhPZFRMRWpjODNRZW5XYkR5ZnVRU1hhMkhPNnpVWUhhMnZQUmwxbDYxMy1oQW5JLW1lZ2kyLW5FQmNDV01yTFlfZW1yWjJLZjIxQm1ISWlXTzNSMEFVeThUbjFJemRLbUdMUl8wbkRqcEtWZmJvUnNvY2VzaXR1cmxFT1ZsTXRkSTEzYi13?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 岩手県盛岡市 好摩字好摩沢の出没情報",
+      "url": ""
     },
     {
-      "title": "石川県白山市桑島におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPajZxbVdoM1VnMzlxOEZodFdfeThlalZ2TGdGbzNBdUNSSkp2WVI0ZmlVU09YampPa3lQRkR2QXlUanZhVDJoRld0cmljaWN2endKYUV4dGYxQ2VHT1JCOXFZVVZtYzZ4REJSVGhwS05nbmpSa2ZOdER1ckI1TF9oMFVLa0Y3RWpoTm1LdmlyYXoxQ3RfZm4yU3h5UHjSAaIBQVVfeXFMTnBDTWlaeHpoNHcwSDREWWFOcTBhNFo2bV9PdEJIbHM4MUt4SWhpdUNqWm4zdmktY3hPSmE3dXpjY1J2Rm9hdXp6WjFKVHhJM2ZFbFllTTF3NTg5RS05XzZuei1FUzBqTlhwUlJlSzRpY0ZDbUVOSVpwYjkyVlVMWVJzblNIWktRUEx6MjB0UVdHcDFTTWl1MUFKdVZPem1KaUhR?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 宮城県仙台市青葉区の出没情報",
+      "url": ""
     },
     {
-      "title": "長野県大町市社舘ノ内におけるクマ出没情報",
-      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQbktidTdHM2RkM0NVRVVabXd1SWEzS0VmZ013QVVsUE5PYVFaeDdyeEJwZUN2dzlnaGItdjZJMHhEYnhRRlFQdkhPc0RNLVFuTG9aR29YS0F0dE1Gd3BjY3J2elZ3YmI2S0hISFNyVHdYbHZKV0s0YkM0ekg1QkdwSi1TamRDRlU3MExIczFNeTJpdklxUEtXY3AybzjSAaIBQVVfeXFMT2FVZEZ3VFhGWHI0UTdTLUVyQW0wamNTQkJMTUczMks3dUxSNzktUGViOHhXOW02bXNEMEdCUEZfVGNHdmxJMTY0ci1Deks3SnRNTHdlZHN1M3pqeU1XTHhObFFjczV2Z3R2UGYwdDRjdlotZm96ZlZiTTBqaEJSQzBLX0hMVnRsc0hPZUt4TGItZ3JCLXdRSXRkVW9JLVdZM3ZR?oc=5",
-      "site": "Google News"
+      "title": "2026年6月9日 宮城県白石市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 宮城県大和町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 宮城県大崎市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 宮城県富谷市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山形県白鷹町 大字黒鴨の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山形県川西町 大字玉庭の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山形県川西町 大字大舟の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山形県庄内町 立谷沢工藤沢の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山形県高畠町 金原の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 福島県福島市 福島市土湯温泉町字天沼地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 福島県西郷村 西白河郡西郷村大字真船字観音山の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 福島県福島市 福島市町庭坂字長林地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 福島県福島市 福島市笹木野字上中島の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 福島県会津若松市 会津若松市大戸町上三寄南原の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 青森県南部町 三戸郡南部町平字葉柴山9の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 青森県東通村 下北郡東通村田屋２１−６７の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 青森県平内町 東津軽郡平内町狩場沢１６１−７の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 青森県むつ市 大湊字大近川の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 青森県八戸市 南郷大字島守の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 栃木県那須塩原市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 栃木県鹿沼市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 栃木県日光市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 栃木県那須烏山市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 群馬県嬬恋村 万座ハイウェイ三原料金所から万座方面1.5km付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 群馬県中之条町 中之条町大字四万 譲葉地区稲荷神社付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 群馬県安中市 松井田町上増田地内　木馬瀬付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 群馬県東吾妻町 東吾妻町大字五町田　林道高橋千沢線付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 群馬県みなかみ町 藤原地内　平出の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 埼玉県秩父市 秩父市大滝字上強石地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 埼玉県横瀬町 横瀬町花咲山山頂付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 神奈川県相模原市 緑区牧野の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 岐阜県白川村 平瀬の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 岐阜県本巣市 木知原の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 岐阜県中津川市 田瀬　田瀬坂バス停付近の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 岐阜県揖斐川町 上南方の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 岐阜県揖斐川町 桂の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 長野県上田市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 長野県安曇野市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 長野県大町市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 長野県上松町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 長野県塩尻市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 新潟県糸魚川市 大字一ノ宮地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 新潟県上越市 名立区丸田の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 新潟県妙高市 大貝の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 新潟県南魚沼市 新潟県南魚沼市樺野沢の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 富山県南砺市 利賀村上百瀬（中村）の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 富山県南砺市 利賀村利賀の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 富山県立山町 西大森の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 石川県白山市 白峰の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 石川県加賀市 栄谷町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 石川県白山市 桑島地内の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山梨県甲府市 城東1丁目の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 北海道苫小牧市の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 北海道厚岸町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 北海道江差町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 北海道黒松内町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 北海道愛別町の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山口県山口市 秋穂二島仁光寺の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山口県山口市 秋穂の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 山口県阿武町 大字奈古の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 鳥取県大山町 大山の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 鳥取県西伯郡大山町 大山の出没情報",
+      "url": ""
+    },
+    {
+      "title": "2026年6月9日 奈良県川上村 井戸の出没情報",
+      "url": ""
     }
   ];
+
+const CHART_DATA: { pref: string; count: number }[] = [{"pref":"秋田県","count":45},{"pref":"栃木県","count":12},{"pref":"岐阜県","count":12},{"pref":"長野県","count":9},{"pref":"新潟県","count":8},{"pref":"宮城県","count":8},{"pref":"山形県","count":6},{"pref":"青森県","count":6},{"pref":"福島県","count":5},{"pref":"群馬県","count":5},{"pref":"北海道","count":5},{"pref":"山口県","count":4},{"pref":"岩手県","count":4},{"pref":"石川県","count":3},{"pref":"富山県","count":3},{"pref":"鳥取県","count":2},{"pref":"埼玉県","count":2},{"pref":"島根県","count":2},{"pref":"山梨県","count":1},{"pref":"奈良県","count":1},{"pref":"神奈川県","count":1}];
 
 export default function ResearchPage() {
   return (
@@ -154,26 +390,59 @@ export default function ResearchPage() {
         </Link>
       </div>
 
-      <p>2026年6月9日、くまウォッチが収集した国内のクマ出没事案は総計39件に上った。都道府県別では新潟県が10件と最も多く、次いで群馬県と栃木県が各5件、岩手県が4件と、本州の広範囲で出没が確認された。これらの情報は、報道機関から16件、自治体等のウェブサイトから23件収集されたもので、公式発表に基づかない情報も多数含まれている。幸いにも、この日に人身被害が発生したとの報告はなかった。また、捕獲や銃猟に至った事案も確認されていない。一方で、都市部への接近を示唆するキーワードに合致する事案が1件報告されており、クマの行動域が人の生活圏に及んでいる状況がうかがえる。</p>
-      <h2>主要事案の概況</h2>
-      <p>当日は、人命に関わるような重大事案の発生はなかった。しかし、人の生活圏への接近は看過できない状況である。都市部キーワードに合致した事案が1件記録されたことは、市街地やその周辺部における潜在的な遭遇リスクを示唆している。具体的な地点や状況の詳細は不明であるが、クマが従来の生息域である山林から、より人口密度の高いエリアへ活動範囲を広げている可能性を考慮する必要がある。</p>
-      <h2>地域別の出没傾向</h2>
-      <h3>中部地方：新潟県で多発</h3>
-      <p>全39件のうち、中部地方では新潟県(10件)、富山県(3件)、岐阜県(2件)、石川県(1件)、長野県(1件)の合計17件が報告され、全国で最も出没が集中した地域となった。特に新潟県では、糸魚川市(※2)や上越市名立区丸田での目撃情報のほか、胎内市の畑で足跡が発見されるなど、目撃と痕跡の両面からクマの活動が確認されている。妙高市大貝では体長50cm程度の子グマが目撃されており、母グマが近くにいる可能性も懸念される。富山県では立山町西大森(※3)や南砺市利賀村、岐阜県では高山市朝日町(※11)や揖斐川町上南方(※12)で出没が報告されており、広範囲で注意が必要な状況である。</p>
-      <h3>関東地方：群馬・栃木で目撃相次ぐ</h3>
-      <p>関東地方では、群馬県(5件)、栃木県(5件)、埼玉県(2件)の合計12件が報告された。群馬県では中之条町四万での出没(※1)のほか、万座ハイウェイ付近で通行者が子グマを目撃した情報や、同町内の神社付近で幼獣が目撃されるなど、子グマに関する報告が目立つ。栃木県では那須塩原市塩原での目撃情報(※7)に加え、詳細地点不明ながら報道に基づく4件の情報が報告されている。埼玉県では秩父市大滝や横瀬町の山中で、登山者や猟友会による目撃情報があり、山間部でのレジャー活動における注意喚起が必要である。</p>
-      <h3>東北地方：岩手・秋田で広域に出没</h3>
-      <p>東北地方では、岩手県(4件)、秋田県(2件)の合計6件が報告された。岩手県では釜石市の甲子町(※4)と大只越町(※5)、奥州市前沢石田(※6)で出没が確認された。また、盛岡市の岩山展望台駐車場付近では幼獣1頭が目撃されており、ここでも子グマの存在が確認されている。秋田県では由利本荘市(※13)と秋田市(※14)で出没があり、いずれも人の生活圏に近いエリアでの報告であった。</p>
-      <h3>近畿・中国地方：散発的な出没</h3>
-      <p>近畿地方では京都府で3件の出没が報告された。綾部市の五津合町(※8)と五泉町(※9)、京丹後市丹後町(※10)でそれぞれ目撃情報が寄せられている。中国地方では島根県大田市仁摩町馬路の空き地で体長1メートルほどの個体1頭が目撃されており、山林から離れた場所にも出没する事例が確認された。</p>
-      <h2>リスク評価と今後の展望</h2>
-      <p>2026年6月9日の出没状況を分析すると、以下の3つの観点から今後のリスクを評価できる。</p>
+      <ResearchPrefChart
+        data={CHART_DATA}
+        total={144}
+        periodLabel={"2026年6月9日"}
+      />
+
+      <h2>主要事案の分析（生活圏侵入・接近・捕獲動向）</h2>
+      <p>本報告期間内において人身被害の発生は記録されていないものの、人的被害の潜在的リスクが極めて高い近接遭遇や、生活圏中枢部への侵入事案が複数発生している。新潟県阿賀町福取の国道49号線沿いでは、車両誘導中の交通誘導員に向かってクマ1頭が走って接近し、約30メートルの距離まで迫る事案が記録された。当該個体は走行車両の音に気付いて奥へと引き返したため接触は回避された（※1）。</p>
+      <p>また、学校敷地や交通拠点などの生活基盤施設への侵入・接近も報告されている。秋田県秋田市河辺北野田高屋字雷谷地では中学校敷地内にて体長50センチメートルのクマ1頭が目撃され、付近の民家から20メートルの距離を経て東の山林へ立ち去った（※2）。秋田県大仙市刈和野字浮島でも中学校からの市道と県道の交差点付近を体長約1メートルのクマが南側に移動する様子が通行者に目撃された（※3）。島根県大田市では、大田市駅近くで目撃情報が記録されたほか（※4）、同市仁摩町馬路の空き地でも体長1メートルの個体が目撃されている（※5）。</p>
+      <p>捕獲に関しては、栃木県宇都宮市東簗瀬1丁目で捕獲が記録された（※6）。さらに山口県岩国市周東町川上において、イノシシ用くくりわなにクマが錯誤捕獲される事案が報告されている（※7）。</p>
+      <div className="not-prose my-4 overflow-x-auto rounded-xl border border-gray-200">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-stone-50 text-xs text-stone-700">
+            <tr>
+              <th className="px-3 py-2">地域</th>
+              <th className="px-3 py-2">場所・施設類型</th>
+              <th className="px-3 py-2">状況概要</th>
+              <th className="px-3 py-2">個体情報</th>
+              <th className="px-3 py-2">記録ID</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 text-gray-800">
+            <tr><td className="px-3 py-2 text-xs">新潟県阿賀町</td><td className="px-3 py-2 text-xs">国道49号線沿い</td><td className="px-3 py-2 text-xs">交通誘導員へ走って約30mまで接近後、車両音で退避</td><td className="px-3 py-2 text-xs">1頭</td><td className="px-3 py-2 text-xs">（※1）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">秋田県秋田市</td><td className="px-3 py-2 text-xs">中学校敷地内</td><td className="px-3 py-2 text-xs">敷地内で目撃、民家から20mを経て山林へ移動</td><td className="px-3 py-2 text-xs">体長50cm・1頭</td><td className="px-3 py-2 text-xs">（※2）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">秋田県大仙市</td><td className="px-3 py-2 text-xs">学校周辺市道交差点</td><td className="px-3 py-2 text-xs">交差点付近を南側へ移動する様子を目撃</td><td className="px-3 py-2 text-xs">体長約1m・1頭</td><td className="px-3 py-2 text-xs">（※3）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">栃木県宇都宮市</td><td className="px-3 py-2 text-xs">東簗瀬1丁目</td><td className="px-3 py-2 text-xs">捕獲事案</td><td className="px-3 py-2 text-xs">記録なし</td><td className="px-3 py-2 text-xs">（※6）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">島根県大田市</td><td className="px-3 py-2 text-xs">駅周辺</td><td className="px-3 py-2 text-xs">駅近くでの目撃情報</td><td className="px-3 py-2 text-xs">記録なし</td><td className="px-3 py-2 text-xs">（※4）</td></tr>
+            <tr><td className="px-3 py-2 text-xs">山口県岩国市</td><td className="px-3 py-2 text-xs">周東町川上</td><td className="px-3 py-2 text-xs">イノシシ用くくりわなによる錯誤捕獲</td><td className="px-3 py-2 text-xs">捕獲</td><td className="px-3 py-2 text-xs">（※7）</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2>東北地方の出没動向</h2>
+      <p>東北地方では計70件以上の事案が集中しており、なかでも秋田県は45件と全国最多の記録数を示した。秋田県内では、北秋田市阿仁水無字新町で体長70センチメートルの個体が河川公園方向へ立ち去る様子が確認されたほか（※8）、鹿角市十和田錦木では住宅から10メートル、目撃者から20メートルの距離にある線路のそばをうろつく体長80センチメートルの個体が作業場敷地から目撃されている（※9）。八峰町峰浜目名潟の水澤ダム公園付近では、車道走行中に藪から飛び出した体長約1.2メートルの単独個体が車に驚いて藪に戻り、近隣で草刈り作業中であった業者へ注意喚起がなされた（※10）。</p>
+      <p>岩手県盛岡市では、新庄字岩山の岩山展望台駐車場付近で幼獣1頭が目撃されたほか（※11）、下田字石羽根（※12）、好摩字野中の児童館付近で成獣1頭が目撃され（※13）、好摩字好摩沢の畑地では痕跡が確認されている（※14）。宮城県では仙台市青葉区、白石市、大和町、大崎市、富谷市などで計8件が記録された（※15・16・17・18・19）。山形県でも白鷹町大字黒鴨、川西町大字玉庭および大字大舟、庄内町立谷沢工藤沢、高畠町金原など計6件の報告がある（※20・21・22・23・24）。</p>
+      <p>福島県では計5件が記録され、福島市土湯温泉町字天沼地内の路上（※25）や西郷村大字真船字観音山での道路横断（※26）など道路上での目撃のほか、福島市町庭坂字長林の畑地における約15センチメートルの足跡（※27）、福島市笹木野字上中島の畑地マルチシート上の足跡（※28）、会津若松市大戸町上三寄南原の畑地における在宅中の目撃（※29）と、農地への侵入が目立っている。青森県では計6件が記録され、南部町平字葉柴山での農作業中の目撃（※30）、東通村田屋での小熊目撃（※31）、平内町狩場沢（※32）、むつ市大湊字大近川（※33）、八戸市南郷大字島守（※34）で目撃事案が続いた。</p>
+      <h2>関東地方の出没動向</h2>
+      <p>関東地方では栃木県が12件、群馬県が5件と北関東を中心に多発傾向がみられる。栃木県内では宇都宮市での捕獲事案（※6）のほか、那須塩原市、鹿沼市、日光市、那須烏山市において事案が記録された（※35・36・37・38）。</p>
+      <p>群馬県では、嬬恋村の有料道路料金所付近で通行者による子グマの目撃（※39）、中之条町四万の神社付近での幼獣目撃（※40）、安中市松井田町上増田での目撃（※41）、東吾妻町（※42）、みなかみ町（※43）での事案が確認されている。埼玉県では秩父市大滝の山林で登山者による目撃（※44）、横瀬町花咲山山頂付近で猟友会による目撃（※45）が発生した。神奈川県では相模原市緑区牧野の人里環境において13時頃に目撃が報告されている（※46）。</p>
+      <h2>中部地方の出没動向</h2>
+      <p>中部地方では岐阜県（12件）、長野県（9件）、新潟県（8件）をはじめ広域で活動が確認された。岐阜県では、白川村平瀬（※47）、本巣市木知原（※48）、中津川市田瀬のバス停付近（※49）、揖斐川町上南方（※50）と公道上での目撃が相次ぎ、揖斐川町桂の山林内でも目撃された（※51）。長野県では里地環境での出没が顕著であり、上田市の道路横断（※52）、安曇野市（※53）、大町市での親子連れの目撃（※54）、上松町（※55）、塩尻市の林内（※56）で事案が発生している。</p>
+      <p>新潟県では阿賀町での接近事案（※1）のほか、糸魚川市大字一ノ宮の博物館庭園付近（※57）、上越市名立区丸田の住宅敷地近辺（※58）、妙高市大貝（※59）で目撃され、南魚沼市樺野沢では畑で足跡が確認された（※60）。富山県では南砺市利賀村の県道やダム工事用道路で成獣が目撃され（※61・62）、立山町西大森でも車両のバックミラー越しにクマらしきものが確認された（※63）。石川県では白山市白峰の市道橋下流側（※64）、加賀市栄谷町（※65）、白山市桑島（※66）で記録された。山梨県甲府市城東1丁目では、自転車移動中に中・大型動物に追い抜かれる事案が報告されている（※67）。</p>
+      <h2>北海道・近畿・中国地方の出没動向</h2>
+      <p>北海道では、苫小牧市字錦岡の道道141号において道路を横断する体長1.5メートルのヒグマ1頭が目撃されたほか（※68）、厚岸町白浜の国道44号線路上でもヒグマ1頭が目撃された（※69）。江差町での目撃（※70）、黒松内町での痕跡（※71）、愛別町での記録（※72）も生じている。</p>
+      <p>中国地方では、山口県岩国市でのイノシシ用わなによる錯誤捕獲（※7）、山口市秋穂二島仁光寺および秋穂の田んぼや周辺での足跡確認（※73・74）、阿武町大字奈古での道路横断事案（※75）が記録された。島根県大田市では駅周辺や空き地で目撃が相次ぎ（※4・5）、鳥取県大山町大山でも目撃事案が報告されている（※76・77）。近畿地方では奈良県川上村井戸において14時50分に事案が記録された（※78）。</p>
+      <h2>リスク評価</h2>
+      <p>本日の集計データから導かれる野生動物管理上のリスク評価は以下の通りである。</p>
       <ul>
-        <li>季節的要因：6月はクマの繁殖期にあたり、雄が雌を探して行動範囲を拡大させる時期である。また、前年に生まれた子グマが親離れを迎える時期でもあり、単独で行動する経験の浅い若グマが、餌を求めて人里近くに迷い込む可能性が高まる。群馬県、岩手県、新潟県で子グマや幼獣の目撃が複数報告されていることは、この季節的要因を裏付けており、子を連れた母グマとの不意の遭遇は極めて危険性が高い。</li>
-        <li>餌資源と生息域：今回のデータのみで山中の餌資源の状況を判断することは困難であるが、畑や空き地といった人里の環境にまでクマが出没している事実は、生息域の拡大や、何らかの誘引要因が人里側に存在することを示唆している。特に新潟県胎内市や南魚沼市で発見された足跡は、住民が認識していない時間帯にクマが生活圏内を移動している証拠であり、潜在的なリスクの高さを示している。</li>
-        <li>人口圏への接近：人身被害は発生しなかったものの、全国の広範囲で、道路、畑、神社、観光地の駐車場付近など、人間の活動エリアに隣接した場所での目撃が多発した。これは、クマと人間との物理的な距離が縮まっていることを意味する。今後、農作業や林野での作業、観光やレジャー活動において、クマとの遭遇リスクは継続的に高い水準で推移すると予測される。</li>
+        <li>季節要因と活動特性: 6月上旬の活発な移動期にあたり、成獣の単独行動だけでなく、群馬県や岩手県、青森県で記録された幼獣・子グマの単独行動や、長野県大町市で確認された親子の移動など、多様な個体群の活動が活発化している。</li>
+        <li>餌資源と農地接近: 福島県各地や新潟県、岩手県において、畑地内のマルチシート上や土壌から足跡が確認されており、農地周辺を採食や移動経路として利用する傾向が継続している。</li>
+        <li>人口圏接近度と突発遭遇リスク: 新潟県阿賀町での誘導員への接近や、秋田県秋田市・大仙市での学校敷地・交差点への侵入、島根県大田市での駅近傍出没など、人的警戒が手薄になりがちな生活動線上での事案が顕著である。視界不良な道路沿いや藪近傍での遭遇防止措置の徹底が求められる。</li>
       </ul>
-      <p>結論として、当日は幸いにも人的被害には至らなかったが、出没件数の多さ、地理的な範囲の広がり、そして子グマの目撃情報の存在は、決して楽観視できる状況ではないことを示している。各地域において、住民への注意喚起を継続するとともに、ゴミの管理徹底や誘引物の除去といった予防策を講じることが、今後の被害を防ぐ上で不可欠である。</p>
+
+      <p className="text-sm text-stone-500">2026 年 10 月 31 日 改訂：同じ出没の重複を束ね、その後に集まった記録も含めて、本文を作り直しました。件数は公開時と異なることがあります。</p>
 
       {REFERENCES.length > 0 && (
         <>
@@ -213,7 +482,7 @@ export default function ResearchPage() {
           <dt className="text-stone-500">公開日</dt>
           <dd>2026-06-10</dd>
           <dt className="text-stone-500">最終更新</dt>
-          <dd>2026-06-10</dd>
+          <dd>2026-10-31</dd>
           <dt className="text-stone-500">データ範囲</dt>
           <dd>くまウォッチ sightings.json (内部集計データのみ)</dd>
         </dl>
