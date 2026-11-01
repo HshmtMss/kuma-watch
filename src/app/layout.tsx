@@ -155,10 +155,10 @@ const webAppSchema = {
       foundingDate: "2018",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "西新宿1-20-3 西新宿高木ビル8F",
+        streetAddress: "新宿2-12-13-2F",
         addressLocality: "新宿区",
         addressRegion: "東京都",
-        postalCode: "160-0023",
+        postalCode: "160-0022",
         addressCountry: "JP",
       },
       email: "contact@research-coordinate.co.jp",

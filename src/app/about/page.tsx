@@ -95,10 +95,10 @@ const APP_SCHEMA = {
       url: "https://www.research-coordinate.co.jp",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "西新宿1-20-3 西新宿高木ビル8F",
+        streetAddress: "新宿2-12-13-2F",
         addressLocality: "新宿区",
         addressRegion: "東京都",
-        postalCode: "160-0023",
+        postalCode: "160-0022",
         addressCountry: "JP",
       },
     },
@@ -412,7 +412,7 @@ export default function AboutPage() {
       <p className="text-sm leading-relaxed">
         獣医工学ラボは <a href="https://www.research-coordinate.co.jp" target="_blank" rel="noopener noreferrer">リサーチコーディネート株式会社</a> が運営する技術プロジェクトです。お問い合わせは{" "}
         <a href="mailto:contact@research-coordinate.co.jp">contact@research-coordinate.co.jp</a> まで。
-        住所: 〒160-0023 東京都新宿区西新宿1-20-3 西新宿高木ビル8F。
+        住所: 〒160-0022 東京都新宿区新宿2-12-13-2F。
       </p>
 
       {/* Final CTA */}

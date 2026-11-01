@@ -63,12 +63,12 @@ export default function PrivacyPage() {
       <p>
         リサーチコーディネート株式会社
         <br />
-        〒160-0023 東京都新宿区西新宿1-20-3 西新宿高木ビル8F
+        〒160-0022 東京都新宿区新宿2-12-13-2F
         <br />
         Email: <a href="mailto:contact@research-coordinate.co.jp">contact@research-coordinate.co.jp</a>
       </p>
 
-      <p className="mt-10 text-xs text-gray-500">最終改定日: 2026-04-18</p>
+      <p className="mt-10 text-xs text-gray-500">最終改定日: 2026-11-02</p>
     </PageShell>
   );
 }
