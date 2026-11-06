@@ -20,10 +20,26 @@
  */
 import { normalizeSection } from "@/lib/incident-key";
 
+/**
+ * 地区名は引けたが、その代表点が特定の施設・敷地の上に落ちてしまい、
+ * 「その施設で出た」と読めてしまう記録。id 指定でピンにせず件数だけにする。
+ * 記録そのものは消さない (出没の事実は元の情報にあるため)。
+ * 誤った事案を消す場合は news-suppression.ts の SUPPRESSED_NEWS_IDS を使う。
+ */
+export const UNPINNABLE_IDS: Record<string, string> = {
+  // 2026-11-06、大厚木カントリークラブ (厚木市上荻野4088) より「当社の敷地内に
+  // 出没箇所が設定されているが、そのような事実はない」との申し出。元の報道は
+  // 「厚木市上荻野でクマ出没の可能性」で大字名までしかなく、上荻野の代表点が
+  // ゴルフ場 (OSM way 615218586) の区域内に落ちていた。
+  "news-1tw6nwb-3-2":
+    "大厚木カントリークラブの申し出(2026-11-06)。大字「上荻野」の代表点がゴルフ場内に落ちていた",
+};
+
 /** 座標が地名からの推定でしかない取り込み経路。 */
 const GEOCODED_KINDS = new Set(["news", "llm-html"]);
 
 export type LocationPrecisionInput = {
+  id?: string | number;
   sourceKind?: string;
   source?: string;
   sectionName?: string;
@@ -41,6 +57,7 @@ export type LocationPrecisionInput = {
 export function isApproximateLocation(r: LocationPrecisionInput): boolean {
   const kind = r.sourceKind ?? r.source ?? "";
   if (!GEOCODED_KINDS.has(kind)) return false;
+  if (r.id != null && String(r.id) in UNPINNABLE_IDS) return true;
   // 地区名があっても、その地区を座標に起こせなかったものはピンにできない。
   // 以前は地区名の有無だけを見ていたため、「緑区長竹」が引けずに相模原市の
   // 代表点 (駅前) へ丸められた記録がピンとして出ていた (2026-09-27 利用者指摘)。
