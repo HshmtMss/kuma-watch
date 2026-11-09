@@ -43,8 +43,28 @@ export type LocationPrecisionInput = {
   sourceKind?: string;
   source?: string;
   sectionName?: string;
+  prefectureName?: string;
+  cityName?: string;
   approxLocation?: boolean;
 };
+
+/**
+ * 地区名の欄に県名・市町村名・区名しか入っていないか。
+ * 報道では「福島市」「宮城野区」のように市区町村名がそのまま地区名に入ることがあり、
+ * その座標は市区町村の代表点 (役所・学校・公園など) でしかない。
+ * 実測 (2026-11-07): 約 560 件 (233 地点) がこの形でピンになり、鶴ヶ城公園・宮城野区役所・
+ * 県立高校などの上に立っていた。
+ */
+function isAdminOnlySection(r: LocationPrecisionInput, section: string): boolean {
+  let t = section;
+  for (const name of [r.prefectureName, r.cityName]) {
+    const n = normalizeSection(name);
+    if (n && t.startsWith(n)) t = t.slice(n.length);
+  }
+  // 県名・市町村名だけ / 区名だけ (政令市の「宮城野区」、合併前の旧町村にあたる
+  // 「小高区」など)。「緑郷3区」のような番号付きの区や「〇〇地区」は地区として扱う。
+  return t === "" || /^[^区\d]{1,4}(?<!地)区$/.test(t);
+}
 
 /**
  * 場所が市町村までしか分かっていない (= ピンとして打てない) なら true。
@@ -62,7 +82,9 @@ export function isApproximateLocation(r: LocationPrecisionInput): boolean {
   // 以前は地区名の有無だけを見ていたため、「緑区長竹」が引けずに相模原市の
   // 代表点 (駅前) へ丸められた記録がピンとして出ていた (2026-09-27 利用者指摘)。
   if (r.approxLocation) return true;
-  return normalizeSection(r.sectionName) === "";
+  const section = normalizeSection(r.sectionName);
+  if (section === "") return true;
+  return isAdminOnlySection(r, section);
 }
 
 /** 地図に出せるレコードだけを残す。 */
