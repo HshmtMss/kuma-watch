@@ -12,7 +12,7 @@
  * date が無い/不正/未来日の記録は通知しない（鮮度を確認できないため）。
  */
 import { jstDaysAgo, jstToday } from "./jst-date";
-import { isApproximateLocation } from "./location-precision";
+import { isMunicipalityLevelOnly } from "./location-precision";
 
 /**
  * 通知対象とする出没日の上限（日数）。
@@ -101,7 +101,8 @@ export function isFreshForNotify(
  * dateEstimated=false=実日付なので、当日なら通知される。警察通報など
  * dateEstimated を持たないソースは常に実日付扱い(当日なら通知)。
  *
- * 場所が市町村までしか分からない記録 (isApproximateLocation) も通知しない。
+ * 場所が市町村までしか分からない記録 (isMunicipalityLevelOnly) も通知しない。
+ * 大字など地区の代表点は地図ではピンにしないが、誤差が配信半径に収まるので通知はする。
  * 配信先は「登録地点から半径 N km 以内か」で決めているが、その座標は地名から
  * 起こした推定なので、誰に届くかが偶然で決まってしまう。届いた人にとっては
  * 「近くで出た」という誤った知らせになり、逆に本当に近い人には届かない。
@@ -118,6 +119,6 @@ export function isNotifiable(
   today: string = jstToday(),
 ): boolean {
   if (record.dateEstimated) return false;
-  if (isApproximateLocation(record)) return false;
+  if (isMunicipalityLevelOnly(record)) return false;
   return isFreshForNotify(record.date, today);
 }

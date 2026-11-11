@@ -46,6 +46,7 @@ export type LocationPrecisionInput = {
   prefectureName?: string;
   cityName?: string;
   approxLocation?: boolean;
+  comment?: string;
 };
 
 /**
@@ -75,6 +76,44 @@ function isAdminOnlySection(r: LocationPrecisionInput, section: string): boolean
  * normalizeSection を使い、規則を二重に持たない。
  */
 export function isApproximateLocation(r: LocationPrecisionInput): boolean {
+  if (isMunicipalityLevelOnly(r)) return true;
+  const kind = r.sourceKind ?? r.source ?? "";
+  if (!GEOCODED_KINDS.has(kind)) return false;
+  return !namesSpecificPoint(r);
+}
+
+/**
+ * 地区名が一点を指す名前か (橋・学校・駅・番地・河川敷など)。
+ *
+ * 大字・町名など「面」の名前から起こした座標はその区域の代表点でしかなく、
+ * 代表点がゴルフ場や神社や学校の敷地に落ちると「そこで出た」と読めてしまう
+ * (2026-11-06 大厚木カントリークラブの申し出。点検で大山阿夫利神社・本郷CC・
+ * 鳥屋駐在所なども同じ形)。そのため、一点を指す名前以外はピンにしない
+ * (2026-11-12 方針決定)。件数と通知 (地区単位で十分) には残す。
+ * 河川敷・川沿いは取り込み時に川へ寄せている (snapToRiver) のでピンに残す。
+ */
+// 名前つきの施設・地物で終わる (「白髭濁沼橋」「第一中学校付近」)。前に 2 文字以上の
+// 名前を求めるのは、「小学校付近」「公園」「ゴルフ場」のように名前が無いと
+// どの施設か分からず、座標が当て推量になるため。
+const NAMED_FEATURE =
+  /\S{2,}(橋|トンネル|駅|小学校|中学校|高校|学校|大学|保育園|幼稚園|公園|神社|寺院|病院|インター|IC|道の駅|バス停|ダム|キャンプ場|スキー場|ゴルフ場|牧場|登山口|峠|交差点)$/;
+const VAGUE_SUFFIX = /(付近|周辺|近く|近辺|の?敷地内?|運動場|入口|前)$/;
+const ADDRESS = /(番地|\d+番|\d+-\d+)/;
+const RIVERSIDE = /(河川敷|川沿い)/;
+
+function namesSpecificPoint(r: LocationPrecisionInput): boolean {
+  const section = (r.sectionName ?? "").normalize("NFKC").replace(/\s/g, "");
+  if (ADDRESS.test(section)) return true;
+  if (NAMED_FEATURE.test(section.replace(VAGUE_SUFFIX, ""))) return true;
+  return RIVERSIDE.test(section) || RIVERSIDE.test((r.comment ?? "").normalize("NFKC"));
+}
+
+/**
+ * 場所が市町村までしか分かっていない (地区名が無い・市町村名だけ・地区を座標に
+ * 起こせなかった) なら true。通知の可否はこちらで決める: 通知は「登録地点から
+ * 半径 N km」で届けるので、地区の代表点なら誤差は配信半径に収まる。
+ */
+export function isMunicipalityLevelOnly(r: LocationPrecisionInput): boolean {
   const kind = r.sourceKind ?? r.source ?? "";
   if (!GEOCODED_KINDS.has(kind)) return false;
   if (r.id != null && String(r.id) in UNPINNABLE_IDS) return true;

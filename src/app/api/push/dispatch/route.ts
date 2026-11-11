@@ -64,7 +64,7 @@ type NewRecord = {
   comment?: string;
   sourceUrl?: string;
   // 以下 2 つは「場所が市町村までしか分かっていない記録か」の判定に使う
-  // (isNotifiable → isApproximateLocation)。座標が地名からの推定だと
+  // (isNotifiable → isMunicipalityLevelOnly)。座標が地名からの推定だと
   // 半径マッチで誰に届くかが偶然で決まるため、そういう記録は通知しない。
   sectionName?: string;
   sourceKind?: string;
