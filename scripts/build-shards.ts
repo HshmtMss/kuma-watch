@@ -44,7 +44,7 @@ const blob = JSON.parse(readFileSync(inFile, "utf8")) as {
 const records = (blob.records ?? []).filter(
   // 個別に誤りと判明したレコード(news-suppression の id 指定)はシャードにも
   // 出さない。地図はこのシャードから直接読むため、ここを通すと削除したはずの
-  // ピンが地図にだけ残る(2026-09-24 大垣市の件)。
+  // ピンが地図にだけ残る(2026-09-24 の誤帰属の件)。
   (r) => !isNewsSuppressedId(typeof r.id === "string" ? r.id : undefined),
 );
 
