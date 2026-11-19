@@ -12,12 +12,12 @@ const CONTACT_MAILTO =
 export const metadata: Metadata = {
   title: "製品・サービスの掲載｜広告掲載のご案内",
   description:
-    "クマ対策の製品・サービスをくまウォッチに掲載できます。スプレー・電気柵・センサー機器・専門サービスなど、住民・自治体・登山者の安全を支える製品の紹介枠をご用意。",
+    "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載できます。スプレー・電気柵・センサー機器・アウトドア用品・専門サービスなど、住民・自治体・登山者の安全を支える製品の紹介枠をご用意。",
   alternates: { canonical: `${SITE_URL}/for-vendors` },
   openGraph: {
     title: "製品・サービスの掲載｜くまウォッチ",
     description:
-      "クマ対策の製品・サービスをくまウォッチに掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
+      "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
     url: `${SITE_URL}/for-vendors`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "製品・サービスの掲載｜くまウォッチ",
-    description: "クマ対策の製品・サービスをくまウォッチに掲載。詳細はお問い合わせください。",
+    description: "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載。詳細はお問い合わせください。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
@@ -92,13 +92,15 @@ const CATEGORIES = [
   "監視・検知システム",
   "捕獲・駆除",
   "情報・教育サービス",
+  "獣害対策（シカ・イノシシ・サルなど）",
+  "アウトドア用品",
 ];
 
 export default function ForVendorsPage() {
   return (
     <PageShell
       title="製品・サービスの掲載"
-      lead="クマ対策の製品・サービスをくまウォッチに掲載いただけます。"
+      lead="クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載いただけます。"
     >
       {/* Hero — 3 メッセージで即決 */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">
@@ -106,7 +108,7 @@ export default function ForVendorsPage() {
           製品・サービス掲載のご案内
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          クマ対策の製品・サービスを、必要としている読者に届けます。
+          クマ・獣害対策やアウトドアの製品・サービスを、必要としている読者に届けます。
         </h2>
         {/* 読者規模。抽象的な形容より、数字を4つ出すほうが検討が進む。 */}
         <div className="mb-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -141,7 +143,7 @@ export default function ForVendorsPage() {
 
       {/* 何が掲載できるか — カテゴリは chip 表示で 1 画面に収める */}
       <h2 id="categories">掲載できる製品・サービス</h2>
-      <p>クマ・野生動物対策に関わるものが対象です。以下のカテゴリ以外もご相談ください。</p>
+      <p>クマをはじめとする野生動物の対策や、山・野外での安全に関わるものが対象です。以下のカテゴリ以外もご相談ください。</p>
       <div className="not-prose my-4 flex flex-wrap gap-2">
         {CATEGORIES.map((c) => (
           <span
@@ -231,7 +233,7 @@ export default function ForVendorsPage() {
           どんな製品でも掲載できますか?
         </summary>
         <div className="border-t border-stone-200 px-4 py-3 text-sm leading-relaxed text-stone-700">
-          クマ・野生動物対策に関わり、安全に資すると判断したものが対象です。科学的根拠や安全性に懸念がある製品はお断りする場合があります。
+          クマ・シカ・イノシシ・サルなどの野生動物対策や、登山・キャンプ・農作業などアウトドアでの安全に関わり、安全に資すると判断したものが対象です。科学的根拠や安全性に懸念がある製品はお断りする場合があります。
         </div>
       </details>
       <details className="my-2 rounded-xl border border-stone-200 bg-white open:bg-stone-50">
