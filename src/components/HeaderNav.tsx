@@ -97,13 +97,13 @@ const LEARN_LINKS: NavLink[] = isLearnHubReleased()
 const BUSINESS_LINKS: NavLink[] = [
   {
     href: "/for-gov",
-    label: "法人・自治体の方",
-    desc: "クマ・野生動物対策のご相談",
+    label: "野生動物対策支援",
+    desc: "データ分析から対策の実行まで",
   },
   {
     href: "/for-vendors",
-    label: "製品掲載 (事業者の方)",
-    desc: "クマ対策製品の掲載・広告",
+    label: "製品掲載",
+    desc: "アウトドア・獣害対策製品の広告掲載",
   },
 ];
 
