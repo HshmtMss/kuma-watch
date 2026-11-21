@@ -76,7 +76,9 @@
 .fg .hero h1 { font-size: clamp(32px, 5vw, 50px); font-weight: 800; line-height: 1.34; margin-top: 14px; }
 .fg .hero h1 em { font-style: normal; color: var(--glow); }
 .fg .hero .lead { margin-top: 22px; color: #c9d1da; font-size: 17px; }
-.fg .hero .actions { margin-top: 34px; }
+.fg .hero .actions { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
+.fg .hero .animals { margin-top: 14px; font-size: 14px; font-weight: 700; color: var(--night-muted, #9aa6b4); letter-spacing: .04em; }
+.fg .hero .actions .dl { color: var(--night-ink, #eef1f4); font-size: 15px; text-underline-offset: 4px; }
 .fg .hero .map {
   position: absolute; z-index: 1; top: 0; bottom: 0;
   right: max(-40px, calc((100vw - var(--content)) / 2 - 60px));

@@ -18,7 +18,11 @@ const SITE_URL = "https://kuma-watch.jp";
 const LAB_URL = "https://www.research-coordinate.co.jp/labs/vet/";
 const COMPANY_URL = "https://www.research-coordinate.co.jp";
 const META_DESC =
-  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師中心のチームが、地域の出没傾向を分析し、具体的な対策を立て、実行まで伴走します。自治体・企業・団体の方へ。";
+  "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師と、データ分析・システム開発のチームが、出没傾向の分析から仕組みづくり、対策の実行まで伴走します。自治体・企業・団体の方へ。";
+
+// 展示会などで配るリーフレット (表: 野生動物対策支援 / 裏: 広告掲載)。
+// 文言・数字を変えたらページとリーフレットの両方を直す。
+const LEAFLET_PDF = "/for-gov/leaflet.pdf";
 
 export const metadata: Metadata = {
   title: "野生動物対策支援｜法人・自治体の方へ",
@@ -104,21 +108,20 @@ const TROUBLES: { icon: ReactNode; who: string; items: string[] }[] = [
 // optional の段 (専門家の紹介) は必須ではないので、枠を点線にして「必要に応じて」を添える。
 const STEPS: { title: string; body: string; optional?: boolean }[] = [
   {
-    title: "分析する",
-    body: "出没データを｜場所・季節・｜誘引物などで｜分析し、｜どこで・いつ・｜なぜ出るのかを｜明らかにします。",
+    title: "データを分析",
+    body: "出没データを｜場所・季節・｜誘引物などで｜分析し、｜出没傾向とリスクを｜見える化します。",
   },
   {
     title: "対策を立てる",
     body: "刈り払い、｜電気柵、｜誘引物の管理、｜出没直後の｜対応ルールまで、｜何を・どこに・｜いつ行うかを｜ご提案します。",
   },
   {
-    title: "専門家につなぐ",
-    body: "必要な場面では、｜獣医師・｜研究者・｜捕獲の担い手・｜対策機器の｜メーカーなどを｜ご紹介します。",
-    optional: true,
+    title: "仕組みをつくる",
+    body: "出没情報の地図・｜通知・｜定期レポートなど、｜対策を続けるための｜システムを｜つくります。",
   },
   {
-    title: "実行に伴走する",
-    body: "定期レポート、｜研修、｜住民説明会などで、｜対策が根づくまで｜ご一緒します。",
+    title: "実行に伴走",
+    body: "獣医師・研究者・｜捕獲の担い手などの｜専門家の紹介、｜研修や｜住民説明会まで、｜対策が根づくまで｜ご一緒します。",
   },
 ];
 
@@ -213,21 +216,23 @@ export default function ForGovPage() {
         <div className="map" aria-hidden />
         <div className="wrap">
           <div className="body">
-            <p className="who">自治体・企業・団体の方へ</p>
+            <p className="who">自治体・企業・団体の方へ　野生動物対策のご提案</p>
             <h1>
               クマ・野生動物の
               <wbr />
               <em>お困りごと</em>、<wbr />
-              まずは
-              <wbr />
               ご相談ください。
             </h1>
             <p className="lead">
-              <Wbr text="獣医師中心のチームが、｜地域の出没傾向を分析し、｜具体的な対策を立て、｜実行まで伴走します。" />
+              <Wbr text="獣医師と、｜データ分析・システム開発の｜チームが、｜分析から対策の実行まで｜伴走します。" />
             </p>
+            <p className="animals">クマ・シカ・イノシシ・サル など</p>
             <div className="actions">
               <a className="btn" href="#contact">
                 相談する →
+              </a>
+              <a className="dl" href={LEAFLET_PDF} download>
+                リーフレット（PDF）
               </a>
             </div>
           </div>
@@ -427,12 +432,20 @@ export default function ForGovPage() {
               <p>
                 <Wbr text="リサーチコーディネート株式会社の、｜獣医師中心のチームです。｜獣医師開発のクマ警戒レベルマップ｜「くまウォッチ」を｜開発・運営しています。" />
               </p>
+              <p className="addr">
+                〒160-0022 東京都新宿区新宿2-12-13-2F
+                <br />
+                contact@research-coordinate.co.jp
+              </p>
               <div className="links">
                 <a href={LAB_URL} target="_blank" rel="noopener noreferrer">
                   獣医工学ラボ ↗
                 </a>
                 <a href={COMPANY_URL} target="_blank" rel="noopener noreferrer">
                   リサーチコーディネート株式会社 ↗
+                </a>
+                <a href={LEAFLET_PDF} download>
+                  リーフレット（PDF）
                 </a>
                 <Link href="/">くまウォッチに戻る</Link>
               </div>

@@ -291,7 +291,7 @@ export default async function ProductsPage({
               href="/for-vendors"
               className="font-medium text-amber-700 hover:underline"
             >
-              製品・サービスの掲載
+              広告掲載のご案内
             </Link>
             ページもご参照ください。
           </li>

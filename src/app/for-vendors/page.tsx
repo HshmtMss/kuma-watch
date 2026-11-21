@@ -10,39 +10,37 @@ const CONTACT_MAILTO =
   "mailto:contact@research-coordinate.co.jp?subject=KumaWatch%20%E5%88%B6%E5%93%81%E3%83%BB%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E6%8E%B2%E8%BC%89%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87";
 
 export const metadata: Metadata = {
-  title: "製品・サービスの掲載｜広告掲載のご案内",
+  title: "アウトドア・レジャー製品／獣害対策製品の広告掲載",
   description:
-    "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載できます。スプレー・電気柵・センサー機器・アウトドア用品・専門サービスなど、住民・自治体・登山者の安全を支える製品の紹介枠をご用意。",
+    "アウトドア・レジャー製品、獣害対策製品をくまウォッチで紹介する広告掲載のご案内。サイトへのアクセス月10万件、LINE登録者約1万人。山や野外で過ごす人、獣害に悩む地域の人に製品情報を届けます。",
   alternates: { canonical: `${SITE_URL}/for-vendors` },
   openGraph: {
-    title: "製品・サービスの掲載｜くまウォッチ",
+    title: "広告掲載のご案内｜くまウォッチ",
     description:
-      "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載できます。対象カテゴリ・料金の考え方・お申し込みフォームをご案内。",
+      "アウトドア・レジャー製品、獣害対策製品をくまウォッチで紹介する広告掲載のご案内。対象カテゴリ・料金の考え方・お問い合わせフォーム。",
     url: `${SITE_URL}/for-vendors`,
     type: "website",
     images: [{ url: `${SITE_URL}/lp/og.jpg`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "製品・サービスの掲載｜くまウォッチ",
-    description: "クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載。詳細はお問い合わせください。",
+    title: "広告掲載のご案内｜くまウォッチ",
+    description: "アウトドア・レジャー製品、獣害対策製品の広告掲載。詳細はお問い合わせください。",
     images: [`${SITE_URL}/lp/og.jpg`],
   },
 };
 
 /**
- * 掲載検討時に事業者が最初に見る数字。出典が違うので更新時は必ずセットで見直す。
- *   検索: Search Console 直近28日 / 通知: LINE 公式アカウントのターゲットリーチ
- *   通知の届く範囲: 管理画面 /admin/push-stats の登録内訳
- * 数字は必ず「いつ時点か」と一緒に出す (古い数字を実績として出さない)。
+ * 掲載検討時に事業者が最初に見る数字。数字は必ず「いつ時点か」と一緒に出す。
+ * 展示会のリーフレット (public/for-gov/leaflet.pdf の裏面) と同じ数字・時点にそろえる。
+ * 変えるときはリーフレットも作り直す。
  */
-const AUDIENCE_AS_OF = "2026年8月";
+const AUDIENCE_AS_OF = "2026年11月";
 const AUDIENCE_STATS: { value: string; unit: string; label: string }[] = [
-  { value: "5.0", unit: "万クリック/月", label: "検索から訪れる回数" },
-  { value: "118", unit: "万回/月", label: "検索結果での表示回数" },
-  { value: "2,900", unit: "人", label: "クマ出没通知の登録者" },
-  { value: "419", unit: "自治体", label: "通知が登録された地域" },
+  { value: "10", unit: "万件/月", label: "サイトへのアクセス" },
+  { value: "約1", unit: "万人", label: "LINE 登録者" },
 ];
+const LEAFLET_PDF = "/for-gov/leaflet.pdf";
 
 /**
  * 掲載イメージ用のサンプル。実在製品を「掲載例」として出すと、その事業者が
@@ -85,6 +83,9 @@ const SAMPLE_FEATURED: Product = {
 
 // 対象カテゴリ。説明はチップ表示時に hover で出すかページ下部に短くまとめる程度。
 const CATEGORIES = [
+  "アウトドア用品",
+  "レジャー製品・サービス",
+  "獣害対策製品（クマ・シカ・イノシシ・サルなど）",
   "撃退・忌避",
   "防護柵・物理バリア",
   "住宅・誘引物管理",
@@ -92,32 +93,33 @@ const CATEGORIES = [
   "監視・検知システム",
   "捕獲・駆除",
   "情報・教育サービス",
-  "獣害対策（シカ・イノシシ・サルなど）",
-  "アウトドア用品",
 ];
 
 export default function ForVendorsPage() {
   return (
     <PageShell
-      title="製品・サービスの掲載"
-      lead="クマ対策・獣害対策・アウトドアの製品・サービスをくまウォッチに掲載いただけます。"
+      title="広告掲載のご案内"
+      lead="アウトドア・レジャー製品、獣害対策製品を、くまウォッチで紹介します。"
     >
       {/* Hero — 3 メッセージで即決 */}
       <section className="not-prose mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-stone-50 p-5 sm:p-6">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">
-          製品・サービス掲載のご案内
+          メーカー・販売店の方へ　製品の広告掲載のご提案
         </div>
         <h2 className="m-0 mb-3 text-xl font-bold leading-tight text-stone-900 sm:text-2xl">
-          クマ・獣害対策やアウトドアの製品・サービスを、必要としている読者に届けます。
+          アウトドア・レジャー製品、獣害対策製品の広告掲載
         </h2>
-        {/* 読者規模。抽象的な形容より、数字を4つ出すほうが検討が進む。 */}
-        <div className="mb-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <p className="m-0 mb-4 text-sm leading-relaxed text-stone-700">
+          くまウォッチは、獣医師が開発した、全国のクマ出没情報を地図で確認できる無料サイトです。登録した地域の出没を
+          LINE でお知らせします。山や野外で過ごす人、獣害に悩む地域の人に、貴社の製品情報を届けます。
+        </p>
+        <div className="mb-4 grid grid-cols-2 gap-2.5">
           {AUDIENCE_STATS.map((s) => (
             <div
               key={s.label}
               className="rounded-xl border border-emerald-100 bg-white px-3 py-2.5"
             >
-              <div className="text-lg font-black leading-none text-stone-900">
+              <div className="text-2xl font-black leading-none text-stone-900">
                 {s.value}
                 <span className="ml-1 text-[11px] font-semibold text-stone-500">
                   {s.unit}
@@ -130,7 +132,7 @@ export default function ForVendorsPage() {
           ))}
         </div>
         <p className="m-0 mb-5 text-xs text-stone-500">
-          {AUDIENCE_AS_OF}時点の実測値
+          {AUDIENCE_AS_OF}時点
         </p>
         <a
           href="#contact"
@@ -138,6 +140,13 @@ export default function ForVendorsPage() {
           style={{ color: "#fff", textDecoration: "none" }}
         >
           掲載について相談する →
+        </a>
+        <a
+          href={LEAFLET_PDF}
+          download
+          className="ml-4 text-sm font-semibold text-emerald-800 underline underline-offset-4"
+        >
+          リーフレット（PDF）
         </a>
       </section>
 
@@ -155,7 +164,7 @@ export default function ForVendorsPage() {
         ))}
       </div>
       {/* 掲載イメージ。言葉だけだと「どう見えるか」が伝わらないので実物を出す。 */}
-      <h2 id="example">掲載されるとこう見えます</h2>
+      <h2 id="example">掲載例</h2>
       <p>
         <strong>注目掲載</strong>は製品写真が入り、幅広のカードで一覧の先頭に
         固定されます。ボタンの文言も指定できます。通常掲載は文字のみ・カテゴリ内の通常順です。
