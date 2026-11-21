@@ -22,5 +22,5 @@ export function isLineSupportCtaEnabled(): boolean {
  */
 export function lineSupportCtaSuffix(base: string): string {
   if (!isLineSupportCtaEnabled()) return "";
-  return `\n\n▼ 法人・事業者の方へ（野生動物対策支援のご案内）\n${base}/for-gov?src=line`;
+  return `\n\n▼ 法人・事業者の方へ（野生動物対策）\n${base}/for-gov?src=line`;
 }
