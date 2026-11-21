@@ -1,0 +1,77 @@
+/* 広告掲載ページ専用。部品は法人ページ (for-gov.css の .fg) をそのまま使い、
+   色だけを展示会リーフレットの裏面 (深い緑 × オレンジ) に差し替える。
+   表 (野生動物対策支援) と裏 (広告掲載) で、紙とサイトの色をそろえるため。 */
+.fg.fv {
+  --paper: #f4f6f1;
+  --line: #d9e1db;
+  --ink: #17301f;
+  --muted: #4f6155;
+  --pine: #1d5a3a;
+  --pine-soft: #e2ede5;
+  --honey: #c2621c;
+  --night: #183a2b;
+  --night-line: #2b4d3d;
+  --night-ink: #f1f5f2;
+  --night-muted: #b5c7bb;
+  --glow: #f08a3c;
+}
+
+/* 最初の画面: 装備の写真を背景にうっすら敷く (リーフレット裏面と同じ) */
+.fv .hero .photo {
+  position: absolute; inset: 0; z-index: 0;
+  background: url("/articles/repellent-comparison.jpg") center / cover no-repeat;
+}
+.fv .hero .photo::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(24, 58, 43, 0.97) 0%, rgba(24, 58, 43, 0.88) 60%, rgba(24, 58, 43, 0.55) 100%);
+}
+.fv .hero .body { max-width: 44rem; }
+/* 見出しは <wbr> の位置でだけ折る (.fg の keep-all)。本文・カード・質問は
+   区切りを入れていないので、狭い画面で横にはみ出さないよう普通に折り返す。 */
+.fv .hero .lead, .fv .fields p, .fv .chips span, .fv .kw .txt > p, .fv .stats span,
+.fv .note, .fv .proof span, .fv .steps p, .fv .faq summary, .fv .faq details p,
+.fv .contact .dl, .fv .org p { word-break: normal; }
+.fv .hero h1 { font-size: clamp(30px, 4.6vw, 46px); }
+
+/* 掲載できるもの: 3 分野 */
+.fv .fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fv .fields .card { padding: 22px 24px; display: grid; gap: 10px; align-content: start; }
+.fv .fields .top { display: flex; align-items: center; gap: 12px; }
+.fv .fields b { font-family: var(--f-display); font-size: 19px; }
+.fv .fields p { font-size: 15px; color: var(--muted); line-height: 1.7; }
+.fv .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fv .chips span { font-size: 13px; font-weight: 700; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 2px 12px; }
+
+/* くまウォッチとは: 画面イメージ + 数字 */
+.fv .kw { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: 28px; align-items: center; padding: 24px; }
+.fv .kw img { width: 100%; height: auto; border-radius: 12px; display: block; }
+.fv .kw .txt { display: grid; gap: 16px; }
+.fv .kw .txt > p { font-size: 16px; color: var(--muted); }
+.fv .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fv .stats div { background: var(--paper); border-radius: 12px; padding: 12px 16px; display: grid; gap: 2px; }
+.fv .stats span { font-size: 13px; color: var(--muted); }
+.fv .stats b { justify-self: center; font-family: var(--f-num); font-size: 40px; line-height: 1.1; color: var(--ink); white-space: nowrap; }
+.fv .stats b small { font-family: var(--f-display); font-size: 16px; margin-left: 4px; }
+.fv .kw .txt > p.to { font-size: 17px; font-weight: 700; color: var(--honey); }
+.fv .kw .see { font-size: 14px; font-weight: 700; color: var(--pine); }
+
+/* 掲載例の下の実績 */
+.fv .proof { padding: 20px 24px; display: grid; gap: 12px; }
+.fv .proof .row { display: flex; flex-wrap: wrap; gap: 12px 40px; }
+.fv .proof b.v { font-family: var(--f-num); font-size: 30px; line-height: 1.1; }
+.fv .proof b.v small { font-family: var(--f-display); font-size: 14px; margin-left: 4px; }
+.fv .proof span { display: block; font-size: 14px; color: var(--muted); }
+
+/* 掲載までの流れは 3 段 */
+.fv .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 900px) {
+  .fv .fields { grid-template-columns: minmax(0, 1fr); }
+  .fv .kw { grid-template-columns: minmax(0, 1fr); }
+  .fv .steps { grid-template-columns: minmax(0, 1fr); }
+  .fv .steps li:nth-child(2)::after,
+  .fv .steps li:not(:last-child)::after { display: block; top: auto; bottom: -14px; right: auto; left: 34px; transform: rotate(135deg); }
+}
+
+/* 相談欄の下のメール導線 */
+.fv .contact .dl { justify-self: start; font-size: 14px; color: var(--night-ink); text-underline-offset: 4px; }
