@@ -40,12 +40,12 @@ const SCHEMA = {
   author: {
     "@type": "Organization",
     name: "獣医工学ラボ",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
   },
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
   },
   mainEntityOfPage: `${SITE_URL}/research/${SLUG}`,
 };

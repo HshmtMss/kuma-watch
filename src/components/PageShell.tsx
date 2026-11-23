@@ -33,7 +33,7 @@ export default function PageShell({ title, lead, children }: Props) {
             <span>
               運営:{" "}
               <a
-                href="https://www.research-coordinate.co.jp/labs/vet/"
+                href="https://restructure.rc-website.pages.dev/animal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block py-1 font-medium text-stone-900 hover:underline"

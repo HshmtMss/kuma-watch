@@ -88,7 +88,7 @@ const APP_SCHEMA = {
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
     parentOrganization: {
       "@type": "Organization",
       name: "リサーチコーディネート株式会社",
@@ -110,7 +110,7 @@ const APP_SCHEMA = {
     name: "獣医工学ラボ",
     description:
       "リサーチコーディネート株式会社が運営する、獣医師主体の獣医療・野生動物・公衆衛生領域の技術プロジェクト",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
   },
 };
 
@@ -397,7 +397,7 @@ export default function AboutPage() {
         <p className="m-0 text-center text-sm leading-relaxed text-stone-700 sm:border-l sm:border-stone-200 sm:pl-6 sm:text-left">
           開発・運営は、獣医師が中心のチーム{" "}
           <a
-            href="https://www.research-coordinate.co.jp/labs/vet/"
+            href="https://restructure.rc-website.pages.dev/animal"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-blue-700 underline"

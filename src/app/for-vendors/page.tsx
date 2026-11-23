@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 
 /**
  * 掲載検討時に事業者が最初に見る数字。数字は必ず「いつ時点か」と一緒に出す。
- * 展示会のリーフレット (public/for-gov/leaflet.pdf の裏面) と同じ数字・時点にそろえる。
+ * 展示会のリーフレットの裏面 (public/for-vendors/leaflet.pdf) と同じ数字・時点にそろえる。
  * 変えるときはリーフレットも作り直す。
  */
 const AUDIENCE_AS_OF = "2026年11月";
@@ -45,7 +45,7 @@ const AUDIENCE_STATS: { value: string; unit: string; label: string }[] = [
   { value: "10", unit: "万件/月", label: "サイトへのアクセス" },
   { value: "約1", unit: "万人", label: "LINE 登録者" },
 ];
-const LEAFLET_PDF = "/for-gov/leaflet.pdf";
+const LEAFLET_PDF = "/for-vendors/leaflet.pdf";
 
 /**
  * 掲載イメージ用のサンプル。実在製品を「掲載例」として出すと、その事業者が
@@ -86,7 +86,7 @@ const SAMPLE_FEATURED: Product = {
   ctaLabel: "公式サイトで詳しく見る",
 };
 
-const LAB_URL = "https://www.research-coordinate.co.jp/labs/vet/";
+const LAB_URL = "https://restructure.rc-website.pages.dev/animal";
 const COMPANY_URL = "https://www.research-coordinate.co.jp";
 
 // 掲載できる 3 分野 (リーフレット裏面と同じ)。

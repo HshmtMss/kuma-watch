@@ -15,13 +15,13 @@ import {
 import { jstToday } from "@/lib/jst-date";
 
 const SITE_URL = "https://kuma-watch.jp";
-const LAB_URL = "https://www.research-coordinate.co.jp/labs/vet/";
+const LAB_URL = "https://restructure.rc-website.pages.dev/animal";
 const COMPANY_URL = "https://www.research-coordinate.co.jp";
 const META_DESC =
   "クマ・野生動物のお困りごとを、まずはご相談ください。獣医師と、データ分析・システム開発のチームが、出没傾向の分析から仕組みづくり、対策の実行まで伴走します。自治体・企業・団体の方へ。";
 
-// 展示会などで配るリーフレット (表: 野生動物対策支援 / 裏: 広告掲載)。
-// 文言・数字を変えたらページとリーフレットの両方を直す。
+// 展示会などで配るリーフレットの表面 (野生動物対策支援)。裏面 (広告掲載) は
+// /for-vendors/leaflet.pdf。文言・数字を変えたらページとリーフレットの両方を直す。
 const LEAFLET_PDF = "/for-gov/leaflet.pdf";
 
 export const metadata: Metadata = {

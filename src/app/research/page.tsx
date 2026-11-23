@@ -170,7 +170,7 @@ export default async function ResearchIndexPage({
             「獣医工学ラボはリサーチコーディネート…」の重複説明文を削除している。 */}
         <div className="flex flex-col items-center gap-4 px-6 pb-5 pt-6 sm:flex-row sm:items-center sm:gap-7 sm:px-8 sm:py-7">
           <a
-            href="https://www.research-coordinate.co.jp/labs/vet/"
+            href="https://restructure.rc-website.pages.dev/animal"
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0"

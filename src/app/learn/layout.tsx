@@ -25,7 +25,7 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
             <span>
               運営:{" "}
               <a
-                href="https://www.research-coordinate.co.jp/labs/vet/"
+                href="https://restructure.rc-website.pages.dev/animal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block py-1 font-medium text-stone-900 hover:underline"

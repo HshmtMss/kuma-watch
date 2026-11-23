@@ -147,7 +147,7 @@ const webAppSchema = {
     "@type": "Organization",
     name: "獣医工学ラボ",
     alternateName: "Veterinary Engineering Lab",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
     parentOrganization: {
       "@type": "Organization",
       name: "リサーチコーディネート株式会社",
@@ -167,7 +167,7 @@ const webAppSchema = {
   publisher: {
     "@type": "Organization",
     name: "獣医工学ラボ",
-    url: "https://www.research-coordinate.co.jp/labs/vet/",
+    url: "https://restructure.rc-website.pages.dev/animal",
   },
   // 開発主体を明示。Google は creator / contributor を補助シグナルとして使う。
   creator: {
